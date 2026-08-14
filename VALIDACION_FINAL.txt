@@ -1,0 +1,18 @@
+SIDE — validación final del apartado Decisiones
+
+Base: SIDE_Boss_Bags_DECISIONES_GAME_FINAL.zip
+Fuente de iconos: SIDE_JUEGO_DECISIONES_ICONOS_FLEX_FINAL(1).zip
+Fuente de catálogo: DECISIONES SIDE (9).xlsx / Catalogo_Decisiones
+
+Validaciones realizadas:
+- 7 zonas jugables: Empresa, Infraestructura, Recursos Humanos, Canales y ventas, Insumos, Inversiones y Finanzas.
+- 26 menús de decisión.
+- 65 opciones del Excel integradas.
+- Segmento / línea incluido como decisión.
+- Campos no jugables indicados por el usuario eliminados del menú/código de decisiones.
+- Infraestructura: hasta 3 selecciones en menús de 3 alternativas.
+- Recursos Humanos: hasta 3 selecciones en menús de 3 alternativas.
+- Decisiones binarias/únicas conservadas como selección exclusiva.
+- Iconos SVG de categorías + back/play/check/lock integrados.
+- app.js y decision_catalog.js pasan validación de sintaxis con Node.
+- Todos los IDs DOM estáticos usados por app.js existen en index.html.

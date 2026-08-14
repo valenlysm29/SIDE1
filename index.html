@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#020817">
+  <title>SIDE — Simulador de Decisiones Financieras</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main id="app">
+  <section id="landing" class="screen landing-screen">
+    <img class="upch-corner" src="assets/upch_logo.png" alt="Universidad Peruana Cayetano Heredia">
+    <div class="landing-overlay"></div>
+    <div class="landing-content">
+      <img class="landing-side-logo" src="assets/side_logo.png" alt="SIDE">
+      <p class="landing-subtitle">SIMULADOR DE DECISIONES FINANCIERAS</p>
+      <div class="loading-wrap" aria-label="Carga inicial">
+        <div class="loading-track">
+          <div id="loadingBar" class="loading-bar"></div>
+          <span id="loadingPercent">0%</span>
+        </div>
+        <button id="startBtn" class="start-link" disabled>HAZ CLIC PARA EMPEZAR</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="profiles" class="screen profile-screen hidden" aria-label="Elegir perfil">
+    <div class="profile-bg"></div>
+    <img class="upch-corner" src="assets/upch_logo.png" alt="Universidad Peruana Cayetano Heredia">
+
+    <div class="profile-main">
+      <img class="profile-side-logo" src="assets/side_logo.png" alt="SIDE">
+      <p class="profile-subtitle">ELIGE TU PERFIL</p>
+
+      <button class="profile-card student-hero" data-profile="student" aria-label="Iniciar sesión como estudiante">
+        <img class="student-hero-img" src="assets/estudiante.png" alt="">
+        <span class="student-hero-copy">
+          <span class="hero-eyebrow">ESTUDIANTE</span>
+          <span class="hero-cta">INICIAR SESIÓN <i>&rarr;</i></span>
+        </span>
+      </button>
+    </div>
+
+    <button class="profile-card teacher-mini" data-profile="teacher" aria-label="Iniciar sesión como profesor">
+      <img class="teacher-mini-img" src="assets/profesor.png" alt="">
+      <span class="teacher-mini-copy">
+        <span class="mini-eyebrow">PROFESOR</span>
+        <span class="mini-cta">Iniciar sesión</span>
+      </span>
+    </button>
+  </section>
+
+  <div id="modalRoot" class="modal-root hidden">
+    <div class="modal-backdrop"></div>
+
+    <section id="teacherLoginModal" class="modal hidden" role="dialog" aria-modal="true">
+      <button class="close-btn" data-close aria-label="Cerrar">×</button>
+      <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
+      <h2>Acceso del profesor</h2>
+      <p class="modal-lead">Ingresa a tu cuenta para administrar una partida.</p>
+      <form id="loginForm">
+        <label for="loginEmail">Correo institucional</label>
+        <input id="loginEmail" type="email" placeholder="profesor@upch.pe" autocomplete="email" required>
+        <label for="loginPassword">Contraseña</label>
+        <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        <button class="primary-gold" type="submit">INICIAR SESIÓN</button>
+      </form>
+      <p class="switch-line">¿No tienes cuenta? <button type="button" data-switch="register">REGÍSTRATE AQUÍ</button></p>
+      <div id="loginMessage" class="form-message"></div>
+    </section>
+
+    <section id="teacherRegisterModal" class="modal hidden" role="dialog" aria-modal="true">
+      <button class="close-btn" data-close aria-label="Cerrar">×</button>
+      <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
+      <h2>Registro del profesor</h2>
+      <p class="modal-lead">Crea tu cuenta para administrar partidas de SIDE.</p>
+      <form id="registerForm">
+        <div class="two-cols">
+          <div><label for="registerName">Nombre</label><input id="registerName" placeholder="Ana" required></div>
+          <div><label for="registerLastName">Apellido</label><input id="registerLastName" placeholder="Ramírez" required></div>
+        </div>
+        <label for="registerCourse">Curso</label><input id="registerCourse" placeholder="Finanzas Corporativas" required>
+        <label for="registerEmail">Correo institucional</label><input id="registerEmail" type="email" placeholder="profesor@upch.pe" required>
+        <label for="registerPassword">Contraseña</label><input id="registerPassword" type="password" minlength="6" placeholder="••••••••" required>
+        <button class="primary-gold" type="submit">CREAR CUENTA</button>
+      </form>
+      <p class="switch-line">¿Ya tienes cuenta? <button type="button" data-switch="login">INICIA SESIÓN</button></p>
+      <div id="registerMessage" class="form-message"></div>
+    </section>
+
+    <section id="studentModal" class="modal hidden" role="dialog" aria-modal="true">
+      <button class="close-btn" data-close aria-label="Cerrar">×</button>
+      <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
+      <h2>Entrar a una partida</h2>
+      <p class="modal-lead">Introduce el código que te entregó tu profesor.</p>
+      <form id="studentForm">
+        <label for="gameCode">Código de partida</label><input id="gameCode" placeholder="Ej. SIDE-4821" maxlength="12" required>
+        <label for="studentName">Nombre del estudiante</label><input id="studentName" placeholder="Tu nombre" required>
+        <label for="companyName">Nombre de la empresa</label><input id="companyName" placeholder="Tu empresa" required>
+        <button class="primary-gold" type="submit">ENTRAR A LA PARTIDA</button>
+      </form>
+      <div id="studentMessage" class="form-message"></div>
+    </section>
+  </div>
+
+  <section id="studentLoading" class="screen game-loading-screen hidden">
+    <div class="game-loading-bg"></div>
+    <div class="game-loading-content">
+      <img src="assets/side_logo.png" class="game-loading-logo" alt="SIDE">
+      <div class="loading-orbit"><span></span><span></span><span></span></div>
+      <p class="eyebrow">CONECTANDO CON LA SIMULACIÓN</p>
+      <h1>PREPARANDO TU EMPRESA...</h1>
+      <div class="game-progress"><div id="joinProgress"></div></div>
+      <p id="joinLoadingText">Sincronizando partida</p>
+    </div>
+  </section>
+
+  <section id="tutorial" class="screen tutorial-screen hidden" aria-label="Tutorial de las zonas de decisión">
+    <div id="tutorialMount"></div>
+  </section>
+
+  <section id="studentLobby" class="screen dashboard-screen hidden">
+    <div class="dashboard-bg"></div>
+    <div class="dashboard-inner lobby">
+      <img src="assets/side_logo.png" class="dash-logo" alt="SIDE">
+      <div class="lobby-card"><p class="eyebrow">PARTIDA</p><h1 id="lobbyCode">SIDE-0000</h1><h2 id="lobbyGameName">Esperando...</h2><p id="lobbyStudent">Estudiante</p><span id="lobbySegment">SEGMENTO DEFINIDO POR EL PROFESOR: ESTÁNDAR</span><div class="pulse-dot"></div><p>Te has unido correctamente. Tu empresa está lista para comenzar.</p><button id="enterDecisionsBtn" class="primary-gold lobby-start">ENTRAR AL MENÚ DE DECISIONES</button><button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button><button id="backToProfiles" class="ghost-btn">VOLVER</button></div>
+    </div>
+  </section>
+
+  <section id="decisionMenu" class="screen decision-screen hidden" aria-label="Decisiones del juego">
+    <div class="decision-bg"></div>
+    <div class="game-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+    <header class="decision-topbar">
+      <button id="exitDecisions" class="game-back-btn" aria-label="Volver a la sala"><img src="assets/icons/ui/back.svg" alt=""></button>
+      <div class="game-title-mark">
+        <span class="mark-dot"></span>
+        <div><strong>DECISIONES</strong><small>ELIGE TU PRÓXIMA JUGADA</small></div>
+      </div>
+      <div class="mission-meter" aria-label="Progreso de decisiones">
+        <div class="mission-label"><span>MISIÓN</span><strong id="decisionProgressText">0%</strong></div>
+        <div class="mission-track"><div id="decisionProgressBar"></div></div>
+      </div>
+    </header>
+
+    <main class="decision-game-stage">
+      <div id="decisionHome" class="decision-home">
+        <div class="decision-intro">
+          <div>
+            <span class="intro-kicker">RONDA DE ESTRATEGIA</span>
+            <h1>¿CUÁL SERÁ TU<br><em>PRÓXIMA JUGADA?</em></h1>
+            <p>Explora una zona, toma una decisión y construye tu estrategia paso a paso.</p>
+          </div>
+          <div class="controller-hint"><span>⌁</span><small>SELECCIONA<br>UNA ZONA</small></div>
+        </div>
+        <div id="categoryCards" class="category-game-grid"></div>
+      </div>
+
+      <div id="decisionDetail" class="decision-detail hidden">
+        <div class="decision-detail-head">
+          <button id="backToDecisionHome" class="game-back-inline"><img src="assets/icons/ui/back.svg" alt=""> VOLVER</button>
+          <div class="detail-heading">
+            <img id="detailCategoryIcon" src="assets/icons/categories/infraestructura.svg" alt="">
+            <div><span id="categoryEyebrow">ZONA DE DECISIÓN</span><h1 id="categoryTitle">Infraestructura</h1><p id="categoryDescription">Selecciona una decisión.</p></div>
+          </div>
+          <div class="detail-count"><strong id="categoryCount">0</strong><span>JUGADAS</span></div>
+        </div>
+        <div id="decisionCards" class="decision-cards"></div>
+      </div>
+    </main>
+
+    <div id="decisionConfirm" class="decision-confirm hidden">
+      <div class="confirm-glow"></div>
+      <div><small>JUGADA SELECCIONADA</small><strong id="selectedDecisionName">—</strong><span id="selectedDecisionOption">—</span></div>
+      <button id="confirmDecision" class="game-confirm-btn">JUGAR ESTA OPCIÓN</button>
+    </div>
+
+    <div id="decisionSummary" class="decision-summary hidden">
+      <div class="summary-icon">★</div>
+      <div><span class="intro-kicker">RONDA COMPLETADA</span><h2>¡BUENA JUGADA!</h2><p>Has completado todas las decisiones disponibles.</p></div>
+      <div id="summaryStats" class="summary-stats"></div>
+      <button id="restartDecisionMenu" class="game-back-inline">REVISAR JUGADAS</button>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="decision_catalog.js"></script>
+<script src="tutorial.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
