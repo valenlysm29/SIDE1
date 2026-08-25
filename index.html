@@ -99,8 +99,9 @@
       <p class="modal-lead">Introduce el código que te entregó tu profesor.</p>
       <form id="studentForm">
         <label for="gameCode">Código de partida</label><input id="gameCode" placeholder="Ej. SIDE-4821" maxlength="12" required>
-        <label for="studentName">Nombre del estudiante</label><input id="studentName" placeholder="Tu nombre" required>
-        <label for="companyName">Nombre de la empresa</label><input id="companyName" placeholder="Tu empresa" required>
+        <label for="companyLegalName">Nombre de tu empresa</label><input id="companyLegalName" placeholder="Ej. Textiles Andinos S.A.C." maxlength="60" required>
+        <label for="companyBrandName">Nombre comercial</label><input id="companyBrandName" placeholder="Ej. BOSS BAGS" maxlength="40" required>
+        <small class="field-hint">Estos nombres identificarán a tu empresa durante toda la partida y no podrás cambiarlos después.</small>
         <button class="primary-gold" type="submit">ENTRAR A LA PARTIDA</button>
       </form>
       <div id="studentMessage" class="form-message"></div>
@@ -127,7 +128,7 @@
     <div class="dashboard-bg"></div>
     <div class="dashboard-inner lobby">
       <img src="assets/side_logo.png" class="dash-logo" alt="SIDE">
-      <div class="lobby-card"><p class="eyebrow">PARTIDA</p><h1 id="lobbyCode">SIDE-0000</h1><h2 id="lobbyGameName">Esperando...</h2><p id="lobbyStudent">Estudiante</p><span id="lobbySegment">SEGMENTO DEFINIDO POR EL PROFESOR: ESTÁNDAR</span><div class="pulse-dot"></div><p>Te has unido correctamente. Tu empresa está lista para comenzar.</p><button id="enterDecisionsBtn" class="primary-gold lobby-start">ENTRAR AL MENÚ DE DECISIONES</button><button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button><button id="backToProfiles" class="ghost-btn">VOLVER</button></div>
+      <div class="lobby-card"><p class="eyebrow">PARTIDA</p><h1 id="lobbyCode">SIDE-0000</h1><h2 id="lobbyGameName">Esperando...</h2><p id="lobbyStudent">BOSS BAGS</p><span id="lobbySegment">SEGMENTO DEFINIDO POR EL PROFESOR: ESTÁNDAR</span><div class="pulse-dot"></div><p>Te has unido correctamente. Tu empresa está lista para comenzar.</p><button id="enterDecisionsBtn" class="primary-gold lobby-start">ENTRAR AL MENÚ DE DECISIONES</button><button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button><button id="backToProfiles" class="ghost-btn">VOLVER</button></div>
     </div>
   </section>
 
@@ -135,61 +136,56 @@
     <div class="decision-bg"></div>
     <div class="game-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-    <header class="decision-topbar">
+    <header id="decisionTopbar" class="decision-topbar">
       <button id="exitDecisions" class="game-back-btn" aria-label="Volver a la sala"><img src="assets/icons/ui/back.svg" alt=""></button>
       <div class="game-title-mark">
         <span class="mark-dot"></span>
-        <div><strong>DECISIONES</strong><small>ELIGE TU PRÓXIMA JUGADA</small></div>
+        <div><strong>DECISIONES</strong><small id="roundLabel">CICLO 1 · BOSS BAGS</small></div>
+      </div>
+      <div class="cash-hud" aria-label="Caja disponible">
+        <span>CAJA / EFECTIVO</span>
+        <strong id="cashBalance">S/ 100,000</strong>
+        <small id="cashMovement">Disponible para decidir</small>
       </div>
       <div class="mission-meter" aria-label="Progreso de decisiones">
-        <div class="mission-label"><span>MISIÓN</span><strong id="decisionProgressText">0%</strong></div>
+        <div class="mission-label"><span>PROGRESO</span><strong id="decisionProgressText">0%</strong></div>
         <div class="mission-track"><div id="decisionProgressBar"></div></div>
       </div>
     </header>
 
-    <main class="decision-game-stage">
-      <div id="decisionHome" class="decision-home">
-        <div class="decision-intro">
-          <div>
-            <span class="intro-kicker">RONDA DE ESTRATEGIA</span>
-            <h1>¿CUÁL SERÁ TU<br><em>PRÓXIMA JUGADA?</em></h1>
-            <p>Explora una zona, toma una decisión y construye tu estrategia paso a paso.</p>
+    <main class="decision-game-stage tabbed-stage">
+      <section class="decision-window" aria-label="Ventana de decisiones">
+        <nav id="decisionTabs" class="decision-tabs" aria-label="Secciones de decisión"></nav>
+        <div id="decisionDetail" class="decision-detail">
+          <div id="decisionStickyHead" class="decision-detail-head sticky-section-head">
+            <div class="detail-heading">
+              <img id="detailCategoryIcon" src="assets/icons/categories/infraestructura.svg" alt="">
+              <div><span id="categoryEyebrow">SECCIÓN DE DECISIÓN</span><h1 id="categoryTitle">Infraestructura</h1><p id="categoryDescription">Selecciona tus decisiones.</p></div>
+            </div>
+            <div class="section-balance"><span>SALDO TRAS GUARDAR</span><strong id="projectedCash">S/ 100,000</strong></div>
           </div>
-          <div class="controller-hint"><span>⌁</span><small>SELECCIONA<br>UNA ZONA</small></div>
-        </div>
-        <div id="categoryCards" class="category-game-grid"></div>
-      </div>
-
-      <div id="decisionDetail" class="decision-detail hidden">
-        <div class="decision-detail-head">
-          <button id="backToDecisionHome" class="game-back-inline"><img src="assets/icons/ui/back.svg" alt=""> VOLVER</button>
-          <div class="detail-heading">
-            <img id="detailCategoryIcon" src="assets/icons/categories/infraestructura.svg" alt="">
-            <div><span id="categoryEyebrow">ZONA DE DECISIÓN</span><h1 id="categoryTitle">Infraestructura</h1><p id="categoryDescription">Selecciona una decisión.</p></div>
+          <div id="decisionCards" class="decision-cards decision-list"></div>
+          <div class="section-save-bar">
+            <div><span>CAMBIOS DE ESTA SECCIÓN</span><strong id="sectionDraftCost">S/ 0</strong><small id="sectionSaveHint">Selecciona tus jugadas y guarda la sección.</small></div>
+            <button id="saveDecisionSection" class="game-confirm-btn save-section-btn"><span class="save-disc">●</span> GUARDAR DECISIONES</button>
           </div>
-          <div class="detail-count"><strong id="categoryCount">0</strong><span>JUGADAS</span></div>
         </div>
-        <div id="decisionCards" class="decision-cards"></div>
-      </div>
+      </section>
     </main>
 
-    <div id="decisionConfirm" class="decision-confirm hidden">
-      <div class="confirm-glow"></div>
-      <div><small>JUGADA SELECCIONADA</small><strong id="selectedDecisionName">—</strong><span id="selectedDecisionOption">—</span></div>
-      <button id="confirmDecision" class="game-confirm-btn">JUGAR ESTA OPCIÓN</button>
-    </div>
-
+    <div id="cashFx" class="cash-fx" aria-hidden="true"><span>− S/ 0</span></div>
     <div id="decisionSummary" class="decision-summary hidden">
       <div class="summary-icon">★</div>
-      <div><span class="intro-kicker">RONDA COMPLETADA</span><h2>¡BUENA JUGADA!</h2><p>Has completado todas las decisiones disponibles.</p></div>
+      <div><span class="intro-kicker">CICLO GUARDADO</span><h2>¡DECISIONES REGISTRADAS!</h2><p>Puedes seguir revisando tus pestañas mientras el ciclo permanezca abierto.</p></div>
       <div id="summaryStats" class="summary-stats"></div>
-      <button id="restartDecisionMenu" class="game-back-inline">REVISAR JUGADAS</button>
+      <button id="restartDecisionMenu" class="game-back-inline">VOLVER A DECISIONES</button>
     </div>
   </section>
 </main>
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+<script src="icon_bank.js"></script>
 <script src="decision_catalog.js"></script>
 <script src="tutorial.js"></script>
 <script src="app.js"></script>

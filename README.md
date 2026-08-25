@@ -1,57 +1,58 @@
-# SIDE — Boss Bags | Menú de decisiones tipo juego
+# SIDE — Boss Bags · versión corregida después de reunión
 
-Esta versión usa como base el proyecto **SIDE_Boss_Bags_DECISIONES_GAME_FINAL** y reconstruye el apartado de decisiones desde la hoja `Catalogo_Decisiones` del Excel entregado.
+Esta versión transforma el módulo de decisiones en una experiencia tipo juego con navegación por pestañas y caja visible.
 
-## Decisiones jugables
-- Empresa: Segmento / línea.
-- Infraestructura.
-- Recursos Humanos.
-- Canales y ventas.
-- Insumos.
-- Inversiones.
-- Finanzas.
-
-Los campos de identidad de empresa que no corresponden a una jugada no forman parte del menú.
-
-## Selección múltiple
-En Infraestructura y Recursos Humanos, los menús con tres alternativas permiten combinar hasta **3 opciones**. Las decisiones binarias o de opción única se mantienen como selección exclusiva para evitar elecciones contradictorias.
-
-## Interfaz
-- Iconos de categorías y controles tomados del paquete de iconos entregado.
-- Tarjetas de jugada ordenadas por categoría.
-- Indicador 1/3, 2/3 o 3/3 en decisiones múltiples.
-- Costo, permanencia, código e impactos de cada alternativa.
-- Estados visuales pendiente, por guardar y guardada.
-- Confirmación por cada jugada y progreso global de la ronda.
-
-## Demo
+## Acceso demo
 - Profesor: `profesor@upch.pe`
 - Contraseña: `Heredia`
-- Partida: `SIDE-000`
+- Código estudiante: `SIDE-000`
+- Empresa del juego: `BOSS BAGS` (fija)
 
-## Archivos principales
-- `decision_catalog.js`: catálogo generado desde el Excel.
-- `app.js`: lógica de selección, guardado y progreso.
-- `styles.css`: interfaz de decisiones estilo videojuego.
-- `assets/icons/`: iconos SVG usados en el menú y botones.
+## Pestañas del jugador
+1. Empresa
+2. Infraestructura
+3. Producción (RR. HH. + insumos)
+4. Canales y ventas
+5. Inversiones y finanzas
 
+## Cambios principales
+- Login del estudiante únicamente con código.
+- Tutorial obligatorio; se eliminó “Saltar tutorial”.
+- Flechas del tutorial más gruesas.
+- Caja/efectivo visible; capital inicial por defecto S/ 100,000.
+- El saldo se proyecta y se actualiza al guardar cada pestaña.
+- Efecto visual al descontar o aumentar caja.
+- Sin códigos internos ni indicadores visibles de eficiencia/calidad/reputación.
+- Títulos y pestañas anclados mientras se hace scroll.
+- Cantidades para mesas, maquinaria, personal e insumos.
+- Maquinaria adquirida marcada como “Ya tienes”.
+- Moldes no se deprecian y quedan bloqueados desde el ciclo siguiente a su compra.
+- Mantenimiento correctivo: S/ 200.
+- Local de producción movido a Infraestructura.
+- Producción reúne personal, compras, materiales y volumen objetivo.
+- Analista de compras: S/ 5,000 por ciclo; negocia descuentos decrecientes por ciclo.
+- Eliminadas las decisiones de número de proveedores, lead time, política de pago e inventario.
+- Canales: web, Los Olivos, Miraflores y San Juan de Lurigancho.
+- Personal de ventas se activa solo al elegir tienda física; S/ 1,300 por persona/ciclo.
+- % de ventas a crédito se muestra como dato automático, no como decisión.
+- Garantía de proveedor en 0%, 80% o 100%, sin afectar caja al elegirla.
+- Inversiones y Finanzas combinadas.
+- Préstamo bancario muestra TEA y monto máximo definidos por el docente.
+- Eliminada la decisión de depreciación.
+- Banco central de rutas de iconos en `icon_bank.js`.
 
 ## Panel docente
-El panel del profesor fue separado completamente en:
-- `docente.html`: estructura del panel.
-- `docente.css`: estilos exclusivos del panel docente.
-- `docente.js`: configuración, aleatoriedad, rondas, eventos, seguimiento, eliminación, podio y PDF.
+- Caja inicial por empresa.
+- Demanda configurable por distrito.
+- TEA inicial por defecto 20% y límite de préstamo.
+- % inicial de ventas a crédito.
+- Tiempo por ciclo en horas y minutos.
+- Cierre manual o automático.
+- Botón para cortar el ciclo cuando el cierre es manual.
+- Eventos no elegibles: solo banco de posibles eventos y ocurrencia aleatoria.
+- Estado de empresa: activo/tomando decisiones o sin actividad reciente.
+- Botón “Guardar e iniciar partida”.
+- La TEA baja 1 punto porcentual al avanzar cada ciclo, y el docente puede modificarla.
 
-### Configuración manual / aleatoria
-Los parámetros económicos y de eventos incluyen modo **Manual** o **Aleatorio**. Los valores aleatorios se generan dentro del rango indicado y quedan guardados en la configuración local.
-
-### Reportes de estudiantes
-Mientras los módulos no estén conectados, `docente.js` utiliza `SIDE_STUDENT_REPORTS` en `localStorage` y muestra datos demo. La función `loadReports()` contiene un bloque `TODO CONEXIÓN ESTUDIANTE → DOCENTE` indicando dónde sustituirlo por Supabase/API.
-
-Además, `app.js` contiene `syncStudentReportPreview()`, que simula el envío de un reporte desde el módulo estudiante al panel docente. Ese bloque también está marcado con `TODO BACKEND CONNECTION`.
-
-### PDF
-El botón **Ver PDF** abre una vista previa y **Descargar PDF** genera el reporte mediante jsPDF. El PDF incluye configuración, resultados, decisiones recibidas y, si existe, el podio publicado.
-
-### Ganador y eliminación
-El docente puede eliminar/reactivar empresas durante la simulación, seleccionar manualmente al ganador, escribir una justificación y publicar el podio. La publicación queda simulada en `SIDE_PUBLISHED_PODIUM` hasta conectar el backend.
+## Nota técnica
+El proyecto mantiene el modo local con `localStorage` y conserva los puntos de integración con Supabase. Las reglas que dependen de un motor contable completo de ventas/devoluciones se presentan como reglas del juego, mientras que caja, compras, cantidades, préstamo y costos sí se calculan en esta versión.

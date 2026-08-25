@@ -1,300 +1,244 @@
 const cfg = window.SIDE_CONFIG || {};
-const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes("TU-PROYECTO") && cfg.SUPABASE_PUBLISHABLE_KEY && !cfg.SUPABASE_PUBLISHABLE_KEY.includes("TU-PUBLISHABLE");
-const supabaseClient = hasConfig ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY) : null;
+const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') && cfg.SUPABASE_PUBLISHABLE_KEY && !cfg.SUPABASE_PUBLISHABLE_KEY.includes('TU-PUBLISHABLE');
+const supabaseClient = hasConfig && window.supabase ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY) : null;
 const $ = id => document.getElementById(id);
-const screens = ["landing","profiles","studentLoading","tutorial","studentLobby","decisionMenu"];
-const modals = ["teacherLoginModal","teacherRegisterModal","studentModal"];
-const DEMO_TEACHER = { email: "profesor@upch.pe", password: "Heredia" };
-const DEMO_GAME = { id: "demo-side-000", codigo: "SIDE-000", nombre: "SIDE — Simulación Principal", curso: "Finanzas Corporativas", estado: "esperando", segmento: "Estandar" };
-const DECISION_CATEGORY_ICONS = {
-  A:"assets/side_logo.png",
-  B:"assets/icons/categories/infraestructura.svg",
-  C:"assets/icons/categories/recursos_humanos.svg",
-  D:"assets/icons/categories/canales_ventas.svg",
-  E:"assets/icons/categories/insumos.svg",
-  F:"assets/icons/categories/inversiones.svg",
-  G:"assets/icons/categories/finanzas.svg"
-};
-const UI_ICONS = {
-  play:"assets/icons/ui/play.svg",
-  check:"assets/icons/ui/check.svg",
-  back:"assets/icons/ui/back.svg",
-  lock:"assets/icons/ui/lock.svg"
-};
-const decisionIcon = cat => DECISION_CATEGORY_ICONS[cat] || "assets/side_logo.png";
-let currentStudent = { name:"", company:"", participantId:null, game:DEMO_GAME };
+const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','decisionMenu'];
+const modals = ['teacherLoginModal','teacherRegisterModal','studentModal'];
+const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
+const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando',segmento:'Estandar'};
+const COMPANY_NAME = 'BOSS BAGS'; // valor por defecto antes de que el estudiante ingrese los nombres de su empresa
+const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
+const UI_ICONS = {check:'assets/icons/ui/check.svg',play:'assets/icons/ui/play.svg',lock:'assets/icons/ui/lock.svg'};
+let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,game:DEMO_GAME};
 let decisionState = {};
 let decisionDrafts = {};
-let currentCategory = null;
-const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
+let cashLedger = {};
+let currentCategory = DECISION_CATALOG[0]?.cat || 'A';
+let playerIsDeciding = false;
 
-function showScreen(id){screens.forEach(s=>$(s)?.classList.toggle("hidden",s!==id));window.scrollTo(0,0)}
-function showModal(id){$("modalRoot").classList.remove("hidden");modals.forEach(m=>$(m)?.classList.toggle("hidden",m!==id));setTimeout(()=>$(id)?.querySelector("input")?.focus(),80)}
-function closeModal(){$("modalRoot").classList.add("hidden");modals.forEach(m=>$(m)?.classList.add("hidden"))}
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500)}
-function message(id,msg,error=false){$(id).textContent=msg;$(id).style.color=error?"#ff9d9d":"#ffe06a"}
-function requireSupabase(){if(!supabaseClient){toast("Modo local activo: configura Supabase para sincronización.");return false}return true}
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function showScreen(id){screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0)}
+function showModal(id){$('modalRoot').classList.remove('hidden');modals.forEach(m=>$(m)?.classList.toggle('hidden',m!==id));setTimeout(()=>$(id)?.querySelector('input')?.focus(),80)}
+function closeModal(){$('modalRoot').classList.add('hidden');modals.forEach(m=>$(m)?.classList.add('hidden'))}
+function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__sideToast);window.__sideToast=setTimeout(()=>t.classList.remove('show'),2600)}
+function message(id,msg,error=false){const el=$(id);if(!el)return;el.textContent=msg;el.style.color=error?'#ff9d9d':'#ffe06a'}
+function requireSupabase(){if(!supabaseClient){toast('Modo local activo: configura Supabase para sincronización.');return false}return true}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
+function deepClone(v){return JSON.parse(JSON.stringify(v??{}))}
 
-document.querySelector(".modal-backdrop")?.addEventListener("click",closeModal);
-document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",closeModal));
-document.querySelectorAll("[data-switch]").forEach(b=>b.addEventListener("click",()=>showModal(b.dataset.switch==="register"?"teacherRegisterModal":"teacherLoginModal")));
-document.querySelectorAll(".profile-card").forEach(card=>card.addEventListener("click",()=>showModal(card.dataset.profile==="teacher"?"teacherLoginModal":"studentModal")));
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
-
-let progress=0;
-const timer=setInterval(()=>{progress=Math.min(100,progress+1);$("loadingBar").style.width=progress+"%";$("loadingPercent").textContent=progress+"%";if(progress>=100){clearInterval(timer);$("startBtn").disabled=false}},28);
-$("startBtn").addEventListener("click",()=>showScreen("profiles"));
-
-function openTeacherPanel(){
-  closeModal();
-  window.location.href="docente.html";
+function teacherConfig(){
+  const defaults={capital:100000,interest:20,loanMax:50000,creditPercentStart:20,round:1,cycles:6,demandLosOlivos:1000,demandMiraflores:1250,demandSJL:1100,cycleCloseMode:'manual'};
+  try{return {...defaults,...JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')||'{}')}}catch{return defaults}
 }
-$("loginForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const email=$("loginEmail").value.trim().toLowerCase(),password=$("loginPassword").value;
-  if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}
-  if(!requireSupabase())return;
-  message("loginMessage","Ingresando...");
-  const{error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){message("loginMessage",error.message,true);return}
-  openTeacherPanel();
-});
-$("registerForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  if(!requireSupabase())return;
-  message("registerMessage","Creando cuenta...");
-  const email=$("registerEmail").value.trim(),password=$("registerPassword").value;
-  const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$("registerName").value.trim(),apellido:$("registerLastName").value.trim(),curso:$("registerCourse").value.trim()}}});
-  if(error){message("registerMessage",error.message,true);return}
-  if(data.session){openTeacherPanel()}else message("registerMessage","Cuenta creada. Revisa tu correo si la confirmación está activada.");
-});
+function currentRound(){return Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||teacherConfig().round||1))}
+function storageKey(){return `${currentStudent.game?.codigo||'SIDE-000'}_${currentStudent.company}`}
+function decisionKey(){return 'SIDE_DECISIONS_'+storageKey()}
+function ledgerKey(){return 'SIDE_CASH_LEDGER_'+storageKey()}
+function loadDecisionState(){
+  try{decisionState=JSON.parse(localStorage.getItem(decisionKey())||'{}')||{}}catch{decisionState={}}
+  try{cashLedger=JSON.parse(localStorage.getItem(ledgerKey())||'{}')||{}}catch{cashLedger={}}
+  decisionDrafts={};
+}
+function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
+function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)}
+function cashBalance(){return Number(teacherConfig().capital||100000)+ledgerTotal()}
+function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 
-$("studentForm").addEventListener("submit",async e=>{e.preventDefault();const code=$("gameCode").value.trim().toUpperCase(),name=$("studentName").value.trim(),company=$("companyName").value.trim();if(code!=="SIDE-000"){if(!requireSupabase())return;message("studentMessage","Buscando partida...");const{data:game,error}=await supabaseClient.rpc("buscar_partida_por_codigo",{p_codigo:code});if(error){message("studentMessage",error.message,true);return}const found=Array.isArray(game)?game[0]:game;if(!found){message("studentMessage","No encontramos una partida con ese código.",true);return}const{data:participant,error:joinError}=await supabaseClient.from("participantes").insert({partida_id:found.id,nombre:name,empresa:company}).select("id").single();if(joinError){message("studentMessage",joinError.message,true);return}currentStudent={name,company,participantId:participant?.id||null,game:found};}else currentStudent={name,company,participantId:null,game:DEMO_GAME};closeModal();startJoinLoading()});
-function startJoinLoading(){showScreen("studentLoading");let p=0;const texts=["Sincronizando partida","Cargando escenario empresarial","Preparando decisiones","¡Todo listo!"];let step=0;$("joinProgress").style.width="0%";const i=setInterval(()=>{p+=4;$("joinProgress").style.width=p+"%";if(p%25===0&&step<3)$("joinLoadingText").textContent=texts[++step];if(p>=100){clearInterval(i);prepareLobby()}},55)}
+// Landing / acceso
+const loadingTimer=setInterval(()=>{const bar=$('loadingBar');if(!bar){clearInterval(loadingTimer);return}const p=Math.min(100,(Number(bar.dataset.p)||0)+1);bar.dataset.p=p;bar.style.width=p+'%';$('loadingPercent').textContent=p+'%';if(p>=100){clearInterval(loadingTimer);$('startBtn').disabled=false}},28);
+$('startBtn')?.addEventListener('click',()=>showScreen('profiles'));
+document.querySelector('.modal-backdrop')?.addEventListener('click',closeModal);
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));
+document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
+document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
+function openTeacherPanel(){closeModal();window.location.href='docente.html'}
+$('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
+$('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
+$('studentForm')?.addEventListener('submit',async e=>{
+  e.preventDefault(); const code=$('gameCode').value.trim().toUpperCase();
+  const legalName=$('companyLegalName').value.trim();
+  const brandName=$('companyBrandName').value.trim()||legalName||COMPANY_NAME;
+  if(!legalName||!brandName){message('studentMessage','Ingresa el nombre y el nombre comercial de tu empresa.',true);return}
+  if(code!=='SIDE-000'){
+    if(!requireSupabase())return; message('studentMessage','Buscando partida...');
+    const{data:game,error}=await supabaseClient.rpc('buscar_partida_por_codigo',{p_codigo:code});if(error){message('studentMessage',error.message,true);return}
+    const found=Array.isArray(game)?game[0]:game;if(!found){message('studentMessage','No encontramos una partida con ese código.',true);return}
+    const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
+    if(joinError){message('studentMessage',joinError.message,true);return} currentStudent={name:'Jugador',company:brandName,legalName,participantId:participant?.id||null,game:found};
+  }else currentStudent={name:'Jugador',company:brandName,legalName,participantId:null,game:DEMO_GAME};
+  closeModal();startJoinLoading();
+});
+function startJoinLoading(){showScreen('studentLoading');let p=0,step=0;const texts=['Sincronizando partida','Cargando escenario empresarial','Preparando decisiones','¡Todo listo!'];$('joinProgress').style.width='0%';const i=setInterval(()=>{p+=4;$('joinProgress').style.width=p+'%';if(p%25===0&&step<3)$('joinLoadingText').textContent=texts[++step];if(p>=100){clearInterval(i);prepareLobby()}},55)}
 async function prepareLobby(){
-  $("lobbyCode").textContent=currentStudent.game.codigo;
-  $("lobbyGameName").textContent=currentStudent.game.nombre;
-  $("lobbyStudent").textContent=currentStudent.name+" · "+currentStudent.company;
-  $("lobbySegment").textContent="SEGMENTO INICIAL DE REFERENCIA: "+(currentStudent.game.segmento||"ESTÁNDAR").toUpperCase()+" · PODRÁS DEFINIRLO EN DECISIONES";
+  $('lobbyCode').textContent=currentStudent.game.codigo;$('lobbyGameName').textContent=currentStudent.game.nombre;
+  $('lobbyStudent').textContent=currentStudent.legalName&&currentStudent.legalName!==currentStudent.company?`${currentStudent.company} · ${currentStudent.legalName}`:currentStudent.company;
+  $('lobbySegment').textContent='EMPRESA FIJA: '+currentStudent.company+' · DEFINE TU SEGMENTO EN DECISIONES';
   await openStudentTutorial();
 }
-async function openStudentTutorial(isReplay=false){
-  showScreen("tutorial");
-  const mount=$("tutorialMount");
-  if(!mount.dataset.loaded){
-    try{
-      const response=await fetch("tutorial.html");
-      if(!response.ok) throw new Error("No se pudo cargar tutorial.html");
-      mount.innerHTML=await response.text();
-      mount.dataset.loaded="1";
-    }catch(error){
-      console.error(error);
-      showScreen("studentLobby");
-      return;
-    }
-  }
-  if(typeof window.initSIDETutorial==="function"){
-    window.initSIDETutorial(()=>showScreen("studentLobby"));
-  }
+async function openStudentTutorial(){
+  showScreen('tutorial'); const mount=$('tutorialMount');
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
-$("enterDecisionsBtn").addEventListener("click",()=>openDecisionMenu());
-$("reopenTutorialBtn").addEventListener("click",()=>openStudentTutorial(true));
-$("backToProfiles").addEventListener("click",()=>showScreen("profiles"));
+$('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
+$('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
+$('backToProfiles')?.addEventListener('click',()=>showScreen('profiles'));
+$('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStudentReportPreview();showScreen('studentLobby')});
+$('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 
-function loadDecisionState(){
-  try{decisionState=JSON.parse(localStorage.getItem("SIDE_DECISIONS_"+currentStudent.company)||"{}")||{}}
-  catch{decisionState={}}
-  decisionDrafts={};
-}
-function saveDecisionState(){localStorage.setItem("SIDE_DECISIONS_"+currentStudent.company,JSON.stringify(decisionState))}
-function syncStudentReportPreview(){
-  /*
-   * TODO BACKEND CONNECTION:
-   * Reemplazar este bloque por INSERT/UPSERT a la tabla/API de reportes
-   * cuando el módulo Estudiante y el Panel Docente estén conectados.
-   */
-  const entries=allDecisionItems().map(item=>decisionState[item.id]).filter(Boolean);
-  const totalCosts=entries.reduce((sum,e)=>sum+(Number(e.cost)||0),0);
-  const seed=Array.from(currentStudent.company||"SIDE").reduce((n,c)=>n+c.charCodeAt(0),0);
-  const base=30000;
-  const ingresos=Math.max(0,Math.round(base*0.18 + entries.length*1250 + (seed%900)));
-  const costos=Math.round(totalCosts + base*0.05);
-  const report={
-    id:currentStudent.participantId||("local-"+currentStudent.company),
-    nombre:currentStudent.name||"Estudiante demo",
-    empresa:currentStudent.company||"Empresa demo",
-    partida:currentStudent.game?.codigo||"SIDE-000",
-    ronda:1,
-    capital:base,
-    ingresos,costos,utilidad:ingresos-costos,
-    rondasActivas:1,
-    actividad:entries.length,
-    decisiones:entries.map(e=>e.label),
-    score:Math.max(0,Math.round((ingresos-costos)/100 + entries.length*5)),
-    estado:"activa",
-    updatedAt:new Date().toISOString()
-  };
-  const reports=JSON.parse(localStorage.getItem("SIDE_STUDENT_REPORTS")||"[]");
-  const idx=reports.findIndex(r=>r.empresa===report.empresa&&r.partida===report.partida);
-  if(idx>=0) reports[idx]=report; else reports.push(report);
-  localStorage.setItem("SIDE_STUDENT_REPORTS",JSON.stringify(reports));
-}
 function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
+function categoryByCat(cat){return DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
-function normalizeIds(entry,item){
-  const raw=Array.isArray(entry?.optionIds)?entry.optionIds:(entry?.optionId?[entry.optionId]:[]);
-  const valid=new Set(item.options.map(o=>o.id));
-  return [...new Set(raw.filter(id=>valid.has(id)))];
+function savedEntry(item){return decisionState[item.id]||null}
+function isLocked(item){const e=savedEntry(item);return !!(item.lockAfterPurchase&&e&&Number(e.round)<currentRound())}
+function itemComplete(item){
+  if(item.type==='info')return true;
+  const e=savedEntry(item); if(!e)return false;
+  if(item.asset&&e.purchases)return Object.values(e.purchases).some(r=>Object.values(r||{}).some(q=>Number(q)>0));
+  if(item.type==='number')return Number(e.value)>=0;
+  if(item.type==='loan')return e.amount!==undefined;
+  if(item.type==='sales-staff')return true;
+  return (e.optionIds||[]).length>0 || Object.values(e.quantities||{}).some(q=>Number(q)>0);
 }
-function savedIds(item){return normalizeIds(decisionState[item.id],item)}
-function pickedIds(item){return Object.prototype.hasOwnProperty.call(decisionDrafts,item.id)?decisionDrafts[item.id]:savedIds(item)}
-function isDecisionDone(item){return savedIds(item).length>0}
-function arraysEqual(a,b){return a.length===b.length&&a.every((v,i)=>v===b[i])}
-function formatCost(cost){const n=Number(cost)||0;return n>0?"S/ "+n.toLocaleString("es-PE"):"Sin costo"}
-function impactChip(label,value){
-  const n=Number(value)||0;
-  if(!n)return "";
-  const sign=n>0?"+":"";
-  const cls=n>0?"positive":"negative";
-  return `<span class="impact-chip ${cls}">${escapeHtml(label)} ${sign}${n}</span>`;
+function getOwned(item,optId){
+  const e=savedEntry(item);if(!e?.purchases)return 0;
+  return Object.values(e.purchases).reduce((s,row)=>s+(Number(row?.[optId])||0),0);
 }
-function openDecisionMenu(){loadDecisionState();currentCategory=null;renderDecisionHome();showScreen("decisionMenu")}
-function renderDecisionHome(){
-  currentCategory=null;
-  decisionDrafts={};
-  $("decisionHome").classList.remove("hidden");
-  $("decisionDetail").classList.add("hidden");
-  $("decisionConfirm")?.classList.add("hidden");
-  const grid=$("categoryCards");
-  grid.innerHTML=DECISION_CATALOG.map(c=>{
-    const done=c.items.filter(isDecisionDone).length;
-    const pct=c.items.length?Math.round(done/c.items.length*100):0;
-    return `<button class="category-game-card cat-${c.cat}" data-cat="${c.cat}" aria-label="Abrir ${escapeHtml(c.title)}">
-      <div class="cat-art"><img class="category-svg" src="${escapeHtml(c.icon||decisionIcon(c.cat))}" alt=""><span class="cat-glow"></span></div>
-      <div class="cat-copy"><span class="cat-kicker">ZONA DE DECISIÓN</span><h3>${escapeHtml(c.title)}</h3><p>${escapeHtml(c.desc)}</p><div class="cat-progress"><span style="width:${pct}%"></span></div><small>${done}/${c.items.length} jugadas completadas</small></div>
-      <span class="play-arrow"><img src="${UI_ICONS.play}" alt=""></span>
-    </button>`;
-  }).join("");
-  grid.querySelectorAll(".category-game-card").forEach(b=>b.addEventListener("click",()=>openDecisionCategory(b.dataset.cat)));
-  updateOverallProgress();
+function currentPurchase(item,optId){return Number(savedEntry(item)?.purchases?.[currentRound()]?.[optId]||0)}
+function initDraft(item){
+  if(decisionDrafts[item.id])return decisionDrafts[item.id]; const e=savedEntry(item);
+  if(item.asset){const quantities={};item.options.forEach(o=>quantities[o.id]=currentPurchase(item,o.id));return decisionDrafts[item.id]={quantities}}
+  if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities}}
+  if(item.type==='number')return decisionDrafts[item.id]={value:Number(e?.round===currentRound()?e.value:0)};
+  if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(e?.round===currentRound()?e.amount:0)};
+  if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(e?.round===currentRound()?e.staff:{})};
+  const ids=(e?.optionIds||[]).slice();return decisionDrafts[item.id]={optionIds:ids};
 }
-function openDecisionCategory(cat){
-  currentCategory=cat;
-  decisionDrafts={};
-  renderDecisionCategory();
-  $("decisionHome").classList.add("hidden");
-  $("decisionDetail").classList.remove("hidden");
-  window.scrollTo(0,0);
-}
-function renderDecisionCategory(){
-  const cat=DECISION_CATALOG.find(c=>c.cat===currentCategory);
-  if(!cat){renderDecisionHome();return}
-  $("categoryEyebrow").textContent="ZONA DE DECISIÓN";
-  $("categoryTitle").textContent=cat.title;
-  $("categoryDescription").textContent=cat.desc;
-  $("categoryCount").textContent=cat.items.length;
-  $("detailCategoryIcon").src=cat.icon||decisionIcon(cat.cat);
-  const cards=$("decisionCards");
-  cards.innerHTML=cat.items.map(item=>renderDecisionCard(item,cat)).join("");
-  cards.querySelectorAll(".option-card").forEach(b=>b.addEventListener("click",()=>toggleDecisionOption(b.dataset.decision,b.dataset.option)));
-  cards.querySelectorAll(".confirm-card").forEach(b=>b.addEventListener("click",()=>confirmDecisionSelection(b.dataset.decision)));
-  updateOverallProgress();
-}
-function renderDecisionCard(item,cat){
-  const saved=savedIds(item);
-  const picked=pickedIds(item);
-  const changed=!arraysEqual(saved,picked);
-  const complete=saved.length>0;
-  const multi=item.multi===true&&Number(item.max)>1;
-  const max=multi?Math.min(Number(item.max)||3,item.options.length):1;
-  const slots=Array.from({length:max},(_,i)=>`<i class="pick-slot ${i<picked.length?"on":""}"></i>`).join("");
-  const instruction=multi?`Combina hasta ${max} alternativas en esta jugada.`:(item.options.length===1?"Decisión obligatoria: confírmala para continuar.":"Elige una alternativa y confirma la jugada.");
-  const status=changed?(picked.length?"POR GUARDAR":"PENDIENTE"):(complete?"✓ GUARDADA":"PENDIENTE");
-  const statusClass=changed?"draft":(complete?"saved":"");
-  const options=item.options.map(opt=>{
-    const selected=picked.includes(opt.id);
-    const impacts=[impactChip("Cal.",opt.quality),impactChip("Efi.",opt.efficiency),impactChip("Rep.",opt.reputation),impactChip("Fin.",opt.finance)].filter(Boolean).join("");
-    const choiceIcon=selected?UI_ICONS.check:(item.options.length===1?UI_ICONS.lock:UI_ICONS.play);
-    return `<button class="option-card ${selected?"selected":""}" data-decision="${item.id}" data-option="${opt.id}" aria-pressed="${selected}">
-      <span class="option-option-icon"><img src="${choiceIcon}" alt=""></span>
-      <span class="option-top"><strong>${escapeHtml(opt.label)}</strong><i>${formatCost(opt.cost)}</i></span>
-      <span class="option-desc">${escapeHtml(opt.desc)}</span>
-      <span class="option-meta"><small>${escapeHtml(opt.period)}</small><b>${escapeHtml(opt.id)}</b></span>
-      ${impacts?`<span class="impact-row">${impacts}</span>`:""}
-      ${opt.notes?`<span class="option-note">${escapeHtml(opt.notes)}</span>`:""}
-      <span class="option-play">${selected?"SELECCIONADA":"ELEGIR"} <img src="${selected?UI_ICONS.check:UI_ICONS.play}" alt=""></span>
-    </button>`;
-  }).join("");
-  const selectionText=multi?`${picked.length}/${max} seleccionadas`:(picked.length?"1/1 seleccionada":"0/1 seleccionada");
-  return `<article class="decision-card ${complete?"completed":""} ${changed?"has-draft":""}">
-    <div class="decision-card-art">
-      <img src="${escapeHtml(cat.icon||decisionIcon(cat.cat))}" alt="">
-      <div><span class="decision-kicker">DECISIÓN ${escapeHtml(cat.cat)} · ${escapeHtml(item.id)}</span><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(instruction)}</p></div>
-      <span class="decision-status ${statusClass}">${status}</span>
-    </div>
-    <div class="selection-guide"><div class="pick-slots">${slots}</div><strong>${selectionText}</strong>${multi?"<small>PUEDES ELEGIR 1, 2 O 3</small>":"<small>SELECCIÓN ÚNICA</small>"}</div>
-    <div class="options-grid">${options}</div>
-    <div class="decision-card-foot">
-      <span>${picked.length?`Costo de la jugada: <strong>${formatCost(item.options.filter(o=>picked.includes(o.id)).reduce((n,o)=>n+(Number(o.cost)||0),0))}</strong>`:"Selecciona una opción para habilitar el botón."}</span>
-      <button class="confirm-card" data-decision="${item.id}" ${picked.length?"":"disabled"}><img src="${UI_ICONS.check}" alt="">${complete?"ACTUALIZAR JUGADA":"CONFIRMAR JUGADA"}</button>
-    </div>
-  </article>`;
-}
-function toggleDecisionOption(decisionId,optionId){
-  const item=findDecisionItem(decisionId); if(!item)return;
-  let ids=[...pickedIds(item)];
-  const pos=ids.indexOf(optionId);
-  if(item.multi===true&&Number(item.max)>1){
-    if(pos>=0) ids.splice(pos,1);
-    else{
-      const max=Math.min(Number(item.max)||3,item.options.length);
-      if(ids.length>=max){toast(`Puedes seleccionar como máximo ${max} opciones en ${item.name}.`);return}
-      ids.push(optionId);
-    }
-  }else ids=pos>=0?[]:[optionId];
-  decisionDrafts[item.id]=ids;
-  renderDecisionCategory();
-}
-function confirmDecisionSelection(decisionId){
-  const item=findDecisionItem(decisionId); if(!item)return;
-  const ids=pickedIds(item); if(!ids.length){toast("Selecciona al menos una opción.");return}
-  const opts=item.options.filter(o=>ids.includes(o.id));
-  const cost=opts.reduce((n,o)=>n+(Number(o.cost)||0),0);
-  decisionState[item.id]={optionIds:ids,optionId:ids[0],label:opts.map(o=>o.label).join(" + "),cost,options:opts.map(o=>({id:o.id,label:o.label,cost:o.cost}))};
-  delete decisionDrafts[item.id];
-  saveDecisionState();
-  syncStudentReportPreview();
-  saveDecisionToSupabase({item,opts,cost});
-  toast(opts.length>1?`${opts.length} opciones confirmadas en ${item.name}.`:`Jugada confirmada: ${opts[0].label}`);
-  renderDecisionCategory();
-  checkAllDecisions();
-}
-async function saveDecisionToSupabase(selection){
-  if(!supabaseClient || !currentStudent.participantId) return;
-  try{
-    const impacts=selection.opts.reduce((a,o)=>({quality:a.quality+(Number(o.quality)||0),efficiency:a.efficiency+(Number(o.efficiency)||0),reputation:a.reputation+(Number(o.reputation)||0),finance:a.finance+(Number(o.finance)||0)}),{quality:0,efficiency:0,reputation:0,finance:0});
-    await supabaseClient.from("decisiones").insert({participante_id:currentStudent.participantId,ronda:1,categoria:selection.item.name,decision:{id:selection.item.id,option_ids:selection.opts.map(o=>o.id),options:selection.opts.map(o=>o.label)},resultado:{costo_referencial:selection.cost,impactos:impacts}});
-  }catch(err){console.warn("No se pudo sincronizar la decisión:",err.message)}
-}
-function updateOverallProgress(){
-  const items=allDecisionItems();
-  const done=items.filter(isDecisionDone).length;
-  const pct=items.length?Math.round(done/items.length*100):0;
-  $("decisionProgressText").textContent=pct+"%";
-  $("decisionProgressBar").style.width=pct+"%";
-}
-function checkAllDecisions(){
-  const items=allDecisionItems();
-  const done=items.filter(isDecisionDone).length;
-  if(done>=items.length&&items.length){
-    $("decisionSummary").classList.remove("hidden");
-    const cost=items.reduce((n,item)=>n+(Number(decisionState[item.id]?.cost)||0),0);
-    $("summaryStats").innerHTML=`<div><strong>${items.length}</strong><span>DECISIONES</span></div><div><strong>S/ ${cost.toLocaleString("es-PE")}</strong><span>COSTO REFERENCIAL</span></div>`;
-  }
-}
-$("restartDecisionMenu").addEventListener("click",()=>{$("decisionSummary").classList.add("hidden");renderDecisionHome()});
-$("backToDecisionHome").addEventListener("click",()=>renderDecisionHome());
-$("exitDecisions").addEventListener("click",()=>showScreen("studentLobby"));
+function selectedOptionIds(item){return initDraft(item).optionIds||[]}
+function analystSelected(){const item=findDecisionItem('ANALISTA_COMPRAS');return selectedOptionIds(item).includes('si_analista')}
+function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound()-1)*2):0}
+function optionUnitCost(item,opt){const base=Number(opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
+function currentProductionTarget(){return Number(initDraft(findDecisionItem('PRODUCCION_META')).value||0)}
+function materialNeed(){return currentProductionTarget()}
+function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos||1000):id==='miraflores'?Number(c.demandMiraflores||1250):id==='sjl'?Number(c.demandSJL||1100):0}
+function chosenStores(){const item=findDecisionItem('CANALES');return selectedOptionIds(item).map(id=>item.options.find(o=>o.id===id)).filter(o=>o?.channel==='store')}
+function creditPercent(){const base=Number(teacherConfig().creditPercentStart||20);return Math.min(70,base+(currentRound()-1)*5+(analystSelected()?5:0))}
+function recurringAlreadyPrevious(item){const e=savedEntry(item);return e&&Number(e.round)<currentRound()}
 
-if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==="SIGNED_OUT")showScreen("profiles")});
+function computeItemCost(item){
+  if(item.noCashEffect||item.type==='info'||item.type==='number'||item.type==='loan')return 0;
+  if(item.lockAfterPurchase&&isLocked(item))return 0;
+  const d=initDraft(item);
+  if(item.asset){return item.options.reduce((sum,o)=>sum+(Number(d.quantities?.[o.id])||0)*optionUnitCost(item,o),0)}
+  if(item.type==='quantity'||item.type==='quantity-choice')return item.options.reduce((sum,o)=>sum+(Number(d.quantities?.[o.id])||0)*optionUnitCost(item,o),0);
+  if(item.type==='sales-staff')return Object.values(d.staff||{}).reduce((s,q)=>s+(Number(q)||0)*Number(item.costPerPerson||0),0);
+  return item.options?.filter(o=>(d.optionIds||[]).includes(o.id)).reduce((s,o)=>s+optionUnitCost(item,o),0)||0;
+}
+function categoryDraftNet(cat){
+  const category=categoryByCat(cat);if(!category)return 0;
+  let cost=0,loan=0;
+  category.items.forEach(item=>{if(item.type==='loan')loan+=Number(initDraft(item).amount||0);else cost+=computeItemCost(item)});
+  return loan-cost;
+}
+function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0);return Number(teacherConfig().capital||100000)+ledgerTotal()-old+categoryDraftNet(currentCategory)}
+
+function openDecisionMenu(){
+  loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||DECISION_CATALOG[0]?.cat; showScreen('decisionMenu');
+  renderTabs(); renderDecisionCategory(); updateHud(); syncStudentReportPreview();
+  const stage=$('decisionMenu'); stage.onscroll=()=>{$('decisionTopbar')?.classList.toggle('compact',stage.scrollTop>70);$('decisionStickyHead')?.classList.toggle('compact',stage.scrollTop>135)};
+}
+function renderTabs(){
+  const nav=$('decisionTabs');
+  nav.innerHTML=DECISION_CATALOG.map(c=>`<button class="decision-tab ${c.cat===currentCategory?'active':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span>${escapeHtml(c.short||c.title)}</span>${categoryHasSaved(c.cat)?'<b>✓</b>':''}</button>`).join('');
+  nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;decisionDrafts={};renderTabs();renderDecisionCategory()}));
+}
+function categoryHasSaved(cat){const c=categoryByCat(cat);return c.items.filter(i=>i.type!=='info').some(itemComplete)}
+function eventHint(){const hints=['La demanda del mercado podría variar en este ciclo.','El costo de algún insumo podría cambiar.','Podría presentarse una condición regulatoria inesperada.','El abastecimiento puede verse afectado por eventos del mercado.'];return hints[(currentRound()-1)%hints.length]}
+function renderDecisionCategory(){
+  const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
+  $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
+  const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
+  $('decisionCards').innerHTML=`<div class="event-clue"><span>PISTA DE EVENTO</span><strong>${escapeHtml(eventHint())}</strong><small>Es una posibilidad, no una confirmación.</small></div>`+items.map(renderDecisionRow).join('');
+  bindDecisionControls(); updateHud(); updateSectionCost();
+}
+function renderDecisionRow(item){
+  const locked=isLocked(item),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item);
+  let body='';
+  if(item.type==='choice'||item.type==='multi-choice'){
+    const multi=item.type==='multi-choice';body=`<div class="choice-strip">${item.options.map(o=>{
+      const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';
+      return `<button class="choice-pill ${selected?'selected':''}" data-choice="${item.id}" data-option="${o.id}" ${locked?'disabled':''}><span class="choice-check">${selected?'✓':'+'}</span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${extra}</button>`}).join('')}</div>${multi?'<div class="micro-caption">Puedes activar más de un canal.</div>':''}`;
+  } else if(item.type==='quantity'||item.type==='quantity-choice'){
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="0" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>`;
+  } else if(item.type==='number'){
+    body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima mínima estimada</span><b>Cuero: ${materialNeed()}</b><b>Accesorios: ${materialNeed()}</b><b>Hilo: ${materialNeed()}</b><small>Puedes comprar una cantidad mayor si deseas mantener un excedente.</small></div>`;
+  } else if(item.type==='sales-staff'){
+    const stores=chosenStores();body=stores.length?`<div class="quantity-grid">${stores.map(store=>{const q=Number(d.staff?.[store.id]||0);return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(store.district)}</strong><p>Personal de venta por recibo por honorarios.</p><small>${money(item.costPerPerson)} por persona / ciclo</small></div><div class="stepper"><button data-staff-step="${item.id}" data-store="${store.id}" data-delta="-1">−</button><input data-staff="${item.id}" data-store="${store.id}" type="number" min="0" value="${q}"><button data-staff-step="${item.id}" data-store="${store.id}" data-delta="1">+</button></div></div>`}).join('')}</div>`:`<div class="disabled-decision">Activa una tienda física en <strong>Canales de venta</strong> para habilitar personal de ventas.</div>`;
+  } else if(item.type==='loan'){
+    const conf=teacherConfig(),max=Number(conf.loanMax||50000),rate=Number(conf.interest||20),amount=Math.min(max,Number(d.amount||0));body=`<div class="loan-box"><div><span>TEA DEFINIDA POR EL DOCENTE</span><strong>${rate.toFixed(1)}%</strong></div><div><span>MONTO MÁXIMO DISPONIBLE</span><strong>${money(max)}</strong></div></div><div class="loan-control"><input data-loan="${item.id}" type="range" min="0" max="${max}" step="500" value="${amount}"><input data-loan-number="${item.id}" type="number" min="0" max="${max}" step="500" value="${amount}"><b>${money(amount)}</b></div>`;
+  } else if(item.type==='info'){
+    const dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
+  }
+  const costLabel=item.type==='loan'?'Aumenta caja':item.noCashEffect?'No afecta caja':cost>0?`Costo actual: ${money(cost)}`:'Sin salida de caja';
+  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':'POR DEFINIR'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
+}
+function bindDecisionControls(){
+  document.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>{const item=findDecisionItem(b.dataset.choice);const d=initDraft(item);const id=b.dataset.option;if(item.type==='multi-choice'){const set=new Set(d.optionIds||[]);set.has(id)?set.delete(id):set.add(id);d.optionIds=[...set]}else d.optionIds=[id];if(item.id==='CANALES'){const staff=initDraft(findDecisionItem('PERSONAL_VENTAS'));const valid=new Set(chosenStores().map(s=>s.id));Object.keys(staff.staff||{}).forEach(k=>{if(!valid.has(k))delete staff.staff[k]})}renderDecisionCategory()}));
+  document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta))));
+  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{const d=initDraft(findDecisionItem(i.dataset.qty));d.quantities[i.dataset.option]=Math.max(0,Number(i.value)||0);updateSectionCost();updateRowCost(i.dataset.qty)}));
+  document.querySelectorAll('[data-number-step]').forEach(b=>b.addEventListener('click',()=>{const item=findDecisionItem(b.dataset.numberStep),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(d.value||0)+Number(b.dataset.delta));renderDecisionCategory()}));
+  document.querySelectorAll('[data-number]').forEach(i=>i.addEventListener('input',()=>{const item=findDecisionItem(i.dataset.number),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(i.value)||0);renderDecisionCategory()}));
+  document.querySelectorAll('[data-staff-step]').forEach(b=>b.addEventListener('click',()=>changeStaff(b.dataset.staffStep,b.dataset.store,Number(b.dataset.delta))));
+  document.querySelectorAll('[data-staff]').forEach(i=>i.addEventListener('input',()=>{const d=initDraft(findDecisionItem(i.dataset.staff));d.staff[i.dataset.store]=Math.max(0,Number(i.value)||0);updateSectionCost();updateRowCost(i.dataset.staff)}));
+  document.querySelectorAll('[data-loan]').forEach(i=>i.addEventListener('input',()=>setLoan(i.dataset.loan,Number(i.value),true)));
+  document.querySelectorAll('[data-loan-number]').forEach(i=>i.addEventListener('input',()=>setLoan(i.dataset.loan,Number(i.value),true)));
+}
+function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.quantities[optId]=Math.max(0,(Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
+function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.staff[store]=Math.max(0,(Number(d.staff[store])||0)+delta);renderDecisionCategory()}
+function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=Number(teacherConfig().loanMax||50000),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
+function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(row)row.textContent=computeItemCost(item)>0?'Costo actual: '+money(computeItemCost(item)):'Sin salida de caja'}
+function updateSectionCost(){
+  const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old;
+  $('sectionDraftCost').textContent=delta<0?money(Math.abs(delta))+' de salida':delta>0?'+'+money(delta)+' a caja':'Sin cambio de caja';
+  $('projectedCash').textContent=money(projectedCash());$('projectedCash').classList.toggle('danger',projectedCash()<0);
+  $('sectionSaveHint').textContent=projectedCash()<0?'No hay caja suficiente para guardar estas decisiones.':'El saldo se actualiza al guardar esta pestaña.';
+  $('saveDecisionSection').disabled=projectedCash()<0;
+}
+function validateProductionMaterials(){
+  if(currentCategory!=='C')return true; const need=materialNeed();if(!need)return true;
+  for(const id of ['CUERO','ACCESORIOS','HILO']){const item=findDecisionItem(id),d=initDraft(item),total=Object.values(d.quantities||{}).reduce((s,q)=>s+(Number(q)||0),0);if(total<need){toast(`Para producir ${need} unidades necesitas al menos ${need} unidades en ${item.name.toLowerCase()}.`);return false}}
+  return true;
+}
+function saveCurrentSection(){
+  const cat=categoryByCat(currentCategory);if(!cat)return;if(projectedCash()<0){toast('No tienes caja suficiente para guardar esta sección.');return}if(!validateProductionMaterials())return;
+  const round=currentRound();
+  cat.items.forEach(item=>{
+    if(item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))return;const d=initDraft(item);
+    if(item.asset){const prev=decisionState[item.id]||{purchases:{}};prev.purchases=prev.purchases||{};prev.purchases[round]=deepClone(d.quantities||{});prev.round=round;prev.label=item.name;decisionState[item.id]=prev;return}
+    if(item.type==='quantity'||item.type==='quantity-choice'){decisionState[item.id]={quantities:deepClone(d.quantities||{}),round,label:item.name,cost:computeItemCost(item)};return}
+    if(item.type==='number'){decisionState[item.id]={value:Number(d.value||0),round,label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`,cost:0};return}
+    if(item.type==='sales-staff'){decisionState[item.id]={staff:deepClone(d.staff||{}),round,label:item.name,cost:computeItemCost(item)};return}
+    if(item.type==='loan'){decisionState[item.id]={amount:Number(d.amount||0),round,label:`Préstamo: ${money(d.amount||0)}`,cost:0};return}
+    decisionState[item.id]={optionIds:(d.optionIds||[]).slice(),round,label:(item.options||[]).filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.label).join(' + '),cost:computeItemCost(item)};
+  });
+  const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0),next=categoryDraftNet(currentCategory);cashLedger[key]=next;persistGameState();syncStudentReportPreview();syncSectionToSupabase(cat);
+  const movement=next-old;animateCash(movement);decisionDrafts={};renderTabs();renderDecisionCategory();updateHud();toast('Decisiones guardadas. La caja fue actualizada.');
+}
+$('saveDecisionSection')?.addEventListener('click',saveCurrentSection);
+function animateCash(netMovement){
+  const fx=$('cashFx');if(!fx||!netMovement)return;fx.querySelector('span').textContent=(netMovement>0?'+ ':'− ')+money(Math.abs(netMovement));fx.classList.remove('gain','spend','play');fx.classList.add(netMovement>0?'gain':'spend');void fx.offsetWidth;fx.classList.add('play');setTimeout(()=>fx.classList.remove('play'),1150);
+  const cash=$('cashBalance');cash.classList.remove('cash-pulse');void cash.offsetWidth;cash.classList.add('cash-pulse');
+}
+function updateHud(){
+  const cash=cashBalance();$('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Capital inicial: ${money(teacherConfig().capital||100000)}`;
+  const actionable=allDecisionItems().filter(i=>i.type!=='info'),done=actionable.filter(itemComplete).length,pct=actionable.length?Math.round(done/actionable.length*100):0;$('decisionProgressText').textContent=pct+'%';$('decisionProgressBar').style.width=pct+'%';
+}
+function currentDecisionLabels(){return allDecisionItems().map(i=>savedEntry(i)?.label).filter(Boolean)}
+function syncStudentReportPreview(){
+  const config=teacherConfig(),entries=allDecisionItems().filter(i=>savedEntry(i));const costs=Object.values(cashLedger).reduce((s,n)=>s+Math.max(0,-Number(n||0)),0),loans=Object.values(cashLedger).reduce((s,n)=>s+Math.max(0,Number(n||0)),0);const target=Number(savedEntry(findDecisionItem('PRODUCCION_META'))?.value||0);const ingresos=Math.round(target*75);const report={id:currentStudent.participantId||('local-'+storageKey()),nombre:'Jugador',empresa:currentStudent.company,partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:Number(config.capital||100000)+loans,ingresos,costos:Math.round(costs),utilidad:ingresos-Math.round(costs),rondasActivas:currentRound(),actividad:entries.length,decisiones:currentDecisionLabels(),score:Math.max(0,Math.round((ingresos-costs)/100+entries.length*4)),estado:'activa',tomandoDecisiones:playerIsDeciding,caja:cashBalance(),updatedAt:new Date().toISOString()};
+  let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}const idx=reports.findIndex(r=>r.id===report.id);if(idx>=0)reports[idx]=report;else reports.push(report);localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));
+}
+async function syncSectionToSupabase(cat){if(!supabaseClient||!currentStudent.participantId)return;try{await supabaseClient.from('decisiones').insert({participante_id:currentStudent.participantId,ronda:currentRound(),categoria:cat.title,decision:{seccion:cat.title,decisiones:cat.items.map(i=>savedEntry(i)).filter(Boolean)},resultado:{caja:cashBalance()}})}catch(err){console.warn('No se pudo sincronizar la sección:',err.message)}}
+
+if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});
