@@ -1,0 +1,18 @@
+SIDE — COPIA LIMPIA PARA GITHUB
+
+Esta carpeta fue revisada para evitar conflictos de merge sin resolver.
+
+Verificación realizada:
+- No contiene líneas que empiecen con <<<<<<<
+- No contiene separadores de conflicto ======= como línea única
+- No contiene líneas que empiecen con >>>>>>>
+- Los archivos JavaScript principales pasan node --check.
+- Se mantiene el simulador 3D y el banco de eventos Perú.
+
+IMPORTANTE:
+Si GitHub vuelve a mostrar algo como:
+<<<<<<< HEAD
+=======
+>>>>>>> <commit>
+
+el conflicto está en la rama/repositorio de GitHub. Debes resolver ese archivo en GitHub o reemplazarlo por el archivo limpio de este ZIP.

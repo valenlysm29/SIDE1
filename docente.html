@@ -45,11 +45,7 @@
 
     <section id="tab-configuracion" class="tab-panel active">
       <div class="hero-card">
-<<<<<<< HEAD
         <div><span class="eyebrow">PARTIDA ÚNICA ACTIVA</span><h2>Configura la simulación antes de iniciar</h2><p>El docente solo puede mantener una partida activa. El código es asignado por el sistema y no puede editarse.</p></div>
-=======
-        <div><span class="eyebrow">NUEVA SIMULACIÓN</span><h2>Configura la partida antes de iniciar</h2><p>Define caja, demanda por distrito, financiamiento y tiempo de cada ciclo. Los eventos no se eligen: el sistema puede activarlos durante la simulación.</p></div>
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
         <div class="hero-orb">SIDE</div>
       </div>
       <div class="grid two">
@@ -57,7 +53,6 @@
           <div class="card-title"><h3>Identificación</h3><span>Partida</span></div>
           <label>Nombre de la simulación<input id="gameName" value="SIDE — Simulación Principal"></label>
           <label>Curso<input id="gameCourse" value="Finanzas Corporativas"></label>
-<<<<<<< HEAD
           <label>Código de partida<input id="gameCode" class="locked-input" value="SIDE-000" maxlength="12" readonly aria-readonly="true"></label>
           <label>Nombre sugerido de empresa (opcional)<input id="fixedCompany" value="" placeholder="Ej. Nova Bags"></label>
           <p class="hint">El nombre legal y comercial lo define cada estudiante. El código de partida se genera automáticamente.</p>
@@ -67,23 +62,12 @@
           <div class="native-choice-row"><label><input type="radio" name="capitalMode" value="fixed" id="capitalModeFixed" checked> Monto fijo para todos</label><label><input type="radio" name="capitalMode" value="random" id="capitalModeRandom"> Monto aleatorio</label></div>
           <div id="fixedCapitalFields"><label>Dinero inicial por empresa (S/)<input id="capital" type="number" value="100000" min="0" step="1000"></label></div>
           <div id="randomCapitalFields" class="hidden"><div class="value-row"><label>Rango mínimo (S/)<input id="capitalMin" type="number" value="80000" min="0" step="1000"></label><label>Rango máximo (S/)<input id="capitalMax" type="number" value="120000" min="0" step="1000"></label></div><p class="hint">Cada empresa recibe un monto estable dentro de este rango; no cambia al recargar.</p></div>
-=======
-          <label>Código de partida<input id="gameCode" value="SIDE-000" maxlength="12"></label>
-          <label>Nombre sugerido de empresa<input id="fixedCompany" value="BOSS BAGS"></label>
-          <p class="hint">Cada estudiante define el nombre y el nombre comercial de su propia empresa al ingresar con el código de partida.</p>
-        </article>
-        <article class="card">
-          <div class="card-title"><h3>Caja / efectivo</h3><span>Capital inicial</span></div>
-          <label>Dinero inicial por empresa (S/)<input id="capital" type="number" value="100000" min="0" step="1000"></label>
-          <p class="hint">Este monto aparece en el apartado de decisiones y disminuye o aumenta al guardar cada pestaña.</p>
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
         </article>
         <article class="card">
           <div class="card-title"><h3>Demanda por distrito</h3><span>Unidades por ciclo</span></div>
           <label>Los Olivos<input id="demandLosOlivos" type="number" value="1000" min="0"></label>
           <label>Miraflores<input id="demandMiraflores" type="number" value="1250" min="0"></label>
           <label>San Juan de Lurigancho<input id="demandSJL" type="number" value="1100" min="0"></label>
-<<<<<<< HEAD
         </article>
         <article class="card">
           <div class="card-title"><h3>Financiamiento</h3><span>Regla automática</span></div>
@@ -100,49 +84,21 @@
           <div id="manualCycleDisclaimer" class="mode-disclaimer"><strong>Modo manual</strong><span>El profesor puede iniciar o terminar el ciclo cuando quiera. Al llegar a cero, el sistema espera al docente.</span></div>
           <div id="automaticCycleConfig" class="hidden"><label>Programar horario de inicio<input id="scheduledStart" type="datetime-local"></label><div class="mode-disclaimer"><strong>Modo automático</strong><span>La simulación inicia a la hora programada y avanza sola al terminar cada ciclo.</span></div></div>
           <input id="cycleCloseMode" type="hidden" value="manual"><input id="currentRound" type="hidden" value="1">
-=======
-          <p class="hint">Estas referencias se muestran al jugador cuando evalúa una tienda física.</p>
-        </article>
-        <article class="card">
-          <div class="card-title"><h3>Financiamiento</h3><span>Préstamo bancario</span></div>
-          <label>TEA inicial (%)<input id="interest" type="number" step="0.1" value="20" min="0"></label>
-          <label>Monto máximo de préstamo (S/)<input id="loanMax" type="number" value="50000" min="0" step="500"></label>
-          <label>% inicial de ventas a crédito<input id="creditPercentStart" type="number" value="20" min="0" max="100"></label>
-          <p class="hint">La TEA puede ser modificada por el docente en ciclos posteriores. El jugador ve la tasa y el límite antes de solicitar el préstamo.</p>
-        </article>
-        <article class="card">
-          <div class="card-title"><h3>Duración y ciclos</h3><span>Control del docente</span></div>
-          <div class="mode-row"><span>Número de ciclos</span><div class="segmented" data-mode-for="cycles"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <div class="value-row"><label>Mínimo<input id="cyclesMin" type="number" value="4" min="1"></label><label>Máximo<input id="cyclesMax" type="number" value="8" min="1"></label></div>
-          <label>Número de ciclos<input id="cycles" type="number" value="6" min="1"></label>
-          <div class="value-row value-row-3"><label>Horas por ciclo<input id="roundHours" type="number" value="0" min="0"></label><label>Minutos por ciclo<input id="roundMinutes" type="number" value="10" min="0" max="59"></label><label>Segundos por ciclo<input id="roundSecs" type="number" value="0" min="0" max="59"></label></div>
-          <label>Al terminar el tiempo<select id="cycleCloseMode"><option value="manual">El profesor cierra el ciclo manualmente</option><option value="automatic">Cerrar y avanzar automáticamente</option></select></label>
-          <input id="currentRound" type="hidden" value="1">
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
         </article>
         <article class="card">
           <div class="card-title"><h3>Calendario académico</h3><span>Referencia</span></div>
           <div class="value-row"><label>Fecha de inicio<input id="startDate" type="date"></label><label>Fecha de fin<input id="endDate" type="date"></label></div>
-<<<<<<< HEAD
           <p class="hint">Las fechas son informativas. El reloj del estudiante se sincroniza con el ciclo activo.</p>
-=======
-          <p class="hint">Las fechas organizan la simulación académica; el reloj real de cada ciclo se controla por horas, minutos y segundos, de forma independiente al calendario.</p>
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
         </article>
       </div>
     </section>
 
     <section id="tab-rondas" class="tab-panel">
-<<<<<<< HEAD
       <div class="section-head"><div><span class="eyebrow">CONTROL DE CICLO</span><h2>Tiempo, noticias y eventos</h2></div><button id="advanceRound" class="primary">Pasar al siguiente ciclo <img class="button-arrow-icon" src="assets/icons/ui/arrow-right-thick.svg" alt=""></button></div>
-=======
-      <div class="section-head"><div><span class="eyebrow">CONTROL DE CICLO</span><h2>Tiempo y posibles eventos</h2></div><button id="advanceRound" class="primary">Pasar al siguiente ciclo →</button></div>
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
       <div class="round-status card">
         <div class="round-number"><span>CICLO</span><strong id="roundDisplay">1 / 6</strong></div>
         <div><b id="roundState">Preparación</b><p id="roundSummary">La partida está lista para iniciar.</p></div>
         <div class="timer-box">⏱ <strong id="roundTimer">00:10:00</strong><button id="startTimer" class="mini">Iniciar</button><button id="cutRound" class="mini danger-mini">Cortar ciclo</button></div>
-<<<<<<< HEAD
       </div>
       <div class="card event-bank-card">
         <div class="card-title"><div><h3>Banco de eventos · contexto Perú</h3><p>El docente decide qué eventos estarán disponibles en la partida. Puede seleccionarlos manualmente o dejar que SIDE escoja una muestra aleatoria.</p></div><span id="eventSelectionCount">0 seleccionados</span></div>
@@ -172,23 +128,6 @@
       <div class="grid two">
         <article class="card"><div class="card-title"><h3>Reglas del ciclo</h3><span id="modeSummaryBadge">Manual</span></div><p id="modeRulesText"><strong>Manual:</strong> el profesor inicia y cierra cada ciclo.</p><p class="hint">El timer del panel estudiante usa la misma referencia de tiempo.</p></article>
         <article class="card"><div class="card-title"><h3>Noticias generadas</h3><span>Eventos ocurridos</span></div><div id="cycleNews"></div></article>
-=======
-      </div>
-      <div class="grid two">
-        <article class="card">
-          <div class="card-title"><h3>Posibles eventos</h3><span>No se seleccionan</span></div>
-          <p class="hint">El docente conoce el banco de eventos, pero no escoge cuál ocurrirá. En cada ciclo puede ocurrir uno o ninguno.</p>
-          <div class="possible-events">
-            <span>Variación del precio del cuero</span><span>Cambio de moda / demanda</span><span>Contracción o boom de mercado</span><span>Norma ambiental</span><span>Arancel o impuesto extraordinario</span><span>Problema de abastecimiento</span>
-          </div>
-        </article>
-        <article class="card">
-          <div class="card-title"><h3>Reglas del ciclo</h3><span>Automático / manual</span></div>
-          <p><strong>Manual:</strong> cuando el reloj llega a cero, el ciclo queda esperando hasta que el profesor lo cierre.</p>
-          <p><strong>Automático:</strong> al llegar a cero, el sistema cierra el ciclo y avanza al siguiente.</p>
-          <p class="hint">El botón “Cortar ciclo” permite al profesor terminar antes un ciclo que esté configurado como manual.</p>
-        </article>
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
       </div>
       <div class="event-log card"><div class="card-title"><h3>Registro de eventos</h3><button id="clearEvents" class="mini">Limpiar</button></div><div id="eventLog"></div></div>
     </section>

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # SIDE — Simulador empresarial · versión integrada 3D
-=======
-# SIDE — Boss Bags · versión corregida después de reunión
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
 
 Esta versión transforma el módulo de decisiones en una experiencia tipo juego con navegación por pestañas y caja visible.
 
@@ -10,11 +6,7 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Profesor: `profesor@upch.pe`
 - Contraseña: `Heredia`
 - Código estudiante: `SIDE-000`
-<<<<<<< HEAD
 - Cada estudiante registra su propio nombre legal y nombre comercial al ingresar. No existe una empresa predeterminada.
-=======
-- Empresa del juego: `BOSS BAGS` (fija)
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
 
 ## Pestañas del jugador
 1. Empresa
@@ -64,9 +56,6 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 
 ## Nota técnica
 El proyecto mantiene el modo local con `localStorage` y conserva los puntos de integración con Supabase. Las reglas que dependen de un motor contable completo de ventas/devoluciones se presentan como reglas del juego, mientras que caja, compras, cantidades, préstamo y costos sí se calculan en esta versión.
-<<<<<<< HEAD
 
 ## Actualización 29/08/2026
 La versión actual incorpora obligatoriedad selectiva de decisiones, saldo guardado por pestaña, capital fijo/aleatorio, ciclos manuales/automáticos, timer del estudiante, préstamo porcentual, banco de 50 eventos, noticias, seguimiento docente por apartados y resultados financieros disgregados. Consulta `CORRECCIONES_29_08_2026.md` para el detalle completo.
-=======
->>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
