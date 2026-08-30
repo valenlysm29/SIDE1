@@ -6,7 +6,11 @@ Implementación consolidada en la versión entregada:
 - Ventana de decisiones compacta, con títulos sticky y HUD de caja.
 - Guardado por sección y efecto visual de dinero.
 - Capital inicial S/ 100,000.
+<<<<<<< HEAD
 - Login por código, sin nombre del estudiante y con nombre legal/comercial de empresa definido por cada participante.
+=======
+- Login por código, empresa fija y sin nombre del estudiante.
+>>>>>>> 6c291dcf79430771bca699adf70a29650678cc04
 - Tutorial obligatorio y flechas reforzadas.
 - Infraestructura con cantidades, activos adquiridos, molde bloqueable y local de producción.
 - Producción unifica RR. HH. + insumos + objetivo de producción.
