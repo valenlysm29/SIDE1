@@ -1,0 +1,18 @@
+VALIDACIÓN — BANCO DE EVENTOS PERÚ
+
+- 92 eventos disponibles.
+- Incluye Día del Padre, renuncias, escasez de cuero, paro de transportistas, SUNAFIL, fallas de maquinaria, dólar, Fenómeno del Niño, eventos digitales, regulatorios, comerciales y logísticos.
+- Panel docente con desplazamiento vertical del banco.
+- Selección MANUAL mediante checkbox.
+- Selección ALEATORIA con cantidad definida por el docente (1 a 40 eventos por generación).
+- Botones para generar selección aleatoria, seleccionar visibles y limpiar selección.
+- Búsqueda por texto.
+- Filtro por categoría.
+- Filtro por alcance: grupal / individual.
+- Columnas: Descripción, Afectados, Ciclos por afectar, Implicancia, Ocurrencia.
+- +0 = mismo ciclo; +1 = siguiente ciclo; +2 = después de dos ciclos.
+- Los eventos grupales, cuando ocurren, afectan a todas las empresas.
+- Los eventos individuales se resuelven empresa por empresa según su probabilidad.
+- El efecto temporal se respeta también en el módulo del estudiante.
+- Noticias y resultados reflejan los eventos activos.
+- Todos los archivos JavaScript pasan node --check.

@@ -1,18 +1,24 @@
-SIDE — validación final del apartado Decisiones
+SIDE — VALIDACIÓN FINAL
 
-Base: SIDE_Boss_Bags_DECISIONES_GAME_FINAL.zip
-Fuente de iconos: SIDE_JUEGO_DECISIONES_ICONOS_FLEX_FINAL(1).zip
-Fuente de catálogo: DECISIONES SIDE (9).xlsx / Catalogo_Decisiones
+Validaciones ejecutadas:
+- Sintaxis de todos los archivos JavaScript: OK (node --check).
+- Referencias de IDs HTML ↔ JavaScript: OK, sin IDs faltantes.
+- Catálogo nuevo: 5 pestañas y 25 elementos/reglas de decisión.
+- Prueba lógica de caja:
+  * caja inicial S/ 100,000: OK
+  * compra infraestructura S/ 5,000 => S/ 95,000: OK
+  * guardar nuevamente sin cambios no duplica descuento: OK
+  * préstamo S/ 10,000 => caja S/ 105,000: OK
+- Analista de compras: descuento inicial 12%: OK.
+- Producción: validación de materia prima mínima: OK.
+- Tienda física: activa detección de local para personal de ventas: OK.
+- Molde: queda bloqueado desde el siguiente ciclo: OK.
+- Panel docente:
+  * capital S/ 100,000: OK
+  * TEA 20% inicial: OK
+  * límite préstamo S/ 50,000: OK
+  * iniciar partida fija ciclo 1: OK
+  * avanzar ciclo actualiza ronda: OK
+  * TEA disminuye de 20% a 19% en ciclo siguiente: OK
 
-Validaciones realizadas:
-- 7 zonas jugables: Empresa, Infraestructura, Recursos Humanos, Canales y ventas, Insumos, Inversiones y Finanzas.
-- 26 menús de decisión.
-- 65 opciones del Excel integradas.
-- Segmento / línea incluido como decisión.
-- Campos no jugables indicados por el usuario eliminados del menú/código de decisiones.
-- Infraestructura: hasta 3 selecciones en menús de 3 alternativas.
-- Recursos Humanos: hasta 3 selecciones en menús de 3 alternativas.
-- Decisiones binarias/únicas conservadas como selección exclusiva.
-- Iconos SVG de categorías + back/play/check/lock integrados.
-- app.js y decision_catalog.js pasan validación de sintaxis con Node.
-- Todos los IDs DOM estáticos usados por app.js existen en index.html.
+Nota: el entorno de ejecución bloqueó la navegación headless local con Chromium, por lo que la validación visual automatizada no pudo ejecutarse. Se realizó validación estructural, sintáctica y de lógica con Node.

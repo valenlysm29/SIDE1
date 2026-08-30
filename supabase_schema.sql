@@ -249,3 +249,31 @@ grant insert on public.decisiones to anon, authenticated;
 -- ============================================================
 -- LISTO
 -- ============================================================
+
+-- ============================================================
+-- ACTUALIZACIÓN 29/08/2026 · PARTIDA ÚNICA, CONFIGURACIÓN Y EVENTOS
+-- ============================================================
+-- Un profesor no puede mantener más de una partida ACTIVA simultáneamente.
+create unique index if not exists ux_side_una_partida_activa_por_profesor
+on public.partidas(profesor_id)
+where estado = 'activa';
+
+-- Configuración avanzada de la simulación. JSONB permite evolucionar las reglas
+-- sin romper partidas ya creadas.
+alter table public.partidas add column if not exists configuracion jsonb not null default '{}'::jsonb;
+alter table public.partidas add column if not exists eventos_habilitados jsonb not null default '[]'::jsonb;
+alter table public.partidas add column if not exists inicio_programado timestamptz;
+
+-- Ejemplo de configuracion:
+-- {
+--   "capitalMode":"fixed|random",
+--   "capital":100000,
+--   "capitalMin":80000,
+--   "capitalMax":120000,
+--   "interest":20,
+--   "cycles":6,
+--   "cycleCloseMode":"manual|automatic",
+--   "durationSeconds":600,
+--   "loanMaxPercent":50,
+--   "loanInitialPercent":25
+-- }

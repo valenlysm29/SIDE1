@@ -1,0 +1,32 @@
+SIDE — INTEGRACIÓN DEL PROYECTO UNIFORME + SIMULADOR 3D
+
+Se tomó como base el proyecto UNIFORME entregado y se integró la edición 3D integral.
+
+Se conservó del proyecto UNIFORME:
+- Nombre legal y nombre comercial definidos por el estudiante.
+- Cambios recientes del panel docente.
+- Temporizador con horas, minutos y segundos.
+- Estilo visual y recursos gráficos recientes.
+- Catálogo de decisiones y lógica general existente.
+
+Se restauró / integró:
+- Simulador 3D integral.
+- Flujo 100% decisiones -> carga -> juego 3D.
+- Puente entre decisiones, caja y simulador.
+- Ventas 3D reflejadas en caja/reporte.
+- Inventario, producción, clientes, empleados, POS, misiones, eventos, administración y progresión de la edición 3D.
+- Nombre comercial del estudiante mostrado también dentro del 3D.
+- Guardado 3D separado por código, empresa y ciclo.
+
+Flechas corregidas:
+- Iniciar sesión.
+- Tutorial anterior / siguiente.
+- Empezar a jugar.
+- Volver a inicio del panel docente.
+- Pasar al siguiente ciclo.
+- SVG de flechas con stroke-width 9 px.
+
+Validación:
+- Sintaxis de todos los JS comprobada con node --check.
+- Referencias estáticas de IDs de app.js y simulator3d.js verificadas sin faltantes.
+- No quedan glifos finos → ← › ‹ en HTML/JS/CSS.

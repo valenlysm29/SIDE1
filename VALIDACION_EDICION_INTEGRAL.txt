@@ -1,0 +1,18 @@
+VALIDACIÓN — SIDE SIMULADOR EMPRESARIAL EDICIÓN INTEGRAL
+
+- Sintaxis JavaScript: OK
+- IDs UI / referencias del simulador: OK
+- Inventario + proveedor: integrado
+- Producción automática: integrada
+- Eventos aleatorios: integrados
+- Reputación: integrada y persistente
+- Devoluciones físicas en caja: integradas
+- POS escaneo + efectivo/tarjeta: integrado
+- Precios editables: integrados
+- Empleados / auto reposición / auto caja: integrados
+- Expansiones: exhibidores, caja y almacén
+- Minimapa: integrado
+- Tutorial 3D: integrado
+- Calidad gráfica: Bajo / Medio / Alto / Auto
+- Resolución adaptativa FPS: conservada
+- Administración: ingresos, gastos, utilidad, stock, producción, precios, personal, expansión

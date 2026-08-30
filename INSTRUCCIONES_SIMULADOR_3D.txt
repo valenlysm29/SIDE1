@@ -1,0 +1,36 @@
+SIDE — SIMULADOR EMPRESARIAL 3D
+================================
+
+ACCESO DEMO
+Profesor: profesor@upch.pe
+Contraseña: Heredia
+Código estudiante: SIDE-000
+
+CÓMO EJECUTAR
+1. Mantén todos los archivos dentro de esta carpeta.
+2. Recomendado: abrir el proyecto mediante un servidor web local (Live Server de VS Code o python -m http.server).
+3. Abre index.html desde ese servidor.
+4. Ingresa como estudiante con SIDE-000.
+5. Completa el tutorial y entra a "IR A DECISIONES".
+6. Completa y GUARDA todas las decisiones hasta llegar al 100%.
+7. Al llegar al 100% aparecerá el botón "INICIAR JUEGO 3D".
+8. Pulsa el botón: verás una pantalla de carga que construye tu empresa y luego entrarás directamente al simulador 3D.
+
+CONTROLES
+W A S D  = caminar
+Mouse    = mirar
+Shift    = correr
+E        = interactuar
+Esc      = liberar el mouse
+
+QUÉ CAMBIA EN 3D
+- La tienda de la empresa registrada por el estudiante es recorrible en primera persona.
+- Hay clientes NPC que entran, miran productos, pasan por caja y salen.
+- La afluencia responde a canales y marketing.
+- La probabilidad de compra mejora con personal de ventas/marketing.
+- Las ventas NPC actualizan una entrada de ventas 3D por ciclo.
+- El terminal de decisiones está junto a la caja y también hay botón "TABLET DE DECISIONES".
+- Al guardar decisiones y regresar, se reconstruye la tienda para mostrar activos, máquinas, trabajadores, stock, canales, marketing, segmento y financiamiento.
+
+IMPORTANTE
+El motor 3D se carga desde Internet. Se necesita conexión para entrar al escenario 3D.

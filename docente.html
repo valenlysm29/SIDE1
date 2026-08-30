@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#061126">
+  <meta name="theme-color" content="#020509">
   <title>SIDE — Panel Docente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,30 +12,32 @@
 </head>
 <body>
 <div class="app-shell">
+  <div class="docente-bg" aria-hidden="true"></div>
   <aside class="sidebar">
     <div class="brand"><img src="assets/side_logo.png" alt="SIDE"><span>PANEL DOCENTE</span></div>
     <nav>
-      <button class="nav-btn active" data-tab="configuracion">⚙ <span>Configuración</span></button>
-      <button class="nav-btn" data-tab="rondas">◷ <span>Rondas y eventos</span></button>
-      <button class="nav-btn" data-tab="empresas">▣ <span>Empresas</span></button>
-      <button class="nav-btn" data-tab="resultados">◆ <span>Resultados</span></button>
-      <button class="nav-btn" data-tab="podio">🏆 <span>Ganador y podio</span></button>
+      <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/decision-icons/ui/objetivo.png" alt=""></span><span>Configuración</span></button>
+      <button class="nav-btn" data-tab="rondas"><span class="nav-icon"><img src="assets/decision-icons/ui/reloj.png" alt=""></span><span>Rondas y eventos</span></button>
+      <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/decision-icons/ui/mapa.png" alt=""></span><span>Empresas</span></button>
+      <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/decision-icons/ui/confirmar.png" alt=""></span><span>Resultados</span></button>
+      <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/decision-icons/ui/trofeo.png" alt=""></span><span>Ganador y podio</span></button>
     </nav>
     <div class="sidebar-bottom">
       <div class="connection"><span id="connectionDot"></span><span id="connectionText">Modo simulación</span></div>
-      <button id="backHome" class="sidebar-link">← Volver a inicio</button>
+      <button id="backHome" class="sidebar-link"><img class="button-arrow-icon left" src="assets/icons/ui/arrow-left-thick.svg" alt=""> Volver a inicio</button>
     </div>
   </aside>
 
   <main class="content">
     <header class="topbar">
-      <div>
-        <span class="eyebrow">SIMULADOR DE DECISIONES FINANCIERAS</span>
+      <div class="topbar-title">
+        <div class="topbar-mark"><span class="mark-dot"></span><span class="eyebrow">SIMULADOR DE DECISIONES FINANCIERAS</span></div>
         <h1 id="pageTitle">Configuración de la simulación</h1>
       </div>
       <div class="top-actions">
         <span id="gameCodeBadge" class="code-badge">SIDE-000</span>
-        <button id="saveAll" class="primary">Guardar configuración</button>
+        <button id="saveAll" class="secondary">Guardar configuración</button>
+        <button id="startGame" class="primary">Guardar e iniciar partida</button>
       </div>
     </header>
 
@@ -43,101 +45,89 @@
 
     <section id="tab-configuracion" class="tab-panel active">
       <div class="hero-card">
-        <div>
-          <span class="eyebrow">NUEVA SIMULACIÓN</span>
-          <h2>Diseña las reglas antes de iniciar</h2>
-          <p>Cada parámetro puede configurarse <strong>manualmente</strong> o mediante <strong>aleatorización</strong>. La aleatoriedad queda registrada para que el docente pueda revisar qué valores se generaron.</p>
-        </div>
+        <div><span class="eyebrow">PARTIDA ÚNICA ACTIVA</span><h2>Configura la simulación antes de iniciar</h2><p>El docente solo puede mantener una partida activa. El código es asignado por el sistema y no puede editarse.</p></div>
         <div class="hero-orb">SIDE</div>
       </div>
-
       <div class="grid two">
         <article class="card">
           <div class="card-title"><h3>Identificación</h3><span>Partida</span></div>
           <label>Nombre de la simulación<input id="gameName" value="SIDE — Simulación Principal"></label>
           <label>Curso<input id="gameCourse" value="Finanzas Corporativas"></label>
-          <label>Código de partida<input id="gameCode" value="SIDE-000" maxlength="12"></label>
+          <label>Código de partida<input id="gameCode" class="locked-input" value="SIDE-000" maxlength="12" readonly aria-readonly="true"></label>
+          <label>Nombre sugerido de empresa (opcional)<input id="fixedCompany" value="" placeholder="Ej. Nova Bags"></label>
+          <p class="hint">El nombre legal y comercial lo define cada estudiante. El código de partida se genera automáticamente.</p>
         </article>
-
         <article class="card">
-          <div class="card-title"><h3>Capital inicial</h3><span>Parámetro económico</span></div>
-          <div class="mode-row">
-            <span>Modo de definición</span>
-            <div class="segmented" data-mode-for="capital"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div>
-          </div>
-          <div class="value-row"><label>Mínimo<input id="capitalMin" type="number" value="20000"></label><label>Máximo<input id="capitalMax" type="number" value="50000"></label></div>
-          <label>Capital por empresa<input id="capital" type="number" value="30000"></label>
-          <button class="randomize" data-randomize="capital">↻ Generar capital</button>
-          <small class="hint">Si está en aleatorio, se usa un valor entero entre mínimo y máximo.</small>
+          <div class="card-title"><h3>Caja / efectivo</h3><span>Capital inicial</span></div>
+          <div class="native-choice-row"><label><input type="radio" name="capitalMode" value="fixed" id="capitalModeFixed" checked> Monto fijo para todos</label><label><input type="radio" name="capitalMode" value="random" id="capitalModeRandom"> Monto aleatorio</label></div>
+          <div id="fixedCapitalFields"><label>Dinero inicial por empresa (S/)<input id="capital" type="number" value="100000" min="0" step="1000"></label></div>
+          <div id="randomCapitalFields" class="hidden"><div class="value-row"><label>Rango mínimo (S/)<input id="capitalMin" type="number" value="80000" min="0" step="1000"></label><label>Rango máximo (S/)<input id="capitalMax" type="number" value="120000" min="0" step="1000"></label></div><p class="hint">Cada empresa recibe un monto estable dentro de este rango; no cambia al recargar.</p></div>
         </article>
-
         <article class="card">
-          <div class="card-title"><h3>Demanda del mercado</h3><span>Unidades/ciclo</span></div>
-          <div class="mode-row"><span>Modo</span><div class="segmented" data-mode-for="demand"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <div class="value-row"><label>Mínimo<input id="demandMin" type="number" value="800"></label><label>Máximo<input id="demandMax" type="number" value="1800"></label></div>
-          <label>Demanda base<input id="demand" type="number" value="1200"></label>
-          <button class="randomize" data-randomize="demand">↻ Generar demanda</button>
+          <div class="card-title"><h3>Demanda por distrito</h3><span>Unidades por ciclo</span></div>
+          <label>Los Olivos<input id="demandLosOlivos" type="number" value="1000" min="0"></label>
+          <label>Miraflores<input id="demandMiraflores" type="number" value="1250" min="0"></label>
+          <label>San Juan de Lurigancho<input id="demandSJL" type="number" value="1100" min="0"></label>
         </article>
-
         <article class="card">
-          <div class="card-title"><h3>Tasa de interés</h3><span>Financiamiento</span></div>
-          <div class="mode-row"><span>Modo</span><div class="segmented" data-mode-for="interest"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <div class="value-row"><label>Mínimo %<input id="interestMin" type="number" step=".1" value="5"></label><label>Máximo %<input id="interestMax" type="number" step=".1" value="15"></label></div>
-          <label>Tasa base %<input id="interest" type="number" step=".1" value="10"></label>
-          <button class="randomize" data-randomize="interest">↻ Generar tasa</button>
+          <div class="card-title"><h3>Financiamiento</h3><span>Regla automática</span></div>
+          <label>TEA inicial (%)<input id="interest" type="number" step="0.1" value="20" min="0"></label>
+          <div class="rule-box"><strong>Límite del préstamo: 50% de la caja inicial</strong><span>Referencia inicial del préstamo: 25% de la caja inicial.</span><small>El docente fija únicamente la TEA inicial; los montos se calculan automáticamente para cada empresa.</small></div>
+          <label>% inicial de ventas a crédito<input id="creditPercentStart" type="number" value="20" min="0" max="100"></label>
         </article>
-
-        <article class="card">
-          <div class="card-title"><h3>Duración y ritmo</h3><span>Tiempo de juego</span></div>
-          <div class="mode-row"><span>Número de ciclos</span><div class="segmented" data-mode-for="cycles"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <div class="value-row"><label>Mínimo ciclos<input id="cyclesMin" type="number" value="4"></label><label>Máximo ciclos<input id="cyclesMax" type="number" value="8"></label></div>
-          <label>Número de ciclos<input id="cycles" type="number" value="6" min="1"></label>
-          <div class="value-row"><label>Minutos por ronda<input id="roundMinutes" type="number" value="10" min="1"></label><label>Ronda actual<input id="currentRound" type="number" value="1" min="1"></label></div>
-          <button class="randomize" data-randomize="cycles">↻ Generar ciclos</button>
+        <article class="card cycle-config-card">
+          <div class="card-title"><h3>Duración y ciclos</h3><span>Número fijo</span></div>
+          <label>Número de ciclos<input id="cycles" type="number" value="6" min="1" max="20"></label>
+          <div class="value-row"><label>Horas por ciclo<input id="roundHours" type="number" value="0" min="0"></label><label>Minutos por ciclo<input id="roundMinutes" type="number" value="10" min="1" max="59"></label></div>
+          <input id="roundSecs" type="hidden" value="0">
+          <div class="native-choice-row"><label><input type="radio" name="cycleMode" value="manual" id="cycleModeManual" checked> Manual</label><label><input type="radio" name="cycleMode" value="automatic" id="cycleModeAutomatic"> Automática</label></div>
+          <div id="manualCycleDisclaimer" class="mode-disclaimer"><strong>Modo manual</strong><span>El profesor puede iniciar o terminar el ciclo cuando quiera. Al llegar a cero, el sistema espera al docente.</span></div>
+          <div id="automaticCycleConfig" class="hidden"><label>Programar horario de inicio<input id="scheduledStart" type="datetime-local"></label><div class="mode-disclaimer"><strong>Modo automático</strong><span>La simulación inicia a la hora programada y avanza sola al terminar cada ciclo.</span></div></div>
+          <input id="cycleCloseMode" type="hidden" value="manual"><input id="currentRound" type="hidden" value="1">
         </article>
-
         <article class="card">
-          <div class="card-title"><h3>Calendario</h3><span>Inicio / fin</span></div>
+          <div class="card-title"><h3>Calendario académico</h3><span>Referencia</span></div>
           <div class="value-row"><label>Fecha de inicio<input id="startDate" type="date"></label><label>Fecha de fin<input id="endDate" type="date"></label></div>
-          <p class="hint">Estas fechas son las de la simulación académica. No alteran el tiempo real disponible por ronda.</p>
+          <p class="hint">Las fechas son informativas. El reloj del estudiante se sincroniza con el ciclo activo.</p>
         </article>
       </div>
     </section>
 
     <section id="tab-rondas" class="tab-panel">
-      <div class="section-head"><div><span class="eyebrow">CONTROL DE RONDA</span><h2>Rondas, shocks y eventos</h2></div><button id="advanceRound" class="primary">Pasar a siguiente ronda →</button></div>
+      <div class="section-head"><div><span class="eyebrow">CONTROL DE CICLO</span><h2>Tiempo, noticias y eventos</h2></div><button id="advanceRound" class="primary">Pasar al siguiente ciclo <img class="button-arrow-icon" src="assets/icons/ui/arrow-right-thick.svg" alt=""></button></div>
       <div class="round-status card">
-        <div class="round-number"><span>RONDA</span><strong id="roundDisplay">1 / 6</strong></div>
-        <div><b id="roundState">Preparación</b><p id="roundSummary">La ronda actual está lista para iniciar.</p></div>
-        <div class="timer-box">⏱ <strong id="roundTimer">10:00</strong><button id="startTimer" class="mini">Iniciar</button></div>
+        <div class="round-number"><span>CICLO</span><strong id="roundDisplay">1 / 6</strong></div>
+        <div><b id="roundState">Preparación</b><p id="roundSummary">La partida está lista para iniciar.</p></div>
+        <div class="timer-box">⏱ <strong id="roundTimer">00:10:00</strong><button id="startTimer" class="mini">Iniciar</button><button id="cutRound" class="mini danger-mini">Cortar ciclo</button></div>
       </div>
-
+      <div class="card event-bank-card">
+        <div class="card-title"><div><h3>Banco de eventos · contexto Perú</h3><p>El docente decide qué eventos estarán disponibles en la partida. Puede seleccionarlos manualmente o dejar que SIDE escoja una muestra aleatoria.</p></div><span id="eventSelectionCount">0 seleccionados</span></div>
+        <div class="event-mode-panel">
+          <div>
+            <span class="event-control-label">Modo de selección</span>
+            <div class="native-choice-row compact">
+              <label><input type="radio" name="eventSelectionMode" value="manual" checked> Manual</label>
+              <label><input type="radio" name="eventSelectionMode" value="random"> Aleatoria</label>
+            </div>
+          </div>
+          <label class="random-count-field">Cantidad aleatoria<input id="eventRandomCount" type="number" min="1" max="40" value="15"></label>
+          <button id="eventRandomize" class="secondary" type="button">GENERAR SELECCIÓN ALEATORIA</button>
+          <button id="eventSelectAllVisible" class="mini" type="button">Seleccionar visibles</button>
+          <button id="eventClearSelection" class="mini danger-mini" type="button">Limpiar selección</button>
+        </div>
+        <div class="event-filter-row">
+          <label>Buscar evento<input id="eventSearch" type="search" placeholder="Ej. cuero, SUNAFIL, Fiestas Patrias..."></label>
+          <label>Categoría<select id="eventCategoryFilter"><option value="all">Todas</option></select></label>
+          <label>Afectados<select id="eventScopeFilter"><option value="all">Todos</option><option value="group">Grupal</option><option value="individual">Individual</option></select></label>
+          <span id="eventVisibleCount" class="event-visible-count"></span>
+        </div>
+        <div class="event-bank-help"><strong>GRUPAL</strong><span>Si el evento ocurre, afecta a todas las empresas.</span><strong>INDIVIDUAL</strong><span>Se evalúa empresa por empresa con la probabilidad indicada.</span><strong>OCURRENCIA</strong><span>Es la probabilidad de que el evento se active; no significa que ocurrirá siempre.</span></div>
+        <div class="event-table-wrap"><table class="event-table"><thead><tr><th>Usar</th><th>Descripción</th><th>Afectados</th><th>Ciclos por afectar</th><th>Implicancia</th><th>Ocurrencia</th></tr></thead><tbody id="eventBankBody"></tbody></table></div>
+        <p class="hint event-mode-hint">Ejemplo: <b>+0</b> = mismo ciclo, <b>+1</b> = siguiente ciclo, <b>+2</b> = el efecto empieza después de dos ciclos. Si un evento dura más de un ciclo, se indica dentro de la implicancia.</p>
+      </div>
       <div class="grid two">
-        <article class="card">
-          <div class="card-title"><h3>Shocks de mercado</h3><span>Precio / moda / costos</span></div>
-          <div class="mode-row"><span>Selección</span><div class="segmented" data-mode-for="marketShock"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <label>Catálogo de shocks<select id="marketShock">
-            <option value="none">Sin shock</option><option value="leather_up">Cuero +25%</option><option value="leather_down">Cuero -15%</option><option value="fashion">Cambio de moda: demanda premium +30%</option><option value="recession">Contracción: demanda -25%</option><option value="boom">Boom de mercado: demanda +25%</option>
-          </select></label>
-          <button class="randomize" data-randomize="marketShock">↻ Elegir shock</button>
-        </article>
-
-        <article class="card">
-          <div class="card-title"><h3>Volatilidad de demanda</h3><span>Variación por ronda</span></div>
-          <div class="mode-row"><span>Modo</span><div class="segmented" data-mode-for="volatility"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <div class="value-row"><label>Mínimo %<input id="volMin" type="number" value="5"></label><label>Máximo %<input id="volMax" type="number" value="20"></label></div>
-          <label>Volatilidad %<input id="volatility" type="number" value="10"></label>
-          <button class="randomize" data-randomize="volatility">↻ Generar volatilidad</button>
-        </article>
-
-        <article class="card">
-          <div class="card-title"><h3>Eventos regulatorios</h3><span>Normas / aranceles</span></div>
-          <div class="mode-row"><span>Selección</span><div class="segmented" data-mode-for="regulation"><button data-mode="manual">Manual</button><button data-mode="random">Aleatorio</button></div></div>
-          <label>Catálogo<select id="regulation">
-            <option value="none">Sin evento</option><option value="tariff">Arancel de importación +12%</option><option value="environment">Norma ambiental: costo +8%</option><option value="quality">Norma de calidad: penalización por baja calidad</option><option value="tax">Impuesto extraordinario +5%</option>
-          </select></label>
-          <button class="randomize" data-randomize="regulation">↻ Elegir evento</button>
-        </article>
+        <article class="card"><div class="card-title"><h3>Reglas del ciclo</h3><span id="modeSummaryBadge">Manual</span></div><p id="modeRulesText"><strong>Manual:</strong> el profesor inicia y cierra cada ciclo.</p><p class="hint">El timer del panel estudiante usa la misma referencia de tiempo.</p></article>
+        <article class="card"><div class="card-title"><h3>Noticias generadas</h3><span>Eventos ocurridos</span></div><div id="cycleNews"></div></article>
       </div>
       <div class="event-log card"><div class="card-title"><h3>Registro de eventos</h3><button id="clearEvents" class="mini">Limpiar</button></div><div id="eventLog"></div></div>
     </section>
@@ -149,14 +139,16 @@
     </section>
 
     <section id="tab-resultados" class="tab-panel">
-      <div class="section-head"><div><span class="eyebrow">INFORMACIÓN RECIBIDA</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
+      <div class="section-head"><div><span class="eyebrow">RESULTADOS DISGREGADOS</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
       <div class="stats-grid" id="resultStats"></div>
-      <div class="card table-card"><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Capital</th><th>Ingresos</th><th>Costos</th><th>Utilidad</th><th>Rondas</th><th>Actividad</th><th>Estado</th></tr></thead><tbody id="resultsBody"></tbody></table></div></div>
-      <div class="card"><div class="card-title"><h3>Detalle por empresa</h3><span>Decisiones reportadas</span></div><div id="detailReports"></div></div>
+      <article class="card table-card"><div class="card-title"><h3>Estado de resultados</h3><span>Ingresos · costos · eventos · utilidad</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ingresos</th><th>Costos</th><th>Impacto eventos</th><th>Utilidad</th></tr></thead><tbody id="incomeStatementBody"></tbody></table></div></article>
+      <article class="card table-card"><div class="card-title"><h3>Balance de caja</h3><span>Caja inicial · préstamos · caja final</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Caja inicial</th><th>Préstamos</th><th>Caja final</th><th>Progreso</th></tr></thead><tbody id="cashBalanceBody"></tbody></table></div></article>
+      <article class="card table-card"><div class="card-title"><h3>Flujo de caja</h3><span>Operación · financiamiento · eventos · flujo neto</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Operación</th><th>Financiamiento</th><th>Eventos</th><th>Flujo neto</th></tr></thead><tbody id="cashFlowBody"></tbody></table></div></article>
+      <div class="card"><div class="card-title"><h3>Detalle por empresa</h3><span>Apartados terminados y eventos</span></div><div id="detailReports"></div></div>
     </section>
 
     <section id="tab-podio" class="tab-panel">
-      <div class="hero-card winner-hero"><div><span class="eyebrow">DECISIÓN FINAL DEL DOCENTE</span><h2>El sistema propone; el docente decide.</h2><p>Selecciona la empresa ganadora, revisa el podio y publícalo cuando estés listo. La publicación queda guardada localmente y se podrá conectar al backend.</p></div><div class="hero-orb">🏆</div></div>
+      <div class="hero-card winner-hero"><div><span class="eyebrow">DECISIÓN FINAL DEL DOCENTE</span><h2>El sistema propone; el docente decide.</h2><p>Selecciona la empresa ganadora, revisa el podio y publícalo cuando estés listo. La publicación queda guardada localmente y se podrá conectar al backend.</p></div><div class="hero-orb trophy-orb"><img src="assets/decision-icons/trofeo_victoria.png" alt=""></div></div>
       <div class="grid two">
         <article class="card"><div class="card-title"><h3>Elegir ganador</h3><span>Manual</span></div><label>Empresa ganadora<select id="winnerSelect"></select></label><label>Justificación<textarea id="winnerReason" rows="4" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary full">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
         <article class="card"><div class="card-title"><h3>Podio publicado</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium"></div></article>
@@ -170,6 +162,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="config.js"></script>
+<script src="events_catalog.js"></script>
 <script src="docente.js"></script>
 </body>
 </html>

@@ -1,0 +1,48 @@
+VALIDACIÓN ESTÁTICA — CORRECCIONES 29/08/2026
+
+OK — JavaScript: app.js
+OK — JavaScript: config.js
+OK — JavaScript: decision_catalog.js
+OK — JavaScript: docente.js
+OK — JavaScript: events_catalog.js
+OK — JavaScript: icon_bank.js
+OK — JavaScript: simulator3d.js
+OK — JavaScript: tutorial.js
+
+OK — 50 eventos explícitos en events_catalog.js
+OK — 23 eventos grupales
+OK — 27 eventos individuales
+OK — Todos los eventos contienen descripción, alcance, probabilidad, ciclos, implicancia y efecto.
+
+OK — Local de producción obligatorio, preseleccionado y con una sola opción.
+OK — Garantía de productos terminados incorporada.
+OK — Canal de ventas obligatorio.
+OK — Marketing obligatorio.
+OK — Capacitación opcional.
+OK — Préstamo opcional.
+OK — Personal de ventas automático por tienda física.
+OK — Decisiones opcionales excluidas del progreso obligatorio.
+OK — Radio buttons para opción única y checkboxes para opción múltiple.
+OK — Botón ENVIAR DECISIONES antes de habilitar el 3D.
+OK — Saldo guardado no cambia durante la edición del borrador.
+OK — Gasto/movimiento de pestaña se calcula incrementalmente.
+
+OK — Código docente readonly y asignado automáticamente.
+OK — Capital fijo/aleatorio por rango.
+OK — Modo de ciclos manual/automático.
+OK — Inicio programado en modo automático.
+OK — Timer visible para estudiante.
+OK — TEA inicial como único parámetro docente de préstamo.
+OK — Préstamo máximo 50% de caja inicial y referencia 25%.
+OK — Restricción de una partida activa en frontend y esquema SQL.
+
+OK — Banco de resultados disgregado en Estado de resultados, Balance de caja y Flujo de caja.
+OK — Apartados completados visibles en panel docente.
+OK — Noticias y detalle de eventos por empresa.
+OK — Simulador 3D preservado.
+OK — Nombre de empresa dinámico preservado.
+OK — No se encontraron IDs HTML duplicados.
+OK — No se encontraron referencias $() a IDs inexistentes.
+OK — No quedan flechas finas →/← en las interfaces HTML principales.
+
+NOTA: La validación realizada es de sintaxis, estructura e integración estática. La publicación en Supabase requiere ejecutar la migración incluida en supabase_schema.sql para activar la restricción de una sola partida activa a nivel de base de datos.

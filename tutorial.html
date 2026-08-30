@@ -1,135 +1,44 @@
 <div class="tutorial-shell" aria-label="Tutorial de SIDE">
   <div class="tutorial-top">
-    <div class="tutorial-brand">
-      <img src="assets/side_logo.png" alt="SIDE">
-      <span>TUTORIAL DE JUEGO</span>
-    </div>
-    <button id="tutorialSkip" class="tutorial-skip" type="button">SALTAR TUTORIAL</button>
+    <div class="tutorial-brand"><img src="assets/side_logo.png" alt="SIDE"><span>TUTORIAL DE JUEGO</span></div>
+    <span class="tutorial-required">COMPLETA EL TUTORIAL</span>
   </div>
-
-  <div class="tutorial-progress">
-    <div id="tutorialProgressFill"></div>
-  </div>
-
+  <div class="tutorial-progress"><div id="tutorialProgressFill"></div></div>
   <div class="tutorial-carousel" id="tutorialCarousel">
-    <button id="tutorialPrev" class="tutorial-arrow tutorial-arrow-left" type="button" aria-label="Anterior">‹</button>
-
-    <div class="tutorial-viewport">
-      <div class="tutorial-track" id="tutorialTrack">
-
-        <article class="tutorial-slide tutorial-intro">
-          <div class="tutorial-intro-glow"></div>
-          <img class="tutorial-intro-logo" src="assets/side_logo.png" alt="SIDE">
-          <span class="tutorial-kicker">ANTES DE COMENZAR</span>
-          <h1>¡CONOCE TU<br><em>PRÓXIMA JUGADA!</em></h1>
-          <p>En SIDE construirás tu empresa tomando decisiones estratégicas. Explora las 7 zonas, analiza tus opciones y arma la estrategia que llevará a tu empresa al siguiente nivel.</p>
-          <div class="tutorial-hints">
-            <span><b>7</b> zonas de decisión</span>
-            <span><b>1</b> estrategia empresarial</span>
-            <span><b>∞</b> formas de jugar</span>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="A">
-          <div class="tutorial-art-wrap zone-a">
-            <img src="assets/side_logo.png" alt="Empresa">
-            <span class="tutorial-letter">A</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA A · EMPRESA</span>
-            <h2>Define el rumbo de tu empresa</h2>
-            <p>Elige el <strong>segmento estratégico</strong> en el que competirá tu empresa. Esta decisión marca la orientación general de tu negocio y condiciona las decisiones que tomarás después.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿A qué tipo de cliente quiero servir y con qué propuesta?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="B">
-          <div class="tutorial-art-wrap zone-b">
-            <img src="assets/icons/categories/infraestructura.svg" alt="Infraestructura">
-            <span class="tutorial-letter">B</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA B · INFRAESTRUCTURA</span>
-            <h2>Equipa la operación</h2>
-            <p>Decide el <strong>nivel tecnológico y operativo</strong> de tu planta: maquinaria, moldes, acabados y mantenimiento. Una mayor capacidad puede mejorar eficiencia y calidad, pero también exige inversión.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Cuánto necesito invertir para producir mejor?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="C">
-          <div class="tutorial-art-wrap zone-c">
-            <img src="assets/icons/categories/recursos_humanos.svg" alt="Recursos Humanos">
-            <span class="tutorial-letter">C</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA C · RECURSOS HUMANOS</span>
-            <h2>Forma el equipo</h2>
-            <p>Arma el equipo que hará posible la operación: <strong>corte, ensamble, acabados y coordinación</strong>. El talento y la especialización influyen en la velocidad, calidad y capacidad de tu empresa.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Qué habilidades necesita mi empresa para crecer?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="D">
-          <div class="tutorial-art-wrap zone-d">
-            <img src="assets/icons/categories/canales_ventas.svg" alt="Canales y ventas">
-            <span class="tutorial-letter">D</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA D · CANALES Y VENTAS</span>
-            <h2>Lleva tu producto al mercado</h2>
-            <p>Decide <strong>cómo llegarás a tus clientes</strong>, cómo financiarás tus ventas y qué respaldo ofrecerás. Tu elección afecta el alcance comercial y la relación con el mercado.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Dónde y cómo quiero vender?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="E">
-          <div class="tutorial-art-wrap zone-e">
-            <img src="assets/icons/categories/insumos.svg" alt="Insumos">
-            <span class="tutorial-letter">E</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA E · INSUMOS</span>
-            <h2>Asegura los recursos</h2>
-            <p>Configura <strong>materiales, proveedores, pagos, tiempos e inventario</strong>. Una buena gestión de insumos ayuda a controlar costos y evita que la operación se quede sin recursos.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Cómo mantengo el equilibrio entre costo, calidad y disponibilidad?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="F">
-          <div class="tutorial-art-wrap zone-f">
-            <img src="assets/icons/categories/inversiones.svg" alt="Inversiones">
-            <span class="tutorial-letter">F</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA F · INVERSIONES</span>
-            <h2>Haz crecer tus capacidades</h2>
-            <p>Fortalece las capacidades internas y la <strong>presencia comercial</strong> de tu empresa. Invierte pensando en el crecimiento, pero sin perder de vista los recursos que tienes disponibles.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Qué inversión puede generar más valor para mi empresa?</div>
-          </div>
-        </article>
-
-        <article class="tutorial-slide" data-zone="G">
-          <div class="tutorial-art-wrap zone-g">
-            <img src="assets/icons/categories/finanzas.svg" alt="Finanzas">
-            <span class="tutorial-letter">G</span>
-          </div>
-          <div class="tutorial-copy">
-            <span class="tutorial-kicker">ZONA G · FINANZAS</span>
-            <h2>Cuida la salud financiera</h2>
-            <p>Define el <strong>tratamiento financiero y contable</strong> de tu operación. Aquí tus decisiones se conectan con el resultado económico y con la capacidad de sostener la estrategia.</p>
-            <div class="tutorial-question"><span>✦</span> Pregúntate: ¿Mi estrategia es financieramente sostenible?</div>
-          </div>
-        </article>
-
-      </div>
-    </div>
-
-    <button id="tutorialNext" class="tutorial-arrow tutorial-arrow-right" type="button" aria-label="Siguiente">›</button>
+    <button id="tutorialPrev" class="tutorial-arrow tutorial-arrow-left" type="button" aria-label="Anterior"><img src="assets/icons/ui/arrow-left-thick.svg" alt=""></button>
+    <div class="tutorial-viewport"><div class="tutorial-track" id="tutorialTrack">
+      <article class="tutorial-slide tutorial-intro">
+        <div class="tutorial-intro-glow"></div><img class="tutorial-intro-logo" src="assets/side_logo.png" alt="SIDE"><span class="tutorial-kicker">ANTES DE COMENZAR</span>
+        <h1>ADMINISTRA TU<br><em>EMPRESA COMO UN JUEGO</em></h1>
+        <p>Tu empresa empieza con una caja definida por el docente. Cada decisión que guardes puede modificar el dinero disponible. Revisa las pestañas, elige cantidades y construye tu estrategia para cada ciclo.</p>
+        <div class="tutorial-hints"><span><b>5</b> pestañas de decisión</span><span><b>S/</b> caja en tiempo real</span><span><b>1</b> estrategia por ciclo</span></div>
+      </article>
+      <article class="tutorial-slide" data-zone="A">
+        <div class="tutorial-art-wrap zone-a"><img src="assets/side_logo.png" alt="Empresa"><span class="tutorial-letter">A</span></div>
+        <div class="tutorial-copy"><span class="tutorial-kicker">EMPRESA</span><h2>Define tu segmento</h2><p>El <strong>nombre legal y el nombre comercial</strong> los defines al ingresar a la partida. Aquí eliges el <strong>segmento de mercado</strong> con el que competirás.</p><div class="tutorial-question"><span>✦</span> Tu segmento orienta las decisiones posteriores.</div></div>
+      </article>
+      <article class="tutorial-slide" data-zone="B">
+        <div class="tutorial-art-wrap zone-b"><img src="assets/icons/categories/infraestructura.svg" alt="Infraestructura"><span class="tutorial-letter">B</span></div>
+        <div class="tutorial-copy"><span class="tutorial-kicker">INFRAESTRUCTURA</span><h2>Compra activos y equipa la planta</h2><p>Elige <strong>cantidades de mesas y maquinaria</strong>, local de producción, molde y mantenimiento. La maquinaria adquirida quedará marcada como parte de tus activos.</p><div class="tutorial-question"><span>✦</span> Los moldes ya adquiridos no vuelven a elegirse en ciclos posteriores.</div></div>
+      </article>
+      <article class="tutorial-slide" data-zone="C">
+        <div class="tutorial-art-wrap zone-c"><img src="assets/icons/categories/recursos_humanos.svg" alt="Producción"><span class="tutorial-letter">C</span></div>
+        <div class="tutorial-copy"><span class="tutorial-kicker">PRODUCCIÓN</span><h2>Personal, compras e insumos en un solo lugar</h2><p>Indica cuántas personas contratar, cuánto producir y cuánta materia prima comprar. Si contratas un <strong>analista de compras</strong>, obtendrás mejores condiciones de negociación.</p><div class="tutorial-question"><span>✦</span> Puedes comprar más materia prima que la mínima requerida.</div></div>
+      </article>
+      <article class="tutorial-slide" data-zone="D">
+        <div class="tutorial-art-wrap zone-d"><img src="assets/icons/categories/canales_ventas.svg" alt="Canales y ventas"><span class="tutorial-letter">D</span></div>
+        <div class="tutorial-copy"><span class="tutorial-kicker">CANALES Y VENTAS</span><h2>Elige dónde vender</h2><p>Activa página web o tiendas en <strong>Los Olivos, Miraflores y San Juan de Lurigancho</strong>. La demanda depende del distrito y el personal de ventas aparece cuando eliges una tienda física.</p><div class="tutorial-question"><span>✦</span> Cada vendedor cuesta S/ 1,300 por ciclo.</div></div>
+      </article>
+      <article class="tutorial-slide" data-zone="E">
+        <div class="tutorial-art-wrap zone-g"><img src="assets/icons/categories/finanzas.svg" alt="Inversiones y finanzas"><span class="tutorial-letter">E</span></div>
+        <div class="tutorial-copy"><span class="tutorial-kicker">INVERSIONES Y FINANZAS</span><h2>Invierte y administra financiamiento</h2><p>Decide cuánto invertir en capacidades y marketing. También puedes solicitar un <strong>préstamo bancario</strong> viendo la TEA y el monto máximo definidos por el docente.</p><div class="tutorial-question"><span>✦</span> Guarda cada pestaña para aplicar los cambios a tu caja.</div></div>
+      </article>
+    </div></div>
+    <button id="tutorialNext" class="tutorial-arrow tutorial-arrow-right" type="button" aria-label="Siguiente"><img src="assets/icons/ui/arrow-right-thick.svg" alt=""></button>
   </div>
-
   <div class="tutorial-bottom">
     <div class="tutorial-dots" id="tutorialDots" aria-label="Progreso del tutorial"></div>
-    <div class="tutorial-counter"><strong id="tutorialCurrent">1</strong><span>/ 8</span></div>
-    <button id="tutorialContinue" class="tutorial-continue" type="button">CONTINUAR AL JUEGO <span>→</span></button>
+    <div class="tutorial-counter"><strong id="tutorialCurrent">1</strong><span>/ 6</span></div>
+    <button id="tutorialContinue" class="tutorial-continue hidden" type="button">EMPEZAR A JUGAR <span class="tutorial-inline-arrow"><img src="assets/icons/ui/arrow-right-thick.svg" alt=""></span></button>
   </div>
 </div>

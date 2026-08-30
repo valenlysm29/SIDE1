@@ -1,0 +1,8 @@
+SIDE — CAMBIO DE NOMBRE DE EMPRESA
+
+- Ya no existe BOSS BAGS como empresa obligatoria o predeterminada.
+- El estudiante registra Nombre legal y Nombre comercial al entrar a una partida.
+- El nombre comercial se muestra en lobby, decisiones, tienda 3D, caja, tickets y computadora administrativa.
+- El nombre legal se conserva para identificación/reportes.
+- El nombre sugerido del docente es opcional y no reemplaza la elección del estudiante.
+- El progreso 3D se separa por código de partida + empresa + ciclo.
