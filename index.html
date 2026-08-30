@@ -92,17 +92,26 @@
       <div id="registerMessage" class="form-message"></div>
     </section>
 
-    <section id="studentModal" class="modal hidden" role="dialog" aria-modal="true">
+    <section id="studentModal" class="modal student-join-modal hidden" role="dialog" aria-modal="true">
       <button class="close-btn" data-close aria-label="Cerrar">×</button>
       <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
       <h2>Entrar a una partida</h2>
       <p class="modal-lead">Introduce el código que te entregó tu profesor.</p>
-      <form id="studentForm">
-        <label for="gameCode">Código de partida</label><input id="gameCode" placeholder="Ej. SIDE-4821" maxlength="12" required>
-        <label for="companyLegalName">Nombre de tu empresa</label><input id="companyLegalName" placeholder="Ej. Textiles Andinos S.A.C." maxlength="60" required>
-        <label for="companyBrandName">Nombre comercial</label><input id="companyBrandName" placeholder="Ej. Nova Bags" maxlength="40" required>
-        <small class="field-hint">Estos nombres identificarán a tu empresa durante toda la partida y no podrás cambiarlos después.</small>
-        <button class="primary-gold" type="submit">ENTRAR A LA PARTIDA</button>
+      <form id="studentForm" class="student-join-form">
+        <div class="join-field join-code-field">
+          <label for="gameCode">Código de partida</label>
+          <input id="gameCode" placeholder="Ej. SIDE-4821" maxlength="12" autocomplete="off" required>
+        </div>
+        <div class="join-field">
+          <label for="companyLegalName">Nombre de tu empresa</label>
+          <input id="companyLegalName" placeholder="Ej. Textiles Andinos S.A.C." maxlength="60" autocomplete="organization" required>
+        </div>
+        <div class="join-field">
+          <label for="companyBrandName">Nombre comercial</label>
+          <input id="companyBrandName" placeholder="Ej. BOSS BAGS" maxlength="40" autocomplete="off" required>
+        </div>
+        <p class="join-name-warning">Estos nombres identificarán a tu empresa durante toda la partida y no podrás cambiarlos después.</p>
+        <button class="primary-gold join-submit" type="submit">ENTRAR A LA PARTIDA</button>
       </form>
       <div id="studentMessage" class="form-message"></div>
     </section>

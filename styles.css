@@ -980,3 +980,92 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 @media(max-width:1000px){.decision-topbar{grid-template-columns:50px 1fr 190px}.student-top-timer{display:none}.mission-meter{grid-column:2/-1}.machinery-summary{grid-template-columns:1fr 1fr}.student-finance-mini{grid-template-columns:1fr}.required-alert{align-items:flex-start;flex-direction:column}}
 
 .student-result-breakdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 8px;text-align:left}.student-result-breakdown>div{padding:11px 12px;border-radius:11px;background:#051321;border:1px solid #ffffff10}.student-result-breakdown>div>strong{display:block;margin-bottom:7px;font-size:10px;letter-spacing:.9px;color:#73c2ff}.student-result-breakdown span{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border-bottom:1px solid #ffffff08;font-size:9px;color:#8399b1}.student-result-breakdown span:last-child{border-bottom:0}.student-result-breakdown b{color:#eef6ff;font-size:10px;font-variant-numeric:tabular-nums}.student-event-impact{margin:8px 0 10px;padding:9px 11px;border-radius:9px;background:#ffd34f0a;border:1px solid #ffd34f25;color:#a9b9c9!important;font-size:9px!important;line-height:1.45;text-align:left}.student-event-impact:not(:empty)::before{content:"EVENTOS · ";color:#ffd34f;font-weight:900;letter-spacing:.6px}@media(max-width:850px){.student-result-breakdown{grid-template-columns:1fr}}
+
+
+/* ===== ACCESO ESTUDIANTE · ESTILO UNIFORME ===== */
+.student-join-modal{
+  width:min(875px,94vw);
+  max-height:92vh;
+  padding:48px 58px 34px;
+  border:3px solid #ffd329;
+  border-radius:36px;
+  background:linear-gradient(145deg,#061b3b 0%,#03142e 64%,#021027 100%);
+  box-shadow:0 34px 110px rgba(0,0,0,.78),0 0 0 1px rgba(255,211,41,.10);
+  scrollbar-color:#777 #f4f4f4;
+  scrollbar-width:auto;
+}
+.student-join-modal .modal-side-logo{
+  width:190px;
+  height:82px;
+  margin:-54px auto 8px;
+  filter:drop-shadow(0 6px 13px rgba(0,0,0,.8));
+}
+.student-join-modal h2{
+  margin:16px 0 10px;
+  font-size:clamp(38px,5vw,50px);
+  line-height:1.05;
+  letter-spacing:-1px;
+  color:#ffd329;
+}
+.student-join-modal .modal-lead{
+  margin:0 0 34px;
+  font-size:25px;
+  line-height:1.35;
+  color:#d9e3f2;
+}
+.student-join-form{display:flex;flex-direction:column;gap:20px}
+.student-join-form .join-field{display:flex;flex-direction:column;gap:10px}
+.student-join-form .join-field label{
+  margin:0;
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:-.3px;
+  color:#fff;
+}
+.student-join-form .join-field input{
+  min-height:80px;
+  padding:0 28px;
+  border:1.5px solid #32679d;
+  border-radius:20px;
+  background:#061f42;
+  color:#fff;
+  font-size:25px;
+  font-weight:500;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+}
+.student-join-form .join-field input::placeholder{color:#8490a1;opacity:1}
+.student-join-form .join-code-field input{
+  border:2px solid #e8bd00;
+  box-shadow:0 0 0 4px rgba(255,211,41,.10),inset 0 1px 0 rgba(255,255,255,.02);
+}
+.student-join-form .join-field input:focus{
+  border-color:#ffd329;
+  box-shadow:0 0 0 4px rgba(255,211,41,.15);
+}
+.student-join-form .join-name-warning{
+  margin:-2px 0 8px;
+  color:#8ea4c1;
+  font-size:20px;
+  line-height:1.55;
+}
+.student-join-form .join-submit{
+  min-height:80px;
+  margin-top:2px;
+  border-radius:18px;
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:2px;
+  box-shadow:inset 0 -8px 0 rgba(180,120,0,.22),0 10px 24px rgba(0,0,0,.25);
+}
+.student-join-modal .form-message{margin-top:16px;font-size:14px;text-align:center}
+@media(max-width:720px){
+  .student-join-modal{width:95vw;padding:38px 20px 26px;border-radius:26px}
+  .student-join-modal .modal-side-logo{width:150px;height:65px;margin-top:-42px}
+  .student-join-modal h2{font-size:34px}
+  .student-join-modal .modal-lead{font-size:18px;margin-bottom:24px}
+  .student-join-form{gap:16px}
+  .student-join-form .join-field label{font-size:18px}
+  .student-join-form .join-field input{min-height:62px;padding:0 18px;border-radius:15px;font-size:18px}
+  .student-join-form .join-name-warning{font-size:15px}
+  .student-join-form .join-submit{min-height:64px;font-size:18px}
+}
