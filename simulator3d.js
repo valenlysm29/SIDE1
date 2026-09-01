@@ -2,6 +2,7 @@
 (() => {
   const rootId = 'simulator3d';
   let THREE = null, renderer = null, scene = null, camera = null, clock = null, raf = 0;
+  let POSTFX = null, RoomEnvironment = null, composer = null, normalPass = null, envRenderTarget = null;
   const MODEL_ASSETS = {};
   const modelMixers = [];
   let modelAnimations = null;
@@ -574,6 +575,20 @@
     if (THREE) return true;
     try {
       THREE = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
+      // Módulos de realismo visual (opcionales): si no cargan, el simulador sigue
+      // funcionando exactamente igual que antes, solo sin sombras/post-procesado.
+      try {
+        POSTFX = await import('postprocessing');
+      } catch (e) {
+        console.warn('[SIDE 3D] Post-procesado no disponible, se usará render estándar.', e);
+        POSTFX = null;
+      }
+      try {
+        const envMod = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/environments/RoomEnvironment.js');
+        RoomEnvironment = envMod.RoomEnvironment;
+      } catch (e) {
+        RoomEnvironment = null;
+      }
       return true;
     } catch (err) {
       console.error(err);
@@ -658,7 +673,7 @@
         geo.computeBoundingBox(); geo.computeBoundingSphere();
         const material = materials[prim.material || 0] || new THREE.MeshStandardMaterial({color:0xcccccc,roughness:.7});
         const m = new THREE.Mesh(geo, material); m.name = `${group.name}_primitive_${pi}`;
-        m.castShadow = false; m.receiveShadow = false;
+        m.castShadow = !material.transparent; m.receiveShadow = true;
         group.add(m);
       });
       return group;
@@ -783,8 +798,9 @@
 
   function mesh(geometry, material) {
     const m = new THREE.Mesh(geometry, material);
-    m.castShadow = false;
-    m.receiveShadow = false;
+    const isGlassy = Boolean(material && material.transparent);
+    m.castShadow = !isGlassy;
+    m.receiveShadow = true;
     return m;
   }
 
@@ -1237,7 +1253,9 @@
   function setGraphicsQuality(mode) {
     perfMode=mode; businessState.graphics=mode; saveBusinessState();
     const map={low:.72,medium:1.0,high:Math.min(devicePixelRatio,1.35),auto:1.05}; renderScale=map[mode]||1.05;
-    renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale)); resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
+    renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale)); resize();
+    if (renderer) setupRealism();
+    refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
 
   const TUTORIAL_STEPS=[
@@ -1456,6 +1474,7 @@
     sunLight.position.set(16, 22, 10);
     sunLight.castShadow = false;
     scene.add(sunLight);
+    setupRealism();
 
     scene.add(plane(180, 180, 0x95ad7f, 0, -0.02, 18, -Math.PI / 2, 0, 1, 0));
     scene.add(texturedPlane(42, 38, 'road', 0, 0.01, 16, 12, 10));
@@ -2482,6 +2501,102 @@
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (composer) { try { composer.setSize(w, h, false); } catch (e) {} }
+  }
+
+  /* ---------- Realismo visual: sombras, entorno PMREM y post-procesado ---------- */
+
+  function disposePostFX() {
+    if (composer) { try { composer.dispose(); } catch (e) {} }
+    composer = null;
+    normalPass = null;
+  }
+
+  function setupEnvironment() {
+    if (!renderer || !scene || !RoomEnvironment) return;
+    try {
+      if (envRenderTarget) { envRenderTarget.dispose(); envRenderTarget = null; }
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const envScene = new RoomEnvironment();
+      envRenderTarget = pmrem.fromScene(envScene, 0.045);
+      scene.environment = envRenderTarget.texture;
+      scene.environmentIntensity = 0.55;
+      pmrem.dispose();
+    } catch (e) {
+      console.warn('[SIDE 3D] No se pudo generar el mapa de entorno.', e);
+    }
+  }
+
+  function setupShadows() {
+    if (!renderer || !sunLight) return;
+    const enable = perfMode !== 'low';
+    renderer.shadowMap.enabled = enable;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    sunLight.castShadow = enable;
+    if (!enable) return;
+    const mapSize = perfMode === 'high' ? 2048 : 1024;
+    sunLight.shadow.mapSize.set(mapSize, mapSize);
+    sunLight.shadow.camera.near = 4;
+    sunLight.shadow.camera.far = 58;
+    sunLight.shadow.camera.left = -23;
+    sunLight.shadow.camera.right = 23;
+    sunLight.shadow.camera.top = 23;
+    sunLight.shadow.camera.bottom = -19;
+    sunLight.shadow.bias = -0.0018;
+    sunLight.shadow.normalBias = 0.025;
+    sunLight.shadow.camera.updateProjectionMatrix();
+  }
+
+  function setupPostFX() {
+    disposePostFX();
+    if (!POSTFX || !renderer || !scene || !camera || perfMode === 'low') return;
+    try {
+      const c = new POSTFX.EffectComposer(renderer);
+      c.addPass(new POSTFX.RenderPass(scene, camera));
+      const effects = [];
+      if (perfMode === 'high') {
+        normalPass = new POSTFX.NormalPass(scene, camera);
+        c.addPass(normalPass);
+        effects.push(new POSTFX.SSAOEffect(camera, normalPass.texture, {
+          blendFunction: POSTFX.BlendFunction.MULTIPLY,
+          samples: 9,
+          rings: 7,
+          radius: 0.16,
+          intensity: 1.35,
+          luminanceInfluence: 0.6,
+          bias: 0.03,
+          fade: 0.02,
+          worldDistanceThreshold: 20,
+          worldDistanceFalloff: 8,
+          worldProximityThreshold: 1.2,
+          worldProximityFalloff: 0.6
+        }));
+      }
+      effects.push(new POSTFX.BloomEffect({
+        blendFunction: POSTFX.BlendFunction.SCREEN,
+        luminanceThreshold: 0.82,
+        luminanceSmoothing: 0.25,
+        mipmapBlur: true,
+        intensity: perfMode === 'high' ? 0.55 : 0.4,
+        radius: 0.78
+      }));
+      effects.push(new POSTFX.SMAAEffect({ preset: POSTFX.SMAAPreset.MEDIUM }));
+      effects.push(new POSTFX.VignetteEffect({ offset: 0.3, darkness: 0.38 }));
+      c.addPass(new POSTFX.EffectPass(camera, ...effects));
+      const w = $3('side3dCanvas')?.clientWidth || innerWidth;
+      const h = $3('side3dCanvas')?.clientHeight || innerHeight;
+      c.setSize(w, h, false);
+      composer = c;
+    } catch (e) {
+      console.warn('[SIDE 3D] No se pudo iniciar el post-procesado, se usará render estándar.', e);
+      disposePostFX();
+    }
+  }
+
+  function setupRealism() {
+    setupShadows();
+    setupEnvironment();
+    setupPostFX();
   }
 
 
@@ -2547,7 +2662,7 @@
     }
     updateAdaptiveQuality(dt, now);
     updateModelMixers(dt);
-    renderer.render(scene, camera);
+    if (composer) composer.render(dt); else renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
 

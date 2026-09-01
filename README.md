@@ -62,3 +62,13 @@ La versión actual incorpora obligatoriedad selectiva de decisiones, saldo guard
 
 ## Mejora GLB de realismo 3D
 La versión actual incorpora modelos GLB locales para NPCs, bolsos, caja/POS, estanterías y mobiliario. Los NPC utilizan animaciones con `THREE.AnimationMixer` y existe fallback procedural si un recurso no carga. Ver `MODELOS_GLB_REALISMO.md`.
+
+## Realismo visual: sombras, entorno PMREM y post-procesado (actualización 31/08/2026)
+Se incorporó un segundo nivel de realismo sobre la base GLB existente, apoyado en las librerías de referencia `three.js` (r0.180.0) y `postprocessing` (pmndrs, v6.39.4):
+
+- **Sombras dinámicas**: la luz solar (`sunLight`) proyecta sombras suaves (`PCFSoftShadowMap`) sobre toda la tienda y el mobiliario cercano. El vidrio queda excluido para no generar sombras sólidas irreales.
+- **Mapa de entorno PMREM**: se genera un entorno de iluminación (`RoomEnvironment` + `THREE.PMREMGenerator`) que mejora los reflejos del piso de madera, el mostrador y los vidrios de la fachada.
+- **Post-procesado**: `EffectComposer` con Bloom (brillos de luces/vidrieras), SMAA (antialiasing) y viñeta sutil. En calidad **Alta** se suma Ambient Occlusion (SSAO) con un `NormalPass` dedicado para reforzar el contacto de los objetos con el piso.
+- **Todo ligado a la calidad gráfica existente** (`Baja/Media/Alta/Auto`): en Baja se desactivan sombras y post-procesado para máximo rendimiento; Media/Auto activan sombras + Bloom/SMAA/viñeta; Alta suma SSAO. Cambiar la calidad desde el panel de ajustes reconstruye estos efectos al instante.
+- **Carga tolerante a fallos**: si el CDN de `postprocessing` o el módulo `RoomEnvironment` no cargan (sin conexión, bloqueo de red, etc.), el simulador sigue funcionando exactamente igual que antes, solo sin estas mejoras visuales.
+- Requiere el `<script type="importmap">` agregado en `index.html` que resuelve `three`, `three/addons/` y `postprocessing` a CDN (jsDelivr), manteniendo el mismo enfoque sin build step que ya usaba el proyecto.
