@@ -7,8 +7,8 @@
 .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 30px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:18px}.brand img{width:84px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}.brand span{font-size:13px;font-weight:900;letter-spacing:.14em;color:var(--gold)}
 nav{display:grid;gap:8px}
 .nav-btn,.sidebar-link{border:0;background:transparent;color:var(--muted);padding:12px 13px;border-radius:13px;text-align:left;font-weight:700;display:flex;gap:12px;align-items:center;transition:.2s;position:relative}
-.nav-icon{width:40px;height:40px;min-width:40px;border-radius:12px;display:grid;place-items:center;background:#07172a;border:1px solid rgba(255,255,255,.08);transition:.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.nav-icon img{width:24px;height:24px;object-fit:contain;filter:none;transition:.2s}
+.nav-icon{width:34px;height:34px;min-width:34px;border-radius:10px;display:grid;place-items:center;background:#07172a;border:1px solid rgba(255,255,255,.08);transition:.2s}
+.nav-icon img{width:19px;height:19px;object-fit:contain;filter:brightness(.85) saturate(.8);transition:.2s}
 .nav-btn:hover{background:#0a203a;color:#eaf4ff}.nav-btn:hover .nav-icon{border-color:rgba(101,194,255,.4)}
 .nav-btn.active{color:#fff;background:linear-gradient(180deg,rgba(16,59,102,.9),rgba(10,32,56,.9));box-shadow:inset 0 0 0 1px rgba(61,167,255,.33),0 10px 25px rgba(0,0,0,.3)}
 .nav-btn.active .nav-icon{background:linear-gradient(145deg,#ffe985,#e7a800);border-color:transparent;box-shadow:0 0 16px rgba(255,211,41,.4)}
@@ -53,3 +53,39 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.mini{font-family:Montserrat,A
 
 /* ===== BANCO DE EVENTOS PERÚ · SELECCIÓN MANUAL / ALEATORIA ===== */
 .event-mode-panel{display:grid;grid-template-columns:minmax(210px,1fr) 150px auto auto auto;gap:10px;align-items:end;margin:12px 0;padding:12px;border:1px solid #1d3047;border-radius:12px;background:#05111f}.event-control-label{display:block;color:#7f96af;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}.native-choice-row.compact{margin:0}.native-choice-row.compact label{padding:8px 10px}.random-count-field{display:grid;gap:5px;font-size:10px;color:#8398b1;font-weight:800}.random-count-field input{min-width:0}.event-filter-row{display:grid;grid-template-columns:minmax(220px,1.4fr) minmax(170px,.8fr) minmax(140px,.65fr) auto;gap:10px;align-items:end;margin:12px 0}.event-filter-row label{display:grid;gap:5px;font-size:10px;color:#8398b1;font-weight:800}.event-filter-row input,.event-filter-row select,.random-count-field input{width:100%;padding:9px 10px;border-radius:9px;border:1px solid #23384f;background:#071528;color:#eaf3ff}.event-visible-count{align-self:center;justify-self:end;color:#7f96af;font-size:10px;font-weight:800}.event-table-wrap{max-height:610px;overflow:auto;scrollbar-color:#38526e #07111f;scrollbar-width:thin}.event-table th:nth-child(4),.event-table td:nth-child(4),.event-table th:nth-child(6),.event-table td:nth-child(6){text-align:center}.event-table td:nth-child(5){min-width:285px}.event-table .cycle-offset{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border-radius:8px;background:#0b2138;border:1px solid #27496b;color:#8fc9ff;font-size:10px;font-weight:900;white-space:nowrap}.event-table .event-category{display:block;margin-top:4px;color:#5f7893;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.45px}.event-table tr.random-picked{background:#ffd32908}.event-table input:disabled{opacity:.55;cursor:not-allowed}.event-mode-hint{margin-top:10px}.event-mode-hint b{color:#ffd65a}.event-mode-panel.random-mode #eventSelectAllVisible{opacity:.45;pointer-events:none}.event-mode-panel.manual-mode #eventRandomize,.event-mode-panel.manual-mode .random-count-field{opacity:.45}.event-mode-panel.manual-mode #eventRandomize{pointer-events:none}@media(max-width:1100px){.event-mode-panel{grid-template-columns:1fr 140px 1fr}.event-mode-panel>button:nth-of-type(2),.event-mode-panel>button:nth-of-type(3){grid-row:2}.event-filter-row{grid-template-columns:1fr 1fr}.event-visible-count{justify-self:start}}@media(max-width:680px){.event-mode-panel,.event-filter-row{grid-template-columns:1fr}.event-mode-panel>button{width:100%}.event-visible-count{justify-self:start}}
+
+
+/* ===== Ajustes UX 31/08/2026 · panel docente ===== */
+.section-head{margin-bottom:18px}
+#tab-resultados>.table-card{margin-top:18px}
+#tab-resultados>.table-card+.table-card{margin-top:22px}
+#tab-resultados>.card:last-child{margin-top:22px}
+#tab-resultados .card-title{padding:18px 20px}
+#tab-resultados .card-title h3{margin:0;text-align:center;flex:1}
+#tab-resultados .card-title>span{min-width:220px;text-align:right}
+
+/* Rondas/eventos: todos los controles tienen una altura y alineación uniforme. */
+#tab-rondas .event-mode-panel{grid-template-columns:minmax(250px,1.25fr) minmax(130px,.55fr) minmax(210px,1fr) minmax(150px,.7fr) minmax(150px,.7fr);align-items:stretch}
+#tab-rondas .event-mode-panel>div,
+#tab-rondas .event-mode-panel>label,
+#tab-rondas .event-mode-panel>button{min-height:44px;box-sizing:border-box}
+#tab-rondas .event-mode-panel>button{height:44px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+#tab-rondas .event-mode-panel .native-choice-row{height:44px;align-items:stretch}
+#tab-rondas .event-mode-panel .native-choice-row label{height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+#tab-rondas .random-count-field{height:44px}
+#tab-rondas .random-count-field input{height:44px;box-sizing:border-box}
+#tab-rondas .event-filter-row{align-items:stretch}
+#tab-rondas .event-filter-row label{min-height:72px}
+#tab-rondas .event-filter-row input,#tab-rondas .event-filter-row select{height:42px;box-sizing:border-box}
+#tab-rondas .event-visible-count{height:42px;display:flex;align-items:center}
+
+@media(max-width:1100px){
+ #tab-rondas .event-mode-panel{grid-template-columns:1fr 140px}
+ #tab-rondas .event-mode-panel>button{width:100%}
+}
+@media(max-width:680px){
+ #tab-rondas .event-mode-panel{grid-template-columns:1fr}
+ #tab-rondas .event-mode-panel>button{height:44px}
+ #tab-resultados .card-title{align-items:center;flex-direction:column;gap:7px}
+ #tab-resultados .card-title>span{min-width:0;text-align:center}
+}

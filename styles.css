@@ -1070,37 +1070,119 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .student-join-form .join-submit{min-height:64px;font-size:18px}
 }
 
-/* ===== ACCESO ESTUDIANTE COMPACTO ===== */
-.student-join-modal{width:min(620px,90vw)!important;max-height:calc(100vh - 56px)!important;padding:20px 30px 18px!important;border-radius:24px!important;overflow:auto!important}
-.student-join-modal .modal-side-logo{width:126px!important;height:50px!important;margin:-24px auto 0!important}
-.student-join-modal h2{font-size:clamp(26px,3.6vw,34px)!important;margin:4px 0 4px!important;line-height:1.04!important}
-.student-join-modal .modal-lead{font-size:15px!important;margin:0 0 12px!important;line-height:1.35!important}
-.student-join-form{gap:10px!important}
-.student-join-form .join-field{gap:5px!important}
-.student-join-form .join-field label{font-size:15px!important}
-.student-join-form .join-field input{min-height:50px!important;padding:0 16px!important;border-radius:12px!important;font-size:16px!important}
-.student-join-form .join-name-warning{font-size:13px!important;line-height:1.35!important;margin:0!important}
-.student-join-form .join-submit{min-height:52px!important;border-radius:12px!important;font-size:16px!important;letter-spacing:1px!important;margin-top:4px!important}
-@media(max-width:720px){.student-join-modal{width:94vw!important;padding:18px 16px 16px!important}.student-join-modal .modal-side-logo{width:112px!important;height:44px!important}.student-join-form .join-field input{min-height:48px!important}}
 
-/* ===== EMPRESA · VISTA COMPACTA Y SIN IMPORTES ===== */
-#decisionDetail[data-cat="A"] .sticky-section-head{padding:12px 16px;margin:0 -18px 10px}
-#decisionDetail[data-cat="A"] .detail-heading>img{width:38px;height:38px}
-#decisionDetail[data-cat="A"] .detail-heading h1{font-size:23px}
-#decisionDetail[data-cat="A"] .detail-heading p{font-size:13px;max-width:620px}
-#decisionDetail[data-cat="A"] .section-balance{display:none}
-#decisionDetail[data-cat="A"] .event-clue{padding:8px 10px;margin-bottom:0}
-#decisionDetail[data-cat="A"] .decision-row{padding:12px 13px}
-#decisionDetail[data-cat="A"] .decision-row-head{margin-bottom:8px}
-#decisionDetail[data-cat="A"] .decision-row-head h3{font-size:16px}
-#decisionDetail[data-cat="A"] .decision-row-head p{font-size:12px;line-height:1.35}
-#decisionDetail[data-cat="A"] .choice-strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-#decisionDetail[data-cat="A"] .choice-pill{min-height:88px;padding:10px 10px 8px 36px}
-#decisionDetail[data-cat="A"] .choice-pill strong{font-size:13px}
-#decisionDetail[data-cat="A"] .choice-pill em{display:none}
-#decisionDetail[data-cat="A"] .choice-pill p{font-size:11px;margin-top:4px}
-#decisionDetail[data-cat="A"] .micro-caption{font-size:12px}
-#decisionDetail[data-cat="A"] .section-save-bar{margin-top:10px;padding:10px 12px;bottom:8px}
-#decisionDetail[data-cat="A"] .section-save-bar>div strong{font-size:15px;color:#dbe7f5}
-#decisionDetail[data-cat="A"] .save-section-btn{min-width:180px}
-@media(max-width:900px){#decisionDetail[data-cat="A"] .choice-strip{grid-template-columns:1fr}}
+/* ===== Ajustes UX 31/08/2026 ===== */
+/* Los campos numéricos de producción se editan sin reconstruir el DOM en cada tecla. */
+.number-decision input[type="number"]{-moz-appearance:textfield;touch-action:manipulation;overscroll-behavior:contain}
+.number-decision input[type="number"]::-webkit-inner-spin-button,.number-decision input[type="number"]::-webkit-outer-spin-button{margin:0}
+.number-decision{min-width:0;flex-wrap:nowrap}
+.number-decision input{flex:0 1 150px;min-width:90px}
+
+/* Panel financiero: tres estados visibles completos, sin scroll horizontal. */
+.student-result-breakdown{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;box-sizing:border-box;overflow:hidden}
+.student-result-breakdown>div{min-width:0;box-sizing:border-box;overflow:hidden}
+.student-result-breakdown span{min-width:0;white-space:nowrap}
+.student-result-breakdown span b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.student-finance-mini{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.student-finance-mini>div{min-width:0;overflow:hidden}
+
+/* Encabezados y tarjetas financieras con respiración visual. */
+.student-result-breakdown>div>strong{text-align:center;padding:0 4px;line-height:1.25}
+.student-finance-mini span,.student-finance-mini small{text-align:center}
+.student-finance-mini strong{text-align:center}
+
+@media(min-width:901px){
+  .lobby-card{width:min(780px,94vw);padding:34px 38px}
+}
+@media(max-width:700px){
+  .student-result-breakdown{grid-template-columns:1fr}
+  .student-finance-mini{grid-template-columns:1fr}
+  .number-decision{flex-wrap:wrap}
+}
+
+
+/* ===== UX 31/08/2026 · ciclo: borrador vs envío definitivo ===== */
+.save-section-btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.25)}
+.decision-row.locked{opacity:.72;border-color:#ffd34f35;box-shadow:inset 3px 0 0 #ffd34f55}
+.decision-row.locked input,.decision-row.locked button{cursor:not-allowed;pointer-events:none}
+.decision-row.locked .row-state{color:#ffd34f}
+.number-decision input[type="number"],.quantity-option input[type="number"]{overscroll-behavior:contain;touch-action:manipulation}
+@media(min-width:901px){
+  .dashboard-screen .lobby{min-height:100vh;height:100vh;padding:10px 18px;box-sizing:border-box;overflow:hidden}
+  .dashboard-screen .lobby-card{width:min(900px,94vw);max-height:calc(100vh - 20px);box-sizing:border-box;overflow:hidden;padding:22px 30px;border-radius:22px}
+  .dashboard-screen .lobby-card h1{font-size:46px;margin:4px 0}
+  .dashboard-screen .lobby-card h2{font-size:20px;margin:5px 0}
+  .dashboard-screen .lobby-card #lobbySegment{font-size:11px;padding:6px 10px;margin:5px 0 9px}
+  .dashboard-screen .student-cycle-clock{margin:8px 0;padding:9px 12px}
+  .dashboard-screen .student-news{margin:8px 0}
+  .dashboard-screen .student-news article,.dashboard-screen .student-news p{padding:6px 9px;margin:3px 0}
+  .dashboard-screen .student-finance-mini{margin:8px 0;gap:6px}
+  .dashboard-screen .student-finance-mini>div{padding:7px}
+  .dashboard-screen .student-result-breakdown{margin:7px 0 5px;gap:6px}
+  .dashboard-screen .student-result-breakdown>div{padding:7px 9px}
+  .dashboard-screen .student-result-breakdown span{padding:2px 0;font-size:8px}
+  .dashboard-screen .student-event-impact{margin:5px 0 7px;padding:6px 9px}
+  .dashboard-screen .pulse-dot{width:10px;height:10px;margin:8px auto}
+  .dashboard-screen .lobby-card>p:last-of-type{margin:5px 0 8px;font-size:11px}
+  .dashboard-screen .lobby-start{padding:9px 18px}
+  .dashboard-screen .tutorial-reopen-btn{padding:7px 12px;margin-top:5px}
+  .dashboard-screen .ghost-btn{padding:6px 14px;margin-top:5px}
+}
+@media(min-width:721px){
+  .student-join-modal{width:min(610px,92vw);max-height:88vh;padding:30px 36px 24px;border-width:2px;border-radius:24px}
+  .student-join-modal .modal-side-logo{width:135px;height:58px;margin:-36px auto 2px}
+  .student-join-modal h2{font-size:32px;margin:8px 0 6px}
+  .student-join-modal .modal-lead{font-size:15px;margin:0 0 18px}
+  .student-join-form{gap:12px}
+  .student-join-form .join-field{gap:6px}
+  .student-join-form .join-field label{font-size:15px}
+  .student-join-form .join-field input{min-height:48px;padding:0 16px;border-radius:12px;font-size:16px}
+  .student-join-form .join-name-warning{font-size:12px;line-height:1.4;margin:0 0 2px}
+  .student-join-form .join-submit{min-height:50px;border-radius:12px;font-size:16px}
+}
+
+/* ===== SIDE UX FINAL · v2 + v3 consolidado ===== */
+#decisionMenu{scroll-behavior:smooth}
+#decisionMenu .decision-topbar{position:sticky;top:0;z-index:120}
+#decisionMenu .decision-tabs{position:sticky;top:0;z-index:115;background:rgba(3,11,22,.98);box-shadow:0 8px 22px rgba(0,0,0,.28)}
+#decisionMenu .sticky-section-head{position:sticky;top:57px;z-index:110;background:rgba(5,17,34,.98)}
+#decisionMenu input[type=number]{overscroll-behavior:contain}
+#decisionMenu .number-decision input[type=number],#decisionMenu .stepper input[type=number]{touch-action:manipulation}
+.decision-action-pair{display:flex;align-items:stretch;gap:10px;margin-left:auto}
+.decision-action-pair button{min-height:50px;border-radius:12px;padding:8px 18px;min-width:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;line-height:1.05}
+.decision-action-pair .save-section-btn{background:linear-gradient(145deg,#17314f,#10243c);border:1px solid #3e6b92;color:#eaf6ff}
+.decision-action-pair .section-submit-btn{background:linear-gradient(145deg,#ffd84a,#e6a800);border:1px solid #ffe37b;color:#271c00}
+.decision-action-pair button strong{font-size:12px;letter-spacing:.4px}
+.decision-action-pair button small{font-size:9px;margin-top:4px;opacity:.8}
+.decision-action-pair button:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.5)}
+.section-submit-btn.submitted{background:linear-gradient(145deg,#174d32,#123b27)!important;color:#a9ffd0!important;border-color:#4fd486!important}
+.top-submit-all{border:1px solid #ffd33f;background:rgba(255,211,63,.1);color:#ffe47a;border-radius:10px;padding:8px 13px;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap;margin-left:auto}
+.top-submit-all:hover{background:rgba(255,211,63,.18)}
+.decision-tab{min-height:50px}
+.decision-tab.section-sent{border-color:#4fd48655}
+.decision-tab .tab-status{font-size:7px;display:block;opacity:.85;margin-top:2px}
+.lobby-card{width:min(570px,90vw);padding:30px 34px;border-radius:22px}
+.lobby-card h1{font-size:48px;margin:7px 0}
+.lobby-card h2{font-size:23px;margin:5px 0}
+.student-result-breakdown{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:100%;box-sizing:border-box;overflow:hidden}
+.student-result-breakdown>div{min-width:0;box-sizing:border-box;overflow:hidden}
+.student-result-breakdown>div>strong{text-align:center;padding:0 8px;line-height:1.25;display:block}
+@media(min-width:901px){.student-result-breakdown{gap:18px}.student-finance-mini{gap:14px}}
+@media(max-width:700px){.decision-action-pair{width:100%;margin-left:0}.decision-action-pair button{min-width:0;flex:1}.student-result-breakdown{grid-template-columns:1fr}.top-submit-all{display:none}}
+
+
+/* ===== AJUSTE FINAL DE FIJACIÓN Y ACCIONES ===== */
+@media(min-width:901px){
+  #decisionMenu .decision-topbar{grid-template-columns:54px minmax(170px,1fr) 220px 145px auto 175px;position:sticky;top:0;z-index:120}
+  #decisionMenu .decision-tabs{position:sticky;top:82px;z-index:115}
+  #decisionMenu .sticky-section-head{position:sticky;top:139px;z-index:110}
+}
+@media(max-width:900px){
+  #decisionMenu .decision-tabs{position:sticky;top:72px;z-index:115}
+  #decisionMenu .sticky-section-head{position:sticky;top:129px;z-index:110}
+}
+.top-submit-all{margin:0;justify-self:end;align-self:center}
+.section-save-bar{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.section-save-bar>div:first-child{min-width:0;flex:1}
+.decision-action-pair{flex:0 0 auto}
+@media(max-width:700px){.section-save-bar{gap:10px}.decision-action-pair{flex:1}}

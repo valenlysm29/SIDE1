@@ -59,6 +59,3 @@ El proyecto mantiene el modo local con `localStorage` y conserva los puntos de i
 
 ## Actualización 29/08/2026
 La versión actual incorpora obligatoriedad selectiva de decisiones, saldo guardado por pestaña, capital fijo/aleatorio, ciclos manuales/automáticos, timer del estudiante, préstamo porcentual, banco de 50 eventos, noticias, seguimiento docente por apartados y resultados financieros disgregados. Consulta `CORRECCIONES_29_08_2026.md` para el detalle completo.
-
-## Mejora GLB de realismo 3D
-La versión actual incorpora modelos GLB locales para NPCs, bolsos, caja/POS, estanterías y mobiliario. Los NPC utilizan animaciones con `THREE.AnimationMixer` y existe fallback procedural si un recurso no carga. Ver `MODELOS_GLB_REALISMO.md`.

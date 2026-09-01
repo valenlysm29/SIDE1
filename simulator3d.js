@@ -2,9 +2,6 @@
 (() => {
   const rootId = 'simulator3d';
   let THREE = null, renderer = null, scene = null, camera = null, clock = null, raf = 0;
-  const MODEL_ASSETS = {};
-  const modelMixers = [];
-  let modelAnimations = null;
   let initialized = false, running = false, locked = false;
   let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0, jumpQueued = false;
   let keys = {}, dynamicGroup = null, npcGroup = null, interactables = [], npcs = [], colliders = [];
@@ -19,10 +16,6 @@
   let lastHudTick = 0, lastPromptTick = 0, lastLightTick = 0;
   let hemiLight = null, sunLight = null, checkoutOpen = false, checkoutScanned = false, checkoutPayment = 'cash';
   let adminMesh = null, adminOpen = false, businessState = null, nextEventAt = 0, nextProductionAt = 0, supplierDeliveryAt = 0, tutorialIndex = 0, secondRegisterMesh = null;
-  let focusedInteractable = null, interactionRaycaster = null, interactionPointer = null, interactionScratch = null;
-  let checkoutBagMesh = null, checkoutBagTarget = null, checkoutBagRemoveAt = 0;
-  let settingsOpen = false, settingsResumeRunning = false, mouseSensitivity = 1, baseFov = 74, nextFootstepAt = 0, lastAutoSaveAt = 0;
-  let deliveryVan = null, deliveryActor = null;
 
   const PRODUCTS = [
     { id: 'esencial', name: 'Bolso Esencial', price: 75, color: 0xc46b59, accent: '#ff9b89' },
@@ -45,13 +38,6 @@
     { x: -8.35, z: 8.85 },
     { x: -8.35, z: 10.15 },
     { x: -8.35, z: 11.45 }
-  ];
-
-  const SHOPPING_SPOTS = [
-    { x: -4.6, z: 2.65, zone: 'mesa' }, { x: 0.0, z: 2.15, zone: 'mesa' }, { x: 4.6, z: 2.65, zone: 'mesa' },
-    { x: -10.2, z: -6.9, zone: 'mural' }, { x: -6.1, z: -6.9, zone: 'mural' }, { x: -2.0, z: -6.9, zone: 'mural' },
-    { x: 2.1, z: -6.9, zone: 'mural' }, { x: 6.2, z: -6.9, zone: 'mural' }, { x: 10.1, z: 1.0, zone: 'exhibidor' },
-    { x: 10.1, z: 3.0, zone: 'exhibidor' }, { x: 10.1, z: 5.0, zone: 'exhibidor' }
   ];
 
   const $3 = (id) => document.getElementById(id);
@@ -94,8 +80,7 @@
       logs: ['Empresa preparada para operar.'],
       tutorialDone: false,
       defects: 0,
-      graphics: 'auto',
-      controls: { sensitivity: 1, fov: 74 }
+      graphics: 'auto'
     };
   }
 
@@ -111,9 +96,6 @@
     businessState.upgrades ||= { display: 0, checkout: 0, warehouse: 0 };
     businessState.production ||= { producedToday: 0, stage: 0 };
     businessState.logs ||= [];
-    businessState.controls ||= { sensitivity: 1, fov: 74 };
-    mouseSensitivity = Math.max(0.45, Math.min(1.8, Number(businessState.controls.sensitivity || 1)));
-    baseFov = Math.max(62, Math.min(88, Number(businessState.controls.fov || 74)));
     PRODUCTS.forEach(p => { p.price = Math.max(1, Number(businessState.prices[p.id] || p.price)); });
     perfMode = businessState.graphics || 'auto';
     renderScale = ({low:.72,medium:1.0,high:1.30,auto:1.05}[perfMode] || 1.05);
@@ -242,14 +224,6 @@
     else if (kind === 'start') { playTone(392, 0.08, 'triangle', 0.03, 0); playTone(523, 0.12, 'triangle', 0.03, 0.07); playTone(659, 0.16, 'triangle', 0.025, 0.14); }
     else if (kind === 'endWin') { playTone(523, 0.1, 'triangle', 0.03, 0); playTone(659, 0.12, 'triangle', 0.03, 0.08); playTone(784, 0.18, 'triangle', 0.03, 0.16); }
     else if (kind === 'endLose') { playTone(392, 0.14, 'sine', 0.024, 0); playTone(294, 0.18, 'sine', 0.024, 0.12); }
-  }
-
-
-  function playFootstep(sprinting = false) {
-    if (!audioEnabled) return;
-    const base = sprinting ? 135 : 112;
-    playTone(base + Math.random() * 18, 0.045, 'triangle', sprinting ? 0.010 : 0.007, 0);
-    playTone(72 + Math.random() * 12, 0.055, 'sine', 0.004, 0.01);
   }
 
   function startAmbient() {
@@ -564,201 +538,6 @@
     }
   }
 
-  function gltfComponents(type) {
-    return ({ SCALAR:1, VEC2:2, VEC3:3, VEC4:4, MAT4:16 })[type] || 1;
-  }
-
-  function gltfArrayCtor(componentType) {
-    return ({5120:Int8Array,5121:Uint8Array,5122:Int16Array,5123:Uint16Array,5125:Uint32Array,5126:Float32Array})[componentType] || Float32Array;
-  }
-
-  async function loadSimpleGLB(url) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`GLB ${response.status}: ${url}`);
-    const buffer = await response.arrayBuffer();
-    const dv = new DataView(buffer);
-    if (dv.getUint32(0,true) !== 0x46546c67) throw new Error('Archivo GLB inválido');
-    let offset = 12, json = null, bin = null;
-    while (offset < buffer.byteLength) {
-      const len = dv.getUint32(offset,true), type = dv.getUint32(offset+4,true); offset += 8;
-      const chunk = buffer.slice(offset, offset+len); offset += len;
-      if (type === 0x4E4F534A) json = JSON.parse(new TextDecoder().decode(chunk).replace(/\u0000+$/,''));
-      if (type === 0x004E4942) bin = chunk;
-    }
-    if (!json || !bin) throw new Error('GLB sin JSON/BIN');
-
-    const materials = (json.materials || []).map((m, i) => {
-      const pbr = m.pbrMetallicRoughness || {};
-      const f = pbr.baseColorFactor || [1,1,1,1];
-      const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(f[0],f[1],f[2]),
-        opacity: f[3] ?? 1,
-        transparent: (f[3] ?? 1) < 0.999,
-        roughness: pbr.roughnessFactor ?? .7,
-        metalness: pbr.metallicFactor ?? .05,
-        side: m.doubleSided ? THREE.DoubleSide : THREE.FrontSide
-      });
-      material.name = m.name || `Material_${i}`;
-      if (/Glass/i.test(material.name)) { material.transparent=true; material.opacity=.58; material.roughness=.08; material.metalness=.12; }
-      if (/WarmLight|LampGlow/i.test(material.name)) { material.emissive=material.color.clone(); material.emissiveIntensity=1.15; }
-      if (/ScannerGlass|ScreenFace/i.test(material.name)) { material.emissive=material.color.clone(); material.emissiveIntensity=.55; }
-      return material;
-    });
-
-    function accessorData(index) {
-      const a = json.accessors[index], bv = json.bufferViews[a.bufferView];
-      const Ctor = gltfArrayCtor(a.componentType), comps = gltfComponents(a.type);
-      const byteOffset = (bv.byteOffset || 0) + (a.byteOffset || 0);
-      const count = a.count * comps;
-      if (bv.byteStride && bv.byteStride !== Ctor.BYTES_PER_ELEMENT * comps) {
-        const out = new Ctor(count), src = new Uint8Array(bin);
-        const scratch = new DataView(src.buffer, src.byteOffset, src.byteLength);
-        const getters = {5120:'getInt8',5121:'getUint8',5122:'getInt16',5123:'getUint16',5125:'getUint32',5126:'getFloat32'};
-        const getter = getters[a.componentType], size = Ctor.BYTES_PER_ELEMENT;
-        for (let n=0;n<a.count;n++) for (let c=0;c<comps;c++) out[n*comps+c] = scratch[getter](byteOffset+n*bv.byteStride+c*size,true);
-        return {array:out, comps, normalized:Boolean(a.normalized)};
-      }
-      const arr = new Ctor(bin, byteOffset, count);
-      return {array:arr.slice ? arr.slice() : new Ctor(arr), comps, normalized:Boolean(a.normalized)};
-    }
-
-    const meshTemplates = (json.meshes || []).map((def, mi) => {
-      const group = new THREE.Group(); group.name = def.name || `Mesh_${mi}`;
-      (def.primitives || []).forEach((prim, pi) => {
-        const geo = new THREE.BufferGeometry();
-        const pos = accessorData(prim.attributes.POSITION);
-        geo.setAttribute('position', new THREE.BufferAttribute(pos.array, pos.comps, pos.normalized));
-        if (prim.attributes.NORMAL !== undefined) {
-          const nor = accessorData(prim.attributes.NORMAL);
-          geo.setAttribute('normal', new THREE.BufferAttribute(nor.array,nor.comps,nor.normalized));
-        }
-        if (prim.indices !== undefined) {
-          const idx = accessorData(prim.indices);
-          geo.setIndex(new THREE.BufferAttribute(idx.array,1,idx.normalized));
-        }
-        if (!geo.getAttribute('normal')) geo.computeVertexNormals();
-        geo.computeBoundingBox(); geo.computeBoundingSphere();
-        const material = materials[prim.material || 0] || new THREE.MeshStandardMaterial({color:0xcccccc,roughness:.7});
-        const m = new THREE.Mesh(geo, material); m.name = `${group.name}_primitive_${pi}`;
-        m.castShadow = false; m.receiveShadow = false;
-        group.add(m);
-      });
-      return group;
-    });
-
-    const nodes = (json.nodes || []).map((def, i) => {
-      const o = def.mesh !== undefined ? meshTemplates[def.mesh].clone(true) : new THREE.Group();
-      o.name = def.name || `Node_${i}`;
-      if (def.matrix) {
-        const matrix = new THREE.Matrix4().fromArray(def.matrix);
-        matrix.decompose(o.position,o.quaternion,o.scale);
-      } else {
-        if (def.translation) o.position.fromArray(def.translation);
-        if (def.rotation) o.quaternion.fromArray(def.rotation);
-        if (def.scale) o.scale.fromArray(def.scale);
-      }
-      o.traverse(ch => { if (ch.isMesh) ch.name = `${o.name}_mesh`; });
-      return o;
-    });
-    (json.nodes || []).forEach((def, i) => (def.children || []).forEach(ci => nodes[i].add(nodes[ci])));
-    const root = new THREE.Group(); root.name='GLBRoot';
-    const sceneDef = (json.scenes || [])[json.scene || 0] || {nodes:[0]};
-    (sceneDef.nodes || [0]).forEach(i => root.add(nodes[i]));
-    root.userData.sourceUrl = url;
-    return root;
-  }
-
-  function cloneModel(key) {
-    const src = MODEL_ASSETS[key];
-    if (!src) return null;
-    const cloned = src.clone(true);
-    cloned.traverse(o => {
-      if (o.isMesh && o.material) { o.material = o.material.clone(); o.userData.sharedGLBGeometry = true; }
-    });
-    return cloned;
-  }
-
-  function tintPersonModel(root, cfg, female) {
-    const skin = cfg.skin ?? [0xd8ab7e,0xc8956c,0x9f6a4a,0xe2b98d][Math.floor(Math.random()*4)];
-    const shirt = cfg.shirt ?? (female ? 0xb76f63 : 0x315a91);
-    const pants = cfg.pants ?? [0x233041,0x283746,0x30333a,0x485366][Math.floor(Math.random()*4)];
-    const shoes = cfg.shoes ?? 0x4e392c;
-    const hair = cfg.hair ?? [0x37281f,0x6f5038,0x1f2023,0x9a7046][Math.floor(Math.random()*4)];
-    root.traverse(o => {
-      if (!o.isMesh) return;
-      const n = o.name || '';
-      if (/Head|Neck|Forearm|Hand/.test(n)) o.material.color.setHex(skin);
-      else if (/Torso|Arm_/.test(n)) o.material.color.setHex(shirt);
-      else if (/Hips|Leg_|Thigh|Calf|Knee/.test(n)) o.material.color.setHex(pants);
-      else if (/Shoe/.test(n)) o.material.color.setHex(shoes);
-      else if (/Hair/.test(n)) o.material.color.setHex(hair);
-      else if (/Tie/.test(n)) o.material.color.setHex(cfg.tie ?? 0x2f67c2);
-    });
-  }
-
-  function qValues(axis, angles) {
-    const vals=[];
-    angles.forEach(a => { const q=new THREE.Quaternion().setFromAxisAngle(axis,a); vals.push(q.x,q.y,q.z,q.w); });
-    return vals;
-  }
-
-  function ensureModelAnimations() {
-    if (modelAnimations) return modelAnimations;
-    const times=[0,.25,.5,.75,1];
-    const X=new THREE.Vector3(1,0,0), Y=new THREE.Vector3(0,1,0);
-    const walkTracks=[
-      new THREE.QuaternionKeyframeTrack('Arm_L.quaternion',times,qValues(X,[.62,-.58,.62,-.58,.62])),
-      new THREE.QuaternionKeyframeTrack('Arm_R.quaternion',times,qValues(X,[-.58,.62,-.58,.62,-.58])),
-      new THREE.QuaternionKeyframeTrack('Forearm_L.quaternion',times,qValues(X,[-.10,.34,-.10,.34,-.10])),
-      new THREE.QuaternionKeyframeTrack('Forearm_R.quaternion',times,qValues(X,[.34,-.10,.34,-.10,.34])),
-      new THREE.QuaternionKeyframeTrack('Leg_L.quaternion',times,qValues(X,[-.44,.40,-.44,.40,-.44])),
-      new THREE.QuaternionKeyframeTrack('Leg_R.quaternion',times,qValues(X,[.40,-.44,.40,-.44,.40])),
-      new THREE.QuaternionKeyframeTrack('Knee_L.quaternion',times,qValues(X,[.12,.34,.12,.34,.12])),
-      new THREE.QuaternionKeyframeTrack('Knee_R.quaternion',times,qValues(X,[.34,.12,.34,.12,.34])),
-      new THREE.QuaternionKeyframeTrack('Head.quaternion',times,qValues(Y,[0,.035,0,-.035,0]))
-    ];
-    const idleTimes=[0,1.2,2.4];
-    const idleTracks=[new THREE.QuaternionKeyframeTrack('Head.quaternion',idleTimes,qValues(Y,[-.04,.04,-.04]))];
-    modelAnimations={walk:new THREE.AnimationClip('walk',1,walkTracks),idle:new THREE.AnimationClip('idle',2.4,idleTracks)};
-    return modelAnimations;
-  }
-
-  function setupPersonMixer(root) {
-    const clips=ensureModelAnimations();
-    const mixer=new THREE.AnimationMixer(root);
-    const idle=mixer.clipAction(clips.idle), walk=mixer.clipAction(clips.walk);
-    idle.play(); walk.play(); idle.setEffectiveWeight(1); walk.setEffectiveWeight(0);
-    root.userData.modelMixer=mixer; root.userData.modelActions={idle,walk}; root.userData.modelAnimState='idle';
-    modelMixers.push({root,mixer});
-  }
-
-  function updateModelMixers(dt) {
-    for (let i=modelMixers.length-1;i>=0;i--) {
-      const entry=modelMixers[i];
-      if (!entry.root || (!entry.root.parent && entry.root !== scene)) { modelMixers.splice(i,1); continue; }
-      entry.mixer.update(dt);
-    }
-  }
-
-  async function loadModelAssets() {
-    const specs={
-      npc_male:'assets/models3d/npc_male.glb', npc_female:'assets/models3d/npc_female.glb', npc_staff:'assets/models3d/npc_staff.glb',
-      bag_esencial:'assets/models3d/bag_esencial.glb', bag_urbano:'assets/models3d/bag_urbano.glb', bag_premium:'assets/models3d/bag_premium.glb',
-      checkout:'assets/models3d/checkout.glb', shelf:'assets/models3d/shelf.glb', sofa:'assets/models3d/sofa.glb',
-      car_sedan:'assets/models3d/car_sedan.glb', streetlamp:'assets/models3d/streetlamp.glb'
-    };
-    const results=await Promise.allSettled(Object.entries(specs).map(async ([key,url])=>{ MODEL_ASSETS[key]=await loadSimpleGLB(url); return key; }));
-    const ok=results.filter(r=>r.status==='fulfilled').length;
-    console.info(`[SIDE 3D] Modelos locales cargados: ${ok}/${results.length}`);
-    return ok;
-  }
-
-  function placeModel(key,x=0,y=0,z=0,scale=1,rotationY=0) {
-    const model=cloneModel(key); if (!model) return null;
-    model.position.set(x,y,z); model.scale.setScalar(scale); model.rotation.y=rotationY;
-    return model;
-  }
-
   function mat(color, rough = 0.72, metal = 0.05, extra = {}) {
     return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal, ...extra });
   }
@@ -804,17 +583,9 @@
       for(let y=0;y<=256;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(256,y);ctx.stroke();}
       for(let i=0;i<90;i++){ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(Math.random()*256,Math.random()*256,2,2);}
     } else {
-      ctx.fillStyle='#9b7758';ctx.fillRect(0,0,256,256);
-      const plank=48;
-      for(let y=-48;y<304;y+=24){
-        for(let x=-48;x<304;x+=plank){
-          const offset=((Math.floor(y/24)&1)?24:0);
-          ctx.save();ctx.translate(x+offset,y);ctx.rotate((Math.floor((x+y)/24)&1)?Math.PI/4:-Math.PI/4);
-          const tone=145+Math.floor(Math.random()*25);ctx.fillStyle=`rgb(${tone+24},${tone},${tone-28})`;ctx.fillRect(-22,-9,44,18);
-          ctx.strokeStyle='rgba(55,32,19,.28)';ctx.lineWidth=1;ctx.strokeRect(-22,-9,44,18);ctx.restore();
-        }
-      }
-      for(let i=0;i<120;i++){ctx.strokeStyle='rgba(50,28,16,.08)';ctx.beginPath();ctx.moveTo(Math.random()*256,Math.random()*256);ctx.lineTo(Math.random()*256,Math.random()*256);ctx.stroke();}
+      ctx.fillStyle='#c9b79f';ctx.fillRect(0,0,256,256);
+      for(let y=0;y<256;y+=32){ctx.fillStyle=y%64===0?'#d3c2aa':'#c7b39a';ctx.fillRect(0,y,256,30);ctx.strokeStyle='rgba(76,55,36,.18)';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(256,y);ctx.stroke();}
+      for(let i=0;i<80;i++){ctx.strokeStyle='rgba(80,55,30,.07)';ctx.beginPath();const y=Math.random()*256;ctx.moveTo(0,y);ctx.bezierCurveTo(80,y+Math.random()*7,180,y-Math.random()*7,256,y);ctx.stroke();}
     }
     const tex = new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace; tex.wrapS=tex.wrapT=THREE.RepeatWrapping;
     patternCache[kind]=tex; return tex;
@@ -860,7 +631,7 @@
     return sp;
   }
 
-  function proceduralHandbag(x, y, z, color = 0xb98a58, scale = 1, rotate = 0) {
+  function handbag(x, y, z, color = 0xb98a58, scale = 1, rotate = 0) {
     const g = new THREE.Group();
     const variant = Math.abs(Math.round(Number(color) || 0)) % 3;
     if (variant === 0) {
@@ -901,12 +672,10 @@
     return g;
   }
 
-  function proceduralPerson(style = 0x5aa9ff) {
+  function person(style = 0x5aa9ff) {
     const cfg = typeof style === 'object' ? style : { shirt: style };
     const g = new THREE.Group();
     const skin = cfg.skin ?? [0xd8ab7e, 0xc8956c, 0x9f6a4a, 0xe2b98d][Math.floor(Math.random()*4)];
-    const groundShadow = new THREE.Mesh(new THREE.CircleGeometry(0.28, 14), new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.17,depthWrite:false}));
-    groundShadow.rotation.x = -Math.PI/2; groundShadow.position.y = .012; groundShadow.renderOrder = -1; g.add(groundShadow);
     const shirt = cfg.shirt ?? 0x5aa9ff;
     const pants = cfg.pants ?? [0x233041,0x283746,0x30333a,0x485366][Math.floor(Math.random()*4)];
     const shoes = cfg.shoes ?? 0x4e392c;
@@ -966,45 +735,7 @@
     return g;
   }
 
-  function handbag(x, y, z, color = 0xb98a58, scale = 1, rotate = 0) {
-    let key='bag_esencial';
-    const distances=PRODUCTS.map(p=>Math.abs(Number(color)-Number(p.color)));
-    const idx=distances.indexOf(Math.min(...distances));
-    if (idx===1) key='bag_urbano'; else if (idx===2) key='bag_premium';
-    const model=cloneModel(key);
-    if (!model) return proceduralHandbag(x,y,z,color,scale,rotate);
-    model.position.set(x,y,z); model.scale.setScalar(scale); model.rotation.y=rotate;
-    model.userData.isLocalGLB=true; model.userData.modelKey=key;
-    return model;
-  }
-
-  function person(style = 0x5aa9ff) {
-    const cfg=typeof style==='object' ? {...style} : {shirt:style};
-    const female=cfg.gender==='female' || (!cfg.gender && Math.random()<.48);
-    const key=cfg.formal ? 'npc_staff' : (female ? 'npc_female' : 'npc_male');
-    const model=cloneModel(key);
-    if (!model) return proceduralPerson(style);
-    tintPersonModel(model,cfg,female);
-    const bodyScale=cfg.bodyScale ?? (female ? .94+Math.random()*.08 : .98+Math.random()*.08);
-    model.scale.setScalar(bodyScale);
-    const contact=new THREE.Mesh(new THREE.CircleGeometry(.27,18),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.18,depthWrite:false}));
-    contact.rotation.x=-Math.PI/2;contact.position.y=.012;contact.scale.set(1,.68,1);model.add(contact);
-    model.userData.gender=female?'female':'male'; model.userData.isLocalGLB=true; model.userData.modelKey=key;
-    setupPersonMixer(model);
-    return model;
-  }
-
   function setPersonPose(g, cycle = 0, moving = false) {
-    if (g?.userData?.modelActions) {
-      const next=moving?'walk':'idle';
-      if (g.userData.modelAnimState!==next) {
-        g.userData.modelAnimState=next;
-        g.userData.modelActions.walk.setEffectiveWeight(moving?1:0);
-        g.userData.modelActions.idle.setEffectiveWeight(moving?0:1);
-        g.userData.modelActions.walk.timeScale=moving?Math.max(.75,Math.min(1.45,Math.abs(cycle)%1.5+0.75)):1;
-      }
-      return;
-    }
     const parts = g.userData.parts;
     if (!parts) return;
     const swing = moving ? Math.sin(cycle) * 0.58 : Math.sin(cycle * 0.5) * 0.06;
@@ -1025,11 +756,8 @@
   function attachBagToNpc(npc) {
     if (npc.obj.userData.heldBag) return;
     const product = productById(npc.productId);
-    const hand = npc.obj.getObjectByName?.('Hand_R');
-    const bag = hand
-      ? handbag(0.02, -0.15, 0.05, product.color, 0.31, Math.PI / 2.1)
-      : handbag(0.28, 0.78, 0, product.color, 0.36, Math.PI / 2.2);
-    (hand || npc.obj).add(bag);
+    const bag = handbag(0.28, 0.78, 0, product.color, 0.36, Math.PI / 2.2);
+    npc.obj.add(bag);
     npc.obj.userData.heldBag = bag;
     if (!npc.obj.userData.orderLabel) {
       const product = productById(npc.productId);
@@ -1177,24 +905,11 @@
     saveInventory(); saveBusinessState(); renderInventoryDisplays(); refreshAdminUI(); updateHUD();
   }
 
-  function spawnSupplierVan() {
-    if (!scene || deliveryVan) return;
-    deliveryVan = buildCar(-25, 13.55, 0xe9ecef, 1);
-    deliveryVan.scale.set(1.12, 1.18, 1.12);
-    scene.add(deliveryVan);
-    deliveryActor = registerAnimatedActor({ type:'supplierVan', obj:deliveryVan, state:'inbound', speed:6.2, stopX:-3.2, dead:false });
-  }
-
-  function dismissSupplierVan() {
-    if (deliveryActor) deliveryActor.state = 'outbound';
-  }
-
   function orderSupplierStock() {
     if(supplierDeliveryAt) { message('Ya existe un pedido en camino.'); return; }
     if(operationalCash()<360) { message('No hay caja suficiente para este pedido.'); return; }
     applyExpense(360,'Pedido a proveedor');
     supplierDeliveryAt=performance.now()+(businessState.supplierDelay?24000:12000);
-    spawnSupplierVan();
     addBusinessLog('Pedido de 12 unidades enviado al proveedor.');
     message(businessState.supplierDelay?'Pedido enviado: llegará con retraso.':'Pedido enviado: mercancía en camino.');
   }
@@ -1204,7 +919,7 @@
     supplierDeliveryAt=0; businessState.supplierDelay=false;
     PRODUCTS.forEach(p=>inventory.reserve[p.id]=(inventory.reserve[p.id]||0)+4);
     saveInventory(); saveBusinessState(); renderInventoryDisplays(); refreshAdminUI(); updateHUD(); playSfx('restock');
-    showEvent('Proveedor entregó mercancía','Llegaron 12 bolsos nuevos al almacén.'); addBusinessLog('Proveedor entregó 12 unidades.'); dismissSupplierVan();
+    showEvent('Proveedor entregó mercancía','Llegaron 12 bolsos nuevos al almacén.'); addBusinessLog('Proveedor entregó 12 unidades.');
   }
 
   function buyUpgrade(type,cost,max) {
@@ -1254,14 +969,15 @@
   }
 
   function buildStreetLamp(x, z) {
-    const model=placeModel('streetlamp',x,0,z,1,0);
-    if (model) return model;
     const g = new THREE.Group();
     g.add(cylinder(0.08, 0.11, 4.6, 0x2f3843, 0, 2.3, 0, 10, 0.55, 0.18));
     const arm = box(0.95, 0.06, 0.06, 0x2f3843, 0.42, 4.3, 0, 0.5, 0.18);
     const lampMat = new THREE.MeshStandardMaterial({color:0xffe6a8,roughness:.22,metalness:.02,emissive:0x6d5422,emissiveIntensity:.8});
-    const lightBox = mesh(new THREE.BoxGeometry(0.28,0.14,0.28),lampMat); lightBox.position.set(0.83,4.18,0); g.add(arm, lightBox);
-    g.position.set(x,0,z); return g;
+    const lightBox = mesh(new THREE.BoxGeometry(0.28,0.14,0.28),lampMat);
+    lightBox.position.set(0.83,4.18,0);
+    g.add(arm, lightBox);
+    g.position.set(x, 0, z);
+    return g;
   }
 
   function buildTree(x, z) {
@@ -1289,39 +1005,44 @@
   }
 
   function buildCar(x, z, color = 0xb14646, dir = 1) {
-    const model=placeModel('car_sedan',x,0,z,1,dir<0?Math.PI:0);
-    if (model) {
-      model.traverse(o=>{ if(o.isMesh && /CarBody|CarCabin/.test(o.name)){o.material=o.material.clone();o.material.color.setHex(color);o.material.roughness=.30;o.material.metalness=.34;} });
-      const shadow=new THREE.Mesh(new THREE.CircleGeometry(1.15,24),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.18,depthWrite:false}));
-      shadow.scale.set(1,.46,1);shadow.rotation.x=-Math.PI/2;shadow.position.y=.015;model.add(shadow);
-      return model;
-    }
     const g = new THREE.Group();
-    const body = box(2.45, 0.62, 1.16, color, 0, 0.52, 0, 0.35, 0.22); g.add(body); g.position.set(x,0,z); g.rotation.y=dir<0?Math.PI:0; return g;
+    const body = box(2.45, 0.62, 1.16, color, 0, 0.52, 0, 0.35, 0.22);
+    const roof = box(1.28, 0.42, 0.92, 0xd6e8f6, 0.1, 0.94, 0, 0.15, 0.3);
+    const bumperF = box(0.18, 0.20, 1.08, 0x20262d, 1.22, 0.34, 0, 0.5, 0.25);
+    const bumperB = box(0.18, 0.20, 1.08, 0x20262d, -1.22, 0.34, 0, 0.5, 0.25);
+    g.add(body, roof, bumperF, bumperB);
+    [[-0.82, -0.52], [0.82, -0.52], [-0.82, 0.52], [0.82, 0.52]].forEach(([wx, wz]) => {
+      const wheel = mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.18, 18), mat(0x121416, 0.72, 0.2));
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position.set(wx, 0.24, wz);
+      g.add(wheel);
+    });
+    g.position.set(x, 0, z);
+    g.rotation.y = dir < 0 ? Math.PI : 0;
+    return g;
   }
 
   function buildBuilding(x, z, w, d, h, color = 0x394b64) {
-    const g=new THREE.Group();
-    const body=box(w,h,d,color,0,h/2,0,.82,.04);g.add(body);
-    const trim=mat(0x252f3a,.55,.12);
-    const roof=mesh(new THREE.BoxGeometry(w+.16,.18,d+.16),trim);roof.position.y=h+.09;g.add(roof);
-    const floorCount=Math.max(3,Math.floor(h/1.45));
-    const colCount=Math.max(2,Math.floor(w/1.55));
-    const winMat=new THREE.MeshStandardMaterial({color:0x84b9d5,roughness:.12,metalness:.28,emissive:0x142c3c,emissiveIntensity:.28});
-    const litMat=new THREE.MeshStandardMaterial({color:0xf3d8a0,roughness:.18,metalness:.05,emissive:0x6d4d20,emissiveIntensity:.65});
-    for(let r=0;r<floorCount;r++){
-      const yy=.85+r*1.34;
-      const ledge=box(w-.35,.055,.16,0x2a3541,0,yy-.50,d/2+.07,.45,.12);g.add(ledge);
-      for(let c=0;c<colCount;c++){
-        const xx=-w/2+.82+c*((w-1.64)/Math.max(1,colCount-1));
-        const wm=((r+c)%7===0)?litMat:winMat;
-        const panel=mesh(new THREE.BoxGeometry(.68,.72,.035),wm);panel.position.set(xx,yy,d/2+.025);g.add(panel);
-        const sill=box(.78,.045,.12,0x303b46,xx,yy-.42,d/2+.08,.42,.15);g.add(sill);
-      }
+    const g = new THREE.Group();
+    const body = box(w, h, d, color, 0, h / 2, 0, 0.94, 0.02);
+    g.add(body);
+    const c = document.createElement('canvas');
+    c.width = 256; c.height = 512;
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    const cols = 4, rows = 8;
+    for (let r=0;r<rows;r++) for (let col=0;col<cols;col++) {
+      const xx=22+col*58, yy=22+r*58;
+      ctx.fillStyle = ((r+col)%5===0) ? 'rgba(255,220,150,.78)' : 'rgba(115,195,235,.62)';
+      ctx.fillRect(xx,yy,30,38);
     }
-    const entrance=box(Math.min(2.4,w*.38),1.65,.10,0x182b39,0,.83,d/2+.07,.18,.32);g.add(entrance);
-    const canopy=box(Math.min(3.0,w*.45),.12,.72,0x293846,0,1.78,d/2+.38,.35,.12);g.add(canopy);
-    g.position.set(x,0,z);return g;
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace;
+    const facadeMat = new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide,depthWrite:false});
+    const facade = new THREE.Mesh(new THREE.PlaneGeometry(Math.max(1,w-.45),Math.max(1,h-.65)),facadeMat);
+    facade.position.set(0,h/2,d/2+0.015);
+    g.add(facade);
+    g.position.set(x, 0, z);
+    return g;
   }
 
   function addCeilingLight(x, z, warm = true, realLight = false) {
@@ -1361,29 +1082,20 @@
 
   function buildBoutiqueDecor() {
     const decor = new THREE.Group();
-    // Wall shelves: modelos GLB locales reutilizables.
+    // Wall shelves and warm light strips.
     [-10.4,-7.2,-4.0,-0.8,2.4,5.6].forEach((x,i)=>{
-      const shelfModel=placeModel('shelf',x,0,-8.35,.88,0);
-      if (shelfModel) decor.add(shelfModel);
-      else {
-        const shelf = box(2.3,0.10,0.52,0x5d4938,x,1.55,-8.45,0.42,0.08);
-        const upper = box(2.3,0.09,0.52,0x5d4938,x,2.55,-8.45,0.42,0.08);
-        decor.add(shelf,upper);
-      }
-      decor.add(handbag(x-.55,.55,-8.00,PRODUCTS[i%3].color,.55,.08));
-      decor.add(handbag(x+.52,1.28,-8.00,PRODUCTS[(i+1)%3].color,.55,-.08));
+      const shelf = box(2.3,0.10,0.52,0x5d4938,x,1.55,-8.45,0.42,0.08);
+      const upper = box(2.3,0.09,0.52,0x5d4938,x,2.55,-8.45,0.42,0.08);
+      decor.add(shelf,upper);
+      decor.add(handbag(x-0.55,1.64,-8.05,PRODUCTS[i%3].color,0.55,0.08));
+      decor.add(handbag(x+0.55,1.64,-8.05,PRODUCTS[(i+1)%3].color,0.55,-0.08));
     });
-    // Lounge area con sofá GLB local.
-    const sofaModel=placeModel('sofa',5.5,0,6.25,1,0);
-    if (sofaModel) decor.add(sofaModel);
-    else {
-      const bench = box(3.0,0.42,0.78,0x26384d,5.5,0.35,6.25,0.78,0.02);
-      const benchBack = box(3.0,0.78,0.18,0x2e435b,5.5,0.82,6.60,0.78,0.02);
-      decor.add(bench,benchBack);
-    }
+    // Lounge area.
+    const bench = box(3.0,0.42,0.78,0x26384d,5.5,0.35,6.25,0.78,0.02);
+    const benchBack = box(3.0,0.78,0.18,0x2e435b,5.5,0.82,6.60,0.78,0.02);
     const tableTop = cylinder(0.58,0.58,0.08,0xc5b9aa,7.4,0.48,6.0,28,0.38,0.05);
     const tableLeg = cylinder(0.10,0.16,0.46,0x2b3138,7.4,0.23,6.0,16,0.5,0.2);
-    decor.add(tableTop,tableLeg);
+    decor.add(bench,benchBack,tableTop,tableLeg);
     addCollider(3.8,7.0,5.65,6.9);
     addCollider(6.75,8.05,5.35,6.65);
     // Decorative mirror on left wall.
@@ -1402,23 +1114,16 @@
     scene.add(decor);
   }
 
-  function buildSkyDome() {
-    const geo=new THREE.SphereGeometry(110,32,18);
-    const matSky=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,uniforms:{top:{value:new THREE.Color(0x4f8fc2)},bottom:{value:new THREE.Color(0xd8e8ef)}},vertexShader:`varying vec3 vWorld;void main(){vec4 w=modelMatrix*vec4(position,1.0);vWorld=w.xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,fragmentShader:`uniform vec3 top;uniform vec3 bottom;varying vec3 vWorld;void main(){float h=normalize(vWorld).y;float t=smoothstep(-.12,.72,h);gl_FragColor=vec4(mix(bottom,top,t),1.0);}`});
-    const sky=new THREE.Mesh(geo,matSky);sky.renderOrder=-100;return sky;
-  }
-
   function buildStaticWorld() {
     interactables = [];
     colliders = [];
     npcs = [];
-    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian' || a.type === 'supplierVan');
+    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian');
     checkoutQueue = [];
     queueDecor = [];
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xbfd8e8);
-    scene.fog = new THREE.Fog(0xbfd8e8, 55, 125);
-    scene.add(buildSkyDome());
+    scene.background = new THREE.Color(0xa6c8ea);
+    scene.fog = new THREE.Fog(0xa6c8ea, 42, 90);
 
     camera = new THREE.PerspectiveCamera(74, 1, 0.08, 160);
     camera.rotation.order = 'YXZ';
@@ -1430,11 +1135,11 @@
     renderer.shadowMap.enabled = false;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.18;
+    renderer.toneMappingExposure = 1.08;
 
-    hemiLight = new THREE.HemisphereLight(0xe8f4ff, 0x59675e, 1.35);
+    hemiLight = new THREE.HemisphereLight(0xd9efff, 0x64707f, 1.95);
     scene.add(hemiLight);
-    sunLight = new THREE.DirectionalLight(0xfff0d2, 2.45);
+    sunLight = new THREE.DirectionalLight(0xfff1d7, 2.1);
     sunLight.position.set(16, 22, 10);
     sunLight.castShadow = false;
     scene.add(sunLight);
@@ -1497,21 +1202,16 @@
     scene.add(frontLeft, frontRight, frontBeam);
     addCollider(-13.2, -4.25, 8.7, 9.25);
     addCollider(4.25, 13.2, 8.7, 9.25);
-    const glassMat = new THREE.MeshPhysicalMaterial({color:0xbfe8ff,roughness:.08,metalness:.08,transparent:true,opacity:.34,transmission:.12,clearcoat:.7,clearcoatRoughness:.12});
+    const glassMat = mat(0xb8e3ff, 0.08, 0.0, { transparent: true, opacity: 0.28 });
     const glassL = mesh(new THREE.BoxGeometry(8.2, 4.2, 0.05), glassMat); glassL.position.set(-8.7, 2.1, 8.9);
     const glassR = mesh(new THREE.BoxGeometry(8.2, 4.2, 0.05), glassMat); glassR.position.set(8.7, 2.1, 8.9);
     scene.add(glassL, glassR);
-    const doorMat = new THREE.MeshPhysicalMaterial({color:0xc8e8ff,roughness:.05,metalness:.08,transparent:true,opacity:.38,transmission:.16,clearcoat:.8,clearcoatRoughness:.08});
+    const doorMat = mat(0xc8e8ff, 0.06, 0.0, { transparent: true, opacity: 0.32 });
     entryDoorLeft = mesh(new THREE.BoxGeometry(1.75, 4.0, 0.05), doorMat);
     entryDoorRight = mesh(new THREE.BoxGeometry(1.75, 4.0, 0.05), doorMat);
     entryDoorLeft.position.set(-0.92, 2.0, 8.90);
     entryDoorRight.position.set(0.92, 2.0, 8.90);
     scene.add(entryDoorLeft, entryDoorRight);
-    // Marcos, tiradores y zócalos para que la fachada deje de verse como un bloque.
-    [-12.75,-4.35,4.35,12.75].forEach(x=>scene.add(box(.10,4.15,.12,0x202a34,x,2.05,8.82,.32,.35)));
-    scene.add(box(25.4,.10,.15,0x26333f,0,.13,8.84,.35,.22));
-    const handleL=cylinder(.025,.025,.72,0xc6cbd0,-.18,2.0,8.80,12,.20,.85);handleL.rotation.x=Math.PI/2;
-    const handleR=cylinder(.025,.025,.72,0xc6cbd0,.18,2.0,8.80,12,.20,.85);handleR.rotation.x=Math.PI/2;scene.add(handleL,handleR);
     const awning = box(12.2, 0.18, 1.8, 0x111820, 0, 4.18, 9.82, 0.48, 0.12);
     scene.add(awning);
     scene.add(addTextLabel(companyName(), 0, 4.85, 10.05, '#ffd329', 1.28, 'rgba(3,8,14,.88)'));
@@ -1536,11 +1236,9 @@
     });
 
     [-10.2, -6.1, -2.0, 2.1, 6.2, 10.3].forEach((x, i) => {
-      const shelfModel=placeModel('shelf',x,0,-8.38,.96,0);
-      if (shelfModel) scene.add(shelfModel);
-      else scene.add(box(2.5,1.82,.52,0x5a4636,x,.91,-8.4,.58,.05));
-      scene.add(handbag(x-.48,.52,-7.98,[0xb95050,0x456eaa,0xc59a45][i%3],.62,.12));
-      scene.add(handbag(x+.48,1.24,-7.98,[0x456eaa,0xc59a45,0xb95050][i%3],.62,-.12));
+      const side = box(2.5, 1.82, 0.52, 0x5a4636, x, 0.91, -8.4, 0.58, 0.05);
+      scene.add(side);
+      for (let r = 0; r < 2; r++) scene.add(handbag(x + (r ? 0.34 : -0.34), 0.92 + r * 0.58, -7.98, [0xb95050, 0x456eaa, 0xc59a45][(i + r) % 3], 0.68, r ? -0.16 : 0.18));
       addCollider(x - 1.3, x + 1.3, -8.75, -7.85);
     });
 
@@ -1550,18 +1248,20 @@
     scene.add(handbag(10.7, 1.12, 3.9, 0xcaa27f, 0.82, -0.12));
     scene.add(handbag(10.1, 1.12, 5.2, 0xe5dfd3, 0.82, 0.18));
 
-    const checkoutModel=placeModel('checkout',-8.2,0,6.65,1,0);
-    if (checkoutModel) {
-      scene.add(checkoutModel);
-      registerMesh=checkoutModel.getObjectByName('Scanner') || checkoutModel;
-    } else {
-      const counterBase = box(4.8, 0.98, 1.24, 0x20262f, -8.2, 0.49, 6.65, 0.42, 0.08);
-      const counterTop = box(4.95, 0.08, 1.30, 0xe8edf2, -8.2, 1.02, 6.65, 0.18, 0.15);
-      const scanner = box(0.46, 0.16, 0.42, 0x252d35, -8.12, 1.14, 6.38, 0.18, 0.32);
-      scene.add(counterBase,counterTop,scanner);
-      registerMesh=scanner;
-    }
+    const counterBase = box(4.8, 0.98, 1.24, 0x20262f, -8.2, 0.49, 6.65, 0.42, 0.08);
+    const counterTop = box(4.95, 0.08, 1.30, 0xe8edf2, -8.2, 1.02, 6.65, 0.18, 0.15);
+    const sideLedge = box(1.15, 0.04, 0.26, 0xd8dde3, -9.98, 0.88, 6.65, 0.18, 0.1);
+    const sideLedge2 = box(1.15, 0.04, 0.26, 0xd8dde3, -6.42, 0.88, 6.65, 0.18, 0.1);
+    const scanner = box(0.46, 0.16, 0.42, 0x252d35, -8.12, 1.14, 6.38, 0.18, 0.32);
+    const screenStand = box(0.08, 0.22, 0.08, 0x121821, -8.06, 1.30, 6.34, 0.22, 0.25);
+    const screen = box(0.42, 0.24, 0.06, 0x0d1117, -8.06, 1.46, 6.28, 0.12, 0.35);
+    screen.rotation.x = -0.42;
+    const keypad = box(0.30, 0.04, 0.20, 0xeff3f7, -8.52, 1.08, 6.55, 0.14, 0.02);
+    const receiptRoll = cylinder(0.07, 0.07, 0.16, 0xf1f3f5, -7.70, 1.08, 6.52, 14, 0.22, 0.0);
+    receiptRoll.rotation.z = Math.PI / 2;
+    scene.add(counterBase, counterTop, sideLedge, sideLedge2, scanner, screenStand, screen, keypad, receiptRoll);
     addCollider(-10.35, -6.05, 6.34, 7.18);
+    registerMesh = scanner;
     interactables.push({ mesh: registerMesh, type: 'register', label: 'Cobrar cliente en caja' });
 
     const terminal = box(0.48, 0.34, 0.08, 0x111924, -10.65, 1.22, 6.55, 0.16, 0.22);
@@ -1612,7 +1312,7 @@
       const child = group.children[0];
       group.remove(child);
       child.traverse?.((c) => {
-        if (!c.userData?.sharedGLBGeometry) c.geometry?.dispose?.();
+        c.geometry?.dispose?.();
         if (c.material) Array.isArray(c.material) ? c.material.forEach(m => m.dispose?.()) : c.material.dispose?.();
       });
     }
@@ -1656,7 +1356,7 @@
     productInteractables = [];
     if (inventoryDisplayGroup) {
       dynamicGroup.remove(inventoryDisplayGroup);
-      inventoryDisplayGroup.traverse?.(o => { if (!o.userData?.sharedGLBGeometry) o.geometry?.dispose?.(); if (o.material) Array.isArray(o.material) ? o.material.forEach(m=>m.dispose?.()) : o.material.dispose?.(); });
+      inventoryDisplayGroup.traverse?.(o => { o.geometry?.dispose?.(); if (o.material) Array.isArray(o.material) ? o.material.forEach(m=>m.dispose?.()) : o.material.dispose?.(); });
     }
     inventoryDisplayGroup = new THREE.Group();
     const locations = [
@@ -1664,13 +1364,14 @@
     ];
     PRODUCTS.forEach((product, i) => {
       const loc = locations[i];
-      const shelfModel=placeModel('shelf',loc.x,0,loc.z,.92,0);
-      const shelf = shelfModel || box(2.4,0.10,0.74,0x4b4239,loc.x,.70,loc.z,.46,.08);
-      inventoryDisplayGroup.add(shelf);
+      const shelf = box(2.4, 0.10, 0.74, 0x4b4239, loc.x, 0.70, loc.z, 0.46, 0.08);
+      const leg1 = box(0.10, 0.66, 0.10, 0x232a32, loc.x - 0.9, 0.33, loc.z, 0.52, 0.12);
+      const leg2 = box(0.10, 0.66, 0.10, 0x232a32, loc.x + 0.9, 0.33, loc.z, 0.52, 0.12);
+      inventoryDisplayGroup.add(shelf, leg1, leg2);
       const pi = { mesh: shelf, type: 'product', productId: product.id, label: product.name };
       productInteractables.push(pi); interactables.push(pi);
       const count = Math.min(displayCapacity(), displayStock(product.id));
-      for (let n = 0; n < count; n++) inventoryDisplayGroup.add(handbag(loc.x - 0.75 + n * 0.5, 0.50 + (n%2)*0.72, loc.z + .28, product.color, 0.50, 0.05));
+      for (let n = 0; n < count; n++) inventoryDisplayGroup.add(handbag(loc.x - 0.75 + n * 0.5, 0.80, loc.z, product.color, 0.56, 0.05));
     });
     const reserveTotal = totalReserveStock();
     for (let i = 0; i < Math.min(24, reserveTotal); i++) {
@@ -1694,7 +1395,7 @@
   function rebuildDynamicWorld() {
     if (!dynamicGroup) return;
     clearGroup(dynamicGroup);
-    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian' || a.type === 'supplierVan');
+    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian');
     checkoutQueue = [];
     npcs = [];
     clearGroup(npcGroup);
@@ -1744,16 +1445,15 @@
     const ups=businessState?.upgrades||{};
     for(let i=0;i<Number(ups.display||0);i++){
       const x=-4.8+i*4.8;
-      const extraShelf=placeModel('shelf',x,0,0.1,.90,0);
-      if(extraShelf) dynamicGroup.add(extraShelf); else dynamicGroup.add(box(3.2,0.10,0.68,0x4b4239,x,0.74,0.1,0.45,0.08));
-      dynamicGroup.add(handbag(x-.58,.50,.35,PRODUCTS[i%3].color,.52,.04));
-      dynamicGroup.add(handbag(x+.05,1.20,.35,PRODUCTS[(i+1)%3].color,.52,-.04));
-      dynamicGroup.add(handbag(x+.60,1.90,.35,PRODUCTS[(i+2)%3].color,.52,.02));
+      dynamicGroup.add(box(3.2,0.10,0.68,0x4b4239,x,0.74,0.1,0.45,0.08));
+      dynamicGroup.add(handbag(x-0.65,0.82,0.1,PRODUCTS[i%3].color,0.56,0.04));
+      dynamicGroup.add(handbag(x+0.15,0.82,0.1,PRODUCTS[(i+1)%3].color,0.56,-0.04));
+      dynamicGroup.add(handbag(x+0.65,0.82,0.1,PRODUCTS[(i+2)%3].color,0.56,0.02));
     }
     if(Number(ups.checkout||0)>0){
-      const reg2=placeModel('checkout',-4.8,0,6.7,.50,0);
-      if(reg2){ dynamicGroup.add(reg2); secondRegisterMesh=reg2; }
-      else { const fallback=box(1.4,.78,.72,0x252e38,-4.8,.39,6.7,.42,.08); dynamicGroup.add(fallback); secondRegisterMesh=fallback; }
+      const reg2=box(1.4,0.78,0.72,0x252e38,-4.8,0.39,6.7,0.42,0.08);
+      const scr2=box(0.38,0.25,0.05,0x0b1118,-4.8,0.96,6.42,0.15,0.25); scr2.rotation.x=-0.35;
+      dynamicGroup.add(reg2,scr2); secondRegisterMesh=reg2;
     } else secondRegisterMesh=null;
     if(Number(ups.warehouse||0)>0){
       for(let i=0;i<8*Number(ups.warehouse);i++) dynamicGroup.add(box(0.48,0.34,0.44,0x7a5d45,10.5+(i%4)*0.55,0.17,-8.0+Math.floor(i/4)*0.46,0.8,0.02));
@@ -1812,53 +1512,6 @@
     return true;
   }
 
-  function makeShoppingRoute(spawnX) {
-    const count = 2 + Math.floor(Math.random() * 3);
-    const pool = SHOPPING_SPOTS.slice();
-    const route = [[spawnX, 11.4], [0, 9.8]];
-    for (let i = 0; i < count && pool.length; i++) {
-      const idx = Math.floor(Math.random() * pool.length);
-      const spot = pool.splice(idx, 1)[0];
-      route.push([spot.x + (Math.random() - .5) * .35, spot.z + (Math.random() - .5) * .30]);
-    }
-    return route;
-  }
-
-  function npcSay(npc, text, color = '#d9efff', duration = 1400) {
-    if (!npc?.obj || npc.dead) return;
-    const now = performance.now();
-    if (npc.lastBubbleAt && now - npc.lastBubbleAt < 2400) return;
-    npc.lastBubbleAt = now;
-    const old = npc.obj.userData.chatBubble;
-    if (old) npc.obj.remove(old);
-    const bubble = makeLocalLabel(text, color, .52);
-    bubble.position.y = 2.05;
-    npc.obj.add(bubble);
-    npc.obj.userData.chatBubble = bubble;
-    setTimeout(() => {
-      if (npc.obj?.userData?.chatBubble === bubble) {
-        npc.obj.remove(bubble);
-        npc.obj.userData.chatBubble = null;
-      }
-    }, duration);
-  }
-
-  function computeNpcAvoidance(npc) {
-    let ax = 0, az = 0;
-    for (const other of npcs) {
-      if (other === npc || other.dead || !other.obj) continue;
-      const dx = npc.obj.position.x - other.obj.position.x;
-      const dz = npc.obj.position.z - other.obj.position.z;
-      const d2 = dx * dx + dz * dz;
-      if (d2 <= 0.0001 || d2 > 0.72 * 0.72) continue;
-      const d = Math.sqrt(d2);
-      const push = (0.72 - d) / 0.72;
-      ax += (dx / d) * push;
-      az += (dz / d) * push;
-    }
-    return [ax, az];
-  }
-
   function spawnNpc(now) {
     const score = npcDemandScore();
     const dayBoost = gameSession?.difficulty || 1;
@@ -1871,10 +1524,12 @@
     const spawnX = (Math.random() - 0.5) * 8;
     p.position.set(spawnX, 0, 20.8 + Math.random() * 1.8);
     npcGroup.add(p);
+    const browseTable = [-4.6, 0, 4.6][Math.floor(Math.random() * 3)] + (Math.random() - 0.5) * 0.4;
+    const browseShelf = [-10.2, -6.1, -2.0, 2.1, 6.2, 10.3][Math.floor(Math.random() * 6)];
     const npc = {
       obj: p,
       spawnX,
-      route: makeShoppingRoute(spawnX),
+      route: [[spawnX, 11.4], [0, 9.8], [browseTable, 3.0], [browseShelf, -6.8]],
       routeIndex: 0,
       phase: 'shopping',
       wait: 0,
@@ -1884,8 +1539,6 @@
       queueIndex: -1,
       dead: false,
       shoppingPasses: 0,
-      browseLooks: 0,
-      lastBubbleAt: 0,
       archetype,
       patienceLimit: archetype.patience + customerPatienceBoost() + (hasManager() ? 1 : 0)
     };
@@ -1919,33 +1572,6 @@
     if (simSales % 5 === 0) message(`¡${simSales} ventas! La tienda está agarrando ritmo.`);
   }
 
-  function clearCheckoutBag(delay = 0) {
-    if (!checkoutBagMesh) return;
-    if (delay > 0) { checkoutBagRemoveAt = performance.now() + delay; return; }
-    dynamicGroup?.remove(checkoutBagMesh);
-    checkoutBagMesh = null;
-    checkoutBagTarget = null;
-    checkoutBagRemoveAt = 0;
-  }
-
-  function showCheckoutBag(npc) {
-    clearCheckoutBag();
-    const product = productById(npc.productId);
-    checkoutBagMesh = handbag(-7.38, 1.06, 6.46, product.color, .54, .12);
-    checkoutBagTarget = { x: -7.72, y: 1.06, z: 6.43, r: .12 };
-    dynamicGroup?.add(checkoutBagMesh);
-  }
-
-  function animateCheckoutBag(dt) {
-    if (!checkoutBagMesh || !checkoutBagTarget) return;
-    const k = 1 - Math.exp(-9 * dt);
-    checkoutBagMesh.position.x += (checkoutBagTarget.x - checkoutBagMesh.position.x) * k;
-    checkoutBagMesh.position.y += (checkoutBagTarget.y - checkoutBagMesh.position.y) * k;
-    checkoutBagMesh.position.z += (checkoutBagTarget.z - checkoutBagMesh.position.z) * k;
-    checkoutBagMesh.rotation.y += (checkoutBagTarget.r - checkoutBagMesh.rotation.y) * k;
-    if (checkoutBagRemoveAt && performance.now() >= checkoutBagRemoveAt) clearCheckoutBag();
-  }
-
   function openCheckout() {
     const npc = checkoutQueue[0];
     if (!npc) { message('No hay clientes en la cola de caja.'); return; }
@@ -1963,7 +1589,6 @@
     $3('checkoutChargeBtn').textContent = npc.isReturn ? `REEMBOLSAR ${fmt(npc.productPrice)}` : `COBRAR ${fmt(npc.productPrice)}`;
     $3('payCashBtn')?.classList.add('active'); $3('payCardBtn')?.classList.remove('active');
     $3('simCheckout')?.classList.remove('hidden');
-    showCheckoutBag(npc);
   }
 
   function closeCheckout(resume = true) {
@@ -1979,14 +1604,11 @@
     $3('checkoutStatus').textContent = 'Producto escaneado correctamente';
     $3('checkoutScanBtn').disabled = true;
     $3('checkoutChargeBtn').disabled = false;
-    checkoutBagTarget = { x: -8.10, y: 1.08, z: 6.40, r: -.08 };
     playTone(980,.06,'square',.022,0); playTone(1200,.04,'square',.016,.05);
   }
 
   function confirmCheckout() {
     if (!checkoutOpen || !checkoutScanned) return;
-    checkoutBagTarget = { x: -8.52, y: 1.08, z: 6.48, r: -.16 };
-    clearCheckoutBag(520);
     closeCheckout(false);
     serveNextQueuedCustomer(false);
     setTimeout(()=>$3('side3dCanvas')?.requestPointerLock?.(),80);
@@ -2017,7 +1639,6 @@
     } else {
       recordSale(npc.productId, npc.productPrice);
       const who = autoServed ? 'Tu equipo atendió' : 'Cobraste';
-      npcSay(npc, '¡Gracias!', '#a9f0c5', 1100);
       message(`${who}: ${product.name} por ${fmt(npc.productPrice)} · ${checkoutPayment==='card'?'tarjeta':'efectivo'}.`);
     }
     reflowQueue();
@@ -2025,10 +1646,8 @@
 
   function prepareNpcNextStep(n) {
     if (n.phase === 'shopping') {
-      if (n.routeIndex >= 1) {
-        n.wait = 0.75 + Math.random() * 1.55;
-        n.browseLooks = Number(n.browseLooks || 0) + 1;
-        if (Math.random() < 0.18) npcSay(n, ['Estoy comparando','Voy a mirar otro modelo','Se ve interesante'][Math.floor(Math.random()*3)], '#bfe7ff', 1150);
+      if (n.routeIndex === 1 || n.routeIndex === 2 || n.routeIndex === 3) {
+        n.wait = 0.9 + Math.random() * 1.4;
       }
       if (n.routeIndex < n.route.length - 1) {
         n.routeIndex++;
@@ -2047,10 +1666,7 @@
         return;
       }
       if (n.buy) {
-        npcSay(n, product ? 'La cola está llena' : 'No encontré stock', product ? '#ffd18b' : '#ff9c9c', 1500);
         markLostCustomer(product ? 'queue' : 'stock');
-      } else if (Math.random() < .35) {
-        npcSay(n, 'Seguiré buscando', '#b7c9d9', 1200);
       }
       n.phase = 'leaving';
       n.route = [[0, 10.4], [n.spawnX, 21.6]];
@@ -2086,14 +1702,13 @@
           saveInventory();
           renderInventoryDisplays();
         }
-        if (n.obj.userData.heldBag) { n.obj.userData.heldBag.removeFromParent?.(); n.obj.userData.heldBag = null; }
+        if (n.obj.userData.heldBag) { n.obj.remove(n.obj.userData.heldBag); n.obj.userData.heldBag = null; }
         if (n.obj.userData.orderLabel) { n.obj.remove(n.obj.userData.orderLabel); n.obj.userData.orderLabel = null; }
         n.phase = 'leaving';
         n.route = [[0, 10.6], [n.spawnX, 21.6]];
         n.routeIndex = 0;
         markLostCustomer('queue');
         updateHUD();
-        npcSay(n, 'Esperé demasiado', '#ff9f9f', 1600);
         message('Un cliente abandonó la cola por demora y devolvió el producto.');
       }
       setPersonPose(n.obj, n.walkCycle += dt * 2.2, false);
@@ -2117,17 +1732,12 @@
     }
     n.walkCycle += dt * 7.0;
     setPersonPose(n.obj, n.walkCycle, true);
-    const [avoidX, avoidZ] = computeNpcAvoidance(n);
-    let moveX = dx / dist + avoidX * 0.72;
-    let moveZ = dz / dist + avoidZ * 0.72;
-    const ml = Math.hypot(moveX, moveZ) || 1;
-    moveX /= ml; moveZ /= ml;
-    n.obj.position.x += moveX * n.speed * dt;
-    n.obj.position.z += moveZ * n.speed * dt;
-    n.obj.rotation.y = Math.atan2(moveX, moveZ);
+    n.obj.position.x += dx / dist * n.speed * dt;
+    n.obj.position.z += dz / dist * n.speed * dt;
+    n.obj.rotation.y = Math.atan2(dx, dz);
   }
 
-  function animateActors(time, dt = 0.016) {
+  function animateActors(time) {
     animatedActors.forEach((a) => {
       if (a.type === 'worker' || a.type === 'cashier' || a.type === 'manager' || a.type === 'analyst' || a.type === 'salesperson') {
         a.obj.position.y = a.baseY + Math.sin(time * a.speed + a.phase) * 0.012;
@@ -2145,18 +1755,11 @@
       } else if (a.type === 'machineWheel') {
         a.wheel.rotation.x += 0.06;
       } else if (a.type === 'traffic') {
-        a.obj.position.x += a.speed * a.dir * dt;
+        a.obj.position.x += a.speed * a.dir * 0.016;
         if (a.dir > 0 && a.obj.position.x > a.maxX) a.obj.position.x = a.minX;
         if (a.dir < 0 && a.obj.position.x < a.minX) a.obj.position.x = a.maxX;
-      } else if (a.type === 'supplierVan') {
-        if (a.state === 'inbound') {
-          a.obj.position.x = Math.min(a.stopX, a.obj.position.x + a.speed * dt);
-        } else if (a.state === 'outbound') {
-          a.obj.position.x += (a.speed + 1.4) * dt;
-          if (a.obj.position.x > 26) { scene.remove(a.obj); a.dead = true; if (deliveryActor === a) { deliveryActor = null; deliveryVan = null; } }
-        }
       } else if (a.type === 'pedestrian') {
-        a.obj.position.x += a.speed * a.dir * dt;
+        a.obj.position.x += a.speed * a.dir * 0.01;
         if (a.dir > 0 && a.obj.position.x > a.maxX) a.obj.position.x = a.minX;
         if (a.dir < 0 && a.obj.position.x < a.minX) a.obj.position.x = a.maxX;
         a.obj.position.z = a.baseZ + Math.sin(time * 0.6 + a.phase) * 0.02;
@@ -2164,7 +1767,6 @@
         setPersonPose(a.obj, time * 4.0 + a.phase, true);
       }
     });
-    animatedActors = animatedActors.filter(a => !a.dead);
     if (salesStaff() > 0 && time - lastAutoRestock > Math.max(10, 22 - salesStaff() * 3)) {
       lastAutoRestock = time;
       restockDisplays(false);
@@ -2262,14 +1864,9 @@
     const bobAmount = player.grounded ? Math.min(.045, player.speed * .009) : 0;
     player.headBobY = Math.sin(player.bob * 2) * bobAmount;
     player.headBobX = Math.cos(player.bob) * bobAmount * .45;
-    const nowMs = performance.now();
-    if (player.grounded && player.speed > 1.1 && nowMs >= nextFootstepAt) {
-      playFootstep(sprinting);
-      nextFootstepAt = nowMs + (sprinting ? 255 : 390);
-    }
 
     if (camera) {
-      const targetFov = sprinting ? Math.min(92, baseFov + 4) : baseFov;
+      const targetFov = sprinting ? 78 : 74;
       camera.fov += (targetFov - camera.fov) * (1 - Math.exp(-7 * dt));
       camera.updateProjectionMatrix();
     }
@@ -2297,26 +1894,10 @@
   }
 
   function nearestInteractable() {
-    if (!THREE || !camera) return null;
-    interactionRaycaster ||= new THREE.Raycaster();
-    interactionPointer ||= new THREE.Vector2(0, 0);
-    interactionScratch ||= new THREE.Vector3();
-    interactionRaycaster.setFromCamera(interactionPointer, camera);
-    const roots = interactables.map(it => it.mesh).filter(Boolean);
-    const hits = roots.length ? interactionRaycaster.intersectObjects(roots, true) : [];
-    for (const hit of hits) {
-      if (hit.distance > 3.25) break;
-      let node = hit.object;
-      while (node) {
-        const match = interactables.find(it => it.mesh === node);
-        if (match) return match;
-        node = node.parent;
-      }
-    }
-    let best = null, dist = 1.75;
+    let best = null, dist = 2.2;
     interactables.forEach((it) => {
-      it.mesh.getWorldPosition(interactionScratch);
-      const d = Math.hypot(player.x - interactionScratch.x, player.z - interactionScratch.z);
+      const p = it.mesh.getWorldPosition(new THREE.Vector3());
+      const d = Math.hypot(player.x - p.x, player.z - p.z);
       if (d < dist) { dist = d; best = it; }
     });
     return best;
@@ -2325,8 +1906,6 @@
   function updatePrompt() {
     const p = $3('sim3dPrompt');
     const it = nearestInteractable();
-    focusedInteractable = it;
-    $3('simulator3d')?.classList.toggle('has-focus-target', Boolean(it));
     if (!p) return;
     if (it?.type === 'decisions') {
       p.innerHTML = '<kbd>E</kbd> Abrir terminal de decisiones';
@@ -2375,42 +1954,6 @@
     stopAmbient();
     window.__SIDE_RETURN_TO_3D = true;
     if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
-  }
-
-  function syncSettingsUI() {
-    const sens = $3('simSensitivity');
-    const fov = $3('simFov');
-    if (sens) { sens.value = String(mouseSensitivity); $3('simSensitivityValue').textContent = `${mouseSensitivity.toFixed(2)}×`; }
-    if (fov) { fov.value = String(baseFov); $3('simFovValue').textContent = `${Math.round(baseFov)}°`; }
-    document.querySelectorAll('[data-sim-quality]').forEach(btn => btn.classList.toggle('active', btn.dataset.simQuality === perfMode));
-  }
-
-  function openSettings() {
-    settingsOpen = true;
-    settingsResumeRunning = running;
-    running = false;
-    document.exitPointerLock?.();
-    syncSettingsUI();
-    $3('simSettings')?.classList.remove('hidden');
-  }
-
-  function closeSettings(resume = true) {
-    settingsOpen = false;
-    $3('simSettings')?.classList.add('hidden');
-    if (resume && settingsResumeRunning) {
-      running = true;
-      clock?.getDelta();
-      setTimeout(() => $3('side3dCanvas')?.requestPointerLock?.(), 70);
-    }
-    settingsResumeRunning = false;
-  }
-
-  function autoSave3D(now = performance.now()) {
-    if (now - lastAutoSaveAt < 30000) return;
-    lastAutoSaveAt = now;
-    saveInventory(); saveBusinessState();
-    const el = $3('simSaveIndicator');
-    if (el) { el.classList.add('show'); clearTimeout(autoSave3D.t); autoSave3D.t = setTimeout(()=>el.classList.remove('show'), 1500); }
   }
 
   function resize() {
@@ -2470,22 +2013,18 @@
         npcs.forEach((n) => moveNpc(n, dt));
         npcs = npcs.filter((n) => !n.dead);
       }
-      animateActors(time, dt);
-      animateCheckoutBag(dt);
-      autoSave3D(now);
+      animateActors(time);
       updateEntryDoors(dt);
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
       if (now - lastHudTick > 220) { updateHUD(); updateMinimap(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
     } else {
-      animateActors(time, dt);
-      animateCheckoutBag(dt);
+      animateActors(time);
       updateEntryDoors(dt);
       if (now - lastLightTick > 350) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastHudTick > 350) { updateHUD(); lastHudTick = now; }
     }
     updateAdaptiveQuality(dt, now);
-    updateModelMixers(dt);
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
@@ -2496,14 +2035,12 @@
     document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === canvas; });
     document.addEventListener('mousemove', (e) => {
       if (!running || !locked) return;
-      targetYaw -= e.movementX * 0.00215 * mouseSensitivity;
-      targetPitch -= e.movementY * 0.00185 * mouseSensitivity;
+      targetYaw -= e.movementX * 0.00215;
+      targetPitch -= e.movementY * 0.00185;
       targetPitch = Math.max(-1.3, Math.min(1.3, targetPitch));
     });
     document.addEventListener('keydown', (e) => {
       if ($3(rootId)?.classList.contains('hidden')) return;
-      if (settingsOpen) { if(e.code==='Escape'||e.code==='KeyP') closeSettings(true); return; }
-      if (e.code==='KeyP' && !checkoutOpen && !productInspectOpen && !adminOpen) { openSettings(); e.preventDefault(); return; }
       if (adminOpen) { if(e.code==='Escape') closeAdmin(); return; }
       if (productInspectOpen && e.code !== 'Escape') return;
       if (productInspectOpen && e.code === 'Escape') { closeProductInspect(); return; }
@@ -2525,19 +2062,6 @@
     $3('checkoutCloseBtn')?.addEventListener('click', () => closeCheckout(true));
     $3('checkoutScanBtn')?.addEventListener('click', scanCheckoutProduct);
     $3('checkoutChargeBtn')?.addEventListener('click', confirmCheckout);
-    $3('sim3dSettingsBtn')?.addEventListener('click', openSettings);
-    $3('simSettingsClose')?.addEventListener('click', () => closeSettings(true));
-    $3('simSensitivity')?.addEventListener('input', (e) => {
-      mouseSensitivity = Math.max(.45, Math.min(1.8, Number(e.target.value) || 1));
-      businessState.controls.sensitivity = mouseSensitivity; saveBusinessState(); syncSettingsUI();
-    });
-    $3('simFov')?.addEventListener('input', (e) => {
-      baseFov = Math.max(62, Math.min(88, Number(e.target.value) || 74));
-      businessState.controls.fov = baseFov; saveBusinessState(); syncSettingsUI();
-    });
-    document.querySelectorAll('[data-sim-quality]').forEach(btn => btn.addEventListener('click', () => {
-      setGraphicsQuality(btn.dataset.simQuality); syncSettingsUI();
-    }));
     $3('sim3dStartBtn')?.addEventListener('click', () => {
       resetGameSession(false);
       running = true;
@@ -2605,7 +2129,6 @@
     if (initialized) return true;
     if (!await loadThree()) return false;
     loadBusinessState();
-    await loadModelAssets();
     buildStaticWorld();
     loadAudioSetting();
     clock = new THREE.Clock();

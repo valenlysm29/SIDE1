@@ -3,7 +3,7 @@ window.SIDE_DECISION_CATALOG = [
     cat:'A', title:'Empresa', short:'Empresa', icon:'assets/side_logo.png',
     desc:'Define el segmento estratégico. El estudiante registra el nombre legal y el nombre comercial de su empresa al ingresar; luego se mantienen durante la partida.',
     items:[
-      {id:'SEGMENTO', name:'Segmento de mercado', type:'choice', fixed:true, required:true, options:[
+      {id:'SEGMENTO', name:'Segmento de mercado', type:'choice', fixed:true, required:true, showPrice:false, options:[
         {id:'economico',label:'Económico',desc:'Prioriza volumen y precio accesible.',cost:0},
         {id:'estandar',label:'Estándar',desc:'Equilibra precio, calidad y margen.',cost:0},
         {id:'premium',label:'Premium',desc:'Compite por diferenciación, diseño y mayor valor percibido.',cost:0}
@@ -85,12 +85,12 @@ window.SIDE_DECISION_CATALOG = [
         {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:4},
         {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:7}
       ]},
-      {id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,options:[
+      {id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:[
         {id:'gar_0',label:'Sin garantía',desc:'No hay porcentaje de devolución por material fallado.',cost:0,value:0},
         {id:'gar_80',label:'80% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 80% del valor correspondiente.',cost:0,value:80},
         {id:'gar_100',label:'100% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 100% del valor correspondiente.',cost:0,value:100}
       ]},
-      {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,options:[
+      {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:[
         {id:'pt_30',label:'Cobertura comercial 30 días',desc:'Política básica de respaldo al cliente para productos terminados.',cost:0,value:30},
         {id:'pt_90',label:'Cobertura comercial 90 días',desc:'Mayor respaldo posventa y confianza del cliente.',cost:0,value:90},
         {id:'pt_180',label:'Cobertura comercial 180 días',desc:'Política amplia de respaldo para líneas de mayor valor.',cost:0,value:180}

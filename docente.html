@@ -16,11 +16,11 @@
   <aside class="sidebar">
     <div class="brand"><img src="assets/side_logo.png" alt="SIDE"><span>PANEL DOCENTE</span></div>
     <nav>
-      <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/icons/profesor_sidebar/configuracion.svg" alt=""></span><span>Configuración</span></button>
-      <button class="nav-btn" data-tab="rondas"><span class="nav-icon"><img src="assets/icons/profesor_sidebar/rondas_eventos.svg" alt=""></span><span>Rondas y eventos</span></button>
-      <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/icons/profesor_sidebar/empresas.svg" alt=""></span><span>Empresas</span></button>
-      <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/icons/profesor_sidebar/resultados.svg" alt=""></span><span>Resultados</span></button>
-      <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/icons/profesor_sidebar/podio.svg" alt=""></span><span>Ganador y podio</span></button>
+      <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/decision-icons/ui/objetivo.png" alt=""></span><span>Configuración</span></button>
+      <button class="nav-btn" data-tab="rondas"><span class="nav-icon"><img src="assets/decision-icons/ui/reloj.png" alt=""></span><span>Rondas y eventos</span></button>
+      <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/decision-icons/ui/mapa.png" alt=""></span><span>Empresas</span></button>
+      <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/decision-icons/ui/confirmar.png" alt=""></span><span>Resultados</span></button>
+      <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/decision-icons/ui/trofeo.png" alt=""></span><span>Ganador y podio</span></button>
     </nav>
     <div class="sidebar-bottom">
       <div class="connection"><span id="connectionDot"></span><span id="connectionText">Modo simulación</span></div>
@@ -54,7 +54,6 @@
           <label>Nombre de la simulación<input id="gameName" value="SIDE — Simulación Principal"></label>
           <label>Curso<input id="gameCourse" value="Finanzas Corporativas"></label>
           <label>Código de partida<input id="gameCode" class="locked-input" value="SIDE-000" maxlength="12" readonly aria-readonly="true"></label>
-          <label>Nombre sugerido de empresa (opcional)<input id="fixedCompany" value="" placeholder="Ej. Nova Bags"></label>
           <p class="hint">El nombre legal y comercial lo define cada estudiante. El código de partida se genera automáticamente.</p>
         </article>
         <article class="card">
@@ -139,7 +138,7 @@
     </section>
 
     <section id="tab-resultados" class="tab-panel">
-      <div class="section-head"><div><span class="eyebrow">RESULTADOS DISGREGADOS</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
+      <div class="section-head"><div><span class="eyebrow">RESULTADOS</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
       <div class="stats-grid" id="resultStats"></div>
       <article class="card table-card"><div class="card-title"><h3>Estado de resultados</h3><span>Ingresos · costos · eventos · utilidad</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ingresos</th><th>Costos</th><th>Impacto eventos</th><th>Utilidad</th></tr></thead><tbody id="incomeStatementBody"></tbody></table></div></article>
       <article class="card table-card"><div class="card-title"><h3>Balance de caja</h3><span>Caja inicial · préstamos · caja final</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Caja inicial</th><th>Préstamos</th><th>Caja final</th><th>Progreso</th></tr></thead><tbody id="cashBalanceBody"></tbody></table></div></article>
