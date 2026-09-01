@@ -1,0 +1,26 @@
+SIDE 3D — VALIDACIÓN DE MEJORAS POR REFERENCIA
+
+Proyecto base: versión SIDE con panel docente, eventos Perú y simulador 3D integral.
+Referencias revisadas: supermarket-stable.zip y store-simulator-game-master.zip.
+
+VALIDACIONES REALIZADAS
+- No se copiaron modelos, texturas, sonidos ni código de los proyectos de referencia.
+- Interacción por raycast central implementada.
+- Fallback por proximidad limitado a distancia corta.
+- Rutas de compra variables entre múltiples exhibidores.
+- Separación suave entre NPCs.
+- Burbujas de reacción temporales y no permanentes.
+- Bolso físico animado sobre la caja durante escaneo/cobro.
+- Pasos del jugador sincronizados con caminar/correr.
+- Menú de ajustes 3D con sensibilidad, FOV y calidad gráfica.
+- El menú de ajustes pausa el turno.
+- Auto-guardado visible cada 30 s durante operación.
+- Vehículo de proveedor visible durante pedidos.
+- Movimiento de tráfico/proveedor dependiente de delta time.
+- Sombras de contacto ligeras para NPCs.
+- No hay IDs HTML duplicados.
+- Todos los archivos JavaScript principales pasan node --check.
+- No hay marcadores activos de conflictos Git en los archivos del proyecto.
+
+NOTA
+No fue posible validar visualmente WebGL con una sesión gráfica real dentro de este entorno. La validación realizada es estructural, sintáctica y lógica.

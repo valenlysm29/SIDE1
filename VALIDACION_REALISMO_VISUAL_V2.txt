@@ -1,0 +1,9 @@
+VALIDACIÓN REALISMO VISUAL V2
+- loadModelAssets() se ejecuta antes de buildStaticWorld(): OK
+- 11 GLB locales presentes: OK
+- NPC con nodos Arm_L, Forearm_L, Leg_L y Knee_L: OK
+- Modelos de automóvil/farola agregados al manifiesto: OK
+- Materiales de vidrio/emisión tratados en el cargador: OK
+- Modal de ingreso compacto: OK
+- Marcadores de conflicto Git: no encontrados
+- Sintaxis JS: validada con node --check

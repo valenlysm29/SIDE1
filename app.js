@@ -182,6 +182,7 @@ function categoryDraftNet(cat){
   return loan-cost;
 }
 function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0);return initialCapital()+ledgerTotal()-old+categoryDraftNet(currentCategory)}
+function isCompanyCategory(cat=currentCategory){return cat==='A'}
 
 function openDecisionMenu(){
   loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||DECISION_CATALOG[0]?.cat; showScreen('decisionMenu');
@@ -202,6 +203,7 @@ function machinerySummaryHtml(){
 function renderDecisionCategory(){
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
+  $('decisionDetail')?.setAttribute('data-cat',cat.cat);
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   let lead=`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
   if(cat.cat==='C')lead+=machinerySummaryHtml();
@@ -210,11 +212,11 @@ function renderDecisionCategory(){
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer();
 }
 function renderDecisionRow(item){
-  const locked=isLocked(item),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
+  const locked=isLocked(item),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item),hideFinancials=isCompanyCategory();
   let body='';
   if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
-    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const disabled=locked||item.mandatoryFixed;return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${extra}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':'<div class="micro-caption">Botón de opción: solo puedes seleccionar una alternativa.</div>'}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
+    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const disabled=locked||item.mandatoryFixed;return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${hideFinancials?'':`<em>${money(optionUnitCost(item,o))}</em>`}<p>${escapeHtml(o.desc)}</p>${extra}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':'<div class="micro-caption">Botón de opción: solo puedes seleccionar una alternativa.</div>'}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span><span class="buying-badge">VAS A COMPRAR: ${q}</span>`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="0" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>`;
   } else if(item.type==='number'){
@@ -226,8 +228,8 @@ function renderDecisionRow(item){
   } else if(item.type==='info'){
     let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS')dynamic='<strong>1 vendedor básico por tienda · comisión 1%</strong>';body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
-  const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:'Sin salida de caja';
-  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
+  const costLabel=hideFinancials?'':item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:'Sin salida de caja';
+  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div>${hideFinancials?'':`<div class="row-cost">${costLabel}</div>`}</div>${body}</article>`;
 }
 function bindDecisionControls(){
   document.querySelectorAll('[data-choice]').forEach(input=>input.addEventListener('change',()=>{const item=findDecisionItem(input.dataset.choice);if(item.mandatoryFixed){toast('Esta decisión corresponde a un costo obligatorio y no puede retirarse.');renderDecisionCategory();return}const d=initDraft(item),id=input.dataset.option;if(item.type==='multi-choice'){const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set]}else d.optionIds=[id];renderDecisionCategory()}));
@@ -243,9 +245,16 @@ function bindDecisionControls(){
 function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.quantities[optId]=Math.max(0,(Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
 function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.staff[store]=Math.max(0,(Number(d.staff[store])||0)+delta);renderDecisionCategory()}
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
-function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(row)row.textContent=computeItemCost(item)>0?'Costo actual: '+money(computeItemCost(item)):'Sin salida de caja'}
+function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(row&&!isCompanyCategory())row.textContent=computeItemCost(item)>0?'Costo actual: '+money(computeItemCost(item)):'Sin salida de caja'}
 function updateSectionCost(){
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
+  if(isCompanyCategory()){
+    $('sectionDraftCost').textContent='Sin montos en este apartado';
+    $('projectedCash').textContent='—';$('projectedCash').classList.remove('danger');
+    $('sectionSaveHint').textContent='Esta sección solo define la identidad de la empresa y no muestra importes monetarios.';
+    $('saveDecisionSection').disabled=false;
+    return;
+  }
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
   $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
   $('sectionSaveHint').textContent=projected<0?'El gasto supera tu caja actual. Ajusta antes de guardar.':'El saldo mostrado permanece fijo. Se actualizará únicamente cuando guardes esta pestaña.';

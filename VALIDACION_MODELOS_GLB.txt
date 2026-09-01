@@ -1,0 +1,11 @@
+VALIDACIÓN — MODELOS GLB SIDE 3D
+
+[OK] 9 archivos GLB locales presentes.
+[OK] Todos los GLB son glTF 2.0 binarios válidos.
+[OK] Los modelos usan únicamente primitives TRIANGLES (mode 4).
+[OK] Tipos de accessor compatibles con el cargador integrado.
+[OK] NPCs poseen nodos nombrados para animación: Arm_L, Arm_R, Forearm_L, Forearm_R, Leg_L, Leg_R, Hand_L, Hand_R y Head.
+[OK] Cargador local con fallback procedural.
+[OK] Materiales clonados por instancia y geometrías compartidas.
+[OK] Caja, estantes y mobiliario usan los modelos GLB cuando están disponibles.
+[OK] Sintaxis JavaScript validada con node --check.

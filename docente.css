@@ -7,8 +7,8 @@
 .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 30px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:18px}.brand img{width:84px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.5))}.brand span{font-size:13px;font-weight:900;letter-spacing:.14em;color:var(--gold)}
 nav{display:grid;gap:8px}
 .nav-btn,.sidebar-link{border:0;background:transparent;color:var(--muted);padding:12px 13px;border-radius:13px;text-align:left;font-weight:700;display:flex;gap:12px;align-items:center;transition:.2s;position:relative}
-.nav-icon{width:34px;height:34px;min-width:34px;border-radius:10px;display:grid;place-items:center;background:#07172a;border:1px solid rgba(255,255,255,.08);transition:.2s}
-.nav-icon img{width:19px;height:19px;object-fit:contain;filter:brightness(.85) saturate(.8);transition:.2s}
+.nav-icon{width:40px;height:40px;min-width:40px;border-radius:12px;display:grid;place-items:center;background:#07172a;border:1px solid rgba(255,255,255,.08);transition:.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.nav-icon img{width:24px;height:24px;object-fit:contain;filter:none;transition:.2s}
 .nav-btn:hover{background:#0a203a;color:#eaf4ff}.nav-btn:hover .nav-icon{border-color:rgba(101,194,255,.4)}
 .nav-btn.active{color:#fff;background:linear-gradient(180deg,rgba(16,59,102,.9),rgba(10,32,56,.9));box-shadow:inset 0 0 0 1px rgba(61,167,255,.33),0 10px 25px rgba(0,0,0,.3)}
 .nav-btn.active .nav-icon{background:linear-gradient(145deg,#ffe985,#e7a800);border-color:transparent;box-shadow:0 0 16px rgba(255,211,41,.4)}
