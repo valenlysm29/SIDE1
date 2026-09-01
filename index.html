@@ -183,7 +183,7 @@
         <div id="simMissionList" class="sim3d-mission-list"></div>
       </div>
       <div class="sim3d-bottom">
-        <div class="sim3d-controls"><strong>CONTROLES</strong><p><kbd>W A S D</kbd> moverte · <kbd>Mouse</kbd> mirar · <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>E</kbd> interactuar, reponer y cobrar · <kbd>Esc</kbd> liberar mouse</p></div>
+        <div class="sim3d-controls"><strong>CONTROLES</strong><p><kbd>W A S D</kbd> moverte · <kbd>Mouse</kbd> mirar · <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>E</kbd> interactuar, reponer y cobrar · <kbd>P</kbd> ajustes · <kbd>Esc</kbd> liberar mouse</p></div>
         <div class="sim3d-inventory" aria-label="Inventario de la tienda">
           <span>INVENTARIO EN EXHIBICIÓN</span>
           <div><b>ESENCIAL</b><strong id="stock-esencial">0</strong><small id="price-esencial">S/ 75</small><em>Almacén <i id="reserve-esencial">0</i></em></div>
@@ -197,9 +197,11 @@
     <div class="sim3d-actionbar">
       <button id="sim3dDecisionsBtn" class="sim3d-btn primary" type="button">TABLET DE DECISIONES</button>
       <button id="sim3dAudioBtn" class="sim3d-btn" type="button">AUDIO: ON</button>
+      <button id="sim3dSettingsBtn" class="sim3d-btn" type="button">AJUSTES 3D</button>
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
     </div>
     <div id="sim3dMessage" class="sim3d-message" aria-live="polite"></div>
+    <div id="simSaveIndicator" class="sim-save-indicator" aria-live="polite"><span>✓</span> PROGRESO GUARDADO</div>
     <div id="sim3dReceipt" class="sim3d-receipt" aria-live="polite">
       <div class="receipt-brand">TU EMPRESA</div>
       <span id="receiptTicket">TICKET #0001</span>
@@ -228,6 +230,19 @@
       </div>
     </div>
 
+
+    <div id="simSettings" class="sim-settings hidden" aria-label="Ajustes del simulador 3D">
+      <div class="sim-settings-card">
+        <button id="simSettingsClose" class="sim-settings-close" type="button" aria-label="Cerrar">×</button>
+        <span class="sim-settings-kicker">EXPERIENCIA 3D</span>
+        <h2>Ajustes de juego</h2>
+        <p>Personaliza la cámara y el rendimiento sin afectar tus decisiones ni el progreso.</p>
+        <label class="sim-range-row"><span>Sensibilidad del mouse <b id="simSensitivityValue">1.00×</b></span><input id="simSensitivity" type="range" min="0.45" max="1.8" step="0.05" value="1"></label>
+        <label class="sim-range-row"><span>Campo de visión <b id="simFovValue">74°</b></span><input id="simFov" type="range" min="62" max="88" step="1" value="74"></label>
+        <div class="sim-quality-setting"><span>Calidad gráfica</span><div><button type="button" data-sim-quality="low">BAJA</button><button type="button" data-sim-quality="medium">MEDIA</button><button type="button" data-sim-quality="high">ALTA</button><button type="button" data-sim-quality="auto" class="active">AUTO</button></div></div>
+        <small><kbd>P</kbd> abre/cierra este panel. En AUTO el juego ajusta resolución si detecta una caída de FPS.</small>
+      </div>
+    </div>
 
     <div id="simCheckout" class="sim-checkout hidden">
       <div class="sim-checkout-card">
@@ -375,7 +390,7 @@
         <strong id="cashBalance">S/ 100,000</strong>
         <small id="cashMovement">Disponible para decidir</small>
       </div>
-      <div class="student-top-timer"><span>TIEMPO DEL CICLO</span><strong id="decisionRoundTimer">--:--:--</strong></div><button id="topSubmitAllDecisions" class="top-submit-all" type="button"><span>✓</span> ENVIAR TODO</button><div class="mission-meter" aria-label="Progreso de decisiones">
+      <div class="student-top-timer"><span>TIEMPO DEL CICLO</span><strong id="decisionRoundTimer">--:--:--</strong></div><div class="mission-meter" aria-label="Progreso de decisiones">
         <div class="mission-label"><span>PROGRESO</span><strong id="decisionProgressText">0%</strong></div>
         <div class="mission-track"><div id="decisionProgressBar"></div></div>
       </div>
@@ -390,12 +405,12 @@
               <img id="detailCategoryIcon" src="assets/icons/categories/infraestructura.svg" alt="">
               <div><span id="categoryEyebrow">SECCIÓN DE DECISIÓN</span><h1 id="categoryTitle">Infraestructura</h1><p id="categoryDescription">Selecciona tus decisiones.</p></div>
             </div>
-            <div class="section-balance"><span>SALDO FINAL GUARDADO</span><strong id="projectedCash">S/ 100,000</strong><small>Se actualiza al guardar el borrador</small></div>
+            <div class="section-balance"><span>SALDO FINAL GUARDADO</span><strong id="projectedCash">S/ 100,000</strong><small>No cambia hasta guardar</small></div>
           </div>
           <div id="decisionCards" class="decision-cards decision-list"></div>
           <div class="section-save-bar">
             <div><span>GASTADO / MOVIMIENTO DE ESTA PESTAÑA</span><strong id="sectionDraftCost">S/ 0</strong><small id="sectionSaveHint">El gasto se actualiza mientras eliges. El saldo cambia recién al guardar.</small></div>
-            <div class="decision-action-pair"><button id="saveDecisionSection" class="game-confirm-btn save-section-btn" type="button"><span class="save-disc">●</span><strong>GUARDAR BORRADOR</strong><small>Seguir editando</small></button><button id="sendDecisionSection" class="game-confirm-btn submit-decisions-btn section-submit-btn" type="button"><span>✓</span><strong>ENVIAR DECISIÓN</strong><small>Bloquear esta pestaña</small></button></div>
+            <button id="saveDecisionSection" class="game-confirm-btn save-section-btn"><span class="save-disc">●</span> GUARDAR DECISIONES</button>
           </div>
           <div id="simulationLaunch" class="simulation-launch hidden" aria-live="polite">
             <div class="simulation-launch-badge"><span>100%</span><small>COMPLETADO</small></div>
@@ -404,7 +419,7 @@
               <h2>Convierte tus decisiones en una tienda 3D</h2>
               <p>Se construirán el local, la zona de producción, maquinaria, personal, stock y flujo de clientes según lo que elegiste.</p>
             </div>
-            <div class="simulation-launch-actions"><button id="submitAllDecisionsBtn" class="submit-decisions-btn" type="button"><strong>ENVIAR DECISIONES</strong><small>Confirmar y bloquear este ciclo</small></button><button id="startSimulationBtn" class="start-simulation-btn hidden" type="button"><span>▶</span><strong>INICIAR JUEGO 3D</strong><small>Decisiones enviadas</small></button></div>
+            <div class="simulation-launch-actions"><button id="submitAllDecisionsBtn" class="submit-decisions-btn" type="button"><strong>ENVIAR DECISIONES</strong><small>Confirmar decisiones obligatorias del ciclo</small></button><button id="startSimulationBtn" class="start-simulation-btn hidden" type="button"><span>▶</span><strong>INICIAR JUEGO 3D</strong><small>Decisiones enviadas</small></button></div>
           </div>
         </div>
       </section>
@@ -427,6 +442,12 @@
 <script src="decision_catalog.js"></script>
 <script src="tutorial.js"></script>
 <script src="simulator3d.js"></script>
+<script src="enterprise_world_v5.js"></script>
+<script src="enterprise_world_v6.js"></script>
+<script src="enterprise_world_v7.js"></script>
 <script src="app.js"></script>
+<script src="enterprise_visual_v8.js"></script>
+<script src="enterprise_visual_v9.js"></script>
+<script src="correcciones_observaciones.js"></script>
 </body>
 </html>
