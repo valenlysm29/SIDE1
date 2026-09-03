@@ -1226,7 +1226,24 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   opacity:.5;
   filter:saturate(.5);
 }
-
-/* Correccion contraste boton enviar decisiones */
-.submit-decisions-btn,.top-submit-all{background:linear-gradient(180deg,#1d8cff,#0753a5)!important;color:#ffffff!important;border-color:#6ec1ff!important;text-shadow:0 1px 2px #000;}
-.submit-decisions-btn small,.top-submit-all small{color:#e8f4ff!important;}
+/* El texto heredaba #ffd34f (dorado) de ".section-save-bar>div strong/small",
+   casi invisible sobre el fondo dorado del botón. Se fuerza un color oscuro
+   legible, y uno claro cuando el botón ya está en estado "submitted". */
+#decisionMenu .section-submit-btn strong,
+#decisionMenu .section-submit-btn span,
+#decisionMenu .section-submit-btn small{
+  color:#3d1900 !important;
+}
+/* ".section-submit-btn.submitted" (verde, botón ya bloqueado) tenía menos
+   especificidad que la regla dorada de arriba (que sí lleva #decisionMenu),
+   así que el fondo nunca cambiaba a verde. Se iguala el alcance aquí para
+   que el estado "enviado" también se muestre con su fondo verde real. */
+#decisionMenu .section-submit-btn.submitted{
+  background:linear-gradient(145deg,#174d32,#123b27) !important;
+  border-color:#4fd486 !important;
+}
+#decisionMenu .section-submit-btn.submitted strong,
+#decisionMenu .section-submit-btn.submitted span,
+#decisionMenu .section-submit-btn.submitted small{
+  color:#a9ffd0 !important;
+}
