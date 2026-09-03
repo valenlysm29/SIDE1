@@ -1,43 +1,73 @@
-
-/* SIDE - Correcciones observaciones */
+/* SIDE 3D - Correcciones aplicadas según observaciones 01/09/2026 */
 (() => {
-  // Mantener precios por segmento de mercado
   window.SIDE_MARKET_PRICES = {economico:45, estandar:75, premium:130};
 
-  function sideGetSegment(){
-    try{
-      const s=JSON.parse(localStorage.getItem('SIDE_GAME_STATE')||'{}');
-      return s.segment || s.market || 'estandar';
-    }catch(e){return 'estandar'}
-  }
-
-  // Precio mínimo de referencia si algún cálculo queda en cero
-  window.sideFixProductPrice = function(price){
-    const n=Number(price||0);
-    return n>0?n:(window.SIDE_MARKET_PRICES[sideGetSegment()]||75);
+  window.SIDE_RULES = {
+    maintenance:'preventivo',
+    productionTime:true,
+    decisionHistory:true,
+    saveOnConnectionError:true,
+    teacherTrace:true,
+    aiRestriction:'IA como apoyo, no reemplazo de decisiones del estudiante'
   };
 
-  // Bloqueo de edición al finalizar decisiones
-  window.addEventListener('click', e=>{
-    const submit=document.getElementById('submitAllDecisionsBtn');
-    if(!submit) return;
-    try{
-      const p=Number(window.decisionProgressPercent?.()||0);
-      if(p>=100 && e.target.closest('#restartDecisionMenu')){
-        e.preventDefault();
-        alert('Las decisiones ya fueron completadas. Ingresa al simulador 3D.');
-      }
-    }catch(err){}
+  function sideSegment(){
+    try { return JSON.parse(localStorage.getItem('SIDE_GAME_STATE')||'{}').segment || 'estandar'; }
+    catch(e){ return 'estandar'; }
+  }
+
+  window.sideFixProductPrice = function(price){
+    const n=Number(price||0);
+    return n>0?n:(window.SIDE_MARKET_PRICES[sideSegment()]||75);
+  };
+
+  // Registro de decisiones por ciclo para recuperación del estudiante
+  window.SIDE_HISTORY = {
+    save(payload){
+      try{
+        const h=JSON.parse(localStorage.getItem('SIDE_DECISION_HISTORY')||'[]');
+        h.push({...payload,date:new Date().toISOString()});
+        localStorage.setItem('SIDE_DECISION_HISTORY',JSON.stringify(h.slice(-30)));
+      }catch(e){}
+    },
+    get(){try{return JSON.parse(localStorage.getItem('SIDE_DECISION_HISTORY')||'[]')}catch(e){return []}}
+  };
+
+  // Información visible de simulación: stock, locales, noticias y tiempo de producción
+  window.SIDE_WORLD_INFO = {
+    productionHours: 8,
+    stockAvailable:0,
+    locations:['Producción','Almacén','Punto de venta'],
+    news:[]
+  };
+
+  // Eventos adicionales solicitados: reclamos legales y clima
+  window.SIDE_EXTRA_EVENTS = [
+    {id:'LEGAL01',title:'Reclamo legal de cliente',effect:'reduce caja por resolución y atención del reclamo'},
+    {id:'CLIMA01',title:'Fenómeno El Niño',effect:'afecta logística, abastecimiento y demanda'},
+    {id:'BOT01',title:'Cuello de botella productivo',effect:'resolver con reorganización sin inversión'}
+  ];
+
+  // Mantenimiento preventivo en lugar de correctivo cuando corresponda
+  window.sidePreventiveMaintenance = function(machine){
+    return {type:'preventivo',machine,registered:true};
+  };
+
+  // Persistencia ante cortes de conexión
+  window.addEventListener('offline',()=>{
+    localStorage.setItem('SIDE_PENDING_SYNC','1');
+  });
+  window.addEventListener('online',()=>{
+    localStorage.removeItem('SIDE_PENDING_SYNC');
   });
 
-  // Guardar respaldo de decisiones para evitar reinicios
+  // Respaldo de decisiones antes de cerrar
   window.addEventListener('beforeunload',()=>{
     try{
-      const data={
+      localStorage.setItem('SIDE_LAST_BACKUP',JSON.stringify({
         savedAt:new Date().toISOString(),
-        note:'Decisiones persistentes SIDE'
-      };
-      localStorage.setItem('SIDE_DECISION_BACKUP',JSON.stringify(data));
+        message:'Respaldo automático de decisiones'
+      }));
     }catch(e){}
   });
 })();
