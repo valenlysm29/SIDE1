@@ -215,8 +215,8 @@ function sectionDraftReady(cat=currentCategory){const c=categoryByCat(cat);if(!c
 function sectionReady(cat=currentCategory){return sectionDraftReady(cat)}
 function eventHint(){const ev=activeStudentEvents()[0];if(ev)return `${ev.title}: ${ev.implication}`;return 'No hay un evento activo confirmado para esta empresa en este ciclo.'}
 function machinerySummaryHtml(){
-  const defs=[['MESA_CORTE','Corte'],['ENSAMBLE','Ensamble'],['ACABADOS','Acabado']];
-  return `<div class="machinery-summary production-flow"><div><span>DIAGRAMA DE FLUJO DE PRODUCCIÓN</span><small>Disponible = comprado anteriormente + adquirido en este ciclo. Capacidad calculada sin diferenciar nivel.</small></div>${defs.map(([id,label])=>{const item=findDecisionItem(id);let previous=0,current=0;(item?.options||[]).forEach(o=>{previous+=getOwned(item,o.id);current+=Number(initDraft(item).quantities?.[o.id]||0)});const available=previous+current;return `<div><b>${escapeHtml(label)}</b><strong>${available}</strong><small>Disponible ahora</small><em>${current?`+${current} comprado(s) este ciclo`:'Sin compra nueva'}</em></div>`}).join('')}</div>`;
+  const defs=[['MESA_CORTE','Mesas de corte'],['ENSAMBLE','Ensamblado'],['ACABADOS','Acabados']];
+  return `<div class="machinery-summary"><div><span>MAQUINARIA DISPONIBLE PARA PRODUCCIÓN</span><small>Incluye equipos adquiridos anteriormente y los comprados en este ciclo.</small></div>${defs.map(([id,label])=>{const item=findDecisionItem(id);let previous=0,current=0;(item?.options||[]).forEach(o=>{previous+=getOwned(item,o.id);current+=Number(initDraft(item).quantities?.[o.id]||0)});const available=previous+current;return `<div><b>${escapeHtml(label)}</b><strong>${available}</strong><small>Disponible ahora</small><em>${current?`+${current} comprado(s) este ciclo`:'Sin compra nueva'}</em></div>`}).join('')}</div>`;
 }
 function renderDecisionCategory(){
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;

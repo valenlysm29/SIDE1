@@ -842,11 +842,7 @@
     PRODUCTS.forEach(p => { const el=$3(`price-${p.id}-input`); if(el && document.activeElement!==el) el.value=String(p.price); });
     const rows=$3('adminStockRows');
     if(rows && inventory) rows.innerHTML=PRODUCTS.map(p=>`<div><strong>${p.name}</strong><span>Exhibición ${displayStock(p.id)}</span><span>Almacén ${reserveStock(p.id)}</span></div>`).join('');
-    if ($3('adminProductionText')) {
-      const corte=owned('MESA_CORTE'), ens=owned('ENSAMBLE'), aca=owned('ACABADOS');
-      const capacidadDia=Math.max(0, Math.round((corte+ens+aca)*2));
-      $3('adminProductionText').textContent = `Flujo: Corte (${corte}) → Ensamble (${ens}) → Acabado (${aca}) → Almacén | Producción total estimada: ${capacidadDia} unidades/día | Producidas hoy: ${businessState.production.producedToday}.`;
-    }
+    if ($3('adminProductionText')) $3('adminProductionText').textContent = `Producidas hoy: ${businessState.production.producedToday} · Capacidad de almacén: ${warehouseCapacity()} · Próxima unidad automática durante el turno.`;
     const log=$3('adminLogList'); if(log) log.innerHTML=(businessState.logs||[]).map(x=>`<div>${x}</div>`).join('') || '<div>Sin actividad todavía.</div>';
     document.querySelectorAll('[data-quality]').forEach(b=>b.classList.toggle('active',b.dataset.quality===perfMode));
     const up=businessState.upgrades||{};

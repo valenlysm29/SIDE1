@@ -42,7 +42,7 @@ window.SIDE_DECISION_CATALOG = [
   },
   {
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
-    desc:'Integra personal, compras, materia prima y el volumen que deseas producir en el ciclo.',
+    desc:'Integra personal, compras, materia prima y el volumen que deseas producir en el ciclo. El resumen de producción considera lo comprado previamente más lo adquirido en el ciclo actual y muestra la capacidad total diaria por etapa.',
     items:[
       {id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1500},
@@ -59,11 +59,11 @@ window.SIDE_DECISION_CATALOG = [
         {id:'aca_personal_tec',label:'Técnico en acabados',desc:'Maneja herramientas y equipos de acabado.',cost:2800},
         {id:'aca_personal_art',label:'Artesano acabador',desc:'Realiza acabados finos y detalles especiales.',cost:4500}
       ]},
-      {id:'JEFATURA',required:false,name:'Jefatura de producción',type:'choice',recurring:true,options:[
+      {id:'JEFATURA',required:false,position:'top',name:'Jefatura de producción',type:'choice',recurring:true,options:[
         {id:'no_jefatura',label:'No contratar',desc:'La coordinación queda a cargo del equipo.',cost:0},
         {id:'si_jefatura',label:'Contratar',desc:'Incorpora una jefatura para coordinar la operación.',cost:3000}
       ]},
-      {id:'LIMPIEZA',required:false,name:'Limpieza y servicios generales',type:'quantity',recurring:true,options:[
+      {id:'LIMPIEZA',required:false,fixedCost:true,name:'Limpieza y servicios generales',type:'fixed-cost',recurring:true,options:[
         {id:'limpieza',label:'Personal de limpieza / servicios',desc:'Apoyo operativo para mantener el área de producción.',cost:600}
       ]},
       {id:'ANALISTA_COMPRAS',required:false,name:'Analista de compras',type:'choice',recurring:true,options:[
@@ -85,7 +85,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:4},
         {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:7}
       ]},
-      {id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:[
+      {id:'GARANTIA_PROV',required:false,costAffects:'compra',name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:[
         {id:'gar_0',label:'Sin garantía',desc:'No hay porcentaje de devolución por material fallado.',cost:0,value:0},
         {id:'gar_80',label:'80% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 80% del valor correspondiente.',cost:0,value:80},
         {id:'gar_100',label:'100% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 100% del valor correspondiente.',cost:0,value:100}
@@ -101,7 +101,7 @@ window.SIDE_DECISION_CATALOG = [
     cat:'D', title:'Canales y ventas', short:'Ventas', icon:'assets/icons/categories/canales_ventas.svg',
     desc:'Elige dónde vender. La demanda cambia por distrito y el equipo comercial se activa cuando existe una tienda física.',
     items:[
-      {id:'CANALES',name:'Canales de venta',type:'multi-choice',required:true,minSelections:1,options:[
+      {id:'CANALES',name:'Canales de venta',type:'multi-choice',required:true,minSelections:1,contractMonths:12,options:[
         {id:'web',label:'Página web',desc:'Canal digital con cobertura amplia.',cost:500,channel:'web'},
         {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00},
         {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo.',cost:3500,channel:'store',district:'Miraflores',demand:1.25},

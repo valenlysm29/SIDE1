@@ -1227,6 +1227,6 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   filter:saturate(.5);
 }
 
-/* Corrección visual: botón de envío con contraste legible */
-.submit-decisions-btn,.section-submit-btn{background:linear-gradient(135deg,#1f8cff,#0059c9)!important;color:#ffffff!important;border:1px solid #62b5ff!important;text-shadow:0 1px 2px #000!important}
-.submit-decisions-btn small{color:#eaf5ff!important;opacity:1!important}
+/* Correccion contraste boton enviar decisiones */
+.submit-decisions-btn,.top-submit-all{background:linear-gradient(180deg,#1d8cff,#0753a5)!important;color:#ffffff!important;border-color:#6ec1ff!important;text-shadow:0 1px 2px #000;}
+.submit-decisions-btn small,.top-submit-all small{color:#e8f4ff!important;}
