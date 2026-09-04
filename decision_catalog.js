@@ -14,18 +14,21 @@ window.SIDE_DECISION_CATALOG = [
     cat:'B', title:'Infraestructura', short:'Infraestructura', icon:'assets/icons/categories/infraestructura.svg',
     desc:'Compra activos, define el local de producción y administra el mantenimiento de la planta.',
     items:[
+      // dailyCapacity = unidades/día que aporta CADA equipo de esa opción (valor referencial,
+      // ajustar al modelo real del curso). liquidationRate = % del costo original que se
+      // recupera al vender/liquidar una unidad ya adquirida (ver "Despido y liquidación").
       {id:'MESA_CORTE',required:false,name:'Mesas de corte',type:'quantity',asset:true,unlimited:true,options:[
-        {id:'mesa',label:'Mesa de corte',desc:'Mesa de trabajo para la etapa de corte. Puedes adquirir más de una.',cost:2500}
+        {id:'mesa',label:'Mesa de corte',desc:'Mesa de trabajo para la etapa de corte. Puedes adquirir más de una.',cost:2500,dailyCapacity:40,liquidationRate:0.4}
       ]},
       {id:'ENSAMBLE',required:false,name:'Máquinas de ensamblado',type:'quantity-choice',asset:true,unlimited:true,options:[
-        {id:'ens_basica',label:'Básica / manual',desc:'Equipo básico para diseños sencillos.',cost:3500},
-        {id:'ens_semi',label:'Semi-industrial',desc:'Mayor estabilidad y velocidad de producción.',cost:7500},
-        {id:'ens_ind',label:'Industrial',desc:'Equipo de alto desempeño para producción intensiva.',cost:15000}
+        {id:'ens_basica',label:'Básica / manual',desc:'Equipo básico para diseños sencillos.',cost:3500,dailyCapacity:15,liquidationRate:0.4},
+        {id:'ens_semi',label:'Semi-industrial',desc:'Mayor estabilidad y velocidad de producción.',cost:7500,dailyCapacity:30,liquidationRate:0.4},
+        {id:'ens_ind',label:'Industrial',desc:'Equipo de alto desempeño para producción intensiva.',cost:15000,dailyCapacity:55,liquidationRate:0.4}
       ]},
       {id:'ACABADOS',required:false,name:'Máquinas de acabados',type:'quantity-choice',asset:true,unlimited:true,options:[
-        {id:'aca_basica',label:'Básica / manual',desc:'Acabado manual con herramientas básicas.',cost:1200},
-        {id:'aca_semi',label:'Semi-industrial',desc:'Pulido eléctrico y aplicación más uniforme.',cost:4500},
-        {id:'aca_ind',label:'Industrial',desc:'Línea de acabado para mayor volumen y consistencia.',cost:9500}
+        {id:'aca_basica',label:'Básica / manual',desc:'Acabado manual con herramientas básicas.',cost:1200,dailyCapacity:15,liquidationRate:0.4},
+        {id:'aca_semi',label:'Semi-industrial',desc:'Pulido eléctrico y aplicación más uniforme.',cost:4500,dailyCapacity:30,liquidationRate:0.4},
+        {id:'aca_ind',label:'Industrial',desc:'Línea de acabado para mayor volumen y consistencia.',cost:9500,dailyCapacity:55,liquidationRate:0.4}
       ]},
       {id:'MOLDE',name:'Molde de producto',type:'choice',fixed:true,lockAfterPurchase:true,noDepreciation:true,required:true,options:[
         {id:'molde_1',label:'Molde básico',desc:'Patrón sencillo para una línea de entrada.',cost:300},
@@ -44,17 +47,17 @@ window.SIDE_DECISION_CATALOG = [
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
     desc:'Integra personal, compras, materia prima y el volumen que deseas producir en el ciclo.',
     items:[
-      {id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,options:[
+      {id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1500},
         {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2500},
         {id:'corte_maestro',label:'Maestro cortador',desc:'Especialista para materiales y diseños complejos.',cost:4000}
       ]},
-      {id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',type:'quantity-choice',recurring:true,options:[
+      {id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'ens_personal_basico',label:'Costurero básico',desc:'Adecuado para diseños simples y tareas repetitivas.',cost:1500},
         {id:'ens_personal_ind',label:'Maquinista industrial',desc:'Opera equipos industriales con mayor productividad.',cost:2800},
         {id:'ens_personal_esp',label:'Marroquinero especializado',desc:'Especialista para piezas complejas y líneas premium.',cost:4500}
       ]},
-      {id:'PERS_ACABADO',required:false,name:'Personal de acabados',type:'quantity-choice',recurring:true,options:[
+      {id:'PERS_ACABADO',required:false,name:'Personal de acabados',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'aca_personal_basico',label:'Operario de acabado',desc:'Realiza acabados básicos y tareas de apoyo.',cost:1500},
         {id:'aca_personal_tec',label:'Técnico en acabados',desc:'Maneja herramientas y equipos de acabado.',cost:2800},
         {id:'aca_personal_art',label:'Artesano acabador',desc:'Realiza acabados finos y detalles especiales.',cost:4500}
@@ -63,8 +66,8 @@ window.SIDE_DECISION_CATALOG = [
         {id:'no_jefatura',label:'No contratar',desc:'La coordinación queda a cargo del equipo.',cost:0},
         {id:'si_jefatura',label:'Contratar',desc:'Incorpora una jefatura para coordinar la operación.',cost:3000}
       ]},
-      {id:'LIMPIEZA',required:false,name:'Limpieza y servicios generales',type:'quantity',recurring:true,options:[
-        {id:'limpieza',label:'Personal de limpieza / servicios',desc:'Apoyo operativo para mantener el área de producción.',cost:600}
+      {id:'LIMPIEZA',name:'Limpieza y servicios generales',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['limpieza'],options:[
+        {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo operativo fijo obligatorio para mantener el área de producción.',cost:600}
       ]},
       {id:'ANALISTA_COMPRAS',required:false,name:'Analista de compras',type:'choice',recurring:true,options:[
         {id:'no_analista',label:'No contratar',desc:'Compras sin negociación especializada.',cost:0},
@@ -103,13 +106,13 @@ window.SIDE_DECISION_CATALOG = [
     items:[
       {id:'CANALES',name:'Canales de venta',type:'multi-choice',required:true,minSelections:1,options:[
         {id:'web',label:'Página web',desc:'Canal digital con cobertura amplia.',cost:500,channel:'web'},
-        {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00},
-        {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo.',cost:3500,channel:'store',district:'Miraflores',demand:1.25},
-        {id:'sjl',label:'Tienda · San Juan de Lurigancho',desc:'Punto físico con alta base poblacional y demanda distrital propia.',cost:2200,channel:'store',district:'San Juan de Lurigancho',demand:1.10}
+        {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00,minCommitCycles:12},
+        {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:3500,channel:'store',district:'Miraflores',demand:1.25,minCommitCycles:12},
+        {id:'sjl',label:'Tienda · San Juan de Lurigancho',desc:'Punto físico con alta base poblacional y demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:2200,channel:'store',district:'San Juan de Lurigancho',demand:1.10,minCommitCycles:12}
       ]},
       {id:'PERSONAL_VENTAS',name:'Personal básico de ventas',type:'info',desc:'Cada tienda física incluye automáticamente 1 vendedor básico. Su remuneración variable equivale al 1% de las ventas realizadas en el simulador.'},
       {id:'CREDITO_VENTAS',name:'Ventas a crédito',type:'info',desc:'El porcentaje inicia fijo y aumenta según avanzan los ciclos. No es una decisión del jugador.'},
-      {id:'DEVOLUCIONES',name:'Producto fallado',type:'info',desc:'Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.'}
+      {id:'DEVOLUCIONES',name:'Producto fallado',type:'info',displayAsAsterisk:true,desc:'Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.'}
     ]
   },
   {

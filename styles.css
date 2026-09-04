@@ -1247,3 +1247,55 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 #decisionMenu .section-submit-btn.submitted small{
   color:#a9ffd0 !important;
 }
+/* Blindaje adicional: mismo color explícito en los otros dos botones "enviar"
+   (top-submit-all y submit-decisions-btn) en vez de depender solo de la
+   herencia de color desde el botón padre. */
+#decisionMenu .top-submit-all strong,
+#decisionMenu .top-submit-all span,
+#decisionMenu .top-submit-all small,
+#decisionMenu .submit-decisions-btn strong,
+#decisionMenu .submit-decisions-btn span,
+#decisionMenu .submit-decisions-btn small{
+  color:#3d1900 !important;
+}
+
+/* ===== Producción: diagrama de flujo (resumen) ===== */
+.production-flow{margin:0 0 10px;padding:14px;border-radius:14px;background:linear-gradient(145deg,#071b30,#061421);border:1px solid #5ebcff2b;display:grid;gap:12px}
+.flow-jefe{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:#ffd34f14;border:1px solid #ffd34f45;width:fit-content}
+.flow-jefe span{font-size:12px;font-weight:900;letter-spacing:.6px;color:#ffd34f}
+.flow-jefe small{font-size:10px;color:#cdb877}
+.flow-header span{display:block;font-size:10px;color:#67bfff;font-weight:900;letter-spacing:.8px}
+.flow-header small{display:block;margin-top:2px;font-size:10px;color:#748ca4}
+.flow-line{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
+.flow-node{flex:1 1 140px;display:grid;gap:3px;padding:10px;border-radius:11px;background:#03111f;border:1px solid #ffffff14;text-align:center}
+.flow-node b{font-size:10px;color:#9fb4c8;letter-spacing:.4px}
+.flow-node strong{font-size:22px;color:#86e8a1}
+.flow-node small{font-size:9px;color:#748ca4}
+.flow-node em{font-size:9px;font-style:normal;color:#ffd34f}
+.flow-cap{display:inline-block;margin-top:2px;font-size:9px;font-weight:900;color:#70c8ff;background:#228bcc20;border-radius:6px;padding:2px 5px}
+.flow-arrow{align-self:center;font-size:20px;color:#3d6f96;font-weight:900}
+.flow-totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.flow-totals>div{padding:10px;border-radius:10px;background:#061421;border:1px solid #ffffff0d}
+.flow-totals span{display:block;font-size:9px;color:#748ea6;font-weight:900;letter-spacing:.6px}
+.flow-totals strong{display:block;margin-top:3px;font-size:18px;color:#ffd34f}
+.flow-totals strong.over{color:#ff8f8f}
+.flow-totals small{display:block;margin-top:2px;font-size:9px;color:#607990}
+.flow-garantias{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:#061828;border:1px dashed #4ca8e933}
+.flow-garantias span{font-size:9px;color:#6f8da8;font-weight:900;letter-spacing:.6px;margin-right:2px}
+.flow-garantias b{font-size:11px;color:#dbe9f5;font-weight:700}
+
+/* Venta/liquidación de máquinas y despido de personal */
+.selling-badge{display:inline-block;margin-left:8px;padding:3px 6px;border-radius:6px;font-size:12px;font-weight:900;letter-spacing:.5px;color:#ffb3b3;background:#ff5a5a20}
+.severance-badge{display:block;margin-top:4px;padding:3px 6px;border-radius:6px;font-size:11px;font-weight:900;letter-spacing:.3px;color:#ffcf9d;background:#ff8f3d20;width:fit-content}
+
+/* Compromiso mínimo de canal (tienda física) */
+.lock-note{display:block;margin-top:6px;font-size:10px;font-weight:800;color:#ffcf9d;background:#ff8f3d18;border-radius:6px;padding:3px 6px;width:fit-content}
+
+/* Reglas mostradas solo como nota al pie (sin tarjeta/recuadro) */
+.asterisk-notes{margin:2px 0 10px;display:grid;gap:4px}
+.asterisk-note{margin:0;font-size:11px;color:#8299b2;font-style:italic}
+
+@media(max-width:1000px){
+  .flow-line{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg);align-self:center}
+}

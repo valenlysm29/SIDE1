@@ -11,6 +11,15 @@ const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SI
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
 const LOAN_MAX_PERCENT = 50;
 const LOAN_INITIAL_PERCENT = 25;
+// Supuestos de modelo de producción (ajustables si el curso define otros valores):
+// 1 ciclo del simulador ≈ 1 mes de operación; se asumen 24 días hábiles por ciclo/mes.
+const WORKING_DAYS_PER_MONTH = 24;
+// Indemnización por reducir personal de un ciclo a otro: medio "sueldo" (costo de la
+// opción) por persona que se retira, como aproximación simple de liquidación laboral.
+const SEVERANCE_RATE = 0.5;
+// % de recuperación al vender/liquidar una máquina ya adquirida cuando la opción no
+// define su propio liquidationRate.
+const LIQUIDATION_RATE_DEFAULT = 0.4;
 const UI_ICONS = {check:'assets/icons/ui/check.svg',play:'assets/icons/ui/play.svg',lock:'assets/icons/ui/lock.svg'};
 let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,game:DEMO_GAME};
 let decisionState = {};
@@ -170,13 +179,39 @@ function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Num
 function chosenStores(){const item=findDecisionItem('CANALES');return selectedOptionIds(item).map(id=>item.options.find(o=>o.id===id)).filter(o=>o?.channel==='store')}
 function creditPercent(){const base=Number(teacherConfig().creditPercentStart||20);return Math.min(70,base+(currentRound()-1)*5+(analystSelected()?5:0))}
 function recurringAlreadyPrevious(item){const e=savedEntry(item);return e&&Number(e.round)<currentRound()}
+function priorQuantity(item,optId){const e=savedEntry(item);if(!e||Number(e.round)>=currentRound())return 0;return Number(e.quantities?.[optId]||0)}
+function severanceForItem(item){
+  if(!item.severanceEligible)return 0;
+  const d=initDraft(item);
+  return (item.options||[]).reduce((sum,o)=>{
+    const prev=priorQuantity(item,o.id),now=Number(d.quantities?.[o.id]||0);
+    return now<prev?sum+(prev-now)*optionUnitCost(item,o)*SEVERANCE_RATE:sum;
+  },0);
+}
+function optionCommitRemaining(item,optId){
+  const opt=(item.options||[]).find(o=>o.id===optId);
+  if(!opt?.minCommitCycles)return 0;
+  const e=savedEntry(item),firstRound=e?.optionRounds?.[optId];
+  if(firstRound===undefined)return 0;
+  return Math.max(0,Number(opt.minCommitCycles)-(currentRound()-Number(firstRound)));
+}
 
 function computeItemCost(item){
   if(item.noCashEffect||item.type==='info'||item.type==='number'||item.type==='loan')return 0;
   if(item.lockAfterPurchase&&isLocked(item))return 0;
   const d=initDraft(item);
-  if(item.asset){return item.options.reduce((sum,o)=>sum+(Number(d.quantities?.[o.id])||0)*optionUnitCost(item,o),0)}
-  if(item.type==='quantity'||item.type==='quantity-choice')return item.options.reduce((sum,o)=>sum+(Number(d.quantities?.[o.id])||0)*optionUnitCost(item,o),0);
+  if(item.asset){
+    return item.options.reduce((sum,o)=>{
+      const qty=Number(d.quantities?.[o.id])||0,rate=optionUnitCost(item,o);
+      if(qty>=0)return sum+qty*rate;
+      const liqRate=Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT);
+      return sum+qty*rate*liqRate; // qty negativo → costo negativo (ingreso por liquidación)
+    },0);
+  }
+  if(item.type==='quantity'||item.type==='quantity-choice'){
+    const base=item.options.reduce((sum,o)=>sum+(Number(d.quantities?.[o.id])||0)*optionUnitCost(item,o),0);
+    return base+severanceForItem(item);
+  }
   if(item.type==='sales-staff')return Object.values(d.staff||{}).reduce((s,q)=>s+(Number(q)||0)*Number(item.costPerPerson||0),0);
   return item.options?.filter(o=>(d.optionIds||[]).includes(o.id)).reduce((s,o)=>s+optionUnitCost(item,o),0)||0;
 }
@@ -214,18 +249,47 @@ function draftItemComplete(item){
 function sectionDraftReady(cat=currentCategory){const c=categoryByCat(cat);if(!c)return false;return c.items.filter(i=>i.type!=='info'&&itemRequired(i)).every(draftItemComplete)}
 function sectionReady(cat=currentCategory){return sectionDraftReady(cat)}
 function eventHint(){const ev=activeStudentEvents()[0];if(ev)return `${ev.title}: ${ev.implication}`;return 'No hay un evento activo confirmado para esta empresa en este ciclo.'}
-function machinerySummaryHtml(){
-  const defs=[['MESA_CORTE','Mesas de corte'],['ENSAMBLE','Ensamblado'],['ACABADOS','Acabados']];
-  return `<div class="machinery-summary"><div><span>MAQUINARIA DISPONIBLE PARA PRODUCCIÓN</span><small>Incluye equipos adquiridos anteriormente y los comprados en este ciclo.</small></div>${defs.map(([id,label])=>{const item=findDecisionItem(id);let previous=0,current=0;(item?.options||[]).forEach(o=>{previous+=getOwned(item,o.id);current+=Number(initDraft(item).quantities?.[o.id]||0)});const available=previous+current;return `<div><b>${escapeHtml(label)}</b><strong>${available}</strong><small>Disponible ahora</small><em>${current?`+${current} comprado(s) este ciclo`:'Sin compra nueva'}</em></div>`}).join('')}</div>`;
+function stationStats(itemId){
+  const item=findDecisionItem(itemId);
+  let count=0,capacity=0,buying=0;
+  (item?.options||[]).forEach(o=>{
+    const previous=getOwned(item,o.id),draftQty=Number(initDraft(item).quantities?.[o.id]||0);
+    const total=Math.max(0,previous+draftQty);
+    count+=total; capacity+=total*Number(o.dailyCapacity||0);
+    if(draftQty>0)buying+=draftQty;
+  });
+  return {count,capacity,buying};
+}
+function productionFlowHtml(){
+  const stations=[['MESA_CORTE','Corte'],['ENSAMBLE','Ensamble'],['ACABADOS','Acabados']].map(([id,label])=>({label,...stationStats(id)}));
+  const capacities=stations.map(s=>s.capacity),bottleneck=capacities.length?Math.min(...capacities):0;
+  const monthly=Math.round(bottleneck*WORKING_DAYS_PER_MONTH),target=currentProductionTarget();
+  const jefeItem=findDecisionItem('JEFATURA'),jefeOn=jefeItem&&selectedOptionIds(jefeItem).includes('si_jefatura');
+  const provItem=findDecisionItem('GARANTIA_PROV'),ptItem=findDecisionItem('GARANTIA_PT');
+  const provOpt=(provItem?.options||[]).find(o=>selectedOptionIds(provItem).includes(o.id));
+  const ptOpt=(ptItem?.options||[]).find(o=>selectedOptionIds(ptItem).includes(o.id));
+  return `<div class="production-flow">
+    ${jefeOn?`<div class="flow-jefe"><span>👤 JEFE DE PRODUCCIÓN</span><small>Coordina la línea este ciclo</small></div>`:''}
+    <div class="flow-header"><span>RESUMEN DE PRODUCCIÓN · DIAGRAMA DE FLUJO</span><small>Lo que ya tienes comprado + lo que quieres adquirir este ciclo. El total no distingue el nivel de cada máquina.</small></div>
+    <div class="flow-line">${stations.map((s,i)=>`<div class="flow-node"><b>${escapeHtml(s.label)}</b><strong>${s.count}</strong><small>equipo(s) disponible(s)</small><em>${s.buying?`+${s.buying} este ciclo`:'Sin compra nueva'}</em><span class="flow-cap">${s.capacity.toLocaleString('es-PE')} u./día</span></div>${i<stations.length-1?'<div class="flow-arrow">→</div>':''}`).join('')}</div>
+    <div class="flow-totals">
+      <div><span>CAPACIDAD DIARIA DE LA LÍNEA</span><strong>${bottleneck.toLocaleString('es-PE')} u./día</strong><small>La define la etapa más lenta</small></div>
+      <div><span>TOTAL DE PRODUCCIÓN AL MES</span><strong>${monthly.toLocaleString('es-PE')} u.</strong><small>Estimado con ${WORKING_DAYS_PER_MONTH} días hábiles/ciclo</small></div>
+      <div><span>META DEL CICLO</span><strong class="${target>monthly&&monthly>0?'over':''}">${target.toLocaleString('es-PE')} u.</strong><small>${target>monthly&&monthly>0?'Supera la capacidad instalada':'Definida en «¿Cuánto deseas producir?»'}</small></div>
+    </div>
+    ${(provOpt||ptOpt)?`<div class="flow-garantias"><span>GARANTÍAS</span>${provOpt?`<b>Proveedores: ${escapeHtml(provOpt.label)}</b>`:''}${ptOpt?`<b>Producto terminado: ${escapeHtml(ptOpt.label)}</b>`:''}</div>`:''}
+  </div>`;
 }
 function renderDecisionCategory(){
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
+  const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
   let lead=`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
-  if(cat.cat==='C')lead+=machinerySummaryHtml();
+  if(cat.cat==='C')lead+=productionFlowHtml();
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
-  $('decisionCards').innerHTML=lead+items.map(renderDecisionRow).join('');
+  const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
+  $('decisionCards').innerHTML=lead+cardItems.map(renderDecisionRow).join('')+footnotes;
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer();
 }
 function renderDecisionRow(item){
@@ -233,9 +297,9 @@ function renderDecisionRow(item){
   let body='';
   if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
-    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const disabled=locked||item.mandatoryFixed;const showPrice=item.showPrice!==false;return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':'<div class="micro-caption">Botón de opción: solo puedes seleccionar una alternativa.</div>'}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
+    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':'<div class="micro-caption">Botón de opción: solo puedes seleccionar una alternativa.</div>'}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
-    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span><span class="buying-badge">VAS A COMPRAR: ${q}</span>`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="0" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>`;
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='number'){
     body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima mínima estimada</span><b>Cuero: ${materialNeed()}</b><b>Accesorios: ${materialNeed()}</b><b>Hilo: ${materialNeed()}</b><small>Puedes comprar una cantidad mayor si deseas mantener un excedente.</small></div>`;
   } else if(item.type==='sales-staff'){
@@ -245,14 +309,14 @@ function renderDecisionRow(item){
   } else if(item.type==='info'){
     let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS')dynamic='<strong>1 vendedor básico por tienda · comisión 1%</strong>';body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
-  const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:'Sin salida de caja';
+  const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
 document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 function bindDecisionControls(){
-  document.querySelectorAll('[data-choice]').forEach(input=>input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(input.dataset.choice);if(item.mandatoryFixed){toast('Esta decisión corresponde a un costo obligatorio y no puede retirarse.');renderDecisionCategory();return}const d=initDraft(item),id=input.dataset.option;if(item.type==='multi-choice'){const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set]}else d.optionIds=[id];persistCurrentDraftOnly();renderDecisionCategory()}));
+  document.querySelectorAll('[data-choice]').forEach(input=>input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(input.dataset.choice);if(item.mandatoryFixed){toast('Esta decisión corresponde a un costo obligatorio y no puede retirarse.');renderDecisionCategory();return}const id=input.dataset.option;if(item.type==='multi-choice'&&!input.checked){const remaining=optionCommitRemaining(item,id);if(remaining>0){toast(`Este canal tiene un compromiso mínimo vigente de ${remaining} ciclo(s) más. No puedes retirarlo aún.`);renderDecisionCategory();return}}const d=initDraft(item);if(item.type==='multi-choice'){const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set]}else d.optionIds=[id];persistCurrentDraftOnly();renderDecisionCategory()}));
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
-  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem(i.dataset.qty));d.quantities[i.dataset.option]=Math.max(0,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
+  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item),floor=item.asset?-getOwned(item,i.dataset.option):0;d.quantities[i.dataset.option]=Math.max(floor,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
   document.querySelectorAll('[data-number-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(b.dataset.numberStep),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(d.value||0)+Number(b.dataset.delta));persistCurrentDraftOnly();renderDecisionCategory()}));
   document.querySelectorAll('[data-number]').forEach(i=>{
     i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.number),d=initDraft(item);const raw=i.value;d.value=raw===''?'':Math.max(Number(item.min||0),Number(raw)||0);persistCurrentDraftOnly();updateSectionCost();});
@@ -263,10 +327,10 @@ function bindDecisionControls(){
   document.querySelectorAll('[data-loan]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;setLoan(i.dataset.loan,Number(i.value),true);persistCurrentDraftOnly();}));
   document.querySelectorAll('[data-loan-number]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;setLoan(i.dataset.loan,Number(i.value),true);persistCurrentDraftOnly();}));
 }
-function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.quantities[optId]=Math.max(0,(Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
+function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item),floor=item.asset?-getOwned(item,optId):0;d.quantities[optId]=Math.max(floor,(Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
 function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.staff[store]=Math.max(0,(Number(d.staff[store])||0)+delta);renderDecisionCategory()}
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
-function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(row)row.textContent=computeItemCost(item)>0?'Costo actual: '+money(computeItemCost(item)):'Sin salida de caja'}
+function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(!row)return;const cost=computeItemCost(item);row.textContent=cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja'}
 function updateSectionCost(){
   const locked=cycleDecisionsLocked();
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
@@ -302,7 +366,9 @@ function saveCurrentSection(){
     if(item.type==='number'){decisionState[item.id]={value:Number(d.value||0),round,label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`,cost:0};return}
     if(item.type==='sales-staff'){decisionState[item.id]={staff:deepClone(d.staff||{}),round,label:item.name,cost:computeItemCost(item)};return}
     if(item.type==='loan'){decisionState[item.id]={amount:Number(d.amount||0),round,label:`Préstamo: ${money(d.amount||0)}`,cost:0};return}
-    decisionState[item.id]={optionIds:(d.optionIds||[]).slice(),round,label:(item.options||[]).filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.label).join(' + '),cost:computeItemCost(item)};
+    const prevRounds=(decisionState[item.id]&&decisionState[item.id].optionRounds)||{};
+    const optionRounds={};(d.optionIds||[]).forEach(id=>{optionRounds[id]=prevRounds[id]!==undefined?prevRounds[id]:round});
+    decisionState[item.id]={optionIds:(d.optionIds||[]).slice(),round,optionRounds,label:(item.options||[]).filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.label).join(' + '),cost:computeItemCost(item)};
   });
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0),next=categoryDraftNet(currentCategory);cashLedger[key]=next;persistGameState();applyEventCashEffects();syncStudentReportPreview();syncSectionToSupabase(cat);
   const draftStoreKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let draftStore={};try{draftStore=JSON.parse(localStorage.getItem(draftStoreKey)||'{}')||{}}catch{}delete draftStore[currentCategory];localStorage.setItem(draftStoreKey,JSON.stringify(draftStore));
