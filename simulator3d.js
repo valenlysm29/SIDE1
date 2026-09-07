@@ -772,12 +772,9 @@
     if (!inventory) loadInventory();
     const available = PRODUCTS.filter(p => displayStock(p.id) > 0);
     if (!available.length) return null;
-    const segment = String(saved('SEGMENTO')?.label || '').toLowerCase();
     const pref = archetype?.pref;
     const weights = available.map(p => {
       let w = p.id === 'urbano' ? 1.35 : 1;
-      if (segment.includes('premium') && p.id === 'premium') w += 1.1;
-      if ((segment.includes('estándar') || segment.includes('estandar')) && p.id === 'esencial') w += 0.45;
       if (p.id === 'premium' && salesStaff() > 1) w += 0.25;
       if (pref && p.id === pref) w += 1.25;
       if (hasAnalyst() && p.id === 'urbano') w += 0.2;

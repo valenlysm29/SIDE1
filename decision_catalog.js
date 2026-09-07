@@ -1,14 +1,8 @@
 window.SIDE_DECISION_CATALOG = [
   {
-    cat:'A', title:'Empresa', short:'Empresa', icon:'assets/side_logo.png',
-    desc:'Define el segmento estratégico. El estudiante registra el nombre legal y el nombre comercial de su empresa al ingresar; luego se mantienen durante la partida. Debajo puedes consultar el resumen y el historial de decisiones enviadas.',
-    items:[
-      {id:'SEGMENTO', name:'Segmento de mercado', type:'choice', fixed:true, required:true, showPrice:false, options:[
-        {id:'economico',label:'Económico',desc:'Prioriza volumen y precio accesible.',cost:0},
-        {id:'estandar',label:'Estándar',desc:'Equilibra precio, calidad y margen.',cost:0},
-        {id:'premium',label:'Premium',desc:'Compite por diferenciación, diseño y mayor valor percibido.',cost:0}
-      ]}
-    ]
+    cat:'A', title:'Resumen', short:'Resumen', icon:'assets/side_logo.png', summaryOnly:true,
+    desc:'Consulta las decisiones del ciclo, el plan de producción por proceso y los costos estimados de tu empresa.',
+    items:[]
   },
   {
     cat:'B', title:'Infraestructura', short:'Infraestructura', icon:'assets/icons/categories/infraestructura.svg',

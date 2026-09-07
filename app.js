@@ -5,15 +5,15 @@ const $ = id => document.getElementById(id);
 const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','simulationLoading','simulator3d','decisionMenu'];
 const modals = ['teacherLoginModal','teacherRegisterModal','studentModal'];
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
-const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando',segmento:'Estandar'};
+const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
 const LOAN_MAX_PERCENT = 50;
 const LOAN_INITIAL_PERCENT = 25;
 // Supuestos de modelo de producción (ajustables si el curso define otros valores):
-// 1 ciclo del simulador ≈ 1 mes de operación; se asumen 24 días hábiles por ciclo/mes.
-const WORKING_DAYS_PER_MONTH = 24;
+// El Excel de referencia calcula la capacidad mensual con 30 días por ciclo.
+const WORKING_DAYS_PER_MONTH = 30;
 // Indemnización por reducir personal de un ciclo a otro: medio "sueldo" (costo de la
 // opción) por persona que se retira, como aproximación simple de liquidación laboral.
 const SEVERANCE_RATE = 0.5;
@@ -91,7 +91,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260907-3'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260907-4'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -116,13 +116,13 @@ function startJoinLoading(){showScreen('studentLoading');let p=0,step=0;const te
 async function prepareLobby(){
   $('lobbyCode').textContent=currentStudent.game.codigo;$('lobbyGameName').textContent=currentStudent.game.nombre;
   $('lobbyStudent').textContent=currentStudent.legalName&&currentStudent.legalName!==currentStudent.company?`${currentStudent.company} · ${currentStudent.legalName}`:currentStudent.company;
-  $('lobbySegment').textContent='EMPRESA: '+currentStudent.company+' · DEFINE TU SEGMENTO EN DECISIONES';
+  $('lobbySegment').textContent='EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES';
   renderStudentStatus(); syncStudentTimer();
   await openStudentTutorial();
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260907-3');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260907-4');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -132,6 +132,7 @@ $('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStu
 $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 
 function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
+function decisionCategories(){return DECISION_CATALOG.filter(category=>!category.summaryOnly)}
 function categoryByCat(cat){return DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
 function savedEntry(item){return decisionState[item.id]||null}
@@ -180,7 +181,11 @@ function analystSelected(){const item=findDecisionItem('ANALISTA_COMPRAS');retur
 function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound()-1)*2):0}
 function optionUnitCost(item,opt){const base=Number(opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
 function currentProductionTarget(){return Number(initDraft(findDecisionItem('PRODUCCION_META')).value||0)}
-function materialNeed(){return currentProductionTarget()}
+function productionPlan(){return window.SIDE_PRODUCTION_MODEL.calculate(decisionModelContext())}
+function materialYieldLabel(itemId,optionId){
+  const amount=window.SIDE_PRODUCTION_MODEL.yieldFor(itemId,optionId),unit=window.SIDE_PRODUCTION_MODEL.materialUnit(itemId);
+  return amount?`Cada compra aporta ${amount.toLocaleString('es-PE')} ${unit}`:'';
+}
 function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos??1000):id==='miraflores'?Number(c.demandMiraflores??1250):id==='sjl'?Number(c.demandSJL??1100):0}
 function chosenStores(){const item=findDecisionItem('CANALES');return selectedOptionIds(item).map(id=>item.options.find(o=>o.id===id)).filter(o=>o?.channel==='store')}
 function channelDraft(){
@@ -323,7 +328,7 @@ function openDecisionMenu(){
 }
 function renderTabs(){
   const nav=$('decisionTabs');
-  nav.innerHTML=DECISION_CATALOG.map(c=>{const sent=sectionSubmitted(c.cat),saved=categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span>${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
+  nav.innerHTML=DECISION_CATALOG.map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span>${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
   nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;renderTabs();renderDecisionCategory()}));
 }
 function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
@@ -354,21 +359,18 @@ function stationStats(itemId){
   return {count,capacity,buying};
 }
 function productionFlowHtml(){
-  const stations=[['MESA_CORTE','Corte'],['ENSAMBLE','Ensamble'],['ACABADOS','Acabados']].map(([id,label])=>({label,...stationStats(id)}));
-  const capacities=stations.map(s=>s.capacity),bottleneck=capacities.length?Math.min(...capacities):0;
-  const monthly=Math.round(bottleneck*WORKING_DAYS_PER_MONTH),target=currentProductionTarget();
-  const jefeItem=findDecisionItem('JEFATURA'),jefeOn=jefeItem&&selectedOptionIds(jefeItem).includes('si_jefatura');
+  const plan=productionPlan(),target=plan.target;
   const provItem=findDecisionItem('GARANTIA_PROV'),ptItem=findDecisionItem('GARANTIA_PT');
   const provOpt=(provItem?.options||[]).find(o=>selectedOptionIds(provItem).includes(o.id));
   const ptOpt=(ptItem?.options||[]).find(o=>selectedOptionIds(ptItem).includes(o.id));
   return `<div class="production-flow">
-    ${jefeOn?`<div class="flow-jefe"><span>👤 JEFE DE PRODUCCIÓN</span><small>Coordina la línea este ciclo</small></div>`:''}
-    <div class="flow-header"><span>RESUMEN DE PRODUCCIÓN · DIAGRAMA DE FLUJO</span><small>Lo que ya tienes comprado + lo que quieres adquirir este ciclo. El total no distingue el nivel de cada máquina.</small></div>
-    <div class="flow-line">${stations.map((s,i)=>`<div class="flow-node"><b>${escapeHtml(s.label)}</b><strong>${s.count}</strong><small>equipo(s) disponible(s)</small><em>${s.buying?`+${s.buying} este ciclo`:'Sin compra nueva'}</em><span class="flow-cap">${s.capacity.toLocaleString('es-PE')} u./día</span></div>${i<stations.length-1?'<div class="flow-arrow">→</div>':''}`).join('')}</div>
+    ${plan.hasLeadership?`<div class="flow-jefe"><span>👤 JEFE DE PRODUCCIÓN</span><small>+4 puntos porcentuales de eficiencia este ciclo</small></div>`:''}
+    <div class="flow-header"><span>PLAN DE PRODUCCIÓN · CORTE → ENSAMBLADO → ACABADO</span><small>Capacidad calculada como en el Excel: personal emparejado con equipos, 30 días por ciclo y eficiencia de la línea.</small></div>
+    <div class="flow-line">${plan.processes.map((process,i)=>`<div class="flow-node"><b>${escapeHtml(process.label)}</b><strong>${process.plannedUnits.toLocaleString('es-PE')} u.</strong><small>deben pasar por este proceso</small><em>${process.staff} trabajador(es) · ${process.machines} equipo(s)</em><span class="flow-cap">Capacidad: ${process.cycleCapacity.toLocaleString('es-PE')} u./ciclo</span></div>${i<plan.processes.length-1?'<div class="flow-arrow">→</div>':''}`).join('')}</div>
     <div class="flow-totals">
-      <div><span>CAPACIDAD DIARIA DE LA LÍNEA</span><strong>${bottleneck.toLocaleString('es-PE')} u./día</strong><small>La define la etapa más lenta</small></div>
-      <div><span>TOTAL DE PRODUCCIÓN AL MES</span><strong>${monthly.toLocaleString('es-PE')} u.</strong><small>Estimado con ${WORKING_DAYS_PER_MONTH} días hábiles/ciclo</small></div>
-      <div><span>META DEL CICLO</span><strong class="${target>monthly&&monthly>0?'over':''}">${target.toLocaleString('es-PE')} u.</strong><small>${target>monthly&&monthly>0?'Supera la capacidad instalada':'Definida en «¿Cuánto deseas producir?»'}</small></div>
+      <div><span>META DEL CICLO</span><strong>${target.toLocaleString('es-PE')} u.</strong><small>Volumen elegido por la empresa</small></div>
+      <div><span>CAPACIDAD DEL CUELLO DE BOTELLA</span><strong>${plan.processCapacity.toLocaleString('es-PE')} u.</strong><small>${escapeHtml(plan.limitingProcesses.join(' y ')||'Sin línea instalada')}</small></div>
+      <div><span>PRODUCCIÓN POSIBLE</span><strong class="${plan.productionGap?'over':''}">${plan.producibleUnits.toLocaleString('es-PE')} u.</strong><small>${plan.productionGap?`Faltan ${plan.productionGap.toLocaleString('es-PE')} u. por capacidad o insumos`:'La meta puede completarse'}</small></div>
     </div>
     ${(provOpt||ptOpt)?`<div class="flow-garantias"><span>GARANTÍAS</span>${provOpt?`<b>Proveedores: ${escapeHtml(provOpt.label)}</b>`:''}${ptOpt?`<b>Producto terminado: ${escapeHtml(ptOpt.label)}</b>`:''}</div>`:''}
   </div>`;
@@ -378,12 +380,12 @@ function renderDecisionCategory(){
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
-  let lead=`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
-  if(cat.cat==='A')lead+='<div class="cs-jump-bar"><span>Consulta los recursos y decisiones de todos los apartados.</span><button id="companySummaryJump" type="button">VER RESUMEN DE DECISIONES</button></div>';
+  let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
   if(cat.cat==='C')lead+=productionFlowHtml();
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   $('decisionCards').innerHTML=lead+cardItems.map(renderDecisionRow).join('')+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
+  document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer();
 }
 function renderDecisionRow(item){
@@ -395,9 +397,9 @@ function renderDecisionRow(item){
     const multi=item.type==='multi-choice';
     body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
-    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='number'){
-    body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima mínima estimada</span><b>Cuero: ${materialNeed()}</b><b>Accesorios: ${materialNeed()}</b><b>Hilo: ${materialNeed()}</b><small>Puedes comprar una cantidad mayor si deseas mantener un excedente.</small></div>`;
+    const plan=productionPlan();body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima para la meta · ${escapeHtml(plan.moldLabel)}</span>${plan.materials.map(material=>`<b>${escapeHtml(material.label)}: ${material.neededForTarget.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</b>`).join('')}<small>La compra se convierte según su presentación: rollo, piel, juego o carrete.</small></div>`;
   } else if(item.type==='sales-staff'){
     body=`<div class="info-decision"><strong>Personal automático por tienda</strong><p>Se asigna 1 vendedor básico a cada tienda física. La comisión es 1% de las ventas.</p></div>`;
   } else if(item.type==='loan'){
@@ -476,17 +478,14 @@ function updateSectionCost(){
 }
 function productionMaterialShortages(){
   if(currentCategory!=='C')return [];
-  const need=materialNeed();if(!need)return [];
-  return ['CUERO','ACCESORIOS','HILO'].map(id=>{
-    const item=findDecisionItem(id),d=initDraft(item),total=Object.values(d.quantities||{}).reduce((s,q)=>s+(Number(q)||0),0),missing=Math.max(0,need-total);
-    return missing?{item,need,total,missing}:null;
-  }).filter(Boolean);
+  if(!currentProductionTarget())return [];
+  return productionPlan().materials.filter(material=>material.shortfall>0).map(material=>({item:findDecisionItem(material.id),need:material.neededForTarget,total:material.available,missing:material.shortfall,unit:material.unit}));
 }
 function validateProductionMaterials(){return true;}
 function warnProductionMaterialShortage(){
   const shortages=productionMaterialShortages();
   if(!shortages.length)return;
-  const detail=shortages.map(x=>`${x.item.name}: faltan ${x.missing}`).join(' · ');
+  const detail=shortages.map(x=>`${x.item.name}: faltan ${x.missing.toLocaleString('es-PE')} ${x.unit}`).join(' · ');
   toast(`Advertencia: tu producción supera los insumos comprados. ${detail}. Puedes continuar.`);
 }
 function validateRequiredSection(cat){for(const item of cat.items){if(!itemRequired(item)||item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))continue;const d=initDraft(item);if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}}return true}
@@ -588,7 +587,7 @@ function animateCash(netMovement){
 }
 function requiredDecisionItems(){return allDecisionItems().filter(i=>i.type!=='info'&&itemRequired(i))}
 function decisionProgressPercent(){const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
-function categoryCompletionMap(){const out={};DECISION_CATALOG.forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
+function categoryCompletionMap(){const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
 function updateHud(){
   const cash=cashBalance();$('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
   const pct=decisionProgressPercent();$('decisionProgressText').textContent=pct+'%';$('decisionProgressBar').style.width=pct+'%';
@@ -626,6 +625,7 @@ function syncStudentReportPreview(){
     partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:initialCapital(),
     ingresos:adjusted.revenue,costos:adjusted.costs,utilidad,rondasActivas:currentRound(),actividad:entries.length,
     canalesVenta:{cantidades:deepClone(savedEntry(findDecisionItem('CANALES'))?.quantities||{}),tiendasFisicas:RULES.storeCount(savedEntry(findDecisionItem('CANALES')))},
+    produccion:productionPlan(),
     resumenEnviado:typeof readReviewReceipts==='function'?readReviewReceipts():null,
     decisiones:currentDecisionLabels(),apartados:categoryCompletionMap(),progreso:decisionProgressPercent(),enviado:decisionsSubmitted(),
     eventos:events.map(e=>({id:e.id,titulo:e.title,descripcion:e.description,afectados:e.scope==='group'?'Todos':'Empresa individual',ciclos:e.cycles,cicloAfecta:(Number(e.cycleOffset||0)===0?'+0 · mismo ciclo':Number(e.cycleOffset||0)===1?'+1 · siguiente ciclo':`+${Number(e.cycleOffset||0)} · después de ${Number(e.cycleOffset||0)} ciclos`),implicancia:e.implication,ocurrencia:e.probability})),

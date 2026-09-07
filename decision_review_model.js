@@ -1,9 +1,10 @@
 /* SIDE V3: pure, read-only decision breakdowns. No storage or DOM side effects. */
 (function(root,factory){
-  const api=factory();
+  const productionModel=typeof module==='object'&&module.exports?require('./production_model'):root.SIDE_PRODUCTION_MODEL;
+  const api=factory(productionModel);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_REVIEW_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(productionModel){
   'use strict';
   const n=value=>Number.isFinite(Number(value))?Number(value):0;
   const sum=values=>values.reduce((a,b)=>a+n(b),0);
@@ -105,19 +106,10 @@
       recurring:sum(sections.map(s=>s.recurring)),contracts:future(ctx)};
   }
   function warnings(ctx){
-    const items=ctx.catalog.flatMap(c=>c.items),target=n(draft(items.find(i=>i.id==='PRODUCCION_META'),ctx).value),warnings=[];
-    if(target>0){
-      for(const id of ['CUERO','ACCESORIOS','HILO']){
-        const item=items.find(i=>i.id===id),quantity=sum(Object.values(draft(item,ctx).quantities||{}));
-        if(quantity<target)warnings.push({cat:'C',text:`${item.name}: ${quantity} disponibles frente a ${target} de meta. Faltan ${target-quantity}, seg\u00fan la regla actual de 1 insumo por unidad.`});
-      }
-      const capacities=['MESA_CORTE','ENSAMBLE','ACABADOS'].map(id=>{
-        const item=items.find(i=>i.id===id),d=draft(item,ctx);
-        return sum(item.options.map(o=>(owned(item,o.id,ctx)+n(d.quantities?.[o.id]))*n(o.dailyCapacity)));
-      });
-      const capacity=Math.min(...capacities)*n(ctx.workingDays??24);
-      if(target>capacity)warnings.push({cat:'B',text:`La meta (${target} unidades) supera la capacidad referencial de la l\u00ednea (${capacity} por ciclo, ${ctx.workingDays??24} d\u00edas). Revisa maquinaria y organizaci\u00f3n.`});
-    }
+    const warnings=[],plan=productionModel?.calculate(ctx);
+    if(!plan||!plan.target)return warnings;
+    for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'C',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
+    for(const process of plan.processes)if(process.shortfall>0)warnings.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad de ${process.cycleCapacity.toLocaleString('es-PE')} unidades frente a una meta de ${plan.target.toLocaleString('es-PE')}. Revisa personal y equipos del proceso.`});
     return warnings;
   }
   return Object.freeze({draft,owned,previousStaff,unitCost,breakdown,section,future,finances,warnings,roundMoney});

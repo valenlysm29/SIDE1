@@ -13,7 +13,7 @@ function receiptRounds(){
 }
 function confirmedContext(){
   const ctx=decisionModelContext(),receipts=readReviewReceipts();
-  for(const cat of DECISION_CATALOG){
+  for(const cat of decisionCategories()){
     if(!(sectionSubmitted(cat.cat)||decisionsSubmitted()))continue;
     const receipt=receipts[cat.cat];
     if(receipt?.drafts){Object.assign(ctx.drafts,deepClone(receipt.drafts));continue;}
@@ -25,7 +25,7 @@ function confirmedContext(){
 }
 function migrateCurrentReceipts(){
   const receipts=readReviewReceipts(),ctx=confirmedContext();let changed=false;
-  for(const cat of DECISION_CATALOG){
+  for(const cat of decisionCategories()){
     if(receipts[cat.cat]||!(sectionSubmitted(cat.cat)||decisionsSubmitted()))continue;
     const model=reviewModel.section(cat,ctx),drafts={};cat.items.forEach(i=>{drafts[i.id]=deepClone(ctx.drafts[i.id])});
     receipts[cat.cat]={...model,drafts,submitted:true,source:'legacy',sentAt:null,company:currentStudent.company,game:currentStudent.game?.codigo,recordedNet:Number(cashLedger[sectionLedgerKey(cat.cat)]||0)};
@@ -42,7 +42,7 @@ function comparableSummaryDraft(item,d){
 }
 function liveCompanyReview(){
   const context=confirmedContext(),receipts=readReviewReceipts();
-  const sections=DECISION_CATALOG.map(cat=>{
+  const sections=decisionCategories().map(cat=>{
     const submitted=sectionSubmitted(cat.cat)||decisionsSubmitted(),saved=cat.items.some(i=>Number(decisionState[i.id]?.round)===currentRound());
     const frozen=submitted?receipts[cat.cat]:null;
     const section=frozen?.items?deepClone(frozen):reviewModel.section(cat,context);
@@ -51,9 +51,9 @@ function liveCompanyReview(){
   });
   return {round:currentRound(),context,sections,financial:reviewModel.finances(sections,context),warnings:reviewModel.warnings(context)};
 }
-function reviewProblems(review,cats=DECISION_CATALOG.map(c=>c.cat)){
+function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
   const issues=[],ctx=review.context;
-  for(const cat of DECISION_CATALOG.filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat))){
+  for(const cat of decisionCategories().filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat))){
     for(const item of cat.items){
       if(item.type==='info')continue;
       const d=ctx.drafts[item.id]||{};
@@ -77,7 +77,7 @@ function reviewProblems(review,cats=DECISION_CATALOG.map(c=>c.cat)){
 function reviewFingerprint(){
   return JSON.stringify({company:storageKey(),round:currentRound(),drafts:decisionModelContext().drafts,config:teacherConfig(),
     state:localStorage.getItem(decisionKey()),ledger:localStorage.getItem(ledgerKey()),receipts:localStorage.getItem(receiptKey()),
-    flags:DECISION_CATALOG.map(c=>sectionSubmitted(c.cat)),all:decisionsSubmitted()});
+    flags:decisionCategories().map(c=>sectionSubmitted(c.cat)),all:decisionsSubmitted()});
 }
 function commitReviewedSections(cats,finalize){
   if(reviewCommitBusy||decisionsSubmitted())return false;
@@ -85,7 +85,7 @@ function commitReviewedSections(cats,finalize){
   try{
     const review=liveCompanyReview(),problems=reviewProblems(review,cats);
     if(problems.length){toast(problems[0].text);return false;}
-    const selected=DECISION_CATALOG.filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat));
+    const selected=decisionCategories().filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat));
     const plans=selected.map(cat=>prepareSectionSave(cat,review.context));
     const state=deepClone(decisionState),ledger=deepClone(cashLedger),receipts=readReviewReceipts(),writes={},sentAt=new Date().toISOString();
     const draftKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let draftStore={};try{draftStore=JSON.parse(localStorage.getItem(draftKey)||'{}')||{}}catch{}
@@ -131,10 +131,46 @@ function futureHtml(financial){
     <p><b>Costos de continuidad: ${reviewMoney(f.recurring)} por ciclo</b> si mantienes los locales, las tiendas y la dotaci\u00f3n elegidos. Es una referencia, no una obligaci\u00f3n contractual completa; excluye nuevas compras de insumos, marketing y capacitaci\u00f3n.</p>
     ${f.contracts.contracts.length?`<div class="cs-contracts">${f.contracts.contracts.map(c=>`<p><b>${escapeHtml(c.label)}: ${c.quantity} tienda(s).</b> ${reviewMoney(c.perCycle)} por ciclo; ${reviewMoney(c.total)} de alquileres m\u00ednimos futuros. \u00daltimo compromiso hasta el ciclo ${c.lastRound}.</p>`).join('')}</div>`:'<p>Sin contratos de tiendas f\u00edsicas seleccionados.</p>'}
     ${f.contracts.beyondGame>0?`<p class="cs-warning-text">${reviewMoney(f.contracts.beyondGame)} de esos alquileres quedan despu\u00e9s del \u00faltimo ciclo configurado. Se informan, pero este resumen no inventa una liquidaci\u00f3n al terminar la partida.</p>`:''}
-    <p>El modelo actual usa 1 ciclo como aproximadamente 1 mes y 24 d\u00edas h\u00e1biles. La duraci\u00f3n real del temporizador es independiente. La proyecci\u00f3n solo aplica los movimientos elegidos a la caja guardada: no anticipa ventas, eventos futuros, devoluciones ni intereses.</p>
+    <p>El modelo de producci\u00f3n usa 1 ciclo como un mes de 30 d\u00edas, de acuerdo con el Excel de referencia. La duraci\u00f3n real del temporizador es independiente. La proyecci\u00f3n solo aplica los movimientos elegidos a la caja guardada: no anticipa ventas, eventos futuros, devoluciones ni intereses.</p>
     ${f.financing>0?'<p>El pr\u00e9stamo figura como ingreso de financiamiento, no como venta ni utilidad. El proyecto a\u00fan no define plazo ni cuotas; por eso no se presenta una amortizaci\u00f3n ficticia.</p>':''}
     <p>Guardar un borrador ya actualiza el saldo guardado en SIDE. Confirmar aplica \u00fanicamente la diferencia pendiente y bloquea las decisiones del ciclo.</p>
   </div></details>`;
+}
+function productionItemOutflow(review,id){
+  const item=review.sections.flatMap(section=>section.items||[]).find(entry=>entry.id===id);
+  return Number(item?.outflow||0);
+}
+function productionSummaryHtml(review){
+  const plan=window.SIDE_PRODUCTION_MODEL.calculate(review.context);
+  const materialCost=['CUERO','ACCESORIOS','HILO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
+  const laborCost=['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
+  const supportCost=['JEFATURA','LIMPIEZA','ANALISTA_COMPRAS','LOCAL_PROD','MANTENIMIENTO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
+  const investmentCost=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
+  const cycleProductionCost=materialCost+laborCost+supportCost;
+  const unitCost=plan.producibleUnits?cycleProductionCost/plan.producibleUnits:0;
+  const stateClass=plan.productionGap?'limited':'ready';
+  return `<section class="cs-production cs-production-${stateClass}" aria-labelledby="companyProductionTitle">
+    <header class="cs-production-heading"><div><span class="cs-kicker">PLAN PRODUCTIVO DEL CICLO</span><h3 id="companyProductionTitle">De la compra a la producción terminada</h3><p>La cantidad final depende del menor resultado entre corte, ensamblado, acabado y materia prima disponible.</p></div><span class="cs-production-state">${plan.productionGap?'CAPACIDAD INSUFICIENTE':'META CUBIERTA'}</span></header>
+    <div class="cs-production-kpis">
+      <div><span>Meta elegida</span><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div>
+      <div><span>Producción posible</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} u.</strong></div>
+      <div><span>Faltante</span><strong>${plan.productionGap.toLocaleString('es-PE')} u.</strong></div>
+      <div><span>Eficiencia aplicada</span><strong>${Math.round(plan.efficiency*100)}%</strong></div>
+    </div>
+    <div class="cs-process-grid">${plan.processes.map((process,index)=>`<article class="cs-process-card ${process.shortfall?'is-limited':''}"><span class="cs-process-step">${index+1}</span><div><h4>${escapeHtml(process.label)}</h4><strong>Debe procesar ${process.plannedUnits.toLocaleString('es-PE')} unidades</strong><p>Capacidad máxima: ${process.cycleCapacity.toLocaleString('es-PE')} u./ciclo · ${process.dailyCapacity.toLocaleString('es-PE')} u./día</p><small>${process.staff} trabajador(es) · ${process.machines} equipo(s) emparejados · personal ${reviewMoney(process.payroll)}</small></div></article>`).join('')}</div>
+    <div class="cs-material-table" role="table" aria-label="Conversión y uso de insumos">
+      <div class="cs-material-head" role="row"><span>Insumo</span><span>Disponible por compras</span><span>Necesario para la meta</span><span>Uso en producción posible</span><span>Saldo</span></div>
+      ${plan.materials.map(material=>`<div class="cs-material-row ${material.shortfall?'is-limited':''}" role="row"><strong>${escapeHtml(material.label)}</strong><span>${material.available.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</span><span>${material.neededForTarget.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</span><span>${material.consumption.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</span><span>${material.remaining.toLocaleString('es-PE')} ${escapeHtml(material.unit)}${material.shortfall?`<small>Faltan ${material.shortfall.toLocaleString('es-PE')}</small>`:''}</span></div>`).join('')}
+    </div>
+    <div class="cs-production-costs">
+      <div><span>Materia prima comprada</span><strong>${reviewMoney(materialCost)}</strong></div>
+      <div><span>Personal directo</span><strong>${reviewMoney(laborCost)}</strong></div>
+      <div><span>Soporte productivo</span><strong>${reviewMoney(supportCost)}</strong></div>
+      <div><span>Inversión en planta</span><strong>${reviewMoney(investmentCost)}</strong><small>Se muestra aparte del costo operativo.</small></div>
+      <div class="cs-unit-cost"><span>Costo operativo por unidad posible</span><strong>${plan.producibleUnits?reviewMoney(unitCost):'No calculable'}</strong><small>${reviewMoney(cycleProductionCost)} / ${plan.producibleUnits.toLocaleString('es-PE')} unidades posibles.</small></div>
+    </div>
+    <p class="cs-production-method">Base del Excel: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. Modelo seleccionado: ${escapeHtml(plan.moldLabel)}.</p>
+  </section>`;
 }
 function sectionSummaryHtml(section,{history=false,compact=false}={}){
   const hasSelection=section.items.some(i=>i.rows?.some(r=>r.outflow||r.income||Number(r.quantity)>0));
@@ -159,15 +195,15 @@ function renderCompanySummary(){
   migrateCurrentReceipts();
   const history=companySummaryRound!=='current'&&Number(companySummaryRound)!==currentRound(),review=liveCompanyReview();
   const old=history?readReviewReceipts(Number(companySummaryRound)):null;
-  let sections=history?DECISION_CATALOG.map(c=>old[c.cat]).filter(Boolean):review.sections;
+  let sections=history?decisionCategories().map(c=>old[c.cat]).filter(Boolean):review.sections;
   if(companySummaryFilter==='sent')sections=sections.filter(s=>s.submitted);
-  const sent=(history?Object.values(old):review.sections).filter(s=>s.submitted).length;
+  const sent=(history?decisionCategories().map(category=>old[category.cat]).filter(Boolean):review.sections).filter(s=>s.submitted).length;
   const rounds=receiptRounds().filter(r=>r!==currentRound());
   const heading=history?`Decisiones enviadas \u00b7 ciclo ${companySummaryRound}`:'Resumen de decisiones de tu empresa';
-  mount.innerHTML=`<section class="company-summary" aria-labelledby="companySummaryTitle"><header class="cs-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${history?companySummaryRound:currentRound()}</span><h2 id="companySummaryTitle">${heading}</h2><p>Maquinaria, locales, operarios, insumos, tiendas y financiamiento en un solo lugar.</p></div><span class="cs-progress">${sent} / ${DECISION_CATALOG.length}<small>apartados enviados</small></span></header>
+  mount.innerHTML=`<section class="company-summary" aria-labelledby="companySummaryTitle"><header class="cs-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${history?companySummaryRound:currentRound()}</span><h2 id="companySummaryTitle">${heading}</h2><p>Decisiones, proceso productivo, compras, costos y financiamiento en un solo lugar.</p></div><span class="cs-progress">${sent} / ${decisionCategories().length}<small>apartados enviados</small></span></header>
     <div class="cs-toolbar"><div class="cs-filters" role="group" aria-label="Filtrar decisiones"><button type="button" data-summary-filter="all" aria-pressed="${companySummaryFilter==='all'}">Todas las decisiones</button><button type="button" data-summary-filter="sent" aria-pressed="${companySummaryFilter==='sent'}">Solo enviadas</button></div><label>Ciclo <select id="companySummaryCycle"><option value="current">Actual \u00b7 ciclo ${currentRound()}</option>${rounds.map(r=>`<option value="${r}" ${history&&Number(companySummaryRound)===r?'selected':''}>Ciclo ${r} \u00b7 historial enviado</option>`).join('')}</select></label></div>
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
-    ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+futureHtml(review.financial)}
+    ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+productionSummaryHtml(review)+futureHtml(review.financial)}
     <p class="cs-local-note">Las etiquetas ENVIADA corresponden a confirmaciones guardadas en este navegador. No son un acuse de recibo de Supabase. Los borradores no se presentan como enviados.</p>
     ${!history?`<div class="cs-status-strip">${review.sections.map(s=>`<span class="cs-mini-${s.submitted?'sent':'pending'}">${escapeHtml(s.title)}: ${s.submitted?'enviada':'pendiente de env\u00edo'}</span>`).join('')}</div>`:''}
     <div class="cs-sections">${sections.length?sections.map(s=>sectionSummaryHtml(s,{history})).join(''):'<div class="cs-empty"><h3>A\u00fan no hay decisiones enviadas</h3><p>Guardar borrador no confirma una decisi\u00f3n. Usa ENVIAR DECISI\u00d3N en cada apartado o revisa el env\u00edo completo.</p></div>'}</div>
@@ -194,14 +230,14 @@ function paintReviewDialog(message=''){
   const dialog=ensureReviewDialog(),review=liveCompanyReview(),problems=decisionsSubmitted()?[]:reviewProblems(review),complete=decisionsSubmitted();
   activeReview={fingerprint:reviewFingerprint(),round:currentRound()};
   dialog.innerHTML=`<div class="cs-dialog-frame"><header class="cs-dialog-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${currentRound()}</span><h2 id="companyReviewTitle">${complete?'Decisiones del ciclo confirmado':'Revisi\u00f3n final antes de enviar'}</h2><p id="companyReviewDescription">${complete?'Consulta las decisiones confirmadas en este equipo.':'Revisar no guarda, no cobra y no bloquea. Solo el bot\u00f3n de confirmaci\u00f3n env\u00eda el ciclo.'}</p></div><button type="button" id="closeCompanyReview" class="cs-close" aria-label="Cerrar revisi\u00f3n">\u00d7</button></header>
-    <div class="cs-dialog-body" tabindex="0">${message?`<p class="cs-notice cs-notice-warning" role="status">${escapeHtml(message)}</p>`:''}${financialCardsHtml(review.financial)}${futureHtml(review.financial)}${noticesHtml(problems,review.warnings)}
+    <div class="cs-dialog-body" tabindex="0">${message?`<p class="cs-notice cs-notice-warning" role="status">${escapeHtml(message)}</p>`:''}${financialCardsHtml(review.financial)}${productionSummaryHtml(review)}${futureHtml(review.financial)}${noticesHtml(problems,review.warnings)}
     <div class="cs-sections">${review.sections.map(s=>sectionSummaryHtml(s,{compact:true,history:complete})).join('')}</div><p class="cs-local-note">Confirmaci\u00f3n local: este proyecto no implementa a\u00fan un acuse de recepci\u00f3n del servidor para estas decisiones.</p></div>
     <footer class="cs-dialog-footer"><p>${complete?'Las decisiones no se vuelven a cobrar.':problems.length?`${problems.length} punto(s) por resolver antes de confirmar.`:'Se bloquear\u00e1n los apartados pendientes hasta el pr\u00f3ximo ciclo. Las advertencias no impiden continuar.'}</p><div><button type="button" id="cancelCompanyReview" class="cs-secondary">${complete?'CERRAR':'VOLVER A EDITAR'}</button>${!complete?`<button type="button" id="confirmCompanyReview" class="cs-primary" ${problems.length?'disabled':''}>CONFIRMAR Y ENVIAR TODO</button>`:''}</div></footer></div>`;
   dialog.querySelector('#closeCompanyReview').addEventListener('click',closeCompanyReview);dialog.querySelector('#cancelCompanyReview').addEventListener('click',closeCompanyReview);
   dialog.querySelector('#confirmCompanyReview')?.addEventListener('click',()=>{
     if(!activeReview||activeReview.round!==currentRound()){closeCompanyReview();toast('El ciclo ha cambiado. Revisa las decisiones del nuevo ciclo.');return;}
     if(activeReview.fingerprint!==reviewFingerprint()){paintReviewDialog('Los datos cambiaron mientras revisabas. Verifica los valores actualizados y confirma nuevamente.');return;}
-    commitReviewedSections(DECISION_CATALOG.map(c=>c.cat),true);
+    commitReviewedSections(decisionCategories().map(c=>c.cat),true);
   });
   bindSummaryLinks(dialog);
 }

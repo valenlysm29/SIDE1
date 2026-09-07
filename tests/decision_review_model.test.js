@@ -62,7 +62,7 @@ test('pure model never mutates its context',()=>{
  assert.equal(JSON.stringify(ctx),before);
 });
 test('all catalog items, including zero-cost guarantees and automatic rules, appear',()=>{
- const ctx=context({drafts:{GARANTIA_PROV:{optionIds:['gar_80']},GARANTIA_PT:{optionIds:['pt_90']},SEGMENTO:{optionIds:['premium']}}});
+ const ctx=context({drafts:{GARANTIA_PROV:{optionIds:['gar_80']},GARANTIA_PT:{optionIds:['pt_90']}}});
  const sections=catalog.map(c=>model.section(c,ctx));assert.equal(sections.flatMap(s=>s.items).length,catalog.flatMap(c=>c.items).length);
  assert.equal(model.breakdown(item('GARANTIA_PROV'),ctx).rows[0].label,'80% de devoluci\u00f3n');
 });

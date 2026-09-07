@@ -1,0 +1,22 @@
+SIDE — ENTREGA FINAL V4
+
+Esta versión incorpora las observaciones sobre segmento de mercado,
+calendario académico y resumen productivo.
+
+CAMBIOS CLAVE
+1. La decisión "Segmento de mercado" fue eliminada.
+2. La primera pestaña del jugador ahora es "Resumen".
+3. El calendario académico ocupa menos altura.
+4. El resumen muestra corte, ensamblado y acabado, con las unidades que
+   deben pasar por cada proceso y la capacidad máxima de cada etapa.
+5. Las compras de cuero, accesorios e hilo se convierten a materia prima
+   utilizable según la lógica del Excel.
+6. La producción posible es el menor valor entre la meta, el cuello de
+   botella productivo y los insumos disponibles.
+7. Se muestran los costos productivos y el costo operativo por unidad posible.
+
+INICIO
+Ejecuta INICIAR_JUEGO.bat en Windows o inicia servidor_local.py y abre
+http://localhost:8000/ en el navegador.
+
+Consulta CAMBIOS_FINAL_V4.md para el detalle de las fórmulas aplicadas.

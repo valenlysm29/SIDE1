@@ -1,8 +1,14 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
-## Entrega actual: v2026.09.07.3
+## Entrega actual: v2026.09.07.4
 
-El apartado **Empresa** ahora integra todas las decisiones, filtros de envío,
+La V4 elimina la decisión de segmento de mercado, compacta el calendario
+académico y vincula el resumen con la lógica de producción del Excel. Ahora se
+muestran meta, capacidad y unidades posibles en corte, ensamblado y acabado,
+además de la conversión de compras a materia prima y el costo productivo por
+unidad. Comienza por `LEEME_FINAL_V4.txt` y consulta `CAMBIOS_FINAL_V4.md`.
+
+El apartado **Resumen** integra todas las decisiones, filtros de envío,
 historial por ciclo y cuatro indicadores financieros. **Enviar todo** abre una
 revisión previa; confirmar es una acción separada. Los registros son locales,
 no acuses de recibo de Supabase. La estimación es de caja, no de utilidad futura.
@@ -21,7 +27,7 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Cada estudiante registra su propio nombre legal y nombre comercial al ingresar. No existe una empresa predeterminada.
 
 ## Pestañas del jugador
-1. Empresa
+1. Resumen
 2. Infraestructura
 3. Producción (RR. HH. + insumos)
 4. Canales y ventas

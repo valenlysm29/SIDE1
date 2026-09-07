@@ -32,7 +32,7 @@ def clear_rect(page,selector):
 def capture_summary(page,name):
     page.evaluate('''()=>{const mount=document.getElementById('companySummaryMount'),stage=document.getElementById('decisionMenu'),head=document.getElementById('decisionStickyHead');stage.scrollTop+=mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12;}''')
     page.screenshot(path=str(OUT/name))
-minimal={'SEGMENTO':{'optionIds':['estandar']},'MOLDE':{'optionIds':['molde_1']},'PRODUCCION_META':{'value':10},'CUERO':{'quantities':{'cuero_sint':10}},'ACCESORIOS':{'quantities':{'acc_eco':10}},'HILO':{'quantities':{'hilo_std':10}},'GARANTIA_PT':{'optionIds':['pt_30']},'CANALES':{'optionIds':['web'],'quantities':{}},'INV_MARKETING':{'optionIds':['mkt_baja']}}
+minimal={'MOLDE':{'optionIds':['molde_1']},'PRODUCCION_META':{'value':10},'CUERO':{'quantities':{'cuero_sint':3}},'ACCESORIOS':{'quantities':{'acc_eco':10}},'HILO':{'quantities':{'hilo_std':1}},'GARANTIA_PT':{'optionIds':['pt_30']},'CANALES':{'optionIds':['web'],'quantities':{}},'INV_MARKETING':{'optionIds':['mkt_baja']}}
 try:
  with sync_playwright() as p:
     browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -50,8 +50,6 @@ try:
     ok('Incomplete cycle opens a blocked review instead of submitting',business(page)==before)
     page.locator('#companyReviewDialog [data-summary-goto="B"]').first.click()
     ok('Review correction link closes dialog and opens the right tab',page.evaluate("currentCategory==='B'&&!document.getElementById('companyReviewDialog').open"))
-    tab(page,'A');choice(page,'SEGMENTO','premium');page.locator('#saveDecisionSection').click()
-    ok('Saving Empresa leaves it editable and unsubmitted',page.evaluate("!sectionSubmitted('A')&&decisionState.SEGMENTO.optionIds[0]==='premium'"))
     tab(page,'B')
     qty(page,'MESA_CORTE','mesa',2);qty(page,'ENSAMBLE','ens_basica',1);qty(page,'ENSAMBLE','ens_semi',1);qty(page,'ACABADOS','aca_semi',1)
     choice(page,'MOLDE','molde_2');choice(page,'MANTENIMIENTO','correctivo')
@@ -72,16 +70,16 @@ try:
     for district,value in [('los_olivos',2),('miraflores',1),('sjl',3)]:
         choice(page,'CANALES',district);page.locator(f'[data-store-qty="{district}"]').fill(str(value))
     page.locator('#saveDecisionSection').click();saved_cash=page.evaluate('cashBalance()')
-    ok('Saved sales are not marked as sent in Empresa',not page.evaluate("liveCompanyReview().sections.find(s=>s.cat==='D').submitted"))
+    ok('Saved sales are not marked as sent in Resumen',not page.evaluate("liveCompanyReview().sections.find(s=>s.cat==='D').submitted"))
     page.locator('#sendDecisionSection').click()
     expected_d=500+3600+3500+6600
     ok('Sending an already saved sales section never charges it twice',page.evaluate('cashBalance()')==saved_cash)
     ok('All three store counts and six sellers appear in sent receipt',page.evaluate("readReviewReceipts().D.outflow")==expected_d and page.evaluate("readReviewReceipts().D.items.find(i=>i.id==='PERSONAL_VENTAS').rows[0].quantity")==6)
     tab(page,'E');choice(page,'INV_RRHH','cap_baja');choice(page,'INV_MARKETING','mkt_media');page.locator('[data-loan-number="PRESTAMO"]').fill('10000')
     tab(page,'A')
-    ok('Empresa contains all catalog items, not just free-form labels',page.locator('#companySummaryMount [data-summary-item]').count()==page.evaluate('allDecisionItems().length'))
+    ok('Resumen contains all decision items',page.locator('#companySummaryMount [data-summary-item]').count()==page.evaluate('allDecisionItems().length'))
     page.locator('[data-summary-filter="sent"]').click()
-    ok('Only sent filter includes B, C, D and excludes drafts A, E',page.locator('#companySummaryMount [data-summary-section]').evaluate_all('(els)=>els.map(e=>e.dataset.summarySection)')==['B','C','D'])
+    ok('Only sent filter includes B, C, D and excludes draft E',page.locator('#companySummaryMount [data-summary-section]').evaluate_all('(els)=>els.map(e=>e.dataset.summarySection)')==['B','C','D'])
     capture_summary(page,'empresa-enviadas-escritorio.png')
     page.locator('[data-summary-filter="all"]').click()
     expected_outflow=expected_b+expected_c+expected_d+7000
@@ -105,11 +103,11 @@ try:
     page.set_viewport_size({'width':1366,'height':900});page.locator('#cancelCompanyReview').click()
     ok('Cancel review preserves every submitted and unsubmitted value',business(page)==before)
     page.locator('#topSubmitAllDecisions').click();page.locator('#confirmCompanyReview').click()
-    ok('Confirmation submits all five sections in a single local batch',page.evaluate('decisionsSubmitted()&&DECISION_CATALOG.every(c=>sectionSubmitted(c.cat))'))
+    ok('Confirmation submits all four decision sections in a single local batch',page.evaluate('decisionsSubmitted()&&decisionCategories().every(c=>sectionSubmitted(c.cat))'))
     ok('Final cash exactly matches the reviewed projection',abs(page.evaluate('cashBalance()')-f['projectedCash'])<.001)
     after=business(page);page.evaluate('commitReviewedSections(DECISION_CATALOG.map(c=>c.cat),true)')
     ok('Repeated confirmation cannot double-charge or replace receipts',business(page)==after)
-    ok('Submitted summary remains visible even after Empresa itself is locked',page.locator('#companySummaryMount [data-summary-section]').count()==5)
+    ok('Submitted summary remains visible after the cycle is locked',page.locator('#companySummaryMount [data-summary-section]').count()==4)
     receipts1=page.evaluate('readReviewReceipts()');student=page.evaluate('currentStudent')
     saved_storage=page.evaluate("Object.fromEntries(Array.from({length:localStorage.length},(_,i)=>{const k=localStorage.key(i);return [k,localStorage.getItem(k)]}))")
     page.close();page=context.new_page();load(page,'index.html',saved_storage);page.evaluate('student=>{currentStudent=student;openDecisionMenu()}',student)
@@ -117,7 +115,7 @@ try:
     page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');lastObservedRound=2;loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory()")
     ok('New cycle is not incorrectly marked as already sent',page.evaluate("!decisionsSubmitted()&&!sectionSubmitted('B')"))
     page.locator('#companySummaryCycle').select_option('1')
-    ok('Historical cycle shows the five immutable submitted sections',page.locator('#companySummaryMount [data-summary-section]').count()==5 and page.evaluate('readReviewReceipts(1)')==receipts1)
+    ok('Historical cycle shows the four immutable submitted sections',page.locator('#companySummaryMount [data-summary-section]').count()==4 and page.evaluate('readReviewReceipts(1)')==receipts1)
     ok('History does not invent an old projected cash value',page.locator('#companySummaryMount .cs-metric').count()==0)
     capture_summary(page,'historial-ciclo-1.png')
     # Fresh company with enough combined financing but not enough cash for B before E.
@@ -155,5 +153,5 @@ try:
     browser.close()
 finally:
  pass
-(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.07.3','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
+(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.07.4','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
 print('TOTAL PASS',len(checks),flush=True)

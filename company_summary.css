@@ -32,6 +32,23 @@
 .cs-future-body p{font-size:12px}
 .cs-contracts{padding-left:12px;border-left:2px solid #729ab8}
 .cs-future-body .cs-warning-text{color:#ffe09d}
+.cs-production{margin:15px 0;border:1px solid #37627d;border-radius:13px;background:#071a2a;padding:16px;overflow:hidden}
+.cs-production-ready{border-color:#3e866e}.cs-production-limited{border-color:#a48645}
+.cs-production-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:12px}
+.cs-production-heading h3{margin:4px 0;color:#fff;font-size:18px}.cs-production-heading p{margin:0!important;font-size:12px!important}
+.cs-production-state{flex:0 0 auto;padding:5px 8px;border-radius:6px;background:#173b34;color:#acf2d4;border:1px solid #3b7d67;font-size:10px;font-weight:850;letter-spacing:.5px}
+.cs-production-limited .cs-production-state{background:#3c3016;color:#ffe09d;border-color:#8b7139}
+.cs-production-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:10px 0}
+.cs-production-kpis>div,.cs-production-costs>div{min-width:0;padding:10px;border:1px solid #29475d;border-radius:8px;background:#0a2134}
+.cs-production-kpis span,.cs-production-costs span{display:block;color:#aac2d3;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.cs-production-kpis strong,.cs-production-costs strong{display:block;color:#fff;font-size:17px;line-height:1.35;margin-top:5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.cs-process-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.cs-process-card{position:relative;display:flex;gap:9px;padding:11px;border:1px solid #315773;border-radius:9px;background:#0a2135;min-width:0}
+.cs-process-card.is-limited{border-color:#8f733a;background:#2a2417}.cs-process-step{width:24px;height:24px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%;background:#245476;color:#fff;font-weight:850;font-size:11px}
+.cs-process-card h4{margin:0 0 3px;color:#8fd8ff;font-size:13px}.cs-process-card>div>strong{display:block;color:#fff;font-size:13px}.cs-process-card p{font-size:11px!important;line-height:1.45!important;margin:3px 0!important}.cs-process-card small{display:block;color:#b9cfde;font-size:10px;line-height:1.5}
+.cs-material-table{border:1px solid #2d4d63;border-radius:9px;overflow:hidden;margin:12px 0}.cs-material-head,.cs-material-row{display:grid;grid-template-columns:1.1fr repeat(4,minmax(0,1fr));gap:8px;align-items:center;padding:8px 10px}.cs-material-head{background:#102d43;color:#91acc0;font-size:10px;font-weight:850;text-transform:uppercase}.cs-material-row{border-top:1px solid #233e52;color:#dcebf4;font-size:11px}.cs-material-row strong{color:#8fd8ff}.cs-material-row span{font-variant-numeric:tabular-nums}.cs-material-row.is-limited{background:#2c2517}.cs-material-row small{display:block;color:#ffd989;font-size:10px;margin-top:2px}
+.cs-production-costs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.cs-production-costs strong{font-size:14px}.cs-production-costs small{display:block;color:#a9c1d2;font-size:10px;line-height:1.35;margin-top:3px}.cs-unit-cost{background:#0b2d2f!important;border-color:#39726a!important}.cs-unit-cost strong{color:#9cf0cf!important}
+.cs-production-method{font-size:11px!important;color:#9fb7c8!important;margin:10px 0 0!important}
 .cs-local-note{font-size:11px!important;color:#aabfd1!important;line-height:1.6!important}
 .cs-status-strip{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
 .cs-status-strip span{border-radius:6px;background:#182a3a;padding:5px 9px;font-size:10px;color:#c7dbe9;border:1px solid #405166}
@@ -98,6 +115,7 @@
  .cs-financial-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .cs-metric>span{min-height:0}
  .cs-items{grid-template-columns:1fr}
+ .cs-process-grid{grid-template-columns:1fr}.cs-production-costs{grid-template-columns:repeat(2,minmax(0,1fr))}.cs-unit-cost{grid-column:1/-1}
  .cs-dialog-footer{align-items:stretch;gap:8px;flex-direction:column}
  .cs-dialog-footer>div{justify-content:flex-end}
 }
@@ -115,6 +133,7 @@
  .cs-metric>strong{font-size:19px}
  .cs-metric p{font-size:10px}
  .cs-cash-bridge{font-size:10px;flex-direction:column}
+ .cs-production{padding:11px}.cs-production-heading{display:block}.cs-production-state{display:inline-block;margin-top:7px}.cs-production-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.cs-material-head{display:none}.cs-material-row{grid-template-columns:1fr 1fr}.cs-material-row strong{grid-column:1/-1}.cs-production-costs{grid-template-columns:1fr}.cs-unit-cost{grid-column:auto}
  .cs-section>summary{display:grid;grid-template-columns:28px minmax(0,1fr) 18px;gap:7px;padding:12px}
  .cs-section>summary>img{width:28px;height:28px;grid-column:1;grid-row:1}
  .cs-section-name{grid-column:2;grid-row:1}

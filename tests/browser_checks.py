@@ -126,11 +126,11 @@ with sync_playwright() as p:
         ok('Optional maintenance toggles selected then unselected',page.evaluate("selectedOptionIds(findDecisionItem('MANTENIMIENTO')).length===0&&computeItemCost(findDecisionItem('MANTENIMIENTO'))===0"))
         expect(page.locator('[data-choice="LOCAL_PROD"]')).to_be_disabled()
         ok('Mandatory fixed operating cost stays protected')
-        select_category(page,'A');page.locator('[data-choice="SEGMENTO"]').first.click()
-        selected=page.evaluate('decisionDrafts.SEGMENTO.optionIds[0]')
+        page.locator('[data-qty="MESA_CORTE"][data-option="mesa"]').fill('2')
+        selected=page.evaluate('decisionDrafts.MESA_CORTE.quantities.mesa')
         select_category(page,'D');page.locator('[data-choice="CANALES"][data-option="sjl"]').check();page.locator('#saveDecisionSection').click()
-        select_category(page,'A')
-        ok('Saving sales does not discard a pending draft in another section',page.evaluate('decisionDrafts.SEGMENTO.optionIds[0]')==selected)
+        select_category(page,'B')
+        ok('Saving sales does not discard a pending draft in another section',page.evaluate('decisionDrafts.MESA_CORTE.quantities.mesa')==selected)
         page.close()
 
     if GROUP in ('all','layout'):
