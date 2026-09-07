@@ -1,0 +1,49 @@
+SIDE - ENTREGA FINAL v2026.09.07.2
+=================================
+Base: SIDE_CORREGIDO_07_09_2026.zip.
+Esta entrega incluye el proyecto completo y conserva las modificaciones anteriores.
+
+CORRECCION 1: BOTON DE ENTRADA SIEMPRE VISIBLE
+El boton ENTRAR AL MENU DE DECISIONES esta en un pie de tarjeta independiente,
+que no se reduce ni se desplaza con los resultados. Los resultados y las noticias
+se desplazan dentro del cuadro; el boton, VER TUTORIAL y VOLVER permanecen visibles.
+El logo SIDE original sigue centrado y por delante del borde del cuadro.
+
+CORRECCION 2: CANTIDAD DENTRO DE CADA DISTRITO
+Al marcar Los Olivos, Miraflores o San Juan de Lurigancho aparece inmediatamente
+un campo de cantidad con botones - / + dentro de esa misma tarjeta.
+Cada distrito tiene su propia cantidad; el campo recien abierto se lleva al area
+visible entre el encabezado y la barra de guardado. Pagina web no genera tiendas.
+Los costos, subtotales, vendedores, borradores y envio usan esas cantidades.
+Se mantienen las reglas de compromisos ya existentes y la compatibilidad con
+partidas antiguas que guardaban solo una seleccion (equivale a una tienda).
+
+INICIAR ESTA VERSION EN WINDOWS
+1. Deten el servidor de la version anterior, normalmente con Ctrl+C en su consola.
+2. Extrae TODO este ZIP en una carpeta nueva. Conserva la carpeta anterior de respaldo.
+3. Entra en final_SIDE1 y ejecuta INICIAR_JUEGO.bat. Requiere Python 3.
+4. Comprueba que el pie de la sala indique: SIDE - v2026.09.07.2.
+
+El nuevo lanzador sirve exclusivamente la carpeta donde esta ubicado y abre el
+navegador solo despues de ocupar correctamente el puerto 8000. Si ese puerto ya
+esta ocupado, se detiene y avisa; no abre por error el servidor de otra version.
+
+Alternativa con VS Code: abre la carpeta nueva y ejecuta Live Server sobre su
+index.html. No reutilices un servidor que siga apuntando a la carpeta anterior.
+Alternativa de consola: python servidor_local.py
+El servidor incluido es para uso local, no un servidor de produccion.
+
+ARCHIVOS EN CACHE Y DATOS
+CSS y JavaScript tienen una nueva version en sus referencias para no mezclar
+recursos anteriores. El servidor local tambien evita cachear HTML, CSS y JS.
+Una recarga con Ctrl+F5 ayuda cuando se usa un servidor externo que conserva HTML.
+No borres localStorage ni los datos del navegador para aplicar esta correccion.
+Las partidas locales dependen del navegador y del mismo host/puerto. Cambiar el
+puerto u origen puede mostrar un almacenamiento distinto; no significa que se
+hayan borrado las partidas originales. El lanzador conserva localhost:8000.
+
+VALIDACION
+Consulta VALIDACION_FINAL_V2.md y tests/RESULTADOS_FINAL_V2.json.
+Las pruebas visuales usan Chromium aislado con los HTML, CSS y JS entregados.
+No se ha validado la conexion a Supabase en produccion ni una partida 3D completa.
+No se modifico el esquema SQL ni la configuracion original de Supabase.

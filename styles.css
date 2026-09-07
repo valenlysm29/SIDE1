@@ -1108,8 +1108,8 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .decision-row.locked .row-state{color:#ffd34f}
 .number-decision input[type="number"],.quantity-option input[type="number"]{overscroll-behavior:contain;touch-action:manipulation}
 @media(min-width:901px){
-  .dashboard-screen .lobby{min-height:100vh;height:100vh;padding:10px 18px;box-sizing:border-box;overflow:hidden}
-  .dashboard-screen .lobby-card{width:min(900px,94vw);max-height:calc(100vh - 20px);box-sizing:border-box;overflow:hidden;padding:22px 30px;border-radius:22px}
+  .dashboard-screen .lobby{box-sizing:border-box}
+  .dashboard-screen .lobby-card{box-sizing:border-box;border-radius:22px}
   .dashboard-screen .lobby-card h1{font-size:46px;margin:4px 0}
   .dashboard-screen .lobby-card h2{font-size:20px;margin:5px 0}
   .dashboard-screen .lobby-card #lobbySegment{font-size:11px;padding:6px 10px;margin:5px 0 9px}
@@ -1300,22 +1300,33 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .flow-arrow{transform:rotate(90deg);align-self:center}
 }
 
-/* SIDE 07/09/2026: natural lobby height, foreground logo and readable actions. */
-#studentLobby{min-height:100vh;min-height:100dvh;height:auto;overflow-x:clip;overflow-y:visible}
+/* SIDE v2026.09.07.2: scroll only the results, never the action footer. */
+#studentLobby{height:100vh;height:100dvh;min-height:0;overflow:hidden}
 #studentLobby .dashboard-bg{background-attachment:fixed;pointer-events:none}
-#studentLobby .dashboard-inner.lobby{display:block;width:min(960px,calc(100% - 32px));height:auto;min-height:100vh;min-height:100dvh;padding:68px 0 32px;overflow:visible}
-#studentLobby .lobby-card{position:relative;isolation:isolate;width:100%;height:auto;max-height:none;overflow:visible;padding:58px 30px 24px;margin:0 auto}
-#studentLobby .dash-logo{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);z-index:3;width:280px;height:160px;max-width:80%;object-fit:cover;display:block;opacity:1;filter:drop-shadow(0 5px 8px #000b);pointer-events:none}
-#studentLobby .lobby-card h1{font-size:clamp(30px,4vw,46px);overflow-wrap:anywhere}
-#studentLobby .lobby-card h2{font-size:clamp(17px,2.2vw,22px);overflow-wrap:anywhere}
+#studentLobby .dashboard-inner.lobby{display:flex;align-items:stretch;width:min(1020px,calc(100% - 32px));height:100%;min-height:0;padding:60px 0 12px;overflow:visible}
+#studentLobby .lobby-card{position:relative;isolation:isolate;display:flex;flex-direction:column;width:100%;height:100%;min-height:0;max-height:none;overflow:visible;padding:44px 0 0;margin:0 auto}
+#studentLobby .dash-logo{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);z-index:3;width:250px;height:112px;max-width:80%;object-fit:cover;display:block;opacity:1;filter:drop-shadow(0 5px 8px #000b);pointer-events:none}
+#studentLobby .lobby-content{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 24px 16px;scrollbar-width:thin;scrollbar-color:#36739b #06172b;scrollbar-gutter:stable;overscroll-behavior:contain}
+#studentLobby .lobby-content>.eyebrow{margin:0 0 4px;font-size:14px}
+#studentLobby .lobby-content h1{font-size:clamp(30px,4vw,46px);margin:4px 0;overflow-wrap:anywhere}
+#studentLobby .lobby-content h2{font-size:clamp(17px,2.2vw,22px);margin:4px 0;overflow-wrap:anywhere}
+#studentLobby #lobbyStudent{margin:10px 0;font-size:15px;overflow-wrap:anywhere}
 #studentLobby .student-result-breakdown span{font-size:12px;padding:4px 0;gap:8px}
 #studentLobby .student-finance-mini small{font-size:11px}
 #studentLobby .student-result-breakdown strong{font-size:12px}
-#studentLobby .lobby-card>p:last-of-type{font-size:13px;line-height:1.6;margin:10px 0}
-#studentLobby .lobby-start{padding:14px 18px;min-height:46px;width:min(490px,100%)}
-#studentLobby .tutorial-reopen-btn,#studentLobby .ghost-btn{min-height:44px}
+#studentLobby .lobby-welcome{font-size:12px;line-height:1.5;margin:10px 0 0;color:#b4cde5}
 #studentLobby .student-event-impact{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
 #studentLobby #lobbySegment{line-height:1.6;overflow-wrap:anywhere}
+#studentLobby .lobby-actions{flex:0 0 auto;position:relative;z-index:4;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 20px 8px;border-top:1px solid #39719666;border-radius:0 0 22px 22px;background:#06182d;box-shadow:0 -12px 24px #0003}
+#studentLobby .lobby-start{margin:0;display:block;width:min(560px,100%);height:auto;min-height:48px;padding:12px 16px;font-size:clamp(12px,1.5vw,17px);line-height:1.45;letter-spacing:1px;white-space:normal;overflow-wrap:normal;flex-shrink:0}
+#studentLobby .lobby-secondary-actions{display:flex;justify-content:center;align-items:stretch;gap:10px;width:min(560px,100%)}
+#studentLobby .tutorial-reopen-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:auto;min-width:0;min-height:40px;margin:0;padding:6px 14px;flex:1}
+#studentLobby .tutorial-reopen-icon{width:25px;height:25px;min-width:25px;font-size:15px}
+#studentLobby .tutorial-reopen-btn strong{font-size:11px;line-height:1.4;letter-spacing:.7px}
+#studentLobby .tutorial-reopen-btn small{font-size:9px;letter-spacing:0}
+#studentLobby .ghost-btn{min-height:40px;padding:8px 18px;flex:0 0 auto;font-size:11px}
+#studentLobby .lobby-build{color:#91acc5;font-size:9px;letter-spacing:.8px;line-height:1.2}
+#studentLobby button:focus-visible,#studentLobby .lobby-content:focus-visible{outline:3px solid #7cdbff;outline-offset:2px}
 #decisionMenu .save-section-btn{background:#17496b!important;border:1px solid #80d6ff!important;box-shadow:none;color:#fff!important}
 #decisionMenu .save-section-btn strong,#decisionMenu .save-section-btn small,#decisionMenu .save-section-btn span{color:#fff!important}
 #decisionMenu .decision-action-pair button{min-width:195px;min-height:65px;padding:10px 13px}
@@ -1342,9 +1353,11 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .store-quantity-row .store-contract-note{color:#ffe19a}
 .store-totals{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;margin-top:12px;padding:12px;border-radius:9px;background:#0a2638;color:#ddf3ff;font-size:13px;line-height:1.6}
 @media(max-width:700px){
- #studentLobby .dashboard-inner.lobby{width:calc(100% - 24px);padding-top:60px}
- #studentLobby .lobby-card{padding:48px 14px 20px}
- #studentLobby .dash-logo{width:235px;height:140px}
+ #studentLobby .dashboard-inner.lobby{width:calc(100% - 20px);padding:48px 0 max(10px,env(safe-area-inset-bottom))}
+ #studentLobby .lobby-card{padding:36px 0 0}
+ #studentLobby .dash-logo{width:220px;height:96px}
+ #studentLobby .lobby-content{padding:0 12px 14px}
+ #studentLobby .lobby-actions{padding:10px 12px 7px;gap:7px}
  #studentLobby .student-result-breakdown{grid-template-columns:1fr}
  #studentLobby .student-result-breakdown>div{padding:12px}
  #studentLobby .student-finance-mini{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1389,4 +1402,35 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
  #decisionMenu .decision-action-pair button strong,#decisionMenu .decision-action-pair button small{display:block;width:100%;white-space:normal;overflow-wrap:normal;letter-spacing:0}
  #decisionMenu .decision-action-pair button small{font-family:inherit;font-size:10px;opacity:1}
  #decisionMenu .section-save-bar>div:first-child>small{font-size:9px;letter-spacing:0;line-height:1.4}
+}
+
+/* District cards: reveal the quantity directly below the selected checkbox. */
+#decisionMenu .store-channel-grid{align-items:start;grid-template-columns:repeat(4,minmax(0,1fr))}
+#decisionMenu .store-channel-card{min-width:0;border:1px solid #315269;border-radius:12px;background:#061523;overflow:hidden}
+#decisionMenu .store-channel-card.selected{border-color:#ffd44f;background:#102332;box-shadow:0 0 0 1px #ffd44f33}
+#decisionMenu .store-channel-card>.choice-pill{display:block;min-height:138px;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent;padding:12px 12px 12px 40px;transform:none}
+#decisionMenu .store-channel-card.selected>.choice-pill{background:linear-gradient(145deg,#53431455,#142b3944)}
+#decisionMenu .store-channel-card>.choice-pill strong{font-size:14px;line-height:1.45}
+#decisionMenu .store-channel-card>.choice-pill p{font-size:10px;line-height:1.5}
+#decisionMenu .store-channel-card>.choice-pill small{font-size:10px;line-height:1.5}
+#decisionMenu .store-unit-caption{font-size:10px;font-weight:600;white-space:normal}
+#decisionMenu .store-quantity-row{border:0;border-top:1px solid #ffd44f66;border-radius:0;background:#0a263a;padding:14px 12px;gap:10px}
+#decisionMenu .store-quantity-row>label{font-size:13px;line-height:1.45;color:#fff;cursor:text}
+#decisionMenu .store-quantity-row .stepper{display:flex;justify-content:center;justify-self:stretch;min-width:0;gap:4px}
+#decisionMenu .store-quantity-row .stepper button{flex:0 0 40px;width:40px;height:42px;padding:0;border:1px solid #81b6d6;border-radius:8px;background:#153e58;color:#fff;font-size:23px;line-height:1;cursor:pointer}
+#decisionMenu .store-quantity-row .stepper button:disabled{opacity:.45;cursor:not-allowed}
+#decisionMenu .store-quantity-row .stepper input{flex:1 1 68px;min-width:48px;width:68px;max-width:104px;min-height:42px;margin:0;padding:6px 4px;border:2px solid #ffd44f;border-radius:8px;background:#041626;color:#fff;font-size:18px;font-weight:800;text-align:center}
+#decisionMenu .store-quantity-row .stepper input:disabled{border-color:#6b8598;color:#c3d0db}
+#decisionMenu .store-quantity-row small{font-size:10px;line-height:1.5}
+#decisionMenu .store-quantity-row .store-subtotal{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:1100px){#decisionMenu .store-channel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#decisionMenu .store-channel-grid{grid-template-columns:1fr}#decisionMenu .store-channel-card>.choice-pill{min-height:0}}
+@media(max-height:500px){
+ #studentLobby .dashboard-inner.lobby{padding-top:38px;padding-bottom:6px}
+ #studentLobby .lobby-card{padding-top:24px}
+ #studentLobby .dash-logo{width:190px;height:76px}
+ #studentLobby .lobby-actions{padding-top:7px;gap:5px}
+ #studentLobby .lobby-start{min-height:42px;padding:8px 12px}
+ #studentLobby .tutorial-reopen-btn,#studentLobby .ghost-btn{min-height:32px;padding-top:4px;padding-bottom:4px}
+ #studentLobby .tutorial-reopen-btn small{display:none}
 }

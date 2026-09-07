@@ -91,7 +91,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260907-2'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -122,7 +122,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260907-2');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -190,24 +190,64 @@ function channelDraft(){
   return d;
 }
 function storeMinimum(id){return RULES.committedQuantity(savedEntry(findDecisionItem('CANALES')),id,currentRound())}
-function storeQuantityPanel(locked){
+function storeQuantityControl(option,locked){
+  const d=channelDraft(),id=option.id,quantity=RULES.storeQuantity(d,id);
+  const committed=storeMinimum(id),minimum=Math.max(1,committed);
+  const remaining=optionCommitRemaining(findDecisionItem('CANALES'),id);
+  return `<div id="store-quantity-panel-${id}" class="store-quantity-row" data-store-row="${id}">
+    <label for="store-quantity-${id}">Cantidad de tiendas en ${escapeHtml(option.district)}</label>
+    <div class="stepper">
+      <button type="button" data-store-step="${id}" data-delta="-1" aria-label="Quitar una tienda en ${escapeHtml(option.district)}" ${locked||quantity<=minimum?'disabled':''}>−</button>
+      <input id="store-quantity-${id}" data-store-qty="${id}" type="number" inputmode="numeric" min="${minimum}" step="1" value="${quantity}" aria-describedby="store-cost-${id}" ${locked?'disabled':''}>
+      <button type="button" data-store-step="${id}" data-delta="1" aria-label="Añadir una tienda en ${escapeHtml(option.district)}" ${locked?'disabled':''}>+</button>
+    </div>
+    <span id="store-cost-${id}" class="store-subtotal" data-store-subtotal="${id}">Subtotal: ${money(option.cost*quantity)} / ciclo</span>
+    ${committed?`<small class="store-contract-note">Mínimo contratado: ${committed} tienda(s). Compromiso vigente: hasta ${remaining} ciclo(s) más.</small>`:'<small>Escribe la cantidad o usa − / +. Mínimo: 1 tienda.</small>'}
+  </div>`;
+}
+function storeQuantityPanel(){
   const stores=chosenStores(),d=channelDraft();if(!stores.length)return '';
   const total=RULES.storeCount(d);
   return `<section class="store-quantity-panel" aria-labelledby="storeQuantityTitle">
     <div class="store-quantity-heading"><h4 id="storeQuantityTitle">Cantidad de tiendas por distrito</h4><span data-store-count-label>${total} tienda(s) física(s)</span></div>
-    <p class="store-quantity-help">Indica el total de tiendas que operarás en cada distrito seleccionado. El costo por tienda se aplica en cada ciclo e incluye 1 vendedor básico. La demanda base es distrital; no se multiplica automáticamente por abrir más tiendas.</p>
-    <div class="store-quantity-grid">${stores.map(o=>{
-      const quantity=RULES.storeQuantity(d,o.id),minimum=Math.max(1,storeMinimum(o.id)),remaining=optionCommitRemaining(findDecisionItem('CANALES'),o.id);
-      return `<div class="store-quantity-row" data-store-row="${o.id}">
-        <label for="store-quantity-${o.id}">${escapeHtml(o.district)}</label>
-        <div class="stepper"><button type="button" data-store-step="${o.id}" data-delta="-1" aria-label="Quitar una tienda en ${escapeHtml(o.district)}" ${locked||quantity<=minimum?'disabled':''}>−</button><input id="store-quantity-${o.id}" data-store-qty="${o.id}" type="number" inputmode="numeric" min="${minimum}" step="1" value="${quantity}" aria-describedby="store-cost-${o.id}" ${locked?'disabled':''}><button type="button" data-store-step="${o.id}" data-delta="1" aria-label="Añadir una tienda en ${escapeHtml(o.district)}" ${locked?'disabled':''}>+</button></div>
-        <small>${money(o.cost)} por tienda / ciclo · Demanda del distrito: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>
-        <span id="store-cost-${o.id}" class="store-subtotal" data-store-subtotal="${o.id}">Subtotal: ${money(o.cost*quantity)} / ciclo</span>
-        ${storeMinimum(o.id)>0?`<small class="store-contract-note">Mínimo contratado: ${storeMinimum(o.id)} tienda(s). Quedan hasta ${remaining} ciclo(s) de compromiso. Las aperturas adicionales tienen su propio plazo de 12 ciclos.</small>`:'<small>Puedes ajustar o retirar estas aperturas antes de enviar la decisión. Compromiso mínimo: 12 ciclos.</small>'}
-      </div>`;
-    }).join('')}</div>
-    <div class="store-totals"><span data-store-staff-total>${total} tienda(s) · ${total} vendedor(es) básico(s)</span><strong data-store-cost-total>Tiendas: ${money(stores.reduce((sum,o)=>sum+o.cost*RULES.storeQuantity(d,o.id),0))} / ciclo</strong></div>
+    <p class="store-quantity-help">Ajusta la cantidad dentro de cada distrito marcado. El costo es por tienda y por ciclo; cada tienda incluye 1 vendedor básico. La demanda base es distrital y no se multiplica al abrir más tiendas.</p>
+    <div class="store-totals" role="status" aria-live="polite" aria-atomic="true"><span data-store-staff-total>${total} tienda(s) · ${total} vendedor(es) básico(s)</span><strong data-store-cost-total>Tiendas: ${money(stores.reduce((sum,o)=>sum+o.cost*RULES.storeQuantity(d,o.id),0))} / ciclo</strong></div>
   </section>`;
+}
+function renderChannelChoices(item,locked){
+  const d=channelDraft();
+  return `<div class="choice-strip checkbox-options store-channel-grid">${item.options.map(option=>{
+    const id=option.id,selected=(d.optionIds||[]).includes(id),physical=option.channel==='store';
+    const remaining=optionCommitRemaining(item,id),disabled=locked||(selected&&remaining>0);
+    // The quantity controls are siblings of the checkbox label, never nested in it.
+    // Clicking +, -, or the numeric input must not deselect the district.
+    return `<div class="store-channel-card ${selected?'selected':''}" data-channel-card="${id}">
+      <label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}">
+        <input data-choice="CANALES" data-option="${id}" type="checkbox" name="decision-CANALES" ${selected?'checked':''} ${disabled?'disabled':''} ${physical?`aria-expanded="${selected}" ${selected?`aria-controls="store-quantity-panel-${id}"`:''}`:''}>
+        <span class="choice-check"></span><strong>${escapeHtml(option.label)}</strong>
+        <em>${money(optionUnitCost(item,option))}${physical?' <span class="store-unit-caption">/ tienda / ciclo</span>':''}</em>
+        <p>${escapeHtml(option.desc)}</p>
+        ${physical?`<small>Demanda base del distrito: ${districtDemand(id).toLocaleString('es-PE')} u./ciclo</small>`:''}
+        ${remaining?`<span class="lock-note">Compromiso vigente: ${remaining} ciclo(s)</span>`:''}
+      </label>
+      ${physical&&selected?storeQuantityControl(option,locked):''}
+    </div>`;
+  }).join('')}</div><div class="micro-caption">Marca uno o varios canales. Al elegir un distrito aparece su cantidad de tiendas.</div>${storeQuantityPanel()}`;
+}
+function revealStoreQuantity(id){
+  // Center the newly revealed field between the sticky header and the save bar.
+  // A second frame accounts for the header compacting when scrolling starts.
+  const align=()=>{
+    const input=document.querySelector(`[data-store-qty="${id}"]`),screen=$('decisionMenu');
+    if(!input||!screen||screen.classList.contains('hidden'))return;
+    const bounds=screen.getBoundingClientRect(),rect=input.getBoundingClientRect();
+    const head=screen.querySelector('.sticky-section-head')?.getBoundingClientRect();
+    const footer=screen.querySelector('.section-save-bar')?.getBoundingClientRect();
+    const top=Math.max(bounds.top,head?.bottom||bounds.top)+16;
+    const bottom=Math.min(bounds.bottom,footer?.top||bounds.bottom)-16;
+    if(bottom>top)screen.scrollTop+=rect.top-(top+Math.max(0,(bottom-top-rect.height)/2));
+  };
+  requestAnimationFrame(()=>{align();requestAnimationFrame(align)});
 }
 function refreshStoreQuantityUI(){
   const item=findDecisionItem('CANALES'),d=channelDraft(),total=RULES.storeCount(d),locked=isLocked(item);
@@ -358,10 +398,11 @@ function renderDecisionCategory(){
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
   let body='';
-  if(item.type==='choice'||item.type==='multi-choice'){
+  if(item.id==='CANALES'){
+    body=renderChannelChoices(item,locked);
+  } else if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
     body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
-  if(item.id==='CANALES')body+=storeQuantityPanel(locked);
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='number'){
@@ -376,7 +417,7 @@ function renderDecisionRow(item){
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
-document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
+document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 function bindDecisionControls(){
   document.querySelectorAll('[data-choice]').forEach(input=>{
     input.addEventListener('click',event=>{
@@ -396,7 +437,11 @@ function bindDecisionControls(){
         const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set];
         if(item.id==='CANALES'&&RULES.STORE_IDS.includes(id)){d.quantities=d.quantities||{};if(input.checked)d.quantities[id]=Math.max(1,storeMinimum(id),RULES.storeQuantity(d,id));else delete d.quantities[id]}
       }else d.optionIds=[id];
+      const revealDistrict=item.id==='CANALES'&&input.checked&&RULES.STORE_IDS.includes(id);
       persistCurrentDraftOnly();renderDecisionCategory();
+      const updated=document.querySelector(`[data-choice="${item.id}"][data-option="${id}"]`);
+      updated?.focus({preventScroll:true});
+      if(revealDistrict)revealStoreQuantity(id);
     });
   });
   document.querySelectorAll('[data-store-step]').forEach(button=>button.addEventListener('click',()=>{

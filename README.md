@@ -63,3 +63,13 @@ La versión actual incorpora obligatoriedad selectiva de decisiones, saldo guard
 ## Actualización 07/09/2026
 
 Logo del estudiante en primer plano y sin recorte inferior, calendario automático por ciclos, iconos docentes SVG y cantidades de tiendas por distrito con costos, contratos y guardado. Incluye mejoras de borradores, botones y mantenimiento opcional. Consulta `CAMBIOS_07_09_2026.md` para iniciar el proyecto y conocer los cambios, y `VALIDACION_07_09_2026.md` para las pruebas y limitaciones.
+
+## Entrega final v2026.09.07.2
+
+El boton de entrada ahora permanece visible en un pie independiente de los
+resultados desplazables. Al marcar una tienda fisica, su cantidad aparece dentro
+de la tarjeta del distrito, con campo numerico y botones - / +.
+
+Para abrir esta version, cierra el servidor anterior y ejecuta `INICIAR_JUEGO.bat`
+en la carpeta recien extraida. Consulta `LEEME_FINAL_V2.txt`, `CAMBIOS_FINAL_V2.md`
+y `VALIDACION_FINAL_V2.md`.

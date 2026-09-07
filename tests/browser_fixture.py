@@ -21,9 +21,9 @@ def embed_assets(text):
 def document(name, storage=None):
     text=(ROOT/name).read_text()
     text=re.sub(r'<link[^>]*href="https://[^>]+>', '',text)
-    text=re.sub(r'<link[^>]*href="([^"\s]+\.css)"[^>]*>',lambda m:'<style>'+embed_assets((ROOT/m[1]).read_text())+'</style>',text)
+    text=re.sub(r'<link[^>]*href="([^"\s]+\.css)(?:\?[^"]*)?"[^>]*>',lambda m:'<style>'+embed_assets((ROOT/m[1]).read_text())+'</style>',text)
     def script(m):
-        src=m[1]
+        src=m[1].split('?',1)[0]
         if src.startswith('https://'):return ''
         code=embed_assets((ROOT/src).read_text()).replace('</script','<\\/script')
         return '<script>'+code+'</script>'
