@@ -27,13 +27,13 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Cantidades para mesas, maquinaria, personal e insumos.
 - Maquinaria adquirida marcada como “Ya tienes”.
 - Moldes no se deprecian y quedan bloqueados desde el ciclo siguiente a su compra.
-- Mantenimiento correctivo: S/ 200.
+- Mantenimiento preventivo opcional: S/ 200; permite deselección.
 - Local de producción movido a Infraestructura.
 - Producción reúne personal, compras, materiales y volumen objetivo.
 - Analista de compras: S/ 5,000 por ciclo; negocia descuentos decrecientes por ciclo.
 - Eliminadas las decisiones de número de proveedores, lead time, política de pago e inventario.
 - Canales: web, Los Olivos, Miraflores y San Juan de Lurigancho.
-- Personal de ventas se activa solo al elegir tienda física; S/ 1,300 por persona/ciclo.
+- Cada tienda física incluye un vendedor básico; se mantiene la comisión total del 1% de las ventas simuladas, sin sueldo fijo adicional.
 - % de ventas a crédito se muestra como dato automático, no como decisión.
 - Garantía de proveedor en 0%, 80% o 100%, sin afectar caja al elegirla.
 - Inversiones y Finanzas combinadas.
@@ -52,10 +52,14 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Eventos no elegibles: solo banco de posibles eventos y ocurrencia aleatoria.
 - Estado de empresa: activo/tomando decisiones o sin actividad reciente.
 - Botón “Guardar e iniciar partida”.
-- La TEA baja 1 punto porcentual al avanzar cada ciclo, y el docente puede modificarla.
+- La TEA inicial se define en la configuración docente y se muestra en el apartado de préstamos.
 
 ## Nota técnica
 El proyecto mantiene el modo local con `localStorage` y conserva los puntos de integración con Supabase. Las reglas que dependen de un motor contable completo de ventas/devoluciones se presentan como reglas del juego, mientras que caja, compras, cantidades, préstamo y costos sí se calculan en esta versión.
 
 ## Actualización 29/08/2026
 La versión actual incorpora obligatoriedad selectiva de decisiones, saldo guardado por pestaña, capital fijo/aleatorio, ciclos manuales/automáticos, timer del estudiante, préstamo porcentual, banco de 50 eventos, noticias, seguimiento docente por apartados y resultados financieros disgregados. Consulta `CORRECCIONES_29_08_2026.md` para el detalle completo.
+
+## Actualización 07/09/2026
+
+Logo del estudiante en primer plano y sin recorte inferior, calendario automático por ciclos, iconos docentes SVG y cantidades de tiendas por distrito con costos, contratos y guardado. Incluye mejoras de borradores, botones y mantenimiento opcional. Consulta `CAMBIOS_07_09_2026.md` para iniciar el proyecto y conocer los cambios, y `VALIDACION_07_09_2026.md` para las pruebas y limitaciones.

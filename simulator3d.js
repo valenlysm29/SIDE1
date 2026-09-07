@@ -515,13 +515,14 @@
     if ($3('simRevenue')) $3('simRevenue').textContent = gameSession ? `${fmt(gameSession.revenue)} / ${fmt(gameSession.targetRevenue)}` : fmt(0);
     const target = Number(saved('PRODUCCION_META')?.value || 0);
     const channels = saved('CANALES')?.optionIds?.length || 0;
+    const physicalStores = window.SIDE_RULES.storeCount(saved('CANALES'));
     const queueText = checkoutQueue.length ? ` · Cola: ${checkoutQueue.length}` : '';
     const stockText = inventory ? ` · Stock: ${totalDisplayStock()} tienda / ${totalReserveStock()} almacén` : '';
     const shiftText = gameSession ? ` · Tiempo restante: ${formatTime(gameSession.timeLeft)} · Satisfacción: ${Math.round(gameSession.satisfaction)}% · Combo: x${Math.max(1, gameSession.combo || 0)}` : '';
     $3('simObjectiveText').textContent = gameSession
       ? `Día ${gameSession.day} · Dificultad ${(gameSession.difficulty || 1).toFixed(1)} · Meta del turno: ${fmt(gameSession.targetRevenue)} · Ingresos: ${fmt(gameSession.revenue)}${queueText}${stockText}${shiftText}.`
       : (target
-        ? `Meta: ${target} unidades · ${channels} canal(es)${queueText}${stockText}. Repón exhibidores y cobra en caja.`
+        ? `Meta: ${target} unidades · ${channels} canal(es) · ${physicalStores} tienda(s)${queueText}${stockText}. Repón exhibidores y cobra en caja.`
         : `Gestiona inventario, exhibición y caja${queueText}${stockText}.`);
     updateMissionUI();
   }
@@ -1475,9 +1476,7 @@
   }
 
   function salesStaff() {
-    const channels=saved('CANALES')?.optionIds||[];
-    const itemIds=['los_olivos','miraflores','sjl'];
-    return channels.filter(id=>itemIds.includes(id)).length; // 1 vendedor básico automático por tienda física
+    return window.SIDE_RULES.storeCount(saved('CANALES')); // One salesperson per physical store, including legacy decisions.
   }
 
   function queueCapacity() { return queueSlots.length; }

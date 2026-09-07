@@ -20,6 +20,7 @@ const SEVERANCE_RATE = 0.5;
 // % de recuperación al vender/liquidar una máquina ya adquirida cuando la opción no
 // define su propio liquidationRate.
 const LIQUIDATION_RATE_DEFAULT = 0.4;
+const RULES = window.SIDE_RULES;
 const UI_ICONS = {check:'assets/icons/ui/check.svg',play:'assets/icons/ui/play.svg',lock:'assets/icons/ui/lock.svg'};
 let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,game:DEMO_GAME};
 let decisionState = {};
@@ -75,7 +76,7 @@ window.SIDE_GAME_BRIDGE={
   recordSimulatedSale(amount=75){
     const sale=Math.max(0,Number(amount)||0),key=`${currentRound()}:SIM_VENTAS`;
     cashLedger[key]=Number(cashLedger[key]||0)+sale;
-    const physicalStores=(savedEntry(findDecisionItem('CANALES'))?.optionIds||[]).filter(id=>findDecisionItem('CANALES')?.options?.find(o=>o.id===id)?.channel==='store').length;
+    const physicalStores=RULES.storeCount(savedEntry(findDecisionItem('CANALES')));
     if(physicalStores>0){const commissionKey=`${currentRound()}:COMISION_VENTAS`;cashLedger[commissionKey]=Number(cashLedger[commissionKey]||0)-sale*0.01}
     persistGameState();syncStudentReportPreview();renderStudentStatus();
     return cashLedger[key];
@@ -167,6 +168,11 @@ function initDraft(item){
   if(item.type==='number')return decisionDrafts[item.id]={value:Number(e?.round===currentRound()?e.value:0)};
   if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(e?.round===currentRound()?e.amount:0)};
   if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(e?.round===currentRound()?e.staff:{})};
+  if(item.id==='CANALES'){
+    const optionIds=(e?.optionIds||[]).slice(),quantities={};
+    RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});
+    return decisionDrafts[item.id]={optionIds,quantities};
+  }
   const ids=(e?.optionIds||item.defaultOptionIds||[]).slice();return decisionDrafts[item.id]={optionIds:ids};
 }
 function selectedOptionIds(item){return initDraft(item).optionIds||[]}
@@ -175,8 +181,64 @@ function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound(
 function optionUnitCost(item,opt){const base=Number(opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
 function currentProductionTarget(){return Number(initDraft(findDecisionItem('PRODUCCION_META')).value||0)}
 function materialNeed(){return currentProductionTarget()}
-function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos||1000):id==='miraflores'?Number(c.demandMiraflores||1250):id==='sjl'?Number(c.demandSJL||1100):0}
+function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos??1000):id==='miraflores'?Number(c.demandMiraflores??1250):id==='sjl'?Number(c.demandSJL??1100):0}
 function chosenStores(){const item=findDecisionItem('CANALES');return selectedOptionIds(item).map(id=>item.options.find(o=>o.id===id)).filter(o=>o?.channel==='store')}
+function channelDraft(){
+  const item=findDecisionItem('CANALES'),d=initDraft(item);
+  d.quantities=d.quantities||{};
+  RULES.STORE_IDS.forEach(id=>{if((d.optionIds||[]).includes(id))d.quantities[id]=RULES.storeQuantity(d,id)});
+  return d;
+}
+function storeMinimum(id){return RULES.committedQuantity(savedEntry(findDecisionItem('CANALES')),id,currentRound())}
+function storeQuantityPanel(locked){
+  const stores=chosenStores(),d=channelDraft();if(!stores.length)return '';
+  const total=RULES.storeCount(d);
+  return `<section class="store-quantity-panel" aria-labelledby="storeQuantityTitle">
+    <div class="store-quantity-heading"><h4 id="storeQuantityTitle">Cantidad de tiendas por distrito</h4><span data-store-count-label>${total} tienda(s) física(s)</span></div>
+    <p class="store-quantity-help">Indica el total de tiendas que operarás en cada distrito seleccionado. El costo por tienda se aplica en cada ciclo e incluye 1 vendedor básico. La demanda base es distrital; no se multiplica automáticamente por abrir más tiendas.</p>
+    <div class="store-quantity-grid">${stores.map(o=>{
+      const quantity=RULES.storeQuantity(d,o.id),minimum=Math.max(1,storeMinimum(o.id)),remaining=optionCommitRemaining(findDecisionItem('CANALES'),o.id);
+      return `<div class="store-quantity-row" data-store-row="${o.id}">
+        <label for="store-quantity-${o.id}">${escapeHtml(o.district)}</label>
+        <div class="stepper"><button type="button" data-store-step="${o.id}" data-delta="-1" aria-label="Quitar una tienda en ${escapeHtml(o.district)}" ${locked||quantity<=minimum?'disabled':''}>−</button><input id="store-quantity-${o.id}" data-store-qty="${o.id}" type="number" inputmode="numeric" min="${minimum}" step="1" value="${quantity}" aria-describedby="store-cost-${o.id}" ${locked?'disabled':''}><button type="button" data-store-step="${o.id}" data-delta="1" aria-label="Añadir una tienda en ${escapeHtml(o.district)}" ${locked?'disabled':''}>+</button></div>
+        <small>${money(o.cost)} por tienda / ciclo · Demanda del distrito: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>
+        <span id="store-cost-${o.id}" class="store-subtotal" data-store-subtotal="${o.id}">Subtotal: ${money(o.cost*quantity)} / ciclo</span>
+        ${storeMinimum(o.id)>0?`<small class="store-contract-note">Mínimo contratado: ${storeMinimum(o.id)} tienda(s). Quedan hasta ${remaining} ciclo(s) de compromiso. Las aperturas adicionales tienen su propio plazo de 12 ciclos.</small>`:'<small>Puedes ajustar o retirar estas aperturas antes de enviar la decisión. Compromiso mínimo: 12 ciclos.</small>'}
+      </div>`;
+    }).join('')}</div>
+    <div class="store-totals"><span data-store-staff-total>${total} tienda(s) · ${total} vendedor(es) básico(s)</span><strong data-store-cost-total>Tiendas: ${money(stores.reduce((sum,o)=>sum+o.cost*RULES.storeQuantity(d,o.id),0))} / ciclo</strong></div>
+  </section>`;
+}
+function refreshStoreQuantityUI(){
+  const item=findDecisionItem('CANALES'),d=channelDraft(),total=RULES.storeCount(d),locked=isLocked(item);
+  document.querySelectorAll('[data-store-count-label]').forEach(el=>el.textContent=`${total} tienda(s) física(s)`);
+  document.querySelectorAll('[data-store-staff-total]').forEach(el=>el.textContent=`${total} tienda(s) · ${total} vendedor(es) básico(s)`);
+  const summary=document.querySelector('[data-store-cost-total]');
+  if(summary)summary.textContent=`Tiendas: ${money(chosenStores().reduce((sum,o)=>sum+o.cost*RULES.storeQuantity(d,o.id),0))} / ciclo`;
+  for(const o of chosenStores()){
+    const q=RULES.storeQuantity(d,o.id),subtotal=document.querySelector(`[data-store-subtotal="${o.id}"]`);
+    if(subtotal)subtotal.textContent=`Subtotal: ${money(o.cost*q)} / ciclo`;
+    const minus=document.querySelector(`[data-store-step="${o.id}"][data-delta="-1"]`);
+    if(minus)minus.disabled=locked||q<=Math.max(1,storeMinimum(o.id));
+  }
+  const staff=document.querySelector('[data-basic-sales-staff]');
+  if(staff)staff.textContent=total?`${total} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.';
+  updateRowCost('CANALES');updateHud();updateSectionCost();
+}
+function setStoreQuantity(id,value){
+  if(decisionEditingBlocked()||!RULES.STORE_IDS.includes(id))return;
+  const d=channelDraft();if(!(d.optionIds||[]).includes(id))return;
+  const n=Number(value),minimum=Math.max(1,storeMinimum(id));
+  d.quantities[id]=Math.max(minimum,Number.isFinite(n)?Math.min(Number.MAX_SAFE_INTEGER,Math.trunc(n)):minimum);
+  persistCurrentDraftOnly();refreshStoreQuantityUI();
+}
+function validateChannelQuantities(){
+  const d=channelDraft(),previous=savedEntry(findDecisionItem('CANALES'));
+  for(const id of RULES.STORE_IDS){
+    if(RULES.storeQuantity(d,id)<RULES.committedQuantity(previous,id,currentRound())){toast('Debes mantener las tiendas con contrato vigente.');return false}
+  }
+  return true;
+}
 function creditPercent(){const base=Number(teacherConfig().creditPercentStart||20);return Math.min(70,base+(currentRound()-1)*5+(analystSelected()?5:0))}
 function recurringAlreadyPrevious(item){const e=savedEntry(item);return e&&Number(e.round)<currentRound()}
 function priorQuantity(item,optId){const e=savedEntry(item);if(!e||Number(e.round)>=currentRound())return 0;return Number(e.quantities?.[optId]||0)}
@@ -189,6 +251,7 @@ function severanceForItem(item){
   },0);
 }
 function optionCommitRemaining(item,optId){
+  if(item.id==='CANALES'&&RULES.STORE_IDS.includes(optId))return RULES.remainingCommitment(savedEntry(item),optId,currentRound());
   const opt=(item.options||[]).find(o=>o.id===optId);
   if(!opt?.minCommitCycles)return 0;
   const e=savedEntry(item),firstRound=e?.optionRounds?.[optId];
@@ -213,7 +276,7 @@ function computeItemCost(item){
     return base+severanceForItem(item);
   }
   if(item.type==='sales-staff')return Object.values(d.staff||{}).reduce((s,q)=>s+(Number(q)||0)*Number(item.costPerPerson||0),0);
-  return item.options?.filter(o=>(d.optionIds||[]).includes(o.id)).reduce((s,o)=>s+optionUnitCost(item,o),0)||0;
+  return item.options?.filter(o=>(d.optionIds||[]).includes(o.id)).reduce((s,o)=>s+optionUnitCost(item,o)*(item.id==='CANALES'&&o.channel==='store'?RULES.storeQuantity(d,o.id):1),0)||0;
 }
 function categoryDraftNet(cat){
   const category=categoryByCat(cat);if(!category)return 0;
@@ -236,7 +299,7 @@ function renderTabs(){
 function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
 function draftItemComplete(item){
   if(item.type==='info')return true;
-  if(itemComplete(item))return true;
+  if(item.lockAfterPurchase&&itemComplete(item))return true;
   const d=initDraft(item);
   if(item.type==='number')return d.value!==''&&Number(d.value)>=Number(item.min||0);
   if(item.type==='loan')return d.amount!==undefined;
@@ -297,7 +360,8 @@ function renderDecisionRow(item){
   let body='';
   if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
-    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':'<div class="micro-caption">Botón de opción: solo puedes seleccionar una alternativa.</div>'}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
+    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
+  if(item.id==='CANALES')body+=storeQuantityPanel(locked);
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">NECESITAS: ${materialNeed()} mín.</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='number'){
@@ -307,14 +371,42 @@ function renderDecisionRow(item){
   } else if(item.type==='loan'){
     const rate=Number(teacherConfig().interest||20),max=loanMaximum(),amount=Math.min(max,Number(d.amount||0));body=`<div class="loan-box"><div><span>TEA INICIAL DEFINIDA POR EL DOCENTE</span><strong>${rate.toFixed(1)}%</strong></div><div><span>LÍMITE AUTOMÁTICO</span><strong>${money(max)}</strong><small>${LOAN_MAX_PERCENT}% de tu caja inicial</small></div><div><span>REFERENCIA INICIAL</span><strong>${money(loanInitialReference())}</strong><small>${LOAN_INITIAL_PERCENT}% de tu caja inicial</small></div></div><div class="loan-control"><input data-loan="${item.id}" type="range" min="0" max="${max}" step="500" value="${amount}"><input data-loan-number="${item.id}" type="number" min="0" max="${max}" step="500" value="${amount}"><b>${money(amount)}</b></div><div class="micro-caption">El préstamo es opcional y no suma al progreso obligatorio.</div>`;
   } else if(item.type==='info'){
-    let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS')dynamic='<strong>1 vendedor básico por tienda · comisión 1%</strong>';body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
+    let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
 document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 function bindDecisionControls(){
-  document.querySelectorAll('[data-choice]').forEach(input=>input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(input.dataset.choice);if(item.mandatoryFixed){toast('Esta decisión corresponde a un costo obligatorio y no puede retirarse.');renderDecisionCategory();return}const id=input.dataset.option;if(item.type==='multi-choice'&&!input.checked){const remaining=optionCommitRemaining(item,id);if(remaining>0){toast(`Este canal tiene un compromiso mínimo vigente de ${remaining} ciclo(s) más. No puedes retirarlo aún.`);renderDecisionCategory();return}}const d=initDraft(item);if(item.type==='multi-choice'){const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set]}else d.optionIds=[id];persistCurrentDraftOnly();renderDecisionCategory()}));
+  document.querySelectorAll('[data-choice]').forEach(input=>{
+    input.addEventListener('click',event=>{
+      const item=findDecisionItem(input.dataset.choice);
+      if(item.type==='choice'&&!itemRequired(item)&&!item.mandatoryFixed&&!isLocked(item)&&selectedOptionIds(item).includes(input.dataset.option)){
+        event.preventDefault();if(decisionEditingBlocked())return;
+        initDraft(item).optionIds=[];persistCurrentDraftOnly();renderDecisionCategory();
+      }
+    });
+    input.addEventListener('change',()=>{
+      if(decisionEditingBlocked())return;
+      const item=findDecisionItem(input.dataset.choice),id=input.dataset.option;
+      if(item.mandatoryFixed){renderDecisionCategory();return}
+      if(item.type==='multi-choice'&&!input.checked&&optionCommitRemaining(item,id)>0){toast('Este canal tiene tiendas con contrato vigente y no puede retirarse.');renderDecisionCategory();return}
+      const d=initDraft(item);
+      if(item.type==='multi-choice'){
+        const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set];
+        if(item.id==='CANALES'&&RULES.STORE_IDS.includes(id)){d.quantities=d.quantities||{};if(input.checked)d.quantities[id]=Math.max(1,storeMinimum(id),RULES.storeQuantity(d,id));else delete d.quantities[id]}
+      }else d.optionIds=[id];
+      persistCurrentDraftOnly();renderDecisionCategory();
+    });
+  });
+  document.querySelectorAll('[data-store-step]').forEach(button=>button.addEventListener('click',()=>{
+    const id=button.dataset.storeStep;setStoreQuantity(id,RULES.storeQuantity(channelDraft(),id)+Number(button.dataset.delta));
+    const input=document.querySelector(`[data-store-qty="${id}"]`);if(input)input.value=RULES.storeQuantity(channelDraft(),id);
+  }));
+  document.querySelectorAll('[data-store-qty]').forEach(input=>{
+    input.addEventListener('input',()=>{if(input.value==='')return;setStoreQuantity(input.dataset.storeQty,input.value);input.value=RULES.storeQuantity(channelDraft(),input.dataset.storeQty)});
+    input.addEventListener('change',()=>{setStoreQuantity(input.dataset.storeQty,input.value);input.value=RULES.storeQuantity(channelDraft(),input.dataset.storeQty)});
+  });
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
   document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item),floor=item.asset?-getOwned(item,i.dataset.option):0;d.quantities[i.dataset.option]=Math.max(floor,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
   document.querySelectorAll('[data-number-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(b.dataset.numberStep),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(d.value||0)+Number(b.dataset.delta));persistCurrentDraftOnly();renderDecisionCategory()}));
@@ -332,12 +424,13 @@ function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=i
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
 function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(!row)return;const cost=computeItemCost(item);row.textContent=cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja'}
 function updateSectionCost(){
-  const locked=cycleDecisionsLocked();
+  const locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
   $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
   $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Ajusta antes de guardar.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
   $('saveDecisionSection').disabled=locked||projected<0;
+  const send=$('sendDecisionSection');if(send){send.disabled=locked||projected<0||!sectionDraftReady(currentCategory);send.querySelector('strong').textContent=locked?'DECISIÓN ENVIADA':'ENVIAR DECISIÓN';send.querySelector('small').textContent=locked?'Editable en el próximo ciclo':'Confirmar; no editable en este ciclo'}
 }
 function productionMaterialShortages(){
   if(currentCategory!=='C')return [];
@@ -356,8 +449,8 @@ function warnProductionMaterialShortage(){
 }
 function validateRequiredSection(cat){for(const item of cat.items){if(!itemRequired(item)||item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))continue;const d=initDraft(item);if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}}return true}
 function saveCurrentSection(){
-  if(decisionEditingBlocked())return;
-  const cat=categoryByCat(currentCategory);if(!cat)return;if(!validateRequiredSection(cat))return;if(projectedCash()<0){toast('No tienes caja suficiente para guardar esta sección.');return}warnProductionMaterialShortage();
+  if(decisionEditingBlocked())return false;
+  const cat=categoryByCat(currentCategory);if(!cat)return false;if(currentCategory==='D'&&!validateChannelQuantities())return false;if(projectedCash()<0){toast('No tienes caja suficiente para guardar esta sección.');return false}warnProductionMaterialShortage();
   const round=currentRound();
   cat.items.forEach(item=>{
     if(item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))return;const d=initDraft(item);
@@ -366,19 +459,26 @@ function saveCurrentSection(){
     if(item.type==='number'){decisionState[item.id]={value:Number(d.value||0),round,label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`,cost:0};return}
     if(item.type==='sales-staff'){decisionState[item.id]={staff:deepClone(d.staff||{}),round,label:item.name,cost:computeItemCost(item)};return}
     if(item.type==='loan'){decisionState[item.id]={amount:Number(d.amount||0),round,label:`Préstamo: ${money(d.amount||0)}`,cost:0};return}
+    if(item.id==='CANALES'){
+      const previous=decisionState[item.id],quantities={},storeContracts={},optionRounds={};
+      RULES.STORE_IDS.forEach(id=>{const quantity=RULES.storeQuantity(d,id);if(!quantity)return;quantities[id]=quantity;storeContracts[id]=RULES.nextStoreBatches(previous,id,quantity,round);optionRounds[id]=Math.min(...storeContracts[id].map(b=>b.round))});
+      if((d.optionIds||[]).includes('web'))optionRounds.web=previous?.optionRounds?.web??round;
+      decisionState[item.id]={optionIds:(d.optionIds||[]).slice(),quantities,storeContracts,optionRounds,round,cost:computeItemCost(item),label:item.options.filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.channel==='store'?`${o.label} × ${quantities[o.id]}`:o.label).join(' + ')};
+      return;
+    }
     const prevRounds=(decisionState[item.id]&&decisionState[item.id].optionRounds)||{};
     const optionRounds={};(d.optionIds||[]).forEach(id=>{optionRounds[id]=prevRounds[id]!==undefined?prevRounds[id]:round});
     decisionState[item.id]={optionIds:(d.optionIds||[]).slice(),round,optionRounds,label:(item.options||[]).filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.label).join(' + '),cost:computeItemCost(item)};
   });
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0),next=categoryDraftNet(currentCategory);cashLedger[key]=next;persistGameState();applyEventCashEffects();syncStudentReportPreview();syncSectionToSupabase(cat);
   const draftStoreKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let draftStore={};try{draftStore=JSON.parse(localStorage.getItem(draftStoreKey)||'{}')||{}}catch{}delete draftStore[currentCategory];localStorage.setItem(draftStoreKey,JSON.stringify(draftStore));
-  const movement=next-old;animateCash(movement);decisionDrafts={};renderTabs();renderDecisionCategory();updateHud();toast('Borrador guardado. Puedes seguir revisándolo o enviarlo de inmediato.');
+  const movement=next-old;animateCash(movement);decisionDrafts={};restoreDraftsForRound();renderTabs();renderDecisionCategory();updateHud();toast('Borrador guardado sin enviar. Puedes continuar editando.');return true;
 }
 $('saveDecisionSection')?.addEventListener('click',saveCurrentSection);
 function sendCurrentSection(){
   if(decisionsSubmitted()){toast('El ciclo completo ya fue enviado. Espera al próximo ciclo.');return}
   if(sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada.');return}
-  saveCurrentSection();
+  if(!validateRequiredSection(categoryByCat(currentCategory))||!saveCurrentSection())return;
   if(!sectionReady(currentCategory)){toast('Completa las decisiones obligatorias de esta pestaña para poder enviarla.');return}
   setSectionSubmitted(currentCategory,true);
   persistGameState(); syncStudentReportPreview(); updateHud(); renderTabs(); renderDecisionCategory();
@@ -452,6 +552,7 @@ function syncStudentReportPreview(){
     id:currentStudent.participantId||('local-'+storageKey()),nombre:'Jugador',empresa:currentStudent.company,
     partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:initialCapital(),
     ingresos:adjusted.revenue,costos:adjusted.costs,utilidad,rondasActivas:currentRound(),actividad:entries.length,
+    canalesVenta:{cantidades:deepClone(savedEntry(findDecisionItem('CANALES'))?.quantities||{}),tiendasFisicas:RULES.storeCount(savedEntry(findDecisionItem('CANALES')))},
     decisiones:currentDecisionLabels(),apartados:categoryCompletionMap(),progreso:decisionProgressPercent(),enviado:decisionsSubmitted(),
     eventos:events.map(e=>({id:e.id,titulo:e.title,descripcion:e.description,afectados:e.scope==='group'?'Todos':'Empresa individual',ciclos:e.cycles,cicloAfecta:(Number(e.cycleOffset||0)===0?'+0 · mismo ciclo':Number(e.cycleOffset||0)===1?'+1 · siguiente ciclo':`+${Number(e.cycleOffset||0)} · después de ${Number(e.cycleOffset||0)} ciclos`),implicancia:e.implication,ocurrencia:e.probability})),
     estadoResultados:{ingresos:adjusted.revenue,costos:adjusted.costs,impactoEventos:eventImpact,utilidad},
@@ -470,30 +571,32 @@ function persistCurrentDraftOnly(){
   const cat=categoryByCat(currentCategory);if(!cat)return false;
   const draftStoreKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;
   let store={};try{store=JSON.parse(localStorage.getItem(draftStoreKey)||'{}')||{}}catch{}
-  store[currentCategory]=deepClone(decisionDrafts);
+  store[currentCategory]={};cat.items.forEach(item=>{if(decisionDrafts[item.id])store[currentCategory][item.id]=deepClone(decisionDrafts[item.id])});
   localStorage.setItem(draftStoreKey,JSON.stringify(store));
   return true;
 }
 function restoreDraftsForRound(){
   const key=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let store={};try{store=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}
-  decisionDrafts=store[currentCategory]||{};
+  for(const cat of DECISION_CATALOG){if(sectionSubmitted(cat.cat))continue;const section=store[cat.cat]||{};cat.items.forEach(item=>{if(section[item.id])decisionDrafts[item.id]=deepClone(section[item.id])})}
 }
 function saveAllDraftedSections(){
   const original=currentCategory;
+  let success=true;
+  restoreDraftsForRound();
   for(const cat of DECISION_CATALOG){
     currentCategory=cat.cat;
-    restoreDraftsForRound();
-    if(!sectionDraftReady(cat.cat))continue;
-    saveCurrentSection();
+    if(sectionSubmitted(cat.cat))continue;
+    if(!sectionDraftReady(cat.cat)||!saveCurrentSection()){success=false;break}
   }
   currentCategory=original;
-  decisionDrafts={};
+  decisionDrafts={};restoreDraftsForRound();
+  return success;
 }
 function submitAllDecisions(){
   if(decisionsSubmitted()){toast('Las decisiones de este ciclo ya fueron enviadas. Espera al próximo ciclo para modificarlas.');return}
   // Primero convierte los borradores pendientes de todas las pestañas en decisiones guardadas.
   persistCurrentDraftOnly();
-  saveAllDraftedSections();
+  if(!saveAllDraftedSections()){toast('Hay decisiones incompletas o sin caja suficiente. No se envió el ciclo.');renderTabs();renderDecisionCategory();return}
   const missing=requiredDecisionItems().filter(i=>!itemComplete(i));
   if(missing.length){toast('Completa las decisiones obligatorias que faltan antes de ENVIAR TODO.');renderTabs();renderDecisionCategory();return}
   DECISION_CATALOG.forEach(c=>setSectionSubmitted(c.cat,true));
@@ -503,8 +606,13 @@ $('submitAllDecisionsBtn')?.addEventListener('click',submitAllDecisions);
 $('topSubmitAllDecisions')?.addEventListener('click',submitAllDecisions);
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function readRoundRuntime(){try{return JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'null')}catch{return null}}
-function syncStudentTimer(){const r=readRoundRuntime(),conf=teacherConfig(),configuredDuration=Number(conf.roundHours||0)*3600+Number(conf.roundMinutes||0)*60+Number(conf.roundSecs||0);let remain=Number(r?.remaining??configuredDuration),note='Esperando inicio del docente';if(r?.running&&r.startedAt){const duration=Number(r.duration||configuredDuration||remain);remain=Math.max(0,duration-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));note=remain>0?'Ciclo en curso':'Tiempo finalizado'}else if(r?.status==='scheduled'){const wait=Math.max(0,Math.floor((new Date(r.scheduledStart).getTime()-Date.now())/1000));note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente'}else if(r?.status==='finished')note='Tiempo finalizado';const text=formatStudentTime(remain);if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;if($('studentCycleLabel'))$('studentCycleLabel').textContent=`Ciclo ${r?.round||currentRound()} / ${conf.cycles||6}`;if($('studentTimerNote'))$('studentTimerNote').textContent=note}
+function syncStudentTimer(){const r=readRoundRuntime(),conf=teacherConfig(),configuredDuration=Number(conf.roundHours||0)*3600+Number(conf.roundMinutes||0)*60+Number(conf.roundSecs||0);let remain=Number(r?.remaining??configuredDuration),note='Esperando inicio del docente';if(r?.running&&r.startedAt){const duration=Number(r.duration||configuredDuration||remain);remain=Math.max(0,duration-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));note=remain>0?'Ciclo en curso':'Tiempo finalizado'}else if(r?.status==='scheduled'){const wait=Math.max(0,Math.floor((new Date(r.scheduledStart).getTime()-Date.now())/1000));note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente'}else if(r?.status==='finished')note='Tiempo finalizado';else if(r?.status==='simulation-finished')note='Simulación finalizada';const text=formatStudentTime(remain);if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;if($('studentCycleLabel'))$('studentCycleLabel').textContent=`Ciclo ${r?.round||currentRound()} / ${conf.cycles||6}`;if($('studentTimerNote'))$('studentTimerNote').textContent=note}
 function renderStudentStatus(){if(!$('studentCashResult'))return;applyEventCashEffects();const events=activeStudentEvents(),simRevenue=Number(cashLedger[`${currentRound()}:SIM_VENTAS`]||0),baseCosts=Object.entries(cashLedger).reduce((a,[k,n])=>a+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,-Number(n||0))),0),adjusted=eventAdjustedFinancials(simRevenue,baseCosts),eventCash=Object.entries(cashLedger).filter(([k])=>k.includes(':EVENT:')).reduce((a,[,n])=>a+Number(n||0),0),pctImpact=(adjusted.revenue-simRevenue)-(adjusted.costs-baseCosts),eventImpact=eventCash+pctImpact,profit=adjusted.revenue-adjusted.costs+eventCash,flow=ledgerTotal()+pctImpact,loans=Object.entries(cashLedger).reduce((a,[k,n])=>a+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,Number(n||0))),0);$('studentIncomeResult').textContent=money(profit);$('studentCashResult').textContent=money(cashBalance()+pctImpact);$('studentFlowResult').textContent=(flow>=0?'+':'−')+money(Math.abs(flow));const set=(id,val)=>{if($(id))$(id).textContent=money(val)};set('studentERIngresos',adjusted.revenue);set('studentERCostos',adjusted.costs);set('studentEREventos',eventImpact);set('studentERUtilidad',profit);set('studentBCInicial',initialCapital());set('studentBCPrestamos',loans);set('studentBCFinal',cashBalance()+pctImpact);set('studentFCOperacion',adjusted.revenue-adjusted.costs);set('studentFCFinanciamiento',loans);set('studentFCEventos',eventImpact);set('studentFCNeto',flow);if($('studentEventImpactText'))$('studentEventImpactText').textContent=events.length?`Impacto del ciclo: ${events.map(e=>e.title+' — '+e.implication).join(' · ')}`:'Sin impacto de eventos activo en este ciclo.';const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>${e.scope==='group'?'GRUPAL · todos':'INDIVIDUAL · prob. '+e.probability+'%'} · duración ${e.cycles} ciclo(s)</small></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>'}
-setInterval(()=>{syncStudentTimer();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus()},1000);
+let lastObservedRound=currentRound();
+setInterval(()=>{
+  const round=currentRound();
+  if(round!==lastObservedRound){lastObservedRound=round;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
+  syncStudentTimer();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();
+},1000);
 
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});

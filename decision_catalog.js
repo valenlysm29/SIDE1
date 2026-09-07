@@ -39,7 +39,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'local_std',label:'Local de producción estándar',desc:'Costo operativo obligatorio para contar con un espacio de producción.',cost:2000}
       ]},
       {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:[
-        {id:'correctivo',label:'Mantenimiento correctivo',desc:'Costo simbólico obligatorio cuando corresponde intervenir una falla.',cost:200}
+        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:200}
       ]}
     ]
   },
@@ -104,7 +104,7 @@ window.SIDE_DECISION_CATALOG = [
     cat:'D', title:'Canales y ventas', short:'Ventas', icon:'assets/icons/categories/canales_ventas.svg',
     desc:'Elige dónde vender. La demanda cambia por distrito y el equipo comercial se activa cuando existe una tienda física.',
     items:[
-      {id:'CANALES',name:'Canales de venta',type:'multi-choice',required:true,minSelections:1,options:[
+      {id:'CANALES',name:'Canales de venta',type:'multi-choice',recurring:true,required:true,minSelections:1,options:[
         {id:'web',label:'Página web',desc:'Canal digital con cobertura amplia.',cost:500,channel:'web'},
         {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00,minCommitCycles:12},
         {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:3500,channel:'store',district:'Miraflores',demand:1.25,minCommitCycles:12},

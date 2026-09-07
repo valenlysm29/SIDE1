@@ -6,6 +6,13 @@ window.SIDE_ICON_BANK = {
     D: 'assets/icons/categories/canales_ventas.svg',
     E: 'assets/icons/categories/finanzas.svg'
   },
+  teacher: {
+    configuracion: 'assets/icons/teacher/configuracion.svg',
+    rondas: 'assets/icons/teacher/rondas.svg',
+    empresas: 'assets/icons/teacher/empresas.svg',
+    resultados: 'assets/icons/teacher/resultados.svg',
+    podio: 'assets/icons/teacher/podio.svg'
+  },
   ui: {
     back: 'assets/icons/ui/back.svg',
     check: 'assets/icons/ui/check.svg',

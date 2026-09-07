@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: Six 8-hour cycles: zero minutes stay zero, 48 hours total
+ok 1 - Six 8-hour cycles: zero minutes stay zero, 48 hours total
+  ---
+  duration_ms: 1.100385
+  type: 'test'
+  ...
+# Subtest: Month and year rollover
+ok 2 - Month and year rollover
+  ---
+  duration_ms: 0.213581
+  type: 'test'
+  ...
+# Subtest: Invalid values rejected
+ok 3 - Invalid values rejected
+  ---
+  duration_ms: 0.331538
+  type: 'test'
+  ...
+# Subtest: Clock boundaries and catch-up
+ok 4 - Clock boundaries and catch-up
+  ---
+  duration_ms: 0.241443
+  type: 'test'
+  ...
+# Subtest: Legacy selected districts mean one store each, web is not a store
+ok 5 - Legacy selected districts mean one store each, web is not a store
+  ---
+  duration_ms: 0.191508
+  type: 'test'
+  ...
+# Subtest: Quantities and malformed values
+ok 6 - Quantities and malformed values
+  ---
+  duration_ms: 0.169875
+  type: 'test'
+  ...
+# Subtest: Same-cycle drafts editable, prior contracts enforced
+ok 7 - Same-cycle drafts editable, prior contracts enforced
+  ---
+  duration_ms: 1.275318
+  type: 'test'
+  ...
+# Subtest: Openings expire independently after 12 cycles
+ok 8 - Openings expire independently after 12 cycles
+  ---
+  duration_ms: 0.29917
+  type: 'test'
+  ...
+# Subtest: Repeated saves do not duplicate openings
+ok 9 - Repeated saves do not duplicate openings
+  ---
+  duration_ms: 0.409756
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 61.065165

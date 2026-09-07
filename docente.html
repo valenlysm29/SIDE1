@@ -16,11 +16,11 @@
   <aside class="sidebar">
     <div class="brand"><img src="assets/side_logo.png" alt="SIDE"><span>PANEL DOCENTE</span></div>
     <nav>
-      <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/decision-icons/ui/objetivo.png" alt=""></span><span>Configuración</span></button>
-      <button class="nav-btn" data-tab="rondas"><span class="nav-icon"><img src="assets/decision-icons/ui/reloj.png" alt=""></span><span>Rondas y eventos</span></button>
-      <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/decision-icons/ui/mapa.png" alt=""></span><span>Empresas</span></button>
-      <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/decision-icons/ui/confirmar.png" alt=""></span><span>Resultados</span></button>
-      <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/decision-icons/ui/trofeo.png" alt=""></span><span>Ganador y podio</span></button>
+      <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/icons/teacher/configuracion.svg" alt=""></span><span>Configuración</span></button>
+      <button class="nav-btn" data-tab="rondas"><span class="nav-icon"><img src="assets/icons/teacher/rondas.svg" alt=""></span><span>Rondas y eventos</span></button>
+      <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/icons/teacher/empresas.svg" alt=""></span><span>Empresas</span></button>
+      <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/icons/teacher/resultados.svg" alt=""></span><span>Resultados</span></button>
+      <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/icons/teacher/podio.svg" alt=""></span><span>Ganador y podio</span></button>
     </nav>
     <div class="sidebar-bottom">
       <button id="backHome" class="sidebar-link"><img class="button-arrow-icon left" src="assets/icons/ui/arrow-left-thick.svg" alt=""> Volver a inicio</button>
@@ -76,17 +76,22 @@
         <article class="card cycle-config-card">
           <div class="card-title"><h3>Duración y ciclos</h3><span>Número fijo</span></div>
           <label>Número de ciclos<input id="cycles" type="number" value="6" min="1" max="20"></label>
-          <div class="value-row"><label>Horas por ciclo<input id="roundHours" type="number" value="0" min="0"></label><label>Minutos por ciclo<input id="roundMinutes" type="number" value="10" min="1" max="59"></label></div>
+          <div class="value-row"><label>Horas por ciclo<input id="roundHours" type="number" value="0" min="0"></label><label>Minutos por ciclo<input id="roundMinutes" type="number" value="10" min="0" max="59" step="1"></label></div>
           <input id="roundSecs" type="hidden" value="0">
           <div class="native-choice-row"><label><input type="radio" name="cycleMode" value="manual" id="cycleModeManual" checked> Manual</label><label><input type="radio" name="cycleMode" value="automatic" id="cycleModeAutomatic"> Automática</label></div>
           <div id="manualCycleDisclaimer" class="mode-disclaimer"><strong>Modo manual</strong><span>El profesor puede iniciar o terminar el ciclo cuando quiera. Al llegar a cero, el sistema espera al docente.</span></div>
           <div id="automaticCycleConfig" class="hidden"><label>Programar horario de inicio<input id="scheduledStart" type="datetime-local"></label><div class="mode-disclaimer"><strong>Modo automático</strong><span>La simulación inicia a la hora programada y avanza sola al terminar cada ciclo.</span></div></div>
           <input id="cycleCloseMode" type="hidden" value="manual"><input id="currentRound" type="hidden" value="1">
         </article>
-        <article class="card">
-          <div class="card-title"><h3>Calendario académico</h3><span>Referencia</span></div>
+        <article class="card academic-calendar-card">
+          <div class="card-title"><h3>Calendario académico</h3><span id="calendarModeBadge">Referencia</span></div>
           <div class="value-row"><label>Fecha de inicio<input id="startDate" type="date"></label><label>Fecha de fin<input id="endDate" type="date"></label></div>
-          <p class="hint">Las fechas son informativas. El reloj del estudiante se sincroniza con el ciclo activo.</p>
+          <p id="academicCalendarHint" class="hint">Las fechas son informativas en modo manual.</p>
+          <div id="automaticCalendar" class="automatic-calendar hidden">
+            <div id="calendarSummary" class="calendar-summary" role="status" aria-live="polite"></div>
+            <ol id="cycleCalendarList" class="cycle-calendar-list" aria-label="Programación de los ciclos"></ol>
+            <p class="calendar-footnote">Las noticias y los eventos confirmados se consultan en Rondas y eventos. Este calendario no anticipa resultados aleatorios.</p>
+          </div>
         </article>
       </div>
     </section>
@@ -145,7 +150,7 @@
     </section>
 
     <section id="tab-podio" class="tab-panel">
-      <div class="hero-card winner-hero"><div><span class="eyebrow">DECISIÓN FINAL DEL DOCENTE</span><h2>El sistema propone; el docente decide.</h2><p>Selecciona la empresa ganadora, revisa el podio y publícalo cuando estés listo. La publicación queda guardada localmente y se podrá conectar al backend.</p></div><div class="hero-orb trophy-orb"><img src="assets/decision-icons/trofeo_victoria.png" alt=""></div></div>
+      <div class="hero-card winner-hero"><div><span class="eyebrow">DECISIÓN FINAL DEL DOCENTE</span><h2>El sistema propone; el docente decide.</h2><p>Selecciona la empresa ganadora, revisa el podio y publícalo cuando estés listo. La publicación queda guardada localmente y se podrá conectar al backend.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
       <div class="grid two">
         <article class="card"><div class="card-title"><h3>Elegir ganador</h3><span>Manual</span></div><label>Empresa ganadora<select id="winnerSelect"></select></label><label>Justificación<textarea id="winnerReason" rows="4" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary full">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
         <article class="card"><div class="card-title"><h3>Podio publicado</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium"></div></article>
@@ -159,6 +164,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="config.js"></script>
+<script src="side_rules.js"></script>
 <script src="events_catalog.js"></script>
 <script src="docente.js"></script>
 </body>
