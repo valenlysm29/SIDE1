@@ -1,0 +1,10 @@
+test_busy_port_does_not_bind_another_server (__main__.LocalServerTest.test_busy_port_does_not_bind_another_server) ... ok
+test_entry_and_versioned_resources (__main__.LocalServerTest.test_entry_and_versioned_resources) ... 127.0.0.1 - - [07/Sep/2026 04:44:22] "GET /index.html?v=20260907-3 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Sep/2026 04:44:22] "GET /app.js?v=20260907-3 HTTP/1.1" 200 -
+127.0.0.1 - - [07/Sep/2026 04:44:22] "GET /styles.css?v=20260907-3 HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.028s
+
+OK

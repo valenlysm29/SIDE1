@@ -1,0 +1,3 @@
+Capturas generadas con datos ficticios de Taller Horizonte.
+La vista de migracion V2 muestra fecha original no disponible intencionalmente.
+Los importes no corresponden a una partida real del usuario.

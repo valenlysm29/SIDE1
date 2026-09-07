@@ -1,0 +1,50 @@
+{
+  "build": "2026.09.07.3",
+  "files": [
+    {
+      "file": "app.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "company_summary.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "config.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "decision_catalog.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "decision_review_model.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "docente.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "events_catalog.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "icon_bank.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "side_rules.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "simulator3d.js",
+      "syntax": "PASS"
+    },
+    {
+      "file": "tutorial.js",
+      "syntax": "PASS"
+    }
+  ],
+  "passed": 11
+}

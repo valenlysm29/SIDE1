@@ -1,0 +1,62 @@
+SIDE - ENTREGA FINAL V3
+Versión visible: v2026.09.07.3
+
+ABRIR EL PROYECTO
+1. Detén el servidor anterior con Ctrl+C en su consola.
+2. Extrae todo el ZIP en una carpeta nueva; no abras index.html dentro del ZIP.
+3. Entra en final_SIDE1 y ejecuta INICIAR_JUEGO.bat.
+   Requiere Python 3. También puedes ejecutar: python servidor_local.py
+4. Comprueba v2026.09.07.3 en la parte inferior de la sala del estudiante.
+   Si hace falta, recarga con Ctrl+F5. No borres los datos del sitio.
+
+DÓNDE ESTÁ LA MEJORA
+En Decisiones > Empresa, debajo de Segmento de mercado.
+El botón "Ver resumen de decisiones" permite saltar directamente al resumen.
+
+QUÉ MUESTRA
+- Todas las decisiones: selecciones enviadas, borradores y apartados pendientes.
+- Solo enviadas: exclusivamente los apartados ya confirmados.
+- Infraestructura: mesas, maquinaria, moldes, local y mantenimiento.
+- Producción: meta, operarios, jefatura, limpieza, compras, insumos y garantías.
+- Ventas: web, cantidades de tiendas por distrito, vendedores y reglas automáticas.
+- Finanzas: inversiones, marketing, préstamo solicitado y TEA configurada.
+- Cantidades, costos por concepto, desembolso por apartado y fecha de confirmación.
+- Selector de ciclo para consultar los comprobantes locales conservados.
+
+CUATRO CONCEPTOS DIFERENTES
+Caja actual: saldo ya guardado. El proyecto original aplica a la caja los
+borradores guardados; esa regla se conserva y se explica en pantalla.
+Desembolso de estas decisiones: costo bruto total elegido en el ciclo,
+incluido lo ya guardado/enviado. NO es un segundo cargo ni solo lo pendiente.
+El ajuste pendiente se muestra por separado y reconcilia ambos valores.
+Compromisos futuros: alquileres mínimos de tiendas posteriores al ciclo actual.
+El detalle también muestra la base recurrente y obligaciones más allá de la partida.
+Resultado estimado: caja proyectada al confirmar todos los apartados pendientes,
+considerando desembolsos, financiamiento y liquidaciones. NO es utilidad ni
+una previsión de ventas. Se identifica expresamente como no garantizada.
+
+REVISAR ANTES DE CONFIRMAR
+"ENVIAR TODO" abre la revisión, no envía inmediatamente.
+"VOLVER A EDITAR" o cerrar la ventana no guarda, cobra ni bloquea decisiones.
+Solo "CONFIRMAR Y ENVIAR TODO" confirma el ciclo en este equipo.
+Se indican datos obligatorios pendientes, caja insuficiente y advertencias.
+Los avisos de capacidad e insumos son orientativos; no se confunden con bloqueos.
+Un préstamo y las compras se evalúan juntos, sin depender del orden de las pestañas.
+"GUARDAR BORRADOR" sigue siendo editable. "ENVIAR DECISIÓN" confirma solo el apartado.
+
+HISTORIAL Y CONSERVACIÓN
+Los nuevos envíos conservan una copia por empresa, partida y ciclo. No se recalculan
+sus cantidades y costos al cambiar de ciclo. Las confirmaciones anteriores V2 del
+ciclo actual se recuperan de sus valores guardados, sin inventar la fecha original.
+No se pueden reconstruir ciclos antiguos que nunca guardaron un comprobante.
+Usa el mismo navegador, perfil, dirección (localhost o 127.0.0.1), puerto,
+código de partida y empresa para conservar el acceso a los datos locales.
+Extraer otra carpeta no copia datos entre navegadores, equipos u orígenes distintos.
+
+LÍMITES IMPORTANTES
+ENVIADA significa confirmada en el navegador, no recibida por Supabase.
+Esta entrega NO implementa sincronización de decisiones con un servidor de producción.
+El catálogo no define plazo ni cuotas bancarias: no se inventa una amortización.
+No se ha ejecutado una partida 3D completa ni probado Supabase en producción.
+Los documentos V2 y anteriores se conservan como antecedentes.
+Consulta CAMBIOS_FINAL_V3.md y VALIDACION_FINAL_V3.md para el detalle de esta entrega.

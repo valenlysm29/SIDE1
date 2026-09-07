@@ -1,5 +1,17 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
+## Entrega actual: v2026.09.07.3
+
+El apartado **Empresa** ahora integra todas las decisiones, filtros de envío,
+historial por ciclo y cuatro indicadores financieros. **Enviar todo** abre una
+revisión previa; confirmar es una acción separada. Los registros son locales,
+no acuses de recibo de Supabase. La estimación es de caja, no de utilidad futura.
+
+Comienza por `LEEME_FINAL_V3.txt`. El alcance y los límites están en
+`CAMBIOS_FINAL_V3.md` y `VALIDACION_FINAL_V3.md`. Los apartados siguientes conservan
+la documentación histórica del proyecto y de las entregas anteriores.
+
+
 Esta versión transforma el módulo de decisiones en una experiencia tipo juego con navegación por pestañas y caja visible.
 
 ## Acceso demo

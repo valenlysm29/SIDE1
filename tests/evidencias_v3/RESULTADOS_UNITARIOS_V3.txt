@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: empty scenario includes mandatory local and cleaning only
+ok 1 - empty scenario includes mandatory local and cleaning only
+  ---
+  duration_ms: 3.938471
+  type: 'test'
+  ...
+# Subtest: all three districts retain their quantities and cost
+ok 2 - all three districts retain their quantities and cost
+  ---
+  duration_ms: 0.889341
+  type: 'test'
+  ...
+# Subtest: asset acquisitions and disposals have separate gross flows
+ok 3 - asset acquisitions and disposals have separate gross flows
+  ---
+  duration_ms: 0.349461
+  type: 'test'
+  ...
+# Subtest: same-round submitted mold still costs money; later cycles do not charge again
+ok 4 - same-round submitted mold still costs money; later cycles do not charge again
+  ---
+  duration_ms: 0.298558
+  type: 'test'
+  ...
+# Subtest: staff severance survives repeated saves in the same round
+ok 5 - staff severance survives repeated saves in the same round
+  ---
+  duration_ms: 0.22948
+  type: 'test'
+  ...
+# Subtest: analyst discount affects material prices, not wages
+ok 6 - analyst discount affects material prices, not wages
+  ---
+  duration_ms: 0.154688
+  type: 'test'
+  ...
+# Subtest: loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved
+ok 7 - loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved
+  ---
+  duration_ms: 0.272406
+  type: 'test'
+  ...
+# Subtest: saved ledger is reconciled instead of charged twice
+ok 8 - saved ledger is reconciled instead of charged twice
+  ---
+  duration_ms: 0.453842
+  type: 'test'
+  ...
+# Subtest: additional drafts apply only the difference
+ok 9 - additional drafts apply only the difference
+  ---
+  duration_ms: 0.4366
+  type: 'test'
+  ...
+# Subtest: contract calculation excludes current cycle and shows obligations beyond game
+ok 10 - contract calculation excludes current cycle and shows obligations beyond game
+  ---
+  duration_ms: 0.461021
+  type: 'test'
+  ...
+# Subtest: contract batches preserve different opening cycles
+ok 11 - contract batches preserve different opening cycles
+  ---
+  duration_ms: 0.292471
+  type: 'test'
+  ...
+# Subtest: pure model never mutates its context
+ok 12 - pure model never mutates its context
+  ---
+  duration_ms: 2.062951
+  type: 'test'
+  ...
+# Subtest: all catalog items, including zero-cost guarantees and automatic rules, appear
+ok 13 - all catalog items, including zero-cost guarantees and automatic rules, appear
+  ---
+  duration_ms: 0.26581
+  type: 'test'
+  ...
+# Subtest: Six 8-hour cycles: zero minutes stay zero, 48 hours total
+ok 14 - Six 8-hour cycles: zero minutes stay zero, 48 hours total
+  ---
+  duration_ms: 0.968632
+  type: 'test'
+  ...
+# Subtest: Month and year rollover
+ok 15 - Month and year rollover
+  ---
+  duration_ms: 0.72837
+  type: 'test'
+  ...
+# Subtest: Invalid values rejected
+ok 16 - Invalid values rejected
+  ---
+  duration_ms: 0.263057
+  type: 'test'
+  ...
+# Subtest: Clock boundaries and catch-up
+ok 17 - Clock boundaries and catch-up
+  ---
+  duration_ms: 0.194093
+  type: 'test'
+  ...
+# Subtest: Legacy selected districts mean one store each, web is not a store
+ok 18 - Legacy selected districts mean one store each, web is not a store
+  ---
+  duration_ms: 0.165536
+  type: 'test'
+  ...
+# Subtest: Quantities and malformed values
+ok 19 - Quantities and malformed values
+  ---
+  duration_ms: 0.158397
+  type: 'test'
+  ...
+# Subtest: Same-cycle drafts editable, prior contracts enforced
+ok 20 - Same-cycle drafts editable, prior contracts enforced
+  ---
+  duration_ms: 1.565021
+  type: 'test'
+  ...
+# Subtest: Openings expire independently after 12 cycles
+ok 21 - Openings expire independently after 12 cycles
+  ---
+  duration_ms: 0.361326
+  type: 'test'
+  ...
+# Subtest: Repeated saves do not duplicate openings
+ok 22 - Repeated saves do not duplicate openings
+  ---
+  duration_ms: 0.367786
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89.757134

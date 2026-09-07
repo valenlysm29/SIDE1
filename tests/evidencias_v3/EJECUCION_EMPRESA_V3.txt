@@ -1,0 +1,62 @@
+PASS Delivered HTML, CSS and modules load in isolated Chromium
+PASS Untouched decisions are pending, not false dirty drafts
+PASS Incomplete cycle opens a blocked review instead of submitting
+PASS Review correction link closes dialog and opens the right tab
+PASS Saving Empresa leaves it editable and unsubmitted
+PASS Sending infrastructure records full immutable quantities and costs
+PASS Submitted mold is still included in the exact cycle cost
+PASS Production receipt includes staffing, target, all materials, services and guarantees
+PASS Saved sales are not marked as sent in Empresa
+PASS Sending an already saved sales section never charges it twice
+PASS All three store counts and six sellers appear in sent receipt
+PASS Empresa contains all catalog items, not just free-form labels
+PASS Only sent filter includes B, C, D and excludes drafts A, E
+PASS Four financial concepts reconcile exactly with selections and saved cash
+PASS Contract commitments exclude this cycle and disclose after-game amounts
+PASS Opening complete review does not change decisions, cash or sent flags
+PASS Review enables explicit confirmation only when ready
+PASS Review 1792x862: confirmation and cancel fully visible
+PASS Review 1792x862: no horizontal overflow
+PASS Review 1792x862: scrolling never covers confirmation
+PASS Review 1366x768: confirmation and cancel fully visible
+PASS Review 1366x768: no horizontal overflow
+PASS Review 1366x768: scrolling never covers confirmation
+PASS Review 1024x600: confirmation and cancel fully visible
+PASS Review 1024x600: no horizontal overflow
+PASS Review 1024x600: scrolling never covers confirmation
+PASS Review 768x600: confirmation and cancel fully visible
+PASS Review 768x600: no horizontal overflow
+PASS Review 768x600: scrolling never covers confirmation
+PASS Review 390x844: confirmation and cancel fully visible
+PASS Review 390x844: no horizontal overflow
+PASS Review 390x844: scrolling never covers confirmation
+PASS Review 375x667: confirmation and cancel fully visible
+PASS Review 375x667: no horizontal overflow
+PASS Review 375x667: scrolling never covers confirmation
+PASS Review 320x568: confirmation and cancel fully visible
+PASS Review 320x568: no horizontal overflow
+PASS Review 320x568: scrolling never covers confirmation
+PASS Review 844x390: confirmation and cancel fully visible
+PASS Review 844x390: no horizontal overflow
+PASS Review 844x390: scrolling never covers confirmation
+PASS Cancel review preserves every submitted and unsubmitted value
+PASS Confirmation submits all five sections in a single local batch
+PASS Final cash exactly matches the reviewed projection
+PASS Repeated confirmation cannot double-charge or replace receipts
+PASS Submitted summary remains visible even after Empresa itself is locked
+PASS Receipts and cash survive reconstructing the page from saved Web Storage
+PASS New cycle is not incorrectly marked as already sent
+PASS Historical cycle shows the five immutable submitted sections
+PASS History does not invent an old projected cash value
+PASS Companies do not see another company history
+PASS Loan and purchases can be confirmed together without a category-order cash failure
+PASS Capacity and material shortages produce visible advisory warnings
+PASS Insufficient total cash prevents confirmation without partial saves
+PASS Changing teacher configuration invalidates the previous review
+PASS Refreshed review can then be explicitly confirmed
+PASS A local storage failure rolls back cash, entries and submitted flags
+PASS Retry after storage failure succeeds once
+PASS V2 sent flags migrate saved values without inventing original timestamps
+PASS No uncaught browser JavaScript exceptions
+PASS Summary and shared financial model remain loaded
+TOTAL PASS 61

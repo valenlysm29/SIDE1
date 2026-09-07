@@ -1,0 +1,21 @@
+{
+  "build": "2026.09.07.3",
+  "base": "SIDE_FINAL_CORREGIDO_V2.zip",
+  "original_file_count": 163,
+  "original_files_preserved": true,
+  "changed_original_files": [
+    "final_SIDE1/README.md",
+    "final_SIDE1/app.js",
+    "final_SIDE1/decision_catalog.js",
+    "final_SIDE1/docente.html",
+    "final_SIDE1/index.html",
+    "final_SIDE1/servidor_local.py",
+    "final_SIDE1/tests/local_server_test.py",
+    "final_SIDE1/tests/ui_final_checks.py"
+  ],
+  "new_modules": {
+    "decision_review_model.js": "64328b9d9114db099b5b0bd155e13c6cc3a08dae0755ba51b56d9628402d1ae7",
+    "company_summary.js": "3d7e40e8fb88c880f1509e303b3cdec6a700e1d1a9488605827c13fc34974d81",
+    "company_summary.css": "998f9b995b32a1ec12a64e5d76d396b2750656e33e91008f4ce008c15b3f68bd"
+  }
+}

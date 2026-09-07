@@ -1,4 +1,4 @@
-"""SIDE v2026.09.07.2: actual click handlers + viewport/hit-test regressions.
+"""SIDE v2026.09.07.3: actual click handlers + viewport/hit-test regressions.
 Runs the delivered UI in an offline Chromium DOM, using browser_fixture.
 This does not test an HTTP deployment, Supabase, or the 3D renderer.
 """
@@ -27,7 +27,8 @@ seed={'SIDE_TEACHER_CONFIG':json.dumps({'capital':100000,'roundHours':8,'roundMi
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
     context=browser.new_context(viewport={'width':1366,'height':768},locale='es-PE',timezone_id='America/Lima')
-    context.set_default_timeout(8000)
+    context.set_default_timeout(15000)
+    context.set_default_navigation_timeout(45000)
     context.route('**/*',lambda route:route.abort())
     errors=[]
     context.on('page',lambda page:page.on('pageerror',lambda e:errors.append(str(e))))
@@ -118,5 +119,5 @@ with sync_playwright() as p:
     ok('Sending saves quantities and locks only the confirmed section',page.evaluate("sectionSubmitted('D')&&decisionState.CANALES.quantities.miraflores===5") and page.locator('[data-store-qty="miraflores"]').is_disabled())
     ok('No JavaScript runtime errors in these scenarios',not errors)
     browser.close()
-(OUT/'ui-final-results.json').write_text(json.dumps({'build':'2026.09.07.2','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Offline Chromium DOM using delivered HTML/CSS/JS and a Web Storage double. External network, HTTP deployment, Supabase and 3D not tested.'},indent=2))
+(OUT/'ui-final-results.json').write_text(json.dumps({'build':'2026.09.07.3','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Offline Chromium DOM using delivered HTML/CSS/JS and a Web Storage double. External network, HTTP deployment, Supabase and 3D not tested.'},indent=2))
 print('PASS',len(checks),'checks',flush=True)

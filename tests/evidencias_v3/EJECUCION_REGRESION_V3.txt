@@ -1,0 +1,58 @@
+PASS Student form and complete tutorial lead to the lobby via real buttons
+PASS Lobby 1792x862: entire decisions button visible and unobstructed
+PASS Lobby 1792x862: tutorial and return buttons visible
+PASS Lobby 1792x862: scrolling results never moves or covers footer
+PASS Lobby 1792x862: no horizontal overflow
+PASS Lobby 1366x768: entire decisions button visible and unobstructed
+PASS Lobby 1366x768: tutorial and return buttons visible
+PASS Lobby 1366x768: scrolling results never moves or covers footer
+PASS Lobby 1366x768: no horizontal overflow
+PASS Lobby 1280x720: entire decisions button visible and unobstructed
+PASS Lobby 1280x720: tutorial and return buttons visible
+PASS Lobby 1280x720: scrolling results never moves or covers footer
+PASS Lobby 1280x720: no horizontal overflow
+PASS Lobby 1024x600: entire decisions button visible and unobstructed
+PASS Lobby 1024x600: tutorial and return buttons visible
+PASS Lobby 1024x600: scrolling results never moves or covers footer
+PASS Lobby 1024x600: no horizontal overflow
+PASS Lobby 768x600: entire decisions button visible and unobstructed
+PASS Lobby 768x600: tutorial and return buttons visible
+PASS Lobby 768x600: scrolling results never moves or covers footer
+PASS Lobby 768x600: no horizontal overflow
+PASS Lobby 390x844: entire decisions button visible and unobstructed
+PASS Lobby 390x844: tutorial and return buttons visible
+PASS Lobby 390x844: scrolling results never moves or covers footer
+PASS Lobby 390x844: no horizontal overflow
+PASS Lobby 375x667: entire decisions button visible and unobstructed
+PASS Lobby 375x667: tutorial and return buttons visible
+PASS Lobby 375x667: scrolling results never moves or covers footer
+PASS Lobby 375x667: no horizontal overflow
+PASS Lobby 320x568: entire decisions button visible and unobstructed
+PASS Lobby 320x568: tutorial and return buttons visible
+PASS Lobby 320x568: scrolling results never moves or covers footer
+PASS Lobby 320x568: no horizontal overflow
+PASS Lobby 844x390: entire decisions button visible and unobstructed
+PASS Lobby 844x390: tutorial and return buttons visible
+PASS Lobby 844x390: scrolling results never moves or covers footer
+PASS Lobby 844x390: no horizontal overflow
+PASS Logo stays centered in front of card
+PASS Fully visible entry button opens the decisions menu
+PASS Web-only selection has no physical-store quantity controls
+PASS los_olivos: quantity appears within the selected district card
+PASS los_olivos: newly shown quantity is not hidden by sticky bars
+PASS los_olivos: +/- and typed quantity do not deselect the district
+PASS miraflores: quantity appears within the selected district card
+PASS miraflores: newly shown quantity is not hidden by sticky bars
+PASS miraflores: +/- and typed quantity do not deselect the district
+PASS sjl: quantity appears within the selected district card
+PASS sjl: newly shown quantity is not hidden by sticky bars
+PASS sjl: +/- and typed quantity do not deselect the district
+PASS Three independent quantities compute exact cost and 9 sellers
+PASS Saving applies the exact amount and all three quantities
+PASS Saving again does not duplicate the cost
+PASS Mobile: district selection automatically brings quantity into the visible area
+PASS Mobile: quantity buttons work without unchecking the district
+PASS Saved values and unsent edits survive a reconstructed page load
+PASS Sending saves quantities and locks only the confirmed section
+PASS No JavaScript runtime errors in these scenarios
+PASS 57 checks
