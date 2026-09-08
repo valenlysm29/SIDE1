@@ -9,10 +9,9 @@ const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulac
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
-const LOAN_MAX_PERCENT = 50;
-const LOAN_INITIAL_PERCENT = 25;
-// Supuestos de modelo de producción (ajustables si el curso define otros valores):
-// El Excel de referencia calcula la capacidad mensual con 30 días por ciclo.
+const CREDIT_INITIAL_PERCENT = 70;
+const CREDIT_ASSET_PERCENT = 20;
+// Supuestos del modelo de producción: un ciclo representa 30 días de operación.
 const WORKING_DAYS_PER_MONTH = 30;
 // Indemnización por reducir personal de un ciclo a otro: medio "sueldo" (costo de la
 // opción) por persona que se retira, como aproximación simple de liquidación laboral.
@@ -26,7 +25,7 @@ let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,gam
 let decisionState = {};
 let decisionDrafts = {};
 let cashLedger = {};
-let currentCategory = DECISION_CATALOG[0]?.cat || 'A';
+let currentCategory = null;
 let playerIsDeciding = false;
 
 function showScreen(id){screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0)}
@@ -45,8 +44,43 @@ function teacherConfig(){
 }
 function stableHash(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function initialCapital(){const c=teacherConfig();if(c.capitalMode!=='random')return Math.max(0,Number(c.capital||100000));let min=Math.max(0,Number(c.capitalMin||80000)),max=Math.max(min,Number(c.capitalMax||120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
-function loanMaximum(){return Math.floor(initialCapital()*LOAN_MAX_PERCENT/100/500)*500}
-function loanInitialReference(){return Math.floor(initialCapital()*LOAN_INITIAL_PERCENT/100/500)*500}
+function creditOutstanding(){
+  const prefix=`SIDE_DECISION_RECEIPTS_${storageKey()}_`;
+  let total=0;
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(!key?.startsWith(prefix))continue;
+    try{
+      const receipt=JSON.parse(localStorage.getItem(key)||'{}')||{};
+      const item=receipt.E?.items?.find(x=>x.id==='PRESTAMO');
+      total+=Number(item?.financing||0);
+    }catch{}
+  }
+  return Math.max(0,total);
+}
+function creditAssetValue(){
+  let total=0;
+  const assetIds=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'];
+  for(const id of assetIds){
+    const item=findDecisionItem(id); if(!item)continue;
+    const e=savedEntry(item); if(!e?.purchases)continue;
+    for(const opt of item.options||[]){
+      const netQty=Object.values(e.purchases).reduce((sum,row)=>sum+(Number(row?.[opt.id])||0),0);
+      total+=Math.max(0,netQty)*Number(opt.cost||0);
+    }
+  }
+  return Math.max(0,total);
+}
+function creditApprovedLine(){
+  const round=currentRound();
+  if(round<=1)return Math.floor(initialCapital()*CREDIT_INITIAL_PERCENT/100/500)*500;
+  const cash=Math.max(0,cashBalance()-creditOutstanding());
+  const assets=creditAssetValue();
+  return Math.floor((cash*CREDIT_INITIAL_PERCENT/100+assets*CREDIT_ASSET_PERCENT/100)/500)*500;
+}
+function creditAvailable(){return Math.max(0,creditApprovedLine()-creditOutstanding());}
+function loanMaximum(){return creditAvailable()}
+function loanInitialReference(){return creditApprovedLine()}
 function currentRound(){return Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||teacherConfig().round||1))}
 function storageKey(){return `${currentStudent.game?.codigo||'SIDE-000'}_${currentStudent.company}`}
 function decisionKey(){return 'SIDE_DECISIONS_'+storageKey()}
@@ -91,7 +125,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260907-4'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260908-2'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -122,7 +156,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260907-4');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260908-2');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -133,6 +167,10 @@ $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').cla
 
 function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
 function decisionCategories(){return DECISION_CATALOG.filter(category=>!category.summaryOnly)}
+function navigationCategories(){
+  const summary=DECISION_CATALOG.find(category=>category.summaryOnly),decisions=decisionCategories();
+  return currentRound()<=1?[...decisions,...(summary?[summary]:[])]:[...(summary?[summary]:[]),...decisions];
+}
 function categoryByCat(cat){return DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
 function savedEntry(item){return decisionState[item.id]||null}
@@ -143,6 +181,7 @@ function isLocked(item){const e=savedEntry(item);return sectionSubmitted(current
 function cycleDecisionsLocked(){return decisionsSubmitted()} 
 function decisionEditingBlocked(){if(decisionsSubmitted()){toast('Todas las decisiones de este ciclo ya fueron enviadas. Podrás modificarlas cuando comience el próximo ciclo.');return true}if(sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada y está bloqueada hasta el próximo ciclo.');return true}return false}
 function itemRequired(item){
+  if(item?.id==='MOLDE')return ownedMolds().length===0;
   if(item?.requiredWhenProduction)return currentProductionTarget()>0;
   return item?.required===true;
 }
@@ -151,6 +190,7 @@ function itemComplete(item){
   const e=savedEntry(item); if(!e)return false;
   if(item.recurring&&Number(e.round)!==currentRound())return false;
   if(item.asset&&e.purchases)return Object.values(e.purchases).some(r=>Object.values(r||{}).some(q=>Number(q)>0));
+  if(item.type==='production-plan')return (e.moldTargets?Object.values(e.moldTargets).reduce((total,value)=>total+Number(value||0),0):Number(e.value||0))>=Number(item.min||0);
   if(item.type==='number')return Number(e.value)>=Number(item.min||0);
   if(item.type==='loan')return e.amount!==undefined;
   if(item.type==='sales-staff')return true;
@@ -162,11 +202,27 @@ function getOwned(item,optId){
   return Object.entries(e.purchases).reduce((s,[round,row])=>s+(Number(round)<currentRound()?(Number(row?.[optId])||0):0),0);
 }
 function currentPurchase(item,optId){return Number(savedEntry(item)?.purchases?.[currentRound()]?.[optId]||0)}
+function ownedMolds(){
+  const item=findDecisionItem('MOLDE'),e=savedEntry(item),owned=[];
+  for(const [round,row] of Object.entries(e?.purchases||{})){
+    if(Number(round)>=currentRound())continue;
+    for(const [id,q] of Object.entries(row||{}))if(Number(q)>0&&!owned.some(x=>x.id===id))owned.push({id,round:Number(round)});
+  }
+  if(!owned.length&&e&&Number(e.round)<currentRound())for(const id of e.optionIds||[])if(item.options.some(option=>option.id===id))owned.push({id,round:Number(e.round)});
+  return owned;
+}
 function initDraft(item){
   if(decisionDrafts[item.id])return decisionDrafts[item.id]; const e=savedEntry(item);
   if(item.asset){const quantities={};item.options.forEach(o=>quantities[o.id]=currentPurchase(item,o.id));return decisionDrafts[item.id]={quantities}}
   if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities}}
+  if(item.type==='production-plan'){
+    const moldTargets={molde_1:0,molde_2:0,molde_3:0};
+    if(e?.round===currentRound()&&e.moldTargets)Object.keys(moldTargets).forEach(id=>moldTargets[id]=Number(e.moldTargets[id]||0));
+    else if(e?.round===currentRound()&&e.value){const legacyId=e.moldId||'molde_1';moldTargets[legacyId]=Number(e.value||0);}
+    return decisionDrafts[item.id]={moldTargets};
+  }
   if(item.type==='number')return decisionDrafts[item.id]={value:Number(e?.round===currentRound()?e.value:0)};
+  if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:e?.round===currentRound()?(e.optionIds||[]):[]};
   if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(e?.round===currentRound()?e.amount:0)};
   if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(e?.round===currentRound()?e.staff:{})};
   if(item.id==='CANALES'){
@@ -180,7 +236,7 @@ function selectedOptionIds(item){return initDraft(item).optionIds||[]}
 function analystSelected(){const item=findDecisionItem('ANALISTA_COMPRAS');return selectedOptionIds(item).includes('si_analista')}
 function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound()-1)*2):0}
 function optionUnitCost(item,opt){const base=Number(opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
-function currentProductionTarget(){return Number(initDraft(findDecisionItem('PRODUCCION_META')).value||0)}
+function currentProductionTarget(){return Object.values(initDraft(findDecisionItem('PRODUCCION_META')).moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)}
 function productionPlan(){return window.SIDE_PRODUCTION_MODEL.calculate(decisionModelContext())}
 function materialYieldLabel(itemId,optionId){
   const amount=window.SIDE_PRODUCTION_MODEL.yieldFor(itemId,optionId),unit=window.SIDE_PRODUCTION_MODEL.materialUnit(itemId);
@@ -304,10 +360,25 @@ function optionCommitRemaining(item,optId){
   return Math.max(0,Number(opt.minCommitCycles)-(currentRound()-Number(firstRound)));
 }
 
+function historicalQuantities(){
+  const out={};
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i); if(!key?.startsWith(`SIDE_DECISION_RECEIPTS_${storageKey()}_`))continue;
+    try{const receipt=JSON.parse(localStorage.getItem(key)||'{}')||{};for(const section of Object.values(receipt))for(const item of section?.items||[]){
+      if(!['quantity','quantity-choice'].includes(item.type)||item.asset)continue;
+      const dst=out[item.id]||(out[item.id]={});
+      for(const row of item.rows||[])if(row.quantity!=null){
+        const label=String(row.label||''); const def=findDecisionItem(item.id); const opt=def?.options?.find(o=>o.label===label); if(opt)dst[opt.id]=(dst[opt.id]||0)+Number(row.quantity)||0;
+      }
+    }}catch{}
+  }
+  return out;
+}
 function decisionModelContext(){
   const drafts={};allDecisionItems().forEach(item=>{drafts[item.id]=deepClone(initDraft(item))});
-  return {catalog:DECISION_CATALOG,state:decisionState,drafts,round:currentRound(),config:teacherConfig(),rules:RULES,
-    capital:initialCapital(),ledger:cashLedger,workingDays:WORKING_DAYS_PER_MONTH,severanceRate:SEVERANCE_RATE,liquidationRate:LIQUIDATION_RATE_DEFAULT};
+  return {catalog:DECISION_CATALOG,state:decisionState,drafts: drafts,round:currentRound(),config:teacherConfig(),rules:RULES,
+    capital:initialCapital(),ledger:cashLedger,workingDays:WORKING_DAYS_PER_MONTH,severanceRate:SEVERANCE_RATE,liquidationRate:LIQUIDATION_RATE_DEFAULT,
+    creditOutstanding:creditOutstanding(),creditApprovedLine:creditApprovedLine(),creditAvailable:creditAvailable(),historyQuantities:historicalQuantities()};
 }
 function computeItemCost(item){
   const detail=window.SIDE_REVIEW_MODEL.breakdown(item,decisionModelContext());
@@ -322,13 +393,13 @@ function categoryDraftNet(cat){
 function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0);return initialCapital()+ledgerTotal()-old+categoryDraftNet(currentCategory)}
 
 function openDecisionMenu(){
-  loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||DECISION_CATALOG[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
+  loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
   renderTabs(); renderDecisionCategory(); updateHud(); syncStudentReportPreview();
   const stage=$('decisionMenu'); stage.onscroll=()=>{$('decisionTopbar')?.classList.toggle('compact',stage.scrollTop>70);$('decisionStickyHead')?.classList.toggle('compact',stage.scrollTop>135)};
 }
 function renderTabs(){
   const nav=$('decisionTabs');
-  nav.innerHTML=DECISION_CATALOG.map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span>${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
+  nav.innerHTML=navigationCategories().map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span>${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
   nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;renderTabs();renderDecisionCategory()}));
 }
 function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
@@ -336,6 +407,7 @@ function draftItemComplete(item){
   if(item.type==='info')return true;
   if(item.lockAfterPurchase&&itemComplete(item))return true;
   const d=initDraft(item);
+  if(item.type==='production-plan')return Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)>=Number(item.min||0);
   if(item.type==='number')return d.value!==''&&Number(d.value)>=Number(item.min||0);
   if(item.type==='loan')return d.amount!==undefined;
   if(item.type==='sales-staff')return true;
@@ -358,22 +430,13 @@ function stationStats(itemId){
   });
   return {count,capacity,buying};
 }
-function productionFlowHtml(){
-  const plan=productionPlan(),target=plan.target;
-  const provItem=findDecisionItem('GARANTIA_PROV'),ptItem=findDecisionItem('GARANTIA_PT');
-  const provOpt=(provItem?.options||[]).find(o=>selectedOptionIds(provItem).includes(o.id));
-  const ptOpt=(ptItem?.options||[]).find(o=>selectedOptionIds(ptItem).includes(o.id));
-  return `<div class="production-flow">
-    ${plan.hasLeadership?`<div class="flow-jefe"><span>👤 JEFE DE PRODUCCIÓN</span><small>+4 puntos porcentuales de eficiencia este ciclo</small></div>`:''}
-    <div class="flow-header"><span>PLAN DE PRODUCCIÓN · CORTE → ENSAMBLADO → ACABADO</span><small>Capacidad calculada como en el Excel: personal emparejado con equipos, 30 días por ciclo y eficiencia de la línea.</small></div>
-    <div class="flow-line">${plan.processes.map((process,i)=>`<div class="flow-node"><b>${escapeHtml(process.label)}</b><strong>${process.plannedUnits.toLocaleString('es-PE')} u.</strong><small>deben pasar por este proceso</small><em>${process.staff} trabajador(es) · ${process.machines} equipo(s)</em><span class="flow-cap">Capacidad: ${process.cycleCapacity.toLocaleString('es-PE')} u./ciclo</span></div>${i<plan.processes.length-1?'<div class="flow-arrow">→</div>':''}`).join('')}</div>
-    <div class="flow-totals">
-      <div><span>META DEL CICLO</span><strong>${target.toLocaleString('es-PE')} u.</strong><small>Volumen elegido por la empresa</small></div>
-      <div><span>CAPACIDAD DEL CUELLO DE BOTELLA</span><strong>${plan.processCapacity.toLocaleString('es-PE')} u.</strong><small>${escapeHtml(plan.limitingProcesses.join(' y ')||'Sin línea instalada')}</small></div>
-      <div><span>PRODUCCIÓN POSIBLE</span><strong class="${plan.productionGap?'over':''}">${plan.producibleUnits.toLocaleString('es-PE')} u.</strong><small>${plan.productionGap?`Faltan ${plan.productionGap.toLocaleString('es-PE')} u. por capacidad o insumos`:'La meta puede completarse'}</small></div>
-    </div>
-    ${(provOpt||ptOpt)?`<div class="flow-garantias"><span>GARANTÍAS</span>${provOpt?`<b>Proveedores: ${escapeHtml(provOpt.label)}</b>`:''}${ptOpt?`<b>Producto terminado: ${escapeHtml(ptOpt.label)}</b>`:''}</div>`:''}
-  </div>`;
+function productionDopHtml(plan=productionPlan(),compact=false){
+  const operations=plan.dop.filter(step=>step.type==='operation').length,inspections=plan.dop.length-operations;
+  return `<section class="production-dop ${compact?'dop-compact':''}" aria-labelledby="productionDopTitle">
+    <header class="dop-heading"><div><span>DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Flujo productivo de marroquinería</h3><p>Convención de ingeniería industrial: círculo = operación; cuadrado = inspección.</p></div><div class="dop-legend"><b><i class="dop-symbol operation" aria-hidden="true"></i> Operación</b><b><i class="dop-symbol inspection" aria-hidden="true"></i> Inspección</b></div></header>
+    <div class="dop-layout"><ol class="dop-sequence">${plan.dop.map(step=>`<li class="dop-step"><span class="dop-index">${step.sequence}</span><i class="dop-symbol ${step.type}" aria-hidden="true"></i><div><strong>${escapeHtml(step.label)}</strong><small>${step.units.toLocaleString('es-PE')} unidades posibles en el ciclo</small></div></li>`).join('')}<li class="dop-output"><span>PT</span><strong>Producto terminado</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} unidades</small></li></ol>
+    <aside class="dop-summary"><div><span>Operaciones</span><strong>${operations}</strong></div><div><span>Inspecciones</span><strong>${inspections}</strong></div><div><span>Meta total</span><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div><div><span>Producción posible</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} u.</strong></div><p>El DOP representa operaciones e inspecciones principales; transporte, demora y almacenamiento no forman parte de este tipo de diagrama.</p></aside></div>
+  </section>`;
 }
 function renderDecisionCategory(){
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
@@ -381,10 +444,10 @@ function renderDecisionCategory(){
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
   let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
-  if(cat.cat==='C')lead+=productionFlowHtml();
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
-  $('decisionCards').innerHTML=lead+cardItems.map(renderDecisionRow).join('')+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
+  const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+productionDopHtml()+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
+  $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer();
 }
@@ -393,24 +456,30 @@ function renderDecisionRow(item){
   let body='';
   if(item.id==='CANALES'){
     body=renderChannelChoices(item,locked);
+  } else if(item.id==='MOLDE'){
+    const owned=ownedMolds(),ownedIds=owned.map(x=>x.id),selected=(d.optionIds||[])[0]||'';
+    body=`<div class="choice-strip radio-options">${item.options.map(o=>{const already=ownedIds.includes(o.id),isSelected=selected===o.id&&!already;const disabled=locked||already;return `<label class="choice-pill ${isSelected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="radio" name="decision-${item.id}" ${isSelected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${already?'<span class="owned-badge">YA TIENES ESTE MOLDE · NO SE VUELVE A COMPRAR</span>':isSelected?'<span class="buying-badge">MOLDE ELEGIDO EN INFRAESTRUCTURA</span>':''}</label>`}).join('')}</div><div class="mandatory-note">Por reglamento debes adquirir al menos un molde antes de enviar el ciclo. Los moldes comprados permanecen disponibles y cada tipo se paga una sola vez.</div><div class="mold-owned-list"><strong>MOLDES DISPONIBLES</strong>${owned.length?owned.map(x=>{const o=item.options.find(v=>v.id===x.id);return `<span>${escapeHtml(o?.label||x.id)}</span>`}).join(''):'<span>Ninguno de ciclos anteriores</span>'}${selected?`<span>Elegido ahora: ${escapeHtml(item.options.find(o=>o.id===selected)?.label||selected)}</span>`:''}</div>`;
   } else if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
     body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
+  } else if(item.type==='production-plan'){
+    const plan=productionPlan();
+    body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
   } else if(item.type==='number'){
     const plan=productionPlan();body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima para la meta · ${escapeHtml(plan.moldLabel)}</span>${plan.materials.map(material=>`<b>${escapeHtml(material.label)}: ${material.neededForTarget.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</b>`).join('')}<small>La compra se convierte según su presentación: rollo, piel, juego o carrete.</small></div>`;
   } else if(item.type==='sales-staff'){
     body=`<div class="info-decision"><strong>Personal automático por tienda</strong><p>Se asigna 1 vendedor básico a cada tienda física. La comisión es 1% de las ventas.</p></div>`;
   } else if(item.type==='loan'){
-    const rate=Number(teacherConfig().interest??20),max=loanMaximum(),amount=Math.min(max,Number(d.amount||0));body=`<div class="loan-box"><div><span>TEA INICIAL DEFINIDA POR EL DOCENTE</span><strong>${rate.toFixed(1)}%</strong></div><div><span>LÍMITE AUTOMÁTICO</span><strong>${money(max)}</strong><small>${LOAN_MAX_PERCENT}% de tu caja inicial</small></div><div><span>REFERENCIA INICIAL</span><strong>${money(loanInitialReference())}</strong><small>${LOAN_INITIAL_PERCENT}% de tu caja inicial</small></div></div><div class="loan-control"><input data-loan="${item.id}" type="range" min="0" max="${max}" step="500" value="${amount}"><input data-loan-number="${item.id}" type="number" min="0" max="${max}" step="500" value="${amount}"><b>${money(amount)}</b></div><div class="micro-caption">El préstamo es opcional y no suma al progreso obligatorio.</div>`;
+    const rate=Number(teacherConfig().interest??20),approved=creditApprovedLine(),available=creditAvailable(),amount=Math.min(available,Number(d.amount||0)),afterRequest=Math.max(0,available-amount);body=`<div class="loan-box"><div><span>TEA</span><strong>${rate.toFixed(1)}%</strong><small>Condición definida por el docente</small></div><div><span>LÍNEA APROBADA</span><strong>${money(approved)}</strong><small>${currentRound()===1?'70% de la caja inicial':'Se actualiza según caja y activos'}</small></div><div><span>LÍNEA DISPONIBLE</span><strong>${money(afterRequest)}</strong><small>Después de esta solicitud</small></div></div><div class="loan-control"><input data-loan="${item.id}" type="range" min="0" max="${available}" step="500" value="${amount}"><input data-loan-number="${item.id}" type="number" min="0" max="${available}" step="500" value="${amount}"><b>${money(amount)}</b></div><div class="micro-caption">La línea inicia en 70% de la caja. Al avanzar los ciclos puede aumentar o disminuir según la caja y los activos. Lo utilizado reduce la línea disponible.</div>`;
   } else if(item.type==='info'){
     let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
-document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
+document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty], [data-mold-target]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 function bindDecisionControls(){
   document.querySelectorAll('[data-choice]').forEach(input=>{
     input.addEventListener('click',event=>{
@@ -447,6 +516,18 @@ function bindDecisionControls(){
   });
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
   document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item),floor=item.asset?-getOwned(item,i.dataset.option):0;d.quantities[i.dataset.option]=Math.max(floor,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
+  document.querySelectorAll('[data-mold-step]').forEach(button=>button.addEventListener('click',()=>{
+    if(decisionEditingBlocked())return;const item=findDecisionItem('PRODUCCION_META'),d=initDraft(item),id=button.dataset.moldStep;
+    d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
+  }));
+  document.querySelectorAll('[data-mold-target]').forEach(input=>{
+    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();updateHud();});
+    input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META')),id=input.dataset.moldTarget;d.moldTargets[id]=Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();renderDecisionCategory();});
+  });
+  document.querySelectorAll('[data-mold-suggest]').forEach(button=>button.addEventListener('click',()=>{
+    if(decisionEditingBlocked())return;const id=button.dataset.moldSuggest,line=productionPlan().productLines.find(entry=>entry.id===id),d=initDraft(findDecisionItem('PRODUCCION_META'));
+    d.moldTargets[id]=Number(line?.suggested||0);persistCurrentDraftOnly();renderDecisionCategory();
+  }));
   document.querySelectorAll('[data-number-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(b.dataset.numberStep),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(d.value||0)+Number(b.dataset.delta));persistCurrentDraftOnly();renderDecisionCategory()}));
   document.querySelectorAll('[data-number]').forEach(i=>{
     i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.number),d=initDraft(item);const raw=i.value;d.value=raw===''?'':Math.max(Number(item.min||0),Number(raw)||0);persistCurrentDraftOnly();updateSectionCost();});
@@ -488,7 +569,18 @@ function warnProductionMaterialShortage(){
   const detail=shortages.map(x=>`${x.item.name}: faltan ${x.missing.toLocaleString('es-PE')} ${x.unit}`).join(' · ');
   toast(`Advertencia: tu producción supera los insumos comprados. ${detail}. Puedes continuar.`);
 }
-function validateRequiredSection(cat){for(const item of cat.items){if(!itemRequired(item)||item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))continue;const d=initDraft(item);if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}}return true}
+function validateRequiredSection(cat){
+  for(const item of cat.items){
+    if(!itemRequired(item)||item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))continue;
+    const d=initDraft(item);
+    if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}
+    if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}
+    if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}
+    if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}
+    if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}
+  }
+  return true;
+}
 // Build entries before changing state so totals and severance are stable on re-save.
 function prepareSectionSave(cat,context=decisionModelContext()){
   const entries={},round=context.round,model=window.SIDE_REVIEW_MODEL.section(cat,context);
@@ -505,9 +597,22 @@ function prepareSectionSave(cat,context=decisionModelContext()){
       if(item.severanceEligible)entries[item.id].previousQuantities=deepClone(Number(prev?.round)===round?prev?.previousQuantities||{}:prev?.quantities||{});
       return;
     }
+    if(item.type==='production-plan'){
+      const moldTargets=Object.fromEntries(Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Math.max(0,Math.trunc(Number(value)||0))]));
+      const value=Object.values(moldTargets).reduce((total,target)=>total+target,0);
+      entries[item.id]={...common,moldTargets,value,label:`Producción deseada: ${value} unidades`};return;
+    }
     if(item.type==='number'){entries[item.id]={...common,value:Number(d.value||0),label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`};return;}
     if(item.type==='sales-staff'){entries[item.id]={...common,staff:deepClone(d.staff||{})};return;}
-    if(item.type==='loan'){entries[item.id]={...common,amount:Number(d.amount||0),label:`Prestamo: ${money(d.amount||0)}`};return;}
+    if(item.type==='loan'){entries[item.id]={...common,amount:Number(d.amount||0),label:`Línea de crédito utilizada: ${money(d.amount||0)}`};return;}
+    if(item.id==='MOLDE'){
+      const chosen=(d.optionIds||[]).find(id=>item.options.some(o=>o.id===id)&&!ownedMolds().some(x=>x.id===id))||null;
+      const purchases=deepClone(prev?.purchases||{});
+      delete purchases[round];
+      if(chosen)purchases[round]={[chosen]:1};
+      entries[item.id]={...common,optionIds:chosen?[chosen]:[],optionRounds:{...(prev?.optionRounds||{}),...(chosen?{[chosen]:round}:{})},purchases,label:chosen?item.options.find(o=>o.id===chosen)?.label:(prev?.label||'Sin compra nueva')};
+      return;
+    }
     const optionRounds={};(d.optionIds||[]).forEach(id=>{optionRounds[id]=prev?.optionRounds?.[id]??round});
     if(item.id==='CANALES'){
       const quantities={},storeContracts={};
@@ -534,7 +639,7 @@ function writeDecisionBatch(writes){
 function saveCurrentSection(){
   if(decisionEditingBlocked())return false;
   const cat=categoryByCat(currentCategory);if(!cat)return false;
-  if(currentCategory==='D'&&!validateChannelQuantities())return false;
+  if(currentCategory==='D'&&(!validateChannelQuantities()||!validateRequiredSection(cat)))return false;
   const context=decisionModelContext();let plan;
   try{plan=prepareSectionSave(cat,context);}catch(error){toast(error.message);return false;}
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0);
@@ -610,7 +715,7 @@ function syncStudentReportPreview(){
   applyEventCashEffects();
   const entries=allDecisionItems().filter(i=>savedEntry(i));
   const costsBase=Object.entries(cashLedger).reduce((s,[k,n])=>s+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,-Number(n||0))),0);
-  const loans=Object.entries(cashLedger).reduce((s,[k,n])=>s+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,Number(n||0))),0);
+  const loans=creditOutstanding();
   const simRevenue=Number(cashLedger[`${currentRound()}:SIM_VENTAS`]||0);
   const adjusted=eventAdjustedFinancials(simRevenue,costsBase);
   const eventCash=Object.entries(cashLedger).filter(([k])=>k.includes(':EVENT:')).reduce((s,[,n])=>s+Number(n||0),0);
@@ -630,7 +735,7 @@ function syncStudentReportPreview(){
     decisiones:currentDecisionLabels(),apartados:categoryCompletionMap(),progreso:decisionProgressPercent(),enviado:decisionsSubmitted(),
     eventos:events.map(e=>({id:e.id,titulo:e.title,descripcion:e.description,afectados:e.scope==='group'?'Todos':'Empresa individual',ciclos:e.cycles,cicloAfecta:(Number(e.cycleOffset||0)===0?'+0 · mismo ciclo':Number(e.cycleOffset||0)===1?'+1 · siguiente ciclo':`+${Number(e.cycleOffset||0)} · después de ${Number(e.cycleOffset||0)} ciclos`),implicancia:e.implication,ocurrencia:e.probability})),
     estadoResultados:{ingresos:adjusted.revenue,costos:adjusted.costs,impactoEventos:eventImpact,utilidad},
-    balanceCaja:{cajaInicial:initialCapital(),prestamos:loans,cajaFinal},
+    balanceCaja:{cajaInicial:initialCapital(),prestamos:creditOutstanding(),cajaFinal},
     flujoCaja:{operacion:adjusted.revenue-adjusted.costs,financiamiento:loans,eventos:eventImpact,flujoNeto:flujo},
     score:Math.max(0,Math.round(utilidad/100+decisionProgressPercent())),estado:'activa',tomandoDecisiones:playerIsDeciding,caja:cajaFinal,updatedAt:new Date().toISOString()
   };
@@ -659,11 +764,11 @@ $('topSubmitAllDecisions')?.addEventListener('click',submitAllDecisions);
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function readRoundRuntime(){try{return JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'null')}catch{return null}}
 function syncStudentTimer(){const r=readRoundRuntime(),conf=teacherConfig(),configuredDuration=Number(conf.roundHours||0)*3600+Number(conf.roundMinutes||0)*60+Number(conf.roundSecs||0);let remain=Number(r?.remaining??configuredDuration),note='Esperando inicio del docente';if(r?.running&&r.startedAt){const duration=Number(r.duration||configuredDuration||remain);remain=Math.max(0,duration-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));note=remain>0?'Ciclo en curso':'Tiempo finalizado'}else if(r?.status==='scheduled'){const wait=Math.max(0,Math.floor((new Date(r.scheduledStart).getTime()-Date.now())/1000));note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente'}else if(r?.status==='finished')note='Tiempo finalizado';else if(r?.status==='simulation-finished')note='Simulación finalizada';const text=formatStudentTime(remain);if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;if($('studentCycleLabel'))$('studentCycleLabel').textContent=`Ciclo ${r?.round||currentRound()} / ${conf.cycles||6}`;if($('studentTimerNote'))$('studentTimerNote').textContent=note}
-function renderStudentStatus(){if(!$('studentCashResult'))return;applyEventCashEffects();const events=activeStudentEvents(),simRevenue=Number(cashLedger[`${currentRound()}:SIM_VENTAS`]||0),baseCosts=Object.entries(cashLedger).reduce((a,[k,n])=>a+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,-Number(n||0))),0),adjusted=eventAdjustedFinancials(simRevenue,baseCosts),eventCash=Object.entries(cashLedger).filter(([k])=>k.includes(':EVENT:')).reduce((a,[,n])=>a+Number(n||0),0),pctImpact=(adjusted.revenue-simRevenue)-(adjusted.costs-baseCosts),eventImpact=eventCash+pctImpact,profit=adjusted.revenue-adjusted.costs+eventCash,flow=ledgerTotal()+pctImpact,loans=Object.entries(cashLedger).reduce((a,[k,n])=>a+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,Number(n||0))),0);$('studentIncomeResult').textContent=money(profit);$('studentCashResult').textContent=money(cashBalance()+pctImpact);$('studentFlowResult').textContent=(flow>=0?'+':'−')+money(Math.abs(flow));const set=(id,val)=>{if($(id))$(id).textContent=money(val)};set('studentERIngresos',adjusted.revenue);set('studentERCostos',adjusted.costs);set('studentEREventos',eventImpact);set('studentERUtilidad',profit);set('studentBCInicial',initialCapital());set('studentBCPrestamos',loans);set('studentBCFinal',cashBalance()+pctImpact);set('studentFCOperacion',adjusted.revenue-adjusted.costs);set('studentFCFinanciamiento',loans);set('studentFCEventos',eventImpact);set('studentFCNeto',flow);if($('studentEventImpactText'))$('studentEventImpactText').textContent=events.length?`Impacto del ciclo: ${events.map(e=>e.title+' — '+e.implication).join(' · ')}`:'Sin impacto de eventos activo en este ciclo.';const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>${e.scope==='group'?'GRUPAL · todos':'INDIVIDUAL · prob. '+e.probability+'%'} · duración ${e.cycles} ciclo(s)</small></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>'}
+function renderStudentStatus(){if(!$('studentCashResult'))return;applyEventCashEffects();const events=activeStudentEvents(),simRevenue=Number(cashLedger[`${currentRound()}:SIM_VENTAS`]||0),baseCosts=Object.entries(cashLedger).reduce((a,[k,n])=>a+(k.includes('SIM_VENTAS')||k.includes(':EVENT:')?0:Math.max(0,-Number(n||0))),0),adjusted=eventAdjustedFinancials(simRevenue,baseCosts),eventCash=Object.entries(cashLedger).filter(([k])=>k.includes(':EVENT:')).reduce((a,[,n])=>a+Number(n||0),0),pctImpact=(adjusted.revenue-simRevenue)-(adjusted.costs-baseCosts),eventImpact=eventCash+pctImpact,profit=adjusted.revenue-adjusted.costs+eventCash,flow=ledgerTotal()+pctImpact,loans=creditOutstanding();$('studentIncomeResult').textContent=money(profit);$('studentCashResult').textContent=money(cashBalance()+pctImpact);$('studentFlowResult').textContent=(flow>=0?'+':'−')+money(Math.abs(flow));const set=(id,val)=>{if($(id))$(id).textContent=money(val)};set('studentERIngresos',adjusted.revenue);set('studentERCostos',adjusted.costs);set('studentEREventos',eventImpact);set('studentERUtilidad',profit);set('studentBCInicial',initialCapital());set('studentBCPrestamos',loans);set('studentBCFinal',cashBalance()+pctImpact);set('studentFCOperacion',adjusted.revenue-adjusted.costs);set('studentFCFinanciamiento',loans);set('studentFCEventos',eventImpact);set('studentFCNeto',flow);if($('studentEventImpactText'))$('studentEventImpactText').textContent=events.length?`Impacto del ciclo: ${events.map(e=>e.title+' — '+e.implication).join(' · ')}`:'Sin impacto de eventos activo en este ciclo.';const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>${e.scope==='group'?'GRUPAL · todos':'INDIVIDUAL · prob. '+e.probability+'%'} · duración ${e.cycles} ciclo(s)</small></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>'}
 let lastObservedRound=currentRound();
 setInterval(()=>{
   const round=currentRound();
-  if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
+  if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;currentCategory=round>1?'A':navigationCategories()[0]?.cat;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
   syncStudentTimer();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();
 },1000);
 

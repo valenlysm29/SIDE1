@@ -1,0 +1,878 @@
+/* =========================================================
+   SIDE · CAPA RESPONSIVE GLOBAL · 08/09/2026
+   Se carga al final para armonizar las vistas del estudiante,
+   el tutorial, el simulador 3D y el panel docente.
+   ========================================================= */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 0;
+}
+
+img,
+svg,
+canvas,
+video,
+iframe {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea,
+.content,
+.card,
+.decision-window,
+.decision-detail,
+.company-summary,
+.cs-review-dialog,
+.modal-panel {
+  min-width: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+label,
+button,
+span,
+strong,
+small {
+  overflow-wrap: break-word;
+}
+
+.table-wrap,
+.event-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Portatiles y tablets horizontales */
+@media (max-width: 1180px) {
+  .dashboard-inner,
+  .decision-game-stage,
+  #decisionMenu .tabbed-stage {
+    width: min(100% - 32px, 1050px);
+  }
+
+  .dashboard-card,
+  .lobby-card,
+  .card,
+  .company-summary {
+    max-width: 100%;
+  }
+
+  .sim3d-hud {
+    padding: 14px;
+  }
+
+  .sim3d-top {
+    gap: 10px;
+  }
+}
+
+/* Tablets verticales y telefonos grandes */
+@media (max-width: 820px) {
+  .screen:not(.simulator-screen):not(.simulation-loading-screen) {
+    min-height: 100svh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .landing-content,
+  .profile-main,
+  .dashboard-inner,
+  #decisionMenu .tabbed-stage {
+    width: min(100% - 24px, 720px);
+  }
+
+  .profile-screen {
+    align-items: flex-start;
+    padding: max(24px, env(safe-area-inset-top)) 12px max(86px, env(safe-area-inset-bottom));
+  }
+
+  .profile-main {
+    margin: auto;
+  }
+
+  .student-hero {
+    padding-inline: clamp(16px, 5vw, 30px);
+  }
+
+  .teacher-mini {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .modal-root,
+  .modal,
+  .sim-admin,
+  .sim-checkout,
+  .sim-product-inspect,
+  .sim3d-start,
+  .sim3d-summary {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .student-join-modal,
+  .modal-panel,
+  .sim-admin-card,
+  .sim-product-card,
+  .sim-checkout-card,
+  .sim3d-start-card,
+  .sim3d-summary-card {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Tutorial: la lamina se adapta a la altura disponible. */
+  .tutorial-screen {
+    align-items: flex-start;
+  }
+
+  .tutorial-shell {
+    width: min(100% - 20px, 720px);
+    min-height: 100svh;
+    padding: max(12px, env(safe-area-inset-top)) 0 max(12px, env(safe-area-inset-bottom));
+  }
+
+  .tutorial-carousel,
+  .tutorial-viewport,
+  .tutorial-track {
+    min-width: 0;
+  }
+
+  .tutorial-slide {
+    min-height: min(540px, calc(100dvh - 170px));
+    height: auto;
+  }
+
+  .tutorial-art-wrap {
+    width: min(220px, 52vw);
+  }
+
+  .tutorial-copy h2,
+  .tutorial-intro h1 {
+    font-size: clamp(25px, 7vw, 36px);
+  }
+
+  .tutorial-copy p,
+  .tutorial-intro p {
+    font-size: clamp(14px, 2.4vw, 16px);
+  }
+
+  /* Panel docente: navegacion visible y desplazable sin ampliar la pagina. */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .sidebar .brand {
+    padding: 0 4px 9px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    gap: 6px;
+    max-width: 100%;
+    padding-bottom: 3px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .sidebar .nav-btn {
+    flex: 0 0 auto;
+    min-height: 48px;
+    padding: 7px 10px;
+    scroll-snap-align: start;
+  }
+
+  .content {
+    padding: 20px clamp(12px, 3.5vw, 24px) max(50px, env(safe-area-inset-bottom));
+  }
+
+  .top-actions {
+    width: 100%;
+  }
+
+  .top-actions > * {
+    flex: 1 1 180px;
+    min-height: 44px;
+  }
+
+  .hero-card {
+    align-items: flex-start;
+  }
+
+  .event-entry,
+  .mode-row,
+  .card-title {
+    flex-wrap: wrap;
+  }
+
+  .modal-panel {
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
+    padding: 16px;
+  }
+
+  /* Simulador: el HUD no tapa el area central en tablet o movil. */
+  .sim3d-hud {
+    padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+
+  .sim3d-top {
+    display: block;
+  }
+
+  .sim3d-stats {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sim3d-stat {
+    min-width: 0;
+    padding: 8px 7px;
+  }
+
+  .sim3d-stat:nth-child(5) {
+    border-left: 0;
+  }
+
+  .sim3d-actionbar {
+    top: auto;
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: max(10px, env(safe-area-inset-left));
+    justify-content: flex-end;
+    max-width: none;
+  }
+
+  .sim3d-btn {
+    min-height: 44px;
+  }
+
+  .sim3d-bottom {
+    padding-bottom: 54px;
+  }
+
+  .sim3d-objective {
+    max-width: min(100%, 430px);
+  }
+
+  .cs-review-dialog {
+    width: calc(100vw - 20px);
+    height: calc(100dvh - 20px);
+  }
+}
+
+/* Telefonos */
+@media (max-width: 600px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  button,
+  [role="button"],
+  summary,
+  .nav-btn,
+  .tutorial-dot {
+    touch-action: manipulation;
+  }
+
+  .landing-content {
+    padding-bottom: max(4vh, env(safe-area-inset-bottom));
+  }
+
+  .loading-track {
+    height: 46px;
+  }
+
+  .profile-side-logo {
+    width: min(235px, 68vw);
+  }
+
+  .profile-subtitle {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .student-hero {
+    border-radius: 22px;
+  }
+
+  .teacher-mini-copy .mini-cta {
+    display: none;
+  }
+
+  .modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+    padding: 26px 16px 20px;
+  }
+
+  .dashboard-top,
+  .game-row,
+  .card-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dashboard-card,
+  .lobby-card,
+  .card,
+  .hero-card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  #studentLobby .lobby-card {
+    width: 100%;
+  }
+
+  #studentLobby .lobby-actions,
+  #studentLobby .lobby-secondary-actions {
+    width: 100%;
+  }
+
+  #studentLobby .lobby-actions > *,
+  #studentLobby .lobby-secondary-actions > * {
+    width: 100%;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hero-orb {
+    width: 68px;
+    height: 68px;
+    align-self: center;
+  }
+
+  .value-row,
+  .value-row-3,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-actions > * {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .event-entry {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .podium {
+    gap: 5px;
+    min-height: 220px;
+    padding: 12px 0 0;
+  }
+
+  .podium-place {
+    width: 33.333%;
+    min-width: 0;
+    padding-inline: 4px;
+  }
+
+  .podium-place strong {
+    font-size: 12px;
+  }
+
+  .toast {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: max(10px, env(safe-area-inset-left));
+    text-align: center;
+  }
+
+  .tutorial-top {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .tutorial-brand span {
+    display: none;
+  }
+
+  .tutorial-required {
+    font-size: 10px;
+    padding: 7px 9px;
+  }
+
+  .tutorial-slide {
+    min-height: min(500px, calc(100dvh - 155px));
+    padding: 22px 18px 24px;
+  }
+
+  .tutorial-intro {
+    padding-inline: 18px;
+  }
+
+  .tutorial-intro-logo {
+    width: min(185px, 58vw);
+    margin-bottom: 10px;
+  }
+
+  .tutorial-hints {
+    gap: 6px;
+  }
+
+  .tutorial-hints span {
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  .tutorial-question {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .tutorial-bottom {
+    padding-top: 10px;
+  }
+
+  .tutorial-continue {
+    min-height: 48px;
+  }
+
+  /* Decisiones: textos y controles fluidos, sin columnas forzadas. */
+  #decisionMenu .decision-window {
+    border-radius: 14px;
+  }
+
+  #decisionMenu .decision-tabs {
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  #decisionMenu .decision-tab {
+    flex: 0 0 min(145px, 45vw);
+    scroll-snap-align: start;
+  }
+
+  #decisionMenu .sticky-section-head {
+    align-items: flex-start;
+  }
+
+  #decisionMenu .decision-row,
+  #decisionMenu .company-summary {
+    padding-inline: 12px;
+  }
+
+  #decisionMenu .quantity-option,
+  #decisionMenu .number-decision,
+  #decisionMenu .store-totals,
+  #decisionMenu .cs-main-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #decisionMenu .number-decision input,
+  #decisionMenu .number-decision button {
+    width: 100%;
+  }
+
+  #decisionMenu .stepper {
+    width: 100%;
+  }
+
+  #decisionMenu .stepper input {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  #decisionMenu .stepper button {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+  #decisionMenu .section-save-bar {
+    bottom: 0;
+    margin-inline: -2px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  #decisionMenu .decision-action-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-heading,
+  .cs-dialog-heading,
+  .cs-main-actions,
+  .cs-dialog-footer {
+    flex-direction: column;
+  }
+
+  .cs-progress {
+    text-align: left;
+  }
+
+  .cs-filters {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cs-production-kpis,
+  .cs-financial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-detail-row {
+    flex-direction: column;
+  }
+
+  .cs-row-money {
+    max-width: 100%;
+    text-align: left;
+  }
+
+  .cs-dialog-heading,
+  .cs-dialog-body,
+  .cs-dialog-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cs-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .cs-dialog-heading > div:first-child {
+    padding-right: 44px;
+  }
+
+  .cs-dialog-footer > div,
+  .cs-dialog-footer button {
+    width: 100%;
+  }
+
+  .sim3d-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim3d-stat:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .sim3d-stat span {
+    font-size: 8px;
+    letter-spacing: .5px;
+  }
+
+  .sim3d-stat strong {
+    font-size: 12px;
+  }
+
+  .sim3d-objective {
+    padding: 9px 10px;
+  }
+
+  .sim3d-objective p {
+    display: none;
+  }
+
+  .sim3d-start-card,
+  .sim3d-summary-card,
+  .sim-checkout-card,
+  .sim-product-card {
+    width: calc(100vw - 24px);
+    padding: 18px 15px;
+    border-radius: 17px;
+  }
+
+  .sim3d-summary-actions,
+  .sim-checkout-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .sim3d-summary-actions button,
+  .sim-checkout-actions button {
+    width: 100%;
+  }
+}
+
+/* Telefonos muy estrechos */
+@media (max-width: 380px) {
+  .landing-content,
+  .profile-main,
+  .dashboard-inner,
+  #decisionMenu .tabbed-stage,
+  .tutorial-shell {
+    width: calc(100% - 16px);
+  }
+
+  .upch-corner {
+    width: 64px;
+    height: 64px;
+  }
+
+  .hero-eyebrow {
+    font-size: 18px;
+    letter-spacing: 1.5px;
+  }
+
+  .hero-cta {
+    width: 100%;
+    justify-content: center;
+    padding-inline: 12px;
+    font-size: 15px;
+  }
+
+  .teacher-mini {
+    padding-right: 7px;
+  }
+
+  .teacher-mini-copy {
+    display: none;
+  }
+
+  .sidebar .nav-btn span:last-child {
+    font-size: 12px;
+  }
+
+  #decisionMenu .decision-topbar,
+  #decisionMenu .decision-topbar.compact {
+    grid-template-columns: 38px minmax(0, 1fr) 88px;
+    padding-inline: 8px;
+  }
+
+  #decisionMenu .game-title-mark strong {
+    font-size: 15px;
+  }
+
+  #decisionMenu .student-top-timer strong {
+    font-size: 14px;
+  }
+
+  #decisionMenu .detail-heading h1 {
+    font-size: 15px;
+  }
+
+  #decisionMenu .section-balance {
+    min-width: 88px;
+  }
+
+  .cs-section > summary {
+    grid-template-columns: 26px minmax(0, 1fr) 18px;
+  }
+
+  .cs-badge,
+  .cs-section-total {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+/* Moviles en horizontal y pantallas con poca altura */
+@media (max-height: 560px) and (orientation: landscape) {
+  .landing-screen,
+  .profile-screen,
+  .dashboard-screen,
+  .tutorial-screen {
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .landing-content {
+    padding: 80px 0 max(12px, env(safe-area-inset-bottom));
+  }
+
+  .profile-screen {
+    padding-block: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-bottom));
+  }
+
+  .profile-main {
+    width: min(520px, calc(100% - 120px));
+  }
+
+  .profile-side-logo {
+    width: 170px;
+  }
+
+  .profile-subtitle {
+    margin-bottom: 8px;
+  }
+
+  .student-hero {
+    min-height: 0;
+    padding-bottom: 12px;
+  }
+
+  .student-hero-img {
+    width: 110px;
+    margin-top: -12px;
+  }
+
+  .hero-eyebrow {
+    font-size: 17px;
+  }
+
+  .hero-cta {
+    padding-block: 9px;
+  }
+
+  .teacher-mini {
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
+    bottom: auto;
+  }
+
+  .student-join-modal,
+  .modal,
+  .modal-panel,
+  .sim3d-start-card,
+  .sim3d-summary-card,
+  .sim-admin-card,
+  .sim-checkout-card,
+  .sim-product-card {
+    max-height: calc(100dvh - 16px);
+    overflow-y: auto;
+  }
+
+  .tutorial-shell {
+    width: min(94vw, 900px);
+  }
+
+  .tutorial-top,
+  .tutorial-bottom {
+    padding-block: 6px;
+  }
+
+  .tutorial-slide {
+    grid-template-columns: minmax(120px, .55fr) minmax(0, 1fr);
+    min-height: 250px;
+    padding: 16px 56px;
+    text-align: left;
+  }
+
+  .tutorial-intro {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    align-items: center;
+    text-align: left;
+  }
+
+  .tutorial-intro-logo {
+    grid-row: 1 / 5;
+    width: 130px;
+    margin: 0 15px 0 0;
+  }
+
+  .tutorial-intro h1 {
+    font-size: 26px;
+  }
+
+  .tutorial-intro p {
+    margin: 8px 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .tutorial-art-wrap {
+    width: min(165px, 26vw);
+    margin: 0 auto;
+  }
+
+  .tutorial-copy h2 {
+    font-size: 23px;
+  }
+
+  .tutorial-copy p,
+  .tutorial-question {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .tutorial-arrow {
+    top: 50%;
+  }
+
+  .sim3d-hud {
+    padding: 8px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .sim3d-stats {
+    grid-template-columns: repeat(8, minmax(64px, 1fr));
+    overflow-x: auto;
+  }
+
+  .sim3d-stat {
+    padding-block: 6px;
+  }
+
+  .sim3d-bottom,
+  .sim3d-objective {
+    display: none;
+  }
+
+  .sim3d-actionbar {
+    top: auto;
+    bottom: max(8px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Dispositivos tactiles: blancos comodos y sin efectos hover pegados. */
+@media (pointer: coarse) {
+  button,
+  input,
+  select,
+  textarea,
+  summary {
+    min-height: 44px;
+  }
+
+  .option-card:hover,
+  .choice-pill:hover,
+  .category-btn:hover,
+  .card:hover,
+  .student-hero:hover {
+    transform: none;
+  }
+}
+
+/* Evita animaciones intensas si el sistema solicita menos movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}

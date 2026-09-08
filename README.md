@@ -1,9 +1,22 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
-## Entrega actual: v2026.09.07.4
+## Entrega actual: v2026.09.08.2
+
+La entrega del 08/09/2026 incorpora una capa responsive transversal para
+telefonos, tablets, portatiles y escritorios, tanto en orientacion vertical
+como horizontal. Se adaptaron barras fijas, tutorial, formularios, tablas,
+panel docente, resumen de empresa y HUD del simulador 3D; tambien se añadieron
+areas seguras, controles tactiles y compatibilidad con movimiento reducido.
+
+La revisión v2026.09.08.2 añade una calculadora productiva independiente para
+molde básico, mejorado y premium; presenta los insumos requeridos y una
+sugerencia basada en capacidad instalada. Producción y Resumen incorporan un
+DOP con la simbología industrial de operación e inspección. La compra de al
+menos un molde y la selección de un canal de ventas son obligatorias. En el
+primer ciclo Resumen aparece al final; desde el segundo ciclo aparece primero.
 
 La V4 elimina la decisión de segmento de mercado, compacta el calendario
-académico y vincula el resumen con la lógica de producción del Excel. Ahora se
+académico y vincula el resumen con la lógica de producción del juego. Ahora se
 muestran meta, capacidad y unidades posibles en corte, ensamblado y acabado,
 además de la conversión de compras a materia prima y el costo productivo por
 unidad. Comienza por `LEEME_FINAL_V4.txt` y consulta `CAMBIOS_FINAL_V4.md`.
@@ -27,11 +40,8 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Cada estudiante registra su propio nombre legal y nombre comercial al ingresar. No existe una empresa predeterminada.
 
 ## Pestañas del jugador
-1. Resumen
-2. Infraestructura
-3. Producción (RR. HH. + insumos)
-4. Canales y ventas
-5. Inversiones y finanzas
+1. Primer ciclo: Infraestructura, Producción, Canales y ventas, Finanzas, Resumen.
+2. Desde el segundo ciclo: Resumen, Infraestructura, Producción, Canales y ventas, Finanzas.
 
 ## Cambios principales
 - Login del estudiante únicamente con código.
@@ -55,7 +65,7 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - % de ventas a crédito se muestra como dato automático, no como decisión.
 - Garantía de proveedor en 0%, 80% o 100%, sin afectar caja al elegirla.
 - Inversiones y Finanzas combinadas.
-- Préstamo bancario muestra TEA y monto máximo definidos por el docente.
+- Línea de crédito muestra TEA y monto máximo definidos por el docente.
 - Eliminada la decisión de depreciación.
 - Banco central de rutas de iconos en `icon_bank.js`.
 
@@ -70,7 +80,7 @@ Esta versión transforma el módulo de decisiones en una experiencia tipo juego 
 - Eventos no elegibles: solo banco de posibles eventos y ocurrencia aleatoria.
 - Estado de empresa: activo/tomando decisiones o sin actividad reciente.
 - Botón “Guardar e iniciar partida”.
-- La TEA inicial se define en la configuración docente y se muestra en el apartado de préstamos.
+- La TEA inicial se define en la configuración docente y se muestra en el apartado de línea de crédito.
 
 ## Nota técnica
 El proyecto mantiene el modo local con `localStorage` y conserva los puntos de integración con Supabase. Las reglas que dependen de un motor contable completo de ventas/devoluciones se presentan como reglas del juego, mientras que caja, compras, cantidades, préstamo y costos sí se calculan en esta versión.

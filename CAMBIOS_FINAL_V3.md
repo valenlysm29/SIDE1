@@ -19,7 +19,7 @@ sin salida de caja para que las garantías o el segmento no desaparezcan del res
 ## Finanzas sin doble contabilización
 
 Se separan caja actual, desembolso bruto del ciclo, compromisos posteriores y caja
-proyectada al confirmar. Una línea adicional muestra el ajuste pendiente, préstamos
+proyectada al confirmar. Una línea adicional muestra el ajuste pendiente, línea de crédito
 seleccionados e ingresos por liquidación. El desembolso bruto no se resta otra vez
 a la caja que ya incluye borradores guardados. La proyección no es una utilidad,
 no incorpora ventas hipotéticas ni inventa una amortización del préstamo.
@@ -38,7 +38,7 @@ acción explícita y valida las decisiones obligatorias, cantidades, contratos y
 Las advertencias de capacidad e insumos no impiden una decisión arriesgada válida.
 
 El conjunto de gastos y financiamiento se evalúa antes de guardar; no falla por
-procesar compras antes que préstamos. Un cambio de datos o configuración durante
+procesar compras antes que línea de crédito. Un cambio de datos o configuración durante
 la revisión exige verificar la versión actualizada. Las escrituras locales intentan
 revertirse si alguna falla; no se anuncia un éxito cuando se detecta el error.
 Esto no es una transacción distribuida ni una garantía ante cierres del proceso.

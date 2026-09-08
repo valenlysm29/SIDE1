@@ -15,6 +15,10 @@
     const e=ctx.state?.[item.id],same=n(e?.round)===ctx.round;
     if(item.asset)return {quantities:{...(e?.purchases?.[ctx.round]||{})}};
     if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{}};
+    if(item.type==='production-plan'){
+      if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets}};
+      return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{}};
+    }
     if(item.type==='number')return {value:same?n(e?.value):0};
     if(item.type==='loan')return {amount:same?n(e?.amount):0};
     if(item.type==='sales-staff')return {staff:same?{...(e?.staff||{})}:{}};
@@ -24,6 +28,17 @@
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
   function unitCost(item,option,ctx){return n(option.cost)*(item.material?1-discount(ctx)/100:1);}
+  function approvedCreditLine(ctx){
+    if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
+    const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
+      const def=(ctx.catalog||[]).flatMap(c=>c.items||[]).find(i=>i.id===id),purchases=ctx.state?.[id]?.purchases||{};
+      return total+(def?.options||[]).reduce((sumOpt,opt)=>sumOpt+Math.max(0,Object.values(purchases).reduce((s,row)=>s+n(row?.[opt.id]),0))*n(opt.cost),0);
+    },0);
+    const ownCash=Math.max(0,n(ctx.capital)+sum(Object.values(ctx.ledger||{}))-creditOutstanding(ctx));
+    return Math.floor((ownCash*0.70 + assets*0.20)/500)*500;
+  }
+  function creditOutstanding(ctx){return n(ctx.creditOutstanding??0);}
+  function creditAvailable(ctx){return Math.max(0,n(ctx.creditAvailable??(approvedCreditLine(ctx)-creditOutstanding(ctx))));}
   function breakdown(item,ctx){
     const d=draft(item,ctx),e=ctx.state?.[item.id];
     const out={id:item.id,name:item.name,type:item.type,rows:[],outflow:0,assetIncome:0,financing:0,recurring:0,note:''};
@@ -37,10 +52,18 @@
       }else add(item.desc||'Regla autom\u00e1tica del juego',null,null);
     }else if(item.type==='loan'){
       out.financing=n(d.amount);add(out.financing?'Pr\u00e9stamo solicitado':'Sin pr\u00e9stamo',null,null,0,out.financing,`TEA: ${n(ctx.config?.interest??20)}%. El cat\u00e1logo no define plazo, cuotas ni un calendario de amortizaci\u00f3n.`);
+    }else if(item.type==='production-plan'){
+      const labels={molde_1:'Molde básico',molde_2:'Molde mejorado',molde_3:'Molde premium'};
+      for(const [id,label] of Object.entries(labels)){const quantity=n(d.moldTargets?.[id]);if(quantity)add(label,quantity,null,0,0,'Producción deseada para esta línea de molde.');}
     }else if(item.type==='number'){
       add('Meta del ciclo',n(d.value),null,0,0,item.unit||'unidades');
     }else if(item.type==='sales-staff'){
       Object.entries(d.staff||{}).forEach(([id,q])=>{if(n(q))add(id,n(q),n(item.costPerPerson),n(q)*n(item.costPerPerson));});
+    }else if(item.id==='MOLDE'){
+      const ownedIds=[];for(const [round,row] of Object.entries(e?.purchases||{}))if(n(round)<ctx.round)for(const [id,q] of Object.entries(row||{}))if(n(q)>0&&!ownedIds.includes(id))ownedIds.push(id);if(!ownedIds.length&&e&&n(e.round)<ctx.round)for(const id of e.optionIds||[])if(!ownedIds.includes(id))ownedIds.push(id);
+      const chosen=(d.optionIds||[])[0],opt=(item.options||[]).find(o=>o.id===chosen);
+      if(opt&&!ownedIds.includes(chosen))add(opt.label,1,n(opt.cost),n(opt.cost),0,'Compra nueva. Este tipo de molde queda disponible para los siguientes ciclos.');
+      if(ownedIds.length)add('Moldes disponibles',ownedIds.length,null,0,0,ownedIds.map(id=>(item.options||[]).find(o=>o.id===id)?.label||id).join(', '));
     }else if(item.asset||item.type==='quantity'||item.type==='quantity-choice'){
       for(const opt of item.options||[]){
         const q=n(d.quantities?.[opt.id]),price=unitCost(item,opt,ctx),have=item.asset?owned(item,opt.id,ctx):0,prev=item.severanceEligible?previousStaff(item,opt.id,ctx):0;
@@ -51,7 +74,9 @@
           income=q<0?-q*price*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
           detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
         }
-        add(opt.label,item.asset?have+q:q,price,cost,income,detail);
+        const historical=item.asset?have:sum(Object.entries(ctx.state?.[item.id]?.quantities||{}).filter(()=>false).map(()=>0));
+        const cumulative=item.asset?have+q:q+sum(Object.entries(ctx.historyQuantities?.[item.id]?.[opt.id]||{}).map(([,v])=>n(v)));
+        add(opt.label,item.asset?have+q:cumulative,price,cost,income,detail);
         if(item.severanceEligible&&q<prev){
           add('Indemnizaci\u00f3n por reducci\u00f3n de personal',prev-q,price*n(ctx.severanceRate??0.5),(prev-q)*price*n(ctx.severanceRate??0.5),0,`Dotaci\u00f3n anterior: ${prev}. Dotaci\u00f3n elegida: ${q}.`);
         }
@@ -101,9 +126,10 @@
   function finances(sections,ctx){
     const currentCash=n(ctx.capital)+sum(Object.values(ctx.ledger||{}));
     const pendingDelta=sum(sections.filter(s=>!s.submitted).map(s=>s.net-n(ctx.ledger?.[`${ctx.round}:${s.cat}`])));
+    const creditApprovedValue=n(ctx.creditApprovedLine??approvedCreditLine(ctx)),creditAvailable=n(ctx.creditAvailable??Math.max(0,creditApprovedValue-n(ctx.creditOutstanding??0)));
     return {currentCash,pendingDelta,projectedCash:currentCash+pendingDelta,
       outflow:sum(sections.map(s=>s.outflow)),financing:sum(sections.map(s=>s.financing)),assetIncome:sum(sections.map(s=>s.assetIncome)),
-      recurring:sum(sections.map(s=>s.recurring)),contracts:future(ctx)};
+      recurring:sum(sections.map(s=>s.recurring)),contracts:future(ctx),creditApproved:creditApprovedValue,creditAvailable};
   }
   function warnings(ctx){
     const warnings=[],plan=productionModel?.calculate(ctx);

@@ -48,3 +48,21 @@ test('equipment acquired in a previous cycle remains available',()=>{
   const plan=model.calculate(context(drafts,{round:2,state}));
   assert.equal(plan.processes.every(process=>process.machines===1),true);assert.equal(plan.producibleUnits,100);
 });
+
+test('calculator keeps one target and material requirement for every mold',()=>{
+  const drafts=completeLine({PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:20,molde_3:5}},MOLDE:{optionIds:['molde_2']},
+    CUERO:{quantities:{cuero_sint:100}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:10}}});
+  const plan=model.calculate(context(drafts));
+  assert.equal(plan.target,35);assert.deepEqual(plan.productLines.map(line=>line.target),[10,20,5]);
+  assert.equal(plan.materials.find(material=>material.id==='CUERO').neededForTarget,14.5);
+  assert.equal(plan.materials.find(material=>material.id==='ACCESORIOS').neededForTarget,35);
+  assert.equal(plan.materials.find(material=>material.id==='HILO').neededForTarget,265);
+  assert.equal(plan.productLines.find(line=>line.id==='molde_2').selectedThisCycle,true);
+});
+
+test('industrial DOP exposes operations and inspections in sequence',()=>{
+  const plan=model.calculate(context(completeLine()));
+  assert.equal(plan.dop.length,9);assert.equal(plan.dop.filter(step=>step.type==='operation').length,5);
+  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,4);
+  assert.deepEqual(plan.dop.map(step=>step.sequence),[1,2,3,4,5,6,7,8,9]);
+});

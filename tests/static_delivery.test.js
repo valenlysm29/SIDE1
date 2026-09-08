@@ -27,3 +27,19 @@ test('production model loads before the application and review modules',()=>{
   assert.ok(html.indexOf('production_model.js')<html.indexOf('decision_review_model.js'));
   assert.ok(html.indexOf('production_model.js')<html.indexOf('app.js'));
 });
+
+test('productive catalog requires a mold and a sales channel, with calculator first',()=>{
+  const source=fs.readFileSync(path.join(root,'decision_catalog.js'),'utf8'),sandbox={window:{}};
+  require('node:vm').runInNewContext(source,sandbox);
+  const catalog=sandbox.window.SIDE_DECISION_CATALOG,items=catalog.flatMap(category=>category.items||[]),production=catalog.find(category=>category.cat==='C');
+  assert.equal(items.find(item=>item.id==='MOLDE').required,true);
+  assert.equal(items.find(item=>item.id==='CANALES').minSelections,1);
+  assert.equal(production.items[0].id,'PRODUCCION_META');
+  assert.equal(production.items[0].type,'production-plan');
+});
+
+test('cycle zero places summary last and later cycles place it first',()=>{
+  const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  assert.match(source,/currentRound\(\)<=1\?\[\.\.\.decisions,\.\.\.\(summary\?\[summary\]:\[\]\)\]/);
+  assert.match(source,/round>1\?'A':navigationCategories\(\)\[0\]\?\.cat/);
+});

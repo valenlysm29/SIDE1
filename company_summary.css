@@ -166,3 +166,5 @@
 .company-summary .cs-financial-scope{font-size:11px;color:#bfd6e6;padding-bottom:3px}
 #companySummaryMount{scroll-margin-top:260px;scroll-margin-bottom:140px}
 @media(max-width:700px){.cs-jump-bar{align-items:stretch;flex-direction:column}.cs-jump-bar button{min-height:42px}#companySummaryMount{scroll-margin-top:235px;scroll-margin-bottom:165px}}
+
+.cs-cumulative-resource{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;margin:12px 0;padding:13px 15px;border:1px solid #5ebcff2b;border-radius:12px;background:linear-gradient(145deg,#071b30,#061421)}.cs-cumulative-resource span{font-size:10px;letter-spacing:1px;color:#67bfff;font-weight:900}.cs-cumulative-resource strong{font-size:24px;color:#86e8a1}.cs-cumulative-resource small{grid-column:1/-1;color:#748ca4;font-size:10px}

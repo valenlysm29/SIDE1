@@ -19,7 +19,7 @@ QUÉ MUESTRA
 - Infraestructura: mesas, maquinaria, moldes, local y mantenimiento.
 - Producción: meta, operarios, jefatura, limpieza, compras, insumos y garantías.
 - Ventas: web, cantidades de tiendas por distrito, vendedores y reglas automáticas.
-- Finanzas: inversiones, marketing, préstamo solicitado y TEA configurada.
+- Finanzas: inversiones, marketing, línea de crédito utilizada y TEA configurada.
 - Cantidades, costos por concepto, desembolso por apartado y fecha de confirmación.
 - Selector de ciclo para consultar los comprobantes locales conservados.
 

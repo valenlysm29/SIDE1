@@ -10,7 +10,7 @@ CAMBIOS CLAVE
 4. El resumen muestra corte, ensamblado y acabado, con las unidades que
    deben pasar por cada proceso y la capacidad máxima de cada etapa.
 5. Las compras de cuero, accesorios e hilo se convierten a materia prima
-   utilizable según la lógica del Excel.
+   utilizable según la lógica del modelo de producción.
 6. La producción posible es el menor valor entre la meta, el cuello de
    botella productivo y los insumos disponibles.
 7. Se muestran los costos productivos y el costo operativo por unidad posible.

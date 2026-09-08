@@ -66,3 +66,8 @@ test('all catalog items, including zero-cost guarantees and automatic rules, app
  const sections=catalog.map(c=>model.section(c,ctx));assert.equal(sections.flatMap(s=>s.items).length,catalog.flatMap(c=>c.items).length);
  assert.equal(model.breakdown(item('GARANTIA_PROV'),ctx).rows[0].label,'80% de devoluci\u00f3n');
 });
+test('production review lists the desired quantity for every planned mold',()=>{
+ const ctx=context({drafts:{PRODUCCION_META:{moldTargets:{molde_1:20,molde_2:30,molde_3:10}}}}),result=model.breakdown(item('PRODUCCION_META'),ctx);
+ assert.deepEqual(result.rows.map(row=>[row.label,row.quantity]),[['Molde básico',20],['Molde mejorado',30],['Molde premium',10]]);
+ assert.equal(result.outflow,0);
+});

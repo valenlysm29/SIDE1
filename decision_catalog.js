@@ -24,7 +24,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'aca_semi',label:'Semi-industrial',desc:'Pulido eléctrico y aplicación más uniforme.',cost:4500,dailyCapacity:30,liquidationRate:0.4},
         {id:'aca_ind',label:'Industrial',desc:'Línea de acabado para mayor volumen y consistencia.',cost:9500,dailyCapacity:55,liquidationRate:0.4}
       ]},
-      {id:'MOLDE',name:'Molde de producto',type:'choice',fixed:true,lockAfterPurchase:true,noDepreciation:true,required:true,options:[
+      {id:'MOLDE',name:'Molde de producto',type:'choice',fixed:false,lockAfterPurchase:false,noDepreciation:true,required:true,options:[
         {id:'molde_1',label:'Molde básico',desc:'Patrón sencillo para una línea de entrada.',cost:300},
         {id:'molde_2',label:'Molde mejorado',desc:'Patrón técnico con mejor aprovechamiento del material.',cost:1200},
         {id:'molde_3',label:'Molde premium',desc:'Patrón propio orientado a diferenciación y detalle.',cost:3500}
@@ -41,6 +41,7 @@ window.SIDE_DECISION_CATALOG = [
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
     desc:'Integra personal, compras, materia prima y el volumen que deseas producir en el ciclo.',
     items:[
+      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Calcula la producción deseada por cada tipo de molde. SIDE mostrará los insumos requeridos y una sugerencia basada en la capacidad instalada.',cost:0},
       {id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1500},
         {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2500},
@@ -67,7 +68,6 @@ window.SIDE_DECISION_CATALOG = [
         {id:'no_analista',label:'No contratar',desc:'Compras sin negociación especializada.',cost:0},
         {id:'si_analista',label:'Contratar',desc:'S/ 5,000 por ciclo. Negocia mejores condiciones; el beneficio porcentual es mayor al inicio y luego se reduce.',cost:5000}
       ]},
-      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'number',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica la producción objetivo del ciclo. El juego calculará la materia prima mínima necesaria.',cost:0},
       {id:'CUERO',name:'Compra de cuero',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
         {id:'cuero_sint',label:'Cuero sintético',desc:'Alternativa económica.',cost:25},
         {id:'cuero_std',label:'Cuero genuino estándar',desc:'Balance entre costo y durabilidad.',cost:45},
@@ -124,7 +124,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'mkt_media',label:'Media',desc:'Mayor alcance y frecuencia comercial.',cost:6000},
         {id:'mkt_alta',label:'Alta',desc:'Campaña intensiva para acelerar visibilidad y demanda.',cost:12000}
       ]},
-      {id:'PRESTAMO',name:'Préstamo bancario',type:'loan',required:false,desc:'El docente fija únicamente la TEA inicial. El límite del préstamo se calcula automáticamente como un porcentaje de tu caja inicial.'}
+      {id:'PRESTAMO',name:'Línea de crédito',type:'loan',required:false,desc:'La línea inicia en 70% de la caja. En los siguientes ciclos puede aumentar o disminuir según la caja y los activos; el monto utilizado reduce la línea disponible.'}
     ]
   }
 ];

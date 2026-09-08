@@ -72,7 +72,7 @@ Esta versión mantiene el simulador 3D, el nombre legal/comercial dinámico de c
 ## 9. Resultados del estudiante
 El estudiante visualiza resultados disgregados:
 - **Estado de resultados**: ingresos, costos, impacto de eventos y utilidad.
-- **Balance de caja**: caja inicial, préstamos y caja final.
+- **Balance de caja**: caja inicial, línea de crédito y caja final.
 - **Flujo de caja**: operación, financiamiento, eventos y flujo neto.
 - Los eventos activos se muestran en Noticias y su implicancia queda registrada en los resultados.
 
