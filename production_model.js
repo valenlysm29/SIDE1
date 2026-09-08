@@ -36,15 +36,11 @@
     molde_3:{label:'Molde premium',CUERO:0.7,ACCESORIOS:1,HILO:13}
   };
   const DOP_STEPS=[
-    {id:'receive',type:'inspection',label:'Recepción e inspección de insumos'},
-    {id:'trace',type:'operation',label:'Trazado según molde'},
-    {id:'cut',type:'operation',label:'Corte de piezas'},
-    {id:'cut_check',type:'inspection',label:'Inspección de corte'},
-    {id:'assembly',type:'operation',label:'Ensamblado y costura'},
-    {id:'accessories',type:'operation',label:'Colocación de accesorios'},
-    {id:'assembly_check',type:'inspection',label:'Inspección de ensamble'},
-    {id:'finish',type:'operation',label:'Acabado'},
-    {id:'final_check',type:'inspection',label:'Inspección final'}
+    {id:'cut',type:'operation',number:1,label:'Corte de piezas'},
+    {id:'assembly',type:'operation',number:2,label:'Ensamblado y costura'},
+    {id:'accessories',type:'operation',number:3,label:'Colocación de accesorios'},
+    {id:'finish',type:'operation',number:4,label:'Acabado'},
+    {id:'final_check',type:'inspection',number:1,label:'Inspección final'}
   ];
 
   function items(ctx){return (ctx.catalog||[]).flatMap(category=>category.items||[]);}
@@ -151,13 +147,17 @@
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
       const counts=quantityCounts(ctx,id),available=sum(Object.entries(spec.yields).map(([optionId,yieldValue])=>whole(counts[optionId])*yieldValue));
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=target?neededForTarget/target:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
-      return {id,label:spec.label,unit:spec.unit,available,perUnit,neededForTarget,supportedUnits,cost:materialCost(ctx,id)};
+      const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:whole(counts[option.id]),contribution:whole(counts[option.id])*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
+      return {id,label:spec.label,unit:spec.unit,available,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
     const materialCapacity=materials.length?Math.min(...materials.map(material=>material.supportedUnits)):0;
     const producibleUnits=Math.max(0,Math.min(target,processCapacity,materialCapacity));
     processes.forEach(process=>{process.plannedUnits=producibleUnits;process.shortfall=Math.max(0,target-process.cycleCapacity);});
     materials.forEach(material=>{material.consumption=producibleUnits*material.perUnit;material.remaining=Math.max(0,material.available-material.consumption);material.shortfall=Math.max(0,material.neededForTarget-material.available);});
-    let assigned=0;productLines.forEach((line,index)=>{line.plannedUnits=index===productLines.length-1?Math.max(0,producibleUnits-assigned):Math.floor(producibleUnits*(target?line.target/target:0));assigned+=line.plannedUnits;});
+    const activeLines=productLines.filter(line=>line.target>0);let assigned=0;productLines.forEach(line=>{
+      line.plannedUnits=!line.target?0:line===activeLines.at(-1)?Math.max(0,producibleUnits-assigned):Math.floor(producibleUnits*(line.target/target));assigned+=line.plannedUnits;
+      line.productionPercent=line.target?Math.min(100,Math.round(line.plannedUnits/line.target*100)):0;
+    });
     const limitingProcesses=processes.filter(process=>process.cycleCapacity===processCapacity).map(process=>process.label);
     const limitingMaterials=materials.filter(material=>material.supportedUnits===materialCapacity).map(material=>material.label);
     const unavailablePlannedMolds=productLines.filter(line=>line.target>0&&!line.available).map(line=>line.id);

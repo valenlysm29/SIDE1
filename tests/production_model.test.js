@@ -62,7 +62,15 @@ test('calculator keeps one target and material requirement for every mold',()=>{
 
 test('industrial DOP exposes operations and inspections in sequence',()=>{
   const plan=model.calculate(context(completeLine()));
-  assert.equal(plan.dop.length,9);assert.equal(plan.dop.filter(step=>step.type==='operation').length,5);
-  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,4);
-  assert.deepEqual(plan.dop.map(step=>step.sequence),[1,2,3,4,5,6,7,8,9]);
+  assert.equal(plan.dop.length,5);assert.equal(plan.dop.filter(step=>step.type==='operation').length,4);
+  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,1);
+  assert.deepEqual(plan.dop.filter(step=>step.type==='operation').map(step=>step.number),[1,2,3,4]);
+  assert.equal(plan.dop.find(step=>step.type==='inspection').number,1);
+});
+
+test('DOP data includes purchased material qualities and cycle yield by mold',()=>{
+  const plan=model.calculate(context(completeLine({PRODUCCION_META:{moldTargets:{molde_1:80,molde_2:20,molde_3:0}}})));
+  assert.equal(plan.materials.find(material=>material.id==='CUERO').selections[0].label,'Cuero sintético');
+  assert.equal(plan.productLines.find(line=>line.id==='molde_1').productionPercent,93);
+  assert.equal(plan.productLines.find(line=>line.id==='molde_3').plannedUnits,0);
 });

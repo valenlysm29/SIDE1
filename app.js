@@ -125,7 +125,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260908-2'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260908-3'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -156,7 +156,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260908-2');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260908-3');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -431,11 +431,35 @@ function stationStats(itemId){
   return {count,capacity,buying};
 }
 function productionDopHtml(plan=productionPlan(),compact=false){
-  const operations=plan.dop.filter(step=>step.type==='operation').length,inspections=plan.dop.length-operations;
+  const material=id=>plan.materials.find(entry=>entry.id===id);
+  const selection=id=>{const value=material(id);return value?.selections?.length?value.selections.map(entry=>entry.label).join(' + '):'Sin compra registrada';};
+  const process=id=>plan.processes.find(entry=>entry.id===id)||{staff:0,machines:0,cycleCapacity:0};
+  const cut=process('cut'),assembly=process('assembly'),finish=process('finish');
+  const providerItem=findDecisionItem('GARANTIA_PROV'),productItem=findDecisionItem('GARANTIA_PT');
+  const provider=(providerItem?.options||[]).find(option=>selectedOptionIds(providerItem).includes(option.id));
+  const productWarranty=(productItem?.options||[]).find(option=>selectedOptionIds(productItem).includes(option.id));
+  const lines=plan.productLines.filter(line=>line.target>0);
+  const lineMix=lines.map(line=>`${escapeHtml(line.label)}: ${line.target.toLocaleString('es-PE')} u.`).join(' · ');
+  const finalMix=lines.map(line=>`<span><b>${escapeHtml(line.label)}</b> ${line.plannedUnits.toLocaleString('es-PE')} u.</span>`).join('');
+  const producedPercent=plan.target?Math.min(100,Math.round(plan.producibleUnits/plan.target*100)):0;
+  const diagrams=lines.length?`<article class="dop-product" aria-labelledby="dopProductTitle">
+    <header class="dop-product-head"><div><span>ÁREA PRODUCTIVA ÚNICA · CICLO ${currentRound()}</span><h4 id="dopProductTitle">DOP consolidado de producción</h4><p>Mezcla programada: ${lineMix}</p></div><div><small>PRODUCCIÓN TOTAL DESEADA</small><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div></header>
+    <div class="dop-industrial">
+      <div class="dop-main-input"><span>MATERIA PRIMA PRINCIPAL</span><strong>Cuero · ${escapeHtml(selection('CUERO'))}</strong><small>Necesario total: ${material('CUERO')?.neededForTarget.toLocaleString('es-PE')||0} m² · disponible: ${material('CUERO')?.available.toLocaleString('es-PE')||0} m²</small><b>Moldes en uso: ${lineMix}</b></div>
+      <ol class="dop-main-line">
+        <li class="dop-operation-row"><div class="dop-side-space"></div><i class="dop-symbol operation"><span>1</span></i><div class="dop-operation-copy"><strong>Corte</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>${cut.staff} operario(s) · ${cut.machines} mesa(s) · capacidad total ${cut.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></li>
+        <li class="dop-operation-row"><aside class="dop-side-input"><span>ENTRADA LATERAL</span><strong>Hilo · ${escapeHtml(selection('HILO'))}</strong><small>Necesario total: ${material('HILO')?.neededForTarget.toLocaleString('es-PE')||0} m · disponible: ${material('HILO')?.available.toLocaleString('es-PE')||0} m</small></aside><i class="dop-symbol operation"><span>2</span></i><div class="dop-operation-copy"><strong>Ensamblado y costura</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>${assembly.staff} operario(s) · ${assembly.machines} máquina(s) · capacidad total ${assembly.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></li>
+        <li class="dop-operation-row"><aside class="dop-side-input"><span>ENTRADA LATERAL</span><strong>Accesorios · ${escapeHtml(selection('ACCESORIOS'))}</strong><small>Necesario total: ${material('ACCESORIOS')?.neededForTarget.toLocaleString('es-PE')||0} u. · disponible: ${material('ACCESORIOS')?.available.toLocaleString('es-PE')||0} u.</small></aside><i class="dop-symbol operation"><span>3</span></i><div class="dop-operation-copy"><strong>Colocación de accesorios</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>Hebillas, cierres y componentes elegidos para toda el área productiva</small></div></li>
+        <li class="dop-operation-row"><div class="dop-side-space"></div><i class="dop-symbol operation"><span>4</span></i><div class="dop-operation-copy"><strong>Acabado</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>${finish.staff} operario(s) · ${finish.machines} máquina(s) · capacidad total ${finish.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></li>
+        <li class="dop-operation-row dop-inspection-row"><aside class="dop-side-input dop-quality-data"><span>CONTROL DEL CICLO</span><strong>Eficiencia de línea: ${Math.round(plan.efficiency*100)}%</strong><small>${provider?`Proveedor: ${escapeHtml(provider.label)}`:'Sin garantía de proveedor'}${productWarranty?` · PT: ${escapeHtml(productWarranty.label)}`:''}</small></aside><i class="dop-symbol inspection"><span>I1</span></i><div class="dop-operation-copy"><strong>Inspección final</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades conformes</span><small>Verificación conjunta antes del ingreso al catálogo productivo</small></div></li>
+      </ol>
+      <div class="dop-yield"><span>PORCENTAJE PRODUCIDO</span><strong>${producedPercent}%</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} conformes ÷ ${plan.target.toLocaleString('es-PE')} deseadas</small></div>
+      <div class="dop-final-output"><span>PRODUCCIÓN FINAL DEL CICLO ${currentRound()}</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades totales</strong><div class="dop-final-mix">${finalMix}</div><small>Resultado mensual consolidado del área productiva única.</small></div>
+    </div>
+  </article>`:'';
   return `<section class="production-dop ${compact?'dop-compact':''}" aria-labelledby="productionDopTitle">
-    <header class="dop-heading"><div><span>DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Flujo productivo de marroquinería</h3><p>Convención de ingeniería industrial: círculo = operación; cuadrado = inspección.</p></div><div class="dop-legend"><b><i class="dop-symbol operation" aria-hidden="true"></i> Operación</b><b><i class="dop-symbol inspection" aria-hidden="true"></i> Inspección</b></div></header>
-    <div class="dop-layout"><ol class="dop-sequence">${plan.dop.map(step=>`<li class="dop-step"><span class="dop-index">${step.sequence}</span><i class="dop-symbol ${step.type}" aria-hidden="true"></i><div><strong>${escapeHtml(step.label)}</strong><small>${step.units.toLocaleString('es-PE')} unidades posibles en el ciclo</small></div></li>`).join('')}<li class="dop-output"><span>PT</span><strong>Producto terminado</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} unidades</small></li></ol>
-    <aside class="dop-summary"><div><span>Operaciones</span><strong>${operations}</strong></div><div><span>Inspecciones</span><strong>${inspections}</strong></div><div><span>Meta total</span><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div><div><span>Producción posible</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} u.</strong></div><p>El DOP representa operaciones e inspecciones principales; transporte, demora y almacenamiento no forman parte de este tipo de diagrama.</p></aside></div>
+    <header class="dop-heading"><div><span>DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Flujo mensual del área productiva</h3><p>El área productiva es única: el DOP consolida todos los moldes programados y se recalcula con las decisiones de cada ciclo.</p></div><div class="dop-legend"><b><i class="dop-symbol operation" aria-hidden="true"></i> Operación</b><b><i class="dop-symbol inspection" aria-hidden="true"></i> Inspección</b></div></header>
+    ${diagrams||`<div class="dop-empty"><strong>Aún no hay producción para mostrar</strong><p>Indica cuánto deseas producir; SIDE consolidará todos los moldes activos en un solo DOP del área productiva.</p></div>`}
   </section>`;
 }
 function renderDecisionCategory(){

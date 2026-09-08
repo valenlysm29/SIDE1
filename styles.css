@@ -1300,7 +1300,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .flow-arrow{transform:rotate(90deg);align-self:center}
 }
 
-/* SIDE v2026.09.08.2 · Calculadora por molde y DOP de ingeniería industrial */
+/* SIDE v2026.09.08.3 · Calculadora por molde y DOP de ingeniería industrial */
 .production-calculator{display:grid;gap:14px;width:100%;min-width:0}
 .production-calculator>header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px;border-radius:12px;background:#071b30;border:1px solid #57b9f53b}
 .production-calculator>header>div:first-child{min-width:0}
@@ -1362,6 +1362,50 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .dop-summary span{display:block;color:#7f9aaf;font-size:8px;font-weight:900;letter-spacing:.5px}
 .dop-summary strong{display:block;margin-top:3px;color:#ffd34f;font-size:17px}
 .dop-summary p{grid-column:1/-1;margin:0;padding:10px;border-left:3px solid #5bb7ee;color:#8fa8bd;font-size:10px;line-height:1.5}
+.dop-product{margin-top:4px;padding:16px;border:1px solid #ffffff18;border-radius:13px;background:#03111d;min-width:0}
+.dop-product+.dop-product{margin-top:12px}
+.dop-product-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #ffffff14}
+.dop-product-head>div{min-width:0}
+.dop-product-head>div:last-child{flex:0 0 auto;text-align:right}
+.dop-product-head span,.dop-product-head small{display:block;color:#70c8ff;font-size:12px;font-weight:900;letter-spacing:.6px}
+.dop-product-head h4{margin:4px 0;color:#fff;font-size:20px}
+.dop-product-head p{margin:0;color:#8fa8bd;font-size:14px}
+.dop-product-head strong{display:block;margin-top:4px;color:#ffd34f;font-size:22px}
+.dop-industrial{width:min(860px,100%);margin:0 auto;min-width:0}
+.dop-main-input{width:58%;margin-left:42%;padding:12px 14px;border-left:3px solid #70c8ff;border-radius:8px 8px 0 0;background:#08233a;display:grid;gap:3px}
+.dop-main-input span,.dop-side-input span{color:#70c8ff;font-size:12px;font-weight:900;letter-spacing:.5px}
+.dop-main-input strong,.dop-side-input strong{color:#f0f6fb;font-size:14px}
+.dop-main-input small,.dop-side-input small{color:#9eb2c5;font-size:12px;line-height:1.4}
+.dop-main-input b{color:#86e8a1;font-size:12px}
+.dop-main-line{position:relative;list-style:none;margin:0;padding:0;display:grid}
+.dop-main-line:before{content:"";position:absolute;z-index:0;left:calc(42% + 25px);top:0;bottom:0;width:3px;background:#6299bd}
+.dop-operation-row{position:relative;z-index:1;display:grid;grid-template-columns:42% 52px minmax(0,1fr);align-items:center;min-height:104px;margin:0;padding:8px 0}
+.dop-operation-row>.dop-symbol{grid-column:2;display:grid;place-items:center;justify-self:center;width:44px;height:44px;flex-basis:44px;border-width:3px;background:#0c2c45;color:#fff;font-style:normal;box-shadow:0 0 0 5px #03111d}
+.dop-operation-row>.dop-symbol span{font-size:14px;font-weight:1000}
+.dop-operation-copy{grid-column:3;display:grid;gap:3px;padding-left:14px;min-width:0}
+.dop-operation-copy strong{color:#f2f7fb;font-size:16px}
+.dop-operation-copy>span{color:#86e8a1;font-size:14px;font-weight:900}
+.dop-operation-copy small{color:#91a8bb;font-size:12px;line-height:1.45}
+.dop-side-space,.dop-side-input{grid-column:1;grid-row:1}
+.dop-side-input{position:relative;margin-right:8px;padding:9px 38px 9px 10px;border-bottom:2px solid #6299bd;background:linear-gradient(90deg,#08233a 70%,transparent);display:grid;gap:2px;min-width:0}
+.dop-side-input:after{content:"";position:absolute;right:-8px;bottom:-5px;width:8px;height:8px;border-right:2px solid #6299bd;border-bottom:2px solid #6299bd;transform:rotate(-45deg)}
+.dop-inspection-row>.dop-symbol{border-radius:2px;border-color:#ff9d83;background:#3a1c1b}
+.dop-quality-data{border-bottom-color:#ff9d83;background:linear-gradient(90deg,#351d1d 70%,transparent)}
+.dop-quality-data:after{border-color:#ff9d83}
+.dop-yield{width:58%;margin-left:42%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:13px 14px;border:1px solid #ffd34f55;background:#ffd34f0c}
+.dop-yield span{align-self:end;color:#b99b42;font-size:12px;font-weight:900;letter-spacing:.5px}
+.dop-yield strong{grid-row:1/3;grid-column:2;align-self:center;color:#ffd34f;font-size:30px}
+.dop-yield small{color:#a9b6c0;font-size:12px}
+.dop-final-output{width:58%;margin-left:42%;display:grid;gap:3px;padding:14px;border-radius:0 0 10px 10px;background:linear-gradient(135deg,#145238,#0d3e2a);border:1px solid #67e5a1}
+.dop-final-output span{color:#a9ffd0;font-size:12px;font-weight:900;letter-spacing:.5px}
+.dop-final-output strong{color:#fff;font-size:20px}
+.dop-final-output small{color:#b6d9c5;font-size:12px}
+.dop-final-mix{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.dop-final-mix span{padding:5px 8px;border-radius:6px;background:#ffffff12;color:#d6eee0;font-size:12px}
+.dop-final-mix b{color:#fff}
+.dop-empty{padding:18px;border:1px dashed #6dbdf14f;border-radius:10px;text-align:center;background:#03111d}
+.dop-empty strong{color:#e6f1f8;font-size:16px}
+.dop-empty p{margin:5px 0 0;color:#94aabd;font-size:14px}
 .cs-production .production-dop{margin:14px 0;background:#061624}
 .cs-production .dop-heading h3{font-size:16px}
 .cs-production .dop-sequence li{min-height:43px}
@@ -1401,6 +1445,18 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .dop-sequence:before{left:43px}
   .dop-sequence li{grid-template-columns:20px 26px minmax(0,1fr);gap:8px}
   .dop-sequence .dop-output{margin-left:28px}
+  .dop-product{padding:12px}
+  .dop-product-head{flex-direction:column}
+  .dop-product-head>div:last-child{text-align:left}
+  .dop-main-input,.dop-yield,.dop-final-output{width:100%;margin-left:0}
+  .dop-main-line:before{left:21px}
+  .dop-operation-row{grid-template-columns:44px minmax(0,1fr);min-height:0;padding:14px 0}
+  .dop-operation-row>.dop-symbol{grid-column:1;grid-row:2;width:40px;height:40px;flex-basis:40px;box-shadow:0 0 0 4px #03111d}
+  .dop-operation-copy{grid-column:2;grid-row:2;padding-left:10px}
+  .dop-side-space{display:none}
+  .dop-side-input{grid-column:1/-1;grid-row:1;margin:0 0 10px 44px;padding:9px 12px;border-left:2px solid #6299bd;border-bottom:0;background:#08233a}
+  .dop-side-input:after{display:none}
+  .dop-yield{border-radius:8px;margin-top:8px}
 }
 
 /* SIDE v2026.09.07.2: scroll only the results, never the action footer. */

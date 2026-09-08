@@ -43,3 +43,11 @@ test('cycle zero places summary last and later cycles place it first',()=>{
   assert.match(source,/currentRound\(\)<=1\?\[\.\.\.decisions,\.\.\.\(summary\?\[summary\]:\[\]\)\]/);
   assert.match(source,/round>1\?'A':navigationCategories\(\)\[0\]\?\.cat/);
 });
+
+test('DOP follows the project cycle from leather input to final production',()=>{
+  const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  for(const label of ['MATERIA PRIMA PRINCIPAL','Corte','Ensamblado y costura','Colocación de accesorios','Acabado','Inspección final','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO'])assert.match(app,new RegExp(label));
+  assert.match(app,/plan\.productLines\.filter\(line=>line\.target>0\)/);
+  assert.match(app,/ÁREA PRODUCTIVA ÚNICA/);
+  assert.match(app,/DOP consolidado de producción/);
+});

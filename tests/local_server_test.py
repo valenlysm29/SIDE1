@@ -18,11 +18,11 @@ class LocalServerTest(unittest.TestCase):
         self.server.server_close()
         self.thread.join(timeout=2)
     def test_entry_and_versioned_resources(self):
-        for path,needle in [('index.html?v=20260908-2','class="lobby-actions"'),('app.js?v=20260908-2','function renderChannelChoices'),('styles.css?v=20260908-2','#studentLobby .lobby-actions'),('production_model.js?v=20260908-2','MOLD_REQUIREMENTS'),('responsive.css?v=20260908-2','CAPA RESPONSIVE GLOBAL')]:
+        for path,needle in [('index.html?v=20260908-3','class="lobby-actions"'),('app.js?v=20260908-3','function renderChannelChoices'),('styles.css?v=20260908-3','#studentLobby .lobby-actions'),('production_model.js?v=20260908-3','MOLD_REQUIREMENTS'),('responsive.css?v=20260908-3','CAPA RESPONSIVE GLOBAL')]:
             with urlopen(self.base+'/'+path,timeout=5) as response:
                 self.assertEqual(response.status,200)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')
-                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.08.2')
+                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.08.3')
                 self.assertIn(needle,response.read().decode())
     def test_busy_port_does_not_bind_another_server(self):
         with self.assertRaises(OSError):
