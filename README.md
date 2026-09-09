@@ -1,6 +1,6 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
-## Entrega actual: v2026.09.09.2
+## Entrega actual: v2026.09.09.3
 
 La entrega del 08/09/2026 incorpora una capa responsive transversal para
 telefonos, tablets, portatiles y escritorios, tanto en orientacion vertical
@@ -8,14 +8,16 @@ como horizontal. Se adaptaron barras fijas, tutorial, formularios, tablas,
 panel docente, resumen de empresa y HUD del simulador 3D; tambien se añadieron
 areas seguras, controles tactiles y compatibilidad con movimiento reducido.
 
-La revisión v2026.09.09.2 añade una calculadora productiva independiente para
+La revisión v2026.09.09.3 añade una calculadora productiva independiente para
 molde básico, mejorado y premium; presenta los insumos requeridos y una
 sugerencia basada en capacidad instalada. Producción y Resumen incorporan un
 DOP dinámico único para toda el área productiva: consolida los moldes fabricados,
 el cuero ingresa como materia prima principal, el hilo como insumo auxiliar y los
 accesorios como materia prima secundaria. El DOP utiliza tres operaciones, una
 actividad combinada para colocar e inspeccionar accesorios y una inspección final;
-luego muestra el porcentaje logrado y la producción final
+luego muestra el porcentaje logrado y la producción final. La materia prima
+secundaria se representa en un ramal propio que baja desde la izquierda y se une
+horizontalmente al símbolo combinado de colocación e inspección de accesorios
 desglosada por molde. El pie del DOP presenta la tabla de resumen, la eficiencia
 de la línea, la producción mensual y el cumplimiento de la meta. La nueva pestaña
 Logística concentra la compra de materias primas y el abastecimiento. La compra de

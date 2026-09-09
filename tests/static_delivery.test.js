@@ -54,4 +54,6 @@ test('DOP follows the project cycle from leather input to final production',()=>
   assert.match(app,/ÁREA PRODUCTIVA ÚNICA/);
   assert.match(app,/DOP consolidado de producción/);
   assert.match(app,/dop-symbol combined/);
+  assert.match(app,/dop-secondary-branch/);
+  assert.match(app,/El ramal secundario se une aquí/);
 });
