@@ -37,10 +37,10 @@
   };
   const DOP_STEPS=[
     {id:'cut',type:'operation',number:1,label:'Corte de piezas'},
-    {id:'assembly',type:'operation',number:2,label:'Ensamblado y costura'},
-    {id:'accessories',type:'operation',number:3,label:'Colocación de accesorios'},
-    {id:'finish',type:'operation',number:4,label:'Acabado'},
-    {id:'final_check',type:'inspection',number:1,label:'Inspección final'}
+    {id:'assembly',type:'operation',number:2,label:'Armado, ensamblado y costura'},
+    {id:'accessories_check',type:'combined',number:1,label:'Colocación e inspección de accesorios'},
+    {id:'finish',type:'operation',number:3,label:'Acabado final'},
+    {id:'final_check',type:'inspection',number:1,label:'Inspección final del bolso'}
   ];
 
   function items(ctx){return (ctx.catalog||[]).flatMap(category=>category.items||[]);}

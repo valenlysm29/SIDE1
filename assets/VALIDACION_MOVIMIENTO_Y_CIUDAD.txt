@@ -1,0 +1,27 @@
+SIDE SIMULADOR EMPRESARIAL — VALIDACIÓN DE ESTA VERSIÓN
+
+1. CIUDAD / TIENDA
+- Volumen principal de tienda: X aproximado -13 a 13, Z -9.2 a 9.2.
+- Todos los edificios urbanos fueron desplazados fuera de ese volumen.
+- Se verificó matemáticamente que los rectángulos de edificios no intersectan el volumen de la tienda.
+- Se añadieron colisiones físicas a pared posterior, paredes laterales y vitrinas frontales.
+- La puerta central permanece libre.
+
+2. MOVIMIENTO
+- WASD: aceleración y desaceleración suavizadas.
+- Shift: sprint con cambio progresivo de FOV.
+- Space: salto con gravedad sobre eje Y.
+- Mouse: rotación suavizada mediante target yaw / target pitch.
+- Colisiones separadas en X y Z para permitir deslizamiento natural contra obstáculos.
+- Head bob sutil ligado a la velocidad.
+
+3. GAMEPLAY
+- Misiones por día.
+- Pedidos visibles de clientes.
+- Ticket visual al cobrar.
+- Producto vuelve al stock si el cliente abandona la cola.
+- Progresión de día solo al alcanzar la meta.
+
+4. VALIDACIÓN TÉCNICA
+- Todos los archivos JavaScript fueron verificados con node --check.
+- IDs HTML necesarios para misiones/ticket verificados.

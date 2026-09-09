@@ -1300,7 +1300,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .flow-arrow{transform:rotate(90deg);align-self:center}
 }
 
-/* SIDE v2026.09.09.1 · Calculadora por molde y DOP de ingeniería industrial */
+/* SIDE v2026.09.09.2 · Calculadora por molde y DOP de ingeniería industrial */
 .production-calculator{display:grid;gap:14px;width:100%;min-width:0}
 .production-calculator>header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px;border-radius:12px;background:#071b30;border:1px solid #57b9f53b}
 .production-calculator>header>div:first-child{min-width:0}
@@ -1343,6 +1343,9 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .dop-symbol{display:inline-block;flex:0 0 26px;width:26px;height:26px;border:3px solid #ffd34f;background:#071827}
 .dop-symbol.operation{border-radius:50%}
 .dop-symbol.inspection{border-radius:2px}
+.dop-symbol.combined{position:relative;border-radius:2px}
+.dop-symbol.combined:before{content:"";position:absolute;inset:3px;border:2px solid #ffd34f;border-radius:50%}
+.dop-symbol.combined>span{position:relative;z-index:1}
 .dop-chart-symbol{display:inline-block}
 .dop-layout{display:grid;grid-template-columns:minmax(260px,1.7fr) minmax(190px,.8fr);gap:18px;align-items:start}
 .dop-sequence{list-style:none;margin:0;padding:0}
@@ -1389,6 +1392,10 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .dop-side-space,.dop-side-input{grid-column:1;grid-row:1}
 .dop-side-input{position:relative;margin-right:8px;padding:9px 38px 9px 10px;border-bottom:2px solid #6299bd;background:linear-gradient(90deg,#08233a 70%,transparent);display:grid;gap:2px;min-width:0}
 .dop-side-input:after{content:"";position:absolute;right:-8px;bottom:-5px;width:8px;height:8px;border-right:2px solid #6299bd;border-bottom:2px solid #6299bd;transform:rotate(-45deg)}
+.dop-secondary-input{border-bottom-color:#ffd34f;background:linear-gradient(90deg,#342b10 70%,transparent)}
+.dop-secondary-input:after{border-color:#ffd34f}
+.dop-secondary-input span{color:#ffd34f}
+.dop-combined-row>.dop-symbol{border-color:#ffd34f;background:#332b11}
 .dop-inspection-row>.dop-symbol{border-radius:2px;border-color:#ff9d83;background:#3a1c1b}
 .dop-quality-data{border-bottom-color:#ff9d83;background:linear-gradient(90deg,#351d1d 70%,transparent)}
 .dop-quality-data:after{border-color:#ff9d83}

@@ -250,23 +250,10 @@ grant insert on public.decisiones to anon, authenticated;
 -- LISTO
 -- ============================================================
 
--- Un nombre comercial identifica a una sola empresa dentro de cada partida.
--- La comparación ignora mayúsculas, tildes, signos y espacios repetidos.
-create or replace function public.normalizar_nombre_comercial(valor text)
-returns text
-language sql
-immutable
-strict
-set search_path = public
-as $$
-  select btrim(regexp_replace(
-    translate(lower(valor), 'áéíóúüñ', 'aeiouun'),
-    '[^a-z0-9]+', ' ', 'g'
-  ));
-$$;
-
-create unique index if not exists ux_participante_nombre_comercial_por_partida
-on public.participantes(partida_id, public.normalizar_nombre_comercial(empresa));
+-- Los nombres comerciales pueden repetirse: así un jugador puede volver a
+-- ingresar a una partida con el mismo nombre que ya utilizó.
+drop index if exists public.ux_participante_nombre_comercial_por_partida;
+drop function if exists public.normalizar_nombre_comercial(text);
 
 -- ============================================================
 -- ACTUALIZACIÓN 29/08/2026 · PARTIDA ÚNICA, CONFIGURACIÓN Y EVENTOS

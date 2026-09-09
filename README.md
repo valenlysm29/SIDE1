@@ -1,6 +1,6 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
-## Entrega actual: v2026.09.09.1
+## Entrega actual: v2026.09.09.2
 
 La entrega del 08/09/2026 incorpora una capa responsive transversal para
 telefonos, tablets, portatiles y escritorios, tanto en orientacion vertical
@@ -8,18 +8,20 @@ como horizontal. Se adaptaron barras fijas, tutorial, formularios, tablas,
 panel docente, resumen de empresa y HUD del simulador 3D; tambien se añadieron
 areas seguras, controles tactiles y compatibilidad con movimiento reducido.
 
-La revisión v2026.09.09.1 añade una calculadora productiva independiente para
+La revisión v2026.09.09.2 añade una calculadora productiva independiente para
 molde básico, mejorado y premium; presenta los insumos requeridos y una
 sugerencia basada en capacidad instalada. Producción y Resumen incorporan un
 DOP dinámico único para toda el área productiva: consolida los moldes fabricados,
-el cuero ingresa al corte, el hilo al ensamblado y los accesorios a su colocación;
-luego se muestran acabado, inspección, porcentaje logrado y producción final
+el cuero ingresa como materia prima principal, el hilo como insumo auxiliar y los
+accesorios como materia prima secundaria. El DOP utiliza tres operaciones, una
+actividad combinada para colocar e inspeccionar accesorios y una inspección final;
+luego muestra el porcentaje logrado y la producción final
 desglosada por molde. El pie del DOP presenta la tabla de resumen, la eficiencia
 de la línea, la producción mensual y el cumplimiento de la meta. La nueva pestaña
 Logística concentra la compra de materias primas y el abastecimiento. La compra de
 al menos un molde y la selección de un canal de ventas son obligatorias. El nombre
-comercial es único por partida. En el primer ciclo
-Resumen aparece al final; desde el segundo ciclo aparece primero.
+comercial puede volver a utilizarse para recuperar la partida local. En el primer
+ciclo Resumen aparece al final; desde el segundo ciclo aparece primero.
 
 La V4 elimina la decisión de segmento de mercado, compacta el calendario
 académico y vincula el resumen con la lógica de producción del juego. Ahora se

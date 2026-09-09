@@ -1,0 +1,160 @@
+"""Regression checks against isolated, in-memory copies of the delivered UI.
+Requirements: Python, playwright, Chromium. No server or external service used.
+"""
+import json
+import os
+from pathlib import Path
+import shutil
+from playwright.sync_api import sync_playwright, expect
+from browser_fixture import load
+OUT=Path(os.environ.get('SIDE_QA_OUTPUT','/tmp/side-qa'));OUT.mkdir(parents=True,exist_ok=True)
+GROUP=os.environ.get('SIDE_TEST_GROUP','all')
+checks=[]
+def ok(label,condition=True):
+    assert condition,label
+    checks.append(label);print('PASS',label,flush=True)
+def dump(page):
+    return page.evaluate("Object.fromEntries(Array.from({length:localStorage.length},(_,i)=>{const k=localStorage.key(i);return [k,localStorage.getItem(k)]}))")
+def select_category(page,cat):
+    page.evaluate("cat=>{currentCategory=cat;renderTabs();renderDecisionCategory()}",cat)
+def setup_student(page):
+    page.evaluate("""() => {currentStudent={name:'Jugador',company:'Empresa QA',game:DEMO_GAME};loadDecisionState();openDecisionMenu()}""")
+def make_student(context,storage=None,size=None):
+    page=context.new_page()
+    if size:page.set_viewport_size(size)
+    load(page,'index.html',storage or {'SIDE_TEACHER_CONFIG':json.dumps({'capital':100000,'cycles':20,'roundHours':8,'roundMinutes':0})})
+    setup_student(page);return page
+with sync_playwright() as p:
+    executable=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium') or shutil.which('google-chrome')
+    browser=p.chromium.launch(executable_path=executable,headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+    context=browser.new_context(viewport={'width':1440,'height':900},timezone_id='America/Lima',locale='es-PE')
+    context.set_default_timeout(8000)
+    context.route('**/*',lambda route:route.abort())
+    errors=[]
+    context.on('page',lambda page:page.on('pageerror',lambda error:errors.append(str(error))))
+    if GROUP in ('all','teacher'):
+        page=context.new_page()
+        initial={'nombre':'Proyecto SIDE QA','curso':'Curso de prueba','codigo':'SIDE-QA','cycles':6,'roundHours':8,'roundMinutes':0,'cycleCloseMode':'manual','startDate':'2026-08-18','endDate':'2026-10-18','capital':100000}
+        load(page,'docente.html',{'SIDE_TEACHER_CONFIG':json.dumps(initial)})
+        ok('Teacher names and zero minutes survive config loading',page.locator('#gameName').input_value()=='Proyecto SIDE QA' and page.locator('#roundMinutes').input_value()=='0')
+        expect(page.locator('#automaticCalendar')).to_be_hidden()
+        expect(page.locator('#randomCapitalFields')).to_be_hidden()
+        ok('Manual calendar and capital modes hide irrelevant panels')
+        page.locator('#cycleModeAutomatic').check()
+        expect(page.locator('#automaticCalendar')).to_be_visible()
+        ok('Automatic calendar asks for missing start time',page.locator('#cycleCalendarList li').count()==0)
+        page.locator('#scheduledStart').fill('2050-09-03T18:00');page.locator('#scheduledStart').press('Tab')
+        ok('Automatic calendar shows all six cycles and exact end date',page.locator('#cycleCalendarList li').count()==6 and page.locator('#startDate').input_value()=='2050-09-03' and page.locator('#endDate').input_value()=='2050-09-05')
+        ok('Duration remains exactly 48 hours', '48 h' in page.locator('#calendarSummary').inner_text() and page.evaluate("JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')).roundMinutes") == 0)
+        page.locator('#cycles').fill('2');page.locator('#roundHours').fill('0');page.locator('#roundMinutes').fill('45');page.locator('#scheduledStart').fill('2050-12-31T23:30');page.locator('#scheduledStart').press('Tab')
+        ok('Editing inputs immediately recalculates year rollover',page.locator('#endDate').input_value()=='2051-01-01' and page.locator('#cycleCalendarList li').count()==2)
+        page.locator('#roundMinutes').fill('0')
+        ok('Zero total duration is rejected',page.locator('#cycleCalendarList li').count()==0)
+        page.locator('#cycles').fill('6');page.locator('#roundHours').fill('8');page.locator('#roundMinutes').fill('0');page.locator('#scheduledStart').fill('2050-09-03T18:00');page.locator('#scheduledStart').press('Tab')
+        page.locator('#cycleModeManual').check()
+        expect(page.locator('#automaticCalendar')).to_be_hidden()
+        ok('Returning to manual restores academic reference dates',page.locator('#startDate').input_value()=='2026-08-18' and page.locator('#endDate').input_value()=='2026-10-18')
+        page.locator('#cycleModeAutomatic').check()
+        # Fixture clock only; the delivered application continues to use Date.now.
+        page.evaluate("window.testNow=Date.parse('2050-09-03T17:00:00-05:00');Date.now=()=>window.testNow")
+        page.locator('#startGame').click()
+        ok('Automatic game waits until programmed start',page.evaluate("runtime().status")=='scheduled')
+        page.evaluate("window.testNow=Date.parse('2050-09-03T18:00:00-05:00');refreshAutomaticRuntime()")
+        ok('Programmed start runs cycle one for eight hours',page.evaluate("runtime().running&&runtime().round===1&&runtime().remaining===28800"))
+        page.evaluate("window.testNow+=8*3600000+1000;refreshAutomaticRuntime()")
+        ok('Elapsed-time catch-up advances exactly to cycle two',page.evaluate("runtime().round===2&&runtime().remaining===28799"))
+        page.evaluate("switchTab('configuracion')")
+        expect(page.locator('[data-cycle="1"]')).to_have_class('cycle-calendar-row is-finished')
+        expect(page.locator('[data-cycle="2"]')).to_have_class('cycle-calendar-row is-current')
+        ok('Calendar highlights current and finished cycles')
+        page.locator('.academic-calendar-card').scroll_into_view_if_needed();page.screenshot(path=str(OUT/'teacher-calendar.png'))
+        page.evaluate("$('cycleCalendarList').scrollTop=500;window.scrollSaved=$('cycleCalendarList').scrollTop;renderAcademicCalendar()")
+        ok('Calendar refresh preserves scrolling to later cycles',page.evaluate("$('cycleCalendarList').scrollTop===window.scrollSaved"))
+        page.evaluate("window.testNow=Date.parse('2050-09-05T18:00:00-05:00');refreshAutomaticRuntime()")
+        ok('Last cycle finishes instead of creating a seventh',page.evaluate("runtime().status==='simulation-finished'&&runtime().round===6&&!JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')).active"))
+        ok('Teacher navigation uses five loaded SVG icons',page.evaluate("[...document.querySelectorAll('.nav-icon img')].length===5&&[...document.querySelectorAll('.nav-icon img')].every(i=>i.complete&&i.naturalWidth>0&&i.src.startsWith('data:image/svg'))"))
+        page.close()
+
+    if GROUP in ('all','sales'):
+        page=make_student(context);select_category(page,'D')
+        expect(page.locator('.store-quantity-panel')).to_have_count(0)
+        page.locator('[data-choice="CANALES"][data-option="web"]').check()
+        ok('Web-only channel has no store selector or salesperson',page.evaluate("computeItemCost(findDecisionItem('CANALES'))===500&&RULES.storeCount(channelDraft())===0") and page.locator('.store-quantity-panel').count()==0)
+        page.locator('[data-choice="CANALES"][data-option="los_olivos"]').check()
+        expect(page.locator('[data-store-qty="los_olivos"]')).to_have_value('1')
+        page.locator('[data-store-step="los_olivos"][data-delta="1"]').click()
+        page.locator('[data-store-step="los_olivos"][data-delta="1"]').click()
+        page.locator('[data-choice="CANALES"][data-option="miraflores"]').check();page.locator('[data-store-qty="miraflores"]').fill('2')
+        ok('Independent district quantities update channel cost and staffing',page.evaluate("computeItemCost(findDecisionItem('CANALES'))===12900&&RULES.storeCount(channelDraft())===5"))
+        page.locator('.store-quantity-panel').evaluate("el=>el.scrollIntoView({block:'center'})")
+        page.screenshot(path=str(OUT/'store-quantities-desktop.png'))
+        page.locator('#saveDecisionSection').click()
+        ok('Saving records quantities and deducts exact cost once',page.evaluate("cashBalance()===87100&&decisionState.CANALES.quantities.los_olivos===3&&decisionState.CANALES.quantities.miraflores===2&&!sectionSubmitted('D')"))
+        page.locator('#saveDecisionSection').click()
+        ok('Resaving the same quantities does not charge twice',page.evaluate('cashBalance()===87100'))
+        page.locator('[data-store-qty="los_olivos"]').fill('2');page.locator('#saveDecisionSection').click()
+        ok('A saved draft stays editable and refunds the cost difference',page.evaluate('cashBalance()===88900&&decisionState.CANALES.quantities.los_olivos===2'))
+        data=dump(page);page.close();page=make_student(context,data);select_category(page,'D')
+        ok('Saved quantities survive reconstructed page load',page.locator('[data-store-qty="los_olivos"]').input_value()=='2' and page.locator('[data-store-qty="miraflores"]').input_value()=='2')
+        page.locator('[data-store-qty="los_olivos"]').fill('4')
+        data=dump(page);page.close();page=make_student(context,data);select_category(page,'D')
+        ok('Unsent working quantities survive reconstructed page load',page.locator('[data-store-qty="los_olivos"]').input_value()=='4' and page.evaluate('cashBalance()===88900'))
+        page.locator('[data-store-qty="los_olivos"]').fill('999')
+        expect(page.locator('#sendDecisionSection')).to_be_disabled()
+        page.evaluate('sendCurrentSection()')
+        ok('Insufficient cash never marks an old decision as sent',page.evaluate("!sectionSubmitted('D')&&decisionState.CANALES.quantities.los_olivos===2&&cashBalance()===88900"))
+        page.locator('[data-store-qty="los_olivos"]').fill('3')
+        page.locator('#sendDecisionSection').click()
+        expect(page.locator('[data-store-qty="los_olivos"]')).to_be_disabled()
+        ok('Send saves latest quantities, locks inputs and reports district counts',page.evaluate("sectionSubmitted('D')&&decisionState.CANALES.quantities.los_olivos===3&&JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS'))[0].canalesVenta.tiendasFisicas===5"))
+        page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');loadDecisionState();decisionDrafts={};renderTabs();renderDecisionCategory()")
+        expect(page.locator('[data-choice="CANALES"][data-option="los_olivos"]')).to_be_disabled()
+        ok('Next cycle retains contracted quantities and requires renewed confirmation',page.locator('[data-store-qty="los_olivos"]').get_attribute('min')=='3' and page.evaluate("!itemComplete(findDecisionItem('CANALES'))"))
+        page.locator('[data-store-qty="los_olivos"]').fill('1')
+        expect(page.locator('[data-store-qty="los_olivos"]')).to_have_value('3')
+        page.locator('[data-store-qty="los_olivos"]').fill('5');page.locator('#saveDecisionSection').click()
+        ok('Additional stores use their own commitment batch',page.evaluate("JSON.stringify(decisionState.CANALES.storeContracts.los_olivos)===JSON.stringify([{round:1,quantity:3},{round:2,quantity:2}])"))
+        page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','13');loadDecisionState();decisionDrafts={};renderTabs();renderDecisionCategory()")
+        ok('Only unexpired stores remain mandatory at cycle 13',page.locator('[data-store-qty="los_olivos"]').get_attribute('min')=='2' and not page.locator('[data-choice="CANALES"][data-option="miraflores"]').is_disabled())
+        page.close()
+
+    if GROUP in ('all','drafts'):
+        page=make_student(context);select_category(page,'B')
+        maintenance=page.locator('[data-choice="MANTENIMIENTO"]')
+        maintenance.click();expect(maintenance).to_be_checked()
+        maintenance.click();expect(maintenance).not_to_be_checked()
+        ok('Optional maintenance toggles selected then unselected',page.evaluate("selectedOptionIds(findDecisionItem('MANTENIMIENTO')).length===0&&computeItemCost(findDecisionItem('MANTENIMIENTO'))===0"))
+        expect(page.locator('[data-choice="LOCAL_PROD"]')).to_be_disabled()
+        ok('Mandatory fixed operating cost stays protected')
+        page.locator('[data-qty="MESA_CORTE"][data-option="mesa"]').fill('2')
+        selected=page.evaluate('decisionDrafts.MESA_CORTE.quantities.mesa')
+        select_category(page,'D');page.locator('[data-choice="CANALES"][data-option="sjl"]').check();page.locator('#saveDecisionSection').click()
+        select_category(page,'B')
+        ok('Saving sales does not discard a pending draft in another section',page.evaluate('decisionDrafts.MESA_CORTE.quantities.mesa')==selected)
+        page.close()
+
+    if GROUP in ('all','layout'):
+        # Same DOM at desktop, mobile and short viewport. Buttons must be reachable.
+        for width,height in [(1366,768),(390,844),(768,600)]:
+            page=make_student(context,size={'width':width,'height':height})
+            page.evaluate("showScreen('studentLobby');renderStudentStatus();syncStudentTimer()")
+            metrics=page.evaluate("""() => {const c=document.querySelector('.lobby-card'),l=document.querySelector('.dash-logo'),button=$('backToProfiles'),cb=c.getBoundingClientRect(),lb=l.getBoundingClientRect();return {center:Math.abs(cb.x+cb.width/2-lb.x-lb.width/2),bottom:button.getBoundingClientRect().bottom<=cb.bottom,overflow:getComputedStyle(c).overflowY,wide:document.documentElement.scrollWidth<=innerWidth}}""")
+            ok(f'Lobby {width}x{height}: centered foreground logo and no clipped footer',metrics['center']<1 and metrics['bottom'] and metrics['overflow']=='visible' and metrics['wide'])
+            page.locator('#backToProfiles').scroll_into_view_if_needed();expect(page.locator('#backToProfiles')).to_be_in_viewport()
+            page.screenshot(path=str(OUT/f'lobby-{width}.png'),full_page=True)
+            page.locator('#backToProfiles').click();expect(page.locator('#profiles')).to_be_visible()
+            ok(f'Lobby {width}x{height}: bottom action remains clickable')
+            if width==390:
+                page.evaluate("openDecisionMenu();currentCategory='D';renderTabs();renderDecisionCategory()")
+                page.locator('[data-choice="CANALES"][data-option="los_olivos"]').check()
+                page.locator('[data-store-step="los_olivos"][data-delta="1"]').click()
+                ok('Mobile store stepper remains clickable',page.locator('[data-store-qty="los_olivos"]').input_value()=='2')
+                page.locator('#saveDecisionSection').click()
+                ok('Mobile save button persists quantity',page.evaluate('decisionState.CANALES.quantities.los_olivos===2'))
+                ok('Mobile decision controls stay within the viewport',page.evaluate("$('decisionMenu').scrollWidth<=$('decisionMenu').clientWidth&&$('exitDecisions').getBoundingClientRect().x>=0"))
+                page.screenshot(path=str(OUT/'sales-mobile.png'))
+            page.close()
+    ok('No JavaScript runtime errors in isolated UI scenarios',not errors)
+    browser.close()
+(OUT/f'{GROUP}-browser-results.json').write_text(json.dumps({'passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated DOM with fixture Web Storage; no Supabase, CDN or production server tested.'},indent=2))
+print(f'PASS {len(checks)} checks. Results: {OUT}',flush=True)
