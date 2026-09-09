@@ -1,6 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),R=require('../side_rules.js');
 const config={cycles:6,roundHours:8,roundMinutes:0,scheduledStart:'2026-09-03T18:00'},plan=R.cycleSchedule(config);
+test('Commercial-name normalization blocks cosmetic duplicates',()=>{assert.equal(R.normalizeCompanyName('  BÓSS---Bags S.A.C. '),'boss bags s a c');assert.equal(R.normalizeCompanyName('Carteras Únicas'),R.normalizeCompanyName('carteras unicas'))});
 test('Six 8-hour cycles: zero minutes stay zero, 48 hours total',()=>{assert.equal(plan.duration,28800000);assert.equal(plan.total,172800000);assert.equal(plan.cycles.length,6);assert.equal(R.localDate(plan.start),'2026-09-03');assert.equal(R.localDate(plan.end),'2026-09-05');assert.equal(new Date(plan.end).getHours(),18);for(let i=1;i<6;i++)assert.equal(plan.cycles[i].start,plan.cycles[i-1].end)});
 test('Month and year rollover',()=>{const p=R.cycleSchedule({...config,cycles:2,scheduledStart:'2026-12-31T23:30',roundHours:0,roundMinutes:45});assert.equal(R.localDate(p.end),'2027-01-01');assert.equal(new Date(p.end).getHours(),1)});
 test('Invalid values rejected',()=>{for(const invalid of [{cycles:0},{cycles:21},{cycles:1.5},{roundHours:-1},{roundMinutes:60},{roundMinutes:2.2},{roundHours:0,roundMinutes:0},{scheduledStart:''}])assert.ok(R.cycleSchedule({...config,...invalid}).error)});

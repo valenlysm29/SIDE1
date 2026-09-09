@@ -59,13 +59,18 @@ try:
     ok('Submitted mold is still included in the exact cycle cost',page.evaluate("readReviewReceipts().B.items.find(i=>i.id==='MOLDE').outflow")==1200)
     tab(page,'C')
     qty(page,'PERS_CORTE','corte_basico',2);qty(page,'PERS_ENSAMBLE','ens_personal_ind',1);qty(page,'PERS_ACABADO','aca_personal_basico',1)
-    choice(page,'JEFATURA','si_jefatura');choice(page,'ANALISTA_COMPRAS','si_analista')
+    choice(page,'JEFATURA','si_jefatura')
     page.locator('[data-number="PRODUCCION_META"]').fill('100')
-    qty(page,'CUERO','cuero_sint',100);qty(page,'CUERO','cuero_std',10);qty(page,'ACCESORIOS','acc_eco',100);qty(page,'HILO','hilo_std',100)
-    choice(page,'GARANTIA_PROV','gar_80');choice(page,'GARANTIA_PT','pt_90')
-    expected_c=3000+2800+1500+3000+600+5000+(2500+450+400+200)*.88
+    choice(page,'GARANTIA_PT','pt_90')
+    expected_c=3000+2800+1500+3000+600
     page.locator('#sendDecisionSection').click()
-    ok('Production receipt includes staffing, target, all materials, services and guarantees',abs(page.evaluate("readReviewReceipts().C.outflow")-expected_c)<.001 and page.evaluate("readReviewReceipts().C.items.length===categoryByCat('C').items.length"))
+    ok('Production receipt contains the single productive line, staffing and quality control',abs(page.evaluate("readReviewReceipts().C.outflow")-expected_c)<.001 and page.evaluate("readReviewReceipts().C.items.length===categoryByCat('C').items.length"))
+    tab(page,'F');choice(page,'ANALISTA_COMPRAS','si_analista')
+    qty(page,'CUERO','cuero_sint',100);qty(page,'CUERO','cuero_std',10);qty(page,'ACCESORIOS','acc_eco',100);qty(page,'HILO','hilo_std',100)
+    choice(page,'GARANTIA_PROV','gar_80')
+    expected_f=5000+(2500+450+400+200)*.88
+    page.locator('#sendDecisionSection').click()
+    ok('Logistics receipt includes purchasing, all materials and supplier guarantee',abs(page.evaluate("readReviewReceipts().F.outflow")-expected_f)<.001 and page.evaluate("readReviewReceipts().F.items.length===categoryByCat('F').items.length"))
     tab(page,'D');choice(page,'CANALES','web')
     for district,value in [('los_olivos',2),('miraflores',1),('sjl',3)]:
         choice(page,'CANALES',district);page.locator(f'[data-store-qty="{district}"]').fill(str(value))
@@ -79,10 +84,10 @@ try:
     tab(page,'A')
     ok('Resumen contains all decision items',page.locator('#companySummaryMount [data-summary-item]').count()==page.evaluate('allDecisionItems().length'))
     page.locator('[data-summary-filter="sent"]').click()
-    ok('Only sent filter includes B, C, D and excludes draft E',page.locator('#companySummaryMount [data-summary-section]').evaluate_all('(els)=>els.map(e=>e.dataset.summarySection)')==['B','C','D'])
+    ok('Only sent filter includes B, C, Logistics and Sales and excludes draft Finance',page.locator('#companySummaryMount [data-summary-section]').evaluate_all('(els)=>els.map(e=>e.dataset.summarySection)')==['B','C','F','D'])
     capture_summary(page,'empresa-enviadas-escritorio.png')
     page.locator('[data-summary-filter="all"]').click()
-    expected_outflow=expected_b+expected_c+expected_d+7000
+    expected_outflow=expected_b+expected_c+expected_f+expected_d+7000
     f=page.evaluate('liveCompanyReview().financial')
     (OUT/'financial-debug.json').write_text(json.dumps({'actual':f,'expected_outflow':expected_outflow,'drafts':page.evaluate('decisionDrafts'),'state':page.evaluate('decisionState'),'ledger':page.evaluate('cashLedger')},indent=2))
     ok('Four financial concepts reconcile exactly with selections and saved cash',abs(f['outflow']-expected_outflow)<.001 and abs(f['projectedCash']-(100000-expected_outflow+10000))<.001)
@@ -103,11 +108,11 @@ try:
     page.set_viewport_size({'width':1366,'height':900});page.locator('#cancelCompanyReview').click()
     ok('Cancel review preserves every submitted and unsubmitted value',business(page)==before)
     page.locator('#topSubmitAllDecisions').click();page.locator('#confirmCompanyReview').click()
-    ok('Confirmation submits all four decision sections in a single local batch',page.evaluate('decisionsSubmitted()&&decisionCategories().every(c=>sectionSubmitted(c.cat))'))
+    ok('Confirmation submits all five decision sections in a single local batch',page.evaluate('decisionsSubmitted()&&decisionCategories().every(c=>sectionSubmitted(c.cat))'))
     ok('Final cash exactly matches the reviewed projection',abs(page.evaluate('cashBalance()')-f['projectedCash'])<.001)
     after=business(page);page.evaluate('commitReviewedSections(DECISION_CATALOG.map(c=>c.cat),true)')
     ok('Repeated confirmation cannot double-charge or replace receipts',business(page)==after)
-    ok('Submitted summary remains visible after the cycle is locked',page.locator('#companySummaryMount [data-summary-section]').count()==4)
+    ok('Submitted summary remains visible after the cycle is locked',page.locator('#companySummaryMount [data-summary-section]').count()==5)
     receipts1=page.evaluate('readReviewReceipts()');student=page.evaluate('currentStudent')
     saved_storage=page.evaluate("Object.fromEntries(Array.from({length:localStorage.length},(_,i)=>{const k=localStorage.key(i);return [k,localStorage.getItem(k)]}))")
     page.close();page=context.new_page();load(page,'index.html',saved_storage);page.evaluate('student=>{currentStudent=student;openDecisionMenu()}',student)
@@ -115,7 +120,7 @@ try:
     page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');lastObservedRound=2;loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory()")
     ok('New cycle is not incorrectly marked as already sent',page.evaluate("!decisionsSubmitted()&&!sectionSubmitted('B')"))
     page.locator('#companySummaryCycle').select_option('1')
-    ok('Historical cycle shows the four immutable submitted sections',page.locator('#companySummaryMount [data-summary-section]').count()==4 and page.evaluate('readReviewReceipts(1)')==receipts1)
+    ok('Historical cycle shows the five immutable submitted sections',page.locator('#companySummaryMount [data-summary-section]').count()==5 and page.evaluate('readReviewReceipts(1)')==receipts1)
     ok('History does not invent an old projected cash value',page.locator('#companySummaryMount .cs-metric').count()==0)
     capture_summary(page,'historial-ciclo-1.png')
     # Fresh company with enough combined financing but not enough cash for B before E.
@@ -153,5 +158,5 @@ try:
     browser.close()
 finally:
  pass
-(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.08.3','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
+(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.09.1','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
 print('TOTAL PASS',len(checks),flush=True)

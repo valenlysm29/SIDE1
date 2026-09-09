@@ -7,6 +7,9 @@
   'use strict';
   const STORE_IDS = Object.freeze(['los_olivos', 'miraflores', 'sjl']);
   const COMMITMENT_CYCLES = 12;
+  function normalizeCompanyName(value) {
+    return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  }
   function positiveInteger(value, fallback = 1) {
     const n = Number(value);
     return Number.isSafeInteger(n) && n >= 1 ? n : fallback;
@@ -73,5 +76,5 @@
     if (add>0) batches.push({round,quantity:add});
     return batches;
   }
-  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
+  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,normalizeCompanyName,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
 });

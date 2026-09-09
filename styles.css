@@ -1300,7 +1300,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .flow-arrow{transform:rotate(90deg);align-self:center}
 }
 
-/* SIDE v2026.09.08.3 · Calculadora por molde y DOP de ingeniería industrial */
+/* SIDE v2026.09.09.1 · Calculadora por molde y DOP de ingeniería industrial */
 .production-calculator{display:grid;gap:14px;width:100%;min-width:0}
 .production-calculator>header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px;border-radius:12px;background:#071b30;border:1px solid #57b9f53b}
 .production-calculator>header>div:first-child{min-width:0}
@@ -1392,17 +1392,27 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .dop-inspection-row>.dop-symbol{border-radius:2px;border-color:#ff9d83;background:#3a1c1b}
 .dop-quality-data{border-bottom-color:#ff9d83;background:linear-gradient(90deg,#351d1d 70%,transparent)}
 .dop-quality-data:after{border-color:#ff9d83}
-.dop-yield{width:58%;margin-left:42%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:13px 14px;border:1px solid #ffd34f55;background:#ffd34f0c}
+.dop-yield{position:relative;width:58%;margin-left:42%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:13px 14px;border:1px solid #ffd34f55;background:#ffd34f0c}
+.dop-yield:before,.dop-final-output:before{content:"";position:absolute;left:24px;top:-18px;width:3px;height:18px;background:#83a8bd}
 .dop-yield span{align-self:end;color:#b99b42;font-size:12px;font-weight:900;letter-spacing:.5px}
 .dop-yield strong{grid-row:1/3;grid-column:2;align-self:center;color:#ffd34f;font-size:30px}
 .dop-yield small{color:#a9b6c0;font-size:12px}
-.dop-final-output{width:58%;margin-left:42%;display:grid;gap:3px;padding:14px;border-radius:0 0 10px 10px;background:linear-gradient(135deg,#145238,#0d3e2a);border:1px solid #67e5a1}
+.dop-final-output{position:relative;width:58%;margin-left:42%;display:grid;gap:3px;padding:14px;border-radius:0 0 10px 10px;background:linear-gradient(135deg,#145238,#0d3e2a);border:1px solid #67e5a1}
 .dop-final-output span{color:#a9ffd0;font-size:12px;font-weight:900;letter-spacing:.5px}
 .dop-final-output strong{color:#fff;font-size:20px}
 .dop-final-output small{color:#b6d9c5;font-size:12px}
 .dop-final-mix{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
 .dop-final-mix span{padding:5px 8px;border-radius:6px;background:#ffffff12;color:#d6eee0;font-size:12px}
 .dop-final-mix b{color:#fff}
+.dop-cycle-footer{display:grid;grid-template-columns:minmax(210px,.75fr) minmax(280px,1.25fr);gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid #ffffff18}
+.dop-cycle-footer table{width:100%;border-collapse:collapse;background:#061827;color:#d8e5ef;font-size:12px}
+.dop-cycle-footer caption{padding:8px;border:1px solid #4f7793;border-bottom:0;background:#0a2941;color:#fff;font-size:14px;font-weight:900;text-align:left}
+.dop-cycle-footer th,.dop-cycle-footer td{padding:7px 9px;border:1px solid #4f7793;text-align:left}
+.dop-cycle-footer td:last-child,.dop-cycle-footer th:last-child{text-align:center;font-weight:900}
+.dop-footer-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dop-footer-metrics>div{display:grid;align-content:center;gap:5px;min-width:0;padding:12px;border:1px solid #ffffff18;border-radius:9px;background:#061827}
+.dop-footer-metrics span{color:#80a2ba;font-size:12px;font-weight:900;letter-spacing:.45px}
+.dop-footer-metrics strong{color:#ffd34f;font-size:18px;overflow-wrap:anywhere}
 .dop-empty{padding:18px;border:1px dashed #6dbdf14f;border-radius:10px;text-align:center;background:#03111d}
 .dop-empty strong{color:#e6f1f8;font-size:16px}
 .dop-empty p{margin:5px 0 0;color:#94aabd;font-size:14px}
@@ -1435,6 +1445,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 @media(max-width:900px){
   .mold-production-grid,.cs-mold-grid,.cs-product-mix{grid-template-columns:1fr}
   .dop-layout{grid-template-columns:1fr}
+  .dop-cycle-footer{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   .production-calculator>header,.dop-heading{flex-direction:column}
@@ -1457,6 +1468,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .dop-side-input{grid-column:1/-1;grid-row:1;margin:0 0 10px 44px;padding:9px 12px;border-left:2px solid #6299bd;border-bottom:0;background:#08233a}
   .dop-side-input:after{display:none}
   .dop-yield{border-radius:8px;margin-top:8px}
+  .dop-footer-metrics{grid-template-columns:1fr}
 }
 
 /* SIDE v2026.09.07.2: scroll only the results, never the action footer. */

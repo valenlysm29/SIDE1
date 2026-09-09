@@ -37,6 +37,18 @@ function requireSupabase(){if(!supabaseClient){toast('Modo local activo: configu
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
 function deepClone(v){return JSON.parse(JSON.stringify(v??{}))}
+function companyRegistryKey(code){return `SIDE_COMPANY_NAMES_${String(code||'SIDE-000').toUpperCase()}`}
+function localCompanyNameTaken(code,name){
+  const wanted=RULES.normalizeCompanyName(name);if(!wanted)return true;
+  let names=[];try{names=JSON.parse(localStorage.getItem(companyRegistryKey(code))||'[]')}catch{}
+  let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
+  return names.some(saved=>RULES.normalizeCompanyName(saved)===wanted)||reports.some(report=>String(report?.partida||'').toUpperCase()===String(code).toUpperCase()&&RULES.normalizeCompanyName(report?.empresa)===wanted);
+}
+function reserveLocalCompanyName(code,name){
+  if(localCompanyNameTaken(code,name))return false;
+  const key=companyRegistryKey(code);let names=[];try{names=JSON.parse(localStorage.getItem(key)||'[]')}catch{}
+  names.push(name);localStorage.setItem(key,JSON.stringify(names));return true;
+}
 
 function teacherConfig(){
   const defaults={capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000,interest:20,creditPercentStart:20,round:1,cycles:6,demandLosOlivos:1000,demandMiraflores:1250,demandSJL:1100,cycleCloseMode:'manual',roundHours:0,roundMinutes:10,roundSecs:0,scheduledStart:'',enabledEvents:[]};
@@ -125,7 +137,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260908-3'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260909-1'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -135,6 +147,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
   if(!legalName||!brandName){message('studentMessage','Ingresa el nombre y el nombre comercial de tu empresa.',true);return}
   const localCfg=teacherConfig(),localCode=String(localCfg.codigo||'SIDE-000').toUpperCase();
   if(code===localCode||code==='SIDE-000'){
+    if(!reserveLocalCompanyName(code,brandName)){message('studentMessage','Ese nombre comercial ya está registrado en esta partida. Elige uno diferente.',true);return}
     const localGame={...DEMO_GAME,codigo:code,nombre:localCfg.nombre||DEMO_GAME.nombre,curso:localCfg.curso||DEMO_GAME.curso,estado:'activa'};
     currentStudent={name:'Jugador',company:brandName,legalName,participantId:null,game:localGame};
   }else{
@@ -142,7 +155,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     const{data:game,error}=await supabaseClient.rpc('buscar_partida_por_codigo',{p_codigo:code});if(error){message('studentMessage',error.message,true);return}
     const found=Array.isArray(game)?game[0]:game;if(!found){message('studentMessage','No encontramos una partida con ese código.',true);return}
     const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
-    if(joinError){message('studentMessage',joinError.message,true);return} currentStudent={name:'Jugador',company:brandName,legalName,participantId:participant?.id||null,game:found};
+    if(joinError){message('studentMessage',joinError.code==='23505'?'Ese nombre comercial ya está registrado en esta partida. Elige uno diferente.':joinError.message,true);return} currentStudent={name:'Jugador',company:brandName,legalName,participantId:participant?.id||null,game:found};
   }
   closeModal();startJoinLoading();
 });
@@ -156,7 +169,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260908-3');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260909-1');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -451,10 +464,11 @@ function productionDopHtml(plan=productionPlan(),compact=false){
         <li class="dop-operation-row"><aside class="dop-side-input"><span>ENTRADA LATERAL</span><strong>Hilo · ${escapeHtml(selection('HILO'))}</strong><small>Necesario total: ${material('HILO')?.neededForTarget.toLocaleString('es-PE')||0} m · disponible: ${material('HILO')?.available.toLocaleString('es-PE')||0} m</small></aside><i class="dop-symbol operation"><span>2</span></i><div class="dop-operation-copy"><strong>Ensamblado y costura</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>${assembly.staff} operario(s) · ${assembly.machines} máquina(s) · capacidad total ${assembly.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></li>
         <li class="dop-operation-row"><aside class="dop-side-input"><span>ENTRADA LATERAL</span><strong>Accesorios · ${escapeHtml(selection('ACCESORIOS'))}</strong><small>Necesario total: ${material('ACCESORIOS')?.neededForTarget.toLocaleString('es-PE')||0} u. · disponible: ${material('ACCESORIOS')?.available.toLocaleString('es-PE')||0} u.</small></aside><i class="dop-symbol operation"><span>3</span></i><div class="dop-operation-copy"><strong>Colocación de accesorios</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>Hebillas, cierres y componentes elegidos para toda el área productiva</small></div></li>
         <li class="dop-operation-row"><div class="dop-side-space"></div><i class="dop-symbol operation"><span>4</span></i><div class="dop-operation-copy"><strong>Acabado</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades procesables</span><small>${finish.staff} operario(s) · ${finish.machines} máquina(s) · capacidad total ${finish.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></li>
-        <li class="dop-operation-row dop-inspection-row"><aside class="dop-side-input dop-quality-data"><span>CONTROL DEL CICLO</span><strong>Eficiencia de línea: ${Math.round(plan.efficiency*100)}%</strong><small>${provider?`Proveedor: ${escapeHtml(provider.label)}`:'Sin garantía de proveedor'}${productWarranty?` · PT: ${escapeHtml(productWarranty.label)}`:''}</small></aside><i class="dop-symbol inspection"><span>I1</span></i><div class="dop-operation-copy"><strong>Inspección final</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades conformes</span><small>Verificación conjunta antes del ingreso al catálogo productivo</small></div></li>
+        <li class="dop-operation-row dop-inspection-row"><aside class="dop-side-input dop-quality-data"><span>CONTROL DEL CICLO</span><strong>Garantías aplicadas</strong><small>${provider?`Proveedor: ${escapeHtml(provider.label)}`:'Sin garantía de proveedor'}${productWarranty?` · PT: ${escapeHtml(productWarranty.label)}`:''}</small></aside><i class="dop-symbol inspection"><span>I1</span></i><div class="dop-operation-copy"><strong>Inspección final</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} unidades conformes</span><small>Verificación conjunta antes del ingreso al catálogo productivo</small></div></li>
       </ol>
       <div class="dop-yield"><span>PORCENTAJE PRODUCIDO</span><strong>${producedPercent}%</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} conformes ÷ ${plan.target.toLocaleString('es-PE')} deseadas</small></div>
       <div class="dop-final-output"><span>PRODUCCIÓN FINAL DEL CICLO ${currentRound()}</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades totales</strong><div class="dop-final-mix">${finalMix}</div><small>Resultado mensual consolidado del área productiva única.</small></div>
+      <footer class="dop-cycle-footer"><table><caption>Resumen del DOP</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>4</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>0</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="dop-footer-metrics"><div><span>EFICIENCIA DE LA LÍNEA</span><strong>${Math.round(plan.efficiency*100)}%</strong></div><div><span>PRODUCCIÓN MENSUAL</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades</strong></div><div><span>CUMPLIMIENTO DE LA META</span><strong>${producedPercent}%</strong></div></div></footer>
     </div>
   </article>`:'';
   return `<section class="production-dop ${compact?'dop-compact':''}" aria-labelledby="productionDopTitle">
@@ -582,7 +596,7 @@ function updateSectionCost(){
   const send=$('sendDecisionSection');if(send){send.disabled=locked||projected<0||!sectionDraftReady(currentCategory);send.querySelector('strong').textContent=locked?'DECISIÓN ENVIADA':'ENVIAR DECISIÓN';send.querySelector('small').textContent=locked?'Editable en el próximo ciclo':'Confirmar; no editable en este ciclo'}
 }
 function productionMaterialShortages(){
-  if(currentCategory!=='C')return [];
+  if(!['C','F'].includes(currentCategory))return [];
   if(!currentProductionTarget())return [];
   return productionPlan().materials.filter(material=>material.shortfall>0).map(material=>({item:findDecisionItem(material.id),need:material.neededForTarget,total:material.available,missing:material.shortfall,unit:material.unit}));
 }

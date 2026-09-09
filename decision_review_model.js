@@ -134,7 +134,7 @@
   function warnings(ctx){
     const warnings=[],plan=productionModel?.calculate(ctx);
     if(!plan||!plan.target)return warnings;
-    for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'C',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
+    for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'F',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
     for(const process of plan.processes)if(process.shortfall>0)warnings.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad de ${process.cycleCapacity.toLocaleString('es-PE')} unidades frente a una meta de ${plan.target.toLocaleString('es-PE')}. Revisa personal y equipos del proceso.`});
     return warnings;
   }

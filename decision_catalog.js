@@ -39,7 +39,7 @@ window.SIDE_DECISION_CATALOG = [
   },
   {
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
-    desc:'Integra personal, compras, materia prima y el volumen que deseas producir en el ciclo.',
+    desc:'Define el volumen del ciclo y organiza el personal que opera la línea única de corte, ensamblado y acabado.',
     items:[
       {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Calcula la producción deseada por cada tipo de molde. SIDE mostrará los insumos requeridos y una sugerencia basada en la capacidad instalada.',cost:0},
       {id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
@@ -64,6 +64,17 @@ window.SIDE_DECISION_CATALOG = [
       {id:'LIMPIEZA',name:'Limpieza y servicios generales',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['limpieza'],options:[
         {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo operativo fijo obligatorio para mantener el área de producción.',cost:600}
       ]},
+      {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:[
+        {id:'pt_30',label:'Cobertura comercial 30 días',desc:'Política básica de respaldo al cliente para productos terminados.',cost:0,value:30},
+        {id:'pt_90',label:'Cobertura comercial 90 días',desc:'Mayor respaldo posventa y confianza del cliente.',cost:0,value:90},
+        {id:'pt_180',label:'Cobertura comercial 180 días',desc:'Política amplia de respaldo para líneas de mayor valor.',cost:0,value:180}
+      ]}
+    ]
+  },
+  {
+    cat:'F', title:'Logística', short:'Logística', icon:'assets/icons/categories/insumos.svg',
+    desc:'Planifica las compras y el abastecimiento de materias primas que alimentan el área productiva durante el ciclo.',
+    items:[
       {id:'ANALISTA_COMPRAS',required:false,name:'Analista de compras',type:'choice',recurring:true,options:[
         {id:'no_analista',label:'No contratar',desc:'Compras sin negociación especializada.',cost:0},
         {id:'si_analista',label:'Contratar',desc:'S/ 5,000 por ciclo. Negocia mejores condiciones; el beneficio porcentual es mayor al inicio y luego se reduce.',cost:5000}
@@ -86,11 +97,6 @@ window.SIDE_DECISION_CATALOG = [
         {id:'gar_0',label:'Sin garantía',desc:'No hay porcentaje de devolución por material fallado.',cost:0,value:0},
         {id:'gar_80',label:'80% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 80% del valor correspondiente.',cost:0,value:80},
         {id:'gar_100',label:'100% de devolución',desc:'Ante una falla cubierta, el proveedor devuelve el 100% del valor correspondiente.',cost:0,value:100}
-      ]},
-      {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:[
-        {id:'pt_30',label:'Cobertura comercial 30 días',desc:'Política básica de respaldo al cliente para productos terminados.',cost:0,value:30},
-        {id:'pt_90',label:'Cobertura comercial 90 días',desc:'Mayor respaldo posventa y confianza del cliente.',cost:0,value:90},
-        {id:'pt_180',label:'Cobertura comercial 180 días',desc:'Política amplia de respaldo para líneas de mayor valor.',cost:0,value:180}
       ]}
     ]
   },

@@ -31,7 +31,10 @@ test('production model loads before the application and review modules',()=>{
 test('productive catalog requires a mold and a sales channel, with calculator first',()=>{
   const source=fs.readFileSync(path.join(root,'decision_catalog.js'),'utf8'),sandbox={window:{}};
   require('node:vm').runInNewContext(source,sandbox);
-  const catalog=sandbox.window.SIDE_DECISION_CATALOG,items=catalog.flatMap(category=>category.items||[]),production=catalog.find(category=>category.cat==='C');
+  const catalog=sandbox.window.SIDE_DECISION_CATALOG,items=catalog.flatMap(category=>category.items||[]),production=catalog.find(category=>category.cat==='C'),logistics=catalog.find(category=>category.cat==='F');
+  assert.ok(logistics, 'Logistics category must exist');
+  assert.equal(logistics.items.filter(item=>item.material).map(item=>item.id).join(','),'CUERO,ACCESORIOS,HILO');
+  assert.ok(!production.items.some(item=>['ANALISTA_COMPRAS','CUERO','ACCESORIOS','HILO','GARANTIA_PROV'].includes(item.id)));
   assert.equal(items.find(item=>item.id==='MOLDE').required,true);
   assert.equal(items.find(item=>item.id==='CANALES').minSelections,1);
   assert.equal(production.items[0].id,'PRODUCCION_META');
@@ -46,7 +49,7 @@ test('cycle zero places summary last and later cycles place it first',()=>{
 
 test('DOP follows the project cycle from leather input to final production',()=>{
   const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-  for(const label of ['MATERIA PRIMA PRINCIPAL','Corte','Ensamblado y costura','Colocación de accesorios','Acabado','Inspección final','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO'])assert.match(app,new RegExp(label));
+  for(const label of ['MATERIA PRIMA PRINCIPAL','Corte','Ensamblado y costura','Colocación de accesorios','Acabado','Inspección final','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO','Resumen del DOP','EFICIENCIA DE LA LÍNEA','PRODUCCIÓN MENSUAL'])assert.match(app,new RegExp(label));
   assert.match(app,/plan\.productLines\.filter\(line=>line\.target>0\)/);
   assert.match(app,/ÁREA PRODUCTIVA ÚNICA/);
   assert.match(app,/DOP consolidado de producción/);
