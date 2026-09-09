@@ -1,4 +1,4 @@
-"""SIDE v2026.09.09.6: actual click handlers + viewport/hit-test regressions.
+"""SIDE v2026.09.09.7: actual click handlers + viewport/hit-test regressions.
 Runs the delivered UI in an offline Chromium DOM, using browser_fixture.
 This does not test an HTTP deployment, Supabase, or the 3D renderer.
 """
@@ -119,5 +119,5 @@ with sync_playwright() as p:
     ok('Sending saves quantities and locks only the confirmed section',page.evaluate("sectionSubmitted('D')&&decisionState.CANALES.quantities.miraflores===5") and page.locator('[data-store-qty="miraflores"]').is_disabled())
     ok('No JavaScript runtime errors in these scenarios',not errors)
     browser.close()
-(OUT/'ui-final-results.json').write_text(json.dumps({'build':'2026.09.09.6','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Offline Chromium DOM using delivered HTML/CSS/JS and a Web Storage double. External network, HTTP deployment, Supabase and 3D not tested.'},indent=2))
+(OUT/'ui-final-results.json').write_text(json.dumps({'build':'2026.09.09.7','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Offline Chromium DOM using delivered HTML/CSS/JS and a Web Storage double. External network, HTTP deployment, Supabase and 3D not tested.'},indent=2))
 print('PASS',len(checks),'checks',flush=True)
