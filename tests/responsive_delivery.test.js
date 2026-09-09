@@ -11,7 +11,7 @@ test('student and teacher pages load the final responsive layer', () => {
   for (const file of ['index.html', 'docente.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
     assert.match(html, /<meta\s+name="viewport"[^>]*width=device-width/i);
-    assert.match(html, /href="responsive\.css\?v=20260909-3"/);
+    assert.match(html, /href="responsive\.css\?v=20260909-4"/);
   }
 });
 

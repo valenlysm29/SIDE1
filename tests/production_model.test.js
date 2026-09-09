@@ -62,12 +62,12 @@ test('calculator keeps one target and material requirement for every mold',()=>{
 
 test('industrial DOP separates operations, inspection and combined activity',()=>{
   const plan=model.calculate(context(completeLine()));
-  assert.equal(plan.dop.length,5);assert.equal(plan.dop.filter(step=>step.type==='operation').length,3);
-  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,1);
+  assert.equal(plan.dop.length,6);assert.equal(plan.dop.filter(step=>step.type==='operation').length,3);
+  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,2);
   assert.equal(plan.dop.filter(step=>step.type==='combined').length,1);
   assert.deepEqual(plan.dop.filter(step=>step.type==='operation').map(step=>step.number),[1,2,3]);
   assert.equal(plan.dop.find(step=>step.type==='combined').number,1);
-  assert.equal(plan.dop.find(step=>step.type==='inspection').number,1);
+  assert.deepEqual(plan.dop.filter(step=>step.type==='inspection').map(step=>step.number),[1,2]);
 });
 
 test('DOP data includes purchased material qualities and cycle yield by mold',()=>{
