@@ -1300,7 +1300,7 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .flow-arrow{transform:rotate(90deg);align-self:center}
 }
 
-/* SIDE v2026.09.09.5 · Calculadora por molde y DOP de ingeniería industrial */
+/* SIDE v2026.09.09.6 · Calculadora por molde y DOP de ingeniería industrial */
 .production-calculator{display:grid;gap:14px;width:100%;min-width:0}
 .production-calculator>header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:14px;border-radius:12px;background:#071b30;border:1px solid #57b9f53b}
 .production-calculator>header>div:first-child{min-width:0}
@@ -1428,6 +1428,43 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .dop-footer-metrics>div{display:grid;align-content:center;gap:5px;min-width:0;padding:12px;border:1px solid #ffffff18;border-radius:9px;background:#061827}
 .dop-footer-metrics span{color:#80a2ba;font-size:12px;font-weight:900;letter-spacing:.45px}
 .dop-footer-metrics strong{color:#ffd34f;font-size:18px;overflow-wrap:anywhere}
+.dop-process-map{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 100px 120px 125px 115px 115px;column-gap:80px;position:relative;min-width:0;padding:4px 8px 0}
+.dop-map-source{position:relative;display:grid;align-content:end;justify-items:center;gap:2px;min-height:82px;padding:8px 12px 12px;border-bottom:2px solid #7c96a9;text-align:center}
+.dop-map-source:after{content:"";position:absolute;left:50%;top:100%;width:2px;height:52px;background:#7c96a9}
+.dop-map-source span{color:#8fa8bb;font-size:12px;font-weight:900;letter-spacing:.45px}
+.dop-map-source strong{color:#fff;font-size:17px}
+.dop-map-source small{max-width:230px;color:#7f94a5;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dop-map-secondary-source{grid-column:1;grid-row:1;border-color:#d8b73e}
+.dop-map-secondary-source:after{background:#d8b73e}
+.dop-map-secondary-source span{color:#d8b73e}
+.dop-map-main-source{grid-column:2;grid-row:1;border-color:#70bfe9}
+.dop-map-main-source:after{background:#70bfe9}
+.dop-map-main-source span{color:#70bfe9}
+.dop-map-step{position:relative;display:grid;place-items:center;min-width:0}
+.dop-map-step:before{content:"";position:absolute;z-index:0;left:50%;top:-50%;bottom:-50%;width:2px;background:#7c96a9}
+.dop-map-step>.dop-symbol{position:relative;z-index:2;display:grid;place-items:center;width:46px;height:46px;flex-basis:46px;background:#03111d;color:#fff;font-style:normal;box-shadow:0 0 0 7px #03111d}
+.dop-map-step>.dop-symbol span{position:relative;z-index:2;font-size:15px;font-weight:1000}
+.dop-map-step>div{position:absolute;left:calc(50% + 42px);right:0;top:50%;display:grid;gap:3px;transform:translateY(-50%);min-width:0}
+.dop-map-step>div strong{color:#eff5f9;font-size:14px;line-height:1.25}
+.dop-map-step>div>span{color:#79e7a0;font-size:13px;font-weight:900}
+.dop-map-step>div small{color:#8ba0b0;font-size:11px;line-height:1.4}
+.dop-map-branch-step{grid-column:1}
+.dop-map-branch-step:before{background:#d8b73e}
+.dop-map-main-step{grid-column:2}
+.dop-map-main-step:before,.dop-map-main-rail:before{background:#70bfe9}
+.dop-map-classification{grid-row:2}
+.dop-map-main-rail{position:relative;grid-column:2;grid-row:2}
+.dop-map-main-rail:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px}
+.dop-map-preparation{grid-row:3}
+.dop-map-preparation:after{content:"";position:absolute;z-index:0;left:50%;bottom:-1px;width:calc(100% + 80px);height:2px;background:#d8b73e}
+.dop-map-cut{grid-row:3}
+.dop-map-combined{grid-row:4}
+.dop-map-combined>.dop-symbol{border-color:#ffd34f;background:#332b11}
+.dop-map-finish{grid-row:5}
+.dop-map-final-check{grid-row:6}
+.dop-map-final-check>.dop-symbol{border-color:#ff9d83;background:#3a1c1b}
+.dop-process-map+.dop-yield,.dop-process-map+.dop-yield+.dop-final-output{width:50%;margin-left:50%}
+.dop-process-map+.dop-yield:before,.dop-process-map+.dop-yield+.dop-final-output:before{left:50%}
 .dop-empty{padding:18px;border:1px dashed #6dbdf14f;border-radius:10px;text-align:center;background:#03111d}
 .dop-empty strong{color:#e6f1f8;font-size:16px}
 .dop-empty p{margin:5px 0 0;color:#94aabd;font-size:14px}
@@ -1490,6 +1527,23 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
   .dop-branch-check>strong{position:static;width:auto;padding:0;transform:none;background:transparent;text-align:left;white-space:normal}
   .dop-yield{border-radius:8px;margin-top:8px}
   .dop-footer-metrics{grid-template-columns:1fr}
+  .dop-process-map{display:flex;flex-direction:column;padding:0}
+  .dop-map-source{width:100%;min-height:0;margin:8px 0 0;padding:10px 12px;align-content:start;justify-items:start;text-align:left}
+  .dop-map-source:after,.dop-map-main-rail,.dop-map-preparation:after{display:none}
+  .dop-map-main-source{order:1}
+  .dop-map-cut{order:2}
+  .dop-map-secondary-source{order:3;margin-top:18px}
+  .dop-map-classification{order:4}
+  .dop-map-preparation{order:5}
+  .dop-map-combined{order:6}
+  .dop-map-finish{order:7}
+  .dop-map-final-check{order:8}
+  .dop-map-step{display:grid;grid-template-columns:50px minmax(0,1fr);place-items:center start;min-height:82px}
+  .dop-map-step:before{left:24px;top:-50%;bottom:-50%}
+  .dop-map-step>.dop-symbol{grid-column:1;width:42px;height:42px;flex-basis:42px;box-shadow:0 0 0 5px #03111d}
+  .dop-map-step>div{position:static;grid-column:2;transform:none;padding-left:8px}
+  .dop-process-map+.dop-yield,.dop-process-map+.dop-yield+.dop-final-output{width:100%;margin-left:0}
+  .dop-process-map+.dop-yield:before,.dop-process-map+.dop-yield+.dop-final-output:before{left:21px}
 }
 
 /* SIDE v2026.09.07.2: scroll only the results, never the action footer. */
