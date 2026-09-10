@@ -6,7 +6,7 @@
 })(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
 
-  const WORKING_DAYS=30;
+  const WORKING_DAYS=24;
   const BASE_EFFICIENCY=0.90;
   const LEVEL_THREE_BONUS=0.01;
   const LEADERSHIP_BONUS=0.04;
@@ -15,9 +15,9 @@
   const sum=values=>values.reduce((total,value)=>total+n(value),0);
 
   const STAFF_RATES={
-    PERS_CORTE:{corte_basico:6,corte_exp:8,corte_maestro:12},
+    PERS_CORTE:{corte_basico:5,corte_exp:7,corte_maestro:9},
     PERS_ENSAMBLE:{ens_personal_basico:6,ens_personal_ind:8,ens_personal_esp:12},
-    PERS_ACABADO:{aca_personal_basico:6,aca_personal_tec:8,aca_personal_art:12}
+    PERS_ACABADO:{aca_personal_basico:6,aca_personal_tec:7,aca_personal_art:10}
   };
   const MACHINE_MULTIPLIERS={
     MESA_CORTE:{mesa:1},
@@ -40,8 +40,7 @@
     {id:'accessories_classification',type:'inspection',number:1,label:'Clasificación de accesorios'},
     {id:'accessories_preparation',type:'operation',number:2,label:'Preparación de accesorios'},
     {id:'assembly_accessories',type:'combined',number:1,label:'Ensamblado y colocación de accesorios'},
-    {id:'finish',type:'operation',number:3,label:'Acabado final'},
-    {id:'final_check',type:'inspection',number:2,label:'Inspección final del bolso'}
+    {id:'finish',type:'combined',number:2,label:'Acabado final'}
   ];
 
   function items(ctx){return (ctx.catalog||[]).flatMap(category=>category.items||[]);}
