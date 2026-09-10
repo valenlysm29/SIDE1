@@ -126,7 +126,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260910-1'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260910-2'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -157,7 +157,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260910-1');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260910-2');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
@@ -580,8 +580,10 @@ function updateSectionCost(){
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
   $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
-  $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Ajusta antes de guardar.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
-  $('saveDecisionSection').disabled=locked||projected<0;
+  $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
+  // El presupuesto puede impedir confirmar una decisión, pero nunca debe impedir
+  // conservar el avance del jugador como borrador.
+  $('saveDecisionSection').disabled=locked;
   if(currentCategory==='A'&&$('companySummaryMount'))renderCompanySummary();
   const send=$('sendDecisionSection');if(send){send.disabled=locked||projected<0||!sectionDraftReady(currentCategory);send.querySelector('strong').textContent=locked?'DECISIÓN ENVIADA':'ENVIAR DECISIÓN';send.querySelector('small').textContent=locked?'Editable en el próximo ciclo':'Confirmar; no editable en este ciclo'}
 }
@@ -669,16 +671,23 @@ function saveCurrentSection(){
   const cat=categoryByCat(currentCategory);if(!cat)return false;
   if(currentCategory==='D'&&(!validateChannelQuantities()||!validateRequiredSection(cat)))return false;
   const context=decisionModelContext();let plan;
-  try{plan=prepareSectionSave(cat,context);}catch(error){toast(error.message);return false;}
+  try{plan=prepareSectionSave(cat,context);}catch(error){console.error('SIDE: no se pudo preparar el borrador',error);toast(`No se pudo preparar el borrador: ${error?.message||'revisa las opciones elegidas'}.`);return false;}
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0);
-  if(cashBalance()-old+plan.net<-0.005){toast('No tienes caja suficiente para guardar esta seccion.');return false;}
-  const state={...decisionState,...plan.entries},ledger={...cashLedger,[key]:plan.net};
+  const affordable=cashBalance()-old+plan.net>=-0.005;
+  const state={...decisionState,...plan.entries};
+  // Un borrador que excede la caja conserva sus elecciones sin aplicar todavía
+  // el movimiento financiero. El envío seguirá bloqueado hasta ajustar el gasto.
+  const ledger=affordable?{...cashLedger,[key]:plan.net}:{...cashLedger};
   const draftKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let draftStore={};try{draftStore=JSON.parse(localStorage.getItem(draftKey)||'{}')||{}}catch{}
   delete draftStore[currentCategory];
   if(!writeDecisionBatch({[decisionKey()]:JSON.stringify(state),[ledgerKey()]:JSON.stringify(ledger),[draftKey]:JSON.stringify(draftStore)}))return false;
-  decisionState=state;cashLedger=ledger;warnProductionMaterialShortage();syncStudentReportPreview();syncSectionToSupabase(cat);
-  animateCash(plan.net-old);decisionDrafts={};restoreDraftsForRound();renderTabs();renderDecisionCategory();updateHud();
-  toast('Borrador guardado sin enviar. Puedes continuar editando.');return true;
+  decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
+  // Las vistas derivadas no deben convertir un guardado exitoso en un fallo aparente.
+  try{warnProductionMaterialShortage();}catch(error){console.error('SIDE: no se pudo actualizar la advertencia productiva',error)}
+  try{syncStudentReportPreview();}catch(error){console.error('SIDE: no se pudo actualizar el resumen',error)}
+  try{syncSectionToSupabase(cat);}catch(error){console.error('SIDE: no se pudo sincronizar la sección',error)}
+  try{if(affordable)animateCash(plan.net-old);renderTabs();renderDecisionCategory();updateHud();}catch(error){console.error('SIDE: el borrador se guardó, pero una vista no pudo refrescarse',error)}
+  toast(affordable?'Borrador guardado sin enviar. Puedes continuar editando.':'Borrador guardado. Ajusta el presupuesto antes de enviar la decisión.');return true;
 }
 $('saveDecisionSection')?.addEventListener('click',saveCurrentSection);
 function sendCurrentSection(){

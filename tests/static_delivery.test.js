@@ -60,3 +60,11 @@ test('DOP follows the project cycle from leather input to final production',()=>
   assert.match(styles,/\.dop-map-step:before\{[^}]*top:0;bottom:0/);
   assert.match(styles,/dop-process-map\+\.dop-yield:before[^}]*left:calc\(50% \+ 20px\)/);
 });
+
+test('infrastructure, production and logistics drafts remain saveable over budget',()=>{
+  const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  assert.match(source,/saveDecisionSection'\)\.disabled=locked;/);
+  assert.match(source,/const affordable=cashBalance\(\)-old\+plan\.net>=-0\.005;/);
+  assert.match(source,/const ledger=affordable\?\{\.\.\.cashLedger,\[key\]:plan\.net\}:\{\.\.\.cashLedger\};/);
+  assert.match(source,/Borrador guardado\. Ajusta el presupuesto antes de enviar la decisión\./);
+});

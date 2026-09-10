@@ -58,7 +58,7 @@
     auto: Object.freeze({ pixelRatio: 1.05, maxCustomers: 8, maxCars: 3, farAnimationFps: 12 })
   });
 
-  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, version: '2026.09.10.1' });
+  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, version: '2026.09.10.2' });
   root.SIDE3D_CONFIG = config;
   if (typeof module !== 'undefined' && module.exports) module.exports = config;
 })(typeof window !== 'undefined' ? window : globalThis);

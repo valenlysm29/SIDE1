@@ -3,7 +3,7 @@
 ## Resultado automatizado
 
 - Sintaxis JavaScript: `simulator3d.js` y `app.js` válidos.
-- Pruebas Node.js: 47 aprobadas, 0 fallidas.
+- Pruebas Node.js: 48 aprobadas, 0 fallidas.
 - Pruebas del servidor local: 2 aprobadas, 0 fallidas.
 - Recursos comprobados por HTTP: HTML, CSS, aplicación, modelo productivo, configuración 3D, simulador 3D y modelo GLB local.
 - Modelo humano local: contenedor GLB válido y animaciones de reposo y caminata disponibles.
@@ -19,6 +19,7 @@
 - Controles de teclado, ratón y pantalla táctil.
 - HUD compacto, panel secundario desplegable y calidad gráfica adaptativa.
 - Fallback procedural si el personaje GLB o una integración opcional no puede cargarse.
+- Los borradores de Infraestructura, Producción y Logística se conservan aunque la proyección exceda la caja; el control de presupuesto se mantiene al enviar.
 
 ## Alcance de la validación en este entorno
 

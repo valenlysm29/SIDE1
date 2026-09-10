@@ -1,8 +1,8 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
-## Entrega actual: v2026.09.10.1
+## Entrega actual: v2026.09.10.2
 
-La versión 2026.09.10.1 reforma el simulador 3D: reemplaza el mapa anterior por
+La versión 2026.09.10.2 reforma el simulador 3D: reemplaza el mapa anterior por
 una tienda frontal, un almacén exclusivo de productos terminados y un área de
 producción industrial independiente. Añade ciudad, panel de noticias conectado
 a los eventos del ciclo, cruce semaforizado, tráfico que cede el paso, clientes
@@ -10,13 +10,17 @@ con estados de compra, avatares GLB animados, navegación asistida por Recast co
 ruta local de respaldo, movimiento táctil y HUD compacto. Consulta
 `REFORMA_3D_2026_09_10.md` para arquitectura, extensiones, dependencias y pruebas.
 
+Esta revisión también corrige el guardado común de Infraestructura, Producción
+y Logística: un presupuesto provisional ya no impide conservar el borrador, y
+los errores de actualización visual posteriores no invalidan un guardado exitoso.
+
 La entrega del 08/09/2026 incorpora una capa responsive transversal para
 telefonos, tablets, portatiles y escritorios, tanto en orientacion vertical
 como horizontal. Se adaptaron barras fijas, tutorial, formularios, tablas,
 panel docente, resumen de empresa y HUD del simulador 3D; tambien se añadieron
 areas seguras, controles tactiles y compatibilidad con movimiento reducido.
 
-La revisión v2026.09.10.1 añade una calculadora productiva independiente para
+La revisión v2026.09.10.2 añade una calculadora productiva independiente para
 molde básico, mejorado y premium; presenta los insumos requeridos y una
 sugerencia basada en capacidad instalada. Producción y Resumen incorporan un
 DOP dinámico único para toda el área productiva: consolida los moldes fabricados,
