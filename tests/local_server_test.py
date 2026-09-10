@@ -18,12 +18,16 @@ class LocalServerTest(unittest.TestCase):
         self.server.server_close()
         self.thread.join(timeout=2)
     def test_entry_and_versioned_resources(self):
-        for path,needle in [('index.html?v=20260909-7','class="lobby-actions"'),('app.js?v=20260909-7','function renderChannelChoices'),('styles.css?v=20260909-7','#studentLobby .lobby-actions'),('production_model.js?v=20260909-7','MOLD_REQUIREMENTS'),('responsive.css?v=20260909-7','CAPA RESPONSIVE GLOBAL')]:
+        for path,needle in [('index.html?v=20260910-1','class="lobby-actions"'),('app.js?v=20260910-1','function renderChannelChoices'),('styles.css?v=20260910-1','#studentLobby .lobby-actions'),('production_model.js?v=20260910-1','MOLD_REQUIREMENTS'),('responsive.css?v=20260910-1','CAPA RESPONSIVE GLOBAL'),('simulator3d-config.js?v=20260910-1','NPC_STATES'),('simulator3d.js?v=20260910-1','function buildStaticWorld')]:
             with urlopen(self.base+'/'+path,timeout=5) as response:
                 self.assertEqual(response.status,200)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')
-                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.09.7')
+                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.10.1')
                 self.assertIn(needle,response.read().decode())
+        with urlopen(self.base+'/assets/models/yuka.glb',timeout=5) as response:
+            self.assertEqual(response.status,200)
+            self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.10.1')
+            self.assertEqual(response.read(4),b'glTF')
     def test_busy_port_does_not_bind_another_server(self):
         with self.assertRaises(OSError):
             create_server(self.server.server_port)

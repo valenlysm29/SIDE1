@@ -158,5 +158,5 @@ try:
     browser.close()
 finally:
  pass
-(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.09.7','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
+(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.10.1','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
 print('TOTAL PASS',len(checks),flush=True)

@@ -107,6 +107,7 @@ window.SIDE_GAME_BRIDGE={
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
   activeEvents:()=>activeStudentEvents(),
+  productionPlan:()=>productionPlan(),
   recordSimulatedSale(amount=75){
     const sale=Math.max(0,Number(amount)||0),key=`${currentRound()}:SIM_VENTAS`;
     cashLedger[key]=Number(cashLedger[key]||0)+sale;
@@ -125,7 +126,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260909-7'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260910-1'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
@@ -156,7 +157,7 @@ async function prepareLobby(){
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
-  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260909-7');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
+  if(!mount.dataset.loaded){try{const response=await fetch('tutorial.html?v=20260910-1');if(!response.ok)throw new Error('No se pudo cargar tutorial.html');mount.innerHTML=await response.text();mount.dataset.loaded='1'}catch(error){console.error(error);showScreen('studentLobby');return}}
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);

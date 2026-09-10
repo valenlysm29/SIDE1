@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="side-build" content="2026.09.09.7">
+  <meta name="side-build" content="2026.09.10.1">
   <meta name="theme-color" content="#020817">
   <title>SIDE — Simulador de Decisiones Financieras</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260909-7">
-  <link rel="stylesheet" href="simulator3d.css?v=20260909-7">
-  <link rel="stylesheet" href="company_summary.css?v=20260909-7">
-  <link rel="stylesheet" href="responsive.css?v=20260909-7">
+  <link rel="stylesheet" href="styles.css?v=20260910-1">
+  <link rel="stylesheet" href="simulator3d.css?v=20260910-1">
+  <link rel="stylesheet" href="company_summary.css?v=20260910-1">
+  <link rel="stylesheet" href="responsive.css?v=20260910-1">
 </head>
 <body>
 <main id="app">
@@ -168,7 +168,7 @@
             <button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
             <button id="backToProfiles" class="ghost-btn" type="button">VOLVER</button>
           </div>
-          <small class="lobby-build">SIDE · v2026.09.09.7</small>
+          <small class="lobby-build">SIDE · v2026.09.10.1</small>
         </footer>
       </div>
     </div>
@@ -201,36 +201,36 @@
         <div class="sim3d-brand"><img src="assets/side_logo.png" alt="SIDE"><div><span>SIMULADOR 3D</span><strong>TU EMPRESA</strong></div></div>
         <div class="sim3d-stats">
           <div class="sim3d-stat cash"><span>CAJA</span><strong id="simCash">S/ 100,000</strong></div>
-          <div class="sim3d-stat"><span>CICLO</span><strong id="simRound">Ciclo 1</strong></div>
-          <div class="sim3d-stat"><span>CLIENTES</span><strong id="simVisitors">0</strong></div>
-          <div class="sim3d-stat sales"><span>VENTAS 3D</span><strong id="simSales">0</strong></div>
-          <div class="sim3d-stat stock"><span>STOCK TOTAL</span><strong id="simTotalStock">0</strong></div>
+          <div class="sim3d-stat revenue"><span>UTILIDAD</span><strong id="simNetProfit">S/ 0</strong></div>
+          <div class="sim3d-stat lost"><span>CLIENTES PERDIDOS</span><strong id="simLostCustomers">0</strong></div>
+          <div class="sim3d-stat stock"><span>STOCK</span><strong id="simTotalStock">0</strong></div>
           <div class="sim3d-stat time"><span>TIEMPO</span><strong id="simTime">5:00</strong></div>
-          <div class="sim3d-stat revenue"><span>META DEL DÍA</span><strong id="simRevenue">S/ 0</strong></div>
           <div class="sim3d-stat rating"><span>SATISFACCIÓN</span><strong id="simRating">100%</strong></div>
         </div>
       </div>
       <div class="sim3d-center"><div class="sim3d-crosshair" aria-hidden="true"></div><div id="sim3dPrompt" class="sim3d-prompt"></div></div>
       <div class="sim3d-missions" aria-label="Misiones del día">
-        <div class="sim3d-missions-head"><span>MISIONES</span><strong id="simMissionHeadline">DÍA 1 · 0/3</strong></div>
+        <div class="sim3d-missions-head"><span>MISIONES</span><strong id="simMissionHeadline">DÍA 1 · 0/3</strong><button id="simMissionToggle" type="button" aria-label="Minimizar misiones" aria-expanded="true">−</button></div>
         <div id="simMissionList" class="sim3d-mission-list"></div>
       </div>
-      <div class="sim3d-bottom">
-        <div class="sim3d-controls"><strong>CONTROLES</strong><p><kbd>W A S D</kbd> moverte · <kbd>Mouse</kbd> mirar · <kbd>Shift</kbd> correr · <kbd>Space</kbd> saltar · <kbd>E</kbd> interactuar, reponer y cobrar · <kbd>Esc</kbd> liberar mouse</p></div>
-        <div class="sim3d-inventory" aria-label="Inventario de la tienda">
-          <span>INVENTARIO EN EXHIBICIÓN</span>
-          <div><b>ESENCIAL</b><strong id="stock-esencial">0</strong><small id="price-esencial">S/ 75</small><em>Almacén <i id="reserve-esencial">0</i></em></div>
-          <div><b>URBANO</b><strong id="stock-urbano">0</strong><small id="price-urbano">S/ 95</small><em>Almacén <i id="reserve-urbano">0</i></em></div>
-          <div><b>PREMIUM</b><strong id="stock-premium">0</strong><small id="price-premium">S/ 125</small><em>Almacén <i id="reserve-premium">0</i></em></div>
-        </div>
-        <div class="sim3d-objective"><span>OBJETIVO ACTUAL</span><strong>Construye y opera tu propia empresa</strong><p id="simObjectiveText">Define tu empresa desde el terminal de decisiones.</p></div>
-      </div>
+      <div class="sim3d-bottom"><div class="sim3d-objective"><span>OBJETIVO ACTUAL</span><strong>Opera tu empresa</strong><p id="simObjectiveText">Atiende clientes y mantén abastecida la exhibición.</p></div></div>
     </div>
 
     <div class="sim3d-actionbar">
       <button id="sim3dDecisionsBtn" class="sim3d-btn primary" type="button">TABLET DE DECISIONES</button>
+      <button id="sim3dMetricsBtn" class="sim3d-btn" type="button" aria-expanded="false">INDICADORES</button>
+      <button id="sim3dHelpBtn" class="sim3d-btn" type="button">AYUDA</button>
       <button id="sim3dAudioBtn" class="sim3d-btn" type="button">AUDIO: ON</button>
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
+    </div>
+    <div class="sim3d-touch-controls" aria-label="Controles táctiles">
+      <div class="sim3d-touch-pad">
+        <button data-touch-key="KeyW" class="up" type="button" aria-label="Avanzar">▲</button>
+        <button data-touch-key="KeyA" class="left" type="button" aria-label="Izquierda">◀</button>
+        <button data-touch-key="KeyS" class="down" type="button" aria-label="Retroceder">▼</button>
+        <button data-touch-key="KeyD" class="right" type="button" aria-label="Derecha">▶</button>
+      </div>
+      <div class="sim3d-touch-actions"><button id="simTouchInteract" type="button">E</button><button id="simTouchJump" type="button">↥</button></div>
     </div>
     <div id="sim3dMessage" class="sim3d-message" aria-live="polite"></div>
     <div id="sim3dReceipt" class="sim3d-receipt" aria-live="polite">
@@ -245,20 +245,42 @@
     <div id="sim3dStart" class="sim3d-start">
       <div class="sim3d-start-card">
         <img src="assets/side_logo.png" alt="SIDE">
-        <h2>Tu empresa ahora es un mundo 3D</h2>
-        <p>Recorre tu empresa, observa cómo aparecen tus máquinas, personal y stock, atiende clientes NPC, controla inventario físico, repón exhibidores, observa qué bolso elige cada cliente, forma la cola y cobra manualmente en caja.</p>
+        <span class="sim3d-start-kicker">PRIMER INGRESO</span>
+        <h2>Controles del simulador</h2>
+        <p>Recorre la tienda, el almacén, producción y la ciudad. Las decisiones del ciclo modifican el personal, la maquinaria, el stock y los clientes.</p>
         <div class="sim3d-start-grid">
-          <div><strong>WASD</strong><span>Caminar por el local</span></div>
+          <div><strong>W A S D</strong><span>Caminar libremente</span></div>
+          <div><strong>MOUSE / ARRASTRE</strong><span>Mirar alrededor</span></div>
+          <div><strong>SHIFT</strong><span>Correr</span></div>
+          <div><strong>SPACE</strong><span>Saltar</span></div>
           <div><strong>E</strong><span>Interactuar</span></div>
-          <div><strong>NPC</strong><span>Clientes dinámicos</span></div>
-          <div><strong>CAJA</strong><span>Cobro por modelo y precio</span></div>
-          <div><strong>STOCK</strong><span>Reposición física con E</span></div>
-          <div><strong>DÍAS</strong><span>Progresión y dificultad</span></div>
-          <div><strong>AUDIO</strong><span>Ambiente y efectos</span></div>
-          <div><strong>MISIÓN</strong><span>Objetivos y pedidos reales</span></div>
+          <div><strong>ESC</strong><span>Liberar el cursor</span></div>
         </div>
-        <button id="sim3dStartBtn" type="button">ABRIR TU EMPRESA</button>
+        <label class="sim3d-start-choice"><input id="sim3dNeverShowControls" type="checkbox" checked> No volver a mostrar para esta empresa</label>
+        <button id="sim3dStartBtn" type="button">ENTRAR AL SIMULADOR</button>
       </div>
+    </div>
+
+    <aside id="sim3dMetricsDrawer" class="sim3d-metrics-drawer hidden" aria-label="Indicadores operativos">
+      <div class="sim3d-drawer-head"><div><span>OPERACIÓN DEL TURNO</span><strong id="simRound">Ciclo 1</strong></div><button id="sim3dMetricsClose" type="button" aria-label="Cerrar">×</button></div>
+      <div class="sim3d-drawer-grid">
+        <div><span>CLIENTES</span><strong id="simVisitors">0</strong></div>
+        <div><span>VENTAS</span><strong id="simSales">0</strong></div>
+        <div><span>INGRESOS</span><strong id="simRevenue">S/ 0</strong></div>
+        <div><span>GASTOS Y DEVOLUCIONES</span><strong id="simOperatingLosses">S/ 0</strong></div>
+      </div>
+      <h3>Clientes perdidos</h3>
+      <div class="sim3d-loss-list"><span>Por cola <b id="lost-queue">0</b></span><span>Por falta de stock <b id="lost-stock">0</b></span><span>Por precio <b id="lost-price">0</b></span><span>Por falta de vendedores <b id="lost-staff">0</b></span></div>
+      <h3>Inventario</h3>
+      <div class="sim3d-inventory" aria-label="Inventario de la tienda">
+        <div><b>BÁSICO</b><strong id="stock-esencial">0</strong><small id="price-esencial">S/ 75</small><em>Almacén <i id="reserve-esencial">0</i></em></div>
+        <div><b>MEJORADO</b><strong id="stock-urbano">0</strong><small id="price-urbano">S/ 95</small><em>Almacén <i id="reserve-urbano">0</i></em></div>
+        <div><b>PREMIUM</b><strong id="stock-premium">0</strong><small id="price-premium">S/ 125</small><em>Almacén <i id="reserve-premium">0</i></em></div>
+      </div>
+    </aside>
+
+    <div id="simNewsPanel" class="sim-news-panel hidden" role="dialog" aria-modal="true" aria-labelledby="simNewsTitle">
+      <div class="sim-news-card"><button id="simNewsClose" type="button" aria-label="Cerrar">×</button><span>NOTICIAS DE LA CIUDAD</span><h2 id="simNewsTitle">Eventos del ciclo</h2><div id="simNewsList"></div><small>ESC o × para cerrar</small></div>
     </div>
 
 
@@ -299,7 +321,7 @@
     <div id="simMinimap" class="sim-minimap" aria-label="Minimapa">
       <span class="mini-title">TU EMPRESA</span>
       <div class="mini-map-area">
-        <i class="mini-zone sales"></i><i class="mini-zone warehouse"></i>
+        <i class="mini-zone city"></i><i class="mini-zone sales"></i><i class="mini-zone production"></i><i class="mini-zone warehouse"></i>
         <b id="miniPlayer" class="mini-player"></b>
         <span class="mini-point entry" title="Entrada"></span>
         <span class="mini-point cash" title="Caja"></span>
@@ -454,16 +476,29 @@
 </main>
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=20260909-7"></script>
-<script src="side_rules.js?v=20260909-7"></script>
-<script src="icon_bank.js?v=20260909-7"></script>
-<script src="events_catalog.js?v=20260909-7"></script>
-<script src="decision_catalog.js?v=20260909-7"></script>
-<script src="tutorial.js?v=20260909-7"></script>
-<script src="simulator3d.js?v=20260909-7"></script>
-<script src="production_model.js?v=20260909-7"></script>
-<script src="decision_review_model.js?v=20260909-7"></script>
-<script src="app.js?v=20260909-7"></script>
-<script src="company_summary.js?v=20260909-7"></script>
+<script src="config.js?v=20260910-1"></script>
+<script src="side_rules.js?v=20260910-1"></script>
+<script src="icon_bank.js?v=20260910-1"></script>
+<script src="events_catalog.js?v=20260910-1"></script>
+<script src="decision_catalog.js?v=20260910-1"></script>
+<script src="tutorial.js?v=20260910-1"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/",
+      "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.5.5/lib/three-vrm.module.min.js",
+      "@recast-navigation/core": "https://cdn.jsdelivr.net/npm/@recast-navigation/core@0.43.1/dist/index.mjs",
+      "@recast-navigation/wasm": "https://cdn.jsdelivr.net/npm/@recast-navigation/wasm@0.43.1/dist/recast-navigation.wasm-compat.js",
+      "@recast-navigation/generators": "https://cdn.jsdelivr.net/npm/@recast-navigation/generators@0.43.1/dist/index.mjs"
+    }
+  }
+</script>
+<script src="simulator3d-config.js?v=20260910-1"></script>
+<script src="simulator3d.js?v=20260910-1"></script>
+<script src="production_model.js?v=20260910-1"></script>
+<script src="decision_review_model.js?v=20260910-1"></script>
+<script src="app.js?v=20260910-1"></script>
+<script src="company_summary.js?v=20260910-1"></script>
 </body>
 </html>
