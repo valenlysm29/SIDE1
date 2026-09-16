@@ -876,3 +876,58 @@ small {
     transition-duration: .01ms !important;
   }
 }
+
+/* Decisiones grows with its content; the document owns vertical scrolling. */
+#decisionMenu {
+  height: auto;
+  max-height: none;
+  min-height: 100dvh;
+  overflow: visible !important;
+}
+#decisionMenu .decision-window,
+#decisionMenu .decision-detail,
+#decisionMenu .decision-cards {
+  min-width: 0;
+  max-height: none;
+  overflow: visible;
+}
+#decisionMenu .decision-tabs,
+#decisionMenu .decision-topbar.compact ~ .decision-game-stage .decision-tabs {
+  position: relative;
+  top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  overflow: visible;
+  gap: 5px;
+}
+#decisionMenu .decision-tab {
+  flex: 1 1 140px;
+  min-width: 0;
+  white-space: normal;
+}
+#decisionMenu .sticky-section-head,
+#decisionMenu .decision-topbar.compact ~ .decision-game-stage .sticky-section-head {
+  position: relative;
+  top: auto;
+}
+#decisionMenu .store-channel-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#storeDistrict {
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #315269;
+  border-radius: 8px;
+  background: #061523;
+  color: #fff;
+  font: inherit;
+}
+#decisionMenu .cs-production-kpis { grid-template-columns: repeat(auto-fit,minmax(min(180px,100%),1fr)); }
+#decisionMenu .cs-production-kpis > div { min-width: 0; overflow-wrap: anywhere; }
+@media(max-width:600px) {
+  #decisionMenu .store-channel-grid { grid-template-columns: minmax(0,1fr); }
+  #decisionMenu .decision-topbar { position: relative; }
+  #decisionMenu .section-save-bar { position: relative; bottom: auto; }
+}

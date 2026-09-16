@@ -1,0 +1,9 @@
+PASS all tabs layout 1366x768
+PASS all tabs layout 1024x768
+PASS all tabs layout 768x1024
+PASS all tabs layout 390x844
+PASS all tabs layout 320x568
+PASS all tabs layout 844x390
+PASS one store, district, web channel and save
+PASS actual production, live target, zero, overachievement, DOP/summary parity
+PASS page scroll, review dialog and no browser errors

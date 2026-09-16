@@ -41,6 +41,14 @@
     return positiveInteger(entry?.quantities?.[id], 1);
   }
   function storeCount(entry) { return STORE_IDS.reduce((sum,id)=>sum+storeQuantity(entry,id),0); }
+  function singleStore(entry={},fallbackId=STORE_IDS[0]) {
+    const id=(entry.optionIds||[]).find(value=>STORE_IDS.includes(value))||fallbackId;
+    const optionIds=[...new Set((entry.optionIds||[]).filter(value=>!STORE_IDS.includes(value))),id];
+    const first=storeBatches(entry,id).sort((a,b)=>a.round-b.round)[0];
+    return {...entry,optionIds,quantities:{[id]:1},
+      storeContracts:first?{[id]:[{round:first.round,quantity:1}]}:{},
+      optionRounds:entry.optionRounds?.[id]?{[id]:entry.optionRounds[id]}:{}};
+  }
   function storeBatches(entry, id, round = 1) {
     const quantity = storeQuantity(entry,id);
     if (!quantity) return [];
@@ -73,5 +81,5 @@
     if (add>0) batches.push({round,quantity:add});
     return batches;
   }
-  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
+  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,storeCount,singleStore,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
 });

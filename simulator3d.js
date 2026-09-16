@@ -67,6 +67,13 @@
 
   function salesCountKey() { return `side3d_sales_count_${storageContext()}`; }
   function inventoryKey() { return `side3d_inventory_${storageContext()}`; }
+  function cycleProductionRecord() {
+    try {
+      const record=JSON.parse(localStorage.getItem(inventoryKey())||'null');
+      return typeof record?.producedUnits==='number'?
+        {round:currentRoundSafe(),producedUnits:record.producedUnits}:null;
+    } catch { return null; }
+  }
   function dayKey() { return `side3d_day_${storageContext()}`; }
   function audioKey() { return `side3d_audio_${storageContext()}`; }
   function businessKey() { return `side3d_business_${storageContext()}`; }
@@ -167,7 +174,7 @@
       display[product.id] = show;
       reserve[product.id] = Math.max(0, split[i] - show);
     });
-    return { schemaVersion:2,totalTarget: total, display, reserve, sold: { esencial: 0, urbano: 0, premium: 0 } };
+    return { schemaVersion:2,totalTarget: total, producedUnits:totalFromPlan, display, reserve, sold: { esencial: 0, urbano: 0, premium: 0 } };
   }
 
   function loadInventory() {
@@ -178,6 +185,7 @@
     const currentUnits = PRODUCTS.reduce((n, p) => n + Number(inventory.display[p.id] || 0) + Number(inventory.reserve[p.id] || 0) + Number(inventory.sold?.[p.id] || 0), 0);
     if (desired > currentUnits) {
       let extra = desired - currentUnits;
+      if(typeof inventory.producedUnits==='number')inventory.producedUnits+=extra;
       let i = 0;
       while (extra-- > 0) { const product = PRODUCTS[i++ % PRODUCTS.length]; inventory.reserve[product.id] = Number(inventory.reserve[product.id] || 0) + 1; }
     }
@@ -1070,6 +1078,7 @@
     for(let index=0;index<(plan?.productLines||[]).length;index++){const amount=Math.max(0,Number(plan.productLines[index].plannedUnits||0));if(cursor<amount){productIndex=index;break}cursor-=amount;}
     const p=PRODUCTS[productIndex]||PRODUCTS[businessState.production.producedToday%PRODUCTS.length];
     inventory.reserve[p.id]=(inventory.reserve[p.id]||0)+1;
+    if(typeof inventory.producedUnits==='number')inventory.producedUnits+=1;
     businessState.production.producedToday+=1; businessState.production.stage=(businessState.production.stage+1)%5;
     saveInventory(); saveBusinessState(); renderInventoryDisplays(); refreshAdminUI(); updateHUD();
   }
@@ -2707,5 +2716,5 @@
     message('Cambios aplicados: la boutique, el taller y la atención en caja fueron actualizados con tus decisiones.');
   }
 
-  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld };
+  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld, cycleProductionRecord };
 })();

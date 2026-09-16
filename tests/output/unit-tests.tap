@@ -1,0 +1,374 @@
+TAP version 13
+# Subtest: cycle productivity uses recorded output and does not substitute planned units
+ok 1 - cycle productivity uses recorded output and does not substitute planned units
+  ---
+  duration_ms: 1.0908
+  type: 'test'
+  ...
+# Subtest: changing the target updates percentage and signed difference without capping at 100
+ok 2 - changing the target updates percentage and signed difference without capping at 100
+  ---
+  duration_ms: 0.3227
+  type: 'test'
+  ...
+# Subtest: zero or absent target, absent output and output from another cycle are safe
+ok 3 - zero or absent target, absent output and output from another cycle are safe
+  ---
+  duration_ms: 0.2636
+  type: 'test'
+  ...
+# Subtest: legacy multiple stores normalize to one, keeping its district and first contract
+ok 4 - legacy multiple stores normalize to one, keeping its district and first contract
+  ---
+  duration_ms: 2.2076
+  type: 'test'
+  ...
+# Subtest: production record is scoped to active company and cycle, never reconstructed from inventory
+ok 5 - production record is scoped to active company and cycle, never reconstructed from inventory
+  ---
+  duration_ms: 5.6321
+  type: 'test'
+  ...
+# Subtest: realized cycle output is recorded once on creation and added production, excluding supplied stock
+ok 6 - realized cycle output is recorded once on creation and added production, excluding supplied stock
+  ---
+  duration_ms: 6.591
+  type: 'test'
+  ...
+# Subtest: empty scenario includes mandatory local and cleaning only
+ok 7 - empty scenario includes mandatory local and cleaning only
+  ---
+  duration_ms: 4.5606
+  type: 'test'
+  ...
+# Subtest: all three districts retain their quantities and cost
+ok 8 - all three districts retain their quantities and cost
+  ---
+  duration_ms: 1.6137
+  type: 'test'
+  ...
+# Subtest: asset acquisitions and disposals have separate gross flows
+ok 9 - asset acquisitions and disposals have separate gross flows
+  ---
+  duration_ms: 0.802
+  type: 'test'
+  ...
+# Subtest: same-round submitted mold still costs money; later cycles do not charge again
+ok 10 - same-round submitted mold still costs money; later cycles do not charge again
+  ---
+  duration_ms: 0.4474
+  type: 'test'
+  ...
+# Subtest: staff severance survives repeated saves in the same round
+ok 11 - staff severance survives repeated saves in the same round
+  ---
+  duration_ms: 0.282
+  type: 'test'
+  ...
+# Subtest: analyst discount affects material prices, not wages
+ok 12 - analyst discount affects material prices, not wages
+  ---
+  duration_ms: 0.1852
+  type: 'test'
+  ...
+# Subtest: loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved
+ok 13 - loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved
+  ---
+  duration_ms: 0.188
+  type: 'test'
+  ...
+# Subtest: saved ledger is reconciled instead of charged twice
+ok 14 - saved ledger is reconciled instead of charged twice
+  ---
+  duration_ms: 0.3957
+  type: 'test'
+  ...
+# Subtest: additional drafts apply only the difference
+ok 15 - additional drafts apply only the difference
+  ---
+  duration_ms: 0.2954
+  type: 'test'
+  ...
+# Subtest: contract calculation excludes current cycle and shows obligations beyond game
+ok 16 - contract calculation excludes current cycle and shows obligations beyond game
+  ---
+  duration_ms: 0.235
+  type: 'test'
+  ...
+# Subtest: contract batches preserve different opening cycles
+ok 17 - contract batches preserve different opening cycles
+  ---
+  duration_ms: 0.3894
+  type: 'test'
+  ...
+# Subtest: pure model never mutates its context
+ok 18 - pure model never mutates its context
+  ---
+  duration_ms: 19.8364
+  type: 'test'
+  ...
+# Subtest: all catalog items, including zero-cost guarantees and automatic rules, appear
+ok 19 - all catalog items, including zero-cost guarantees and automatic rules, appear
+  ---
+  duration_ms: 0.5354
+  type: 'test'
+  ...
+# Subtest: production review lists the desired quantity for every planned mold
+ok 20 - production review lists the desired quantity for every planned mold
+  ---
+  duration_ms: 0.2519
+  type: 'test'
+  ...
+# Subtest: workbook conversions turn purchases into usable raw material
+ok 21 - workbook conversions turn purchases into usable raw material
+  ---
+  duration_ms: 6.0052
+  type: 'test'
+  ...
+# Subtest: a raw-material shortage limits all three production processes
+ok 22 - a raw-material shortage limits all three production processes
+  ---
+  duration_ms: 1.9891
+  type: 'test'
+  ...
+# Subtest: workers and machines are paired and the slowest process is the bottleneck
+not ok 23 - workers and machines are paired and the slowest process is the bottleneck
+  ---
+  duration_ms: 2.3364
+  type: 'test'
+  location: 'C:\\Users\\Asus\\OneDrive\\Documentos\\side_va\\SIDE1\\tests\\production_model.test.js:31:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    5 !== 6
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 6
+  actual: 5
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\production_model.test.js:36:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: level-three staff and production leadership reproduce the efficiency bonuses
+ok 24 - level-three staff and production leadership reproduce the efficiency bonuses
+  ---
+  duration_ms: 0.7546
+  type: 'test'
+  ...
+# Subtest: equipment acquired in a previous cycle remains available
+ok 25 - equipment acquired in a previous cycle remains available
+  ---
+  duration_ms: 0.7851
+  type: 'test'
+  ...
+# Subtest: calculator keeps one target and material requirement for every mold
+ok 26 - calculator keeps one target and material requirement for every mold
+  ---
+  duration_ms: 1.6159
+  type: 'test'
+  ...
+# Subtest: industrial DOP separates operations, inspection and combined activity
+not ok 27 - industrial DOP separates operations, inspection and combined activity
+  ---
+  duration_ms: 0.5936
+  type: 'test'
+  location: 'C:\\Users\\Asus\\OneDrive\\Documentos\\side_va\\SIDE1\\tests\\production_model.test.js:63:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    5 !== 6
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 6
+  actual: 5
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\production_model.test.js:65:10)
+    Test.runInAsyncScope (node:async_hooks:227:14)
+    Test.run (node:internal/test_runner/test:1382:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+    Test.postRun (node:internal/test_runner/test:1522:19)
+    Test.run (node:internal/test_runner/test:1447:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+  ...
+# Subtest: DOP data includes purchased material qualities and cycle yield by mold
+ok 28 - DOP data includes purchased material qualities and cycle yield by mold
+  ---
+  duration_ms: 0.5761
+  type: 'test'
+  ...
+# Subtest: student and teacher pages load the final responsive layer
+ok 29 - student and teacher pages load the final responsive layer
+  ---
+  duration_ms: 1.8419
+  type: 'test'
+  ...
+# Subtest: responsive layer covers target widths, orientation and accessibility preferences
+ok 30 - responsive layer covers target widths, orientation and accessibility preferences
+  ---
+  duration_ms: 0.2596
+  type: 'test'
+  ...
+# Subtest: responsive layer addresses every primary product surface
+ok 31 - responsive layer addresses every primary product surface
+  ---
+  duration_ms: 1.2838
+  type: 'test'
+  ...
+# Subtest: responsive CSS has balanced blocks and no remote asset references
+ok 32 - responsive CSS has balanced blocks and no remote asset references
+  ---
+  duration_ms: 0.6492
+  type: 'test'
+  ...
+# Subtest: Six 8-hour cycles: zero minutes stay zero, 48 hours total
+ok 33 - Six 8-hour cycles: zero minutes stay zero, 48 hours total
+  ---
+  duration_ms: 0.9845
+  type: 'test'
+  ...
+# Subtest: Month and year rollover
+ok 34 - Month and year rollover
+  ---
+  duration_ms: 0.1993
+  type: 'test'
+  ...
+# Subtest: Invalid values rejected
+ok 35 - Invalid values rejected
+  ---
+  duration_ms: 0.2316
+  type: 'test'
+  ...
+# Subtest: Clock boundaries and catch-up
+ok 36 - Clock boundaries and catch-up
+  ---
+  duration_ms: 0.1903
+  type: 'test'
+  ...
+# Subtest: Legacy selected districts mean one store each, web is not a store
+ok 37 - Legacy selected districts mean one store each, web is not a store
+  ---
+  duration_ms: 1.0531
+  type: 'test'
+  ...
+# Subtest: Quantities and malformed values
+ok 38 - Quantities and malformed values
+  ---
+  duration_ms: 0.3371
+  type: 'test'
+  ...
+# Subtest: Same-cycle drafts editable, prior contracts enforced
+ok 39 - Same-cycle drafts editable, prior contracts enforced
+  ---
+  duration_ms: 1.4455
+  type: 'test'
+  ...
+# Subtest: Openings expire independently after 12 cycles
+ok 40 - Openings expire independently after 12 cycles
+  ---
+  duration_ms: 0.2992
+  type: 'test'
+  ...
+# Subtest: Repeated saves do not duplicate openings
+ok 41 - Repeated saves do not duplicate openings
+  ---
+  duration_ms: 0.189
+  type: 'test'
+  ...
+# Subtest: the reformed world has three separated business sectors
+ok 42 - the reformed world has three separated business sectors
+  ---
+  duration_ms: 0.7669
+  type: 'test'
+  ...
+# Subtest: the city contains a crosswalk between the store and customer spawn
+ok 43 - the city contains a crosswalk between the store and customer spawn
+  ---
+  duration_ms: 0.1363
+  type: 'test'
+  ...
+# Subtest: the complete customer state machine is declared
+ok 44 - the complete customer state machine is declared
+  ---
+  duration_ms: 0.141
+  type: 'test'
+  ...
+# Subtest: every quality level sets finite simulation limits
+ok 45 - every quality level sets finite simulation limits
+  ---
+  duration_ms: 0.1324
+  type: 'test'
+  ...
+# Subtest: the local human avatar is a valid GLB with idle and walk clips
+ok 46 - the local human avatar is a valid GLB with idle and walk clips
+  ---
+  duration_ms: 4.8201
+  type: 'test'
+  ...
+# Subtest: simulator source connects events, production and financial sales
+ok 47 - simulator source connects events, production and financial sales
+  ---
+  duration_ms: 1.1155
+  type: 'test'
+  ...
+# Subtest: all local HTML assets exist
+ok 48 - all local HTML assets exist
+  ---
+  duration_ms: 16.1519
+  type: 'test'
+  ...
+# Subtest: market-segment decision is absent from the active catalog
+ok 49 - market-segment decision is absent from the active catalog
+  ---
+  duration_ms: 0.5452
+  type: 'test'
+  ...
+# Subtest: production model loads before the application and review modules
+ok 50 - production model loads before the application and review modules
+  ---
+  duration_ms: 0.6038
+  type: 'test'
+  ...
+# Subtest: productive catalog requires a mold and a sales channel, with calculator first
+ok 51 - productive catalog requires a mold and a sales channel, with calculator first
+  ---
+  duration_ms: 1.4258
+  type: 'test'
+  ...
+# Subtest: cycle zero places summary last and later cycles place it first
+ok 52 - cycle zero places summary last and later cycles place it first
+  ---
+  duration_ms: 0.6066
+  type: 'test'
+  ...
+# Subtest: DOP and summary share the active cycle productivity source
+ok 53 - DOP and summary share the active cycle productivity source
+  ---
+  duration_ms: 1.486
+  type: 'test'
+  ...
+# Subtest: infrastructure, production and logistics drafts remain saveable over budget
+ok 54 - infrastructure, production and logistics drafts remain saveable over budget
+  ---
+  duration_ms: 0.8784
+  type: 'test'
+  ...
+1..54
+# tests 54
+# suites 0
+# pass 52
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 293.7329
