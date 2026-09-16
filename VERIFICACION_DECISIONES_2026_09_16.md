@@ -63,3 +63,14 @@ python tests/local_server_test.py
 ```
 
 La prueba de navegador necesita Playwright disponible para Node, `PYTHON_BIN` apuntando a Python y opcionalmente `CHROMIUM_PATH`. En esta sesión se usaron los runtimes incluidos con Codex y Chrome instalado. `tests/output/baseline-summary.txt` conserva el resultado previo y `tests/output/unit-tests.tap` el resultado final.
+
+## Seguimiento: opciones de tiendas, DOP visible y etiquetas de envío
+
+Se actualizaron `app.js`, `responsive.css` y `tests/decisions_cycle_ui.cjs`:
+
+- Tiendas vuelve a presentar las tres alternativas del catálogo como tarjetas con selección exclusiva mediante radio. Conserva una tienda activa, el canal web independiente, costos, persistencia y restricciones de contrato/envío. Sustituye el selector desplegable descrito en la entrega anterior.
+- DOP recupera el diagrama visible de Corte → Ensamblado → Acabado, derivado de los procesos del modelo, al inicio de Producción. Conserva los indicadores del ciclo y su actualización. No se monta en ninguna de las otras cinco pestañas ni en el diálogo de revisión.
+- Los indicadores `ENVIADO` y `BORRADOR` ocupan una segunda fila de cada pestaña, con tipografía de 11 px, relleno, contraste y altura mínima de 24 px. El título y el icono conservan una fila independiente.
+- Navegador: selección de cada alternativa, teclado, exclusividad, canal web, guardado, recarga y bloqueo comprobados. DOP visible y exclusivo en las seis resoluciones anteriores. Los cinco indicadores de envío se comprobaron geométricamente: contenidos dentro de su pestaña, sin corte de texto y sin intersección con título o icono. Cero errores de consola.
+- `node --check` aprobado para aplicación y prueba de navegador. Suite completa: 52/54, con las mismas dos fallas preexistentes del modelo, descritas arriba.
+- Evidencias actualizadas: `tests/output/browser-checks.txt`, `tests/output/unit-tests.tap`, `tests/output/dop-and-badges-mobile.png` y `tests/output/store-options-desktop.png`.

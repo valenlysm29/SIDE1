@@ -4,6 +4,12 @@ PASS all tabs layout 768x1024
 PASS all tabs layout 390x844
 PASS all tabs layout 320x568
 PASS all tabs layout 844x390
-PASS one store, district, web channel and save
+PASS selectable store cards, keyboard, single selection, web, save, reload and submission lock
 PASS actual production, live target, zero, overachievement, DOP/summary parity
+PASS five readable, nonoverlapping submission badges 1366x768
+PASS five readable, nonoverlapping submission badges 1024x768
+PASS five readable, nonoverlapping submission badges 768x1024
+PASS five readable, nonoverlapping submission badges 390x844
+PASS five readable, nonoverlapping submission badges 320x568
+PASS five readable, nonoverlapping submission badges 844x390
 PASS page scroll, review dialog and no browser errors
