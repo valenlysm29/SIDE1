@@ -23,6 +23,7 @@
   let hemiLight = null, sunLight = null, checkoutOpen = false, checkoutScanned = false, checkoutPayment = 'cash';
   let adminMesh = null, newsPanelMesh = null, adminOpen = false, newsOpen = false, businessState = null, nextEventAt = 0, nextProductionAt = 0, supplierDeliveryAt = 0, tutorialIndex = 0, secondRegisterMesh = null;
   let trafficPhase = 0, trafficLight = 'vehicles', trafficSignalMeshes = [], visibilityPaused = false, debugPerformance = false, npcModelTemplate = null;
+  const execModelTemplates = { male: null, female: null };
   let controlsOpenedFromHelp = false, missionCollapsed = false;
 
   const PRODUCTS = [
@@ -37,6 +38,19 @@
     { id: 'urbano', label: 'Urbano', patience: 15, speed: 1.0, pref: 'urbano', budget: 135, priceSensitivity: .58, qualityDemand: .62, helpProbability: .36 },
     { id: 'premium', label: 'Premium', patience: 20, speed: .92, pref: 'premium', budget: 240, priceSensitivity: .22, qualityDemand: .94, helpProbability: .64 },
     { id: 'turista', label: 'Turista', patience: 17, speed: .96, pref: 'premium', budget: 180, priceSensitivity: .42, qualityDemand: .78, helpProbability: .48 }
+  ];
+
+  // Looks de personal de tienda (asesores/as), inspirados en las referencias de vestuario
+  // ejecutivo aportadas: traje azul con corbata y lentes para el asesor, y blazer/vest
+  // crema sin mangas con pantalón sastre para la asesora. `execModel` apunta al modelo GLB
+  // dedicado (assets/models3d/npc_exec_*.glb) cargado por loadExecModelTemplates(): si está
+  // disponible, person() lo usa tal cual (ya trae los mismos colores/accesorios horneados).
+  // `forceProcedural` sigue como respaldo: si el GLB no carga, se evita el clon animado de
+  // assets/models/yuka.glb (no expone puntos de anclaje para lentes/botones/cabello largo)
+  // y se cae al cuerpo procedural articulado, que sí soporta esos accesorios.
+  const STAFF_LOOKS = [
+    { gender: 'male', execModel: 'male', shirt: 0x2c4a72, pants: 0x24344a, tie: 0x3f78c9, hair: 0x14100d, skin: 0xe0b48c, formal: true, glasses: true, forceProcedural: true, bodyScale: 1.0 },
+    { gender: 'female', execModel: 'female', shirt: 0xf2ede2, pants: 0xc9a877, hair: 0x2a2019, skin: 0xcd8f66, formal: false, longHair: true, buttons: true, forceProcedural: true, bodyScale: 0.96 }
   ];
 
   const player = { x: 0, y: 1.72, z: 11.4, radius: 0.36, baseY: 1.72, vx: 0, vz: 0, vy: 0, grounded: true, bob: 0, speed: 0 };
@@ -586,6 +600,34 @@
     }catch(error){console.warn('El avatar GLB no pudo cargarse; se mantiene el personaje procedural articulado.',error);npcModelTemplate=null;return false;}
   }
 
+  // Carga los modelos GLB dedicados del personal ejecutivo (assets/models3d/npc_exec_*.glb),
+  // generados con tools/generate_models_glb_v3.py. A diferencia de npcModelTemplate (avatar
+  // Mixamo animado y compartido para todos los NPC), estos son mallas estáticas por asesor/a
+  // con nodos-pivote nombrados (Arm_L/R, Forearm_L/R, Hand_L/R, Leg_L/R, Torso, Hips, Head)
+  // que reutilizan exactamente el mismo esquema de rotación que el cuerpo procedural en
+  // person()/setPersonPose(), así que no requieren SkeletonUtils ni AnimationMixer: basta con
+  // clonar el Object3D y ubicar los pivotes por nombre. Si un archivo no carga (sin conexión,
+  // GLTFLoader ausente, nodos inesperados), ese género conserva el respaldo procedural.
+  async function loadExecModelTemplates() {
+    if (!GLTFLoader) return false;
+    const specs = [['male', 'assets/models3d/npc_exec_male.glb'], ['female', 'assets/models3d/npc_exec_female.glb']];
+    await Promise.all(specs.map(async ([gender, path]) => {
+      if (execModelTemplates[gender]) return;
+      try {
+        const gltf = await new GLTFLoader().loadAsync(path);
+        const scene = gltf.scene || gltf.scenes?.[0];
+        if (!scene) throw new Error('El GLB no contiene una escena.');
+        const required = ['Arm_L', 'Arm_R', 'Forearm_L', 'Forearm_R', 'Hand_L', 'Hand_R', 'Leg_L', 'Leg_R'];
+        if (required.some(name => !scene.getObjectByName(name))) throw new Error('Faltan nodos de articulación esperados.');
+        execModelTemplates[gender] = scene;
+      } catch (error) {
+        console.warn(`El modelo GLB ejecutivo (${gender}) no pudo cargarse; se mantiene el personaje procedural articulado.`, error);
+        execModelTemplates[gender] = null;
+      }
+    }));
+    return Boolean(execModelTemplates.male || execModelTemplates.female);
+  }
+
   async function initNavigation() {
     navReady = false;
     if (!recastCore || !recastGenerators) return false;
@@ -775,7 +817,7 @@
 
   function person(style = 0x5aa9ff) {
     const cfg = typeof style === 'object' ? style : { shirt: style };
-    if(npcModelTemplate&&SkeletonUtils?.clone){
+    if(!cfg.forceProcedural&&npcModelTemplate&&SkeletonUtils?.clone){
       try{
         const g=new THREE.Group(),avatar=SkeletonUtils.clone(npcModelTemplate.scene);
         avatar.traverse(node=>{
@@ -789,6 +831,30 @@
         idleAction?.play();g.userData.modelAvatar=avatar;g.userData.mixer=mixer;g.userData.actions={idle:idleAction,walk:walkAction};g.userData.currentAction='idle';g.userData.lastAnimAt=performance.now()/1000;
         return g;
       }catch(error){console.warn('No se pudo clonar el avatar; se usa el fallback procedural.',error);}
+    }
+    if(cfg.execModel && execModelTemplates[cfg.execModel]){
+      try{
+        const g=new THREE.Group();
+        const avatar=execModelTemplates[cfg.execModel].clone(true);
+        avatar.traverse(node=>{ if(node.isMesh){node.castShadow=false;node.receiveShadow=false;} });
+        const bodyScale=cfg.bodyScale??1;
+        avatar.scale.setScalar(bodyScale);
+        g.add(avatar);
+        const byName=name=>avatar.getObjectByName(name);
+        const parts={
+          torso:byName('Torso'), hips:byName('Hips'), head:byName('Head'),
+          armL:byName('Arm_L'), armR:byName('Arm_R'), foreL:byName('Forearm_L'), foreR:byName('Forearm_R'),
+          handL:byName('Hand_L'), handR:byName('Hand_R'), legL:byName('Leg_L'), legR:byName('Leg_R')
+        };
+        if(Object.values(parts).every(Boolean)){
+          g.userData.parts=parts;
+          g.userData.baseY={head:parts.head.position.y,torso:parts.torso.position.y,hips:parts.hips.position.y};
+          g.userData.gender=cfg.gender||cfg.execModel;
+          g.userData.execModel=true;
+          return g;
+        }
+        console.warn('El modelo GLB ejecutivo no expone todos los nodos de articulación esperados; se usa el fallback procedural.');
+      }catch(error){console.warn('No se pudo preparar el modelo GLB ejecutivo; se usa el fallback procedural.',error);}
     }
     const g = new THREE.Group();
     const skin = cfg.skin ?? [0xd8ab7e, 0xc8956c, 0x9f6a4a, 0xe2b98d][Math.floor(Math.random()*4)];
@@ -811,15 +877,35 @@
 
     const hair = mesh(new THREE.SphereGeometry(0.19, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.58), mat(hairColor, 0.78, 0.02));
     hair.position.set(0, 1.70, -0.01);
-    if (female && Math.random() < 0.55) {
+    if (female && (cfg.longHair || Math.random() < 0.55)) {
       const backHair = box(0.30, 0.30, 0.10, hairColor, 0, 1.56, -0.10, 0.72, 0.01);
       g.add(backHair);
+      if (cfg.longHair) {
+        const hairSideL = box(0.07, 0.34, 0.09, hairColor, -0.155, 1.53, -0.02, 0.75, 0.01);
+        const hairSideR = box(0.07, 0.34, 0.09, hairColor, 0.155, 1.53, -0.02, 0.75, 0.01);
+        hairSideL.rotation.z = -0.08; hairSideR.rotation.z = 0.08;
+        g.add(hairSideL, hairSideR);
+      }
     }
 
     const eyeMat = mat(0x1a1715, 0.6, 0.0);
     const eyeL = mesh(new THREE.SphereGeometry(0.016, 8, 6), eyeMat); eyeL.position.set(-0.062,1.65,0.166);
     const eyeR = mesh(new THREE.SphereGeometry(0.016, 8, 6), eyeMat); eyeR.position.set(0.062,1.65,0.166);
     const nose = box(0.025,0.04,0.035,skin,0,1.60,0.178,0.8,0);
+
+    if (cfg.glasses) {
+      const frameMat = mat(0x1c1c1c, 0.4, 0.35);
+      const lensMat = mat(0xbcd6e6, 0.15, 0.1, { transparent: true, opacity: 0.55 });
+      const frameL = mesh(new THREE.TorusGeometry(0.028, 0.006, 6, 14), frameMat); frameL.position.set(-0.062,1.652,0.172);
+      const frameR = mesh(new THREE.TorusGeometry(0.028, 0.006, 6, 14), frameMat); frameR.position.set(0.062,1.652,0.172);
+      const lensL = mesh(new THREE.CircleGeometry(0.026, 14), lensMat); lensL.position.set(-0.062,1.652,0.174);
+      const lensR = mesh(new THREE.CircleGeometry(0.026, 14), lensMat); lensR.position.set(0.062,1.652,0.174);
+      const bridge = box(0.032, 0.006, 0.006, 0x1c1c1c, 0, 1.652, 0.170, 0.4, 0.35);
+      g.add(frameL, frameR, lensL, lensR, bridge);
+    }
+    if (cfg.buttons) {
+      for (const y of [1.24, 1.10, 0.96]) g.add(mesh(new THREE.SphereGeometry(0.012, 8, 6), mat(0xcaa25a, 0.35, 0.5)).translateX(0).translateY(y).translateZ(0.135));
+    }
 
     const armL = capsule(.058, .25, shirt, -.27, 1.12, 0, .55, .01);
     const armR = capsule(.058, .25, shirt, .27, 1.12, 0, .55, .01);
@@ -870,9 +956,10 @@
     parts.handR.rotation.z = parts.foreR.rotation.z * 0.55;
     parts.legL.rotation.z = -swing * 0.42;
     parts.legR.rotation.z = swing * 0.42;
-    parts.head.position.y = 1.63 + (moving ? Math.abs(Math.sin(cycle * 0.7)) * 0.012 : 0.006 * Math.sin(cycle * 0.3));
-    parts.torso.position.y = 1.10 + (moving ? Math.abs(Math.sin(cycle)) * 0.012 : 0.006 * Math.sin(cycle * 0.35));
-    parts.hips.position.y = 0.74 + (moving ? Math.abs(Math.sin(cycle)) * 0.008 : 0);
+    const baseY = g.userData.baseY || { head: 1.63, torso: 1.10, hips: 0.74 };
+    parts.head.position.y = baseY.head + (moving ? Math.abs(Math.sin(cycle * 0.7)) * 0.012 : 0.006 * Math.sin(cycle * 0.3));
+    parts.torso.position.y = baseY.torso + (moving ? Math.abs(Math.sin(cycle)) * 0.012 : 0.006 * Math.sin(cycle * 0.35));
+    parts.hips.position.y = baseY.hips + (moving ? Math.abs(Math.sin(cycle)) * 0.008 : 0);
   }
 
   function acquireNpcPerson(style) {
@@ -1696,7 +1783,8 @@
   function buildSalesStaff() {
     const staff = Math.min(perfMode==='low'?3:6, salesStaff());
     for (let i=0;i<staff;i++) {
-      const p = person({shirt:0xf3f5f7,pants:0x25384e,formal:true,tie:0x245f9e,gender:i%2?'female':'male',hair:i%2?0x403026:0x6b4a32});
+      const look = STAFF_LOOKS[i % STAFF_LOOKS.length];
+      const p = person(look);
       p.position.set(3.8 + (i%3) * 2.2, 0, 5.9 - Math.floor(i/3)*1.55);
       dynamicGroup.add(p);
       registerAnimatedActor({ type: 'salesperson', obj: p, baseY: 0, baseX: p.position.x, baseZ: p.position.z, phase: Math.random()*6.28, speed: 1.7 + i*0.15, state:'disponible' });
@@ -2642,6 +2730,7 @@
     if (initialized) return true;
     if (!await loadThree()) return false;
     await loadNpcModelTemplate();
+    await loadExecModelTemplates();
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
