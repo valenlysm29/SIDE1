@@ -382,42 +382,25 @@ function stationStats(itemId){
   });
   return {count,capacity,buying};
 }
-function productionDopHtml(plan=productionPlan(),compact=false){
-  const material=id=>plan.materials.find(entry=>entry.id===id);
-  const selection=id=>{const value=material(id);return value?.selections?.length?value.selections.map(entry=>entry.label).join(' + '):'Sin compra registrada';};
-  const process=id=>plan.processes.find(entry=>entry.id===id)||{staff:0,machines:0,cycleCapacity:0};
-  const cut=process('cut'),assembly=process('assembly'),finish=process('finish');
-  const productItem=findDecisionItem('GARANTIA_PT');
-  const productWarranty=(productItem?.options||[]).find(option=>selectedOptionIds(productItem).includes(option.id));
-  const lines=plan.productLines.filter(line=>line.target>0);
-  const lineMix=lines.map(line=>`${escapeHtml(line.label)}: ${line.target.toLocaleString('es-PE')} u.`).join(' · ');
-  const finalMix=lines.map(line=>`<span><b>${escapeHtml(line.label)}</b> ${line.plannedUnits.toLocaleString('es-PE')} u.</span>`).join('');
+let disposeProductionDop=()=>{};
+function productionDopHtml(plan=productionPlan()){
   const producedPercent=plan.target?Math.min(100,Math.round(plan.producibleUnits/plan.target*100)):0;
-  const diagrams=lines.length?`<article class="dop-product" aria-labelledby="dopProductTitle">
-    <header class="dop-product-head"><div><span>ÁREA PRODUCTIVA ÚNICA · CICLO ${currentRound()}</span><h4 id="dopProductTitle">DOP consolidado de producción</h4><p>Mezcla programada: ${lineMix}</p></div><div><small>PRODUCCIÓN TOTAL DESEADA</small><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div></header>
-    <div class="dop-industrial">
-      <div class="dop-process-map">
-        <div class="dop-map-source dop-map-secondary-source"><span>MATERIA PRIMA SECUNDARIA</span><strong>Accesorios</strong><small>${escapeHtml(selection('ACCESORIOS'))}</small></div>
-        <div class="dop-map-source dop-map-main-source"><span>MATERIA PRIMA PRINCIPAL</span><strong>Cuero</strong><small>${escapeHtml(selection('CUERO'))}</small></div>
-        <div class="dop-map-step dop-map-branch-step dop-map-classification"><i class="dop-symbol inspection"><span>1</span></i><div><strong>Clasificación</strong><small>Selección y conteo</small></div></div>
-        <div class="dop-map-main-rail" aria-hidden="true"></div>
-        <div class="dop-map-step dop-map-branch-step dop-map-preparation"><i class="dop-symbol operation"><span>2</span></i><div><strong>Preparación</strong><small>Accesorios listos</small></div></div>
-        <div class="dop-map-step dop-map-main-step dop-map-cut"><i class="dop-symbol operation"><span>1</span></i><div><strong>Corte de piezas</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} juegos cortados</span><small>${cut.staff} operario(s) · ${cut.machines} mesa(s) · ${cut.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></div>
-        <div class="dop-map-step dop-map-main-step dop-map-combined"><i class="dop-symbol combined"><span>1</span></i><div><strong>Ensamblado y colocación de accesorios</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} bolsos ensamblados</span><small>${assembly.staff} operario(s) · ${assembly.machines} máquina(s) · Hilo: ${escapeHtml(selection('HILO'))}</small></div></div>
-        <div class="dop-map-step dop-map-main-step dop-map-finish"><i class="dop-symbol combined"><span>2</span></i><div><strong>Acabado final</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} bolsos acabados</span><small>${finish.staff} operario(s) · ${finish.machines} máquina(s) · ${finish.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></div>
-
-      </div>
-      <div class="dop-yield"><span>PORCENTAJE PRODUCIDO</span><strong>${producedPercent}%</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} conformes ÷ ${plan.target.toLocaleString('es-PE')} deseadas</small></div>
-      <div class="dop-final-output"><span>PRODUCCIÓN FINAL DEL CICLO ${currentRound()}</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades totales</strong><div class="dop-final-mix">${finalMix}</div><small>Resultado mensual consolidado del área productiva única.</small></div>
-      <footer class="dop-cycle-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="dop-footer-metrics"><div><span>EFICIENCIA DE LA LÍNEA</span><strong>${Math.round(plan.efficiency*100)}%</strong></div><div><span>PRODUCCIÓN MENSUAL</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades</strong></div><div><span>CUMPLIMIENTO DE LA META</span><strong>${producedPercent}%</strong></div></div></footer>
-    </div>
-  </article>`:'';
-  return `<section class="production-dop ${compact?'dop-compact':''}" aria-labelledby="productionDopTitle">
-    <header class="dop-heading"><div><span>DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>El área productiva es única. Las operaciones, inspecciones y actividades combinadas tienen numeración independiente.</p></div><div class="dop-legend"><b><i class="dop-symbol operation" aria-hidden="true"></i> Operación</b><b><i class="dop-symbol inspection" aria-hidden="true"></i> Inspección</b><b><i class="dop-symbol combined" aria-hidden="true"></i> Combinada</b></div></header>
-    ${diagrams||`<div class="dop-empty"><strong>Aún no hay producción para mostrar</strong><p>Indica cuánto deseas producir; SIDE consolidará todos los moldes activos en un solo DOP del área productiva.</p></div>`}
-  </section>`;
+  return window.SIDE_PRODUCTION_DOP.render(plan,{round:currentRound(),producedPercent});
 }
+// Refresh only the diagram while the existing input handlers own state and calculations.
+function refreshProductionDop(){
+  if(currentCategory!=='C')return;
+  const mount=document.querySelector('.production-dop-mount');
+  if(!mount)return;
+  disposeProductionDop();
+  mount.innerHTML=productionDopHtml();
+  disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
+}
+document.addEventListener('input',event=>{
+  if(event.target?.matches?.('[data-qty], [data-mold-target]'))refreshProductionDop();
+});
 function renderDecisionCategory(){
+  disposeProductionDop();
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
@@ -429,6 +412,7 @@ function renderDecisionCategory(){
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
+  disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);

@@ -15,7 +15,7 @@ function runtime(){
     setInterval(){},clearInterval(){},setTimeout(){},clearTimeout(){},requestAnimationFrame(){},
     ResizeObserver:class{observe(){}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,String(v)),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i],get length(){return storage.size}}});
   context.window=context;context.addEventListener=()=>{};context.scrollTo=()=>{};
-  for(const name of ['side_rules.js','decision_catalog.js','production_model.js','decision_review_model.js','app.js','company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
+  for(const name of ['side_rules.js','decision_catalog.js','production_model.js','decision_review_model.js','production_dop.js','app.js','company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
   const run=code=>vm.runInContext(code,context);
   // Peripheral effects are outside these tests; all selection/save/calculation handlers are real.
   run('updateHud=()=>{};updateSectionCost=()=>{};syncStudentReportPreview=()=>{};animateCash=()=>{};syncStudentTimer=()=>{};');
@@ -67,7 +67,7 @@ test('DOP renders once in Production and nowhere in the other categories or summ
   assert.doesNotMatch(r.run('productionSummaryHtml(liveCompanyReview())'),/class="production-dop /);
   assert.deepEqual(r.errors,[]);
 });
-test('original DOP handles empty, zero and valid targets and updates from active drafts',()=>{
+test('visual DOP handles empty, zero and valid targets and updates from active drafts',()=>{
   const r=runtime();
   assert.match(r.run('productionDopHtml()'),/Aún no hay producción para mostrar/);
   r.run(`decisionDrafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}},JEFATURA:{optionIds:['si_jefatura']},MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:100}},CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:3}}};`);
