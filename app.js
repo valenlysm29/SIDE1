@@ -88,7 +88,7 @@ function ledgerKey(){return 'SIDE_CASH_LEDGER_'+storageKey()}
 function loadDecisionState(){
   try{decisionState=JSON.parse(localStorage.getItem(decisionKey())||'{}')||{}}catch{decisionState={}}
   try{cashLedger=JSON.parse(localStorage.getItem(ledgerKey())||'{}')||{}}catch{cashLedger={}}
-  if(decisionState.CANALES)decisionState.CANALES=RULES.singleStore(decisionState.CANALES);
+  if(decisionState.CANALES)decisionState.CANALES=RULES.singleStoreSelection(decisionState.CANALES,currentRound());
   decisionDrafts={};
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
@@ -214,7 +214,11 @@ function ownedMolds(){
   return owned;
 }
 function initDraft(item){
-  if(decisionDrafts[item.id]){if(item.id==='CANALES')decisionDrafts[item.id]=RULES.singleStore(decisionDrafts[item.id]);return decisionDrafts[item.id];} const e=savedEntry(item);
+  if(decisionDrafts[item.id]){
+    if(item.id==='CANALES')decisionDrafts[item.id]=RULES.singleStoreSelection(decisionDrafts[item.id],currentRound());
+    return decisionDrafts[item.id];
+  }
+  const e=savedEntry(item);
   if(item.asset){const quantities={};item.options.forEach(o=>quantities[o.id]=currentPurchase(item,o.id));return decisionDrafts[item.id]={quantities}}
   if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities}}
   if(item.type==='production-plan'){
@@ -227,7 +231,11 @@ function initDraft(item){
   if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:e?.round===currentRound()?(e.optionIds||[]):[]};
   if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(e?.round===currentRound()?e.amount:0)};
   if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(e?.round===currentRound()?e.staff:{})};
-  if(item.id==='CANALES')return decisionDrafts[item.id]=RULES.singleStore(e||{});
+  if(item.id==='CANALES'){
+    const optionIds=(e?.optionIds||[]).slice(),quantities={};
+    RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});
+    return decisionDrafts[item.id]=RULES.singleStoreSelection({optionIds,quantities},currentRound());
+  }
   const ids=(e?.optionIds||item.defaultOptionIds||[]).slice();return decisionDrafts[item.id]={optionIds:ids};
 }
 function selectedOptionIds(item){return initDraft(item).optionIds||[]}
@@ -242,26 +250,37 @@ function materialYieldLabel(itemId,optionId){
 }
 function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos??1000):id==='miraflores'?Number(c.demandMiraflores??1250):id==='sjl'?Number(c.demandSJL??1100):0}
 function chosenStores(){const item=findDecisionItem('CANALES');return selectedOptionIds(item).map(id=>item.options.find(o=>o.id===id)).filter(o=>o?.channel==='store')}
-function channelDraft(){return initDraft(findDecisionItem('CANALES'))}
+function channelDraft(){
+  const item=findDecisionItem('CANALES'),d=initDraft(item);
+  d.quantities=d.quantities||{};
+  RULES.STORE_IDS.forEach(id=>{if((d.optionIds||[]).includes(id))d.quantities[id]=RULES.storeQuantity(d,id)});
+  return d;
+}
+function storeMinimum(id){return RULES.committedQuantity(savedEntry(findDecisionItem('CANALES')),id,currentRound())}
 function renderChannelChoices(item,locked){
-  const d=channelDraft(),id=RULES.STORE_IDS.find(value=>d.optionIds.includes(value));
-  const remaining=optionCommitRemaining(item,id),storeLocked=locked||remaining>0;
-  return `<fieldset class="store-options"><legend>Elige una tienda</legend>
-    <div class="choice-strip radio-options store-channel-grid">${item.options.filter(o=>o.channel==='store').map(o=>{
-      const selected=o.id===id;
-      return `<label class="choice-pill ${selected?'selected':''} ${storeLocked?'fixed-choice':''}">
-        <input data-store-option="${o.id}" type="radio" name="decision-store" value="${o.id}" ${selected?'checked':''} ${storeLocked?'disabled':''}>
-        <span class="choice-check" aria-hidden="true"></span><strong>${escapeHtml(o.label)}</strong>
-        <em>${money(optionUnitCost(item,o))} / ciclo</em><p>${escapeHtml(o.desc)}</p>
-        <small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>
-        ${selected&&remaining?`<span class="lock-note">Compromiso vigente: ${remaining} ciclo(s)</span>`:''}
-      </label>`;
-    }).join('')}</div><p class="micro-caption">Una tienda seleccionada · 1 vendedor básico · comisión total 1%</p>
-    </fieldset><div class="choice-strip checkbox-options">${item.options.filter(o=>o.channel!=='store').map(o=>`<label class="choice-pill ${d.optionIds.includes(o.id)?'selected':''}"><input data-choice="CANALES" data-option="${o.id}" type="checkbox" ${d.optionIds.includes(o.id)?'checked':''} ${locked?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p></label>`).join('')}</div>`;
+  const d=channelDraft();
+  const committed=RULES.STORE_IDS.find(id=>storeMinimum(id)>0);
+  return `<div class="choice-strip store-channel-grid">${item.options.map(option=>{
+    const id=option.id,selected=(d.optionIds||[]).includes(id),physical=option.channel==='store';
+    const remaining=optionCommitRemaining(item,id),disabled=locked||(physical&&!!committed);
+    return `<div class="store-channel-card ${selected?'selected':''}" data-channel-card="${id}">
+      <label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}">
+        <input data-choice="CANALES" data-option="${id}" type="${physical?'radio':'checkbox'}" name="${physical?'decision-store':'decision-web'}" ${selected?'checked':''} ${disabled?'disabled':''}>
+        <span class="choice-check"></span><strong>${escapeHtml(option.label)}</strong>
+        <em>${money(optionUnitCost(item,option))}${physical?' <span class="store-unit-caption">/ ciclo</span>':''}</em>
+        <p>${escapeHtml(option.desc)}</p>
+        ${physical?`<small>Demanda base del distrito: ${districtDemand(id).toLocaleString('es-PE')} u./ciclo</small>`:''}
+        ${remaining?`<span class="lock-note">Compromiso vigente: ${remaining} ciclo(s)</span>`:''}
+      </label>
+    </div>`;
+  }).join('')}</div><div class="micro-caption">Elige una única tienda entre los distritos disponibles. Puedes activar también el canal web. Cada tienda incluye un vendedor básico.</div>`;
 }
 function validateChannelQuantities(){
   const d=channelDraft(),previous=savedEntry(findDecisionItem('CANALES'));
-  return RULES.storeCount(d)===1&&RULES.STORE_IDS.every(id=>RULES.storeQuantity(d,id)>=RULES.committedQuantity(previous,id,currentRound()));
+  for(const id of RULES.STORE_IDS){
+    if(RULES.storeQuantity(d,id)<RULES.committedQuantity(previous,id,currentRound())){toast('Debes mantener las tiendas con contrato vigente.');return false}
+  }
+  return true;
 }
 function creditPercent(){const base=Number(teacherConfig().creditPercentStart??20);return Math.min(70,base+(currentRound()-1)*5+(analystSelected()?5:0))}
 function recurringAlreadyPrevious(item){const e=savedEntry(item);return e&&Number(e.round)<currentRound()}
@@ -318,11 +337,21 @@ function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCat
 function openDecisionMenu(){
   loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
   renderTabs(); renderDecisionCategory(); updateHud(); syncStudentReportPreview();
-  window.onscroll=()=>{if(!$('decisionMenu').classList.contains('hidden')){$('decisionTopbar')?.classList.toggle('compact',window.scrollY>70);}};
+  updateDecisionLayout();
 }
+function updateDecisionLayout(){
+  const screen=$('decisionMenu');
+  if(!screen||screen.classList.contains('hidden'))return;
+  screen.style.setProperty('--decision-top-height',`${$('decisionTopbar').offsetHeight}px`);
+  screen.style.setProperty('--decision-tabs-height',`${$('decisionTabs').offsetHeight}px`);
+}
+const decisionLayoutObserver=new ResizeObserver(updateDecisionLayout);
+[$('decisionTopbar'),$('decisionTabs')].filter(Boolean).forEach(el=>decisionLayoutObserver.observe(el));
+window.addEventListener('resize',updateDecisionLayout);
 function renderTabs(){
   const nav=$('decisionTabs');
-  nav.innerHTML=navigationCategories().map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span class="decision-tab-label">${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADO</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
+  nav.innerHTML=navigationCategories().map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span class="tab-label">${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
+  updateDecisionLayout();
   nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;renderTabs();renderDecisionCategory()}));
 }
 function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
@@ -353,49 +382,53 @@ function stationStats(itemId){
   });
   return {count,capacity,buying};
 }
-function cycleProductivity(plan=productionPlan()){
-  return window.SIDE_PRODUCTION_MODEL.cycleProductivity(plan,window.SIDE3D?.cycleProductionRecord?.(),currentRound());
-}
-function productivityMetricsHtml(metrics,includeDifference=false){
-  const units=value=>value===null?'Sin datos':`${value.toLocaleString('es-PE')} u.`;
-  const percent=metrics.target===0?'Sin objetivo':metrics.compliance===null?'Sin datos':`${metrics.compliance.toLocaleString('es-PE',{maximumFractionDigits:2})}%`;
-  return `<div class="cs-production-kpis" data-cycle-productivity="${metrics.round}">
-    <div><span>Producción realizada</span><strong data-productivity="produced">${units(metrics.produced)}</strong></div>
-    <div><span>Producción objetivo</span><strong data-productivity="target">${units(metrics.target)}</strong></div>
-    <div><span>Porcentaje de cumplimiento</span><strong data-productivity="compliance">${percent}</strong></div>
-    ${includeDifference?`<div><span>Diferencia (objetivo − realizada)</span><strong data-productivity="difference">${units(metrics.difference)}</strong></div>`:''}
-  </div>${!metrics.hasProductionData?'<p class="cs-production-method">Aún no hay un registro de producción realizada para este ciclo.</p>':''}`;
-}
-function productionDopHtml(plan=productionPlan()){
-  const metrics=cycleProductivity(plan);
-  return `<section class="production-dop" aria-labelledby="productionDopTitle">
-    <header class="dop-heading"><div><span>DOP · CICLO ${metrics.round}</span><h3 id="productionDopTitle">Diagrama de operaciones de producción</h3><p>Etapas de la línea y cumplimiento de la producción del ciclo actual.</p></div></header>
-    <ol class="dop-cycle-flow" aria-label="Secuencia de operaciones de producción">${plan.processes.map((process,index)=>`<li>
-      <span class="dop-symbol operation" aria-hidden="true">${index+1}</span><strong>${escapeHtml(process.label)}</strong>
-    </li>`).join('')}</ol>
-    ${productivityMetricsHtml(metrics)}
-    <p class="cs-production-method">Cumplimiento = producción realizada / producción objetivo × 100.</p>
+function productionDopHtml(plan=productionPlan(),compact=false){
+  const material=id=>plan.materials.find(entry=>entry.id===id);
+  const selection=id=>{const value=material(id);return value?.selections?.length?value.selections.map(entry=>entry.label).join(' + '):'Sin compra registrada';};
+  const process=id=>plan.processes.find(entry=>entry.id===id)||{staff:0,machines:0,cycleCapacity:0};
+  const cut=process('cut'),assembly=process('assembly'),finish=process('finish');
+  const productItem=findDecisionItem('GARANTIA_PT');
+  const productWarranty=(productItem?.options||[]).find(option=>selectedOptionIds(productItem).includes(option.id));
+  const lines=plan.productLines.filter(line=>line.target>0);
+  const lineMix=lines.map(line=>`${escapeHtml(line.label)}: ${line.target.toLocaleString('es-PE')} u.`).join(' · ');
+  const finalMix=lines.map(line=>`<span><b>${escapeHtml(line.label)}</b> ${line.plannedUnits.toLocaleString('es-PE')} u.</span>`).join('');
+  const producedPercent=plan.target?Math.min(100,Math.round(plan.producibleUnits/plan.target*100)):0;
+  const diagrams=lines.length?`<article class="dop-product" aria-labelledby="dopProductTitle">
+    <header class="dop-product-head"><div><span>ÁREA PRODUCTIVA ÚNICA · CICLO ${currentRound()}</span><h4 id="dopProductTitle">DOP consolidado de producción</h4><p>Mezcla programada: ${lineMix}</p></div><div><small>PRODUCCIÓN TOTAL DESEADA</small><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div></header>
+    <div class="dop-industrial">
+      <div class="dop-process-map">
+        <div class="dop-map-source dop-map-secondary-source"><span>MATERIA PRIMA SECUNDARIA</span><strong>Accesorios</strong><small>${escapeHtml(selection('ACCESORIOS'))}</small></div>
+        <div class="dop-map-source dop-map-main-source"><span>MATERIA PRIMA PRINCIPAL</span><strong>Cuero</strong><small>${escapeHtml(selection('CUERO'))}</small></div>
+        <div class="dop-map-step dop-map-branch-step dop-map-classification"><i class="dop-symbol inspection"><span>1</span></i><div><strong>Clasificación</strong><small>Selección y conteo</small></div></div>
+        <div class="dop-map-main-rail" aria-hidden="true"></div>
+        <div class="dop-map-step dop-map-branch-step dop-map-preparation"><i class="dop-symbol operation"><span>2</span></i><div><strong>Preparación</strong><small>Accesorios listos</small></div></div>
+        <div class="dop-map-step dop-map-main-step dop-map-cut"><i class="dop-symbol operation"><span>1</span></i><div><strong>Corte de piezas</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} juegos cortados</span><small>${cut.staff} operario(s) · ${cut.machines} mesa(s) · ${cut.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></div>
+        <div class="dop-map-step dop-map-main-step dop-map-combined"><i class="dop-symbol combined"><span>1</span></i><div><strong>Ensamblado y colocación de accesorios</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} bolsos ensamblados</span><small>${assembly.staff} operario(s) · ${assembly.machines} máquina(s) · Hilo: ${escapeHtml(selection('HILO'))}</small></div></div>
+        <div class="dop-map-step dop-map-main-step dop-map-finish"><i class="dop-symbol combined"><span>2</span></i><div><strong>Acabado final</strong><span>${plan.producibleUnits.toLocaleString('es-PE')} bolsos acabados</span><small>${finish.staff} operario(s) · ${finish.machines} máquina(s) · ${finish.cycleCapacity.toLocaleString('es-PE')} u./ciclo</small></div></div>
+
+      </div>
+      <div class="dop-yield"><span>PORCENTAJE PRODUCIDO</span><strong>${producedPercent}%</strong><small>${plan.producibleUnits.toLocaleString('es-PE')} conformes ÷ ${plan.target.toLocaleString('es-PE')} deseadas</small></div>
+      <div class="dop-final-output"><span>PRODUCCIÓN FINAL DEL CICLO ${currentRound()}</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades totales</strong><div class="dop-final-mix">${finalMix}</div><small>Resultado mensual consolidado del área productiva única.</small></div>
+      <footer class="dop-cycle-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="dop-footer-metrics"><div><span>EFICIENCIA DE LA LÍNEA</span><strong>${Math.round(plan.efficiency*100)}%</strong></div><div><span>PRODUCCIÓN MENSUAL</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} unidades</strong></div><div><span>CUMPLIMIENTO DE LA META</span><strong>${producedPercent}%</strong></div></div></footer>
+    </div>
+  </article>`:'';
+  return `<section class="production-dop ${compact?'dop-compact':''}" aria-labelledby="productionDopTitle">
+    <header class="dop-heading"><div><span>DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>El área productiva es única. Las operaciones, inspecciones y actividades combinadas tienen numeración independiente.</p></div><div class="dop-legend"><b><i class="dop-symbol operation" aria-hidden="true"></i> Operación</b><b><i class="dop-symbol inspection" aria-hidden="true"></i> Inspección</b><b><i class="dop-symbol combined" aria-hidden="true"></i> Combinada</b></div></header>
+    ${diagrams||`<div class="dop-empty"><strong>Aún no hay producción para mostrar</strong><p>Indica cuánto deseas producir; SIDE consolidará todos los moldes activos en un solo DOP del área productiva.</p></div>`}
   </section>`;
-}
-function refreshCycleProductivity(){
-  const plan=productionPlan(),dop=document.querySelector('#decisionCards > .production-dop');
-  if(currentCategory==='C'&&dop)dop.outerHTML=productionDopHtml(plan);
-  const total=document.querySelector('.production-total b');if(total)total.textContent=`${plan.target.toLocaleString('es-PE')} u.`;
-  if(currentCategory==='A'&&typeof renderCompanySummary==='function')renderCompanySummary();
 }
 function renderDecisionCategory(){
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
-  document.querySelector('#decisionStickyHead .section-balance')?.classList.toggle('hidden',!!cat.summaryOnly);
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
   let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
-  const cards=(cat.cat==='C'?productionDopHtml():'')+cardItems.map(renderDecisionRow).join('');
+  const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
-  bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer();
+  bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
@@ -412,9 +445,9 @@ function renderDecisionRow(item){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes bajar de 0 para vender/liquidar equipo ya adquirido (recuperas un % de su costo).</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='production-plan'){
     const plan=productionPlan();
-    body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción planificada: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
+    body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
   } else if(item.type==='number'){
-    const plan=productionPlan();body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div>`;
+    const plan=productionPlan();body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima para la meta · ${escapeHtml(plan.moldLabel)}</span>${plan.materials.map(material=>`<b>${escapeHtml(material.label)}: ${material.neededForTarget.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</b>`).join('')}<small>La compra se convierte según su presentación: rollo, piel, juego o carrete.</small></div>`;
   } else if(item.type==='sales-staff'){
     body=`<div class="info-decision"><strong>Personal automático por tienda</strong><p>Se asigna 1 vendedor básico a cada tienda física. La comisión es 1% de las ventas.</p></div>`;
   } else if(item.type==='loan'){
@@ -441,24 +474,18 @@ function bindDecisionControls(){
       if(item.mandatoryFixed){renderDecisionCategory();return}
       if(item.type==='multi-choice'&&!input.checked&&optionCommitRemaining(item,id)>0){toast('Este canal tiene tiendas con contrato vigente y no puede retirarse.');renderDecisionCategory();return}
       const d=initDraft(item);
-      if(item.type==='multi-choice'){
+      if(item.id==='CANALES'&&RULES.STORE_IDS.includes(id)){
+        if(RULES.STORE_IDS.some(store=>storeMinimum(store)>0)){renderDecisionCategory();return}
+        d.optionIds=[...(d.optionIds||[]).filter(option=>!RULES.STORE_IDS.includes(option)),id];
+        d.quantities={[id]:1};
+      }else if(item.type==='multi-choice'){
         const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set];
-        if(item.id==='CANALES')decisionDrafts.CANALES=RULES.singleStore(d);
       }else d.optionIds=[id];
       persistCurrentDraftOnly();renderDecisionCategory();
       const updated=document.querySelector(`[data-choice="${item.id}"][data-option="${id}"]`);
       updated?.focus({preventScroll:true});
     });
   });
-  document.querySelectorAll('[data-store-option]').forEach(input=>input.addEventListener('change',()=>{
-    if(decisionEditingBlocked())return;
-    const item=findDecisionItem('CANALES'),d=channelDraft(),old=RULES.STORE_IDS.find(id=>d.optionIds.includes(id));
-    const selected=input.dataset.storeOption;
-    if(!input.checked||optionCommitRemaining(item,old)>0||!RULES.STORE_IDS.includes(selected)){renderDecisionCategory();return;}
-    d.optionIds=d.optionIds.filter(id=>!RULES.STORE_IDS.includes(id));d.optionIds.push(selected);
-    decisionDrafts.CANALES=RULES.singleStore(d);persistCurrentDraftOnly();renderDecisionCategory();
-    document.querySelector(`[data-store-option="${selected}"]`)?.focus({preventScroll:true});
-  }));
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
   document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item),floor=item.asset?-getOwned(item,i.dataset.option):0;d.quantities[i.dataset.option]=Math.max(floor,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
   document.querySelectorAll('[data-mold-step]').forEach(button=>button.addEventListener('click',()=>{
@@ -466,7 +493,7 @@ function bindDecisionControls(){
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
   }));
   document.querySelectorAll('[data-mold-target]').forEach(input=>{
-    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();updateHud();refreshCycleProductivity();});
+    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();updateHud();});
     input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META')),id=input.dataset.moldTarget;d.moldTargets[id]=Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();renderDecisionCategory();});
   });
   document.querySelectorAll('[data-mold-suggest]').forEach(button=>button.addEventListener('click',()=>{

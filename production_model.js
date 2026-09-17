@@ -171,17 +171,6 @@
   }
 
   function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
-  // Actual output is supplied by the active cycle's production record, never
-  // inferred from capacity, purchases, stock or sales.
-  function cycleProductivity(plan={},record=null,round){
-    const target=whole(plan.target);
-    const hasProductionData=!!record&&Number(record.round)===Number(round)&&
-      typeof record.producedUnits==='number'&&Number.isFinite(record.producedUnits)&&record.producedUnits>=0;
-    const produced=hasProductionData?whole(record.producedUnits):null;
-    return {round,target,produced,hasProductionData,
-      compliance:hasProductionData&&target>0?produced/target*100:null,
-      difference:hasProductionData?target-produced:null};
-  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
-  return Object.freeze({calculate,cycleProductivity,yieldFor,materialUnit,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,yieldFor,materialUnit,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });

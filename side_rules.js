@@ -40,15 +40,20 @@
     if (!STORE_IDS.includes(id) || !(entry?.optionIds || []).includes(id)) return 0;
     return positiveInteger(entry?.quantities?.[id], 1);
   }
-  function storeCount(entry) { return STORE_IDS.reduce((sum,id)=>sum+storeQuantity(entry,id),0); }
-  function singleStore(entry={},fallbackId=STORE_IDS[0]) {
-    const id=(entry.optionIds||[]).find(value=>STORE_IDS.includes(value))||fallbackId;
-    const optionIds=[...new Set((entry.optionIds||[]).filter(value=>!STORE_IDS.includes(value))),id];
-    const first=storeBatches(entry,id).sort((a,b)=>a.round-b.round)[0];
-    return {...entry,optionIds,quantities:{[id]:1},
-      storeContracts:first?{[id]:[{round:first.round,quantity:1}]}:{},
-      optionRounds:entry.optionRounds?.[id]?{[id]:entry.optionRounds[id]}:{}};
+  // Current decisions manage one physical store; legacy helpers remain available for history.
+  function singleStoreSelection(entry = {}, round = 1) {
+    const ids = [...new Set(entry.optionIds || [])];
+    const stores = ids.filter(id => STORE_IDS.includes(id));
+    const selected = stores.find(id => committedQuantity(entry,id,round)>0) || stores[0];
+    const optionIds = ids.filter(id => !STORE_IDS.includes(id) || id === selected);
+    const storeContracts = {};
+    if (selected && entry.storeContracts?.[selected]) {
+      const first = storeBatches(entry,selected,round).sort((a,b)=>a.round-b.round)[0];
+      if (first) storeContracts[selected] = [{round:first.round,quantity:1}];
+    }
+    return {...entry,optionIds,quantities:selected?{[selected]:1}:{},storeContracts};
   }
+  function storeCount(entry) { return STORE_IDS.reduce((sum,id)=>sum+storeQuantity(entry,id),0); }
   function storeBatches(entry, id, round = 1) {
     const quantity = storeQuantity(entry,id);
     if (!quantity) return [];
@@ -81,5 +86,5 @@
     if (add>0) batches.push({round,quantity:add});
     return batches;
   }
-  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,storeCount,singleStore,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
+  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,singleStoreSelection,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
 });

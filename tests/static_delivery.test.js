@@ -47,17 +47,31 @@ test('cycle zero places summary last and later cycles place it first',()=>{
   assert.match(source,/round>1\?'A':navigationCategories\(\)\[0\]\?\.cat/);
 });
 
-test('DOP and summary share the active cycle productivity source',()=>{
+test('DOP follows the project cycle from leather input to final production',()=>{
   const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-  const summary=fs.readFileSync(path.join(root,'company_summary.js'),'utf8');
-  assert.match(app,/SIDE_PRODUCTION_MODEL.cycleProductivity/);
-  assert.match(summary,/metrics=cycleProductivity\(plan\)/);
-  assert.match(app,/productivityMetricsHtml\(metrics\)/);
-  assert.match(summary,/productivityMetricsHtml\(metrics,true\)/);
+  const styles=fs.readFileSync(path.join(root,'styles.css'),'utf8');
+  for(const label of ['MATERIA PRIMA PRINCIPAL','MATERIA PRIMA SECUNDARIA','Corte de piezas','Preparación','Ensamblado y colocación de accesorios','Acabado final','Clasificación','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO','Tabla de resumen','EFICIENCIA DE LA LÍNEA','PRODUCCIÓN MENSUAL'])assert.match(app,new RegExp(label));
+  assert.match(app,/plan\.productLines\.filter\(line=>line\.target>0\)/);
+  assert.match(app,/ÁREA PRODUCTIVA ÚNICA/);
+  assert.match(app,/DOP consolidado de producción/);
+  assert.match(app,/dop-symbol combined/);
+  assert.match(app,/dop-process-map/);
+  assert.match(app,/dop-map-preparation/);
+  // The documented five-activity DOP no longer includes a final inspection.
+  const dopSource=app.slice(app.indexOf('function productionDopHtml('),app.indexOf('function renderDecisionCategory('));
+  assert.doesNotMatch(dopSource,/Inspección final/);
+  assert.match(dopSource,/<td>Operaciones<\/td><td>2<\/td>/);
+  assert.match(dopSource,/<td>Inspecciones<\/td><td>1<\/td>/);
+  assert.match(dopSource,/<td>Combinadas<\/td><td>2<\/td>/);
+  assert.match(dopSource,/<th>Total<\/th><th>5<\/th>/);
+  assert.match(styles,/\.dop-map-step:before\{[^}]*top:0;bottom:0/);
+  assert.match(styles,/dop-process-map\+\.dop-yield:before[^}]*left:calc\(50% \+ 20px\)/);
 });
 
 test('infrastructure, production and logistics drafts remain saveable over budget',()=>{
-  const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
-  assert.match(app,/\$\('saveDecisionSection'\)\.disabled=locked;/);
-  assert.match(app,/const ledger=affordable\?\{\.\.\.cashLedger,\[key\]:plan.net\}:\{\.\.\.cashLedger\};/);
+  const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  assert.match(source,/saveDecisionSection'\)\.disabled=locked;/);
+  assert.match(source,/const affordable=cashBalance\(\)-old\+plan\.net>=-0\.005;/);
+  assert.match(source,/const ledger=affordable\?\{\.\.\.cashLedger,\[key\]:plan\.net\}:\{\.\.\.cashLedger\};/);
+  assert.match(source,/Borrador guardado\. Ajusta el presupuesto antes de enviar la decisión\./);
 });
