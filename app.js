@@ -88,7 +88,6 @@ function ledgerKey(){return 'SIDE_CASH_LEDGER_'+storageKey()}
 function loadDecisionState(){
   try{decisionState=JSON.parse(localStorage.getItem(decisionKey())||'{}')||{}}catch{decisionState={}}
   try{cashLedger=JSON.parse(localStorage.getItem(ledgerKey())||'{}')||{}}catch{cashLedger={}}
-  if(decisionState.CANALES)decisionState.CANALES=RULES.singleStoreSelection(decisionState.CANALES,currentRound());
   decisionDrafts={};
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
@@ -215,7 +214,6 @@ function ownedMolds(){
 }
 function initDraft(item){
   if(decisionDrafts[item.id]){
-    if(item.id==='CANALES')decisionDrafts[item.id]=RULES.singleStoreSelection(decisionDrafts[item.id],currentRound());
     return decisionDrafts[item.id];
   }
   const e=savedEntry(item);
@@ -234,7 +232,7 @@ function initDraft(item){
   if(item.id==='CANALES'){
     const optionIds=(e?.optionIds||[]).slice(),quantities={};
     RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});
-    return decisionDrafts[item.id]=RULES.singleStoreSelection({optionIds,quantities},currentRound());
+    return decisionDrafts[item.id]={optionIds,quantities};
   }
   const ids=(e?.optionIds||item.defaultOptionIds||[]).slice();return decisionDrafts[item.id]={optionIds:ids};
 }
@@ -259,13 +257,12 @@ function channelDraft(){
 function storeMinimum(id){return RULES.committedQuantity(savedEntry(findDecisionItem('CANALES')),id,currentRound())}
 function renderChannelChoices(item,locked){
   const d=channelDraft();
-  const committed=RULES.STORE_IDS.find(id=>storeMinimum(id)>0);
   return `<div class="choice-strip store-channel-grid">${item.options.map(option=>{
     const id=option.id,selected=(d.optionIds||[]).includes(id),physical=option.channel==='store';
-    const remaining=optionCommitRemaining(item,id),disabled=locked||(physical&&!!committed);
+    const remaining=optionCommitRemaining(item,id),disabled=locked||(physical&&storeMinimum(id)>0);
     return `<div class="store-channel-card ${selected?'selected':''}" data-channel-card="${id}">
       <label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}">
-        <input data-choice="CANALES" data-option="${id}" type="${physical?'radio':'checkbox'}" name="${physical?'decision-store':'decision-web'}" ${selected?'checked':''} ${disabled?'disabled':''}>
+        <input data-choice="CANALES" data-option="${id}" type="checkbox" name="decision-channels" ${selected?'checked':''} ${disabled?'disabled':''}>
         <span class="choice-check"></span><strong>${escapeHtml(option.label)}</strong>
         <em>${money(optionUnitCost(item,option))}${physical?' <span class="store-unit-caption">/ ciclo</span>':''}</em>
         <p>${escapeHtml(option.desc)}</p>
@@ -273,7 +270,7 @@ function renderChannelChoices(item,locked){
         ${remaining?`<span class="lock-note">Compromiso vigente: ${remaining} ciclo(s)</span>`:''}
       </label>
     </div>`;
-  }).join('')}</div><div class="micro-caption">Elige una única tienda entre los distritos disponibles. Puedes activar también el canal web. Cada tienda incluye un vendedor básico.</div>`;
+  }).join('')}</div><div class="micro-caption">Puedes seleccionar varias tiendas físicas en los distritos disponibles y activar también el canal web. Cada tienda incluye un vendedor básico.</div>`;
 }
 function validateChannelQuantities(){
   const d=channelDraft(),previous=savedEntry(findDecisionItem('CANALES'));
@@ -459,9 +456,9 @@ function bindDecisionControls(){
       if(item.type==='multi-choice'&&!input.checked&&optionCommitRemaining(item,id)>0){toast('Este canal tiene tiendas con contrato vigente y no puede retirarse.');renderDecisionCategory();return}
       const d=initDraft(item);
       if(item.id==='CANALES'&&RULES.STORE_IDS.includes(id)){
-        if(RULES.STORE_IDS.some(store=>storeMinimum(store)>0)){renderDecisionCategory();return}
-        d.optionIds=[...(d.optionIds||[]).filter(option=>!RULES.STORE_IDS.includes(option)),id];
-        d.quantities={[id]:1};
+        const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set];
+        d.quantities=d.quantities||{};
+        if(input.checked)d.quantities[id]=RULES.positiveInteger(d.quantities[id],1);else delete d.quantities[id];
       }else if(item.type==='multi-choice'){
         const set=new Set(d.optionIds||[]);input.checked?set.add(id):set.delete(id);d.optionIds=[...set];
       }else d.optionIds=[id];

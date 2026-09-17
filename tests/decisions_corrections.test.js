@@ -21,7 +21,7 @@ function runtime(){
   run('updateHud=()=>{};updateSectionCost=()=>{};syncStudentReportPreview=()=>{};animateCash=()=>{};syncStudentTimer=()=>{};');
   for(const id of ['web',...rules.STORE_IDS]){const input=element();input.dataset={choice:'CANALES',option:id};input.checked=true;inputs.push(input);}
   run("currentCategory='D';bindDecisionControls();");
-  return {run,elements,errors,select(id){inputs.find(i=>i.dataset.option===id).handlers.change();},json:code=>JSON.parse(JSON.stringify(run(code)))};
+  return {run,elements,errors,select(id,checked=true){const input=inputs.find(i=>i.dataset.option===id);input.checked=checked;input.handlers.change();},json:code=>JSON.parse(JSON.stringify(run(code)))};
 }
 test('current store selection normalizes duplicates without mutating legacy data',()=>{
   const legacy={optionIds:['web','los_olivos','miraflores'],quantities:{los_olivos:4,miraflores:2},storeContracts:{los_olivos:[{round:1,quantity:4}],miraflores:[{round:2,quantity:2}]}};
@@ -29,16 +29,26 @@ test('current store selection normalizes duplicates without mutating legacy data
   assert.deepEqual(single.optionIds,['web','los_olivos']);assert.equal(rules.storeCount(single),1);
   assert.deepEqual(single.storeContracts.los_olivos,[{round:1,quantity:1}]);assert.equal(JSON.stringify(legacy),before);
 });
-test('selectable store options replace one another, keep web, and update prices',()=>{
+test('store checkboxes accumulate districts, keep web, and update prices independently',()=>{
   const r=runtime();r.select('web');
+  const selected=['web'];let total=500;
   for(const [id,cost] of [['los_olivos',1800],['miraflores',3500],['sjl',2200]]){
-    r.select(id);assert.deepEqual(r.json('channelDraft().optionIds'),['web',id]);
-    assert.equal(r.run('RULES.storeCount(channelDraft())'),1);
-    assert.equal(r.run("computeItemCost(findDecisionItem('CANALES'))"),cost+500);
+    selected.push(id);total+=cost;
+    r.select(id);assert.deepEqual(r.json('channelDraft().optionIds'),selected);
+    assert.equal(r.run('RULES.storeCount(channelDraft())'),selected.length-1);
+    assert.equal(r.run("computeItemCost(findDecisionItem('CANALES'))"),total);
   }
   const html=r.run("renderChannelChoices(findDecisionItem('CANALES'),false)");
-  assert.equal((html.match(/type="radio"/g)||[]).length,3);
+  assert.equal((html.match(/type="checkbox"/g)||[]).length,4);
+  assert.doesNotMatch(html,/type="radio"/);
   assert.doesNotMatch(html,/data-store-qty|data-store-step|type="number"/);
+  r.select('miraflores',false);
+  assert.deepEqual(r.json('channelDraft().optionIds'),['web','los_olivos','sjl']);
+  assert.deepEqual(r.json('channelDraft().quantities'),{los_olivos:1,sjl:1});
+  assert.equal(r.run("computeItemCost(findDecisionItem('CANALES'))"),4500);
+  r.select('web',false);
+  assert.equal(r.run('RULES.storeCount(channelDraft())'),2);
+  assert.equal(r.run("computeItemCost(findDecisionItem('CANALES'))"),4000);
   assert.deepEqual(r.errors,[]);
 });
 test('single-store draft saves and reloads with one charge and one basic seller',()=>{
@@ -51,11 +61,45 @@ test('single-store draft saves and reloads with one charge and one basic seller'
   assert.match(r.run("renderDecisionRow(findDecisionItem('PERSONAL_VENTAS'))"),/1 vendedor/);
   assert.deepEqual(r.errors,[]);
 });
-test('existing contract prevents switching district in a later cycle',()=>{
+test('multiple stores survive draft restoration and repeated saves with correct charges and sellers',()=>{
+  const r=runtime();for(const id of ['web',...rules.STORE_IDS])r.select(id);
+  r.run('loadDecisionState();restoreDraftsForRound();');
+  assert.deepEqual(r.json('channelDraft().optionIds'),['web',...rules.STORE_IDS]);
+  assert.equal(r.run('saveCurrentSection()'),true);
+  assert.equal(r.run('cashBalance()'),92000);
+  assert.equal(r.run('saveCurrentSection()'),true);
+  assert.equal(r.run('cashBalance()'),92000);
+  r.run('loadDecisionState();restoreDraftsForRound();');
+  assert.equal(r.run('RULES.storeCount(channelDraft())'),3);
+  assert.match(r.run("renderDecisionRow(findDecisionItem('PERSONAL_VENTAS'))"),/3 vendedor/);
+  for(const id of rules.STORE_IDS)assert.deepEqual(r.json(`decisionState.CANALES.storeContracts.${id}`),[{round:1,quantity:1}]);
+  assert.deepEqual(r.errors,[]);
+});
+
+test('existing contracts prevent closure but allow adding districts in later cycles',()=>{
   const r=runtime();r.select('los_olivos');r.run('saveCurrentSection();');
   r.run("localStorage.setItem('SIDE_ACTIVE_ROUND','2');loadDecisionState();restoreDraftsForRound();");
-  r.select('sjl');assert.deepEqual(r.json('channelDraft().optionIds'),['los_olivos']);
+  r.select('sjl');assert.deepEqual(r.json('channelDraft().optionIds'),['los_olivos','sjl']);
+  r.select('los_olivos',false);assert.deepEqual(r.json('channelDraft().optionIds'),['los_olivos','sjl']);
+  const html=r.run("renderChannelChoices(findDecisionItem('CANALES'),false)");
+  assert.match(html, /data-option="los_olivos"[^>]*disabled/);
+  assert.doesNotMatch(html, /data-option="(?:miraflores|sjl)"[^>]*disabled/);
   assert.equal(r.run('validateChannelQuantities()'),true);
+  assert.equal(r.run('saveCurrentSection()'),true);
+  assert.deepEqual(r.json('decisionState.CANALES.storeContracts'),{los_olivos:[{round:1,quantity:1}],sjl:[{round:2,quantity:1}]});
+  r.run("localStorage.setItem('SIDE_ACTIVE_ROUND','13');loadDecisionState();restoreDraftsForRound();");
+  r.select('los_olivos',false);r.select('sjl',false);
+  assert.deepEqual(r.json('channelDraft().optionIds'),['sjl']);
+  assert.equal(r.run('saveCurrentSection()'),true);
+  assert.deepEqual(r.errors,[]);
+});
+
+test('loading existing multi-store decisions preserves all quantities and contracts',()=>{
+  const r=runtime();
+  const entry={optionIds:['web','los_olivos','miraflores'],quantities:{los_olivos:4,miraflores:2},round:1,storeContracts:{los_olivos:[{round:1,quantity:4}],miraflores:[{round:1,quantity:2}]}};
+  r.run(`localStorage.setItem(decisionKey(),JSON.stringify({CANALES:${JSON.stringify(entry)}}));loadDecisionState();`);
+  assert.deepEqual(r.json('decisionState.CANALES'),entry);
+  assert.equal(r.run('RULES.storeCount(channelDraft())'),6);
 });
 test('DOP renders once in Production and nowhere in the other categories or summary',()=>{
   const r=runtime();
