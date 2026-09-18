@@ -1,0 +1,142 @@
+✖ cycle productivity uses recorded output and does not substitute planned units (1.5965ms)
+✖ changing the target updates percentage and signed difference without capping at 100 (0.2551ms)
+✖ zero or absent target, absent output and output from another cycle are safe (0.2901ms)
+✖ legacy multiple stores normalize to one, keeping its district and first contract (0.3027ms)
+✖ production record is scoped to active company and cycle, never reconstructed from inventory (6.6441ms)
+✖ realized cycle output is recorded once on creation and added production, excluding supplied stock (7.3967ms)
+✔ empty scenario includes mandatory local and cleaning only (4.1344ms)
+✔ all three districts retain their quantities and cost (1.6714ms)
+✔ asset acquisitions and disposals have separate gross flows (0.6478ms)
+✔ same-round submitted mold still costs money; later cycles do not charge again (0.4607ms)
+✔ staff severance survives repeated saves in the same round (0.3678ms)
+✔ analyst discount affects material prices, not wages (0.2594ms)
+✔ loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved (0.2545ms)
+✔ saved ledger is reconciled instead of charged twice (0.6364ms)
+✔ additional drafts apply only the difference (0.3301ms)
+✔ contract calculation excludes current cycle and shows obligations beyond game (0.3027ms)
+✔ contract batches preserve different opening cycles (1.0889ms)
+✔ pure model never mutates its context (21.1489ms)
+✔ all catalog items, including zero-cost guarantees and automatic rules, appear (1.2819ms)
+✔ production review lists the desired quantity for every planned mold (0.1934ms)
+✔ current store selection normalizes duplicates without mutating legacy data (1.802ms)
+✔ store checkboxes accumulate districts, keep web, and update prices independently (43.9794ms)
+✔ single-store draft saves and reloads with one charge and one basic seller (8.7038ms)
+✔ multiple stores survive draft restoration and repeated saves with correct charges and sellers (12.9275ms)
+✔ existing contracts prevent closure but allow adding districts in later cycles (13.2782ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (5.8726ms)
+✔ DOP renders once in Production and nowhere in the other categories or summary (21.5095ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (10.4942ms)
+✔ desktop wires touch the intended borders and cross no cards (4.3034ms)
+✔ mobile wires touch the intended borders and cross no cards (0.6802ms)
+✔ connector coordinates follow changed card widths and heights instead of fixed viewport positions (0.8222ms)
+✔ rendering an empty plan preserves inputs and shows zero output, percent and mold detail (20.6421ms)
+✔ material labels are escaped and percentages are supplied by the existing app calculation (0.7062ms)
+✔ mount redraws after resize and disconnects observers when the category changes (3.213ms)
+✔ workbook conversions turn purchases into usable raw material (4.3191ms)
+✔ a raw-material shortage limits all three production processes (2.0962ms)
+✔ workers and machines are paired and the slowest process is the bottleneck (0.8583ms)
+✔ level-three staff and production leadership reproduce the efficiency bonuses (0.6178ms)
+✔ equipment acquired in a previous cycle remains available (0.692ms)
+✔ calculator keeps one target and material requirement for every mold (0.6722ms)
+✔ industrial DOP separates operations, inspection and combined activity (0.9718ms)
+✔ DOP data includes purchased material qualities and cycle yield by mold (0.5316ms)
+✔ student and teacher pages load the final responsive layer (2.5997ms)
+✔ responsive layer covers target widths, orientation and accessibility preferences (0.4512ms)
+✔ responsive layer addresses every primary product surface (0.9135ms)
+✔ responsive CSS has balanced blocks and no remote asset references (0.3839ms)
+✔ Six 8-hour cycles: zero minutes stay zero, 48 hours total (1.5806ms)
+✔ Month and year rollover (0.5728ms)
+✔ Invalid values rejected (0.5786ms)
+✔ Clock boundaries and catch-up (0.442ms)
+✔ Legacy selected districts mean one store each, web is not a store (1.3335ms)
+✔ Quantities and malformed values (0.3426ms)
+✔ Same-cycle drafts editable, prior contracts enforced (2.2026ms)
+✔ Openings expire independently after 12 cycles (0.4563ms)
+✔ Repeated saves do not duplicate openings (0.2996ms)
+✔ the reformed world has three separated business sectors (0.8602ms)
+✔ the city contains a crosswalk between the store and customer spawn (0.1484ms)
+✔ the complete customer state machine is declared (0.1533ms)
+✔ every quality level sets finite simulation limits (0.1424ms)
+✔ the local human avatar is a valid GLB with idle and walk clips (5.1956ms)
+✔ simulator source connects events, production and financial sales (1.2058ms)
+✔ all local HTML assets exist (13.4987ms)
+✔ market-segment decision is absent from the active catalog (0.799ms)
+✔ production model loads before the application and review modules (0.6093ms)
+✔ productive catalog requires a mold and a sales channel, with calculator first (1.451ms)
+✔ cycle zero places summary last and later cycles place it first (0.5931ms)
+✔ DOP presentation loads before the app and keeps the documented cycle (1.4231ms)
+✔ infrastructure, production and logistics drafts remain saveable over budget (0.5502ms)
+ℹ tests 68
+ℹ suites 0
+ℹ pass 62
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 536.0116
+
+✖ failing tests:
+
+test at tests\cycle_productivity.test.js:6:1
+✖ cycle productivity uses recorded output and does not substitute planned units (1.5965ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:7:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests\cycle_productivity.test.js:10:1
+✖ changing the target updates percentage and signed difference without capping at 100 (0.2551ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:12:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\cycle_productivity.test.js:16:1
+✖ zero or absent target, absent output and output from another cycle are safe (0.2901ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:17:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:24:1
+✖ legacy multiple stores normalize to one, keeping its district and first contract (0.3027ms)
+  TypeError: rules.singleStore is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:26:51)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:33:1
+✖ production record is scoped to active company and cycle, never reconstructed from inventory (6.6441ms)
+  TypeError: read is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:38:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:46:1
+✖ realized cycle output is recorded once on creation and added production, excluding supplied stock (7.3967ms)
+  TypeError: simulator.cycleProductionRecord is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_va\SIDE1\tests\cycle_productivity.test.js:53:52)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

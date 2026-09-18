@@ -1,0 +1,83 @@
+[
+  {
+    "mode": "all",
+    "passed": true,
+    "loadMs": 83667,
+    "diagnostic": {
+      "initialized": true,
+      "running": true,
+      "navigationReady": true,
+      "models": [
+        "casual",
+        "female",
+        "male"
+      ],
+      "characters": [
+        {
+          "kind": "male",
+          "x": 4.00177270489225,
+          "z": 6.052533382810162
+        },
+        {
+          "kind": "female",
+          "x": 6.258824341196366,
+          "z": 5.81607203012628
+        },
+        {
+          "kind": "female",
+          "x": 1.1634201953156593,
+          "z": 30.020506410278053
+        },
+        {
+          "kind": "female",
+          "x": -0.5024054126155457,
+          "z": 29.481180029770908
+        }
+      ],
+      "player": {
+        "x": 0,
+        "z": 11.4
+      },
+      "renderedFrames": 10,
+      "lastError": ""
+    }
+  },
+  {
+    "mode": "sections",
+    "passed": true,
+    "loadMs": 29641,
+    "diagnostic": {
+      "initialized": true,
+      "running": true,
+      "navigationReady": true,
+      "models": [
+        "casual",
+        "female",
+        "male"
+      ],
+      "characters": [
+        {
+          "kind": "male",
+          "x": 3.5458177093586922,
+          "z": 5.8077283586016195
+        },
+        {
+          "kind": "female",
+          "x": 6.224441390470086,
+          "z": 5.768463679038163
+        },
+        {
+          "kind": "casual",
+          "x": -0.14655883935897784,
+          "z": 29.855759667182653
+        }
+      ],
+      "player": {
+        "x": 0,
+        "z": 11.4
+      },
+      "renderedFrames": 7,
+      "lastError": ""
+    }
+  }
+]

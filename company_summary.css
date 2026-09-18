@@ -168,3 +168,6 @@
 @media(max-width:700px){.cs-jump-bar{align-items:stretch;flex-direction:column}.cs-jump-bar button{min-height:42px}#companySummaryMount{scroll-margin-top:235px;scroll-margin-bottom:165px}}
 
 .cs-cumulative-resource{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;margin:12px 0;padding:13px 15px;border:1px solid #5ebcff2b;border-radius:12px;background:linear-gradient(145deg,#071b30,#061421)}.cs-cumulative-resource span{font-size:10px;letter-spacing:1px;color:#67bfff;font-weight:900}.cs-cumulative-resource strong{font-size:24px;color:#86e8a1}.cs-cumulative-resource small{grid-column:1/-1;color:#748ca4;font-size:10px}
+.cs-world-ready{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px;margin:18px 0;background:linear-gradient(110deg,#103c37,#122f43);border:1px solid #51ba97;border-radius:14px;color:#fff}
+.cs-world-ready strong{font-size:19px}.cs-world-ready p{margin:7px 0 0;color:#d4e7e4;font-size:14px}.cs-world-ready button{flex-shrink:0;min-height:48px}
+@media(max-width:600px){.cs-world-ready{align-items:stretch;flex-direction:column;padding:16px}.cs-world-ready button{width:100%}}

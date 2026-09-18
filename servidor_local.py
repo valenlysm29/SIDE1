@@ -8,23 +8,33 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 import sys
+import socket
 import webbrowser
 
 ROOT = Path(__file__).resolve().parent
-BUILD = '20260910-2'
+BUILD = '20260917-realismo3'
 
 class SIDEHandler(SimpleHTTPRequestHandler):
     def end_headers(self) -> None:
         path = urlsplit(self.path).path
         if path.endswith(('.html', '.js', '.css')) or path.endswith('/'):
             self.send_header('Cache-Control', 'no-store')
-        self.send_header('X-SIDE-Build', '2026.09.10.2')
+        self.send_header('X-SIDE-Build', '2026.09.17.3')
         super().end_headers()
+
+class SIDEServer(ThreadingHTTPServer):
+    # Windows SO_REUSEADDR can let a second process bind an occupied port.
+    allow_reuse_address = False
+
+    def server_bind(self) -> None:
+        if hasattr(socket, 'SO_EXCLUSIVEADDRUSE'):
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
 
 def create_server(port: int = 8000) -> ThreadingHTTPServer:
     if not 0 <= port <= 65535:
         raise ValueError('El puerto debe estar entre 0 y 65535.')
-    return ThreadingHTTPServer(('127.0.0.1', port), partial(SIDEHandler, directory=str(ROOT)))
+    return SIDEServer(('127.0.0.1', port), partial(SIDEHandler, directory=str(ROOT)))
 
 def main() -> int:
     parser = argparse.ArgumentParser(description='Iniciar SIDE desde esta carpeta.')
@@ -40,7 +50,7 @@ def main() -> int:
         return 1
     # Binding succeeds BEFORE opening the page; a busy port can never open the old project.
     url = f'http://localhost:{server.server_port}/index.html?v={BUILD}'
-    print(f'SIDE v2026.09.10.2\nCarpeta: {ROOT}\nAbrir: {url}\nCtrl+C para detener.')
+    print(f'SIDE v2026.09.17.3\nCarpeta: {ROOT}\nAbrir: {url}\nCtrl+C para detener.')
     if not args.no_browser:
         try:
             webbrowser.open(url)

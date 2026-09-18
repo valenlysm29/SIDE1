@@ -95,6 +95,8 @@ function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(
 function cashBalance(){return initialCapital()+ledgerTotal()}
 function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${currentRound()}`}
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
+function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
+function canStartSimulation(){return decisionProgressPercent()===100&&simulationSubmissionComplete()}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 window.SIDE_GAME_BRIDGE={
@@ -103,7 +105,7 @@ window.SIDE_GAME_BRIDGE={
   currentRound:()=>currentRound(),
   cash:()=>cashBalance(),
   decisionProgress:()=>decisionProgressPercent(),
-  canStartSimulation:()=>decisionProgressPercent()===100&&decisionsSubmitted(),
+  canStartSimulation:()=>canStartSimulation(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
   activeEvents:()=>activeStudentEvents(),
@@ -626,10 +628,17 @@ $('sendDecisionSection')?.addEventListener('click',sendCurrentSection);
 
 
 let simulationLoadingTimer=null;
+let simulationLoadingActive=false;
 async function startSimulationLoading(){
+  if(simulationLoadingActive)return false;
   loadDecisionState();
   if(decisionProgressPercent()!==100){toast('Completa y guarda todas las decisiones obligatorias antes de iniciar el juego 3D.');openDecisionMenu();return}
-  if(!decisionsSubmitted()){toast('Primero presiona ENVIAR DECISIONES para confirmar el ciclo.');openDecisionMenu();return}
+  if(!simulationSubmissionComplete()){toast('Envía todos los apartados o confirma ENVIAR TODO antes de abrir el mundo.');openDecisionMenu();return false}
+  if(location.protocol==='file:'){toast('Abre INICIAR_JUEGO.bat para ejecutar el mundo desde el servidor local.');return false}
+  simulationLoadingActive=true;
+  document.querySelectorAll('[data-start-world],#startSimulationBtn').forEach(button=>button.disabled=true);
+  let loadingDeadline=null;
+  try{
   if(simulationLoadingTimer){clearInterval(simulationLoadingTimer);simulationLoadingTimer=null}
   const bar=$('simulationLoadingBar'),pctEl=$('simulationLoadingPercent'),text=$('simulationLoadingText'),stage=$('simulationLoadingStage');
   const stepEls=[...document.querySelectorAll('[data-load-step]')];
@@ -637,15 +646,26 @@ async function startSimulationLoading(){
   const paint=(value)=>{p=Math.max(0,Math.min(100,value));if(bar)bar.style.width=p+'%';if(pctEl)pctEl.textContent=Math.round(p)+'%';let step=1,label='Construyendo local y distribución';if(p>=38){step=2;label='Aplicando maquinaria, personal y stock'}if(p>=72){step=3;label='Preparando inventario, clientes NPC y caja'}if(p>=96)label=`Abriendo ${currentStudent.company||COMPANY_NAME}`;if(stage)stage.textContent=label;if(text)text.textContent=p<38?'Levantando tu tienda según la infraestructura elegida...':p<72?'Colocando físicamente los recursos que compraste y contrataste...':p<96?'Activando stock físico, rutas de clientes, reposición y sistema de ventas...':'Todo listo. Entrando a tu empresa...';stepEls.forEach((el,i)=>el.classList.toggle('active',i<step));};
   paint(0);
   let engineReady=false;
-  const enginePromise=window.SIDE3D?.prepare?.().then(ok=>{engineReady=!!ok;return ok}).catch(()=>false);
+  if(typeof window.SIDE3D?.prepare!=='function')throw new Error('No se encontró el motor 3D. Recarga la página.');
+  const enginePromise=window.SIDE3D.prepare().then(ok=>{engineReady=!!ok;return ok});
   simulationLoadingTimer=setInterval(()=>{if(p<88)paint(p+2);else if(p<94&&engineReady)paint(p+1)},34);
-  const ok=await enginePromise;
-  if(!ok){clearInterval(simulationLoadingTimer);simulationLoadingTimer=null;toast('No se pudo preparar el motor 3D. Revisa tu conexión a Internet.');openDecisionMenu();return}
+  const ok=await Promise.race([enginePromise,new Promise((_,reject)=>{loadingDeadline=setTimeout(()=>reject(new Error('La carga tardó demasiado. Puedes volver a intentarlo sin reenviar decisiones.')),90000)})]);
+  clearTimeout(loadingDeadline);
+  if(!ok)throw new Error(window.SIDE3D.getLastError?.()||'No se pudo preparar el mundo 3D. Revisa que el navegador permita WebGL.');
   clearInterval(simulationLoadingTimer);simulationLoadingTimer=null;
   for(let v=Math.max(94,p);v<=100;v+=2){paint(v);await new Promise(r=>setTimeout(r,45))}
   paint(100);
   await new Promise(r=>setTimeout(r,180));
-  await window.SIDE3D.enter({autoStart:true});
+  if(!await window.SIDE3D.enter({autoStart:true}))throw new Error('No se pudo abrir el mundo. Tus decisiones siguen guardadas.');
+  return true;
+  }catch(error){
+    console.error('SIDE: inicio del mundo 3D',error);
+    openDecisionMenu();toast(error.message||'No se pudo abrir el mundo 3D. Vuelve a intentarlo.');
+    return false;
+  }finally{
+    clearTimeout(loadingDeadline);clearInterval(simulationLoadingTimer);simulationLoadingTimer=null;simulationLoadingActive=false;
+    document.querySelectorAll('[data-start-world],#startSimulationBtn').forEach(button=>button.disabled=false);
+  }
 }
 $('startSimulationBtn')?.addEventListener('click',startSimulationLoading);
 function animateCash(netMovement){
@@ -658,7 +678,7 @@ function categoryCompletionMap(){const out={};decisionCategories().forEach(cat=>
 function updateHud(){
   const cash=cashBalance();$('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
   const pct=decisionProgressPercent();$('decisionProgressText').textContent=pct+'%';$('decisionProgressBar').style.width=pct+'%';
-  const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=decisionsSubmitted();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);if($('sendDecisionSection')){$('sendDecisionSection').disabled=sectionSubmitted(currentCategory)||submitted||!sectionDraftReady(currentCategory);$('sendDecisionSection').classList.toggle('submitted',sectionSubmitted(currentCategory))}}
+  const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=simulationSubmissionComplete();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);if($('sendDecisionSection')){$('sendDecisionSection').disabled=sectionSubmitted(currentCategory)||submitted||!sectionDraftReady(currentCategory);$('sendDecisionSection').classList.toggle('submitted',sectionSubmitted(currentCategory))}}
 }
 function currentDecisionLabels(){return allDecisionItems().map(i=>savedEntry(i)?.label).filter(Boolean)}
 function eventStoreKey(){return `SIDE_STUDENT_EVENTS_${storageKey()}`}

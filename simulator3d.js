@@ -5,10 +5,11 @@
   const WORLD = CONFIG.WORLD || {};
   const NPC_STATE = CONFIG.NPC_STATES || {};
   const PERF = CONFIG.PERFORMANCE || {};
-  let THREE = null, YUKA = null, GLTFLoader = null, SkeletonUtils = null, VRMLoaderPlugin = null;
+  let THREE = null, YUKA = null, GLTFLoader = null, SkeletonUtils = null;
   let recastCore = null, recastGenerators = null, navMesh = null, navQuery = null, navReady = false;
   let renderer = null, scene = null, camera = null, clock = null, raf = 0;
   let initialized = false, running = false, locked = false;
+  let initializationPromise = null, lastPrepareError = '';
   let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0, jumpQueued = false;
   let keys = {}, dynamicGroup = null, npcGroup = null, interactables = [], npcs = [], colliders = [], dynamicColliders = [];
   let animatedActors = [], checkoutQueue = [], queueDecor = [], trafficCars = [], crossingPedestrians = [], npcPool = [];
@@ -23,7 +24,8 @@
   let hemiLight = null, sunLight = null, checkoutOpen = false, checkoutScanned = false, checkoutPayment = 'cash';
   let adminMesh = null, newsPanelMesh = null, adminOpen = false, newsOpen = false, businessState = null, nextEventAt = 0, nextProductionAt = 0, supplierDeliveryAt = 0, tutorialIndex = 0, secondRegisterMesh = null;
   let trafficPhase = 0, trafficLight = 'vehicles', trafficSignalMeshes = [], visibilityPaused = false, debugPerformance = false, npcModelTemplate = null;
-  const execModelTemplates = { male: null, female: null };
+  const execModelTemplates = { male: null, female: null, casual: null };
+  const characterTextures = new Map();
   let controlsOpenedFromHelp = false, missionCollapsed = false;
 
   const PRODUCTS = [
@@ -40,14 +42,8 @@
     { id: 'turista', label: 'Turista', patience: 17, speed: .96, pref: 'premium', budget: 180, priceSensitivity: .42, qualityDemand: .78, helpProbability: .48 }
   ];
 
-  // Looks de personal de tienda (asesores/as), inspirados en las referencias de vestuario
-  // ejecutivo aportadas: traje azul con corbata y lentes para el asesor, y blazer/vest
-  // crema sin mangas con pantalón sastre para la asesora. `execModel` apunta al modelo GLB
-  // dedicado (assets/models3d/npc_exec_*.glb) cargado por loadExecModelTemplates(): si está
-  // disponible, person() lo usa tal cual (ya trae los mismos colores/accesorios horneados).
-  // `forceProcedural` sigue como respaldo: si el GLB no carga, se evita el clon animado de
-  // assets/models/yuka.glb (no expone puntos de anclaje para lentes/botones/cabello largo)
-  // y se cae al cuerpo procedural articulado, que sí soporta esos accesorios.
+  // Los asesores conservan sus puestos; el aspecto se obtiene de modelos con
+  // piel, ropa, cabello y esqueleto independientes del controlador de navegación.
   const STAFF_LOOKS = [
     { gender: 'male', execModel: 'male', shirt: 0x2c4a72, pants: 0x24344a, tie: 0x3f78c9, hair: 0x14100d, skin: 0xe0b48c, formal: true, glasses: true, forceProcedural: true, bodyScale: 1.0 },
     { gender: 'female', execModel: 'female', shirt: 0xf2ede2, pants: 0xc9a877, hair: 0x2a2019, skin: 0xcd8f66, formal: false, longHair: true, buttons: true, forceProcedural: true, bodyScale: 0.96 }
@@ -565,26 +561,24 @@
   }
 
   async function loadThree() {
-    if (THREE) return true;
+    if (THREE && GLTFLoader && SkeletonUtils) return true;
     try {
       THREE = await import('three');
       try { YUKA = await import('./vendor/yuka.module.js'); } catch (error) { console.warn('Yuka no disponible; se usará navegación local.', error); }
       const optional = await Promise.allSettled([
         import('three/addons/loaders/GLTFLoader.js'),
         import('three/addons/utils/SkeletonUtils.js'),
-        import('@pixiv/three-vrm'),
         import('@recast-navigation/core'),
         import('@recast-navigation/generators')
       ]);
       if (optional[0].status === 'fulfilled') GLTFLoader = optional[0].value.GLTFLoader;
       if (optional[1].status === 'fulfilled') SkeletonUtils = optional[1].value;
-      if (optional[2].status === 'fulfilled') VRMLoaderPlugin = optional[2].value.VRMLoaderPlugin;
-      if (optional[3].status === 'fulfilled') recastCore = optional[3].value;
-      if (optional[4].status === 'fulfilled') recastGenerators = optional[4].value;
+      if (optional[2].status === 'fulfilled') recastCore = optional[2].value;
+      if (optional[3].status === 'fulfilled') recastGenerators = optional[3].value;
       return true;
     } catch (err) {
       console.error(err);
-      message('No se pudo cargar el motor 3D. Revisa la conexión a Internet.');
+      lastPrepareError='No se pudo cargar el motor local. Comprueba los archivos de la entrega y usa INICIAR_JUEGO.bat.';
       return false;
     }
   }
@@ -600,29 +594,33 @@
     }catch(error){console.warn('El avatar GLB no pudo cargarse; se mantiene el personaje procedural articulado.',error);npcModelTemplate=null;return false;}
   }
 
-  // Carga los modelos GLB dedicados del personal ejecutivo (assets/models3d/npc_exec_*.glb),
-  // generados con tools/generate_models_glb_v3.py. A diferencia de npcModelTemplate (avatar
-  // Mixamo animado y compartido para todos los NPC), estos son mallas estáticas por asesor/a
-  // con nodos-pivote nombrados (Arm_L/R, Forearm_L/R, Hand_L/R, Leg_L/R, Torso, Hips, Head)
-  // que reutilizan exactamente el mismo esquema de rotación que el cuerpo procedural en
-  // person()/setPersonPose(), así que no requieren SkeletonUtils ni AnimationMixer: basta con
-  // clonar el Object3D y ubicar los pivotes por nombre. Si un archivo no carga (sin conexión,
-  // GLTFLoader ausente, nodos inesperados), ese género conserva el respaldo procedural.
   async function loadExecModelTemplates() {
-    if (!GLTFLoader) return false;
-    const specs = [['male', 'assets/models3d/npc_exec_male.glb'], ['female', 'assets/models3d/npc_exec_female.glb']];
-    await Promise.all(specs.map(async ([gender, path]) => {
-      if (execModelTemplates[gender]) return;
+    if (!GLTFLoader || !SkeletonUtils?.clone) return false;
+    const specs = [['male', 'npc_realistic_male'], ['female', 'npc_realistic_female'], ['casual', 'npc_realistic_male_casual']];
+    await Promise.all(specs.map(async ([kind, file]) => {
+      if (execModelTemplates[kind]) return;
       try {
-        const gltf = await new GLTFLoader().loadAsync(path);
-        const scene = gltf.scene || gltf.scenes?.[0];
-        if (!scene) throw new Error('El GLB no contiene una escena.');
-        const required = ['Arm_L', 'Arm_R', 'Forearm_L', 'Forearm_R', 'Hand_L', 'Hand_R', 'Leg_L', 'Leg_R'];
-        if (required.some(name => !scene.getObjectByName(name))) throw new Error('Faltan nodos de articulación esperados.');
-        execModelTemplates[gender] = scene;
+        const gltf = await new GLTFLoader().loadAsync(`assets/models3d/${file}.glb`);
+        const idle = THREE.AnimationClip.findByName(gltf.animations, 'Idle');
+        const walk = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
+        if (!gltf.scene || !idle || !walk) throw new Error('El personaje necesita escena, reposo y marcha.');
+        gltf.scene.traverse(node => {
+          if (!node.isMesh) return;
+          node.userData.sharedCharacterResource = true;
+          const materials = Array.isArray(node.material) ? node.material : [node.material];
+          materials.forEach(material => {
+            for (const key of ['map', 'normalMap', 'roughnessMap']) {
+              const texture = material[key];
+              if (!texture?.name) continue;
+              const cacheKey = `${key}:${texture.name}`;
+              if (characterTextures.has(cacheKey)) material[key] = characterTextures.get(cacheKey);
+              else { texture.anisotropy = 4; characterTextures.set(cacheKey, texture); }
+            }
+          });
+        });
+        execModelTemplates[kind] = {scene:gltf.scene, animations:{idle, walk, gesture:THREE.AnimationClip.findByName(gltf.animations,'Gesture')}};
       } catch (error) {
-        console.warn(`El modelo GLB ejecutivo (${gender}) no pudo cargarse; se mantiene el personaje procedural articulado.`, error);
-        execModelTemplates[gender] = null;
+        console.warn(`No se pudo cargar el personaje ${kind}; se usará el avatar de respaldo.`, error);
       }
     }));
     return Boolean(execModelTemplates.male || execModelTemplates.female);
@@ -817,6 +815,22 @@
 
   function person(style = 0x5aa9ff) {
     const cfg = typeof style === 'object' ? style : { shirt: style };
+    const modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
+    const template = execModelTemplates[modelKind];
+    if (template && SkeletonUtils?.clone) {
+      const group = new THREE.Group(), avatar = SkeletonUtils.clone(template.scene);
+      avatar.traverse(node => {
+        if (!node.isMesh) return;
+        node.castShadow = true; node.receiveShadow = true;
+      });
+      avatar.scale.setScalar(cfg.bodyScale ?? 1);
+      group.add(avatar);
+      const mixer = new THREE.AnimationMixer(avatar);
+      const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(clip)]));
+      actions.idle.play();mixer.update(0);
+      group.userData = {modelAvatar:avatar, modelKind, mixer, actions, currentAction:'idle', lastAnimAt:performance.now()/1000};
+      return group;
+    }
     if(!cfg.forceProcedural&&npcModelTemplate&&SkeletonUtils?.clone){
       try{
         const g=new THREE.Group(),avatar=SkeletonUtils.clone(npcModelTemplate.scene);
@@ -831,30 +845,6 @@
         idleAction?.play();g.userData.modelAvatar=avatar;g.userData.mixer=mixer;g.userData.actions={idle:idleAction,walk:walkAction};g.userData.currentAction='idle';g.userData.lastAnimAt=performance.now()/1000;
         return g;
       }catch(error){console.warn('No se pudo clonar el avatar; se usa el fallback procedural.',error);}
-    }
-    if(cfg.execModel && execModelTemplates[cfg.execModel]){
-      try{
-        const g=new THREE.Group();
-        const avatar=execModelTemplates[cfg.execModel].clone(true);
-        avatar.traverse(node=>{ if(node.isMesh){node.castShadow=false;node.receiveShadow=false;} });
-        const bodyScale=cfg.bodyScale??1;
-        avatar.scale.setScalar(bodyScale);
-        g.add(avatar);
-        const byName=name=>avatar.getObjectByName(name);
-        const parts={
-          torso:byName('Torso'), hips:byName('Hips'), head:byName('Head'),
-          armL:byName('Arm_L'), armR:byName('Arm_R'), foreL:byName('Forearm_L'), foreR:byName('Forearm_R'),
-          handL:byName('Hand_L'), handR:byName('Hand_R'), legL:byName('Leg_L'), legR:byName('Leg_R')
-        };
-        if(Object.values(parts).every(Boolean)){
-          g.userData.parts=parts;
-          g.userData.baseY={head:parts.head.position.y,torso:parts.torso.position.y,hips:parts.hips.position.y};
-          g.userData.gender=cfg.gender||cfg.execModel;
-          g.userData.execModel=true;
-          return g;
-        }
-        console.warn('El modelo GLB ejecutivo no expone todos los nodos de articulación esperados; se usa el fallback procedural.');
-      }catch(error){console.warn('No se pudo preparar el modelo GLB ejecutivo; se usa el fallback procedural.',error);}
     }
     const g = new THREE.Group();
     const skin = cfg.skin ?? [0xd8ab7e, 0xc8956c, 0x9f6a4a, 0xe2b98d][Math.floor(Math.random()*4)];
@@ -1710,6 +1700,9 @@
       const child = group.children[0];
       group.remove(child);
       child.traverse?.((c) => {
+        if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
+        if (c.isSkinnedMesh) c.skeleton?.dispose?.();
+        if (c.userData?.sharedCharacterResource) return;
         c.geometry?.dispose?.();
         if (c.material) Array.isArray(c.material) ? c.material.forEach(m => m.dispose?.()) : c.material.dispose?.();
       });
@@ -2729,8 +2722,8 @@
   async function init() {
     if (initialized) return true;
     if (!await loadThree()) return false;
-    await loadNpcModelTemplate();
     await loadExecModelTemplates();
+    if (Object.values(execModelTemplates).some(model=>!model)) await loadNpcModelTemplate();
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
@@ -2739,25 +2732,36 @@
     loadAudioSetting();
     clock = new THREE.Clock();
     bind();
-    initialized = true;
     resize();
     rebuildDynamicWorld();
     syncSalesFromLedger();
     camera.position.set(player.x, player.y, player.z);
+    initialized = true;
     frame();
     return true;
   }
 
-  async function prepare() { return await init(); }
+  async function prepare() {
+    if(initialized)return true;
+    if(!initializationPromise){
+      lastPrepareError='';
+      initializationPromise=init().catch(error=>{
+        console.error('SIDE: preparación 3D',error);
+        lastPrepareError=/WebGL|context/i.test(error.message)?'El navegador no pudo crear WebGL. Activa la aceleración gráfica y vuelve a intentarlo.':'No se pudo construir el mundo 3D. Tus decisiones siguen guardadas; vuelve a intentarlo.';
+        return false;
+      }).finally(()=>{initializationPromise=null});
+    }
+    return initializationPromise;
+  }
 
   async function enter(options = {}) {
+    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
     if (bridge().canStartSimulation && !bridge().canStartSimulation()) {
       if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
       if (typeof window.toast === 'function') window.toast('Completa y envía las decisiones obligatorias antes de entrar al simulador 3D.');
       return false;
     }
-    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
-    if (!await init()) return false;
+    if (!await prepare()) return false;
     const autoStart = options === true || Boolean(options?.autoStart);
     const controlsSeen=localStorage.getItem(controlsSeenKey())==='1';
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
@@ -2768,9 +2772,9 @@
     document.querySelector('.admin-head h2') && (document.querySelector('.admin-head h2').textContent = `${companyName()} · Panel operativo`);
     controlsOpenedFromHelp=false;
     if ($3('sim3dStartBtn')) $3('sim3dStartBtn').textContent = 'ENTRAR AL SIMULADOR';
-    $3('sim3dStart')?.classList.toggle('hidden',controlsSeen);
+    $3('sim3dStart')?.classList.toggle('hidden',autoStart||controlsSeen);
     resetGameSession(false);
-    running = controlsSeen;
+    running = autoStart||controlsSeen;
     keys = {};
     player.x = 0; player.z = 11.4; player.y = player.baseY; player.vx = 0; player.vz = 0; player.vy = 0; player.grounded = true; player.bob = 0; yaw = 0; pitch = -0.04; targetYaw = yaw; targetPitch = pitch;
     rebuildDynamicWorld();
@@ -2796,5 +2800,13 @@
     message('Cambios aplicados: la boutique, el taller y la atención en caja fueron actualizados con tus decisiones.');
   }
 
-  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld };
+  function diagnostics() {
+    const characters = [];
+    scene?.traverse(node => {
+      if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, x:node.position.x, z:node.position.z});
+    });
+    return {initialized, running, navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
+  }
+  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();
