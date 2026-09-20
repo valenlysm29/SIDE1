@@ -21,7 +21,7 @@ const SEVERANCE_RATE = 0.5;
 const LIQUIDATION_RATE_DEFAULT = 0.4;
 const RULES = window.SIDE_RULES;
 const UI_ICONS = {check:'assets/icons/ui/check.svg',play:'assets/icons/ui/play.svg',lock:'assets/icons/ui/lock.svg'};
-let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,game:DEMO_GAME};
+let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,empresaId:null,game:DEMO_GAME};
 let decisionState = {};
 let decisionDrafts = {};
 let cashLedger = {};
@@ -142,10 +142,28 @@ $('studentForm')?.addEventListener('submit',async e=>{
     currentStudent={name:'Jugador',company:brandName,legalName,participantId:null,game:localGame};
   }else{
     if(!requireSupabase())return; message('studentMessage','Buscando partida...');
-    const{data:game,error}=await supabaseClient.rpc('buscar_partida_por_codigo',{p_codigo:code});if(error){message('studentMessage',error.message,true);return}
-    const found=Array.isArray(game)?game[0]:game;if(!found){message('studentMessage','No encontramos una partida con ese código.',true);return}
-    const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
-    if(joinError){message('studentMessage',joinError.message,true);return} currentStudent={name:'Jugador',company:brandName,legalName,participantId:participant?.id||null,game:found};
+    const S=window.SIDE||{};
+    // Fase A: buscar partida + crear empresa via servicios (RPC crear_empresa).
+    // Si Supabase falla, se usa el flujo local anterior como respaldo.
+    let found=null,empresaId=null,participantId=null;
+    if(S.PartidaService){
+      const r=await S.PartidaService.buscarPorCodigo(code);
+      if(!r.success){message('studentMessage',r.error||'Error al buscar partida.',true);return}
+      found=r.data;
+    }else{
+      const{data:game,error}=await supabaseClient.rpc('buscar_partida_por_codigo',{p_codigo:code});if(error){message('studentMessage',error.message,true);return}
+      found=Array.isArray(game)?game[0]:game;
+    }
+    if(!found){message('studentMessage','No encontramos una partida con ese código.',true);return}
+    if(S.EmpresaService){
+      const c=await S.EmpresaService.crear(found.id,{nombreEstudiante:'Jugador',nombreLegal:legalName,nombreComercial:brandName,capital:initialCapital()});
+      if(!c.success){message('studentMessage',c.error||'No se pudo crear la empresa.',true);return}
+      empresaId=c.data?.empresa_id||null;participantId=c.data?.participante_id||null;
+    }else{
+      const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
+      if(joinError){message('studentMessage',joinError.message,true);return} participantId=participant?.id||null;
+    }
+    currentStudent={name:'Jugador',company:brandName,legalName,participantId,empresaId,game:found};
   }
   closeModal();startJoinLoading();
 });
@@ -725,7 +743,64 @@ function syncStudentReportPreview(){
   const idx=reports.findIndex(r=>r.id===report.id);if(idx>=0)reports[idx]=report;else reports.push(report);
   localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));renderStudentStatus();
 }
-function syncSectionToSupabase(){/* Las decisiones se mantienen en localStorage para la vista del docente. */}
+/**
+ * Sincroniza la sección actual de decisiones con Supabase (Fase B).
+ * Convierte el estado local a [{decision_id, opcion_id, cantidad, costo_total}]
+ * y lo envía via DecisionesService.guardar(). Silencioso si offline.
+ * @param {string} cat Código de categoría (B/C/D/E/F).
+ */
+async function syncSectionToSupabase(cat){
+  try{
+    const S=window.SIDE||{};
+    if(!S.DecisionesService||!currentStudent?.empresaId)return;
+    const categoria=categoryByCat(cat);if(!categoria||!categoria.items?.length)return;
+    const round=currentRound(),decisiones=[];
+    for(const item of categoria.items){
+      const st=decisionState[item.id];if(!st)continue;
+      const entry=buildSupabaseDecision(item,st,round);
+      if(!entry)continue;
+      if(Array.isArray(entry))decisiones.push(...entry);else decisiones.push(entry);
+    }
+    if(!decisiones.length)return;
+    const r=await S.DecisionesService.guardar(currentStudent.empresaId,round,decisiones);
+    if(!r.success&&!r.offline)console.warn('SIDE: sync decisiones:',r.error);
+  }catch(error){console.error('SIDE: no se pudo sincronizar la sección',error)}
+}
+/**
+ * Convierte una decisión del estado local al formato del RPC guardar_decisiones.
+ * @param {object} item Definición del catálogo (decision_catalog.js).
+ * @param {object} st Estado local de la decisión.
+ * @param {number} round Ciclo actual (informativo).
+ * @returns {object|null} {decision_id, opcion_id, cantidad, costo_total} o null.
+ */
+function buildSupabaseDecision(item,st,round){
+  if(!item||!st)return null;
+  const ids=Array.isArray(st.optionIds)?st.optionIds:[];
+  const quantities=st.quantities||{};
+  const out=[];
+  const push=(opId,qty,cost)=>{
+    out.push({decision_id:item.id,opcion_id:opId||null,cantidad:Math.max(1,Number(qty)||1),costo_total:Math.round(Number(cost)||0)});
+  };
+  if(item.type==='choice'||item.type==='multi-choice'){
+    if(!ids.length)return null;
+    for(const opId of ids){
+      const opt=(item.options||[]).find(o=>o.id===opId);
+      push(opId,quantities[opId]||1,(opt?.cost||0)*(quantities[opId]||1));
+    }
+    return out.length===1?out[0]:out;
+  }
+  if(item.type==='quantity'||item.type==='quantity-choice'){
+    let any=false;
+    for(const[opId,qty]of Object.entries(quantities)){
+      if(Number(qty)>0){const opt=(item.options||[]).find(o=>o.id===opId);push(opId,qty,(opt?.cost||0)*Number(qty));any=true}
+    }
+    if(!any&&ids.length){for(const opId of ids){const opt=(item.options||[]).find(o=>o.id===opId);push(opId,1,opt?.cost||0);any=true}}
+    return any?(out.length===1?out[0]:out):null;
+  }
+  if(typeof st.cost==='number'&&st.cost>0){push(ids[0]||null,1,st.cost);return out[0]}
+  if(typeof st.amount==='number'&&st.amount>0){push(null,1,st.amount);return out[0]}
+  return null;
+}
 
 
 function persistCurrentDraftOnly(){

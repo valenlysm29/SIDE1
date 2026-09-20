@@ -446,6 +446,18 @@ BEGIN
     ALTER TABLE public.decisiones_opciones
       ADD CONSTRAINT decisiones_opciones_decision_opcion_key UNIQUE (decision_id, opcion_id);
   END IF;
+
+  -- Requerido por la RPC guardar_decisiones (ON CONFLICT empresa+ ciclo + decision).
+  -- Sin este constraint el guardado falla con error 42P10.
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'empresas_decisiones_empresa_ciclo_decision_key'
+      AND conrelid = 'public.empresas_decisiones'::regclass
+  ) THEN
+    ALTER TABLE public.empresas_decisiones
+      ADD CONSTRAINT empresas_decisiones_empresa_ciclo_decision_key
+      UNIQUE (empresa_id, ciclo, decision_id);
+  END IF;
 END $$;
 
 -- Insertar categorias de decisiones
@@ -779,5 +791,9 @@ grant select on public.decisiones_opciones to anon, authenticated;
 --               guardar_decisiones, obtener_reporte_empresa,
 --               obtener_estado_juego, avanzar_ciclo
 -- Catálogo poblado: 25 decisiones + 56 opciones
+-- Constraints UNIQUE: decisiones_catalogo(decision_id),
+--   decisiones_opciones(decision_id, opcion_id),
+--   empresas_decisiones(empresa_id, ciclo, decision_id)
 -- RLS configurado en todas las tablas
+-- NOTA: el script es idempotente, puede ejecutarse varias veces.
 -- ============================================================
