@@ -106,7 +106,26 @@ await SIDE.DecisionesService.obtenerReporte(1);
 
 Luego verificar las filas en Supabase Dashboard → Table Editor.
 
-## 7. Cómo extender (para el equipo)
+## 7. Fase C1 — El docente crea la partida en Supabase
+
+**Archivos:** `docente.html` (4 `<script>` de servicios) + `docente.js`
+(`state.partidaId`, `ensureSupabasePartida()`, `startGame()` ahora async).
+
+**Flujo:** Guardar e iniciar partida → `saveConfig()` (local, como antes) →
+`ensureSupabasePartida()` → `PartidaService.crear()` (INSERT en `partidas`
+con nombre, curso, configuración y eventos) → se guarda el `partidaId` en
+`state` + `localStorage (SIDE_PARTIDA_ID)` y el `codigo` real generado por
+la base reemplaza al código local en el formulario.
+
+**Reglas:** si Supabase no está disponible o la creación falla, se avisa con
+toast y se continúa en modo local sin bloquear. Si ya existe `partidaId`,
+no se crea otra (una partida activa por flujo).
+
+**Verificación:** fila nueva en `partidas` con la configuración; el
+estudiante entra con ese código (Fase A) y aparecen `empresas` +
+`participantes`.
+
+## 8. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:
 
@@ -119,7 +138,7 @@ Para agregar una operación nueva:
 
 No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
-## 8. Solución de problemas
+## 9. Solución de problemas
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|
