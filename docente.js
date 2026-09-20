@@ -138,9 +138,16 @@ function randomizeEventSelection(){const candidates=filteredEvents();if(!candida
 function renderEventBank(){const body=$('eventBankBody');if(!body)return;const events=filteredEvents(),random=eventSelectionMode()==='random';body.innerHTML=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''} ${random?'disabled':''} aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td></tr>`).join('')||'<tr><td colspan="6"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';body.querySelectorAll('.event-enable').forEach(i=>i.addEventListener('change',()=>{i.checked?state.enabledEvents.add(i.dataset.event):state.enabledEvents.delete(i.dataset.event);$('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados`;saveConfig(true)}));$('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados de ${EVENT_CATALOG.length}`;if($('eventVisibleCount'))$('eventVisibleCount').textContent=`Mostrando ${events.length} de ${EVENT_CATALOG.length}`}
 
 /**
+ * Promesa de creación en curso (guard anti-doble-clic, Fase C1 fix).
+ * Las llamadas concurrentes esperan la misma promesa en vez de crear duplicados.
+ * @type {Promise<boolean>|null}
+ */
+let creatingPartida=null;
+/**
  * Crea o reutiliza la partida en Supabase (Fase C1).
  * Guarda el partidaId y el código real generado por la base de datos.
  * Si Supabase no está disponible, continúa en modo local sin bloquear.
+ * Anti-doble-clic: una creación en curso se reutiliza, no se duplica.
  * @param {object} config Configuración del formulario (getConfig()).
  * @returns {Promise<boolean>} true si hay partida usable (online u offline).
  */
@@ -148,17 +155,28 @@ async function ensureSupabasePartida(config){
   const S=window.SIDE||{};
   if(!S.PartidaService||!S.SupabaseClient?.isReady()){toast('Modo local: la partida no se sincronizará con Supabase.');return true}
   if(state.partidaId)return true;
-  const r=await S.PartidaService.crear({
-    nombre:config.nombre||'SIDE — Simulación Principal',
-    curso:config.curso||'',
-    configuracion:config,
-    eventos_habilitados:config.enabledEvents||[]
-  });
-  if(!r.success){toast('No se pudo crear la partida en Supabase: '+(r.error||'error')+'. Se continúa en modo local.');return true}
-  state.partidaId=r.data.id;
-  try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
-  if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;saveConfig(true)}
-  toast('Partida creada en Supabase: '+r.data.codigo);return true;
+  if(creatingPartida)return creatingPartida;
+  const btn=$('startGame');
+  if(btn)btn.disabled=true;
+  creatingPartida=(async()=>{
+    try{
+      const r=await S.PartidaService.crear({
+        nombre:config.nombre||'SIDE — Simulación Principal',
+        curso:config.curso||'',
+        configuracion:config,
+        eventos_habilitados:config.enabledEvents||[]
+      });
+      if(!r.success){toast('No se pudo crear la partida en Supabase: '+(r.error||'error')+'. Se continúa en modo local.');return true}
+      state.partidaId=r.data.id;
+      try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
+      if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;saveConfig(true)}
+      toast('Partida creada en Supabase: '+r.data.codigo);return true;
+    }finally{
+      creatingPartida=null;
+      if(btn)btn.disabled=false;
+    }
+  })();
+  return creatingPartida;
 }
 async function startGame(){
   if(!saveConfig(true)){toast('Revisa la duración y los datos de configuración.');return}

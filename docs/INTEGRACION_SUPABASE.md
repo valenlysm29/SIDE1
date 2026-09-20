@@ -121,6 +121,12 @@ la base reemplaza al código local en el formulario.
 toast y se continúa en modo local sin bloquear. Si ya existe `partidaId`,
 no se crea otra (una partida activa por flujo).
 
+**Fix anti-doble-clic:** la primera versión creaba partidas duplicadas si el
+docente pulsaba el botón dos veces seguidas (`state.partidaId` solo se
+seteaba al terminar el RPC). Se agregó `creatingPartida` (promesa en curso
+que las llamadas concurrentes reutilizan) + el botón se deshabilita mientras
+crea y se rehabilita en `finally`.
+
 **Verificación:** fila nueva en `partidas` con la configuración; el
 estudiante entra con ese código (Fase A) y aparecen `empresas` +
 `participantes`.
