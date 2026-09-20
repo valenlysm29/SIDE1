@@ -18,16 +18,17 @@ class LocalServerTest(unittest.TestCase):
         self.server.server_close()
         self.thread.join(timeout=2)
     def test_entry_and_versioned_resources(self):
-        for path,needle in [('index.html?v=20260910-2','class="lobby-actions"'),('app.js?v=20260910-2','function renderChannelChoices'),('styles.css?v=20260910-2','#studentLobby .lobby-actions'),('production_model.js?v=20260910-2','MOLD_REQUIREMENTS'),('responsive.css?v=20260910-2','CAPA RESPONSIVE GLOBAL'),('simulator3d-config.js?v=20260910-2','NPC_STATES'),('simulator3d.js?v=20260910-2','function buildStaticWorld')]:
+        for path,needle in [('index.html?v=20260917-realismo3','class="lobby-actions"'),('app.js?v=20260917-realismo3','function renderChannelChoices'),('styles.css?v=20260917-realismo3','#studentLobby .lobby-actions'),('production_model.js?v=20260917-realismo3','MOLD_REQUIREMENTS'),('responsive.css?v=20260917-realismo3','CAPA RESPONSIVE GLOBAL'),('simulator3d-config.js?v=20260917-realismo3','NPC_STATES'),('simulator3d.js?v=20260917-realismo3','function buildStaticWorld')]:
             with urlopen(self.base+'/'+path,timeout=5) as response:
                 self.assertEqual(response.status,200)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')
-                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.10.2')
+                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.17.3')
                 self.assertIn(needle,response.read().decode())
         with urlopen(self.base+'/assets/models/yuka.glb',timeout=5) as response:
             self.assertEqual(response.status,200)
-            self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.10.2')
+            self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.17.3')
             self.assertEqual(response.read(4),b'glTF')
+            response.read()
     def test_busy_port_does_not_bind_another_server(self):
         with self.assertRaises(OSError):
             create_server(self.server.server_port)

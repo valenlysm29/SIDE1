@@ -5,10 +5,11 @@
   const WORLD = CONFIG.WORLD || {};
   const NPC_STATE = CONFIG.NPC_STATES || {};
   const PERF = CONFIG.PERFORMANCE || {};
-  let THREE = null, YUKA = null, GLTFLoader = null, SkeletonUtils = null, VRMLoaderPlugin = null;
+  let THREE = null, YUKA = null, GLTFLoader = null, SkeletonUtils = null;
   let recastCore = null, recastGenerators = null, navMesh = null, navQuery = null, navReady = false;
   let renderer = null, scene = null, camera = null, clock = null, raf = 0;
   let initialized = false, running = false, locked = false;
+  let initializationPromise = null, lastPrepareError = '';
   let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0, jumpQueued = false;
   let keys = {}, dynamicGroup = null, npcGroup = null, interactables = [], npcs = [], colliders = [], dynamicColliders = [];
   let animatedActors = [], checkoutQueue = [], queueDecor = [], trafficCars = [], crossingPedestrians = [], npcPool = [];
@@ -23,6 +24,8 @@
   let hemiLight = null, sunLight = null, checkoutOpen = false, checkoutScanned = false, checkoutPayment = 'cash';
   let adminMesh = null, newsPanelMesh = null, adminOpen = false, newsOpen = false, businessState = null, nextEventAt = 0, nextProductionAt = 0, supplierDeliveryAt = 0, tutorialIndex = 0, secondRegisterMesh = null;
   let trafficPhase = 0, trafficLight = 'vehicles', trafficSignalMeshes = [], visibilityPaused = false, debugPerformance = false, npcModelTemplate = null;
+  const execModelTemplates = { male: null, female: null, casual: null };
+  const characterTextures = new Map();
   let controlsOpenedFromHelp = false, missionCollapsed = false;
 
   const PRODUCTS = [
@@ -37,6 +40,13 @@
     { id: 'urbano', label: 'Urbano', patience: 15, speed: 1.0, pref: 'urbano', budget: 135, priceSensitivity: .58, qualityDemand: .62, helpProbability: .36 },
     { id: 'premium', label: 'Premium', patience: 20, speed: .92, pref: 'premium', budget: 240, priceSensitivity: .22, qualityDemand: .94, helpProbability: .64 },
     { id: 'turista', label: 'Turista', patience: 17, speed: .96, pref: 'premium', budget: 180, priceSensitivity: .42, qualityDemand: .78, helpProbability: .48 }
+  ];
+
+  // Los asesores conservan sus puestos; el aspecto se obtiene de modelos con
+  // piel, ropa, cabello y esqueleto independientes del controlador de navegación.
+  const STAFF_LOOKS = [
+    { gender: 'male', execModel: 'male', shirt: 0x2c4a72, pants: 0x24344a, tie: 0x3f78c9, hair: 0x14100d, skin: 0xe0b48c, formal: true, glasses: true, forceProcedural: true, bodyScale: 1.0 },
+    { gender: 'female', execModel: 'female', shirt: 0xf2ede2, pants: 0xc9a877, hair: 0x2a2019, skin: 0xcd8f66, formal: false, longHair: true, buttons: true, forceProcedural: true, bodyScale: 0.96 }
   ];
 
   const player = { x: 0, y: 1.72, z: 11.4, radius: 0.36, baseY: 1.72, vx: 0, vz: 0, vy: 0, grounded: true, bob: 0, speed: 0 };
@@ -551,26 +561,24 @@
   }
 
   async function loadThree() {
-    if (THREE) return true;
+    if (THREE && GLTFLoader && SkeletonUtils) return true;
     try {
       THREE = await import('three');
       try { YUKA = await import('./vendor/yuka.module.js'); } catch (error) { console.warn('Yuka no disponible; se usará navegación local.', error); }
       const optional = await Promise.allSettled([
         import('three/addons/loaders/GLTFLoader.js'),
         import('three/addons/utils/SkeletonUtils.js'),
-        import('@pixiv/three-vrm'),
         import('@recast-navigation/core'),
         import('@recast-navigation/generators')
       ]);
       if (optional[0].status === 'fulfilled') GLTFLoader = optional[0].value.GLTFLoader;
       if (optional[1].status === 'fulfilled') SkeletonUtils = optional[1].value;
-      if (optional[2].status === 'fulfilled') VRMLoaderPlugin = optional[2].value.VRMLoaderPlugin;
-      if (optional[3].status === 'fulfilled') recastCore = optional[3].value;
-      if (optional[4].status === 'fulfilled') recastGenerators = optional[4].value;
+      if (optional[2].status === 'fulfilled') recastCore = optional[2].value;
+      if (optional[3].status === 'fulfilled') recastGenerators = optional[3].value;
       return true;
     } catch (err) {
       console.error(err);
-      message('No se pudo cargar el motor 3D. Revisa la conexión a Internet.');
+      lastPrepareError='No se pudo cargar el motor local. Comprueba los archivos de la entrega y usa INICIAR_JUEGO.bat.';
       return false;
     }
   }
@@ -584,6 +592,38 @@
       npcModelTemplate={scene:gltf.scene,animations:{idle,walk}};
       return true;
     }catch(error){console.warn('El avatar GLB no pudo cargarse; se mantiene el personaje procedural articulado.',error);npcModelTemplate=null;return false;}
+  }
+
+  async function loadExecModelTemplates() {
+    if (!GLTFLoader || !SkeletonUtils?.clone) return false;
+    const specs = [['male', 'npc_realistic_male'], ['female', 'npc_realistic_female'], ['casual', 'npc_realistic_male_casual']];
+    await Promise.all(specs.map(async ([kind, file]) => {
+      if (execModelTemplates[kind]) return;
+      try {
+        const gltf = await new GLTFLoader().loadAsync(`assets/models3d/${file}.glb`);
+        const idle = THREE.AnimationClip.findByName(gltf.animations, 'Idle');
+        const walk = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
+        if (!gltf.scene || !idle || !walk) throw new Error('El personaje necesita escena, reposo y marcha.');
+        gltf.scene.traverse(node => {
+          if (!node.isMesh) return;
+          node.userData.sharedCharacterResource = true;
+          const materials = Array.isArray(node.material) ? node.material : [node.material];
+          materials.forEach(material => {
+            for (const key of ['map', 'normalMap', 'roughnessMap']) {
+              const texture = material[key];
+              if (!texture?.name) continue;
+              const cacheKey = `${key}:${texture.name}`;
+              if (characterTextures.has(cacheKey)) material[key] = characterTextures.get(cacheKey);
+              else { texture.anisotropy = 4; characterTextures.set(cacheKey, texture); }
+            }
+          });
+        });
+        execModelTemplates[kind] = {scene:gltf.scene, animations:{idle, walk, gesture:THREE.AnimationClip.findByName(gltf.animations,'Gesture')}};
+      } catch (error) {
+        console.warn(`No se pudo cargar el personaje ${kind}; se usará el avatar de respaldo.`, error);
+      }
+    }));
+    return Boolean(execModelTemplates.male || execModelTemplates.female);
   }
 
   async function initNavigation() {
@@ -775,7 +815,23 @@
 
   function person(style = 0x5aa9ff) {
     const cfg = typeof style === 'object' ? style : { shirt: style };
-    if(npcModelTemplate&&SkeletonUtils?.clone){
+    const modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
+    const template = execModelTemplates[modelKind];
+    if (template && SkeletonUtils?.clone) {
+      const group = new THREE.Group(), avatar = SkeletonUtils.clone(template.scene);
+      avatar.traverse(node => {
+        if (!node.isMesh) return;
+        node.castShadow = true; node.receiveShadow = true;
+      });
+      avatar.scale.setScalar(cfg.bodyScale ?? 1);
+      group.add(avatar);
+      const mixer = new THREE.AnimationMixer(avatar);
+      const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(clip)]));
+      actions.idle.play();mixer.update(0);
+      group.userData = {modelAvatar:avatar, modelKind, mixer, actions, currentAction:'idle', lastAnimAt:performance.now()/1000};
+      return group;
+    }
+    if(!cfg.forceProcedural&&npcModelTemplate&&SkeletonUtils?.clone){
       try{
         const g=new THREE.Group(),avatar=SkeletonUtils.clone(npcModelTemplate.scene);
         avatar.traverse(node=>{
@@ -811,15 +867,35 @@
 
     const hair = mesh(new THREE.SphereGeometry(0.19, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.58), mat(hairColor, 0.78, 0.02));
     hair.position.set(0, 1.70, -0.01);
-    if (female && Math.random() < 0.55) {
+    if (female && (cfg.longHair || Math.random() < 0.55)) {
       const backHair = box(0.30, 0.30, 0.10, hairColor, 0, 1.56, -0.10, 0.72, 0.01);
       g.add(backHair);
+      if (cfg.longHair) {
+        const hairSideL = box(0.07, 0.34, 0.09, hairColor, -0.155, 1.53, -0.02, 0.75, 0.01);
+        const hairSideR = box(0.07, 0.34, 0.09, hairColor, 0.155, 1.53, -0.02, 0.75, 0.01);
+        hairSideL.rotation.z = -0.08; hairSideR.rotation.z = 0.08;
+        g.add(hairSideL, hairSideR);
+      }
     }
 
     const eyeMat = mat(0x1a1715, 0.6, 0.0);
     const eyeL = mesh(new THREE.SphereGeometry(0.016, 8, 6), eyeMat); eyeL.position.set(-0.062,1.65,0.166);
     const eyeR = mesh(new THREE.SphereGeometry(0.016, 8, 6), eyeMat); eyeR.position.set(0.062,1.65,0.166);
     const nose = box(0.025,0.04,0.035,skin,0,1.60,0.178,0.8,0);
+
+    if (cfg.glasses) {
+      const frameMat = mat(0x1c1c1c, 0.4, 0.35);
+      const lensMat = mat(0xbcd6e6, 0.15, 0.1, { transparent: true, opacity: 0.55 });
+      const frameL = mesh(new THREE.TorusGeometry(0.028, 0.006, 6, 14), frameMat); frameL.position.set(-0.062,1.652,0.172);
+      const frameR = mesh(new THREE.TorusGeometry(0.028, 0.006, 6, 14), frameMat); frameR.position.set(0.062,1.652,0.172);
+      const lensL = mesh(new THREE.CircleGeometry(0.026, 14), lensMat); lensL.position.set(-0.062,1.652,0.174);
+      const lensR = mesh(new THREE.CircleGeometry(0.026, 14), lensMat); lensR.position.set(0.062,1.652,0.174);
+      const bridge = box(0.032, 0.006, 0.006, 0x1c1c1c, 0, 1.652, 0.170, 0.4, 0.35);
+      g.add(frameL, frameR, lensL, lensR, bridge);
+    }
+    if (cfg.buttons) {
+      for (const y of [1.24, 1.10, 0.96]) g.add(mesh(new THREE.SphereGeometry(0.012, 8, 6), mat(0xcaa25a, 0.35, 0.5)).translateX(0).translateY(y).translateZ(0.135));
+    }
 
     const armL = capsule(.058, .25, shirt, -.27, 1.12, 0, .55, .01);
     const armR = capsule(.058, .25, shirt, .27, 1.12, 0, .55, .01);
@@ -870,9 +946,10 @@
     parts.handR.rotation.z = parts.foreR.rotation.z * 0.55;
     parts.legL.rotation.z = -swing * 0.42;
     parts.legR.rotation.z = swing * 0.42;
-    parts.head.position.y = 1.63 + (moving ? Math.abs(Math.sin(cycle * 0.7)) * 0.012 : 0.006 * Math.sin(cycle * 0.3));
-    parts.torso.position.y = 1.10 + (moving ? Math.abs(Math.sin(cycle)) * 0.012 : 0.006 * Math.sin(cycle * 0.35));
-    parts.hips.position.y = 0.74 + (moving ? Math.abs(Math.sin(cycle)) * 0.008 : 0);
+    const baseY = g.userData.baseY || { head: 1.63, torso: 1.10, hips: 0.74 };
+    parts.head.position.y = baseY.head + (moving ? Math.abs(Math.sin(cycle * 0.7)) * 0.012 : 0.006 * Math.sin(cycle * 0.3));
+    parts.torso.position.y = baseY.torso + (moving ? Math.abs(Math.sin(cycle)) * 0.012 : 0.006 * Math.sin(cycle * 0.35));
+    parts.hips.position.y = baseY.hips + (moving ? Math.abs(Math.sin(cycle)) * 0.008 : 0);
   }
 
   function acquireNpcPerson(style) {
@@ -1623,6 +1700,9 @@
       const child = group.children[0];
       group.remove(child);
       child.traverse?.((c) => {
+        if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
+        if (c.isSkinnedMesh) c.skeleton?.dispose?.();
+        if (c.userData?.sharedCharacterResource) return;
         c.geometry?.dispose?.();
         if (c.material) Array.isArray(c.material) ? c.material.forEach(m => m.dispose?.()) : c.material.dispose?.();
       });
@@ -1696,7 +1776,8 @@
   function buildSalesStaff() {
     const staff = Math.min(perfMode==='low'?3:6, salesStaff());
     for (let i=0;i<staff;i++) {
-      const p = person({shirt:0xf3f5f7,pants:0x25384e,formal:true,tie:0x245f9e,gender:i%2?'female':'male',hair:i%2?0x403026:0x6b4a32});
+      const look = STAFF_LOOKS[i % STAFF_LOOKS.length];
+      const p = person(look);
       p.position.set(3.8 + (i%3) * 2.2, 0, 5.9 - Math.floor(i/3)*1.55);
       dynamicGroup.add(p);
       registerAnimatedActor({ type: 'salesperson', obj: p, baseY: 0, baseX: p.position.x, baseZ: p.position.z, phase: Math.random()*6.28, speed: 1.7 + i*0.15, state:'disponible' });
@@ -2641,7 +2722,8 @@
   async function init() {
     if (initialized) return true;
     if (!await loadThree()) return false;
-    await loadNpcModelTemplate();
+    await loadExecModelTemplates();
+    if (Object.values(execModelTemplates).some(model=>!model)) await loadNpcModelTemplate();
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
@@ -2650,25 +2732,36 @@
     loadAudioSetting();
     clock = new THREE.Clock();
     bind();
-    initialized = true;
     resize();
     rebuildDynamicWorld();
     syncSalesFromLedger();
     camera.position.set(player.x, player.y, player.z);
+    initialized = true;
     frame();
     return true;
   }
 
-  async function prepare() { return await init(); }
+  async function prepare() {
+    if(initialized)return true;
+    if(!initializationPromise){
+      lastPrepareError='';
+      initializationPromise=init().catch(error=>{
+        console.error('SIDE: preparación 3D',error);
+        lastPrepareError=/WebGL|context/i.test(error.message)?'El navegador no pudo crear WebGL. Activa la aceleración gráfica y vuelve a intentarlo.':'No se pudo construir el mundo 3D. Tus decisiones siguen guardadas; vuelve a intentarlo.';
+        return false;
+      }).finally(()=>{initializationPromise=null});
+    }
+    return initializationPromise;
+  }
 
   async function enter(options = {}) {
+    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
     if (bridge().canStartSimulation && !bridge().canStartSimulation()) {
       if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
       if (typeof window.toast === 'function') window.toast('Completa y envía las decisiones obligatorias antes de entrar al simulador 3D.');
       return false;
     }
-    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
-    if (!await init()) return false;
+    if (!await prepare()) return false;
     const autoStart = options === true || Boolean(options?.autoStart);
     const controlsSeen=localStorage.getItem(controlsSeenKey())==='1';
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
@@ -2679,9 +2772,9 @@
     document.querySelector('.admin-head h2') && (document.querySelector('.admin-head h2').textContent = `${companyName()} · Panel operativo`);
     controlsOpenedFromHelp=false;
     if ($3('sim3dStartBtn')) $3('sim3dStartBtn').textContent = 'ENTRAR AL SIMULADOR';
-    $3('sim3dStart')?.classList.toggle('hidden',controlsSeen);
+    $3('sim3dStart')?.classList.toggle('hidden',autoStart||controlsSeen);
     resetGameSession(false);
-    running = controlsSeen;
+    running = autoStart||controlsSeen;
     keys = {};
     player.x = 0; player.z = 11.4; player.y = player.baseY; player.vx = 0; player.vz = 0; player.vy = 0; player.grounded = true; player.bob = 0; yaw = 0; pitch = -0.04; targetYaw = yaw; targetPitch = pitch;
     rebuildDynamicWorld();
@@ -2707,5 +2800,13 @@
     message('Cambios aplicados: la boutique, el taller y la atención en caja fueron actualizados con tus decisiones.');
   }
 
-  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld };
+  function diagnostics() {
+    const characters = [];
+    scene?.traverse(node => {
+      if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, x:node.position.x, z:node.position.z});
+    });
+    return {initialized, running, navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
+  }
+  window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

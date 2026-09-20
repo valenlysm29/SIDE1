@@ -5,7 +5,7 @@ const model=require('../production_model');
 const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../decision_catalog.js'),'utf8'),sandbox);
 const catalog=JSON.parse(JSON.stringify(sandbox.window.SIDE_DECISION_CATALOG));
 
-function context(drafts={},patch={}){return {catalog,state:{},drafts,round:1,workingDays:30,...patch};}
+function context(drafts={},patch={}){return {catalog,state:{},drafts,round:1,workingDays:24,...patch};}
 function completeLine(extra={}){
   return {
     MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},
@@ -33,8 +33,12 @@ test('workers and machines are paired and the slowest process is the bottleneck'
     PERS_CORTE:{quantities:{corte_basico:1}},MESA_CORTE:{quantities:{mesa:1}},PRODUCCION_META:{value:500},
     CUERO:{quantities:{cuero_sint:200}},ACCESORIOS:{quantities:{acc_eco:500}},HILO:{quantities:{hilo_std:20}}
   })));
-  assert.equal(plan.processes.find(p=>p.id==='cut').dailyCapacity,6);
-  assert.equal(plan.processCapacity,173);assert.equal(plan.producibleUnits,173);
+  // CAMBIOS_DOP_Y_PRODUCCION.md: 24 productive days; current basic cutting rate is 5/day.
+  // Two level-three workers and leadership yield 96%: round(5 * 24 * 0.96) = 115.
+  assert.equal(plan.days,24);
+  assert.equal(plan.processes.find(p=>p.id==='cut').dailyCapacity,5);
+  assert.equal(plan.efficiency,0.96);
+  assert.equal(plan.processCapacity,115);assert.equal(plan.producibleUnits,115);
 });
 
 test('level-three staff and production leadership reproduce the efficiency bonuses',()=>{
@@ -62,12 +66,17 @@ test('calculator keeps one target and material requirement for every mold',()=>{
 
 test('industrial DOP separates operations, inspection and combined activity',()=>{
   const plan=model.calculate(context(completeLine()));
-  assert.equal(plan.dop.length,6);assert.equal(plan.dop.filter(step=>step.type==='operation').length,3);
-  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,2);
-  assert.equal(plan.dop.filter(step=>step.type==='combined').length,1);
-  assert.deepEqual(plan.dop.filter(step=>step.type==='operation').map(step=>step.number),[1,2,3]);
-  assert.equal(plan.dop.find(step=>step.type==='combined').number,1);
-  assert.deepEqual(plan.dop.filter(step=>step.type==='inspection').map(step=>step.number),[1,2]);
+  // Explicit sequence documented in CAMBIOS_DOP_Y_PRODUCCION.md; preserve the delivered DOP.
+  assert.deepEqual(plan.dop.map(({id,type,number})=>({id,type,number})),[
+    {id:'cut',type:'operation',number:1},
+    {id:'accessories_classification',type:'inspection',number:1},
+    {id:'accessories_preparation',type:'operation',number:2},
+    {id:'assembly_accessories',type:'combined',number:1},
+    {id:'finish',type:'combined',number:2}
+  ]);
+  assert.equal(plan.dop.filter(step=>step.type==='operation').length,2);
+  assert.equal(plan.dop.filter(step=>step.type==='inspection').length,1);
+  assert.equal(plan.dop.filter(step=>step.type==='combined').length,2);
 });
 
 test('DOP data includes purchased material qualities and cycle yield by mold',()=>{

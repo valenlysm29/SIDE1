@@ -1,0 +1,80 @@
+✖ cycle productivity uses recorded output and does not substitute planned units (0.9208ms)
+✖ changing the target updates percentage and signed difference without capping at 100 (0.4727ms)
+✖ zero or absent target, absent output and output from another cycle are safe (0.2365ms)
+✖ legacy multiple stores normalize to one, keeping its district and first contract (0.232ms)
+✖ production record is scoped to active company and cycle, never reconstructed from inventory (8.8515ms)
+✖ realized cycle output is recorded once on creation and added production, excluding supplied stock (6.7389ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 0
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 215.2474
+
+✖ failing tests:
+
+test at tests\cycle_productivity.test.js:6:1
+✖ cycle productivity uses recorded output and does not substitute planned units (0.9208ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:7:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests\cycle_productivity.test.js:10:1
+✖ changing the target updates percentage and signed difference without capping at 100 (0.4727ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:12:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\cycle_productivity.test.js:16:1
+✖ zero or absent target, absent output and output from another cycle are safe (0.2365ms)
+  TypeError: model.cycleProductivity is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:17:74)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:24:1
+✖ legacy multiple stores normalize to one, keeping its district and first contract (0.232ms)
+  TypeError: rules.singleStore is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:26:51)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:33:1
+✖ production record is scoped to active company and cycle, never reconstructed from inventory (8.8515ms)
+  TypeError: read is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:38:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at tests\cycle_productivity.test.js:46:1
+✖ realized cycle output is recorded once on creation and added production, excluding supplied stock (6.7389ms)
+  TypeError: simulator.cycleProductionRecord is not a function
+      at TestContext.<anonymous> (C:\Users\Asus\AppData\Local\Temp\side-baseline-check-ffu8tpl_\tests\cycle_productivity.test.js:53:52)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

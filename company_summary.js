@@ -169,7 +169,6 @@ function productionSummaryHtml(review){
     </div>
     <div class="cs-mold-selection"><span>MOLDES SEGÚN INFRAESTRUCTURA</span><strong>${plan.availableMoldIds.length?plan.availableMoldIds.map(id=>plan.productLines.find(line=>line.id===id)?.label||id).map(escapeHtml).join(' · '):'Aún no se ha adquirido un molde'}</strong></div>
     <div class="cs-product-mix">${plan.productLines.map(line=>`<article class="${line.target?'has-target':''}"><span>${escapeHtml(line.label)}</span><strong>${line.target.toLocaleString('es-PE')} u. deseadas</strong><small>${line.plannedUnits.toLocaleString('es-PE')} u. posibles · cuero ${line.requirements.CUERO.toLocaleString('es-PE')} m² · accesorios ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} · hilo ${line.requirements.HILO.toLocaleString('es-PE')} m</small><b>${line.available?'Molde disponible':'Escenario calculado; molde no adquirido'}</b></article>`).join('')}</div>
-    ${productionDopHtml(plan,true)}
     <div class="cs-process-grid">${plan.processes.map((process,index)=>`<article class="cs-process-card ${process.shortfall?'is-limited':''}"><span class="cs-process-step">${index+1}</span><div><h4>${escapeHtml(process.label)}</h4><strong>Debe procesar ${process.plannedUnits.toLocaleString('es-PE')} unidades</strong><p>Capacidad máxima: ${process.cycleCapacity.toLocaleString('es-PE')} u./ciclo · ${process.dailyCapacity.toLocaleString('es-PE')} u./día</p><small>${process.staff} trabajador(es) · ${process.machines} equipo(s) emparejados · personal ${reviewMoney(process.payroll)}</small></div></article>`).join('')}</div>
     <div class="cs-material-table" role="table" aria-label="Conversión y uso de insumos">
       <div class="cs-material-head" role="row"><span>Insumo</span><span>Disponible por compras</span><span>Necesario para la meta</span><span>Uso en producción posible</span><span>Saldo</span></div>
@@ -199,7 +198,7 @@ function noticesHtml(problems,warnings){
 }
 function navigateFromSummary(cat){
   closeCompanyReview();persistCurrentDraftOnly();currentCategory=cat;renderTabs();renderDecisionCategory();
-  $('decisionMenu').scrollTop=0;
+  window.scrollTo(0,0);
 }
 function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
 function renderCompanySummary(){
@@ -214,7 +213,8 @@ function renderCompanySummary(){
   const rounds=receiptRounds().filter(r=>r!==currentRound());
   const heading=history?`Decisiones enviadas \u00b7 ciclo ${companySummaryRound}`:'Resumen de decisiones de tu empresa';
   mount.innerHTML=`<section class="company-summary" aria-labelledby="companySummaryTitle"><header class="cs-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${history?companySummaryRound:currentRound()}</span><h2 id="companySummaryTitle">${heading}</h2><p>Decisiones, proceso productivo, compras, costos y financiamiento en un solo lugar.</p></div><span class="cs-progress">${sent} / ${decisionCategories().length}<small>apartados enviados</small></span></header>
-    <div class="cs-toolbar"><div class="cs-filters" role="group" aria-label="Filtrar decisiones"><button type="button" data-summary-filter="all" aria-pressed="${companySummaryFilter==='all'}">Todas las decisiones</button><button type="button" data-summary-filter="sent" aria-pressed="${companySummaryFilter==='sent'}">Solo enviadas</button></div><label>Ciclo <select id="companySummaryCycle"><option value="current">Actual \u00b7 ciclo ${currentRound()}</option>${rounds.map(r=>`<option value="${r}" ${history&&Number(companySummaryRound)===r?'selected':''}>Ciclo ${r} \u00b7 historial enviado</option>`).join('')}</select></label></div>
+      ${!history&&canStartSimulation()?'<div class="cs-world-ready"><div><strong>Tu empresa está lista para abrir</strong><p>Las decisiones están enviadas. Entra al mundo 3D para gestionar el turno.</p></div><button id="companyStartWorld" data-start-world type="button" class="cs-primary">INICIAR MUNDO 3D</button></div>':''}
+      <div class="cs-toolbar"><div class="cs-filters" role="group" aria-label="Filtrar decisiones"><button type="button" data-summary-filter="all" aria-pressed="${companySummaryFilter==='all'}">Todas las decisiones</button><button type="button" data-summary-filter="sent" aria-pressed="${companySummaryFilter==='sent'}">Solo enviadas</button></div><label>Ciclo <select id="companySummaryCycle"><option value="current">Actual \u00b7 ciclo ${currentRound()}</option>${rounds.map(r=>`<option value="${r}" ${history&&Number(companySummaryRound)===r?'selected':''}>Ciclo ${r} \u00b7 historial enviado</option>`).join('')}</select></label></div>
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
     ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+`<div class="cs-cumulative-resource"><span>CANTIDAD ACUMULADA</span><strong>${cumulativeResourceQuantity(review).toLocaleString('es-PE')}</strong><small>Suma de las cantidades registradas de ciclos anteriores y del ciclo actual.</small></div>`+productionSummaryHtml(review)+futureHtml(review.financial)}
     <p class="cs-local-note">Las etiquetas ENVIADA corresponden a confirmaciones guardadas en este navegador. No son un acuse de recibo de Supabase. Los borradores no se presentan como enviados.</p>
@@ -224,11 +224,12 @@ function renderCompanySummary(){
   </section>`;
   mount.querySelectorAll('[data-summary-filter]').forEach(b=>b.addEventListener('click',()=>{companySummaryFilter=b.dataset.summaryFilter;renderCompanySummary();}));
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
-  mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
+    mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
+    mount.querySelector('#companyStartWorld')?.addEventListener('click',startSimulationLoading);
   if($('companySummaryJump'))$('companySummaryJump').onclick=()=>{
     const stage=$('decisionMenu'),head=$('decisionStickyHead');
-    stage.scrollTop+=mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12;
-    requestAnimationFrame(()=>{stage.scrollTop+=mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12;});
+    window.scrollBy(0,mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12);
+    requestAnimationFrame(()=>{window.scrollBy(0,mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12);});
   };
 }
 function ensureReviewDialog(){
