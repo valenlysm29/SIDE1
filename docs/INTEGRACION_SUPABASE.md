@@ -240,3 +240,4 @@ No agregar acceso directo a `supabaseClient` fuera de `services/`.
 | Registro no redirige | Confirmación por correo activada en Auth | Desactivar "Confirm email" en Authentication → Settings |
 | `profesores` vacío tras registro | El trigger no disparó | Insert manual con el UID de Authentication → Users |
 | El navegador traduce `SIDE-XXXX` a otro texto | Traductor automático del navegador | Desactivar traducción en la pestaña de Supabase |
+| Perfil profesor con datos mezclados (nombre nuevo + resto viejo) | Autocompletado rellenó con el registro anterior | `autocomplete="off"` + reset del form + trigger `on_auth_user_updated_side` que re-sincroniza si la metadata cambia |

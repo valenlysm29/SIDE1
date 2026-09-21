@@ -145,6 +145,13 @@ create trigger on_auth_user_created_side
 after insert on auth.users
 for each row execute procedure public.crear_perfil_profesor();
 
+-- Re-sincroniza el perfil si la metadata llega o cambia después del INSERT
+-- (misma función upsert por id; solo toca profesores, sin recursión).
+drop trigger if exists on_auth_user_updated_side on auth.users;
+create trigger on_auth_user_updated_side
+after update of raw_user_meta_data on auth.users
+for each row execute procedure public.crear_perfil_profesor();
+
 -- ============================================================
 -- 8. FUNCIÓN RPC: Buscar partida por código
 -- Solo devuelve partidas en estado 'esperando'.
