@@ -90,7 +90,8 @@
   /**
    * Obtiene el catálogo de decisiones y opciones para mapear IDs a etiquetas.
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
-   *   data = { decisions: [{id, decision_id, decision_nombre, categoria}],
+   *   data = { decisions: [{id, decision_id, decision_nombre, categoria,
+   *            tipo, es_obligatoria, es_recurrente}],
    *            options: [{id, decision_id, opcion_id, etiqueta}] }.
    */
   async function obtenerCatalogo() {
@@ -98,7 +99,7 @@
     if (!sb) return offline();
     try {
       const [dec, ops] = await Promise.all([
-        sb.from('decisiones_catalogo').select('id, decision_id, decision_nombre, categoria').eq('activo', true),
+        sb.from('decisiones_catalogo').select('id, decision_id, decision_nombre, categoria, tipo, es_obligatoria, es_recurrente').eq('activo', true),
         sb.from('decisiones_opciones').select('id, decision_id, opcion_id, etiqueta').eq('activo', true)
       ]);
       if (dec.error) return { success: false, error: dec.error.message };

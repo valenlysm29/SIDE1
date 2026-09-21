@@ -154,6 +154,13 @@ igual que antes.
 **Verificación:** el estudiante guarda una sección → el docente abre la
 pestaña Empresas → ve la empresa con sus decisiones sincronizadas.
 
+**Progreso y apartados (complemento C2):** `obtenerCatalogo()` ahora trae
+`tipo`/`es_obligatoria`; `remoteProgress()` calcula por categoría
+(B/C/D/E/F) `done/total` sobre obligatorias sincronizadas del ciclo actual y
+el `%` global. Sin filas sincronizadas se conserva lo local. Nota: MOLDE
+cuenta siempre como obligatoria aquí (en local es condicional). El puntaje
+(`score`) sigue requiriendo financieros → pendiente de `reportes_ciclo`.
+
 **Fix Fase B (sync incompleto):** tres causas encontradas al dar 0 filas:
 (1) el envío final (`commitReviewedSections`) nunca llamaba al sync — ahora
 sincroniza cada categoría confirmada; (2) activos y plan de producción no

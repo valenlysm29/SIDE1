@@ -205,7 +205,7 @@ function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){t
 let catalogCache=null;
 /**
  * Catálogo Supabase cacheado en memoria.
- * @returns {Promise<object|null>} {decById: Map, optById: Map} o null si offline.
+ * @returns {Promise<object|null>} {decisions, decById: Map, optById: Map} o null si offline.
  */
 async function supabaseCatalog(){
   const S=window.SIDE||{};
@@ -214,15 +214,50 @@ async function supabaseCatalog(){
   const r=await S.DecisionesService.obtenerCatalogo();
   if(!r.success)return null;
   catalogCache={
+    decisions:r.data.decisions||[],
     decById:new Map((r.data.decisions||[]).map(d=>[d.id,d])),
     optById:new Map((r.data.options||[]).map(o=>[o.id,o]))
   };
   return catalogCache;
 }
 /**
+ * Calcula apartados y progreso desde decisiones sincronizadas (no local).
+ * Obligatorio = catálogo con es_obligatoria=true y tipo distinto de 'info'.
+ * Nota: MOLDE es condicional en local (solo si no hay moldes propios); aquí
+ * cuenta siempre como obligatorio (aproximación documentada).
+ * @param {object|null} cat Catálogo cacheado {decisions, decById}.
+ * @param {Array} rows Filas de empresas_decisiones del ciclo actual.
+ * @returns {{apartados: object, progreso: number, total: number}} total = obligatorias del catálogo.
+ */
+function remoteProgress(cat,rows){
+  const oblig=new Map();
+  for(const d of (cat?.decisions||[])){
+    if(d.tipo==='info'||d.es_obligatoria!==true)continue;
+    if(!oblig.has(d.categoria))oblig.set(d.categoria,new Set());
+    oblig.get(d.categoria).add(d.decision_id);
+  }
+  const synced=new Map();
+  for(const r of (rows||[])){
+    const dd=cat?.decById.get(r.decision_id);
+    if(!dd?.decision_id)continue;
+    const c=dd.categoria||'?';
+    if(!synced.has(c))synced.set(c,new Set());
+    synced.get(c).add(dd.decision_id);
+  }
+  const apartados={};let doneAll=0,totalAll=0;
+  for(const c of ['B','C','D','E','F']){
+    const tot=oblig.get(c)||new Set();
+    const don=[...(synced.get(c)||new Set())].filter(x=>tot.has(x));
+    doneAll+=don.length;totalAll+=tot.size;
+    apartados[c]={complete:tot.size?don.length>=tot.size:true,done:don.length,total:tot.size};
+  }
+  return{apartados,progreso:totalAll?Math.round(100*doneAll/totalAll):0,total:totalAll};
+}
+/**
  * Construye reportes desde Supabase para la partida actual (Fase C2).
  * Fusión: Supabase manda en campos sincronizados (decisiones, caja, ciclo,
- * enviado); local conserva lo vivo (actividad, progreso, financieros) si existe.
+ * enviado, apartados y progreso calculados del ciclo actual); local conserva
+ * lo vivo (actividad, financieros, puntaje) y sirve de respaldo sin filas.
  * @returns {Promise<Array|null>} Reportes fusionados o null si offline/sin partida.
  */
 async function supabaseReports(){
@@ -240,7 +275,8 @@ async function supabaseReports(){
     const rr=await S.DecisionesService.obtenerReporte(p.empresa_id);
     const info=rr.success?rr.data:null;
     const emp=info?.empresa||p.empresas||{};
-    const rows=info?.decisiones||[];
+    const cicloActual=Number(emp.ciclo_actual)||1;
+    const rows=(info?.decisiones||[]).filter(d=>Number(d.ciclo)===cicloActual);
     const labels=rows.map(d=>{
       const dd=cat?.decById.get(d.decision_id);
       const codeName=dd?.decision_id||('decisión '+d.decision_id);
@@ -249,12 +285,13 @@ async function supabaseReports(){
       return op?`${codeName} · ${op.etiqueta}${qty>1?` ×${qty}`:''}`:`${codeName}${qty>1?` ×${qty}`:''}`;
     });
     const local=localBase.find(x=>x.empresa===(emp.nombre_comercial||p.empresa));
+    const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
     out.push({
       id:local?.id||('sb-'+p.empresa_id),
       nombre:p.nombre||local?.nombre||'Jugador',
       empresa:emp.nombre_comercial||p.empresa,
       partida:code,
-      ronda:emp.ciclo_actual||1,rondasActivas:emp.ciclo_actual||1,
+      ronda:cicloActual,rondasActivas:cicloActual,
       capital:emp.caja_inicial??local?.capital??0,
       caja:emp.caja_actual??local?.caja??0,
       ingresos:local?.ingresos??0,costos:local?.costos??0,utilidad:local?.utilidad??0,
@@ -262,7 +299,7 @@ async function supabaseReports(){
       enviado:rows.some(d=>d.enviada)||!!local?.enviado,
       eventos:local?.eventos||[],
       estadoResultados:local?.estadoResultados||{},balanceCaja:local?.balanceCaja||{},flujoCaja:local?.flujoCaja||{},
-      apartados:local?.apartados||{},progreso:local?.progreso||0,score:local?.score||0,
+      apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),score:local?.score||0,
       estado:local?.estado||'activa',tomandoDecisiones:!!local?.tomandoDecisiones,
       updatedAt:new Date().toISOString(),fuente:'supabase'
     });
