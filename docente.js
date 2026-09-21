@@ -181,9 +181,11 @@ async function ensureSupabasePartida(config){
 async function startGame(){
   if(!saveConfig(true)){toast('Revisa la duración y los datos de configuración.');return}
   if(cycleMode()==='automatic'){const plan=RULES.cycleSchedule(getConfig());if(plan.error){toast(plan.error);return}}
-  await ensureSupabasePartida(getConfig());
+  // El chequeo local va ANTES de crear en Supabase: si el flujo se bloquea
+  // aquí, no debe quedar una fila huérfana en partidas (fix orden C1).
   const existing=(()=>{try{return JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{return null}})();
   if(existing?.active&&existing.code!==$('gameCode').value){toast('Ya existe una partida activa. Debes finalizarla antes de crear otra.');return}
+  await ensureSupabasePartida(getConfig());
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true,startedAt:existing?.startedAt||new Date().toISOString(),code:$('gameCode').value}));
   $('interest').disabled=true;$('startGame').textContent='Actualizar partida activa';
   if(cycleMode()==='automatic'){

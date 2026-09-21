@@ -127,6 +127,11 @@ seteaba al terminar el RPC). Se agregó `creatingPartida` (promesa en curso
 que las llamadas concurrentes reutilizan) + el botón se deshabilita mientras
 crea y se rehabilita en `finally`.
 
+**Fix de orden en `startGame()`:** el chequeo de partida activa
+(`SIDE_GAME_STATUS`) ahora corre **antes** de `ensureSupabasePartida()`.
+Antes, un clic bloqueado por ese chequeo ya había creado una fila huérfana
+en `partidas`. Con el nuevo orden, si el flujo se bloquea no toca Supabase.
+
 **Verificación:** fila nueva en `partidas` con la configuración; el
 estudiante entra con ese código (Fase A) y aparecen `empresas` +
 `participantes`.
