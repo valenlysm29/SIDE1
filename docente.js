@@ -201,7 +201,85 @@ async function startGame(){
 }
 function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
 
-function loadReports(){try{state.reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{state.reports=[]}state.reports=state.reports.filter(r=>r.partida===$('gameCode').value);renderCompanies();renderResults();renderWinnerSelect()}
+/** Caché del catálogo Supabase para mapear IDs a etiquetas (Fase C2). @type {object|null} */
+let catalogCache=null;
+/**
+ * Catálogo Supabase cacheado en memoria.
+ * @returns {Promise<object|null>} {decById: Map, optById: Map} o null si offline.
+ */
+async function supabaseCatalog(){
+  const S=window.SIDE||{};
+  if(!S.DecisionesService||!S.SupabaseClient?.isReady())return null;
+  if(catalogCache)return catalogCache;
+  const r=await S.DecisionesService.obtenerCatalogo();
+  if(!r.success)return null;
+  catalogCache={
+    decById:new Map((r.data.decisions||[]).map(d=>[d.id,d])),
+    optById:new Map((r.data.options||[]).map(o=>[o.id,o]))
+  };
+  return catalogCache;
+}
+/**
+ * Construye reportes desde Supabase para la partida actual (Fase C2).
+ * Fusión: Supabase manda en campos sincronizados (decisiones, caja, ciclo,
+ * enviado); local conserva lo vivo (actividad, progreso, financieros) si existe.
+ * @returns {Promise<Array|null>} Reportes fusionados o null si offline/sin partida.
+ */
+async function supabaseReports(){
+  const S=window.SIDE||{};
+  if(!S.PartidaService||!S.DecisionesService||!S.SupabaseClient?.isReady())return null;
+  if(!state.partidaId)return null;
+  const parts=await S.PartidaService.listarParticipantes(state.partidaId);
+  if(!parts.success)return null;
+  const cat=await supabaseCatalog();
+  const code=$('gameCode').value;
+  const localBase=state.reports||[];
+  const out=[];
+  for(const p of (parts.data||[])){
+    if(!p.empresa_id)continue;
+    const rr=await S.DecisionesService.obtenerReporte(p.empresa_id);
+    const info=rr.success?rr.data:null;
+    const emp=info?.empresa||p.empresas||{};
+    const rows=info?.decisiones||[];
+    const labels=rows.map(d=>{
+      const dd=cat?.decById.get(d.decision_id);
+      const codeName=dd?.decision_id||('decisión '+d.decision_id);
+      const op=cat?.optById.get(d.opcion_id);
+      const qty=Number(d.cantidad)||1;
+      return op?`${codeName} · ${op.etiqueta}${qty>1?` ×${qty}`:''}`:`${codeName}${qty>1?` ×${qty}`:''}`;
+    });
+    const local=localBase.find(x=>x.empresa===(emp.nombre_comercial||p.empresa));
+    out.push({
+      id:local?.id||('sb-'+p.empresa_id),
+      nombre:p.nombre||local?.nombre||'Jugador',
+      empresa:emp.nombre_comercial||p.empresa,
+      partida:code,
+      ronda:emp.ciclo_actual||1,rondasActivas:emp.ciclo_actual||1,
+      capital:emp.caja_inicial??local?.capital??0,
+      caja:emp.caja_actual??local?.caja??0,
+      ingresos:local?.ingresos??0,costos:local?.costos??0,utilidad:local?.utilidad??0,
+      decisiones:labels.length?labels:(local?.decisiones||[]),
+      enviado:rows.some(d=>d.enviada)||!!local?.enviado,
+      eventos:local?.eventos||[],
+      estadoResultados:local?.estadoResultados||{},balanceCaja:local?.balanceCaja||{},flujoCaja:local?.flujoCaja||{},
+      apartados:local?.apartados||{},progreso:local?.progreso||0,score:local?.score||0,
+      estado:local?.estado||'activa',tomandoDecisiones:!!local?.tomandoDecisiones,
+      updatedAt:new Date().toISOString(),fuente:'supabase'
+    });
+  }
+  const names=new Set(out.map(r=>r.empresa));
+  for(const l of localBase){if(!names.has(l.empresa))out.push(l)}
+  return out;
+}
+async function loadReports(){
+  try{state.reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{state.reports=[]}
+  state.reports=state.reports.filter(r=>r.partida===$('gameCode').value);
+  try{
+    const remote=await supabaseReports();
+    if(remote)state.reports=remote;
+  }catch(error){console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
+  renderCompanies();renderResults();renderWinnerSelect();
+}
 function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}">${escapeHtml(k)} ${v.complete?'✓':`${v.done||0}/${v.total||0}`}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
 function renderCompanies(){const grid=$('companiesGrid');grid.innerHTML=state.reports.map((r,i)=>`<article class="company-card"><div class="company-status-line"><span class="live-dot ${r.tomandoDecisiones?'online':'idle'}"></span><b>${r.tomandoDecisiones?'ACTIVO · TOMANDO DECISIONES':'SIN ACTIVIDAD RECIENTE'}</b></div><h3>${escapeHtml(r.empresa)}</h3><small>${escapeHtml(r.nombre||'Jugador')} · ciclo ${r.rondasActivas||r.ronda||0}</small><div class="section-status-row">${sectionBadges(r)}</div><div class="score">${Number(r.progreso||0)}% decisiones obligatorias</div><div class="metric"><span>Caja</span><b>${money(r.caja??r.capital)}</b></div><div class="metric"><span>Utilidad</span><b class="${Number(r.utilidad)>=0?'profit':'loss'}">${money(r.utilidad)}</b></div><div class="metric"><span>Enviado</span><b>${r.enviado?'Sí':'No'}</b></div><button class="eliminate" data-eliminate="${i}">${r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad'}</button></article>`).join('')||'<div class="card">Aún no hay empresas reportadas en esta partida.</div>';grid.querySelectorAll('[data-eliminate]').forEach(b=>b.addEventListener('click',()=>toggleElimination(Number(b.dataset.eliminate))))}
 function toggleElimination(i){const r=state.reports[i];if(!r)return;r.estado=r.estado==='eliminada'?'activa':'eliminada';persistReports();renderCompanies();renderResults();renderWinnerSelect();toast(r.empresa+(r.estado==='eliminada'?' fue marcada como eliminada.':' fue reactivada.'))}

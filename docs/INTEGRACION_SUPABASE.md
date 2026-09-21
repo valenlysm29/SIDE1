@@ -136,7 +136,25 @@ en `partidas`. Con el nuevo orden, si el flujo se bloquea no toca Supabase.
 estudiante entra con ese código (Fase A) y aparecen `empresas` +
 `participantes`.
 
-## 8. Cómo extender (para el equipo)
+## 8. Fase C2 — El docente lee reportes desde Supabase
+
+**Archivos:** `services/partida_service.js` (`listarParticipantes()`),
+`services/decisiones_service.js` (`obtenerCatalogo()`), `docente.js`
+(`loadReports()` async + `supabaseReports()` + `supabaseCatalog()` con caché).
+
+**Flujo:** al abrir Empresas/Resultados/Podio o pulsar Actualizar →
+`loadReports()` lee local (como antes) → si hay Supabase + `partidaId`:
+`listarParticipantes()` → por cada empresa `obtenerReporte()` → los IDs de
+decisión/opción se traducen a etiquetas con el catálogo cacheado → se
+fusiona con lo local (**Supabase manda** en decisiones, caja, ciclo y
+enviado; **local conserva** actividad, progreso y financieros calculados) →
+se pintan Empresas/Resultados/Podio. Sin conexión o sin partida, todo sigue
+igual que antes.
+
+**Verificación:** el estudiante guarda una sección → el docente abre la
+pestaña Empresas → ve la empresa con sus decisiones sincronizadas.
+
+## 9. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:
 
@@ -149,7 +167,7 @@ Para agregar una operación nueva:
 
 No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
-## 9. Solución de problemas
+## 10. Solución de problemas
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|

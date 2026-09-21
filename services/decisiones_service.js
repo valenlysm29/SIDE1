@@ -9,6 +9,7 @@
  * Funciones:
  *   - guardar(empresaId, ciclo, decisiones) → RPC guardar_decisiones
  *   - obtenerReporte(empresaId, ciclo?)     → RPC obtener_reporte_empresa
+ *   - obtenerCatalogo()                     → catálogo para mapear IDs a etiquetas
  *
  * Formato de cada decisión en el array:
  *   { decision_id: 'MOLDE', opcion_id: 'molde_2', cantidad: 1, costo_total: 1200 }
@@ -86,6 +87,28 @@
     }
   }
 
+  /**
+   * Obtiene el catálogo de decisiones y opciones para mapear IDs a etiquetas.
+   * @returns {Promise<{success: boolean, data?: object, error?: string}>}
+   *   data = { decisions: [{id, decision_id, decision_nombre, categoria}],
+   *            options: [{id, decision_id, opcion_id, etiqueta}] }.
+   */
+  async function obtenerCatalogo() {
+    const sb = client();
+    if (!sb) return offline();
+    try {
+      const [dec, ops] = await Promise.all([
+        sb.from('decisiones_catalogo').select('id, decision_id, decision_nombre, categoria').eq('activo', true),
+        sb.from('decisiones_opciones').select('id, decision_id, opcion_id, etiqueta').eq('activo', true)
+      ]);
+      if (dec.error) return { success: false, error: dec.error.message };
+      if (ops.error) return { success: false, error: ops.error.message };
+      return { success: true, data: { decisions: dec.data || [], options: ops.data || [] } };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.DecisionesService = { guardar, obtenerReporte };
+  global.SIDE.DecisionesService = { guardar, obtenerReporte, obtenerCatalogo };
 })(window);
