@@ -159,6 +159,15 @@ $('studentForm')?.addEventListener('submit',async e=>{
       const c=await S.EmpresaService.crear(found.id,{nombreEstudiante:'Jugador',nombreLegal:legalName,nombreComercial:brandName,capital:initialCapital()});
       if(!c.success){message('studentMessage',c.error||'No se pudo crear la empresa.',true);return}
       empresaId=c.data?.empresa_id||null;participantId=c.data?.participante_id||null;
+      // Fase A-fix: la partida manda en capital y reglas. Si el navegador no
+      // tiene config propia (incógnito/dispositivo nuevo), se siembra la remota
+      // para que la economía local coincida. Con config propia, manda la local.
+      try{
+        const remoteCfg=c.data?.configuracion;
+        if(remoteCfg&&typeof remoteCfg==='object'&&!localStorage.getItem('SIDE_TEACHER_CONFIG')){
+          localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(remoteCfg));
+        }
+      }catch(error){console.error('SIDE: no se pudo aplicar config de partida',error)}
     }else{
       const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
       if(joinError){message('studentMessage',joinError.message,true);return} participantId=participant?.id||null;

@@ -212,6 +212,12 @@ a 0% eterno). Ahora hereda el ciclo actual de la partida (primera empresa → 1)
 Regla de prueba: un nombre comercial = una empresa; reutilizar nombres mezcla
 el `localStorage` y duplica filas (rejoin con upsert = mejora futura).
 
+**Fix capital del join:** el monto inicial lo calculaba el navegador del
+estudiante (100,000 por defecto), ignorando lo configurado por el docente.
+Ahora `crear_empresa` usa el capital de la partida en modo fijo (en aleatorio
+respeta el cálculo del frontend) y devuelve la `configuracion`, que el join
+siembra en local solo si el navegador no tiene config propia.
+
 ## 10. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:

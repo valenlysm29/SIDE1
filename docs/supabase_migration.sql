@@ -192,6 +192,8 @@ declare
   v_empresa_id bigint;
   v_participante_id uuid;
   v_ciclo integer;
+  v_cfg jsonb;
+  v_capital numeric;
   v_resultado jsonb;
 begin
   -- Verificar que la partida existe y está en espera
@@ -200,6 +202,16 @@ begin
     where id = p_partida_id and estado = 'esperando'
   ) then
     return jsonb_build_object('error', 'La partida no existe o ya inició');
+  end if;
+
+  -- El capital lo manda la partida (modo fijo). En modo aleatorio se respeta
+  -- el monto calculado por el frontend (p_capital) como respaldo.
+  select configuracion into v_cfg
+  from public.partidas where id = p_partida_id;
+  if coalesce(v_cfg->>'capitalMode', 'fixed') = 'random' then
+    v_capital := p_capital;
+  else
+    v_capital := coalesce((v_cfg->>'capital')::numeric, p_capital);
   end if;
 
   -- La empresa nueva arranca en el ciclo actual de la partida (no en 1):
@@ -215,7 +227,7 @@ begin
 
   -- Crear la empresa
   insert into public.empresas (nombre_legal, nombre_comercial, caja_inicial, caja_actual, ciclo_actual)
-  values (p_nombre_legal, p_nombre_comercial, p_capital, p_capital, v_ciclo)
+  values (p_nombre_legal, p_nombre_comercial, v_capital, v_capital, v_ciclo)
   returning id into v_empresa_id;
 
   -- Crear el participante vinculado a la empresa
@@ -223,12 +235,13 @@ begin
   values (p_partida_id, v_empresa_id, p_nombre_estudiante, p_nombre_comercial)
   returning id into v_participante_id;
 
-  -- Resultado
+  -- Resultado (incluye la configuración para que el frontend la aplique)
   v_resultado := jsonb_build_object(
     'empresa_id', v_empresa_id,
     'participante_id', v_participante_id,
-    'caja_inicial', p_capital,
-    'ciclo_inicial', v_ciclo
+    'caja_inicial', v_capital,
+    'ciclo_inicial', v_ciclo,
+    'configuracion', coalesce(v_cfg, '{}'::jsonb)
   );
 
   return v_resultado;
