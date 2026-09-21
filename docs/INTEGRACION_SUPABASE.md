@@ -200,6 +200,11 @@ contador local vuelve a ciclo 1 (no hereda el 11/10 anterior). Al iniciar, si
 el `partidaId` guardado apunta a una partida finalizada/inexistente se libera
 solo (los errores de red no borran nada).
 
+**Aislamiento por profesor:** en equipos compartidos, `purgeForeignProfessorState()`
+compara la sesión actual con `SIDE_PROFESOR_ID` guardado; si cambió de cuenta,
+purga partida/config/estado/eventos/reportes locales para no mostrar datos del
+profesor anterior. Sin sesión (demo) u offline no toca nada.
+
 **Fix C3 (ciclo de partida):** la primera versión sincronizaba con el ciclo
 de la empresa que entra, pero una empresa nueva siempre nace en 1, así que
 re-entrar nunca subía. La RPC ahora devuelve `ciclo_partida` (máximo entre

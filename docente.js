@@ -218,6 +218,29 @@ function syncRoundToSupabase(){
   }catch(error){console.error('SIDE: supabase advance failed',error)}
 }
 /**
+ * Aísla la sesión local por profesor (equipos compartidos).
+ * Si la sesión actual es de otro profesor que el que dejó datos en este
+ * navegador, se purgan las claves de partida/config/juego para no mostrarle
+ * datos ajenos. Sin sesión (demo) u offline no se toca nada. Solo purga ante
+ * confirmación positiva de cambio de cuenta; nunca por error de red.
+ */
+async function purgeForeignProfessorState(){
+  try{
+    const S=window.SIDE||{};
+    const sb=S.SupabaseClient?.get();
+    if(!sb||!S.SupabaseClient?.isReady())return;
+    const {data}=await sb.auth.getUser();
+    const uid=data?.user?.id||null;
+    if(!uid)return;
+    let stored=null;
+    try{stored=localStorage.getItem('SIDE_PROFESOR_ID')}catch{}
+    if(stored&&stored!==uid){
+      ['SIDE_PARTIDA_ID','SIDE_TEACHER_CONFIG','SIDE_ASSIGNED_GAME_CODE','SIDE_GAME_STATUS','SIDE_ACTIVE_ROUND','SIDE_ROUND_RUNTIME','SIDE_EVENT_LOG','SIDE_EVENT_SCHEDULE','SIDE_STUDENT_REPORTS','SIDE_PUBLISHED_PODIUM'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+    }
+    try{localStorage.setItem('SIDE_PROFESOR_ID',uid)}catch{}
+  }catch(error){console.error('SIDE: professor isolation check failed',error)}
+}
+/**
  * Texto del botón principal según haya partida activa vinculada o no.
  * Sin partida → "Nueva partida"; con partida → "Actualizar partida activa".
  */
@@ -393,6 +416,7 @@ $('eventRandomize')?.addEventListener('click',randomizeEventSelection);$('eventC
 $('saveAll')?.addEventListener('click',()=>saveConfig(false));$('startGame')?.addEventListener('click',startGame);$('refreshReports')?.addEventListener('click',()=>{loadReports();toast('Información actualizada.')});$('advanceRound')?.addEventListener('click',()=>advanceRound(false));$('startTimer')?.addEventListener('click',startTimer);$('cutRound')?.addEventListener('click',cutRound);$('clearEvents')?.addEventListener('click',()=>{state.events=[];localStorage.removeItem('SIDE_EVENT_LOG');renderEvents()});$('publishPodium')?.addEventListener('click',publishPodium);$('winnerSelect')?.addEventListener('change',renderPodium);$('viewPdf')?.addEventListener('click',showPdf);$('downloadPdf')?.addEventListener('click',downloadPdf);$('closePdf')?.addEventListener('click',()=>$('pdfModal').classList.add('hidden'));$('backHome')?.addEventListener('click',()=>window.location.href='index.html');
 
 (async function init(){
+  await purgeForeignProfessorState();
   loadConfig();updateEventModeUI();
   try{state.events=JSON.parse(localStorage.getItem('SIDE_EVENT_LOG')||'[]')||[]}catch{}
   const r=runtime();
