@@ -154,6 +154,14 @@ igual que antes.
 **Verificación:** el estudiante guarda una sección → el docente abre la
 pestaña Empresas → ve la empresa con sus decisiones sincronizadas.
 
+**Fix Fase B (sync incompleto):** tres causas encontradas al dar 0 filas:
+(1) el envío final (`commitReviewedSections`) nunca llamaba al sync — ahora
+sincroniza cada categoría confirmada; (2) activos y plan de producción no
+tenían mapeo (`purchases[ciclo]` y `moldTargets`) y se omitían en silencio —
+ahora se convierten (cantidades con signo en liquidaciones) y lo omitido se
+reporta con `console.info`; (3) los guardados previos al constraint UNIQUE
+fallaban con 42P10 — ya resuelto.
+
 ## 9. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:

@@ -105,6 +105,9 @@ function commitReviewedSections(cats,finalize){
     decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
     if(finalize){currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';closeCompanyReview();}
     try{syncStudentReportPreview();}catch(error){console.error('SIDE: preview report refresh failed',error);}
+    // Fase B-fix: el envío también sincroniza con Supabase (no solo el borrador).
+    // Fire-and-forget con guard: syncSectionToSupabase nunca rechaza.
+    try{if(typeof syncSectionToSupabase==='function'){for(const plan of plans){syncSectionToSupabase(plan.cat);}}}catch(error){console.error('SIDE: supabase round sync failed',error);}
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
     toast(finalize?'Decisiones confirmadas en este equipo. Consulta el resumen en Empresa.':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`);
     return true;

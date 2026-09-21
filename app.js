@@ -754,13 +754,15 @@ async function syncSectionToSupabase(cat){
     const S=window.SIDE||{};
     if(!S.DecisionesService||!currentStudent?.empresaId)return;
     const categoria=categoryByCat(cat);if(!categoria||!categoria.items?.length)return;
-    const round=currentRound(),decisiones=[];
+    const round=currentRound(),decisiones=[],omitidas=[];
     for(const item of categoria.items){
+      if(item.type==='info')continue;
       const st=decisionState[item.id];if(!st)continue;
       const entry=buildSupabaseDecision(item,st,round);
-      if(!entry)continue;
+      if(!entry){omitidas.push(item.id);continue}
       if(Array.isArray(entry))decisiones.push(...entry);else decisiones.push(entry);
     }
+    if(omitidas.length)console.info('SIDE: sync omite sin mapeo:',omitidas.join(','));
     if(!decisiones.length)return;
     const r=await S.DecisionesService.guardar(currentStudent.empresaId,round,decisiones);
     if(!r.success&&!r.offline)console.warn('SIDE: sync decisiones:',r.error);
@@ -769,9 +771,10 @@ async function syncSectionToSupabase(cat){
 /**
  * Convierte una decisión del estado local al formato del RPC guardar_decisiones.
  * @param {object} item Definición del catálogo (decision_catalog.js).
- * @param {object} st Estado local de la decisión.
- * @param {number} round Ciclo actual (informativo).
- * @returns {object|null} {decision_id, opcion_id, cantidad, costo_total} o null.
+ * @param {object} st Estado local de la decisión (ver prepareSectionSave).
+ * @param {number} round Ciclo actual (las compras de activos viven por ciclo).
+ * @returns {object|Array|null} {decision_id, opcion_id, cantidad, costo_total},
+ *   array si hay varias opciones, o null si no hay nada que sincronizar.
  */
 function buildSupabaseDecision(item,st,round){
   if(!item||!st)return null;
@@ -781,6 +784,26 @@ function buildSupabaseDecision(item,st,round){
   const push=(opId,qty,cost)=>{
     out.push({decision_id:item.id,opcion_id:opId||null,cantidad:Math.max(1,Number(qty)||1),costo_total:Math.round(Number(cost)||0)});
   };
+  // Activos (mesas, máquinas): las compras del ciclo están en
+  // st.purchases[round]. Cantidad con signo (negativo = liquidación/venta).
+  if(item.asset){
+    const bought=(st.purchases&&st.purchases[round])||{};
+    for(const[opId,qty]of Object.entries(bought)){
+      const q=Number(qty)||0;if(q===0)continue;
+      const opt=(item.options||[]).find(o=>o.id===opId);
+      let unit=Number(opt?.cost)||0;
+      try{if(typeof optionUnitCost==='function'&&opt)unit=optionUnitCost(item,opt)}catch{}
+      out.push({decision_id:item.id,opcion_id:opId,cantidad:q,costo_total:Math.round(unit*q)});
+    }
+    return out.length?(out.length===1?out[0]:out):null;
+  }
+  // Plan de producción: meta total de unidades (sin opción ni costo).
+  if(item.type==='production-plan'){
+    const total=Math.max(0,Math.trunc(Number(st.value)||0));
+    if(total<=0)return null;
+    push(null,total,0);
+    return out[0];
+  }
   if(item.type==='choice'||item.type==='multi-choice'){
     if(!ids.length)return null;
     for(const opId of ids){
