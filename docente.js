@@ -167,9 +167,13 @@ async function ensureSupabasePartida(config){
         eventos_habilitados:config.enabledEvents||[]
       });
       if(!r.success){toast('No se pudo crear la partida en Supabase: '+(r.error||'error')+'. Se continúa en modo local.');return true}
-      state.partidaId=r.data.id;
-      try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
-      if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;saveConfig(true)}
+  state.partidaId=r.data.id;
+  try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
+  if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;saveConfig(true)}
+  // Partida nueva: el contador local vuelve al ciclo 1 (no hereda el anterior).
+  state.round=1;state.seconds=roundSeconds();state.roundClosed=false;
+  try{localStorage.setItem('SIDE_ACTIVE_ROUND','1')}catch{}
+  updateTimer();updateRoundDisplay();
       toast('Partida creada en Supabase: '+r.data.codigo);return true;
     }finally{
       creatingPartida=null;
@@ -187,7 +191,7 @@ async function startGame(){
   if(existing?.active&&existing.code!==$('gameCode').value){toast('Ya existe una partida activa. Debes finalizarla antes de crear otra.');return}
   await ensureSupabasePartida(getConfig());
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true,startedAt:existing?.startedAt||new Date().toISOString(),code:$('gameCode').value}));
-  $('interest').disabled=true;$('startGame').textContent='Actualizar partida activa';
+  $('interest').disabled=true;refreshStartButton();
   if(cycleMode()==='automatic'){
     scheduleAutomaticStart();
     const r=runtime();toast(r?.status==='scheduled'?'Partida programada: comenzará en la fecha y hora indicadas.':r?.status==='simulation-finished'?'El horario programado ya terminó. La simulación está finalizada.':'Partida automática sincronizada con el calendario.');
@@ -214,6 +218,14 @@ function syncRoundToSupabase(){
   }catch(error){console.error('SIDE: supabase advance failed',error)}
 }
 /**
+ * Texto del botón principal según haya partida activa vinculada o no.
+ * Sin partida → "Nueva partida"; con partida → "Actualizar partida activa".
+ */
+function refreshStartButton(){
+  const btn=$('startGame');if(!btn)return;
+  btn.textContent=state.partidaId?'Actualizar partida activa':'Nueva partida';
+}
+/**
  * Cierra la partida en Supabase al finalizar la simulación.
  * Marca estado='finalizada' y libera el partidaId local para que el próximo
  * inicio cree una partida nueva (cierra el ciclo de vida partida única).
@@ -229,6 +241,7 @@ function finishSupabasePartida(){
   }catch(error){console.error('SIDE: supabase finish failed',error)}
   state.partidaId=null;
   try{localStorage.removeItem('SIDE_PARTIDA_ID')}catch{}
+  refreshStartButton();
 }
 function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));finishSupabasePartida();$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();syncRoundToSupabase();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
 
@@ -389,4 +402,20 @@ $('saveAll')?.addEventListener('click',()=>saveConfig(false));$('startGame')?.ad
   else if(r?.running&&r.startedAt){state.seconds=Math.max(0,Number(r.duration||roundSeconds())-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));if(state.seconds>0)beginTimer(false);else finishTime()}
   if(r?.status==='simulation-finished')$('roundState').textContent='Simulación finalizada';
   updateTimer();updateRoundDisplay();loadReports();renderEvents();renderCycleNews();loadPublished();renderAcademicCalendar();
+  refreshStartButton();
+  // Si el partidaId guardado apunta a una partida finalizada/inexistente
+  // (ej. localStorage anterior al fix), se libera para permitir crear nueva.
+  // Solo se limpia con confirmación positiva; errores de red no borran nada.
+  try{
+    const S=window.SIDE||{};
+    if(S.PartidaService&&S.SupabaseClient?.isReady()&&state.partidaId){
+      S.PartidaService.obtener(state.partidaId).then(r=>{
+        if(r.success&&(!r.data||r.data.estado==='finalizada')){
+          state.partidaId=null;
+          try{localStorage.removeItem('SIDE_PARTIDA_ID')}catch{}
+          refreshStartButton();
+        }
+      });
+    }
+  }catch(error){console.error('SIDE: partida check failed',error)}
 })();

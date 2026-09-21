@@ -190,8 +190,15 @@ estudiante re-entra y ve "CICLO 2".
 **Ciclo de vida partida única:** el docente mantiene una sola partida activa
 (ver texto del panel). Al llegar al último ciclo, `finishSupabasePartida()`
 marca `estado='finalizada'` (vía `PartidaService.finalizar()`) y libera el
-`partidaId` local; el próximo "Guardar e iniciar" crea una partida nueva en
-vez de reutilizar la anterior. Sin esto, jamás se podía crear otra.
+`partidaId` local; el próximo inicio crea una partida nueva en vez de
+reutilizar la anterior. Sin esto, jamás se podía crear otra.
+
+**UX nueva partida:** el botón dorado dice "Nueva partida" si no hay partida
+activa vinculada y "Actualizar partida activa" si la hay (`refreshStartButton()`,
+se evalúa al iniciar, al crear y al finalizar). Al crear partida nueva el
+contador local vuelve a ciclo 1 (no hereda el 11/10 anterior). Al iniciar, si
+el `partidaId` guardado apunta a una partida finalizada/inexistente se libera
+solo (los errores de red no borran nada).
 
 **Fix C3 (ciclo de partida):** la primera versión sincronizaba con el ciclo
 de la empresa que entra, pero una empresa nueva siempre nace en 1, así que

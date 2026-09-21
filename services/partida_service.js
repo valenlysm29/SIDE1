@@ -152,6 +152,28 @@
     }
   }
 
+  /**
+   * Lee una partida por id (para validar si sigue activa).
+   * Solo el profesor dueño puede (RLS "profesor ve sus partidas").
+   * @param {string} partidaId UUID de la partida.
+   * @returns {Promise<{success: boolean, data?: object|null, error?: string}>}
+   *   data = { id, codigo, nombre, curso, estado } o null si no existe.
+   */
+  async function obtener(partidaId) {
+    const sb = client();
+    if (!sb) return offline();
+    if (!partidaId) return { success: false, error: 'Falta partidaId.' };
+    try {
+      const { data, error } = await sb.from('partidas')
+        .select('id, codigo, nombre, curso, estado')
+        .eq('id', partidaId).maybeSingle();
+      if (error) return { success: false, error: error.message };
+      return { success: true, data: data || null };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, listarParticipantes };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes };
 })(window);
