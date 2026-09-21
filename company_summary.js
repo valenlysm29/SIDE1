@@ -104,7 +104,7 @@ function commitReviewedSections(cats,finalize){
     const delta=Object.values(ledger).reduce((a,b)=>a+Number(b||0),0)-ledgerTotal();
     decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
     if(finalize){currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';closeCompanyReview();}
-    try{syncStudentReportPreview();}catch(error){console.error('SIDE: preview report refresh failed',error);}
+    try{syncReportToSupabase(syncStudentReportPreview());}catch(error){console.error('SIDE: preview report refresh failed',error);}
     // Fase B-fix: el envío también sincroniza con Supabase (no solo el borrador).
     // Fire-and-forget con guard: syncSectionToSupabase nunca rechaza.
     try{if(typeof syncSectionToSupabase==='function'){for(const plan of plans){syncSectionToSupabase(plan.cat);}}}catch(error){console.error('SIDE: supabase round sync failed',error);}

@@ -10,6 +10,7 @@
  *   - guardar(empresaId, ciclo, decisiones) → RPC guardar_decisiones
  *   - obtenerReporte(empresaId, ciclo?)     → RPC obtener_reporte_empresa
  *   - obtenerCatalogo()                     → catálogo para mapear IDs a etiquetas
+ *   - guardarReporte(empresaId, ciclo, reporte) → RPC guardar_reporte
  *
  * Formato de cada decisión en el array:
  *   { decision_id: 'MOLDE', opcion_id: 'molde_2', cantidad: 1, costo_total: 1200 }
@@ -110,6 +111,36 @@
     }
   }
 
+  /**
+   * Guarda (inserta o actualiza) el reporte financiero de una empresa en un ciclo.
+   * @param {number} empresaId ID de la empresa.
+   * @param {number} ciclo Número de ciclo (1..N).
+   * @param {object} reporte { capital, ingresos, costos, utilidad, caja_final,
+   *   balance_caja, flujo_caja, estado_resultados, decisiones, eventos,
+   *   score, progreso }.
+   * @returns {Promise<{success: boolean, data?: object, error?: string}>}
+   */
+  async function guardarReporte(empresaId, ciclo, reporte) {
+    const sb = client();
+    if (!sb) return offline();
+    if (!empresaId) return { success: false, error: 'Falta empresaId.' };
+    if (!ciclo) return { success: false, error: 'Falta ciclo.' };
+    if (!reporte || typeof reporte !== 'object') {
+      return { success: false, error: 'Reporte vacío.' };
+    }
+    try {
+      const { data, error } = await sb.rpc('guardar_reporte', {
+        p_empresa_id: empresaId,
+        p_ciclo: ciclo,
+        p_reporte: reporte
+      });
+      if (error) return { success: false, error: error.message };
+      return { success: true, data };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.DecisionesService = { guardar, obtenerReporte, obtenerCatalogo };
+  global.SIDE.DecisionesService = { guardar, obtenerReporte, obtenerCatalogo, guardarReporte };
 })(window);

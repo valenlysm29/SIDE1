@@ -651,7 +651,7 @@ function saveCurrentSection(){
   decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
   // Las vistas derivadas no deben convertir un guardado exitoso en un fallo aparente.
   try{warnProductionMaterialShortage();}catch(error){console.error('SIDE: no se pudo actualizar la advertencia productiva',error)}
-  try{syncStudentReportPreview();}catch(error){console.error('SIDE: no se pudo actualizar el resumen',error)}
+  try{syncReportToSupabase(syncStudentReportPreview());}catch(error){console.error('SIDE: no se pudo actualizar el resumen',error)}
   try{syncSectionToSupabase(cat);}catch(error){console.error('SIDE: no se pudo sincronizar la sección',error)}
   try{if(affordable)animateCash(plan.net-old);renderTabs();renderDecisionCategory();updateHud();}catch(error){console.error('SIDE: el borrador se guardó, pero una vista no pudo refrescarse',error)}
   toast(affordable?'Borrador guardado sin enviar. Puedes continuar editando.':'Borrador guardado. Ajusta el presupuesto antes de enviar la decisión.');return true;
@@ -764,6 +764,32 @@ function syncStudentReportPreview(){
   let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
   const idx=reports.findIndex(r=>r.id===report.id);if(idx>=0)reports[idx]=report;else reports.push(report);
   localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));renderStudentStatus();
+  return report;
+}
+/**
+ * Sincroniza el reporte financiero calculado con Supabase (reportes).
+ * Solo se llama en puntos de guardado/confirmación del usuario, nunca en
+ * loops de render ni ventas 3D (ahí el reporte se recalcula muy seguido).
+ * Fire-and-forget con guard: silencioso si offline.
+ * @param {object|null} report Reporte tal cual lo devuelve syncStudentReportPreview().
+ */
+function syncReportToSupabase(report){
+  try{
+    const S=window.SIDE||{};
+    if(!S.DecisionesService||!currentStudent?.empresaId||!report)return;
+    const round=Number(report.ronda)||currentRound();
+    const payload={
+      capital:report.capital,ingresos:report.ingresos,costos:report.costos,
+      utilidad:report.utilidad,caja_final:report.caja,
+      balance_caja:report.balanceCaja||{},flujo_caja:report.flujoCaja||{},
+      estado_resultados:report.estadoResultados||{},
+      decisiones:report.decisiones||[],eventos:report.eventos||[],
+      score:report.score||0,progreso:report.progreso||0
+    };
+    S.DecisionesService.guardarReporte(currentStudent.empresaId,round,payload).then(r=>{
+      if(!r.success&&!r.offline)console.warn('SIDE: sync reporte:',r.error);
+    });
+  }catch(error){console.error('SIDE: no se pudo sincronizar el reporte',error)}
 }
 /**
  * Sincroniza la sección actual de decisiones con Supabase (Fase B).

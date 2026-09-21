@@ -223,7 +223,22 @@ Ahora `crear_empresa` usa el capital de la partida en modo fijo (en aleatorio
 respeta el cálculo del frontend) y devuelve la `configuracion`, que el join
 siembra en local solo si el navegador no tiene config propia.
 
-## 10. Cómo extender (para el equipo)
+## 10. Fase R — Reporte financiero en Supabase
+
+**Problema:** ingresos/costos/utilidad/flujo/puntaje salían S/ 0 entre
+dispositivos porque viven en el `localStorage` del estudiante.
+
+**Archivos:** `docs/supabase_migration.sql` (columnas `score`/`progreso` +
+RPC `guardar_reporte` con upsert por empresa+ciclo), `services/`
+(`DecisionesService.guardarReporte()`), `app.js` (`syncStudentReportPreview()`
+ahora retorna el reporte + `syncReportToSupabase()`), `company_summary.js` y
+`saveCurrentSection` (envían al guardar/confirmar, nunca en loops ni ventas 3D),
+`docente.js` (el merge prefiere la fila `reportes_ciclo` del ciclo actual).
+
+**Verificación:** estudiante guarda → fila en `reportes_ciclo` → docente ve
+números reales y puntaje mayor a 0.
+
+## 11. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:
 
@@ -236,7 +251,7 @@ Para agregar una operación nueva:
 
 No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
-## 11. Solución de problemas
+## 12. Solución de problemas
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|

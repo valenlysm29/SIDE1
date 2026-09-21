@@ -328,6 +328,65 @@ revoke all on function public.guardar_decisiones(bigint, integer, jsonb) from pu
 grant execute on function public.guardar_decisiones(bigint, integer, jsonb) to anon, authenticated;
 
 -- ============================================================
+-- 10b. REPORTE FINANCIERO POR CICLO (para el panel docente)
+-- Columnas score/progreso + RPC de guardado (upsert por empresa+ciclo).
+-- ============================================================
+alter table public.reportes_ciclo add column if not exists score integer not null default 0;
+alter table public.reportes_ciclo add column if not exists progreso integer not null default 0;
+
+create or replace function public.guardar_reporte(
+  p_empresa_id bigint,
+  p_ciclo integer,
+  p_reporte jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.reportes_ciclo (
+    empresa_id, ciclo, capital, ingresos, costos, utilidad, caja_final,
+    balance_caja, flujo_caja, estado_resultados, decisiones, eventos,
+    score, progreso
+  ) values (
+    p_empresa_id,
+    p_ciclo,
+    coalesce((p_reporte->>'capital')::numeric, 0),
+    coalesce((p_reporte->>'ingresos')::numeric, 0),
+    coalesce((p_reporte->>'costos')::numeric, 0),
+    coalesce((p_reporte->>'utilidad')::numeric, 0),
+    coalesce((p_reporte->>'caja_final')::numeric, 0),
+    coalesce(p_reporte->'balance_caja', '{}'::jsonb),
+    coalesce(p_reporte->'flujo_caja', '{}'::jsonb),
+    coalesce(p_reporte->'estado_resultados', '{}'::jsonb),
+    coalesce(p_reporte->'decisiones', '[]'::jsonb),
+    coalesce(p_reporte->'eventos', '[]'::jsonb),
+    coalesce((p_reporte->>'score')::integer, 0),
+    coalesce((p_reporte->>'progreso')::integer, 0)
+  )
+  on conflict (empresa_id, ciclo) do update set
+    capital = excluded.capital,
+    ingresos = excluded.ingresos,
+    costos = excluded.costos,
+    utilidad = excluded.utilidad,
+    caja_final = excluded.caja_final,
+    balance_caja = excluded.balance_caja,
+    flujo_caja = excluded.flujo_caja,
+    estado_resultados = excluded.estado_resultados,
+    decisiones = excluded.decisiones,
+    eventos = excluded.eventos,
+    score = excluded.score,
+    progreso = excluded.progreso,
+    created_at = now();
+  return jsonb_build_object('success', true);
+end;
+$$;
+
+revoke all on function public.guardar_reporte(bigint, integer, jsonb) from public;
+grant execute on function public.guardar_reporte(bigint, integer, jsonb) to anon, authenticated;
+
+-- ============================================================
 -- 11. FUNCIÓN RPC: Obtener reporte de empresa para docente
 -- ============================================================
 create or replace function public.obtener_reporte_empresa(

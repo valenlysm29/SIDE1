@@ -353,20 +353,26 @@ async function supabaseReports(){
     });
     const local=localBase.find(x=>x.empresa===(emp.nombre_comercial||p.empresa));
     const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
+    const rep=((info?.reportes)||[]).find(r=>Number(r.ciclo)===cicloActual)||null;
     out.push({
       id:local?.id||('sb-'+p.empresa_id),
       nombre:p.nombre||local?.nombre||'Jugador',
       empresa:emp.nombre_comercial||p.empresa,
       partida:code,
       ronda:cicloActual,rondasActivas:cicloActual,
-      capital:emp.caja_inicial??local?.capital??0,
-      caja:emp.caja_actual??local?.caja??0,
-      ingresos:local?.ingresos??0,costos:local?.costos??0,utilidad:local?.utilidad??0,
+      capital:rep?Number(rep.capital):(emp.caja_inicial??local?.capital??0),
+      caja:rep?Number(rep.caja_final):(emp.caja_actual??local?.caja??0),
+      ingresos:rep?Number(rep.ingresos):(local?.ingresos??0),
+      costos:rep?Number(rep.costos):(local?.costos??0),
+      utilidad:rep?Number(rep.utilidad):(local?.utilidad??0),
       decisiones:labels.length?labels:(local?.decisiones||[]),
       enviado:rows.some(d=>d.enviada)||!!local?.enviado,
       eventos:local?.eventos||[],
-      estadoResultados:local?.estadoResultados||{},balanceCaja:local?.balanceCaja||{},flujoCaja:local?.flujoCaja||{},
-      apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),score:local?.score||0,
+      estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
+      balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
+      flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
+      apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
+      score:rep?Number(rep.score):(local?.score||0),
       estado:local?.estado||'activa',tomandoDecisiones:!!local?.tomandoDecisiones,
       updatedAt:new Date().toISOString(),fuente:'supabase'
     });
