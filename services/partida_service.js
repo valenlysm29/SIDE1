@@ -7,9 +7,10 @@
  * No toca empresas, decisiones ni UI.
  *
  * Funciones:
- *   - buscarPorCodigo(codigo)      → RPC buscar_partida_por_codigo
- *   - crear(datos)                 → INSERT en partidas
- *   - avanzarCiclo(partidaId)      → RPC avanzar_ciclo
+ *   - buscarPorCodigo(codigo)        → RPC buscar_partida_por_codigo
+ *   - crear(datos)                   → INSERT en partidas
+ *   - avanzarCiclo(partidaId)        → RPC avanzar_ciclo
+ *   - finalizar(partidaId)           → estado 'finalizada' (libera el cupo)
  *   - listarParticipantes(partidaId) → participantes + empresa de la partida
  *
  * Todas retornan { success: boolean, data?: any, error?: string }.
@@ -132,6 +133,25 @@
     }
   }
 
+  /**
+   * Marca una partida como finalizada (libera el cupo de partida única).
+   * Solo el profesor dueño puede (RLS "profesor actualiza sus partidas").
+   * @param {string} partidaId UUID de la partida.
+   * @returns {Promise<{success: boolean, error?: string}>}
+   */
+  async function finalizar(partidaId) {
+    const sb = client();
+    if (!sb) return offline();
+    if (!partidaId) return { success: false, error: 'Falta partidaId.' };
+    try {
+      const { error } = await sb.from('partidas').update({ estado: 'finalizada' }).eq('id', partidaId);
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, listarParticipantes };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, listarParticipantes };
 })(window);

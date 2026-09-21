@@ -213,7 +213,24 @@ function syncRoundToSupabase(){
     });
   }catch(error){console.error('SIDE: supabase advance failed',error)}
 }
-function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();syncRoundToSupabase();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
+/**
+ * Cierra la partida en Supabase al finalizar la simulación.
+ * Marca estado='finalizada' y libera el partidaId local para que el próximo
+ * inicio cree una partida nueva (cierra el ciclo de vida partida única).
+ */
+function finishSupabasePartida(){
+  try{
+    const S=window.SIDE||{};
+    if(S.PartidaService&&S.SupabaseClient?.isReady()&&state.partidaId){
+      S.PartidaService.finalizar(state.partidaId).then(r=>{
+        if(!r.success&&!r.offline)console.warn('SIDE: finalizar partida:',r.error);
+      });
+    }
+  }catch(error){console.error('SIDE: supabase finish failed',error)}
+  state.partidaId=null;
+  try{localStorage.removeItem('SIDE_PARTIDA_ID')}catch{}
+}
+function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));finishSupabasePartida();$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();syncRoundToSupabase();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
 
 /** Caché del catálogo Supabase para mapear IDs a etiquetas (Fase C2). @type {object|null} */
 let catalogCache=null;
