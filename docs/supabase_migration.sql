@@ -360,6 +360,23 @@ as $$
       where pt.empresa_id = p_empresa_id
       limit 1
     ),
+    -- Ciclo de la partida (máximo entre sus empresas). Una empresa recién
+    -- creada siempre nace en 1, así que su propio ciclo no sirve para
+    -- sincronizar al entrar; se usa el de la partida.
+    'ciclo_partida', (
+      select coalesce(max(e2.ciclo_actual), 1)
+      from public.empresas e2
+      where e2.id in (
+        select pt2.empresa_id
+        from public.participantes pt2
+        where pt2.partida_id = (
+          select pt3.partida_id
+          from public.participantes pt3
+          where pt3.empresa_id = p_empresa_id
+          limit 1
+        )
+      )
+    ),
     'decisiones_ciclo', (
       select coalesce(jsonb_agg(row_to_json(ed)), '[]'::jsonb)
       from public.empresas_decisiones ed

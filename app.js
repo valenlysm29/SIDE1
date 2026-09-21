@@ -172,7 +172,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(S.EmpresaService&&S.SupabaseClient?.isReady()&&currentStudent.empresaId){
       S.EmpresaService.obtenerEstado(currentStudent.empresaId).then(r=>{
         if(!r.success||!r.data)return;
-        const remoteRound=Math.max(1,Number(r.data.empresa?.ciclo_actual)||1);
+        const remoteRound=Math.max(1,Number(r.data.ciclo_partida)||Number(r.data.empresa?.ciclo_actual)||1);
         if(remoteRound>currentRound()){try{localStorage.setItem('SIDE_ACTIVE_ROUND',String(remoteRound))}catch{}console.info('SIDE: ciclo sincronizado desde Supabase:',remoteRound)}
         try{localStorage.setItem('SIDE_PARTIDA_REMOTA_'+currentStudent.empresaId,JSON.stringify(r.data.partida||{}))}catch{}
       });

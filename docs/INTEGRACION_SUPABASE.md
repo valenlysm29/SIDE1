@@ -187,6 +187,12 @@ la config local del docente.
 **Verificación:** docente avanza → `ciclo_actual = 2` en `empresas` →
 estudiante re-entra y ve "CICLO 2".
 
+**Fix C3 (ciclo de partida):** la primera versión sincronizaba con el ciclo
+de la empresa que entra, pero una empresa nueva siempre nace en 1, así que
+re-entrar nunca subía. La RPC ahora devuelve `ciclo_partida` (máximo entre
+las empresas de la partida) y el frontend usa ese valor. Microsoft en ciclo 1
+con las demás en 2 es correcto: es de otra partida (`SIDE-63AA`).
+
 ## 10. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:

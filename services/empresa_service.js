@@ -64,7 +64,7 @@
    * Obtiene el estado completo del juego para un estudiante.
    * @param {number} empresaId ID de la empresa.
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
-   *   data = { empresa, partida, decisiones_ciclo }.
+   *   data = { empresa, partida, ciclo_partida, decisiones_ciclo }.
    */
   async function obtenerEstado(empresaId) {
     const sb = client();
