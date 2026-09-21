@@ -199,7 +199,21 @@ async function startGame(){
   }
   syncModeUI();switchTab('rondas');
 }
-function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
+/**
+ * Propaga el avance de ciclo a Supabase (Fase C3).
+ * Sube ciclo_actual de todas las empresas de la partida vía RPC avanzar_ciclo.
+ * Fire-and-forget con guard: no bloquea el flujo local ni cambia firmas.
+ */
+function syncRoundToSupabase(){
+  try{
+    const S=window.SIDE||{};
+    if(!S.PartidaService||!S.SupabaseClient?.isReady()||!state.partidaId)return;
+    S.PartidaService.avanzarCiclo(state.partidaId).then(r=>{
+      if(!r.success&&!r.offline)console.warn('SIDE: avanzar ciclo:',r.error);
+    });
+  }catch(error){console.error('SIDE: supabase advance failed',error)}
+}
+function advanceRound(fromAuto=false){if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}const max=Number($('cycles').value||6);if(state.round>=max){if(state.timer){clearInterval(state.timer);state.timer=null}state.roundClosed=true;writeRuntime({running:false,status:'simulation-finished',remaining:0});localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false,finishedAt:new Date().toISOString(),code:$('gameCode').value}));$('roundState').textContent='Simulación finalizada';toast('La simulación llegó al último ciclo.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.round++;state.roundClosed=false;state.seconds=roundSeconds();localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));triggerGroupEvents(state.round);saveConfig(true);updateTimer();updateRoundDisplay();loadReports();syncRoundToSupabase();if(cycleMode()==='automatic'||fromAuto){writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});beginTimer(true);$('roundState').textContent='Nuevo ciclo automático'}else{writeRuntime({round:state.round,running:false,status:'ready',remaining:state.seconds});$('roundState').textContent='Nuevo ciclo listo';toast(`Ciclo ${state.round} disponible.`)}}
 
 /** Caché del catálogo Supabase para mapear IDs a etiquetas (Fase C2). @type {object|null} */
 let catalogCache=null;

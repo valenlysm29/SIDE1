@@ -169,7 +169,25 @@ ahora se convierten (cantidades con signo en liquidaciones) y lo omitido se
 reporta con `console.info`; (3) los guardados previos al constraint UNIQUE
 fallaban con 42P10 — ya resuelto.
 
-## 9. Cómo extender (para el equipo)
+## 9. Fase C3 — Avanzar ciclo y estado al entrar
+
+**Archivos:** `docente.js` (`syncRoundToSupabase()` + hook en `advanceRound()`),
+`app.js` (hook en el join: `obtenerEstado()`).
+
+**Flujo docente:** "Pasar al siguiente ciclo" → avance local (como antes) →
+`syncRoundToSupabase()` → RPC `avanzarCiclo(partidaId)` → `ciclo_actual + 1`
+en todas las empresas. Fire-and-forget con guard; no bloquea ni cambia firmas.
+No actúa en modo automático ni al finalizar (esos caminos no la llaman).
+
+**Flujo estudiante:** al entrar con `empresaId` → `obtenerEstado()` → si el
+ciclo remoto es mayor que el local, sube `SIDE_ACTIVE_ROUND` (nunca baja) y
+cachea la config de la partida en `SIDE_PARTIDA_REMOTA_{empresaId}` sin tocar
+la config local del docente.
+
+**Verificación:** docente avanza → `ciclo_actual = 2` en `empresas` →
+estudiante re-entra y ve "CICLO 2".
+
+## 10. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:
 
@@ -182,7 +200,7 @@ Para agregar una operación nueva:
 
 No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
-## 10. Solución de problemas
+## 11. Solución de problemas
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|

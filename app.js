@@ -165,6 +165,19 @@ $('studentForm')?.addEventListener('submit',async e=>{
     }
     currentStudent={name:'Jugador',company:brandName,legalName,participantId,empresaId,game:found};
   }
+  // Fase C3: sincroniza el ciclo real desde Supabase (el docente pudo avanzar).
+  // Solo sube (nunca baja) y no toca la config local del docente.
+  try{
+    const S=window.SIDE||{};
+    if(S.EmpresaService&&S.SupabaseClient?.isReady()&&currentStudent.empresaId){
+      S.EmpresaService.obtenerEstado(currentStudent.empresaId).then(r=>{
+        if(!r.success||!r.data)return;
+        const remoteRound=Math.max(1,Number(r.data.empresa?.ciclo_actual)||1);
+        if(remoteRound>currentRound()){try{localStorage.setItem('SIDE_ACTIVE_ROUND',String(remoteRound))}catch{}console.info('SIDE: ciclo sincronizado desde Supabase:',remoteRound)}
+        try{localStorage.setItem('SIDE_PARTIDA_REMOTA_'+currentStudent.empresaId,JSON.stringify(r.data.partida||{}))}catch{}
+      });
+    }
+  }catch(error){console.error('SIDE: no se pudo sincronizar el estado',error)}
   closeModal();startJoinLoading();
 });
 function startJoinLoading(){showScreen('studentLoading');let p=0,step=0;const texts=['Sincronizando partida','Cargando escenario empresarial','Preparando decisiones','¡Todo listo!'];$('joinProgress').style.width='0%';const i=setInterval(()=>{p+=4;$('joinProgress').style.width=p+'%';if(p%25===0&&step<3)$('joinLoadingText').textContent=texts[++step];if(p>=100){clearInterval(i);prepareLobby()}},55)}
