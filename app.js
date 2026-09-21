@@ -174,15 +174,17 @@ $('studentForm')?.addEventListener('submit',async e=>{
     }
     currentStudent={name:'Jugador',company:brandName,legalName,participantId,empresaId,game:found};
   }
-  // Fase C3: sincroniza el ciclo real desde Supabase (el docente pudo avanzar).
-  // Solo sube (nunca baja) y no toca la config local del docente.
+  // Fase C3-fix: al entrar, el ciclo local se fija al ciclo real de la partida
+  // (sube o baja). Sin esto, un ciclo viejo guardado en este navegador
+  // sobrevivía al entrar a una partida nueva. Solo actúa con lectura exitosa;
+  // si Supabase falla, se conserva el valor local. No toca la config docente.
   try{
     const S=window.SIDE||{};
     if(S.EmpresaService&&S.SupabaseClient?.isReady()&&currentStudent.empresaId){
       S.EmpresaService.obtenerEstado(currentStudent.empresaId).then(r=>{
         if(!r.success||!r.data)return;
         const remoteRound=Math.max(1,Number(r.data.ciclo_partida)||Number(r.data.empresa?.ciclo_actual)||1);
-        if(remoteRound>currentRound()){try{localStorage.setItem('SIDE_ACTIVE_ROUND',String(remoteRound))}catch{}console.info('SIDE: ciclo sincronizado desde Supabase:',remoteRound)}
+        if(remoteRound!==currentRound()){try{localStorage.setItem('SIDE_ACTIVE_ROUND',String(remoteRound))}catch{}console.info('SIDE: ciclo sincronizado desde Supabase:',remoteRound)}
         try{localStorage.setItem('SIDE_PARTIDA_REMOTA_'+currentStudent.empresaId,JSON.stringify(r.data.partida||{}))}catch{}
       });
     }

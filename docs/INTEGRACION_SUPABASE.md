@@ -187,6 +187,11 @@ la config local del docente.
 **Verificación:** docente avanza → `ciclo_actual = 2` en `empresas` →
 estudiante re-entra y ve "CICLO 2".
 
+**Fix C3 (fijar ciclo al entrar):** la primera versión solo subía el ciclo
+local, así que un ciclo viejo guardado en el navegador sobrevivía al entrar a
+una partida nueva. Ahora el join fija el ciclo al de la partida (sube o baja),
+solo con lectura exitosa; si Supabase falla se conserva el local.
+
 **Ciclo de vida partida única:** el docente mantiene una sola partida activa
 (ver texto del panel). Al llegar al último ciclo, `finishSupabasePartida()`
 marca `estado='finalizada'` (vía `PartidaService.finalizar()`) y libera el
