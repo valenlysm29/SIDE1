@@ -7,9 +7,10 @@
  * No toca empresas, decisiones ni UI.
  *
  * Funciones:
- *   - buscarPorCodigo(codigo) → RPC buscar_partida_por_codigo
- *   - crear(datos)            → INSERT en partidas
- *   - avanzarCiclo(partidaId) → RPC avanzar_ciclo
+ *   - buscarPorCodigo(codigo)      → RPC buscar_partida_por_codigo
+ *   - crear(datos)                 → INSERT en partidas
+ *   - avanzarCiclo(partidaId)      → RPC avanzar_ciclo
+ *   - listarParticipantes(partidaId) → participantes + empresa de la partida
  *
  * Todas retornan { success: boolean, data?: any, error?: string }.
  * Si Supabase no está disponible retornan { success: false, offline: true }.
@@ -105,6 +106,32 @@
     }
   }
 
+  /**
+   * Lista los participantes de una partida con los datos de su empresa.
+   * Requiere sesión de profesor dueño (RLS "profesor ve participantes").
+   * @param {string} partidaId UUID de la partida.
+   * @returns {Promise<{success: boolean, data?: Array, error?: string}>}
+   *   data = [{ id, nombre, empresa, empresa_id,
+   *             empresas: { id, nombre_legal, nombre_comercial,
+   *                         caja_actual, ciclo_actual, reputacion } }].
+   */
+  async function listarParticipantes(partidaId) {
+    const sb = client();
+    if (!sb) return offline();
+    if (!partidaId) return { success: false, error: 'Falta partidaId.' };
+    try {
+      const { data, error } = await sb
+        .from('participantes')
+        .select('id, nombre, empresa, empresa_id, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
+        .eq('partida_id', partidaId)
+        .order('created_at', { ascending: true });
+      if (error) return { success: false, error: error.message };
+      return { success: true, data: data || [] };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, listarParticipantes };
 })(window);
