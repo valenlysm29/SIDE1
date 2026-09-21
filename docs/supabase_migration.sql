@@ -191,6 +191,7 @@ as $$
 declare
   v_empresa_id bigint;
   v_participante_id uuid;
+  v_ciclo integer;
   v_resultado jsonb;
 begin
   -- Verificar que la partida existe y está en espera
@@ -201,9 +202,20 @@ begin
     return jsonb_build_object('error', 'La partida no existe o ya inició');
   end if;
 
+  -- La empresa nueva arranca en el ciclo actual de la partida (no en 1):
+  -- si entra tarde (partida en ciclo 3), juega el ciclo 3. Primera empresa → 1.
+  select coalesce(max(e.ciclo_actual), 1) into v_ciclo
+  from public.empresas e
+  where e.id in (
+    select pt.empresa_id
+    from public.participantes pt
+    where pt.partida_id = p_partida_id
+      and pt.empresa_id is not null
+  );
+
   -- Crear la empresa
-  insert into public.empresas (nombre_legal, nombre_comercial, caja_inicial, caja_actual)
-  values (p_nombre_legal, p_nombre_comercial, p_capital, p_capital)
+  insert into public.empresas (nombre_legal, nombre_comercial, caja_inicial, caja_actual, ciclo_actual)
+  values (p_nombre_legal, p_nombre_comercial, p_capital, p_capital, v_ciclo)
   returning id into v_empresa_id;
 
   -- Crear el participante vinculado a la empresa
@@ -215,7 +227,8 @@ begin
   v_resultado := jsonb_build_object(
     'empresa_id', v_empresa_id,
     'participante_id', v_participante_id,
-    'caja_inicial', p_capital
+    'caja_inicial', p_capital,
+    'ciclo_inicial', v_ciclo
   );
 
   return v_resultado;

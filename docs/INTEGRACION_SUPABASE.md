@@ -193,6 +193,12 @@ re-entrar nunca subía. La RPC ahora devuelve `ciclo_partida` (máximo entre
 las empresas de la partida) y el frontend usa ese valor. Microsoft en ciclo 1
 con las demás en 2 es correcto: es de otra partida (`SIDE-63AA`).
 
+**Fix join tardío:** `crear_empresa` heredaba `ciclo_actual = 1` por defecto,
+así que una empresa que entraba en ciclo 3 quedaba desfasada (y C2 la filtraba
+a 0% eterno). Ahora hereda el ciclo actual de la partida (primera empresa → 1).
+Regla de prueba: un nombre comercial = una empresa; reutilizar nombres mezcla
+el `localStorage` y duplica filas (rejoin con upsert = mejora futura).
+
 ## 10. Cómo extender (para el equipo)
 
 Para agregar una operación nueva:
