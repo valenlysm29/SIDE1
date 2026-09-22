@@ -12,13 +12,13 @@ import socket
 import webbrowser
 
 ROOT = Path(__file__).resolve().parent
-BUILD = '20260922-mona1'
-VERSION = '2026.09.22.1'
+BUILD = '20260922-npcs2'
+VERSION = '2026.09.22.2'
 
 class SIDEHandler(SimpleHTTPRequestHandler):
     def end_headers(self) -> None:
         path = urlsplit(self.path).path
-        if path.endswith(('.html', '.js', '.css')) or path.endswith('/'):
+        if path.endswith(('.html', '.js', '.mjs', '.css', '.glb')) or path.endswith('/'):
             self.send_header('Cache-Control', 'no-store')
         self.send_header('X-SIDE-Build', VERSION)
         super().end_headers()

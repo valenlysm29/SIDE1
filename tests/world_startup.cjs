@@ -60,8 +60,8 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    const diagnostic=await page.evaluate(()=>SIDE3D.diagnostics());
    assert.equal(diagnostic.running,true);assert.equal(diagnostic.navigationReady,true);
    assert.deepEqual(diagnostic.models.sort(),['casual','female','male']);
-   assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&Math.abs(c.x-3.8)<.3&&Math.abs(c.z-5.9)<.25),'male retains staff position including idle movement');
-   assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&Math.abs(c.x-6)<.3&&Math.abs(c.z-5.9)<.25),'female retains staff position including idle movement');
+   assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&Math.abs(c.x-3.8)<.3&&Math.abs(c.z-4.75)<.25),'male stands in the clear sales aisle');
+   assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&Math.abs(c.x-6)<.3&&Math.abs(c.z-4.75)<.25),'female stands in the clear sales aisle');
    await page.screenshot({path:path.join(output,`world-${mode}.png`)});
    assert.deepEqual(errors,[]);assert.deepEqual(failedLocal,[]);
    results.push({mode,passed:true,loadMs:Date.now()-start,diagnostic});

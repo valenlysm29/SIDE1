@@ -59,14 +59,18 @@
   });
 
   const NPCS = Object.freeze({
+    chico1: Object.freeze({name:'Joel',model:'assets/models3d/npcs/chico1.glb',height:1.78}),
+    chico2: Object.freeze({name:'Miguel',model:'assets/models3d/npcs/chico2.glb',height:1.73}),
+    chico3: Object.freeze({name:'Gonzalo',model:'assets/models3d/npcs/chico3.glb',height:1.76}),
     mona: Object.freeze({
+      name: 'Valeria',
       model: 'assets/models3d/npcs/mona.glb',
       height: 1.68,
       rotationY: 0,
       position: Object.freeze({ x: -3, z: 10.7 })
     })
   });
-  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, NPCS, version: '2026.09.22.1' });
+  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, NPCS, version: '2026.09.22.2' });
   root.SIDE3D_CONFIG = config;
   if (typeof module !== 'undefined' && module.exports) module.exports = config;
 })(typeof window !== 'undefined' ? window : globalThis);

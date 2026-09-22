@@ -2,7 +2,7 @@
   {
     "mode": "all",
     "passed": true,
-    "loadMs": 6234,
+    "loadMs": 18044,
     "diagnostic": {
       "initialized": true,
       "running": true,
@@ -15,25 +15,100 @@
       "characters": [
         {
           "kind": "mona",
+          "name": "Valeria",
           "x": -3,
           "z": 10.7
         },
         {
           "kind": "male",
-          "x": 3.607744881801612,
-          "z": 5.7400574989683095
+          "name": "",
+          "x": 3.8,
+          "z": 4.75
         },
         {
           "kind": "female",
-          "x": 6.1219782966899405,
-          "z": 6.098026960537319
+          "name": "",
+          "x": 6,
+          "z": 4.75
         },
         {
-          "kind": "male",
-          "x": -0.4260730583526751,
-          "z": 29.90706485953586
+          "kind": "chico1",
+          "name": "Joel",
+          "x": -1.05,
+          "z": 29.5
+        },
+        {
+          "kind": "chico1",
+          "name": "Joel",
+          "x": -7.9997010196427984,
+          "z": 11.402864438993243
+        },
+        {
+          "kind": "chico2",
+          "name": "Miguel",
+          "x": 4.2,
+          "z": 11
+        },
+        {
+          "kind": "chico3",
+          "name": "Gonzalo",
+          "x": 10.5,
+          "z": 12.5
         }
       ],
+      "suppliedNpcs": {
+        "loaded": [
+          "chico3",
+          "chico1",
+          "chico2"
+        ],
+        "errors": {},
+        "customers": [
+          {
+            "kind": "chico1",
+            "state": "WALK_TO_STORE",
+            "x": -1.05,
+            "z": 29.5,
+            "speed": 0,
+            "distance": 0,
+            "routeRemaining": 2
+          }
+        ],
+        "actors": [
+          {
+            "kind": "chico1",
+            "x": -7.9997010196427984,
+            "z": 11.402864438993243,
+            "phase": 0.0030445813700616,
+            "distance": 0.002879999999999985,
+            "rigged": true
+          },
+          {
+            "kind": "chico2",
+            "x": 4.2,
+            "z": 11,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          },
+          {
+            "kind": "chico3",
+            "x": 10.5,
+            "z": 12.5,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          },
+          {
+            "kind": "mona",
+            "x": -3,
+            "z": 10.7,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          }
+        ]
+      },
       "mona": {
         "loaded": true,
         "error": "",
@@ -43,14 +118,14 @@
         "x": 0,
         "z": 11.4
       },
-      "renderedFrames": 10,
+      "renderedFrames": 7,
       "lastError": ""
     }
   },
   {
     "mode": "sections",
     "passed": true,
-    "loadMs": 6027,
+    "loadMs": 18670,
     "diagnostic": {
       "initialized": true,
       "running": true,
@@ -63,20 +138,100 @@
       "characters": [
         {
           "kind": "mona",
+          "name": "Valeria",
           "x": -3,
           "z": 10.7
         },
         {
           "kind": "male",
-          "x": 3.9616855309749965,
-          "z": 6.079613991970556
+          "name": "",
+          "x": 3.8,
+          "z": 4.75
         },
         {
           "kind": "female",
-          "x": 6.225559140354161,
-          "z": 5.769649374360063
+          "name": "",
+          "x": 6,
+          "z": 4.75
+        },
+        {
+          "kind": "chico1",
+          "name": "Joel",
+          "x": 0,
+          "z": 29.5
+        },
+        {
+          "kind": "chico1",
+          "name": "Joel",
+          "x": -7.9997010196427984,
+          "z": 11.402864438993243
+        },
+        {
+          "kind": "chico2",
+          "name": "Miguel",
+          "x": 4.2,
+          "z": 11
+        },
+        {
+          "kind": "chico3",
+          "name": "Gonzalo",
+          "x": 10.5,
+          "z": 12.5
         }
       ],
+      "suppliedNpcs": {
+        "loaded": [
+          "chico3",
+          "chico2",
+          "chico1"
+        ],
+        "errors": {},
+        "customers": [
+          {
+            "kind": "chico1",
+            "state": "WALK_TO_STORE",
+            "x": 0,
+            "z": 29.5,
+            "speed": 0,
+            "distance": 0,
+            "routeRemaining": 2
+          }
+        ],
+        "actors": [
+          {
+            "kind": "chico1",
+            "x": -7.9997010196427984,
+            "z": 11.402864438993243,
+            "phase": 0.0030445813700616,
+            "distance": 0.002879999999999985,
+            "rigged": true
+          },
+          {
+            "kind": "chico2",
+            "x": 4.2,
+            "z": 11,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          },
+          {
+            "kind": "chico3",
+            "x": 10.5,
+            "z": 12.5,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          },
+          {
+            "kind": "mona",
+            "x": -3,
+            "z": 10.7,
+            "phase": 0,
+            "distance": 0,
+            "rigged": true
+          }
+        ]
+      },
       "mona": {
         "loaded": true,
         "error": "",
@@ -86,7 +241,7 @@
         "x": 0,
         "z": 11.4
       },
-      "renderedFrames": 9,
+      "renderedFrames": 8,
       "lastError": ""
     }
   }

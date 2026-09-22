@@ -131,3 +131,11 @@ de la tarjeta del distrito, con campo numerico y botones - / +.
 Para abrir esta version, cierra el servidor anterior y ejecuta `INICIAR_JUEGO.bat`
 en la carpeta recien extraida. Consulta `LEEME_FINAL_V2.txt`, `CAMBIOS_FINAL_V2.md`
 y `VALIDACION_FINAL_V2.md`.
+
+
+## NPC articulados — 22/09/2026
+
+Joel, Miguel, Gonzalo y Valeria están integrados con esqueleto, marcha y rutas con
+colisiones. Todo permanece dentro de SIDE1. Consulta [NPCS_Y_MOVIMIENTO.md](NPCS_Y_MOVIMIENTO.md)
+para verlos, ajustar el movimiento o ejecutar las pruebas. El visor local es
+`tools/npc_preview.html`.

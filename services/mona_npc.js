@@ -1,5 +1,7 @@
-/* Local model adapter: Mona is an unrigged character, not a walking avatar. */
+import {loadTemplate,createNpc} from './npc_motion.js';
+/* Mona uses the shared articulated rig; the original remains available for comparison. */
 export async function loadMonaTemplate(THREE, GLTFLoader, config) {
+  if(!config.model.includes('.original.glb'))return loadTemplate(GLTFLoader,config.model);
   const gltf = await new GLTFLoader().loadAsync(config.model);
   if (!gltf.scene) throw new Error('El archivo de Mona no contiene una escena.');
   const avatar = gltf.scene;
@@ -28,6 +30,12 @@ export async function loadMonaTemplate(THREE, GLTFLoader, config) {
 }
 
 export function createMonaNpc(THREE, template, config) {
+  if(template.profile){
+    const npc=createNpc(template,'mona');
+    npc.position.set(config.position.x,0,config.position.z);npc.rotation.y=config.rotationY||0;
+    Object.assign(npc.userData,{npcId:'mona',role:'guide',height:template.height});
+    return npc;
+  }
   const group = new THREE.Group();
   group.name = 'Mona';
   group.add(template.scene.clone(true));

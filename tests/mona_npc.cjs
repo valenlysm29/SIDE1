@@ -39,9 +39,9 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());assert.equal((await p.evaluate(()=>SIDE3D.diagnostics())).mona.instances,1);}
    await p.keyboard.down('KeyA');
    try{await p.waitForFunction(()=>SIDE3D.diagnostics().player.x < -1.4,null,{timeout:15000});}finally{await p.keyboard.up('KeyA');}
-   await p.waitForFunction(()=>document.querySelector('#sim3dPrompt').textContent.includes('Mona'));
+   await p.waitForFunction(()=>document.querySelector('#sim3dPrompt').textContent.includes('Valeria'));
    await p.keyboard.press('KeyE');
-   await p.waitForFunction(()=>document.querySelector('#sim3dMessage').textContent.startsWith('Mona:'));
+   await p.waitForFunction(()=>document.querySelector('#sim3dMessage').textContent.startsWith('Valeria:'));
    await p.locator('#side3dCanvas').click({position:{x:600,y:400}});
    await p.waitForFunction(()=>document.pointerLockElement?.id==='side3dCanvas');
    await p.mouse.move(80,560);

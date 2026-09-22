@@ -1,7 +1,7 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIDE · Mona</title>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIDE · Valeria</title>
 <style>body{margin:0;font:16px system-ui;background:#dfe5e8;color:#19323c}header{position:absolute;left:24px;top:20px}h1{font-size:24px;margin:0}p{margin:8px 0}canvas{display:block}button{font:inherit;padding:8px 12px}</style></head>
-<body><header><h1>Mona · NPC de SIDE</h1><p>Arrastra para girar. Rueda para acercar.</p><button id="turn">Ver espalda</button></header>
+<body><header><h1>Valeria · NPC de SIDE</h1><p>Arrastra para girar. Rueda para acercar.</p><button id="turn">Ver espalda</button></header>
 <script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.js","three/addons/":"../vendor/three/examples/jsm/"}}</script>
 <script src="../simulator3d-config.js"></script>
 <script type="module">
@@ -21,5 +21,5 @@ let drag=false,lastX=0;renderer.domElement.onpointerdown=e=>{drag=true;lastX=e.c
 document.querySelector('#turn').onclick=()=>{model.rotation.y+=Math.PI};
 window.preview={model,camera,scene,renderer,template,bounds:new THREE.Box3().setFromObject(model)};
 function frame(){requestAnimationFrame(frame);renderer.render(scene,camera)}frame();window.ready=true;
-}catch(error){document.querySelector('p').textContent='No se pudo cargar Mona.';console.error(error);window.previewError=error.message;}
+}catch(error){document.querySelector('p').textContent='No se pudo cargar Valeria.';console.error(error);window.previewError=error.message;}
 </script></body></html>

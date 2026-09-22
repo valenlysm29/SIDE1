@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>SIDE · Personajes y movimiento</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#dce5e7;color:#213843;font:14px system-ui}header{position:absolute;top:20px;left:24px;right:24px;pointer-events:none}h1{font-size:24px;margin:0 0 6px}p{margin:6px 0}nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;pointer-events:auto}button,select{padding:8px 12px;border:1px solid #91a8b0;border-radius:6px;background:#f8fbfc;color:inherit;font:inherit}canvas{display:block}footer{position:absolute;bottom:18px;left:24px;font-size:12px;color:#4a626b}@media(max-width:600px){header{left:14px;top:14px}h1{font-size:20px}footer{left:14px;right:14px}}</style></head>
+<body><header><h1>Personajes de SIDE</h1><p>Marcha articulada · Arrastra para girar la vista.</p><nav><select id="model" aria-label="Personaje"><option value="all">Los cuatro</option value="chico1">Joel</option><option value="chico2">Miguel</option><option value="chico3">Gonzalo</option><option value="mona">Valeria</option></select><button id="pause">Pausar</button><button id="turn">Vista lateral</button><label>Velocidad <input id="speed" type="range" min="0" max="1.4" step=".05" value=".95"></label></nav><p id="status">Cargando modelos locales…</p></header><footer>Los gestos de mano en cintura o bolsillo se conservan del modelado original.</footer>
+<script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.js","three/addons/":"../vendor/three/examples/jsm/"}}</script>
+<script src="../simulator3d-config.js"></script>
+<script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {loadTemplate,createNpc,animateNpc,resetMotion} from '../services/npc_motion.js';
+import {setNpcName} from '../services/npc_names.js';
+const params=new URLSearchParams(location.search), selected=params.get('model')||'all',manual=params.has('manual');
+document.querySelector('#model').value=selected;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#dce5e7');scene.fog=new THREE.Fog('#dce5e7',15,38);
+const camera=new THREE.PerspectiveCamera(33,innerWidth/innerHeight,.02,60),renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe8f0ff,0x80796e,2));const sun=new THREE.DirectionalLight(0xfff1df,2.7);sun.position.set(-3,7,5);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-8;sun.shadow.camera.right=8;sun.shadow.camera.top=8;sun.shadow.camera.bottom=-8;sun.shadow.normalBias=.025;scene.add(sun,sun.target);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(120,120),new THREE.MeshStandardMaterial({color:0xc2cdd0,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.005;floor.receiveShadow=true;scene.add(floor);
+const grid=new THREE.GridHelper(120,120,0xa9b9bf,0xb5c3c8);grid.position.y=-.003;scene.add(grid);
+const actors=[], ids=selected==='all'?['chico1','chico2','chico3','mona']:[selected];let angle=0,travel=0,paused=false;
+function placeCamera(){const distance=ids.length>1?Math.max(7.7,7/Math.max(.6,innerWidth/innerHeight)):3.8;camera.position.set(Math.sin(angle)*distance,1.4,travel+Math.cos(angle)*distance);camera.lookAt(0,.93,travel);sun.position.z=travel+5;sun.target.position.z=travel;sun.target.updateMatrixWorld()}
+function step(dt,speed=Number(document.querySelector('#speed').value),render=true) {travel+=dt*speed;for(const a of actors){a.position.z=travel;animateNpc(a,dt,speed>0)}placeCamera();if(render)renderer.render(scene,camera)}
+try{
+for(const [i,id] of ids.entries()){const template=await loadTemplate(GLTFLoader,`../assets/models3d/npcs/${id}.glb`),a=createNpc(template,id);setNpcName(a,SIDE3D_CONFIG.NPCS[id].name,template.height);a.position.x=(i-(ids.length-1)/2)*1.05;resetMotion(a);animateNpc(a,1/60,false);actors.push(a);scene.add(a)}
+document.querySelector('#status').textContent=ids.map(id=>SIDE3D_CONFIG.NPCS[id].name).join(' · ');
+let last=performance.now();function frame(now){requestAnimationFrame(frame);const dt=Math.min(.04,(now-last)/1000);last=now;if(!manual&&!paused)step(dt);else{placeCamera();renderer.render(scene,camera)}}requestAnimationFrame(frame);
+window.preview={actors,scene,camera,renderer,step,animateNpc,resetMotion,rotate:a=>{angle=a;placeCamera()},bounds:()=>actors.map(a=>new THREE.Box3().setFromObject(a))};window.ready=true;
+}catch(e){window.previewError=e.message;document.querySelector('#status').textContent=e.message;console.error(e)}
+document.querySelector('#model').onchange=e=>location.search='?model='+e.target.value;
+document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Continuar':'Pausar'};document.querySelector('#turn').onclick=()=>angle+=Math.PI/2;
+let drag=false,lastX=0;renderer.domElement.onpointerdown=e=>{drag=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)};renderer.domElement.onpointerup=()=>drag=false;renderer.domElement.onpointermove=e=>{if(drag){angle+=(e.clientX-lastX)*.008;lastX=e.clientX}};
+window.onresize=()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);placeCamera()};
+</script></body></html>

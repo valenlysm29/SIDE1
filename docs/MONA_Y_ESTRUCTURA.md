@@ -1,5 +1,9 @@
 # Mona y organización de SIDE1
 
+> Actualización 2026.09.22.2: Mona ahora tiene esqueleto y marcha. El documento
+> vigente de movimiento, tamaños y pruebas es [NPCS_Y_MOVIMIENTO.md](NPCS_Y_MOVIMIENTO.md).
+> Lo que sigue registra la integración estática inicial y la organización de carpetas.
+
 ## Dentro del juego
 
 Mona está junto a la entrada de la tienda, a la izquierda al comenzar el turno,

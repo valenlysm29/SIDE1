@@ -5,7 +5,7 @@
   const WORLD = CONFIG.WORLD || {};
   const NPC_STATE = CONFIG.NPC_STATES || {};
   const PERF = CONFIG.PERFORMANCE || {};
-  let THREE = null, YUKA = null, GLTFLoader = null, SkeletonUtils = null;
+  let THREE = null, GLTFLoader = null, SkeletonUtils = null;
   let recastCore = null, recastGenerators = null, navMesh = null, navQuery = null, navReady = false;
   let renderer = null, scene = null, camera = null, clock = null, raf = 0;
   let initialized = false, running = false, locked = false;
@@ -27,6 +27,8 @@
   const execModelTemplates = { male: null, female: null, casual: null };
   const characterTextures = new Map();
   let monaModule = null, monaTemplate = null, monaLoadError = '';
+  let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
+  const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
 
   const PRODUCTS = [
@@ -298,6 +300,7 @@
     const premium = [0x1d2736,0x283047,0x473c50,0x846d5c];
     const palette = archetype?.id === 'premium' ? premium : casual;
     return {
+      execModel: ['chico1','chico2','chico3'][customerModelIndex++ % 3],
       gender: Math.random() < 0.5 ? 'female' : 'male',
       shirt: palette[Math.floor(Math.random()*palette.length)],
       pants: [0x202a36,0x2c3440,0x40506b,0x61574d][Math.floor(Math.random()*4)],
@@ -565,7 +568,6 @@
     if (THREE && GLTFLoader && SkeletonUtils) return true;
     try {
       THREE = await import('three');
-      try { YUKA = await import('./vendor/yuka.module.js'); } catch (error) { console.warn('Yuka no disponible; se usará navegación local.', error); }
       const optional = await Promise.allSettled([
         import('three/addons/loaders/GLTFLoader.js'),
         import('three/addons/utils/SkeletonUtils.js'),
@@ -639,6 +641,14 @@
       console.warn('No se pudo cargar Mona; su puesto conserva un personaje de respaldo.', error);
       return false;
     }
+  }
+
+  async function loadSuppliedNpcs() {
+    [npcMotion,npcNavigation,npcNames] = await Promise.all([import('./services/npc_motion.js'),import('./services/npc_navigation.mjs'),import('./services/npc_names.js')]);
+    await Promise.all(['chico1','chico2','chico3'].map(async id => {
+      try { suppliedTemplates[id]=await npcMotion.loadTemplate(GLTFLoader,CONFIG.NPCS[id].model); }
+      catch(error) { suppliedErrors[id]=error.message; console.warn(`No se pudo cargar ${id}; se usará el personaje de respaldo.`,error); }
+    }));
   }
 
   async function initNavigation() {
@@ -831,7 +841,11 @@
   function person(style = 0x5aa9ff) {
     const cfg = typeof style === 'object' ? style : { shirt: style };
     const modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
-    const template = execModelTemplates[modelKind];
+    if (suppliedTemplates[modelKind]) {
+      const group=npcMotion.createNpc(suppliedTemplates[modelKind],modelKind);
+      npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);return group;
+    }
+    const template = execModelTemplates[modelKind] || (modelKind.startsWith('chico') ? execModelTemplates.casual : null);
     if (template && SkeletonUtils?.clone) {
       const group = new THREE.Group(), avatar = SkeletonUtils.clone(template.scene);
       avatar.traverse(node => {
@@ -844,6 +858,7 @@
       const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(clip)]));
       actions.idle.play();mixer.update(0);
       group.userData = {modelAvatar:avatar, modelKind, mixer, actions, currentAction:'idle', lastAnimAt:performance.now()/1000};
+      if(CONFIG.NPCS[modelKind])npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);
       return group;
     }
     if(!cfg.forceProcedural&&npcModelTemplate&&SkeletonUtils?.clone){
@@ -943,7 +958,13 @@
     return g;
   }
 
-  function setPersonPose(g, cycle = 0, moving = false) {
+  function setPersonPose(g, cycle = 0, moving = false, frameDt = null) {
+    if(g.userData.motion){
+      const now=performance.now()/1000;
+      const dt=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));
+      g.userData.lastAnimAt=now;
+      npcMotion.animateNpc(g,dt,moving);return;
+    }
     if(g.userData?.mixer){
       const now=performance.now()/1000,delta=Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));g.userData.lastAnimAt=now;
       const next=moving?'walk':'idle';if(next!==g.userData.currentAction){const actions=g.userData.actions||{},previous=actions[g.userData.currentAction],current=actions[next];previous?.fadeOut(.22);current?.reset().fadeIn(.22).play();g.userData.currentAction=next;}
@@ -968,27 +989,37 @@
   }
 
   function acquireNpcPerson(style) {
-    const pooled=npcPool.pop();
+    const index=npcPool.findIndex(p=>p.userData.modelKind===style.execModel);
+    const pooled=index>=0?npcPool.splice(index,1)[0]:null;
     if(!pooled)return person(style);
     pooled.visible=true;pooled.position.set(0,0,0);pooled.rotation.set(0,0,0);pooled.userData.lastAnimAt=performance.now()/1000;
+    npcMotion?.resetMotion(pooled);
     return pooled;
   }
 
   function recycleNpcPerson(npc) {
     if(!npc?.obj)return;
     releaseCrossing(npc);
-    if(npc.obj.userData.heldBag){npc.obj.remove(npc.obj.userData.heldBag);npc.obj.userData.heldBag=null;}
+    removeNpcBag(npc.obj);
     if(npc.obj.userData.orderLabel){npc.obj.remove(npc.obj.userData.orderLabel);npc.obj.userData.orderLabel=null;}
     npcGroup?.remove(npc.obj);npc.obj.visible=false;
     const limit=Number((PERF[perfMode]||PERF.auto||{maxCustomers:8}).maxCustomers||8);
     if(npcPool.length<limit)npcPool.push(npc.obj);
+    else {const disposal=new THREE.Group();disposal.add(npc.obj);clearGroup(disposal)}
+  }
+
+  function removeNpcBag(obj) {
+    const bag=obj.userData.heldBag;if(!bag)return;
+    bag.removeFromParent();clearGroup(bag);obj.userData.heldBag=null;
   }
 
   function attachBagToNpc(npc) {
     if (npc.obj.userData.heldBag) return;
     const product = productById(npc.productId);
     const bag = handbag(0.28, 0.78, 0, product.color, 0.36, Math.PI / 2.2);
-    npc.obj.add(bag);
+    const motion=npc.obj.userData.motion;
+    const hand=motion?(motion.profile.freeArms.includes(-1)?motion.bones.HandL:motion.bones.HandR):null;
+    if(hand){bag.position.set(0,-.22,.045);hand.add(bag)}else npc.obj.add(bag);
     npc.obj.userData.heldBag = bag;
   }
 
@@ -1120,10 +1151,11 @@
 
   function spawnReturnCustomer() {
     if(!THREE || !npcGroup || checkoutQueue.length>=queueCapacity()) return;
+    const spawn=findNpcSpawn();if(!spawn)return;
     const archetype=randomArchetype();
     const p=acquireNpcPerson(customerStyle(archetype));
-    const spawnX=-1.2+Math.random()*2.4;
-    p.position.set(spawnX,0,(WORLD.customerSpawn?.z||29.4));
+    const spawnX=spawn.x;
+    p.position.set(spawnX,.025,spawn.z);
     npcGroup.add(p);
     const prod=PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
     const npc=createNpcRecord(p,spawnX,archetype,{isReturn:true,productId:prod.id,productPrice:prod.price});
@@ -1794,7 +1826,7 @@
     for (let i=0;i<staff;i++) {
       const look = STAFF_LOOKS[i % STAFF_LOOKS.length];
       const p = person(look);
-      p.position.set(3.8 + (i%3) * 2.2, 0, 5.9 - Math.floor(i/3)*1.55);
+      p.position.set(3.8 + (i%3) * 2.2, 0, 4.75 - Math.floor(i/3)*1.1);
       dynamicGroup.add(p);
       registerAnimatedActor({ type: 'salesperson', obj: p, baseY: 0, baseX: p.position.x, baseZ: p.position.z, phase: Math.random()*6.28, speed: 1.7 + i*0.15, state:'disponible' });
     }
@@ -1807,19 +1839,20 @@
       ? monaModule.createMonaNpc(THREE, monaTemplate, config)
       : person({gender:'female', execModel:'female', bodyScale:.96});
     mona.position.set(config.position.x, 0, config.position.z);
-    mona.name = 'Mona';
+    mona.name = config.name;
     mona.userData.npcId = 'mona';
     mona.userData.role = 'guide';
     if (!monaTemplate) mona.userData.modelKind = 'mona-fallback';
     dynamicGroup.add(mona);
-    const label = addTextLabel('Mona', config.position.x, 1.87, config.position.z, '#fff0c2', .16);
-    label.userData.ownedTexture = label.material.map;
-    dynamicGroup.add(label);
-    addDynamicCollider(config.position.x-.28, config.position.x+.28, config.position.z-.24, config.position.z+.24);
-    interactables.push({mesh:mona, type:'mona', label:'Hablar con Mona'});
+    npcNames.setNpcName(mona,config.name,config.height);
+    const collider={npcId:'mona',minX:config.position.x-.28,maxX:config.position.x+.28,minZ:config.position.z-.24,maxZ:config.position.z+.24};
+    dynamicColliders.push(collider);
+    registerAnimatedActor({type:'guide',obj:mona,collider,patrol:[[-3,10.7],[-5.2,10.7],[-5.2,12.5],[-3,12.5]],patrolIndex:1,pause:3,speed:.72});
+    interactables.push({mesh:mona, type:'mona', label:`Hablar con ${config.name}`});
   }
 
   function talkToMona() {
+    const guide=animatedActors.find(a=>a.type==='guide');if(guide)guide.pause=7;
     const advice = checkoutQueue.length
       ? `Hay ${checkoutQueue.length} cliente(s) esperando. Acércate a la caja para cobrar.`
       : totalDisplayStock() === 0 && totalReserveStock() > 0
@@ -1827,14 +1860,14 @@
         : totalDisplayStock() + totalReserveStock() === 0
           ? 'No quedan bolsos. Revisa tu producción y el abastecimiento en Administración.'
           : 'Bienvenido. Revisa los bolsos en los exhibidores y atiende a los clientes en caja.';
-    message(`Mona: ${advice}`, 6500);
+    message(`${CONFIG.NPCS.mona.name}: ${advice}`, 6500);
   }
 
   function rebuildDynamicWorld() {
     if (!dynamicGroup) return;
     clearGroup(dynamicGroup);
     interactables = interactables.filter(it => it.type !== 'mona');
-    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian');
+    animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian' || a.type === 'visitor');
     checkoutQueue = [];
     npcs.forEach(recycleNpcPerson);
     npcs = [];
@@ -1956,19 +1989,6 @@
       animationAccumulator: 0,
       ...extra
     };
-    if (YUKA?.Vehicle && YUKA?.ArriveBehavior && YUKA?.Vector3) {
-      try {
-        npc.vehicle = new YUKA.Vehicle();
-        npc.vehicle.position.set(obj.position.x, 0, obj.position.z);
-        npc.vehicle.maxSpeed = npc.speed;
-        npc.vehicle.maxForce = 7;
-        npc.steeringTarget = new YUKA.Vector3(obj.position.x, 0, obj.position.z);
-        npc.arriveBehavior = new YUKA.ArriveBehavior(npc.steeringTarget, 1.15, .08);
-        npc.vehicle.steering.add(npc.arriveBehavior);
-      } catch (error) {
-        npc.vehicle = null;
-      }
-    }
     return npc;
   }
 
@@ -1980,6 +2000,7 @@
   function setNpcRoute(npc, state, points = []) {
     setNpcState(npc, state);
     const requested=points.map(point=>[Number(point[0]),Number(point[1])]);
+    npc.requestedPoints=requested;
     if(navReady&&requested.length){
       const route=[];let from={x:npc.obj.position.x,z:npc.obj.position.z};
       requested.forEach(point=>{
@@ -1989,24 +2010,22 @@
       });
       npc.route=route.length?route:requested;
     } else npc.route=requested;
-    npc.routeIndex = 0;
-    npc.wait = 0;
-    updateNpcSteeringTarget(npc);
-  }
-
-  function updateNpcSteeringTarget(npc) {
-    const target = npc.route?.[npc.routeIndex];
-    if (!target || !npc.steeringTarget) return;
-    npc.steeringTarget.set(target[0], 0, target[1]);
-    if (npc.vehicle) {
-      npc.vehicle.position.set(npc.obj.position.x, 0, npc.obj.position.z);
-      npc.vehicle.velocity.set(0, 0, 0);
+    if(npcNavigation&&npc.route.length) {
+      const safe=[];let from={x:npc.obj.position.x,z:npc.obj.position.z};
+      for(const point of npc.route) {
+        const segment=npcNavigation.planPath(from,{x:point[0],z:point[1]},npcObstacles());
+        if(!segment.length){safe.length=0;break}
+        safe.push(...segment);const last=segment[segment.length-1];from={x:last[0],z:last[1]};
+      }
+      npc.route=safe;
     }
-  }
+    npc.routeBlocked=Boolean(requested.length&&!npc.route.length);
+    npc.routeIndex = 0;
+    npc.wait = 0;  }
 
   function leaveStore(npc) {
     npc.leavingWorld = true;
-    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[-3.0,7.2],[0,9.9],[WORLD.crosswalkSouth?.x||0,WORLD.crosswalkSouth?.z||13.0]]);
+    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[-3.0,7.2],[npc.spawnX,9.9],[npc.spawnX,WORLD.crosswalkSouth?.z||13.0]]);
   }
 
   function releaseCrossing(npc) {
@@ -2093,6 +2112,15 @@
     return true;
   }
 
+  function findNpcSpawn() {
+    const options=[-1.05,0,1.05].sort(()=>Math.random()-.5);
+    for(const z of [29.5,30.4])for(const x of options) {
+      if(Math.hypot(player.x-x,player.z-z)<.85)continue;
+      if(npcs.every(n=>n.dead||Math.hypot(n.obj.position.x-x,n.obj.position.z-z)>.85))return {x,z};
+    }
+    return null;
+  }
+
   function spawnNpc(now) {
     const score = npcDemandScore();
     const dayBoost = gameSession?.difficulty || 1;
@@ -2100,14 +2128,15 @@
     const interval = Math.max(1500, 8200 / (score * dayBoost * rush));
     const preset=PERF[perfMode]||PERF.auto||{maxCustomers:8};
     if (now - lastSpawn < interval || npcs.length >= Number(preset.maxCustomers||8)) return;
+    const spawn=findNpcSpawn();if(!spawn)return;
     lastSpawn = now;
     const archetype = randomArchetype();
     const p = acquireNpcPerson(customerStyle(archetype));
-    const spawnX = (Math.random() - 0.5) * 2.4;
-    p.position.set(spawnX,0,(WORLD.customerSpawn?.z||29.4)+Math.random()*.7);
+    const spawnX = spawn.x;
+    p.position.set(spawnX,.025,spawn.z);
     npcGroup.add(p);
     const npc=createNpcRecord(p,spawnX,archetype);
-    setNpcRoute(npc,NPC_STATE.WALK_TO_STORE,[[WORLD.crosswalkNorth?.x||0,WORLD.crosswalkNorth?.z||24.8]]);
+    setNpcRoute(npc,NPC_STATE.WALK_TO_STORE,[[spawnX,WORLD.crosswalkNorth?.z||24.8]]);
     npcs.push(npc);
     simVisitors++;
     updateHUD();
@@ -2141,6 +2170,7 @@
   function openCheckout() {
     const npc = checkoutQueue[0];
     if (!npc) { message('No hay clientes en la cola de caja.'); return; }
+    if(npc.state!==NPC_STATE.QUEUE){message('El cliente se está acercando a la caja.');return;}
     checkoutOpen = true;
     checkoutScanned = false;
     checkoutPayment = 'cash';
@@ -2185,12 +2215,12 @@
       message('No hay clientes en la cola de caja.');
       return;
     }
+    if(checkoutQueue[0].state!==NPC_STATE.QUEUE){if(!autoServed)message('El cliente se está acercando a la caja.');return;}
     const npc = checkoutQueue.shift();
     attachBagToNpc(npc);
     showReceipt(npc);
     if (npc.obj.userData.orderLabel) { npc.obj.remove(npc.obj.userData.orderLabel); npc.obj.userData.orderLabel = null; }
     setNpcState(npc,NPC_STATE.PAY);npc.route=[];npc.wait=.55;
-    npc.obj.rotation.y = Math.PI;
     const product = productById(npc.productId);
     if(npc.isReturn){
       const refund=Number(npc.productPrice||product.price);
@@ -2208,12 +2238,12 @@
   }
 
   function prepareNpcNextStep(n) {
-    if (n.routeIndex < n.route.length-1) { n.routeIndex++; updateNpcSteeringTarget(n); return; }
+    if (n.routeIndex < n.route.length-1) { n.routeIndex++; return; }
     if(n.state===NPC_STATE.WALK_TO_STORE){setNpcState(n,NPC_STATE.WAIT_CROSSWALK);n.route=[];return;}
     if(n.state===NPC_STATE.CROSS_STREET){
       releaseCrossing(n);
       if(n.leavingWorld){setNpcRoute(n,NPC_STATE.DESPAWN,[[n.spawnX,(WORLD.customerSpawn?.z||29.4)+1.2]]);}
-      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[WORLD.storeApproach?.x||0,WORLD.storeApproach?.z||11.6],[WORLD.storeDoor?.x||0,WORLD.storeDoor?.z||8.55],[0,7.4]]);
+      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[n.spawnX,WORLD.storeApproach?.z||11.6],[n.spawnX,WORLD.storeDoor?.z||8.55],[n.spawnX,7.4]]);
       return;
     }
     if(n.state===NPC_STATE.ENTER_STORE){
@@ -2238,12 +2268,13 @@
 
   function moveNpc(n, dt) {
     if (n.dead) return;
+    if(!n.route.length||n.wait>0||n.state===NPC_STATE.WAIT_CROSSWALK||n.state===NPC_STATE.QUEUE)if(n.locomotion)n.locomotion.speed=0;
     if(n.state===NPC_STATE.WAIT_CROSSWALK){
-      setPersonPose(n.obj,n.walkCycle+=dt*2,false);
+      setPersonPose(n.obj,n.walkCycle+=dt*2,false,dt);
       if(trafficLight==='pedestrians'){
         n.crossing=true;if(!crossingPedestrians.includes(n))crossingPedestrians.push(n);
         const destination=n.leavingWorld?WORLD.crosswalkNorth:WORLD.crosswalkSouth;
-        setNpcRoute(n,NPC_STATE.CROSS_STREET,[[destination?.x||0,destination?.z||(n.leavingWorld?24.8:13)]]);
+        setNpcRoute(n,NPC_STATE.CROSS_STREET,[[n.spawnX,destination?.z||(n.leavingWorld?24.8:13)]]);
       }
       return;
     }
@@ -2256,20 +2287,20 @@
           saveInventory();
           renderInventoryDisplays();
         }
-        if (n.obj.userData.heldBag) { n.obj.remove(n.obj.userData.heldBag); n.obj.userData.heldBag = null; }
+        removeNpcBag(n.obj);
         if (n.obj.userData.orderLabel) { n.obj.remove(n.obj.userData.orderLabel); n.obj.userData.orderLabel = null; }
         leaveStore(n);
         markLostCustomer('queue');
         updateHUD();
         message('Un cliente abandonó la cola por demora y devolvió el producto.');
       }
-      setPersonPose(n.obj, n.walkCycle += dt * 2.2, false);
+      setPersonPose(n.obj, n.walkCycle += dt * 2.2, false,dt);
       return;
     }
     if (n.wait > 0) {
       n.wait -= dt;
       if (n.state === NPC_STATE.COMPARE) n.obj.rotation.y += Math.sin(n.walkCycle) * 0.004;
-      setPersonPose(n.obj, n.walkCycle += dt * 2.4, false);
+      setPersonPose(n.obj, n.walkCycle += dt * 2.4, false,dt);
       if(n.wait<=0&&n.state===NPC_STATE.COMPARE)evaluateCustomerDecision(n,false);
       else if(n.wait<=0&&n.state===NPC_STATE.WAIT_FOR_ASSISTANCE){if(n.assignedSeller)n.assignedSeller.state='disponible';evaluateCustomerDecision(n,true);}
       else if(n.wait<=0&&n.state===NPC_STATE.TAKE_PRODUCT)prepareNpcNextStep(n);
@@ -2277,30 +2308,27 @@
       return;
     }
     const target = n.route[n.routeIndex];
-    if (!target) return;
-    const dx = target[0] - n.obj.position.x;
-    const dz = target[1] - n.obj.position.z;
-    const dist = Math.hypot(dx, dz);
-    if (dist < 0.12) {
-      prepareNpcNextStep(n);
-      setPersonPose(n.obj, n.walkCycle += dt * 2.4, false);
+    if (!target) {
+      setPersonPose(n.obj,n.walkCycle,false,dt);
+      if(n.routeBlocked){n.pathRetry=(n.pathRetry||0)+dt;if(n.pathRetry>.8){n.pathRetry=0;setNpcRoute(n,n.state,n.requestedPoints)}}
       return;
     }
-    let stepX=dx/dist*n.speed*dt,stepZ=dz/dist*n.speed*dt;
-    if(n.vehicle){
-      n.vehicle.position.set(n.obj.position.x,0,n.obj.position.z);n.vehicle.maxSpeed=n.speed;n.vehicle.update(dt);
-      stepX=n.vehicle.position.x-n.obj.position.x;stepZ=n.vehicle.position.z-n.obj.position.z;
+    const state=n.locomotion || (n.locomotion={speed:0});
+    Object.assign(state,{x:n.obj.position.x,z:n.obj.position.z,yaw:n.obj.rotation.y});
+    const neighbors=npcNeighbors(n.obj);
+    const result=npcNavigation.advance(state,{x:target[0],z:target[1]},dt,npcObstacles(),neighbors,n.speed,n.routeIndex===n.route.length-1);
+    n.obj.position.set(state.x,state.z>9?.025:0,state.z);n.obj.rotation.y=state.yaw;
+    n.walkCycle+=result.distance*6.5;
+    setPersonPose(n.obj,n.walkCycle,result.distance>.00001,dt);
+    if(result.arrived)prepareNpcNextStep(n);
+    // Recover around a stationary crowd, without teleporting or walking through it.
+    n.blockedFor=result.distance<.0001?(n.blockedFor||0)+dt:0;
+    if(n.blockedFor>1.6){
+      const people=neighbors.map(p=>({minX:p.x-.27,maxX:p.x+.27,minZ:p.z-.27,maxZ:p.z+.27}));
+      const detour=npcNavigation.planPath(state,{x:target[0],z:target[1]},[...npcObstacles(),...people],.29);
+      if(detour.length){n.route.splice(n.routeIndex,1,...detour)}
+      n.blockedFor=0;
     }
-    for(const other of npcs){
-      if(other===n||other.dead)continue;const ox=n.obj.position.x-other.obj.position.x,oz=n.obj.position.z-other.obj.position.z,od=Math.hypot(ox,oz);
-      if(od>0&&od<.78){const force=(.78-od)*dt*1.8;stepX+=ox/od*force;stepZ+=oz/od*force;}
-    }
-    n.obj.position.x+=stepX;n.obj.position.z+=stepZ;
-    const desiredRotation=Math.atan2(dx,dz);let turn=((desiredRotation-n.obj.rotation.y+Math.PI*3)%(Math.PI*2))-Math.PI;n.obj.rotation.y+=turn*Math.min(1,dt*8);
-    n.walkCycle+=dt*7.0;n.animationAccumulator+=dt;
-    const far=Math.hypot(player.x-n.obj.position.x,player.z-n.obj.position.z)>18;
-    const fps=(PERF[perfMode]||PERF.auto||{farAnimationFps:12}).farAnimationFps||12;
-    if(!far||n.animationAccumulator>=1/fps){setPersonPose(n.obj,n.walkCycle,true);n.animationAccumulator=0;}
   }
 
   function updateTrafficSignals() {
@@ -2342,15 +2370,61 @@
     });
   }
 
+  function buildAmbientNpcs() {
+    const routes=[
+      [[-8,11.4],[-6.6,11.4],[-6.6,12.8],[-9.5,12.8],[-9.5,11.4]],
+      [[4.2,11.0],[7,11.0],[7,12.6],[4.2,12.6]],
+      [[10.5,12.5],[12.2,12.5],[12.2,10.9],[9,10.9],[9,12.5]]
+    ];
+    ['chico1','chico2','chico3'].forEach((id,i)=>{
+      const obj=person({execModel:id});obj.userData.role='pedestrian';
+      obj.position.set(routes[i][0][0],.025,routes[i][0][1]);scene.add(obj);
+      registerAnimatedActor({type:'visitor',obj,patrol:routes[i],patrolIndex:1,pause:i*.6,speed:.82+i*.06});
+    });
+  }
+
+  function npcNeighbors(obj) {
+    const neighbors=[{x:player.x,z:player.z}];
+    for(const other of npcs)if(other.obj!==obj&&!other.dead)neighbors.push({x:other.obj.position.x,z:other.obj.position.z});
+    for(const actor of animatedActors)if(actor.obj&&actor.obj!==obj&&['visitor','guide','salesperson'].includes(actor.type))neighbors.push({x:actor.obj.position.x,z:actor.obj.position.z});
+    return neighbors;
+  }
+
+  function npcObstacles() {return [...colliders,...dynamicColliders.filter(c=>!c.npcId)]}
+
+  function animatePatrol(actor,dt) {
+    const obj=actor.obj;
+    const nearPlayer=Math.hypot(player.x-obj.position.x,player.z-obj.position.z)<(actor.type==='guide'?2.05:.85);
+    if(!running||nearPlayer||actor.pause>0) {
+      if(actor.pause>0)actor.pause=Math.max(0,actor.pause-dt);
+      if(actor.locomotion)actor.locomotion.speed=0;
+      setPersonPose(obj,0,false,dt);return;
+    }
+    const blocks=[...colliders,...dynamicColliders.filter(c=>c!==actor.collider)];
+    if(!actor.route?.length){
+      const goal=actor.patrol[actor.patrolIndex];
+      actor.route=npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},blocks);
+    }
+    const target=actor.route?.[0];
+    if(!target){setPersonPose(obj,0,false,dt);return}
+    const state=actor.locomotion||(actor.locomotion={speed:0});
+    Object.assign(state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
+    const result=npcNavigation.advance(state,{x:target[0],z:target[1]},dt,blocks,npcNeighbors(obj),actor.speed);
+    obj.position.set(state.x,.025,state.z);obj.rotation.y=state.yaw;
+    if(actor.collider)Object.assign(actor.collider,{minX:state.x-.28,maxX:state.x+.28,minZ:state.z-.24,maxZ:state.z+.24});
+    setPersonPose(obj,0,result.distance>.00001,dt);
+    if(result.arrived){actor.route.shift();if(!actor.route.length){actor.patrolIndex=(actor.patrolIndex+1)%actor.patrol.length;actor.pause=actor.type==='guide'?2:1.2}}
+  }
+
   function animateActors(time,dt=.016) {
     animatedActors.forEach((a) => {
-      if (a.type === 'worker' || a.type === 'cashier' || a.type === 'manager' || a.type === 'analyst' || a.type === 'salesperson') {
+      if(a.type==='guide'||a.type==='visitor') {
+        animatePatrol(a,dt);
+      } else if (a.type === 'worker' || a.type === 'cashier' || a.type === 'manager' || a.type === 'analyst' || a.type === 'salesperson') {
         a.obj.position.y = a.baseY + Math.sin(time * a.speed + a.phase) * 0.012;
         if (a.type === 'salesperson') {
-          a.obj.position.x = a.baseX + Math.sin(time * 0.6 + a.phase) * 0.28;
-          a.obj.position.z = a.baseZ + Math.cos(time * 0.6 + a.phase) * 0.22;
-          a.obj.rotation.y = Math.atan2(Math.cos(time * 0.6 + a.phase), Math.sin(time * 0.6 + a.phase));
-          setPersonPose(a.obj, time * 4.0 + a.phase, true);
+          a.obj.rotation.y = Math.PI + Math.sin(time * .4 + a.phase) * .08;
+          setPersonPose(a.obj, time + a.phase, false,dt);
         } else {
           setPersonPose(a.obj, time * (a.type === 'cashier' ? 3.0 : 2.2) + a.phase, false);
         }
@@ -2373,7 +2447,7 @@
       lastAutoRestock = time;
       restockDisplays(false);
     }
-    if ((salesStaff() > 1 || Number(businessState?.upgrades?.checkout||0)>0) && checkoutQueue.length && time > nextAutoServeAt) {
+    if ((salesStaff() > 1 || Number(businessState?.upgrades?.checkout||0)>0) && checkoutQueue[0]?.state===NPC_STATE.QUEUE && time > nextAutoServeAt) {
       const checkoutBoost=Number(businessState?.upgrades?.checkout||0)>0?4:0;
       nextAutoServeAt = time + Math.max(4.5, 15 - salesStaff() * 1.5 - checkoutBoost);
       serveNextQueuedCustomer(true);
@@ -2417,6 +2491,8 @@
     if (x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ) return true;
     for(const c of colliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
     for(const c of dynamicColliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
+    for(const n of npcs)if(!n.dead&&Math.hypot(x-n.obj.position.x,z-n.obj.position.z)<player.radius+.27)return true;
+    for(const a of animatedActors)if(a.type==='visitor'&&Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27)return true;
     return false;
   }
 
@@ -2512,7 +2588,7 @@
     const it = nearestInteractable();
     if (!p) return;
     if (it?.type === 'mona') {
-      p.innerHTML = '<kbd>E</kbd> Hablar con Mona';
+      p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` Hablar con ${CONFIG.NPCS.mona.name}`);
       p.classList.add('show');
       return;
     }
@@ -2777,12 +2853,14 @@
     if (initialized) return true;
     if (!await loadThree()) return false;
     await loadExecModelTemplates();
+    await loadSuppliedNpcs();
     await loadMonaModel();
     if (Object.values(execModelTemplates).some(model=>!model)) await loadNpcModelTemplate();
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
     buildStaticWorld();
+    buildAmbientNpcs();
     await initNavigation();
     loadAudioSetting();
     clock = new THREE.Clock();
@@ -2858,9 +2936,10 @@
   function diagnostics() {
     const characters = [];
     scene?.traverse(node => {
-      if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, x:node.position.x, z:node.position.z});
+      if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, name:node.userData.displayName||'', x:node.position.x, z:node.position.z});
     });
     return {initialized, running, navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }

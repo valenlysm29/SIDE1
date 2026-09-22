@@ -1,0 +1,23 @@
+{
+  "source": "tools/model-sources/chico1/chico1.original.glb",
+  "output": "assets/models3d/npcs/chico1.glb",
+  "sourceSha256": "c413fcc825c65bf0d84adf3489ed1847bd637391bd9b17985f832c26b84ade49",
+  "outputSha256": "84e1bf33da09ed1946ef3b6f56ee05683b15e8265641aaf10b1a378aabe4b4b6",
+  "sourceBytes": 58869440,
+  "outputBytes": 4058852,
+  "sourceTriangles": 999996,
+  "triangles": 35000,
+  "vertices": 29178,
+  "relativeError": 0.0011187806958332658,
+  "animations": 0,
+  "bones": 17,
+  "height": 1.78,
+  "rigged": true,
+  "animation": "Distance-driven procedural IK in services/npc_motion.js",
+  "freeArms": [
+    -1,
+    1
+  ],
+  "textures": "Color 2048px; normal and metallic/roughness 1024px",
+  "note": "Original supplied by the user. No new license is assigned to the model."
+}
