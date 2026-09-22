@@ -24,16 +24,38 @@
     }
     const start = config.scheduledStart ? new Date(config.scheduledStart).getTime() : NaN;
     if (!Number.isFinite(start)) return {error: 'Selecciona la fecha y hora de inicio para ver el calendario por ciclos.', cycles: []};
-    const duration = (hours*3600+minutes*60)*1000, end = start+count*duration;
+    const duration = (hours*3600+minutes*60)*1000;
+    const firstDuration = Number(config.integrationMinutes)===60 ? 3600000 : duration;
+    const end = start+firstDuration+(count-1)*duration;
     if (!Number.isFinite(new Date(end).getTime())) return {error: 'La duraci\u00f3n indicada supera el rango del calendario.', cycles: []};
-    return {start, end, duration, total: count*duration, cycles: Array.from({length:count}, (_,i)=>({round:i+1,start:start+i*duration,end:start+(i+1)*duration}))};
+    return {start, end, duration, total:end-start, cycles: Array.from({length:count}, (_,i)=>({round:i+1,start:i===0?start:start+firstDuration+(i-1)*duration,end:start+firstDuration+i*duration}))};
   }
   function schedulePosition(schedule, now = Date.now()) {
     if (!schedule || schedule.error || !schedule.cycles.length) return null;
-    if (now < schedule.start) return {status:'scheduled',round:1,remaining:schedule.duration/1000,startedAt:schedule.start};
+    if (now < schedule.start) return {status:'scheduled',round:1,remaining:(schedule.cycles[0].end-schedule.start)/1000,startedAt:schedule.start};
     if (now >= schedule.end) return {status:'simulation-finished',round:schedule.cycles.length,remaining:0,startedAt:schedule.cycles.at(-1).start};
-    const index = Math.floor((now-schedule.start)/schedule.duration), cycle=schedule.cycles[index];
+    const index = schedule.cycles.findIndex(c=>now<c.end), cycle=schedule.cycles[index];
     return {status:'running',round:index+1,remaining:Math.max(0,Math.ceil((cycle.end-now)/1000)),startedAt:cycle.start};
+  }
+  function gameAccess(config={}, status={}, runtime={}, existing=false, now=Date.now()) {
+    if(Number(config.integrationMinutes)!==60)return {canJoin:true,canOperate:true,integration:false,round:Number(runtime.round||config.round||1)};
+    let round=Number(runtime.round||config.round||1), phase=runtime.status;
+    if(status.active&&config.cycleCloseMode==='automatic'){
+      const position=schedulePosition(cycleSchedule(config),now);
+      if(position){round=position.round;phase=position.status;}
+    }
+    const start=Date.parse(status.startedAt||config.gameStartedAt||runtime.startedAt||'');
+    const started=Boolean(status.active)&&Number.isFinite(start)&&now>=start&&!['scheduled','simulation-finished'].includes(phase);
+    const integration=started&&round===1;
+    const admission=integration&&Number.isFinite(start)&&now<start+3600000&&phase!=='finished';
+    return {round,integration,canJoin:started&&(existing||admission),canOperate:started&&round>1&&now>=start+3600000,
+      reason:status.finishedAt||phase==='simulation-finished'?'La partida ha finalizado.':!started?'La partida aún no está en curso. Espera a que el profesor la inicie.':round===1?'Ciclo 1 · integración: solo ingreso y espera durante la primera hora.':'El ingreso de empresas nuevas cerró al terminar el ciclo 1.'};
+  }
+  function podiumExpiry(publication) {
+    return Date.parse(publication?.publishedAt||'')+24*60*60*1000;
+  }
+  function podiumVisible(publication, code, now=Date.now()) {
+    return Boolean(publication)&&(!publication.code||publication.code===code)&&now<podiumExpiry(publication);
   }
   /* Old decisions only contain optionIds: a selected district means one store. */
   function storeQuantity(entry, id) {
@@ -86,5 +108,5 @@
     if (add>0) batches.push({round,quantity:add});
     return batches;
   }
-  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,storeQuantity,singleStoreSelection,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
+  return Object.freeze({STORE_IDS,COMMITMENT_CYCLES,positiveInteger,localDate,cycleSchedule,schedulePosition,gameAccess,podiumExpiry,podiumVisible,storeQuantity,singleStoreSelection,storeCount,storeBatches,committedQuantity,remainingCommitment,nextStoreBatches});
 });

@@ -82,6 +82,7 @@ function reviewFingerprint(){
     flags:decisionCategories().map(c=>sectionSubmitted(c.cat)),all:decisionsSubmitted()});
 }
 function commitReviewedSections(cats,finalize){
+  if(!studentAccess().canOperate){toast(studentAccess().reason);return false;}
   if(reviewCommitBusy||decisionsSubmitted())return false;
   reviewCommitBusy=true;
   try{

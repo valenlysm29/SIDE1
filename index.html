@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="simulator3d.css?v=20260910-2">
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
-  <link rel="stylesheet" href="production.css?v=20260917-visual">
+  <link rel="stylesheet" href="production.css?v=20260922-fixedbar">
 </head>
 <body>
 <main id="app">
@@ -148,6 +148,7 @@
           <h2 id="lobbyGameName">Esperando...</h2>
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
+          <p id="studentIntegrationNotice" class="hint hidden" role="status" aria-live="polite"></p>
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>
           <div class="student-finance-mini">
@@ -479,10 +480,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260920-2"></script>
-<script src="services/partida_service.js?v=20260920-2"></script>
+<script src="services/partida_service.js?v=20260922-teacher-final"></script>
 <script src="services/empresa_service.js?v=20260920-2"></script>
 <script src="services/decisiones_service.js?v=20260921-rep"></script>
-<script src="side_rules.js?v=20260910-2"></script>
+<script src="side_rules.js?v=20260922-teacher-final"></script>
 <script src="icon_bank.js?v=20260910-2"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
 <script src="decision_catalog.js?v=20260910-2"></script>
@@ -503,7 +504,7 @@
 <script src="production_model.js?v=20260910-2"></script>
 <script src="decision_review_model.js?v=20260910-2"></script>
 <script src="production_dop.js?v=20260917-visual"></script>
-<script src="app.js?v=20260922-cycle-restart"></script>
-<script src="company_summary.js?v=20260922-cycle-restart"></script>
+<script src="app.js?v=20260922-teacher-final"></script>
+<script src="company_summary.js?v=20260922-teacher-final"></script>
 </body>
 </html>

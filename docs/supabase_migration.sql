@@ -183,6 +183,25 @@ grant execute on function public.buscar_partida_por_codigo(text) to anon, authen
 -- 9. FUNCIÓN RPC: Crear empresa al unirse a partida
 -- Crea la empresa y vincula el participante.
 -- ============================================================
+-- Resolve the scheduled cycle from the clock even while the teacher reconnects.
+create or replace function public.side_ciclo_actual(p_config jsonb)
+returns integer language plpgsql stable set search_path=public as $$
+declare
+  v_start timestamptz := nullif(p_config->>'gameStartedAt','')::timestamptz;
+  v_seconds numeric;
+  v_duration integer;
+begin
+  if coalesce((p_config->>'integrationMinutes')::integer,0)=60
+    and p_config->>'cycleCloseMode'='automatic' and v_start is not null then
+    v_seconds := extract(epoch from now()-v_start);
+    if v_seconds<3600 then return 1; end if;
+    v_duration := greatest(60,coalesce((p_config->>'roundHours')::integer,0)*3600+coalesce((p_config->>'roundMinutes')::integer,0)*60);
+    return least(coalesce((p_config->>'cycles')::integer,1),2+floor((v_seconds-3600)/v_duration)::integer);
+  end if;
+  return greatest(1,coalesce((p_config#>>'{runtime,round}')::integer,(p_config->>'round')::integer,1));
+end;
+$$;
+
 create or replace function public.crear_empresa(
   p_partida_id uuid,
   p_nombre_estudiante text,
@@ -202,19 +221,24 @@ declare
   v_cfg jsonb;
   v_capital numeric;
   v_resultado jsonb;
+  v_started timestamptz;
 begin
-  -- Verificar que la partida existe y está en espera
-  if not exists (
-    select 1 from public.partidas
-    where id = p_partida_id and estado = 'esperando'
-  ) then
-    return jsonb_build_object('error', 'La partida no existe o ya inició');
+  -- Lock the game so two simultaneous joins cannot duplicate the same company.
+  perform 1 from public.partidas where id=p_partida_id and estado in ('esperando','activa') for update;
+  if not found then
+    return jsonb_build_object('error','La partida no existe o ya finalizó');
   end if;
 
   -- El capital lo manda la partida (modo fijo). En modo aleatorio se respeta
   -- el monto calculado por el frontend (p_capital) como respaldo.
   select configuracion into v_cfg
   from public.partidas where id = p_partida_id;
+  if coalesce((v_cfg->>'integrationMinutes')::integer,0)=60 then
+    v_started := nullif(v_cfg->>'gameStartedAt','')::timestamptz;
+    if v_started is null or now()<v_started then
+      return jsonb_build_object('error','La partida aún no ha iniciado. Espera al profesor.');
+    end if;
+  end if;
   if coalesce(v_cfg->>'capitalMode', 'fixed') = 'random' then
     v_capital := p_capital;
   else
@@ -244,6 +268,13 @@ begin
       from public.empresas e
       where e.id = v_empresa_id
     );
+  end if;
+
+  if coalesce((v_cfg->>'integrationMinutes')::integer,0)=60 and (
+    now()>=v_started+interval '1 hour' or coalesce((v_cfg#>>'{runtime,round}')::integer,1)<>1
+    or coalesce(v_cfg#>>'{runtime,status}','ready') in ('finished','simulation-finished')
+  ) then
+    return jsonb_build_object('error','El ingreso de empresas nuevas solo está permitido durante la hora de integración del ciclo 1.');
   end if;
 
   -- La empresa nueva arranca en el ciclo actual de la partida (no en 1):
@@ -302,7 +333,22 @@ declare
   v_decision jsonb;
   v_decision_catalogo_id integer;
   v_opcion_id integer;
+  v_config jsonb;
+  v_estado text;
 begin
+  select p.configuracion,p.estado into v_config,v_estado from public.partidas p
+    join public.participantes pt on pt.partida_id=p.id where pt.empresa_id=p_empresa_id limit 1;
+  if coalesce((v_config->>'integrationMinutes')::integer,0)=60 and (
+    v_estado='finalizada' or p_ciclo<2 or p_ciclo<>public.side_ciclo_actual(v_config)
+    or nullif(v_config->>'gameStartedAt','') is null
+    or now()< (v_config->>'gameStartedAt')::timestamptz+interval '1 hour'
+    or (v_config->>'cycleCloseMode'='automatic' and now()>=(v_config->>'gameStartedAt')::timestamptz+interval '1 hour'+(coalesce((v_config->>'cycles')::integer,1)-1)*make_interval(secs=>greatest(60,coalesce((v_config->>'roundHours')::integer,0)*3600+coalesce((v_config->>'roundMinutes')::integer,0)*60)))
+  ) then
+    return jsonb_build_object('error','Las decisiones solo se permiten en el ciclo operativo actual de una partida en curso.');
+  end if;
+  if coalesce((v_config->>'integrationMinutes')::integer,0)=60 then
+    update public.empresas set ciclo_actual=p_ciclo where id=p_empresa_id;
+  end if;
   -- Iterar sobre cada decisión del array
   for v_decision in select * from jsonb_array_elements(p_decisiones)
   loop
@@ -514,42 +560,26 @@ grant execute on function public.obtener_estado_juego(bigint) to anon, authentic
 -- 13. FUNCIÓN RPC: Avanzar ciclo de una partida
 -- Solo el profesor dueño puede ejecutar.
 -- ============================================================
-create or replace function public.avanzar_ciclo(
-  p_partida_id uuid
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
+create or replace function public.avanzar_ciclo(p_partida_id uuid)
+returns jsonb language plpgsql security definer set search_path=public as $$
 declare
-  v_profesor_id uuid;
-  v_nuevo_ciclo integer;
+  v_profesor uuid;
+  v_config jsonb;
+  v_ciclo integer;
 begin
-  -- Verificar que el profesor es dueño de la partida
-  select profesor_id into v_profesor_id
-  from public.partidas
-  where id = p_partida_id;
-
-  if v_profesor_id != auth.uid() then
-    return jsonb_build_object('error', 'No tienes permiso para modificar esta partida');
+  select profesor_id,configuracion into v_profesor,v_config from public.partidas where id=p_partida_id for update;
+  if v_profesor is null or auth.uid() is distinct from v_profesor then
+    return jsonb_build_object('error','No tienes permiso para modificar esta partida');
   end if;
-
-  -- Avanzar el ciclo actual de todas las empresas de esta partida
-  update public.empresas e
-  set ciclo_actual = ciclo_actual + 1
-  where e.id in (
-    select pt.empresa_id
-    from public.participantes pt
-    where pt.partida_id = p_partida_id
-      and pt.empresa_id is not null
-  )
-  returning ciclo_actual into v_nuevo_ciclo;
-
-  return jsonb_build_object(
-    'success', true,
-    'nuevo_ciclo', v_nuevo_ciclo
-  );
+  if coalesce((v_config->>'integrationMinutes')::integer,0)=60 then
+    v_ciclo:=public.side_ciclo_actual(v_config);
+  else
+    select coalesce(max(e.ciclo_actual),1)+1 into v_ciclo from public.empresas e
+      join public.participantes pt on pt.empresa_id=e.id where pt.partida_id=p_partida_id;
+  end if;
+  update public.empresas e set ciclo_actual=v_ciclo
+    where e.id in (select empresa_id from public.participantes where partida_id=p_partida_id);
+  return jsonb_build_object('success',true,'nuevo_ciclo',v_ciclo);
 end;
 $$;
 

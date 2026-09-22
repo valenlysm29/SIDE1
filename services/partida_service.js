@@ -174,6 +174,13 @@
     }
   }
 
+  async function actualizarConfiguracion(partidaId, configuracion) {
+    const sb=client();if(!sb)return offline();
+    try{
+      const {error}=await sb.from('partidas').update({configuracion,eventos_habilitados:configuracion.enabledEvents||[]}).eq('id',partidaId);
+      return error?{success:false,error:error.message}:{success:true};
+    }catch(error){return {success:false,error:error.message};}
+  }
   global.SIDE = global.SIDE || {};
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion };
 })(window);
