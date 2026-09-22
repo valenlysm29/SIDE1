@@ -219,14 +219,21 @@ con las demás en 2 es correcto: es de otra partida (`SIDE-63AA`).
 **Fix join tardío:** `crear_empresa` heredaba `ciclo_actual = 1` por defecto,
 así que una empresa que entraba en ciclo 3 quedaba desfasada (y C2 la filtraba
 a 0% eterno). Ahora hereda el ciclo actual de la partida (primera empresa → 1).
-Regla de prueba: un nombre comercial = una empresa; reutilizar nombres mezcla
-el `localStorage` y duplica filas (rejoin con upsert = mejora futura).
+Regla de prueba: con el mismo nombre comercial se regresa a la misma empresa
+(`reingreso: true`); con nombre nuevo se crea otra. En el mismo navegador, no
+reutilizar nombres entre pruebas distintas para no mezclar `localStorage`.
 
 **Fix capital del join:** el monto inicial lo calculaba el navegador del
 estudiante (100,000 por defecto), ignorando lo configurado por el docente.
 Ahora `crear_empresa` usa el capital de la partida en modo fijo (en aleatorio
 respeta el cálculo del frontend) y devuelve la `configuracion`, que el join
 siembra en local solo si el navegador no tiene config propia.
+
+**Reingreso sin duplicar:** si el nombre comercial ya existe en la partida
+(insensible a mayúsculas/espacios), `crear_empresa` devuelve la empresa
+existente (`reingreso: true`, sin filas nuevas) y el frontend muestra
+"Bienvenido de vuelta". Coincide con el texto del juego ("usa el mismo nombre
+comercial para volver a ingresar").
 
 ## 10. Fase R — Reporte financiero en Supabase
 

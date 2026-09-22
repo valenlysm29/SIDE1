@@ -36,7 +36,9 @@
    * @param {string} partidaId UUID de la partida.
    * @param {object} datos { nombreEstudiante, nombreLegal, nombreComercial, capital? }
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
-   *   data = { empresa_id, participante_id, caja_inicial }.
+   *   data = { empresa_id, participante_id, caja_inicial, ciclo_inicial,
+   *   reingreso, configuracion }. Si el nombre comercial ya existía en la
+   *   partida, devuelve la empresa existente (reingreso: true) sin duplicar.
    */
   async function crear(partidaId, datos) {
     const sb = client();

@@ -159,6 +159,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
       const c=await S.EmpresaService.crear(found.id,{nombreEstudiante:'Jugador',nombreLegal:legalName,nombreComercial:brandName,capital:initialCapital()});
       if(!c.success){message('studentMessage',c.error||'No se pudo crear la empresa.',true);return}
       empresaId=c.data?.empresa_id||null;participantId=c.data?.participante_id||null;
+      if(c.data?.reingreso)toast('Bienvenido de vuelta.');
       // Fase A-fix: la partida manda en capital y reglas. Si el navegador no
       // tiene config propia (incógnito/dispositivo nuevo), se siembra la remota
       // para que la economía local coincida. Con config propia, manda la local.

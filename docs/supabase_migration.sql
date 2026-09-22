@@ -221,6 +221,31 @@ begin
     v_capital := coalesce((v_cfg->>'capital')::numeric, p_capital);
   end if;
 
+  -- Reingreso: si ya existe participante con ese nombre comercial en la
+  -- partida (mayúsculas/espacios no importan), se devuelve la empresa
+  -- existente sin duplicar. Coincide con el texto del juego ("usa el mismo
+  -- nombre comercial para volver a ingresar").
+  select pt.empresa_id, pt.id into v_empresa_id, v_participante_id
+  from public.participantes pt
+  where pt.partida_id = p_partida_id
+    and upper(trim(pt.empresa)) = upper(trim(p_nombre_comercial))
+  limit 1;
+
+  if v_empresa_id is not null then
+    return (
+      select jsonb_build_object(
+        'empresa_id', e.id,
+        'participante_id', v_participante_id,
+        'caja_inicial', e.caja_actual,
+        'ciclo_inicial', e.ciclo_actual,
+        'reingreso', true,
+        'configuracion', coalesce((select p.configuracion from public.partidas p where p.id = p_partida_id), '{}'::jsonb)
+      )
+      from public.empresas e
+      where e.id = v_empresa_id
+    );
+  end if;
+
   -- La empresa nueva arranca en el ciclo actual de la partida (no en 1):
   -- si entra tarde (partida en ciclo 3), juega el ciclo 3. Primera empresa → 1.
   select coalesce(max(e.ciclo_actual), 1) into v_ciclo
@@ -248,6 +273,7 @@ begin
     'participante_id', v_participante_id,
     'caja_inicial', v_capital,
     'ciclo_inicial', v_ciclo,
+    'reingreso', false,
     'configuracion', coalesce(v_cfg, '{}'::jsonb)
   );
 
