@@ -206,7 +206,7 @@ function navigateFromSummary(cat){
 function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
 function renderCompanySummary(){
   const mount=$('companySummaryMount');if(!mount)return;
-  const owner=storageKey();if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
+  const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
   migrateCurrentReceipts();
   const history=companySummaryRound!=='current'&&Number(companySummaryRound)!==currentRound(),review=liveCompanyReview();
   const old=history?readReviewReceipts(Number(companySummaryRound)):null;

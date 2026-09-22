@@ -675,7 +675,7 @@ let simulationLoadingActive=false;
 async function startSimulationLoading(){
   if(simulationLoadingActive)return false;
   loadDecisionState();
-  if(decisionProgressPercent()!==100){toast('Completa y guarda todas las decisiones obligatorias antes de iniciar el juego 3D.');openDecisionMenu();return}
+  if(decisionProgressPercent()!==100){toast('Completa y guarda todas las decisiones obligatorias antes de iniciar el juego 3D.');openDecisionMenu();return false}
   if(!simulationSubmissionComplete()){toast('Envía todos los apartados o confirma ENVIAR TODO antes de abrir el mundo.');openDecisionMenu();return false}
   if(location.protocol==='file:'){toast('Abre INICIAR_JUEGO.bat para ejecutar el mundo desde el servidor local.');return false}
   simulationLoadingActive=true;

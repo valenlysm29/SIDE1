@@ -16,7 +16,7 @@
   let simSales = 0, simVisitors = 0, lastSpawn = 0, lastAutoRestock = 0;
   let registerMesh = null, restockMesh = null, inventoryDisplayGroup = null;
   let productInteractables = [], productInspectOpen = false;
-  let inventory = null, gameSession = null;
+  let inventory = null, gameSession = null, sessionContext = '';
   let audioCtx = null, ambientTimer = null, storeMusicTimer = null, audioEnabled = true, nextAutoServeAt = 0, nextManagerBoostAt = 0;
   let entryDoorLeft = null, entryDoorRight = null, entryDoorProgress = 0;
   let perfMode = 'auto', renderScale = 1.15, perfAccum = 0, perfFrames = 0, perfLastCheck = 0;
@@ -398,6 +398,7 @@
   }
 
   function resetGameSession(resetInventory = false, advanceDay = false) {
+    sessionContext = storageContext();
     loadBusinessState();
     let day = loadDay();
     if (advanceDay) day += 1;
@@ -480,6 +481,32 @@
 
   function hideSummaryOverlay() {
     $3('sim3dSummary')?.classList.add('hidden');
+  }
+
+  function clearSessionOverlays() {
+    checkoutOpen = checkoutScanned = productInspectOpen = adminOpen = newsOpen = false;
+    controlsOpenedFromHelp = false;
+    keys = {};
+    jumpQueued = false;
+    clearTimeout(showEvent.t);
+    ['simCheckout', 'simProductInspect', 'simAdmin', 'simNewsPanel', 'sim3dSummary',
+      'sim3dStart', 'simTutorial3d', 'simEventToast'].forEach(id => $3(id)?.classList.add('hidden'));
+  }
+
+  function syncSessionContext() {
+    if (!sessionContext || sessionContext === storageContext()) return;
+    // Stop the old shift before it can record activity under the new cycle's keys.
+    running = false;
+    sessionContext = '';
+    gameSession = null;
+    stopAmbient();
+    document.exitPointerLock?.();
+    clearSessionOverlays();
+    window.__SIDE_RETURN_TO_3D = false;
+    if (!$3(rootId)?.classList.contains('hidden')) {
+      window.openDecisionMenu?.();
+      window.toast?.('El ciclo cambió. Revisa y envía sus decisiones para iniciar el mundo 3D.');
+    }
   }
 
   function showSummaryOverlay() {
@@ -2681,6 +2708,7 @@
 
   function frame(now = performance.now()) {
     if (!initialized) return;
+    syncSessionContext();
     const dt = Math.min(0.04, clock.getDelta());
     const time = performance.now() * 0.001;
     if(visibilityPaused){raf=requestAnimationFrame(frame);return;}
@@ -2782,7 +2810,12 @@
       controlsOpenedFromHelp=false;
     });
     $3('sim3dReplayBtn')?.addEventListener('click', () => {
+      if (sessionContext !== storageContext() || (bridge().canStartSimulation && !bridge().canStartSimulation())) {
+        window.startSimulationLoading?.();
+        return;
+      }
       const advance = Boolean(gameSession && gameSession.revenue >= gameSession.targetRevenue);
+      clearSessionOverlays();
       resetGameSession(true, advance);
       rebuildDynamicWorld();
       running = true;
@@ -2894,7 +2927,17 @@
       if (typeof window.toast === 'function') window.toast('Completa y envía las decisiones obligatorias antes de entrar al simulador 3D.');
       return false;
     }
+    const requestedContext = storageContext();
     if (!await prepare()) return false;
+    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
+    if (requestedContext !== storageContext() || (bridge().canStartSimulation && !bridge().canStartSimulation())) {
+      window.openDecisionMenu?.();
+      window.toast?.('El ciclo cambió durante la carga. Revisa sus decisiones y vuelve a iniciar el mundo 3D.');
+      return false;
+    }
+    running = false;
+    clearSessionOverlays();
+    window.__SIDE_RETURN_TO_3D = false;
     const autoStart = options === true || Boolean(options?.autoStart);
     const controlsSeen=localStorage.getItem(controlsSeenKey())==='1';
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
@@ -2906,6 +2949,7 @@
     controlsOpenedFromHelp=false;
     if ($3('sim3dStartBtn')) $3('sim3dStartBtn').textContent = 'ENTRAR AL SIMULADOR';
     $3('sim3dStart')?.classList.toggle('hidden',autoStart||controlsSeen);
+    loadInventory();
     resetGameSession(false);
     running = autoStart||controlsSeen;
     keys = {};
@@ -2922,6 +2966,11 @@
 
   function returnFromDecisions() {
     if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
+    if (!initialized || !gameSession || gameSession.shiftEnded || sessionContext !== storageContext() ||
+        (bridge().canStartSimulation && !bridge().canStartSimulation())) {
+      return window.startSimulationLoading();
+    }
+    clearSessionOverlays();
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
     rebuildDynamicWorld();
     renderNewsPanel();
@@ -2938,7 +2987,8 @@
     scene?.traverse(node => {
       if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, name:node.userData.displayName||'', x:node.position.x, z:node.position.z});
     });
-    return {initialized, running, navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+    return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
+      navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
