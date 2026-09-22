@@ -1,0 +1,6 @@
+{
+  "name": "side-model-tools",
+  "private": true,
+  "description": "Optional build dependencies. Not loaded by the game.",
+  "dependencies": { "sharp": "0.34.5" }
+}

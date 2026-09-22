@@ -1,0 +1,3857 @@
+{
+  "cells": {
+    "A1": {
+      "value": "Calculo de MO",
+      "cached": "Calculo de MO",
+      "type": "s",
+      "format": "General"
+    },
+    "A3": {
+      "value": "AREA DE CORTE ",
+      "cached": "AREA DE CORTE ",
+      "type": "s",
+      "format": "General"
+    },
+    "E4": {
+      "value": "Bolsas por día ",
+      "cached": "Bolsas por día ",
+      "type": "s",
+      "format": "General"
+    },
+    "F4": {
+      "value": "Mesa de corte",
+      "cached": "Mesa de corte",
+      "type": "s",
+      "format": "General"
+    },
+    "K4": {
+      "value": "Producción por día ",
+      "cached": "Producción por día ",
+      "type": "s",
+      "format": "General"
+    },
+    "L4": {
+      "value": "AL MES",
+      "cached": "AL MES",
+      "type": "s",
+      "format": "General"
+    },
+    "M4": {
+      "value": "Eficiencia",
+      "cached": "Eficiencia",
+      "type": "s",
+      "format": "General"
+    },
+    "N4": {
+      "value": "Produccion Real",
+      "cached": "Produccion Real",
+      "type": "s",
+      "format": "General"
+    },
+    "C5": {
+      "value": "Nivel 1 - Operario basico ",
+      "cached": "Nivel 1 - Operario basico ",
+      "type": "s",
+      "format": "General"
+    },
+    "E5": {
+      "value": 5.0,
+      "cached": 5.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F5": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I5": {
+      "value": "=E5*F5",
+      "cached": 5,
+      "type": "f",
+      "format": "General"
+    },
+    "K5": {
+      "value": "=MIN(I8,I14,I20)",
+      "cached": 17.2,
+      "type": "f",
+      "format": "General"
+    },
+    "L5": {
+      "value": "=K5*24",
+      "cached": 412.8,
+      "type": "f",
+      "format": "General"
+    },
+    "M5": {
+      "value": "=K7+(F7+F13+F19)/100+4%*F21",
+      "cached": 0.96,
+      "type": "f",
+      "format": "0%"
+    },
+    "N5": {
+      "value": "=ROUND(L5*M5,0)",
+      "cached": 396,
+      "type": "f",
+      "format": "0.0"
+    },
+    "O5": {
+      "value": "Esta produccion no puede ser superior a lo que permite el material",
+      "cached": "Esta produccion no puede ser superior a lo que permite el material",
+      "type": "s",
+      "format": "General"
+    },
+    "C6": {
+      "value": "Nivel 2 - Cortador con experiencia ",
+      "cached": "Nivel 2 - Cortador con experiencia ",
+      "type": "s",
+      "format": "General"
+    },
+    "E6": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F6": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I6": {
+      "value": "=E6*F6",
+      "cached": 7,
+      "type": "f",
+      "format": "General"
+    },
+    "K6": {
+      "value": "Eficiencia BASE",
+      "cached": "Eficiencia BASE",
+      "type": "s",
+      "format": "General"
+    },
+    "C7": {
+      "value": "Nivel 3 - Maestro cortador ",
+      "cached": "Nivel 3 - Maestro cortador ",
+      "type": "s",
+      "format": "General"
+    },
+    "E7": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F7": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I7": {
+      "value": "=E7*F7",
+      "cached": 9,
+      "type": "f",
+      "format": "General"
+    },
+    "K7": {
+      "value": 0.9,
+      "cached": 0.9,
+      "type": "n",
+      "format": "0%"
+    },
+    "A8": {
+      "value": "AREA DE ENSAMBLADO",
+      "cached": "AREA DE ENSAMBLADO",
+      "type": "s",
+      "format": "General"
+    },
+    "I8": {
+      "value": "=SUM(I5:I7)",
+      "cached": 21,
+      "type": "f",
+      "format": "General"
+    },
+    "C9": {
+      "value": "Operarios",
+      "cached": "Operarios",
+      "type": "s",
+      "format": "General"
+    },
+    "F9": {
+      "value": "MAQUINARIA MANUAL",
+      "cached": "MAQUINARIA MANUAL",
+      "type": "s",
+      "format": "General"
+    },
+    "G9": {
+      "value": "MAQUINARIA SEMIINDUSTRIAL ",
+      "cached": "MAQUINARIA SEMIINDUSTRIAL ",
+      "type": "s",
+      "format": "General"
+    },
+    "H9": {
+      "value": "MAQUINARIA INDUSTRIAL ",
+      "cached": "MAQUINARIA INDUSTRIAL ",
+      "type": "s",
+      "format": "General"
+    },
+    "K9": {
+      "value": "Total de trabajadores",
+      "cached": "Total de trabajadores",
+      "type": "s",
+      "format": "General"
+    },
+    "L9": {
+      "value": "=SUM(F5:F7,F11:H13,F17:H19)",
+      "cached": 8,
+      "type": "f",
+      "format": "General"
+    },
+    "F10": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G10": {
+      "value": 1.2,
+      "cached": 1.2,
+      "type": "n",
+      "format": "General"
+    },
+    "H10": {
+      "value": 1.5,
+      "cached": 1.5,
+      "type": "n",
+      "format": "General"
+    },
+    "K10": {
+      "value": "total de trabajadores N3",
+      "cached": "total de trabajadores N3",
+      "type": "s",
+      "format": "General"
+    },
+    "L10": {
+      "value": "=SUM(F7,F13:H13,F19:H19)",
+      "cached": 3,
+      "type": "f",
+      "format": "General"
+    },
+    "M10": {
+      "value": "=L10/L9",
+      "cached": 0.375,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "C11": {
+      "value": "Nivel 1",
+      "cached": "Nivel 1",
+      "type": "s",
+      "format": "General"
+    },
+    "E11": {
+      "value": 6.0,
+      "cached": 6.0,
+      "type": "n",
+      "format": "General"
+    },
+    "H11": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I11": {
+      "value": "=SUM(F11*E11*$F$10,G11*E11*$G$10,H11*E11*$H$10)",
+      "cached": 9,
+      "type": "f",
+      "format": "General"
+    },
+    "C12": {
+      "value": "Nivel 2",
+      "cached": "Nivel 2",
+      "type": "s",
+      "format": "General"
+    },
+    "E12": {
+      "value": 8.0,
+      "cached": 8.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F12": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G12": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I12": {
+      "value": "=SUM(F12*E12*$F$10,G12*E12*$G$10,H12*E12*$H$10)",
+      "cached": 8,
+      "type": "f",
+      "format": "General"
+    },
+    "C13": {
+      "value": "Nivel 3",
+      "cached": "Nivel 3",
+      "type": "s",
+      "format": "General"
+    },
+    "E13": {
+      "value": 12.0,
+      "cached": 12.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G13": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I13": {
+      "value": "=SUM(F13*E13*$F$10,G13*E13*$G$10,H13*E13*$H$10)",
+      "cached": 14.4,
+      "type": "f",
+      "format": "General"
+    },
+    "A14": {
+      "value": "AREA DE ACABADO ",
+      "cached": "AREA DE ACABADO ",
+      "type": "s",
+      "format": "General"
+    },
+    "I14": {
+      "value": "=SUM(I11:I13)",
+      "cached": 31.4,
+      "type": "f",
+      "format": "General"
+    },
+    "C15": {
+      "value": "Operarios",
+      "cached": "Operarios",
+      "type": "s",
+      "format": "General"
+    },
+    "F15": {
+      "value": "MAQUINARIA MANUAL",
+      "cached": "MAQUINARIA MANUAL",
+      "type": "s",
+      "format": "General"
+    },
+    "G15": {
+      "value": "MAQUINARIA SEMIINDUSTRIAL ",
+      "cached": "MAQUINARIA SEMIINDUSTRIAL ",
+      "type": "s",
+      "format": "General"
+    },
+    "H15": {
+      "value": "MAQUINARIA INDUSTRIAL ",
+      "cached": "MAQUINARIA INDUSTRIAL ",
+      "type": "s",
+      "format": "General"
+    },
+    "F16": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G16": {
+      "value": 1.2,
+      "cached": 1.2,
+      "type": "n",
+      "format": "General"
+    },
+    "H16": {
+      "value": 1.5,
+      "cached": 1.5,
+      "type": "n",
+      "format": "General"
+    },
+    "C17": {
+      "value": "Nivel 1",
+      "cached": "Nivel 1",
+      "type": "s",
+      "format": "General"
+    },
+    "E17": {
+      "value": 6.0,
+      "cached": 6.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G17": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I17": {
+      "value": "=SUM(F17*E17*$F$16,G17*E17*$G$16,H17*E17*$H$16)",
+      "cached": 7.2,
+      "type": "f",
+      "format": "General"
+    },
+    "C18": {
+      "value": "Nivel 2",
+      "cached": "Nivel 2",
+      "type": "s",
+      "format": "General"
+    },
+    "E18": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G18": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "H18": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I18": {
+      "value": "=SUM(F18*E18*$F$16,G18*E18*$G$16,H18*E18*$H$16)",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C19": {
+      "value": "Nivel 3",
+      "cached": "Nivel 3",
+      "type": "s",
+      "format": "General"
+    },
+    "E19": {
+      "value": 10.0,
+      "cached": 10.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F19": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "I19": {
+      "value": "=SUM(F19*E19*$F$16,G19*E19*$G$16,H19*E19*$H$16)",
+      "cached": 10,
+      "type": "f",
+      "format": "General"
+    },
+    "I20": {
+      "value": "=SUM(I17:I19)",
+      "cached": 17.2,
+      "type": "f",
+      "format": "General"
+    },
+    "A21": {
+      "value": "Jefe de Produccion",
+      "cached": "Jefe de Produccion",
+      "type": "s",
+      "format": "General"
+    },
+    "F21": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "B23": {
+      "value": "NOTA: EL PROCETANJE DE TRABAJADORES DE NIVEL 3 AFECTA POSITIVAMENTE A LA EFICIENCIA ",
+      "cached": "NOTA: EL PROCETANJE DE TRABAJADORES DE NIVEL 3 AFECTA POSITIVAMENTE A LA EFICIENCIA ",
+      "type": "s",
+      "format": "General"
+    },
+    "A25": {
+      "value": "Calculo de MP",
+      "cached": "Calculo de MP",
+      "type": "s",
+      "format": "General"
+    },
+    "D27": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "E27": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "F27": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "G27": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "H27": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "I27": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "J27": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "K27": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "L27": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "D28": {
+      "value": "Nivel 1 - Cuero sintetico",
+      "cached": "Nivel 1 - Cuero sintetico",
+      "type": "s",
+      "format": "General"
+    },
+    "E28": {
+      "value": "Nivel 2 - Cuero genuino estandar",
+      "cached": "Nivel 2 - Cuero genuino estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "F28": {
+      "value": "Nivel 3 - Cuero genuino premium",
+      "cached": "Nivel 3 - Cuero genuino premium",
+      "type": "s",
+      "format": "General"
+    },
+    "G28": {
+      "value": "Nivel 1 - Aleacion economica",
+      "cached": "Nivel 1 - Aleacion economica",
+      "type": "s",
+      "format": "General"
+    },
+    "H28": {
+      "value": "Nivel 2 - Metal premium",
+      "cached": "Nivel 2 - Metal premium",
+      "type": "s",
+      "format": "General"
+    },
+    "I28": {
+      "value": "Nivel 3 - Metal Deluxe",
+      "cached": "Nivel 3 - Metal Deluxe",
+      "type": "s",
+      "format": "General"
+    },
+    "J28": {
+      "value": "Nivel 1 - Poliester estandar",
+      "cached": "Nivel 1 - Poliester estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "K28": {
+      "value": "Nivel 2 - Encerado reforzado",
+      "cached": "Nivel 2 - Encerado reforzado",
+      "type": "s",
+      "format": "General"
+    },
+    "L28": {
+      "value": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "cached": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "type": "s",
+      "format": "General"
+    },
+    "C29": {
+      "value": "UM Compra",
+      "cached": "UM Compra",
+      "type": "s",
+      "format": "General"
+    },
+    "D29": {
+      "value": "rollo",
+      "cached": "rollo",
+      "type": "s",
+      "format": "General"
+    },
+    "E29": {
+      "value": "Piel completa",
+      "cached": "Piel completa",
+      "type": "s",
+      "format": "General"
+    },
+    "F29": {
+      "value": "Piel completa",
+      "cached": "Piel completa",
+      "type": "s",
+      "format": "General"
+    },
+    "G29": {
+      "value": "Juego",
+      "cached": "Juego",
+      "type": "s",
+      "format": "General"
+    },
+    "H29": {
+      "value": "Juego",
+      "cached": "Juego",
+      "type": "s",
+      "format": "General"
+    },
+    "I29": {
+      "value": "Juego",
+      "cached": "Juego",
+      "type": "s",
+      "format": "General"
+    },
+    "J29": {
+      "value": "Carrete",
+      "cached": "Carrete",
+      "type": "s",
+      "format": "General"
+    },
+    "K29": {
+      "value": "Carrete",
+      "cached": "Carrete",
+      "type": "s",
+      "format": "General"
+    },
+    "L29": {
+      "value": "Carrete",
+      "cached": "Carrete",
+      "type": "s",
+      "format": "General"
+    },
+    "C30": {
+      "value": "UM Produccion",
+      "cached": "UM Produccion",
+      "type": "s",
+      "format": "General"
+    },
+    "D30": {
+      "value": "m2",
+      "cached": "m2",
+      "type": "s",
+      "format": "General"
+    },
+    "E30": {
+      "value": "m2",
+      "cached": "m2",
+      "type": "s",
+      "format": "General"
+    },
+    "F30": {
+      "value": "m2",
+      "cached": "m2",
+      "type": "s",
+      "format": "General"
+    },
+    "G30": {
+      "value": "unidad",
+      "cached": "unidad",
+      "type": "s",
+      "format": "General"
+    },
+    "H30": {
+      "value": "unidad",
+      "cached": "unidad",
+      "type": "s",
+      "format": "General"
+    },
+    "I30": {
+      "value": "unidad",
+      "cached": "unidad",
+      "type": "s",
+      "format": "General"
+    },
+    "J30": {
+      "value": "metro",
+      "cached": "metro",
+      "type": "s",
+      "format": "General"
+    },
+    "K30": {
+      "value": "metro",
+      "cached": "metro",
+      "type": "s",
+      "format": "General"
+    },
+    "L30": {
+      "value": "metro",
+      "cached": "metro",
+      "type": "s",
+      "format": "General"
+    },
+    "C31": {
+      "value": "Nivel 1 - Generico basico",
+      "cached": "Nivel 1 - Generico basico",
+      "type": "s",
+      "format": "General"
+    },
+    "D31": {
+      "value": 0.3,
+      "cached": 0.3,
+      "type": "n",
+      "format": "General"
+    },
+    "G31": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "J31": {
+      "value": 6.0,
+      "cached": 6.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C32": {
+      "value": "Nivel 2 - Generico mejorado",
+      "cached": "Nivel 2 - Generico mejorado",
+      "type": "s",
+      "format": "General"
+    },
+    "E32": {
+      "value": 0.4,
+      "cached": 0.4,
+      "type": "n",
+      "format": "General"
+    },
+    "H32": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "K32": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C33": {
+      "value": "Nivel 3 - Premium",
+      "cached": "Nivel 3 - Premium",
+      "type": "s",
+      "format": "General"
+    },
+    "F33": {
+      "value": 0.7,
+      "cached": 0.7,
+      "type": "n",
+      "format": "General"
+    },
+    "I33": {
+      "value": 1.0,
+      "cached": 1.0,
+      "type": "n",
+      "format": "General"
+    },
+    "L33": {
+      "value": 13.0,
+      "cached": 13.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E35": {
+      "value": "=N5",
+      "cached": 396,
+      "type": "f",
+      "format": "0.0"
+    },
+    "C36": {
+      "value": "Cantidad que desea producir",
+      "cached": "Cantidad que desea producir",
+      "type": "s",
+      "format": "General"
+    },
+    "D36": {
+      "value": "=SUM(D37:D39)",
+      "cached": 520,
+      "type": "f",
+      "format": "General"
+    },
+    "E36": {
+      "value": "=SUM(E37:E39)",
+      "cached": 395,
+      "type": "f",
+      "format": "General"
+    },
+    "C37": {
+      "value": "Nivel 1 - Generico basico",
+      "cached": "Nivel 1 - Generico basico",
+      "type": "s",
+      "format": "General"
+    },
+    "D37": {
+      "value": 250.0,
+      "cached": 250.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E37": {
+      "value": "=ROUNDDOWN(D37*E35/D36,0)",
+      "cached": 190,
+      "type": "f",
+      "format": "General"
+    },
+    "C38": {
+      "value": "Nivel 2 - Generico mejorado",
+      "cached": "Nivel 2 - Generico mejorado",
+      "type": "s",
+      "format": "General"
+    },
+    "D38": {
+      "value": 180.0,
+      "cached": 180.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E38": {
+      "value": "=ROUNDDOWN(D38*E35/D36,0)",
+      "cached": 137,
+      "type": "f",
+      "format": "General"
+    },
+    "C39": {
+      "value": "Nivel 3 - Premium",
+      "cached": "Nivel 3 - Premium",
+      "type": "s",
+      "format": "General"
+    },
+    "D39": {
+      "value": 90.0,
+      "cached": 90.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E39": {
+      "value": "=ROUNDDOWN(D39*E35/D36,0)",
+      "cached": 68,
+      "type": "f",
+      "format": "General"
+    },
+    "D40": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "E40": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "F40": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "G40": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "H40": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "I40": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "J40": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "K40": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "L40": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "D41": {
+      "value": "Nivel 1 - Cuero sintetico",
+      "cached": "Nivel 1 - Cuero sintetico",
+      "type": "s",
+      "format": "General"
+    },
+    "E41": {
+      "value": "Nivel 2 - Cuero genuino estandar",
+      "cached": "Nivel 2 - Cuero genuino estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "F41": {
+      "value": "Nivel 3 - Cuero genuino premium",
+      "cached": "Nivel 3 - Cuero genuino premium",
+      "type": "s",
+      "format": "General"
+    },
+    "G41": {
+      "value": "Nivel 1 - Aleacion economica",
+      "cached": "Nivel 1 - Aleacion economica",
+      "type": "s",
+      "format": "General"
+    },
+    "H41": {
+      "value": "Nivel 2 - Metal premium",
+      "cached": "Nivel 2 - Metal premium",
+      "type": "s",
+      "format": "General"
+    },
+    "I41": {
+      "value": "Nivel 3 - Metal Deluxe",
+      "cached": "Nivel 3 - Metal Deluxe",
+      "type": "s",
+      "format": "General"
+    },
+    "J41": {
+      "value": "Nivel 1 - Poliester estandar",
+      "cached": "Nivel 1 - Poliester estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "K41": {
+      "value": "Nivel 2 - Encerado reforzado",
+      "cached": "Nivel 2 - Encerado reforzado",
+      "type": "s",
+      "format": "General"
+    },
+    "L41": {
+      "value": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "cached": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "type": "s",
+      "format": "General"
+    },
+    "C42": {
+      "value": "Nivel 1 - Generico basico",
+      "cached": "Nivel 1 - Generico basico",
+      "type": "s",
+      "format": "General"
+    },
+    "D42": {
+      "value": "=$D37*D31",
+      "cached": 75,
+      "type": "f",
+      "format": "General"
+    },
+    "E42": {
+      "value": "=$D37*E31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "F42": {
+      "value": "=$D37*F31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "G42": {
+      "value": "=$D37*G31",
+      "cached": 250,
+      "type": "f",
+      "format": "General"
+    },
+    "H42": {
+      "value": "=$D37*H31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "I42": {
+      "value": "=$D37*I31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "J42": {
+      "value": "=$D37*J31",
+      "cached": 1500,
+      "type": "f",
+      "format": "General"
+    },
+    "K42": {
+      "value": "=$D37*K31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "L42": {
+      "value": "=$D37*L31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C43": {
+      "value": "Nivel 2 - Generico mejorado",
+      "cached": "Nivel 2 - Generico mejorado",
+      "type": "s",
+      "format": "General"
+    },
+    "D43": {
+      "value": "=$D38*D32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "E43": {
+      "value": "=$D38*E32",
+      "cached": 72,
+      "type": "f",
+      "format": "General"
+    },
+    "F43": {
+      "value": "=$D38*F32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "G43": {
+      "value": "=$D38*G32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "H43": {
+      "value": "=$D38*H32",
+      "cached": 180,
+      "type": "f",
+      "format": "General"
+    },
+    "I43": {
+      "value": "=$D38*I32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "J43": {
+      "value": "=$D38*J32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "K43": {
+      "value": "=$D38*K32",
+      "cached": 1260,
+      "type": "f",
+      "format": "General"
+    },
+    "L43": {
+      "value": "=$D38*L32",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C44": {
+      "value": "Nivel 3 - Premium",
+      "cached": "Nivel 3 - Premium",
+      "type": "s",
+      "format": "General"
+    },
+    "D44": {
+      "value": "=$D39*D33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "E44": {
+      "value": "=$D39*E33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "F44": {
+      "value": "=$D39*F33",
+      "cached": 63,
+      "type": "f",
+      "format": "General"
+    },
+    "G44": {
+      "value": "=$D39*G33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "H44": {
+      "value": "=$D39*H33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "I44": {
+      "value": "=$D39*I33",
+      "cached": 90,
+      "type": "f",
+      "format": "General"
+    },
+    "J44": {
+      "value": "=$D39*J33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "K44": {
+      "value": "=$D39*K33",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "L44": {
+      "value": "=$D39*L33",
+      "cached": 1170,
+      "type": "f",
+      "format": "General"
+    },
+    "D47": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "E47": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "F47": {
+      "value": "Calidad del cuero",
+      "cached": "Calidad del cuero",
+      "type": "s",
+      "format": "General"
+    },
+    "G47": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "H47": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "I47": {
+      "value": "Calidad de accesorios",
+      "cached": "Calidad de accesorios",
+      "type": "s",
+      "format": "General"
+    },
+    "J47": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "K47": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "L47": {
+      "value": "Calidad del hilo",
+      "cached": "Calidad del hilo",
+      "type": "s",
+      "format": "General"
+    },
+    "C48": {
+      "value": "Ejecucion de produccion",
+      "cached": "Ejecucion de produccion",
+      "type": "s",
+      "format": "General"
+    },
+    "D48": {
+      "value": "Nivel 1 - Cuero sintetico",
+      "cached": "Nivel 1 - Cuero sintetico",
+      "type": "s",
+      "format": "General"
+    },
+    "E48": {
+      "value": "Nivel 2 - Cuero genuino estandar",
+      "cached": "Nivel 2 - Cuero genuino estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "F48": {
+      "value": "Nivel 3 - Cuero genuino premium",
+      "cached": "Nivel 3 - Cuero genuino premium",
+      "type": "s",
+      "format": "General"
+    },
+    "G48": {
+      "value": "Nivel 1 - Aleacion economica",
+      "cached": "Nivel 1 - Aleacion economica",
+      "type": "s",
+      "format": "General"
+    },
+    "H48": {
+      "value": "Nivel 2 - Metal premium",
+      "cached": "Nivel 2 - Metal premium",
+      "type": "s",
+      "format": "General"
+    },
+    "I48": {
+      "value": "Nivel 3 - Metal Deluxe",
+      "cached": "Nivel 3 - Metal Deluxe",
+      "type": "s",
+      "format": "General"
+    },
+    "J48": {
+      "value": "Nivel 1 - Poliester estandar",
+      "cached": "Nivel 1 - Poliester estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "K48": {
+      "value": "Nivel 2 - Encerado reforzado",
+      "cached": "Nivel 2 - Encerado reforzado",
+      "type": "s",
+      "format": "General"
+    },
+    "L48": {
+      "value": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "cached": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "type": "s",
+      "format": "General"
+    },
+    "C49": {
+      "value": "Nivel 1 - Generico basico",
+      "cached": "Nivel 1 - Generico basico",
+      "type": "s",
+      "format": "General"
+    },
+    "D49": {
+      "value": 60.0,
+      "cached": 60.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E49": {
+      "value": 10.0,
+      "cached": 10.0,
+      "type": "n",
+      "format": "General"
+    },
+    "H49": {
+      "value": 200.0,
+      "cached": 200.0,
+      "type": "n",
+      "format": "General"
+    },
+    "J49": {
+      "value": 1600.0,
+      "cached": 1600.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C50": {
+      "value": "Nivel 2 - Generico mejorado",
+      "cached": "Nivel 2 - Generico mejorado",
+      "type": "s",
+      "format": "General"
+    },
+    "E50": {
+      "value": 50.0,
+      "cached": 50.0,
+      "type": "n",
+      "format": "General"
+    },
+    "H50": {
+      "value": 150.0,
+      "cached": 150.0,
+      "type": "n",
+      "format": "General"
+    },
+    "L50": {
+      "value": 1200.0,
+      "cached": 1200.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C51": {
+      "value": "Nivel 3 - Premium",
+      "cached": "Nivel 3 - Premium",
+      "type": "s",
+      "format": "General"
+    },
+    "F51": {
+      "value": 70.0,
+      "cached": 70.0,
+      "type": "n",
+      "format": "General"
+    },
+    "H51": {
+      "value": 50.0,
+      "cached": 50.0,
+      "type": "n",
+      "format": "General"
+    },
+    "L51": {
+      "value": 1100.0,
+      "cached": 1100.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D53": {
+      "value": "=D49/D31",
+      "cached": 200,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G53": {
+      "value": "=G49/G31",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "J53": {
+      "value": "=J49/J31",
+      "cached": 266.6666667,
+      "type": "f",
+      "format": "0.00"
+    },
+    "C55": {
+      "value": "TOTAL PRODUCIDO REAL",
+      "cached": "TOTAL PRODUCIDO REAL",
+      "type": "s",
+      "format": "General"
+    },
+    "G55": {
+      "value": "Cuero empleado",
+      "cached": "Cuero empleado",
+      "type": "s",
+      "format": "General"
+    },
+    "H55": {
+      "value": "Accesorios empleados",
+      "cached": "Accesorios empleados",
+      "type": "s",
+      "format": "General"
+    },
+    "I55": {
+      "value": "Hilo empleado",
+      "cached": "Hilo empleado",
+      "type": "s",
+      "format": "General"
+    },
+    "K55": {
+      "value": "Calidad por Materiales",
+      "cached": "Calidad por Materiales",
+      "type": "s",
+      "format": "General"
+    },
+    "C56": {
+      "value": "Nivel 1 - Generico basico",
+      "cached": "Nivel 1 - Generico basico",
+      "type": "s",
+      "format": "General"
+    },
+    "D56": {
+      "value": "=MIN(SUM(D49:F49)/D31,SUM(G49:I49)/G31,SUM(J49:L49)/J31,E37,D37)",
+      "cached": 190,
+      "type": "f",
+      "format": "General"
+    },
+    "E56": {
+      "value": "=ROUNDDOWN(D56,0)",
+      "cached": 190,
+      "type": "f",
+      "format": "General"
+    },
+    "G56": {
+      "value": "=E56*D31",
+      "cached": 57,
+      "type": "f",
+      "format": "General"
+    },
+    "H56": {
+      "value": "=E56*G31",
+      "cached": 190,
+      "type": "f",
+      "format": "General"
+    },
+    "I56": {
+      "value": "=E56*J31",
+      "cached": 1140,
+      "type": "f",
+      "format": "General"
+    },
+    "K56": {
+      "value": "2026-05-01T00:00:00",
+      "cached": "2026-05-01T00:00:00",
+      "type": "d",
+      "format": "d.m"
+    },
+    "C57": {
+      "value": "Nivel 2 - Generico mejorado",
+      "cached": "Nivel 2 - Generico mejorado",
+      "type": "s",
+      "format": "General"
+    },
+    "D57": {
+      "value": "=MIN(SUM(D50:F50)/E32,SUM(G50:I50)/H32,SUM(J50:L50)/K32,E38,D38)",
+      "cached": 125,
+      "type": "f",
+      "format": "General"
+    },
+    "E57": {
+      "value": "=ROUNDDOWN(D57,0)",
+      "cached": 125,
+      "type": "f",
+      "format": "General"
+    },
+    "G57": {
+      "value": "=E57*E32",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "H57": {
+      "value": "=E57*H32",
+      "cached": 125,
+      "type": "f",
+      "format": "General"
+    },
+    "I57": {
+      "value": "=E57*K32",
+      "cached": 875,
+      "type": "f",
+      "format": "General"
+    },
+    "K57": {
+      "value": "2026-03-01T00:00:00",
+      "cached": "2026-03-01T00:00:00",
+      "type": "d",
+      "format": "d.m"
+    },
+    "C58": {
+      "value": "Nivel 3 - Premium",
+      "cached": "Nivel 3 - Premium",
+      "type": "s",
+      "format": "General"
+    },
+    "D58": {
+      "value": "=MIN(SUM(D51:F51)/F33,SUM(G51:I51)/I33,SUM(J51:L51)/L33,E39,D39)",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "E58": {
+      "value": "=ROUNDDOWN(D58,0)",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "G58": {
+      "value": "=E58*F33",
+      "cached": 35,
+      "type": "f",
+      "format": "General"
+    },
+    "H58": {
+      "value": "=E58*I33",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "I58": {
+      "value": "=E58*L33",
+      "cached": 650,
+      "type": "f",
+      "format": "General"
+    },
+    "K58": {
+      "value": "2026-02-01T00:00:00",
+      "cached": "2026-02-01T00:00:00",
+      "type": "d",
+      "format": "d.m"
+    },
+    "D62": {
+      "value": "Inventario Inicial",
+      "cached": "Inventario Inicial",
+      "type": "s",
+      "format": "General"
+    },
+    "E62": {
+      "value": "Compras",
+      "cached": "Compras",
+      "type": "s",
+      "format": "General"
+    },
+    "F62": {
+      "value": "Produccion",
+      "cached": "Produccion",
+      "type": "s",
+      "format": "General"
+    },
+    "G62": {
+      "value": "Inventario Final",
+      "cached": "Inventario Final",
+      "type": "s",
+      "format": "General"
+    },
+    "H62": {
+      "value": "InventarioFinal = InventarioInicial + compras - produccido",
+      "cached": "InventarioFinal = InventarioInicial + compras - produccido",
+      "type": "s",
+      "format": "General"
+    },
+    "C63": {
+      "value": "Nivel 1 - Cuero sintetico",
+      "cached": "Nivel 1 - Cuero sintetico",
+      "type": "s",
+      "format": "General"
+    },
+    "D63": {
+      "value": 15.0,
+      "cached": 15.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E63": {
+      "value": 60.0,
+      "cached": 60.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F63": {
+      "value": 75.0,
+      "cached": 75.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G63": {
+      "value": "=D63+E63-F63",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C64": {
+      "value": "Nivel 2 - Cuero genuino estandar",
+      "cached": "Nivel 2 - Cuero genuino estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "D64": {
+      "value": 17.0,
+      "cached": 17.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E64": {
+      "value": 55.0,
+      "cached": 55.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F64": {
+      "value": 72.0,
+      "cached": 72.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G64": {
+      "value": "=D64+E64-F64",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C65": {
+      "value": "Nivel 3 - Cuero genuino premium",
+      "cached": "Nivel 3 - Cuero genuino premium",
+      "type": "s",
+      "format": "General"
+    },
+    "D65": {
+      "value": 48.0,
+      "cached": 48.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E65": {
+      "value": 15.0,
+      "cached": 15.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F65": {
+      "value": 63.0,
+      "cached": 63.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G65": {
+      "value": "=D65+E65-F65",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C66": {
+      "value": "Nivel 1 - Aleacion economica",
+      "cached": "Nivel 1 - Aleacion economica",
+      "type": "s",
+      "format": "General"
+    },
+    "D66": {
+      "value": 50.0,
+      "cached": 50.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E66": {
+      "value": 200.0,
+      "cached": 200.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F66": {
+      "value": 250.0,
+      "cached": 250.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G66": {
+      "value": "=D66+E66-F66",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C67": {
+      "value": "Nivel 2 - Metal premium",
+      "cached": "Nivel 2 - Metal premium",
+      "type": "s",
+      "format": "General"
+    },
+    "D67": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E67": {
+      "value": 190.0,
+      "cached": 190.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F67": {
+      "value": 180.0,
+      "cached": 180.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G67": {
+      "value": "=D67+E67-F67",
+      "cached": 10,
+      "type": "f",
+      "format": "General"
+    },
+    "C68": {
+      "value": "Nivel 3 - Metal Deluxe",
+      "cached": "Nivel 3 - Metal Deluxe",
+      "type": "s",
+      "format": "General"
+    },
+    "D68": {
+      "value": 90.0,
+      "cached": 90.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E68": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F68": {
+      "value": 90.0,
+      "cached": 90.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G68": {
+      "value": "=D68+E68-F68",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C69": {
+      "value": "Nivel 1 - Poliester estandar",
+      "cached": "Nivel 1 - Poliester estandar",
+      "type": "s",
+      "format": "General"
+    },
+    "D69": {
+      "value": 1494.0,
+      "cached": 1494.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E69": {
+      "value": 6.0,
+      "cached": 6.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F69": {
+      "value": 1500.0,
+      "cached": 1500.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G69": {
+      "value": "=D69+E69-F69",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C70": {
+      "value": "Nivel 2 - Encerado reforzado",
+      "cached": "Nivel 2 - Encerado reforzado",
+      "type": "s",
+      "format": "General"
+    },
+    "D70": {
+      "value": 1253.0,
+      "cached": 1253.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E70": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F70": {
+      "value": 1260.0,
+      "cached": 1260.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G70": {
+      "value": "=D70+E70-F70",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "C71": {
+      "value": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "cached": "Nivel 3 - Alta tenacidad (nylon trenzado)",
+      "type": "s",
+      "format": "General"
+    },
+    "D71": {
+      "value": 1170.0,
+      "cached": 1170.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E71": {
+      "value": 0.0,
+      "cached": 0.0,
+      "type": "n",
+      "format": "General"
+    },
+    "F71": {
+      "value": 1170.0,
+      "cached": 1170.0,
+      "type": "n",
+      "format": "General"
+    },
+    "G71": {
+      "value": "=D71+E71-F71",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "B72": {
+      "value": "0 - 10,000(rango en soles)",
+      "cached": "0 - 10,000(rango en soles)",
+      "type": "s",
+      "format": "General"
+    },
+    "A73": {
+      "value": "Gastos del ciclo en publicidad",
+      "cached": "Gastos del ciclo en publicidad",
+      "type": "s",
+      "format": "General"
+    },
+    "B73": {
+      "value": 3000.0,
+      "cached": 3000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "A75": {
+      "value": "Calculo de Reputacion",
+      "cached": "Calculo de Reputacion",
+      "type": "s",
+      "format": "General"
+    },
+    "C75": {
+      "value": "=F51*10",
+      "cached": 700,
+      "type": "f",
+      "format": "0.00"
+    },
+    "D75": {
+      "value": "=M10*10",
+      "cached": 3.75,
+      "type": "f",
+      "format": "0.00"
+    },
+    "E75": {
+      "value": "=AVERAGE(H65,H68,H71)*10",
+      "cached": "#DIV/0!",
+      "type": "f",
+      "format": "0.00"
+    },
+    "F75": {
+      "value": "=B73/10000*10",
+      "cached": 3,
+      "type": "f",
+      "format": "General"
+    },
+    "G75": {
+      "value": "=SUM(C75:F75)",
+      "cached": "#DIV/0!",
+      "type": "f",
+      "format": "General"
+    },
+    "H75": {
+      "value": "ptos de reputación",
+      "cached": "ptos de reputación",
+      "type": "s",
+      "format": "General"
+    },
+    "C76": {
+      "value": "Factor de producción",
+      "cached": "Factor de producción",
+      "type": "s",
+      "format": "General"
+    },
+    "D76": {
+      "value": "Factor de MO",
+      "cached": "Factor de MO",
+      "type": "s",
+      "format": "General"
+    },
+    "E76": {
+      "value": "Factor de MP (utilizacion)",
+      "cached": "Factor de MP (utilizacion)",
+      "type": "s",
+      "format": "General"
+    },
+    "F76": {
+      "value": "Factor de Publicidad",
+      "cached": "Factor de Publicidad",
+      "type": "s",
+      "format": "General"
+    },
+    "B82": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos Economicos)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos Economicos)",
+      "type": "s",
+      "format": "General"
+    },
+    "C82": {
+      "value": "Reputacion",
+      "cached": "Reputacion",
+      "type": "s",
+      "format": "General"
+    },
+    "D82": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "E82": {
+      "value": "Puntaje del precio",
+      "cached": "Puntaje del precio",
+      "type": "s",
+      "format": "General"
+    },
+    "F82": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "G82": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "H82": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "B83": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C83": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D83": {
+      "value": 40.0,
+      "cached": 40.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E83": {
+      "value": "=(MAX($D$83:$D$86)*2-D83)/10",
+      "cached": 5,
+      "type": "f",
+      "format": "General"
+    },
+    "F83": {
+      "value": "=SUM(C83,E83)",
+      "cached": 12,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G83": {
+      "value": "=F83/$F$87",
+      "cached": 0.223880597,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H83": {
+      "value": "=ROUND(G83*$B$91,0)",
+      "cached": 784,
+      "type": "f",
+      "format": "General"
+    },
+    "B84": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C84": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "D84": {
+      "value": 45.0,
+      "cached": 45.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E84": {
+      "value": "=(MAX($D$83:$D$86)*2-D84)/10",
+      "cached": 4.5,
+      "type": "f",
+      "format": "General"
+    },
+    "F84": {
+      "value": "=SUM(C84,E84)",
+      "cached": 12.8,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G84": {
+      "value": "=F84/$F$87",
+      "cached": 0.2388059701,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H84": {
+      "value": "=ROUND(G84*$B$91,0)",
+      "cached": 836,
+      "type": "f",
+      "format": "General"
+    },
+    "B85": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C85": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "#,##0.00"
+    },
+    "D85": {
+      "value": 43.0,
+      "cached": 43.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E85": {
+      "value": "=(MAX($D$83:$D$86)*2-D85)/10",
+      "cached": 4.7,
+      "type": "f",
+      "format": "General"
+    },
+    "F85": {
+      "value": "=SUM(C85,E85)",
+      "cached": 14.9,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G85": {
+      "value": "=F85/$F$87",
+      "cached": 0.2779850746,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H85": {
+      "value": "=ROUND(G85*$B$91,0)",
+      "cached": 973,
+      "type": "f",
+      "format": "General"
+    },
+    "B86": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C86": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D86": {
+      "value": 41.0,
+      "cached": 41.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E86": {
+      "value": "=(MAX($D$83:$D$86)*2-D86)/10",
+      "cached": 4.9,
+      "type": "f",
+      "format": "General"
+    },
+    "F86": {
+      "value": "=SUM(C86,E86)",
+      "cached": 13.9,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G86": {
+      "value": "=F86/$F$87",
+      "cached": 0.2593283582,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H86": {
+      "value": "=ROUND(G86*$B$91,0)",
+      "cached": 908,
+      "type": "f",
+      "format": "General"
+    },
+    "E87": {
+      "value": "Total",
+      "cached": "Total",
+      "type": "s",
+      "format": "General"
+    },
+    "F87": {
+      "value": "=SUM(F83:F86)",
+      "cached": 53.6,
+      "type": "f",
+      "format": "0.00"
+    },
+    "H87": {
+      "value": "=SUM(H83:H86)",
+      "cached": 3501,
+      "type": "f",
+      "format": "General"
+    },
+    "B89": {
+      "value": 7000.0,
+      "cached": 7000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C89": {
+      "value": "unidades mercado",
+      "cached": "unidades mercado",
+      "type": "s",
+      "format": "General"
+    },
+    "B90": {
+      "value": 0.5,
+      "cached": 0.5,
+      "type": "n",
+      "format": "0%"
+    },
+    "B91": {
+      "value": "=B89*B90",
+      "cached": 3500,
+      "type": "f",
+      "format": "General"
+    },
+    "C91": {
+      "value": "unidades mercado real",
+      "cached": "unidades mercado real",
+      "type": "s",
+      "format": "General"
+    },
+    "B96": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos promedio)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos promedio)",
+      "type": "s",
+      "format": "General"
+    },
+    "C96": {
+      "value": "Reputacion",
+      "cached": "Reputacion",
+      "type": "s",
+      "format": "General"
+    },
+    "D96": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "E96": {
+      "value": "Puntaje del precio",
+      "cached": "Puntaje del precio",
+      "type": "s",
+      "format": "General"
+    },
+    "F96": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "G96": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "H96": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "B97": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C97": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D97": {
+      "value": 120.0,
+      "cached": 120.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E97": {
+      "value": "=(MAX($D$97:$D$100)*2-D97)/10",
+      "cached": 28,
+      "type": "f",
+      "format": "General"
+    },
+    "F97": {
+      "value": "=SUM(C97,E97)",
+      "cached": 35,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G97": {
+      "value": "=F97/$F$101",
+      "cached": 0.2723735409,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H97": {
+      "value": "=ROUND(G97*$B$91,0)",
+      "cached": 953,
+      "type": "f",
+      "format": "General"
+    },
+    "B98": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C98": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "D98": {
+      "value": 150.0,
+      "cached": 150.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E98": {
+      "value": "=(MAX($D$97:$D$100)*2-D98)/10",
+      "cached": 25,
+      "type": "f",
+      "format": "General"
+    },
+    "F98": {
+      "value": "=SUM(C98,E98)",
+      "cached": 33.3,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G98": {
+      "value": "=F98/$F$101",
+      "cached": 0.2591439689,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H98": {
+      "value": "=ROUND(G98*$B$91,0)",
+      "cached": 907,
+      "type": "f",
+      "format": "General"
+    },
+    "B99": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C99": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "General"
+    },
+    "D99": {
+      "value": 190.0,
+      "cached": 190.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E99": {
+      "value": "=(MAX($D$97:$D$100)*2-D99)/10",
+      "cached": 21,
+      "type": "f",
+      "format": "General"
+    },
+    "F99": {
+      "value": "=SUM(C99,E99)",
+      "cached": 31.2,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G99": {
+      "value": "=F99/$F$101",
+      "cached": 0.2428015564,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H99": {
+      "value": "=ROUND(G99*$B$91,0)",
+      "cached": 850,
+      "type": "f",
+      "format": "General"
+    },
+    "B100": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C100": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D100": {
+      "value": 200.0,
+      "cached": 200.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E100": {
+      "value": "=(MAX($D$97:$D$100)*2-D100)/10",
+      "cached": 20,
+      "type": "f",
+      "format": "General"
+    },
+    "F100": {
+      "value": "=SUM(C100,E100)",
+      "cached": 29,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G100": {
+      "value": "=F100/$F$101",
+      "cached": 0.2256809339,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H100": {
+      "value": "=ROUND(G100*$B$91,0)",
+      "cached": 790,
+      "type": "f",
+      "format": "General"
+    },
+    "E101": {
+      "value": "Total",
+      "cached": "Total",
+      "type": "s",
+      "format": "General"
+    },
+    "F101": {
+      "value": "=SUM(F97:F100)",
+      "cached": 128.5,
+      "type": "f",
+      "format": "0.00"
+    },
+    "B103": {
+      "value": 5000.0,
+      "cached": 5000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C103": {
+      "value": "unidades mercado",
+      "cached": "unidades mercado",
+      "type": "s",
+      "format": "General"
+    },
+    "B104": {
+      "value": 0.7,
+      "cached": 0.7,
+      "type": "n",
+      "format": "0%"
+    },
+    "B105": {
+      "value": "=B103*B104",
+      "cached": 3500,
+      "type": "f",
+      "format": "General"
+    },
+    "C105": {
+      "value": "unidades mercado real",
+      "cached": "unidades mercado real",
+      "type": "s",
+      "format": "General"
+    },
+    "B110": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos Premium)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos Premium)",
+      "type": "s",
+      "format": "General"
+    },
+    "C110": {
+      "value": "Reputacion",
+      "cached": "Reputacion",
+      "type": "s",
+      "format": "General"
+    },
+    "D110": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "E110": {
+      "value": "Puntaje del precio",
+      "cached": "Puntaje del precio",
+      "type": "s",
+      "format": "General"
+    },
+    "F110": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "G110": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "H110": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "B111": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C111": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D111": {
+      "value": 250.0,
+      "cached": 250.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E111": {
+      "value": "=(MAX($D$111:$D$114)*2-D111)/10",
+      "cached": 55,
+      "type": "f",
+      "format": "General"
+    },
+    "F111": {
+      "value": "=SUM(C111,E111)",
+      "cached": 62,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G111": {
+      "value": "=F111/$F$115",
+      "cached": 0.2610526316,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H111": {
+      "value": "=ROUND(G111*$B$119,0)",
+      "cached": 209,
+      "type": "f",
+      "format": "General"
+    },
+    "B112": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C112": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "D112": {
+      "value": 300.0,
+      "cached": 300.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E112": {
+      "value": "=(MAX($D$111:$D$114)*2-D112)/10",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "F112": {
+      "value": "=SUM(C112,E112)",
+      "cached": 58.3,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G112": {
+      "value": "=F112/$F$115",
+      "cached": 0.2454736842,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H112": {
+      "value": "=ROUND(G112*$B$119,0)",
+      "cached": 196,
+      "type": "f",
+      "format": "General"
+    },
+    "B113": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C113": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "General"
+    },
+    "D113": {
+      "value": 220.0,
+      "cached": 220.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E113": {
+      "value": "=(MAX($D$111:$D$114)*2-D113)/10",
+      "cached": 58,
+      "type": "f",
+      "format": "General"
+    },
+    "F113": {
+      "value": "=SUM(C113,E113)",
+      "cached": 68.2,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G113": {
+      "value": "=F113/$F$115",
+      "cached": 0.2871578947,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H113": {
+      "value": "=ROUND(G113*$B$119,0)",
+      "cached": 230,
+      "type": "f",
+      "format": "General"
+    },
+    "B114": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C114": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "D114": {
+      "value": 400.0,
+      "cached": 400.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E114": {
+      "value": "=(MAX($D$111:$D$114)*2-D114)/10",
+      "cached": 40,
+      "type": "f",
+      "format": "General"
+    },
+    "F114": {
+      "value": "=SUM(C114,E114)",
+      "cached": 49,
+      "type": "f",
+      "format": "0.00"
+    },
+    "G114": {
+      "value": "=F114/$F$115",
+      "cached": 0.2063157895,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "H114": {
+      "value": "=ROUND(G114*$B$119,0)",
+      "cached": 165,
+      "type": "f",
+      "format": "General"
+    },
+    "E115": {
+      "value": "Total",
+      "cached": "Total",
+      "type": "s",
+      "format": "General"
+    },
+    "F115": {
+      "value": "=SUM(F111:F114)",
+      "cached": 237.5,
+      "type": "f",
+      "format": "0.00"
+    },
+    "B117": {
+      "value": 2000.0,
+      "cached": 2000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C117": {
+      "value": "unidades mercado",
+      "cached": "unidades mercado",
+      "type": "s",
+      "format": "General"
+    },
+    "B118": {
+      "value": 0.4,
+      "cached": 0.4,
+      "type": "n",
+      "format": "0%"
+    },
+    "B119": {
+      "value": "=B117*B118",
+      "cached": 800,
+      "type": "f",
+      "format": "General"
+    },
+    "C119": {
+      "value": "unidades mercado real",
+      "cached": "unidades mercado real",
+      "type": "s",
+      "format": "General"
+    },
+    "A123": {
+      "value": "Calculo de Reputacion",
+      "cached": "Calculo de Reputacion",
+      "type": "s",
+      "format": "General"
+    },
+    "C123": {
+      "value": "=F51*10",
+      "cached": 700,
+      "type": "f",
+      "format": "0.00"
+    },
+    "D123": {
+      "value": "=M10*10",
+      "cached": 3.75,
+      "type": "f",
+      "format": "0.00"
+    },
+    "E123": {
+      "value": "=AVERAGE(H65,H68,H71)*10",
+      "cached": "#DIV/0!",
+      "type": "f",
+      "format": "0.00"
+    },
+    "F123": {
+      "value": "=B73/10000*10",
+      "cached": 3,
+      "type": "f",
+      "format": "General"
+    },
+    "G123": {
+      "value": "=SUM(C123:F123)",
+      "cached": "#DIV/0!",
+      "type": "f",
+      "format": "General"
+    },
+    "H123": {
+      "value": "ptos de reputación",
+      "cached": "ptos de reputación",
+      "type": "s",
+      "format": "General"
+    },
+    "C124": {
+      "value": "Factor de producción",
+      "cached": "Factor de producción",
+      "type": "s",
+      "format": "General"
+    },
+    "D124": {
+      "value": "Factor de MO",
+      "cached": "Factor de MO",
+      "type": "s",
+      "format": "General"
+    },
+    "E124": {
+      "value": "Factor de MP (utilizacion)",
+      "cached": "Factor de MP (utilizacion)",
+      "type": "s",
+      "format": "General"
+    },
+    "F124": {
+      "value": "Factor de Publicidad",
+      "cached": "Factor de Publicidad",
+      "type": "s",
+      "format": "General"
+    },
+    "L124": {
+      "value": "Peso precio",
+      "cached": "Peso precio",
+      "type": "s",
+      "format": "General"
+    },
+    "M124": {
+      "value": 0.7,
+      "cached": 0.7,
+      "type": "n",
+      "format": "0%"
+    },
+    "L125": {
+      "value": "peso reputación",
+      "cached": "peso reputación",
+      "type": "s",
+      "format": "General"
+    },
+    "M125": {
+      "value": 0.2,
+      "cached": 0.2,
+      "type": "n",
+      "format": "0%"
+    },
+    "L126": {
+      "value": "Peso calidad",
+      "cached": "Peso calidad",
+      "type": "s",
+      "format": "General"
+    },
+    "M126": {
+      "value": 0.1,
+      "cached": 0.1,
+      "type": "n",
+      "format": "0%"
+    },
+    "B127": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos Economicos)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos Economicos)",
+      "type": "s",
+      "format": "General"
+    },
+    "C127": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "D127": {
+      "value": "Reputación (0-10)",
+      "cached": "Reputación (0-10)",
+      "type": "s",
+      "format": "General"
+    },
+    "E127": {
+      "value": "Calidad (0-100)",
+      "cached": "Calidad (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "F127": {
+      "value": "Precio Económico (0-100)",
+      "cached": "Precio Económico (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "G127": {
+      "value": "Reputación (0-100)",
+      "cached": "Reputación (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "H127": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "I127": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "J127": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "B128": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C128": {
+      "value": 40.0,
+      "cached": 40.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D128": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E128": {
+      "value": "=ROUND((D128/$D$132)*100,0)",
+      "cached": 20,
+      "type": "f",
+      "format": "General"
+    },
+    "F128": {
+      "value": "=100*(MAX($C$128:$C$131)-C128)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+      "cached": 100,
+      "type": "f",
+      "format": "General"
+    },
+    "G128": {
+      "value": "=D128*10",
+      "cached": 70,
+      "type": "f",
+      "format": "General"
+    },
+    "H128": {
+      "value": "=$M$124*F128+$M$125*G128+$M$126*E128",
+      "cached": 86,
+      "type": "f",
+      "format": "General"
+    },
+    "I128": {
+      "value": "=H128/$H$132",
+      "cached": 0.3690987124,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J128": {
+      "value": "=ROUND(I128*$B$136,0)",
+      "cached": 1292,
+      "type": "f",
+      "format": "General"
+    },
+    "B129": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C129": {
+      "value": 45.0,
+      "cached": 45.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D129": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "E129": {
+      "value": "=ROUND((D129/$D$132)*100,0)",
+      "cached": 24,
+      "type": "f",
+      "format": "General"
+    },
+    "F129": {
+      "value": "=100*(MAX($C$128:$C$131)-C129)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "G129": {
+      "value": "=D129*10",
+      "cached": 83,
+      "type": "f",
+      "format": "General"
+    },
+    "H129": {
+      "value": "=$M$124*F129+$M$125*G129+$M$126*E129",
+      "cached": 19,
+      "type": "f",
+      "format": "General"
+    },
+    "I129": {
+      "value": "=H129/$H$132",
+      "cached": 0.08154506438,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J129": {
+      "value": "=ROUND(I129*$B$136,0)",
+      "cached": 285,
+      "type": "f",
+      "format": "General"
+    },
+    "B130": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C130": {
+      "value": 43.0,
+      "cached": 43.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D130": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "General"
+    },
+    "E130": {
+      "value": "=ROUND((D130/$D$132)*100,0)",
+      "cached": 30,
+      "type": "f",
+      "format": "General"
+    },
+    "F130": {
+      "value": "=100*(MAX($C$128:$C$131)-C130)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+      "cached": 40,
+      "type": "f",
+      "format": "General"
+    },
+    "G130": {
+      "value": "=D130*10",
+      "cached": 102,
+      "type": "f",
+      "format": "General"
+    },
+    "H130": {
+      "value": "=$M$124*F130+$M$125*G130+$M$126*E130",
+      "cached": 51.4,
+      "type": "f",
+      "format": "General"
+    },
+    "I130": {
+      "value": "=H130/$H$132",
+      "cached": 0.2206008584,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J130": {
+      "value": "=ROUND(I130*$B$136,0)",
+      "cached": 772,
+      "type": "f",
+      "format": "General"
+    },
+    "B131": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C131": {
+      "value": 41.0,
+      "cached": 41.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D131": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E131": {
+      "value": "=ROUND((D131/$D$132)*100,0)",
+      "cached": 26,
+      "type": "f",
+      "format": "General"
+    },
+    "F131": {
+      "value": "=100*(MAX($C$128:$C$131)-C131)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+      "cached": 80,
+      "type": "f",
+      "format": "General"
+    },
+    "G131": {
+      "value": "=D131*10",
+      "cached": 90,
+      "type": "f",
+      "format": "General"
+    },
+    "H131": {
+      "value": "=$M$124*F131+$M$125*G131+$M$126*E131",
+      "cached": 76.6,
+      "type": "f",
+      "format": "General"
+    },
+    "I131": {
+      "value": "=H131/$H$132",
+      "cached": 0.3287553648,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J131": {
+      "value": "=ROUND(I131*$B$136,0)",
+      "cached": 1151,
+      "type": "f",
+      "format": "General"
+    },
+    "C132": {
+      "value": "SUMA",
+      "cached": "SUMA",
+      "type": "s",
+      "format": "General"
+    },
+    "D132": {
+      "value": "=SUM(D128:D131)",
+      "cached": 34.5,
+      "type": "f",
+      "format": "General"
+    },
+    "G132": {
+      "value": "TOTAL",
+      "cached": "TOTAL",
+      "type": "s",
+      "format": "General"
+    },
+    "H132": {
+      "value": "=SUM(H128:H131)",
+      "cached": 233,
+      "type": "f",
+      "format": "General"
+    },
+    "J132": {
+      "value": "=SUM(J128:J131)",
+      "cached": 3500,
+      "type": "f",
+      "format": "General"
+    },
+    "B134": {
+      "value": 7000.0,
+      "cached": 7000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C134": {
+      "value": "Unidades mercado ",
+      "cached": "Unidades mercado ",
+      "type": "s",
+      "format": "General"
+    },
+    "B135": {
+      "value": 0.5,
+      "cached": 0.5,
+      "type": "n",
+      "format": "0%"
+    },
+    "B136": {
+      "value": 3500.0,
+      "cached": 3500.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C136": {
+      "value": "Unidades mercado real ",
+      "cached": "Unidades mercado real ",
+      "type": "s",
+      "format": "General"
+    },
+    "L137": {
+      "value": "Peso precio",
+      "cached": "Peso precio",
+      "type": "s",
+      "format": "General"
+    },
+    "M137": {
+      "value": 0.4,
+      "cached": 0.4,
+      "type": "n",
+      "format": "0%"
+    },
+    "L138": {
+      "value": "peso reputación",
+      "cached": "peso reputación",
+      "type": "s",
+      "format": "General"
+    },
+    "M138": {
+      "value": 0.35,
+      "cached": 0.35,
+      "type": "n",
+      "format": "0%"
+    },
+    "L139": {
+      "value": "Peso calidad",
+      "cached": "Peso calidad",
+      "type": "s",
+      "format": "General"
+    },
+    "M139": {
+      "value": 0.25,
+      "cached": 0.25,
+      "type": "n",
+      "format": "0%"
+    },
+    "B140": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos Medio)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos Medio)",
+      "type": "s",
+      "format": "General"
+    },
+    "C140": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "D140": {
+      "value": "Reputación (0-10)",
+      "cached": "Reputación (0-10)",
+      "type": "s",
+      "format": "General"
+    },
+    "E140": {
+      "value": "Calidad (0-100)",
+      "cached": "Calidad (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "F140": {
+      "value": "Precio Económico (0-100)",
+      "cached": "Precio Económico (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "G140": {
+      "value": "Reputación (0-100)",
+      "cached": "Reputación (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "H140": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "I140": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "J140": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "L140": {
+      "value": "Precio ideal",
+      "cached": "Precio ideal",
+      "type": "s",
+      "format": "General"
+    },
+    "M140": {
+      "value": 100.0,
+      "cached": 100.0,
+      "type": "n",
+      "format": "General"
+    },
+    "B141": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C141": {
+      "value": 120.0,
+      "cached": 120.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D141": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E141": {
+      "value": "=ROUND((D141/$D$132)*100,0)",
+      "cached": 20,
+      "type": "f",
+      "format": "General"
+    },
+    "F141": {
+      "value": "=100-(ABS(C141-$M$140)/$M$140*100)",
+      "cached": 80,
+      "type": "f",
+      "format": "General"
+    },
+    "G141": {
+      "value": "=D141*10",
+      "cached": 70,
+      "type": "f",
+      "format": "General"
+    },
+    "H141": {
+      "value": "=$M$137*F141+$M$138*G141+$M$139*E141",
+      "cached": 61.5,
+      "type": "f",
+      "format": "General"
+    },
+    "I141": {
+      "value": "=H141/$H$145",
+      "cached": 0.3048327138,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J141": {
+      "value": "=ROUND(I141*$B$149,0)",
+      "cached": 1067,
+      "type": "f",
+      "format": "General"
+    },
+    "B142": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C142": {
+      "value": 150.0,
+      "cached": 150.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D142": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "E142": {
+      "value": "=ROUND((D142/$D$132)*100,0)",
+      "cached": 24,
+      "type": "f",
+      "format": "General"
+    },
+    "F142": {
+      "value": "=100-(ABS(C142-$M$140)/$M$140*100)",
+      "cached": 50,
+      "type": "f",
+      "format": "General"
+    },
+    "G142": {
+      "value": "=D142*10",
+      "cached": 83,
+      "type": "f",
+      "format": "General"
+    },
+    "H142": {
+      "value": "=$M$137*F142+$M$138*G142+$M$139*E142",
+      "cached": 55.05,
+      "type": "f",
+      "format": "General"
+    },
+    "I142": {
+      "value": "=H142/$H$145",
+      "cached": 0.2728624535,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J142": {
+      "value": "=ROUND(I142*$B$149,0)",
+      "cached": 955,
+      "type": "f",
+      "format": "General"
+    },
+    "B143": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C143": {
+      "value": 190.0,
+      "cached": 190.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D143": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "General"
+    },
+    "E143": {
+      "value": "=ROUND((D143/$D$132)*100,0)",
+      "cached": 30,
+      "type": "f",
+      "format": "General"
+    },
+    "F143": {
+      "value": "=100-(ABS(C143-$M$140)/$M$140*100)",
+      "cached": 10,
+      "type": "f",
+      "format": "General"
+    },
+    "G143": {
+      "value": "=D143*10",
+      "cached": 102,
+      "type": "f",
+      "format": "General"
+    },
+    "H143": {
+      "value": "=$M$137*F143+$M$138*G143+$M$139*E143",
+      "cached": 47.2,
+      "type": "f",
+      "format": "General"
+    },
+    "I143": {
+      "value": "=H143/$H$145",
+      "cached": 0.233952912,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J143": {
+      "value": "=ROUND(I143*$B$149,0)",
+      "cached": 819,
+      "type": "f",
+      "format": "General"
+    },
+    "B144": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C144": {
+      "value": 200.0,
+      "cached": 200.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D144": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E144": {
+      "value": "=ROUND((D144/$D$132)*100,0)",
+      "cached": 26,
+      "type": "f",
+      "format": "General"
+    },
+    "F144": {
+      "value": "=100-(ABS(C144-$M$140)/$M$140*100)",
+      "cached": 0,
+      "type": "f",
+      "format": "General"
+    },
+    "G144": {
+      "value": "=D144*10",
+      "cached": 90,
+      "type": "f",
+      "format": "General"
+    },
+    "H144": {
+      "value": "=$M$137*F144+$M$138*G144+$M$139*E144",
+      "cached": 38,
+      "type": "f",
+      "format": "General"
+    },
+    "I144": {
+      "value": "=H144/$H$145",
+      "cached": 0.1883519207,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J144": {
+      "value": "=ROUND(I144*$B$149,0)",
+      "cached": 659,
+      "type": "f",
+      "format": "General"
+    },
+    "C145": {
+      "value": "SUMA",
+      "cached": "SUMA",
+      "type": "s",
+      "format": "General"
+    },
+    "D145": {
+      "value": "=SUM(D141:D144)",
+      "cached": 34.5,
+      "type": "f",
+      "format": "General"
+    },
+    "G145": {
+      "value": "TOTAL",
+      "cached": "TOTAL",
+      "type": "s",
+      "format": "General"
+    },
+    "H145": {
+      "value": "=SUM(H141:H144)",
+      "cached": 201.75,
+      "type": "f",
+      "format": "General"
+    },
+    "J145": {
+      "value": "=SUM(J141:J144)",
+      "cached": 3500,
+      "type": "f",
+      "format": "General"
+    },
+    "B147": {
+      "value": 5000.0,
+      "cached": 5000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C147": {
+      "value": "Unidades mercado ",
+      "cached": "Unidades mercado ",
+      "type": "s",
+      "format": "General"
+    },
+    "B148": {
+      "value": 0.7,
+      "cached": 0.7,
+      "type": "n",
+      "format": "0%"
+    },
+    "B149": {
+      "value": 3500.0,
+      "cached": 3500.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C149": {
+      "value": "Unidades mercado real ",
+      "cached": "Unidades mercado real ",
+      "type": "s",
+      "format": "General"
+    },
+    "L150": {
+      "value": "Peso precio",
+      "cached": "Peso precio",
+      "type": "s",
+      "format": "General"
+    },
+    "M150": {
+      "value": 0.1,
+      "cached": 0.1,
+      "type": "n",
+      "format": "0%"
+    },
+    "L151": {
+      "value": "peso reputación",
+      "cached": "peso reputación",
+      "type": "s",
+      "format": "General"
+    },
+    "M151": {
+      "value": 0.5,
+      "cached": 0.5,
+      "type": "n",
+      "format": "0%"
+    },
+    "L152": {
+      "value": "Peso calidad",
+      "cached": "Peso calidad",
+      "type": "s",
+      "format": "General"
+    },
+    "M152": {
+      "value": 0.4,
+      "cached": 0.4,
+      "type": "n",
+      "format": "0%"
+    },
+    "B153": {
+      "value": "EJEMPLO de distribución de Ventas (Bolsos Caros)",
+      "cached": "EJEMPLO de distribución de Ventas (Bolsos Caros)",
+      "type": "s",
+      "format": "General"
+    },
+    "C153": {
+      "value": "Precio",
+      "cached": "Precio",
+      "type": "s",
+      "format": "General"
+    },
+    "D153": {
+      "value": "Reputación (0-10)",
+      "cached": "Reputación (0-10)",
+      "type": "s",
+      "format": "General"
+    },
+    "E153": {
+      "value": "Calidad (0-100)",
+      "cached": "Calidad (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "F153": {
+      "value": "Precio Económico (0-100)",
+      "cached": "Precio Económico (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "G153": {
+      "value": "Reputación (0-100)",
+      "cached": "Reputación (0-100)",
+      "type": "s",
+      "format": "General"
+    },
+    "H153": {
+      "value": "Puntaje total",
+      "cached": "Puntaje total",
+      "type": "s",
+      "format": "General"
+    },
+    "I153": {
+      "value": "Porcentaje parcial",
+      "cached": "Porcentaje parcial",
+      "type": "s",
+      "format": "General"
+    },
+    "J153": {
+      "value": "Unidades Vendidas",
+      "cached": "Unidades Vendidas",
+      "type": "s",
+      "format": "General"
+    },
+    "L153": {
+      "value": "Precio ideal",
+      "cached": "Precio ideal",
+      "type": "s",
+      "format": "General"
+    },
+    "M153": {
+      "value": 250.0,
+      "cached": 250.0,
+      "type": "n",
+      "format": "General"
+    },
+    "B154": {
+      "value": "Empresa A",
+      "cached": "Empresa A",
+      "type": "s",
+      "format": "General"
+    },
+    "C154": {
+      "value": 250.0,
+      "cached": 250.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D154": {
+      "value": 7.0,
+      "cached": 7.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E154": {
+      "value": "=ROUND((D154/$D$132)*100,0)",
+      "cached": 20,
+      "type": "f",
+      "format": "General"
+    },
+    "F154": {
+      "value": "=100-(ABS(C154-$M$153)/$M$153*100)",
+      "cached": 100,
+      "type": "f",
+      "format": "General"
+    },
+    "G154": {
+      "value": "=D154*10",
+      "cached": 70,
+      "type": "f",
+      "format": "General"
+    },
+    "H154": {
+      "value": "=$M$150*F154+$M$151*G154+$M$152*E154",
+      "cached": 53,
+      "type": "f",
+      "format": "General"
+    },
+    "I154": {
+      "value": "=H154/$H$158",
+      "cached": 0.21783806,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J154": {
+      "value": "=ROUND(I154*$B$162,0)",
+      "cached": 174,
+      "type": "f",
+      "format": "General"
+    },
+    "B155": {
+      "value": "Empresa B",
+      "cached": "Empresa B",
+      "type": "s",
+      "format": "General"
+    },
+    "C155": {
+      "value": 300.0,
+      "cached": 300.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D155": {
+      "value": 8.3,
+      "cached": 8.3,
+      "type": "n",
+      "format": "General"
+    },
+    "E155": {
+      "value": "=ROUND((D155/$D$132)*100,0)",
+      "cached": 24,
+      "type": "f",
+      "format": "General"
+    },
+    "F155": {
+      "value": "=100-(ABS(C155-$M$153)/$M$153*100)",
+      "cached": 80,
+      "type": "f",
+      "format": "General"
+    },
+    "G155": {
+      "value": "=D155*10",
+      "cached": 83,
+      "type": "f",
+      "format": "General"
+    },
+    "H155": {
+      "value": "=$M$150*F155+$M$151*G155+$M$152*E155",
+      "cached": 59.1,
+      "type": "f",
+      "format": "General"
+    },
+    "I155": {
+      "value": "=H155/$H$158",
+      "cached": 0.2429099877,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J155": {
+      "value": "=ROUND(I155*$B$162,0)",
+      "cached": 194,
+      "type": "f",
+      "format": "General"
+    },
+    "B156": {
+      "value": "Empresa C",
+      "cached": "Empresa C",
+      "type": "s",
+      "format": "General"
+    },
+    "C156": {
+      "value": 220.0,
+      "cached": 220.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D156": {
+      "value": 10.2,
+      "cached": 10.2,
+      "type": "n",
+      "format": "General"
+    },
+    "E156": {
+      "value": "=ROUND((D156/$D$132)*100,0)",
+      "cached": 30,
+      "type": "f",
+      "format": "General"
+    },
+    "F156": {
+      "value": "=100-(ABS(C156-$M$153)/$M$153*100)",
+      "cached": 88,
+      "type": "f",
+      "format": "General"
+    },
+    "G156": {
+      "value": "=D156*10",
+      "cached": 102,
+      "type": "f",
+      "format": "General"
+    },
+    "H156": {
+      "value": "=$M$150*F156+$M$151*G156+$M$152*E156",
+      "cached": 71.8,
+      "type": "f",
+      "format": "General"
+    },
+    "I156": {
+      "value": "=H156/$H$158",
+      "cached": 0.295108919,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J156": {
+      "value": "=ROUND(I156*$B$162,0)",
+      "cached": 236,
+      "type": "f",
+      "format": "General"
+    },
+    "B157": {
+      "value": "Empresa D",
+      "cached": "Empresa D",
+      "type": "s",
+      "format": "General"
+    },
+    "C157": {
+      "value": 400.0,
+      "cached": 400.0,
+      "type": "n",
+      "format": "[$S/.]#,##0.00"
+    },
+    "D157": {
+      "value": 9.0,
+      "cached": 9.0,
+      "type": "n",
+      "format": "General"
+    },
+    "E157": {
+      "value": "=ROUND((D157/$D$132)*100,0)",
+      "cached": 26,
+      "type": "f",
+      "format": "General"
+    },
+    "F157": {
+      "value": "=100-(ABS(C157-$M$153)/$M$153*100)",
+      "cached": 40,
+      "type": "f",
+      "format": "General"
+    },
+    "G157": {
+      "value": "=D157*10",
+      "cached": 90,
+      "type": "f",
+      "format": "General"
+    },
+    "H157": {
+      "value": "=$M$150*F157+$M$151*G157+$M$152*E157",
+      "cached": 59.4,
+      "type": "f",
+      "format": "General"
+    },
+    "I157": {
+      "value": "=H157/$H$158",
+      "cached": 0.2441430333,
+      "type": "f",
+      "format": "0.00%"
+    },
+    "J157": {
+      "value": "=ROUND(I157*$B$162,0)",
+      "cached": 195,
+      "type": "f",
+      "format": "General"
+    },
+    "C158": {
+      "value": "SUMA",
+      "cached": "SUMA",
+      "type": "s",
+      "format": "General"
+    },
+    "D158": {
+      "value": "=SUM(D154:D157)",
+      "cached": 34.5,
+      "type": "f",
+      "format": "General"
+    },
+    "G158": {
+      "value": "TOTAL",
+      "cached": "TOTAL",
+      "type": "s",
+      "format": "General"
+    },
+    "H158": {
+      "value": "=SUM(H154:H157)",
+      "cached": 243.3,
+      "type": "f",
+      "format": "General"
+    },
+    "J158": {
+      "value": "=SUM(J154:J157)",
+      "cached": 799,
+      "type": "f",
+      "format": "General"
+    },
+    "B160": {
+      "value": 2000.0,
+      "cached": 2000.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C160": {
+      "value": "Unidades mercado ",
+      "cached": "Unidades mercado ",
+      "type": "s",
+      "format": "General"
+    },
+    "B161": {
+      "value": 0.4,
+      "cached": 0.4,
+      "type": "n",
+      "format": "0%"
+    },
+    "B162": {
+      "value": 800.0,
+      "cached": 800.0,
+      "type": "n",
+      "format": "General"
+    },
+    "C162": {
+      "value": "Unidades mercado real ",
+      "cached": "Unidades mercado real ",
+      "type": "s",
+      "format": "General"
+    }
+  },
+  "sheet": "CANTIDAD DE PRODUCCIÓN"
+}

@@ -58,7 +58,15 @@
     auto: Object.freeze({ pixelRatio: 1.05, maxCustomers: 8, maxCars: 3, farAnimationFps: 12 })
   });
 
-  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, version: '2026.09.10.2' });
+  const NPCS = Object.freeze({
+    mona: Object.freeze({
+      model: 'assets/models3d/npcs/mona.glb',
+      height: 1.68,
+      rotationY: 0,
+      position: Object.freeze({ x: -3, z: 10.7 })
+    })
+  });
+  const config = Object.freeze({ NPC_STATES, WORLD, PERFORMANCE, NPCS, version: '2026.09.22.1' });
   root.SIDE3D_CONFIG = config;
   if (typeof module !== 'undefined' && module.exports) module.exports = config;
 })(typeof window !== 'undefined' ? window : globalThis);

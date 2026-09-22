@@ -1,0 +1,16 @@
+{
+  "source": "tools/model-sources/mona/mona.original.glb",
+  "output": "assets/models3d/npcs/mona.glb",
+  "sourceSha256": "9da8fa7dd57ec91d67edc1f7a5b00b526ecc9ef9fad08bf7683abd537d7d32a2",
+  "outputSha256": "4c5913db775c99eb9e5d3ba9318f4e039b024857c101c4e2774da050e659f4c1",
+  "sourceBytes": 74999312,
+  "outputBytes": 3948040,
+  "sourceTriangles": 1499830,
+  "triangles": 50000,
+  "vertices": 42364,
+  "relativeError": 0.0009450022480450571,
+  "animations": 0,
+  "rigged": false,
+  "textures": "Color 2048px; normal and metallic/roughness 1024px",
+  "note": "Original supplied by the user. No new license is assigned to the model."
+}

@@ -1,0 +1,11 @@
+{
+  "errors": [
+    "Lotes_Produccion!$J$2: #¿NOMBRE?",
+    "Lotes_Produccion!$J$3: #¿NOMBRE?",
+    "Lotes_Produccion!$J$4: #¿NOMBRE?"
+  ],
+  "version": "16.0",
+  "nativeEngine": "Microsoft Excel",
+  "checks": "Capacity, allocation, inventory, zero plan, shortage, reputation, restoration",
+  "status": "passed"
+}

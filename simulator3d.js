@@ -26,6 +26,7 @@
   let trafficPhase = 0, trafficLight = 'vehicles', trafficSignalMeshes = [], visibilityPaused = false, debugPerformance = false, npcModelTemplate = null;
   const execModelTemplates = { male: null, female: null, casual: null };
   const characterTextures = new Map();
+  let monaModule = null, monaTemplate = null, monaLoadError = '';
   let controlsOpenedFromHelp = false, missionCollapsed = false;
 
   const PRODUCTS = [
@@ -513,13 +514,13 @@
     message(gameSession.revenue >= gameSession.targetRevenue ? 'Se cerró la tienda: alcanzaste la meta del día.' : 'Se cerró la tienda: no llegaste a la meta.');
   }
 
-  function message(text) {
+  function message(text, duration = 2800) {
     const el = $3('sim3dMessage');
     if (!el) return;
     el.textContent = text;
     el.classList.add('show');
     clearTimeout(message.t);
-    message.t = setTimeout(() => el.classList.remove('show'), 2800);
+    message.t = setTimeout(() => el.classList.remove('show'), duration);
   }
 
   function updateHUD() {
@@ -624,6 +625,20 @@
       }
     }));
     return Boolean(execModelTemplates.male || execModelTemplates.female);
+  }
+
+  async function loadMonaModel() {
+    if (monaTemplate) return true;
+    try {
+      monaModule = await import('./services/mona_npc.js');
+      monaTemplate = await monaModule.loadMonaTemplate(THREE, GLTFLoader, CONFIG.NPCS.mona);
+      monaLoadError = '';
+      return true;
+    } catch (error) {
+      monaLoadError = error.message;
+      console.warn('No se pudo cargar Mona; su puesto conserva un personaje de respaldo.', error);
+      return false;
+    }
   }
 
   async function initNavigation() {
@@ -1703,6 +1718,7 @@
         if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
         if (c.isSkinnedMesh) c.skeleton?.dispose?.();
         if (c.userData?.sharedCharacterResource) return;
+        c.userData?.ownedTexture?.dispose?.();
         c.geometry?.dispose?.();
         if (c.material) Array.isArray(c.material) ? c.material.forEach(m => m.dispose?.()) : c.material.dispose?.();
       });
@@ -1784,14 +1800,46 @@
     }
   }
 
+  function buildMonaNpc() {
+    const config = CONFIG.NPCS?.mona;
+    if (!config) return;
+    const mona = monaTemplate
+      ? monaModule.createMonaNpc(THREE, monaTemplate, config)
+      : person({gender:'female', execModel:'female', bodyScale:.96});
+    mona.position.set(config.position.x, 0, config.position.z);
+    mona.name = 'Mona';
+    mona.userData.npcId = 'mona';
+    mona.userData.role = 'guide';
+    if (!monaTemplate) mona.userData.modelKind = 'mona-fallback';
+    dynamicGroup.add(mona);
+    const label = addTextLabel('Mona', config.position.x, 1.87, config.position.z, '#fff0c2', .16);
+    label.userData.ownedTexture = label.material.map;
+    dynamicGroup.add(label);
+    addDynamicCollider(config.position.x-.28, config.position.x+.28, config.position.z-.24, config.position.z+.24);
+    interactables.push({mesh:mona, type:'mona', label:'Hablar con Mona'});
+  }
+
+  function talkToMona() {
+    const advice = checkoutQueue.length
+      ? `Hay ${checkoutQueue.length} cliente(s) esperando. Acércate a la caja para cobrar.`
+      : totalDisplayStock() === 0 && totalReserveStock() > 0
+        ? 'Los exhibidores están vacíos. Repón los bolsos desde el almacén.'
+        : totalDisplayStock() + totalReserveStock() === 0
+          ? 'No quedan bolsos. Revisa tu producción y el abastecimiento en Administración.'
+          : 'Bienvenido. Revisa los bolsos en los exhibidores y atiende a los clientes en caja.';
+    message(`Mona: ${advice}`, 6500);
+  }
+
   function rebuildDynamicWorld() {
     if (!dynamicGroup) return;
     clearGroup(dynamicGroup);
+    interactables = interactables.filter(it => it.type !== 'mona');
     animatedActors = animatedActors.filter(a => a.type === 'traffic' || a.type === 'pedestrian');
     checkoutQueue = [];
     npcs.forEach(recycleNpcPerson);
     npcs = [];
     dynamicColliders=[];
+    buildMonaNpc();
     clearGroup(npcGroup);
     loadInventory();
 
@@ -2463,6 +2511,11 @@
     const p = $3('sim3dPrompt');
     const it = nearestInteractable();
     if (!p) return;
+    if (it?.type === 'mona') {
+      p.innerHTML = '<kbd>E</kbd> Hablar con Mona';
+      p.classList.add('show');
+      return;
+    }
     if (it?.type === 'decisions') {
       p.innerHTML = '<kbd>E</kbd> Abrir terminal de decisiones';
       p.classList.add('show');
@@ -2508,6 +2561,7 @@
     else if (it.type === 'product') openProductInspect(it.productId);
     else if (it.type === 'admin') openAdmin();
     else if (it.type === 'news') openNewsPanel();
+    else if (it.type === 'mona') talkToMona();
   }
 
   function openDecisionsFrom3D() {
@@ -2723,6 +2777,7 @@
     if (initialized) return true;
     if (!await loadThree()) return false;
     await loadExecModelTemplates();
+    await loadMonaModel();
     if (Object.values(execModelTemplates).some(model=>!model)) await loadNpcModelTemplate();
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
@@ -2806,6 +2861,7 @@
       if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, x:node.position.x, z:node.position.z});
     });
     return {initialized, running, navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   window.SIDE3D = { prepare, enter, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };

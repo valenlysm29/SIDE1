@@ -1,5 +1,12 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
+## Mona y carpeta unificada
+
+Se integró el modelo de Mona como NPC de orientación junto a la entrada de la
+tienda. Acércate y pulsa **E** para hablar con ella. El modelo optimizado, el
+original, las pruebas y los informes anteriores están dentro de `SIDE1`.
+Consulta [Mona y estructura](MONA_Y_ESTRUCTURA.md) para ubicación y validación.
+
 ## Entrega actual: v2026.09.10.2
 
 La versión 2026.09.10.2 reforma el simulador 3D: reemplaza el mapa anterior por

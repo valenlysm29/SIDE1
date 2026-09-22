@@ -1,0 +1,1190 @@
+{
+  "L5": {
+    "kind": "Fórmula",
+    "old": "=K5*24",
+    "new": "=K5*$T$4",
+    "why": "Días productivos editables; se conserva el ciclo de 24 días."
+  },
+  "M10": {
+    "kind": "Fórmula",
+    "old": "=L10/L9",
+    "new": "=IF(L9=0,0,L10/L9)",
+    "why": "Evita división por cero cuando no hay operarios."
+  },
+  "M5": {
+    "kind": "Fórmula",
+    "old": "=K7+(F7+F13+F19)/100+4%*F21",
+    "new": "=IF(L9=0,0,MAX(0,MIN(1,K7+$T$5*M10+$T$6*MIN(1,MAX(0,F21)))))",
+    "why": "Se usa proporción N3 de todas las máquinas. Bono máximo propuesto 6 puntos, jefatura 4 puntos y eficiencia limitada al 100%."
+  },
+  "N5": {
+    "kind": "Fórmula",
+    "old": "=ROUND(L5*M5,0)",
+    "new": "=ROUNDDOWN(MAX(0,L5*M5),0)",
+    "why": "Capacidad entera conservadora; no redondear por encima de la capacidad."
+  },
+  "N4": {
+    "kind": "Valor / etiqueta",
+    "old": "Produccion Real",
+    "new": "Capacidad de MO",
+    "why": ""
+  },
+  "O5": {
+    "kind": "Valor / etiqueta",
+    "old": "Esta produccion no puede ser superior a lo que permite el material",
+    "new": "Ver producción factible en Q11",
+    "why": ""
+  },
+  "K9": {
+    "kind": "Valor / etiqueta",
+    "old": "Total de trabajadores",
+    "new": "Operarios productivos",
+    "why": ""
+  },
+  "K10": {
+    "kind": "Valor / etiqueta",
+    "old": "total de trabajadores N3",
+    "new": "Operarios N3",
+    "why": ""
+  },
+  "B23": {
+    "kind": "Valor / etiqueta",
+    "old": "NOTA: EL PROCETANJE DE TRABAJADORES DE NIVEL 3 AFECTA POSITIVAMENTE A LA EFICIENCIA ",
+    "new": "Eficiencia: base + bono por proporción N3 + jefatura. Coeficientes editables en T5:T6.",
+    "why": ""
+  },
+  "E37": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D37*E35/D36,0)",
+    "new": "=T37+IF(V37<=MIN($E$35,SUM($R$37:$R$39))-SUM($T$37:$T$39),1,0)",
+    "why": "Reparte unidades por restos mayores sobre pedidos factibles, con límite de plan, MO, MP y demanda; no pierde unidades al truncar."
+  },
+  "D56": {
+    "kind": "Fórmula",
+    "old": "=MIN(SUM(D49:F49)/D31,SUM(G49:I49)/G31,SUM(J49:L49)/J31,E37,D37)",
+    "new": "=MAX(0,MIN(E37,P37,D37,Q37))",
+    "why": "Sustituye disponibilidades manuales no conciliadas por límites trazables a stock, receta, MO, plan y demanda."
+  },
+  "E56": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D56,0)",
+    "new": "=ROUNDDOWN(D56,0)",
+    "why": "Se conserva el redondeo hacia abajo sobre la producción limitada."
+  },
+  "K56": {
+    "kind": "Fórmula",
+    "old": "2026-05-01T00:00:00",
+    "new": "=$T$9",
+    "why": "Reemplaza fechas sin significado de calidad por puntaje especificado de la receta. Escala propuesta N1=33,33, N2=66,67, N3=100."
+  },
+  "D49": {
+    "kind": "Fórmula",
+    "old": 60,
+    "new": "=$E56*D31",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "E49": {
+    "kind": "Fórmula",
+    "old": 10,
+    "new": "=$E56*E31",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "H49": {
+    "kind": "Fórmula",
+    "old": 200,
+    "new": "=$E56*H31",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "J49": {
+    "kind": "Fórmula",
+    "old": 1600,
+    "new": "=$E56*J31",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "E38": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D38*E35/D36,0)",
+    "new": "=T38+IF(V38<=MIN($E$35,SUM($R$37:$R$39))-SUM($T$37:$T$39),1,0)",
+    "why": "Reparte unidades por restos mayores sobre pedidos factibles, con límite de plan, MO, MP y demanda; no pierde unidades al truncar."
+  },
+  "D57": {
+    "kind": "Fórmula",
+    "old": "=MIN(SUM(D50:F50)/E32,SUM(G50:I50)/H32,SUM(J50:L50)/K32,E38,D38)",
+    "new": "=MAX(0,MIN(E38,P38,D38,Q38))",
+    "why": "Sustituye disponibilidades manuales no conciliadas por límites trazables a stock, receta, MO, plan y demanda."
+  },
+  "E57": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D57,0)",
+    "new": "=ROUNDDOWN(D57,0)",
+    "why": "Se conserva el redondeo hacia abajo sobre la producción limitada."
+  },
+  "K57": {
+    "kind": "Fórmula",
+    "old": "2026-03-01T00:00:00",
+    "new": "=$T$10",
+    "why": "Reemplaza fechas sin significado de calidad por puntaje especificado de la receta. Escala propuesta N1=33,33, N2=66,67, N3=100."
+  },
+  "E50": {
+    "kind": "Fórmula",
+    "old": 50,
+    "new": "=$E57*E32",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "H50": {
+    "kind": "Fórmula",
+    "old": 150,
+    "new": "=$E57*H32",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "L50": {
+    "kind": "Fórmula",
+    "old": 1200,
+    "new": "=$E57*L32",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "E39": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D39*E35/D36,0)",
+    "new": "=T39+IF(V39<=MIN($E$35,SUM($R$37:$R$39))-SUM($T$37:$T$39),1,0)",
+    "why": "Reparte unidades por restos mayores sobre pedidos factibles, con límite de plan, MO, MP y demanda; no pierde unidades al truncar."
+  },
+  "D58": {
+    "kind": "Fórmula",
+    "old": "=MIN(SUM(D51:F51)/F33,SUM(G51:I51)/I33,SUM(J51:L51)/L33,E39,D39)",
+    "new": "=MAX(0,MIN(E39,P39,D39,Q39))",
+    "why": "Sustituye disponibilidades manuales no conciliadas por límites trazables a stock, receta, MO, plan y demanda."
+  },
+  "E58": {
+    "kind": "Fórmula",
+    "old": "=ROUNDDOWN(D58,0)",
+    "new": "=ROUNDDOWN(D58,0)",
+    "why": "Se conserva el redondeo hacia abajo sobre la producción limitada."
+  },
+  "K58": {
+    "kind": "Fórmula",
+    "old": "2026-02-01T00:00:00",
+    "new": "=$T$11",
+    "why": "Reemplaza fechas sin significado de calidad por puntaje especificado de la receta. Escala propuesta N1=33,33, N2=66,67, N3=100."
+  },
+  "F51": {
+    "kind": "Fórmula",
+    "old": 70,
+    "new": "=$E58*F33",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "H51": {
+    "kind": "Fórmula",
+    "old": 50,
+    "new": "=$E58*H33",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "L51": {
+    "kind": "Fórmula",
+    "old": 1100,
+    "new": "=$E58*L33",
+    "why": "Consumo automático por producción real y receta. Evita inventarios paralelos y sustitución no validada de calidades."
+  },
+  "E36": {
+    "kind": "Fórmula",
+    "old": "=SUM(E37:E39)",
+    "new": "=SUM(E37:E39)",
+    "why": "Total de la asignación factible."
+  },
+  "C48": {
+    "kind": "Valor / etiqueta",
+    "old": "Ejecucion de produccion",
+    "new": "Consumo real por calidad",
+    "why": ""
+  },
+  "K55": {
+    "kind": "Valor / etiqueta",
+    "old": "Calidad por Materiales",
+    "new": "Calidad especificada (0–100)",
+    "why": ""
+  },
+  "E62": {
+    "kind": "Valor / etiqueta",
+    "old": "Compras",
+    "new": "Compras convertidas",
+    "why": ""
+  },
+  "F62": {
+    "kind": "Valor / etiqueta",
+    "old": "Produccion",
+    "new": "Consumo real",
+    "why": ""
+  },
+  "H62": {
+    "kind": "Valor / etiqueta",
+    "old": "InventarioFinal = InventarioInicial + compras - produccido",
+    "new": "Utilización",
+    "why": ""
+  },
+  "F63": {
+    "kind": "Fórmula",
+    "old": 75,
+    "new": "=SUM(D49:D51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F64": {
+    "kind": "Fórmula",
+    "old": 72,
+    "new": "=SUM(E49:E51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F65": {
+    "kind": "Fórmula",
+    "old": 63,
+    "new": "=SUM(F49:F51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F66": {
+    "kind": "Fórmula",
+    "old": 250,
+    "new": "=SUM(G49:G51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F67": {
+    "kind": "Fórmula",
+    "old": 180,
+    "new": "=SUM(H49:H51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F68": {
+    "kind": "Fórmula",
+    "old": 90,
+    "new": "=SUM(I49:I51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F69": {
+    "kind": "Fórmula",
+    "old": 1500,
+    "new": "=SUM(J49:J51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F70": {
+    "kind": "Fórmula",
+    "old": 1260,
+    "new": "=SUM(K49:K51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "F71": {
+    "kind": "Fórmula",
+    "old": 1170,
+    "new": "=SUM(L49:L51)",
+    "why": "El consumo sale de la producción ejecutada, no de cifras escritas a mano."
+  },
+  "C75": {
+    "kind": "Fórmula",
+    "old": "=F51*10",
+    "new": "=IF(D36=0,0,10*SUM(E56:E58)/D36)",
+    "why": "Cumplimiento del plan entre 0 y 10. F51 era cantidad de cuero: multiplicarla por 10 daba 700 puntos."
+  },
+  "D75": {
+    "kind": "Fórmula",
+    "old": "=M10*10",
+    "new": "=10*M10",
+    "why": "Aporte de personal experto entre 0 y 10, con denominador protegido."
+  },
+  "E75": {
+    "kind": "Fórmula",
+    "old": "=AVERAGE(H65,H68,H71)*10",
+    "new": "=IF(SUM(E56:E58)=0,0,SUMPRODUCT(E56:E58,K56:K58)/SUM(E56:E58)/10)",
+    "why": "Calidad media ponderada por bolsos. Se eliminan referencias a H65/H68/H71 vacías y la confusión entre calidad y agotamiento de inventario."
+  },
+  "F75": {
+    "kind": "Fórmula",
+    "old": "=B73/10000*10",
+    "new": "=IF($T$8<=0,0,10*MAX(0,MIN(1,B73/$T$8)))",
+    "why": "Publicidad normalizada y acotada de 0 a 10; presupuesto de referencia editable."
+  },
+  "G75": {
+    "kind": "Fórmula",
+    "old": "=SUM(C75:F75)",
+    "new": "=IF(SUM($T$12:$T$15)=0,$T$7,MAX(0,MIN(10,(C75*$T$12+D75*$T$13+E75*$T$14+F75*$T$15)/SUM($T$12:$T$15))))",
+    "why": "Promedio ponderado acotado, no suma de factores incompatibles. Pesos iguales propuestos y editables. Resultado aplicable al próximo ciclo."
+  },
+  "A75": {
+    "kind": "Valor / etiqueta",
+    "old": "Calculo de Reputacion",
+    "new": "Reputación próxima",
+    "why": ""
+  },
+  "C76": {
+    "kind": "Valor / etiqueta",
+    "old": "Factor de producción",
+    "new": "Cumplimiento del plan",
+    "why": ""
+  },
+  "E76": {
+    "kind": "Valor / etiqueta",
+    "old": "Factor de MP (utilizacion)",
+    "new": "Calidad de MP",
+    "why": ""
+  },
+  "C123": {
+    "kind": "Fórmula",
+    "old": "=F51*10",
+    "new": "=C75",
+    "why": "Enlace al cálculo único de reputación; elimina duplicación de la lógica."
+  },
+  "D123": {
+    "kind": "Fórmula",
+    "old": "=M10*10",
+    "new": "=D75",
+    "why": "Enlace al cálculo único de reputación; elimina duplicación de la lógica."
+  },
+  "E123": {
+    "kind": "Fórmula",
+    "old": "=AVERAGE(H65,H68,H71)*10",
+    "new": "=E75",
+    "why": "Enlace al cálculo único de reputación; elimina duplicación de la lógica."
+  },
+  "F123": {
+    "kind": "Fórmula",
+    "old": "=B73/10000*10",
+    "new": "=F75",
+    "why": "Enlace al cálculo único de reputación; elimina duplicación de la lógica."
+  },
+  "G123": {
+    "kind": "Fórmula",
+    "old": "=SUM(C123:F123)",
+    "new": "=G75",
+    "why": "Enlace al cálculo único de reputación; elimina duplicación de la lógica."
+  },
+  "A123": {
+    "kind": "Valor / etiqueta",
+    "old": "Calculo de Reputacion",
+    "new": "Reputación próxima",
+    "why": ""
+  },
+  "C124": {
+    "kind": "Valor / etiqueta",
+    "old": "Factor de producción",
+    "new": "Cumplimiento del plan",
+    "why": ""
+  },
+  "E124": {
+    "kind": "Valor / etiqueta",
+    "old": "Factor de MP (utilizacion)",
+    "new": "Calidad de MP",
+    "why": ""
+  },
+  "H82": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "E83": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$83:$D$86)*2-D83)/10",
+    "new": "=IF(D83<=0,0,10*MIN($D$83:$D$86)/D83)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F83": {
+    "kind": "Fórmula",
+    "old": "=SUM(C83,E83)",
+    "new": "=MAX(0,MIN(10,C83))+E83",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G83": {
+    "kind": "Fórmula",
+    "old": "=F83/$F$87",
+    "new": "=IF($F$87=0,0,F83/$F$87)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E84": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$83:$D$86)*2-D84)/10",
+    "new": "=IF(D84<=0,0,10*MIN($D$83:$D$86)/D84)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F84": {
+    "kind": "Fórmula",
+    "old": "=SUM(C84,E84)",
+    "new": "=MAX(0,MIN(10,C84))+E84",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G84": {
+    "kind": "Fórmula",
+    "old": "=F84/$F$87",
+    "new": "=IF($F$87=0,0,F84/$F$87)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E85": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$83:$D$86)*2-D85)/10",
+    "new": "=IF(D85<=0,0,10*MIN($D$83:$D$86)/D85)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F85": {
+    "kind": "Fórmula",
+    "old": "=SUM(C85,E85)",
+    "new": "=MAX(0,MIN(10,C85))+E85",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G85": {
+    "kind": "Fórmula",
+    "old": "=F85/$F$87",
+    "new": "=IF($F$87=0,0,F85/$F$87)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E86": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$83:$D$86)*2-D86)/10",
+    "new": "=IF(D86<=0,0,10*MIN($D$83:$D$86)/D86)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F86": {
+    "kind": "Fórmula",
+    "old": "=SUM(C86,E86)",
+    "new": "=MAX(0,MIN(10,C86))+E86",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G86": {
+    "kind": "Fórmula",
+    "old": "=F86/$F$87",
+    "new": "=IF($F$87=0,0,F86/$F$87)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "B91": {
+    "kind": "Fórmula",
+    "old": "=B89*B90",
+    "new": "=ROUNDDOWN(MAX(0,B89)*MAX(0,MIN(1,B90)),0)",
+    "why": "Mercado efectivo entero, con proporción limitada a 0–100%."
+  },
+  "H83": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G83*$B$91,0)",
+    "new": "=ROUNDDOWN(P83,0)+IF(R83<=IF($F$87=0,0,$B$91)-SUM(ROUNDDOWN(P83,0),ROUNDDOWN(P84,0),ROUNDDOWN(P85,0),ROUNDDOWN(P86,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H84": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G84*$B$91,0)",
+    "new": "=ROUNDDOWN(P84,0)+IF(R84<=IF($F$87=0,0,$B$91)-SUM(ROUNDDOWN(P83,0),ROUNDDOWN(P84,0),ROUNDDOWN(P85,0),ROUNDDOWN(P86,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H85": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G85*$B$91,0)",
+    "new": "=ROUNDDOWN(P85,0)+IF(R85<=IF($F$87=0,0,$B$91)-SUM(ROUNDDOWN(P83,0),ROUNDDOWN(P84,0),ROUNDDOWN(P85,0),ROUNDDOWN(P86,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H86": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G86*$B$91,0)",
+    "new": "=ROUNDDOWN(P86,0)+IF(R86<=IF($F$87=0,0,$B$91)-SUM(ROUNDDOWN(P83,0),ROUNDDOWN(P84,0),ROUNDDOWN(P85,0),ROUNDDOWN(P86,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H87": {
+    "kind": "Fórmula",
+    "old": "=SUM(H83:H86)",
+    "new": "=SUM(H83:H86)",
+    "why": ""
+  },
+  "H96": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "E97": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$97:$D$100)*2-D97)/10",
+    "new": "=IF(D97<=0,0,10*MIN($D$97:$D$100)/D97)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F97": {
+    "kind": "Fórmula",
+    "old": "=SUM(C97,E97)",
+    "new": "=MAX(0,MIN(10,C97))+E97",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G97": {
+    "kind": "Fórmula",
+    "old": "=F97/$F$101",
+    "new": "=IF($F$101=0,0,F97/$F$101)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E98": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$97:$D$100)*2-D98)/10",
+    "new": "=IF(D98<=0,0,10*MIN($D$97:$D$100)/D98)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F98": {
+    "kind": "Fórmula",
+    "old": "=SUM(C98,E98)",
+    "new": "=MAX(0,MIN(10,C98))+E98",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G98": {
+    "kind": "Fórmula",
+    "old": "=F98/$F$101",
+    "new": "=IF($F$101=0,0,F98/$F$101)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E99": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$97:$D$100)*2-D99)/10",
+    "new": "=IF(D99<=0,0,10*MIN($D$97:$D$100)/D99)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F99": {
+    "kind": "Fórmula",
+    "old": "=SUM(C99,E99)",
+    "new": "=MAX(0,MIN(10,C99))+E99",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G99": {
+    "kind": "Fórmula",
+    "old": "=F99/$F$101",
+    "new": "=IF($F$101=0,0,F99/$F$101)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E100": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$97:$D$100)*2-D100)/10",
+    "new": "=IF(D100<=0,0,10*MIN($D$97:$D$100)/D100)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F100": {
+    "kind": "Fórmula",
+    "old": "=SUM(C100,E100)",
+    "new": "=MAX(0,MIN(10,C100))+E100",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G100": {
+    "kind": "Fórmula",
+    "old": "=F100/$F$101",
+    "new": "=IF($F$101=0,0,F100/$F$101)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "B105": {
+    "kind": "Fórmula",
+    "old": "=B103*B104",
+    "new": "=ROUNDDOWN(MAX(0,B103)*MAX(0,MIN(1,B104)),0)",
+    "why": "Mercado efectivo entero, con proporción limitada a 0–100%."
+  },
+  "H97": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G97*$B$91,0)",
+    "new": "=ROUNDDOWN(P97,0)+IF(R97<=IF($F$101=0,0,$B$105)-SUM(ROUNDDOWN(P97,0),ROUNDDOWN(P98,0),ROUNDDOWN(P99,0),ROUNDDOWN(P100,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H98": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G98*$B$91,0)",
+    "new": "=ROUNDDOWN(P98,0)+IF(R98<=IF($F$101=0,0,$B$105)-SUM(ROUNDDOWN(P97,0),ROUNDDOWN(P98,0),ROUNDDOWN(P99,0),ROUNDDOWN(P100,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H99": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G99*$B$91,0)",
+    "new": "=ROUNDDOWN(P99,0)+IF(R99<=IF($F$101=0,0,$B$105)-SUM(ROUNDDOWN(P97,0),ROUNDDOWN(P98,0),ROUNDDOWN(P99,0),ROUNDDOWN(P100,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H100": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G100*$B$91,0)",
+    "new": "=ROUNDDOWN(P100,0)+IF(R100<=IF($F$101=0,0,$B$105)-SUM(ROUNDDOWN(P97,0),ROUNDDOWN(P98,0),ROUNDDOWN(P99,0),ROUNDDOWN(P100,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H110": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "E111": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$111:$D$114)*2-D111)/10",
+    "new": "=IF(D111<=0,0,10*MIN($D$111:$D$114)/D111)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F111": {
+    "kind": "Fórmula",
+    "old": "=SUM(C111,E111)",
+    "new": "=MAX(0,MIN(10,C111))+E111",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G111": {
+    "kind": "Fórmula",
+    "old": "=F111/$F$115",
+    "new": "=IF($F$115=0,0,F111/$F$115)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E112": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$111:$D$114)*2-D112)/10",
+    "new": "=IF(D112<=0,0,10*MIN($D$111:$D$114)/D112)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F112": {
+    "kind": "Fórmula",
+    "old": "=SUM(C112,E112)",
+    "new": "=MAX(0,MIN(10,C112))+E112",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G112": {
+    "kind": "Fórmula",
+    "old": "=F112/$F$115",
+    "new": "=IF($F$115=0,0,F112/$F$115)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E113": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$111:$D$114)*2-D113)/10",
+    "new": "=IF(D113<=0,0,10*MIN($D$111:$D$114)/D113)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F113": {
+    "kind": "Fórmula",
+    "old": "=SUM(C113,E113)",
+    "new": "=MAX(0,MIN(10,C113))+E113",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G113": {
+    "kind": "Fórmula",
+    "old": "=F113/$F$115",
+    "new": "=IF($F$115=0,0,F113/$F$115)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "E114": {
+    "kind": "Fórmula",
+    "old": "=(MAX($D$111:$D$114)*2-D114)/10",
+    "new": "=IF(D114<=0,0,10*MIN($D$111:$D$114)/D114)",
+    "why": "Puntaje precio de 0 a 10, comparable a reputación; no depende del precio máximo de un competidor."
+  },
+  "F114": {
+    "kind": "Fórmula",
+    "old": "=SUM(C114,E114)",
+    "new": "=MAX(0,MIN(10,C114))+E114",
+    "why": "Acota reputación a la escala declarada."
+  },
+  "G114": {
+    "kind": "Fórmula",
+    "old": "=F114/$F$115",
+    "new": "=IF($F$115=0,0,F114/$F$115)",
+    "why": "Denominador cero implica demanda no asignada."
+  },
+  "B119": {
+    "kind": "Fórmula",
+    "old": "=B117*B118",
+    "new": "=ROUNDDOWN(MAX(0,B117)*MAX(0,MIN(1,B118)),0)",
+    "why": "Mercado efectivo entero, con proporción limitada a 0–100%."
+  },
+  "H111": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G111*$B$119,0)",
+    "new": "=ROUNDDOWN(P111,0)+IF(R111<=IF($F$115=0,0,$B$119)-SUM(ROUNDDOWN(P111,0),ROUNDDOWN(P112,0),ROUNDDOWN(P113,0),ROUNDDOWN(P114,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H112": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G112*$B$119,0)",
+    "new": "=ROUNDDOWN(P112,0)+IF(R112<=IF($F$115=0,0,$B$119)-SUM(ROUNDDOWN(P111,0),ROUNDDOWN(P112,0),ROUNDDOWN(P113,0),ROUNDDOWN(P114,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H113": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G113*$B$119,0)",
+    "new": "=ROUNDDOWN(P113,0)+IF(R113<=IF($F$115=0,0,$B$119)-SUM(ROUNDDOWN(P111,0),ROUNDDOWN(P112,0),ROUNDDOWN(P113,0),ROUNDDOWN(P114,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "H114": {
+    "kind": "Fórmula",
+    "old": "=ROUND(G114*$B$119,0)",
+    "new": "=ROUNDDOWN(P114,0)+IF(R114<=IF($F$115=0,0,$B$119)-SUM(ROUNDDOWN(P111,0),ROUNDDOWN(P112,0),ROUNDDOWN(P113,0),ROUNDDOWN(P114,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J127": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "D128": {
+    "kind": "Fórmula",
+    "old": 7,
+    "new": "=$T$7",
+    "why": "Empresa A es el jugador. Reputación previa fija para este ciclo; evita circularidad producción-demanda."
+  },
+  "E128": {
+    "kind": "Fórmula",
+    "old": "=ROUND((D128/$D$132)*100,0)",
+    "new": "=$K$56",
+    "why": "Calidad del producto independiente de reputación, vinculada a su receta."
+  },
+  "F128": {
+    "kind": "Fórmula",
+    "old": "=100*(MAX($C$128:$C$131)-C128)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+    "new": "=IF(MAX($C$128:$C$131)=MIN($C$128:$C$131),100,MAX(0,MIN(100,100*(MAX($C$128:$C$131)-C128)/(MAX($C$128:$C$131)-MIN($C$128:$C$131)))))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G128": {
+    "kind": "Fórmula",
+    "old": "=D128*10",
+    "new": "=10*MAX(0,MIN(10,D128))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H128": {
+    "kind": "Fórmula",
+    "old": "=$M$124*F128+$M$125*G128+$M$126*E128",
+    "new": "=IF(SUM($M$124:$M$126)=0,0,($M$124*F128+$M$125*G128+$M$126*MAX(0,MIN(100,E128)))/SUM($M$124:$M$126))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I128": {
+    "kind": "Fórmula",
+    "old": "=H128/$H$132",
+    "new": "=IF($H$132=0,0,H128/$H$132)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E129": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D129/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F129": {
+    "kind": "Fórmula",
+    "old": "=100*(MAX($C$128:$C$131)-C129)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+    "new": "=IF(MAX($C$128:$C$131)=MIN($C$128:$C$131),100,MAX(0,MIN(100,100*(MAX($C$128:$C$131)-C129)/(MAX($C$128:$C$131)-MIN($C$128:$C$131)))))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G129": {
+    "kind": "Fórmula",
+    "old": "=D129*10",
+    "new": "=10*MAX(0,MIN(10,D129))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H129": {
+    "kind": "Fórmula",
+    "old": "=$M$124*F129+$M$125*G129+$M$126*E129",
+    "new": "=IF(SUM($M$124:$M$126)=0,0,($M$124*F129+$M$125*G129+$M$126*MAX(0,MIN(100,E129)))/SUM($M$124:$M$126))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I129": {
+    "kind": "Fórmula",
+    "old": "=H129/$H$132",
+    "new": "=IF($H$132=0,0,H129/$H$132)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E130": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D130/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F130": {
+    "kind": "Fórmula",
+    "old": "=100*(MAX($C$128:$C$131)-C130)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+    "new": "=IF(MAX($C$128:$C$131)=MIN($C$128:$C$131),100,MAX(0,MIN(100,100*(MAX($C$128:$C$131)-C130)/(MAX($C$128:$C$131)-MIN($C$128:$C$131)))))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G130": {
+    "kind": "Fórmula",
+    "old": "=D130*10",
+    "new": "=10*MAX(0,MIN(10,D130))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H130": {
+    "kind": "Fórmula",
+    "old": "=$M$124*F130+$M$125*G130+$M$126*E130",
+    "new": "=IF(SUM($M$124:$M$126)=0,0,($M$124*F130+$M$125*G130+$M$126*MAX(0,MIN(100,E130)))/SUM($M$124:$M$126))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I130": {
+    "kind": "Fórmula",
+    "old": "=H130/$H$132",
+    "new": "=IF($H$132=0,0,H130/$H$132)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E131": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D131/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F131": {
+    "kind": "Fórmula",
+    "old": "=100*(MAX($C$128:$C$131)-C131)/(MAX($C$128:$C$131)-MIN($C$128:$C$131))",
+    "new": "=IF(MAX($C$128:$C$131)=MIN($C$128:$C$131),100,MAX(0,MIN(100,100*(MAX($C$128:$C$131)-C131)/(MAX($C$128:$C$131)-MIN($C$128:$C$131)))))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G131": {
+    "kind": "Fórmula",
+    "old": "=D131*10",
+    "new": "=10*MAX(0,MIN(10,D131))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H131": {
+    "kind": "Fórmula",
+    "old": "=$M$124*F131+$M$125*G131+$M$126*E131",
+    "new": "=IF(SUM($M$124:$M$126)=0,0,($M$124*F131+$M$125*G131+$M$126*MAX(0,MIN(100,E131)))/SUM($M$124:$M$126))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I131": {
+    "kind": "Fórmula",
+    "old": "=H131/$H$132",
+    "new": "=IF($H$132=0,0,H131/$H$132)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "B136": {
+    "kind": "Fórmula",
+    "old": 3500,
+    "new": "=ROUNDDOWN(MAX(0,B134)*MAX(0,MIN(1,B135)),0)",
+    "why": "Sustituye constante de mercado por cálculo dinámico."
+  },
+  "J128": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I128*$B$136,0)",
+    "new": "=ROUNDDOWN(P128,0)+IF(R128<=IF($H$132=0,0,$B$136)-SUM(ROUNDDOWN(P128,0),ROUNDDOWN(P129,0),ROUNDDOWN(P130,0),ROUNDDOWN(P131,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J129": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I129*$B$136,0)",
+    "new": "=ROUNDDOWN(P129,0)+IF(R129<=IF($H$132=0,0,$B$136)-SUM(ROUNDDOWN(P128,0),ROUNDDOWN(P129,0),ROUNDDOWN(P130,0),ROUNDDOWN(P131,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J130": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I130*$B$136,0)",
+    "new": "=ROUNDDOWN(P130,0)+IF(R130<=IF($H$132=0,0,$B$136)-SUM(ROUNDDOWN(P128,0),ROUNDDOWN(P129,0),ROUNDDOWN(P130,0),ROUNDDOWN(P131,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J131": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I131*$B$136,0)",
+    "new": "=ROUNDDOWN(P131,0)+IF(R131<=IF($H$132=0,0,$B$136)-SUM(ROUNDDOWN(P128,0),ROUNDDOWN(P129,0),ROUNDDOWN(P130,0),ROUNDDOWN(P131,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J140": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "D141": {
+    "kind": "Fórmula",
+    "old": 7,
+    "new": "=$T$7",
+    "why": "Empresa A es el jugador. Reputación previa fija para este ciclo; evita circularidad producción-demanda."
+  },
+  "E141": {
+    "kind": "Fórmula",
+    "old": "=ROUND((D141/$D$132)*100,0)",
+    "new": "=$K$57",
+    "why": "Calidad del producto independiente de reputación, vinculada a su receta."
+  },
+  "F141": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C141-$M$140)/$M$140*100)",
+    "new": "=IF($M$140<=0,0,MAX(0,MIN(100,100-ABS(C141-$M$140)/$M$140*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G141": {
+    "kind": "Fórmula",
+    "old": "=D141*10",
+    "new": "=10*MAX(0,MIN(10,D141))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H141": {
+    "kind": "Fórmula",
+    "old": "=$M$137*F141+$M$138*G141+$M$139*E141",
+    "new": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F141+$M$138*G141+$M$139*MAX(0,MIN(100,E141)))/SUM($M$137:$M$139))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I141": {
+    "kind": "Fórmula",
+    "old": "=H141/$H$145",
+    "new": "=IF($H$145=0,0,H141/$H$145)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E142": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D142/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F142": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C142-$M$140)/$M$140*100)",
+    "new": "=IF($M$140<=0,0,MAX(0,MIN(100,100-ABS(C142-$M$140)/$M$140*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G142": {
+    "kind": "Fórmula",
+    "old": "=D142*10",
+    "new": "=10*MAX(0,MIN(10,D142))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H142": {
+    "kind": "Fórmula",
+    "old": "=$M$137*F142+$M$138*G142+$M$139*E142",
+    "new": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F142+$M$138*G142+$M$139*MAX(0,MIN(100,E142)))/SUM($M$137:$M$139))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I142": {
+    "kind": "Fórmula",
+    "old": "=H142/$H$145",
+    "new": "=IF($H$145=0,0,H142/$H$145)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E143": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D143/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F143": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C143-$M$140)/$M$140*100)",
+    "new": "=IF($M$140<=0,0,MAX(0,MIN(100,100-ABS(C143-$M$140)/$M$140*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G143": {
+    "kind": "Fórmula",
+    "old": "=D143*10",
+    "new": "=10*MAX(0,MIN(10,D143))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H143": {
+    "kind": "Fórmula",
+    "old": "=$M$137*F143+$M$138*G143+$M$139*E143",
+    "new": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F143+$M$138*G143+$M$139*MAX(0,MIN(100,E143)))/SUM($M$137:$M$139))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I143": {
+    "kind": "Fórmula",
+    "old": "=H143/$H$145",
+    "new": "=IF($H$145=0,0,H143/$H$145)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E144": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D144/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F144": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C144-$M$140)/$M$140*100)",
+    "new": "=IF($M$140<=0,0,MAX(0,MIN(100,100-ABS(C144-$M$140)/$M$140*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G144": {
+    "kind": "Fórmula",
+    "old": "=D144*10",
+    "new": "=10*MAX(0,MIN(10,D144))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H144": {
+    "kind": "Fórmula",
+    "old": "=$M$137*F144+$M$138*G144+$M$139*E144",
+    "new": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F144+$M$138*G144+$M$139*MAX(0,MIN(100,E144)))/SUM($M$137:$M$139))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I144": {
+    "kind": "Fórmula",
+    "old": "=H144/$H$145",
+    "new": "=IF($H$145=0,0,H144/$H$145)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "B149": {
+    "kind": "Fórmula",
+    "old": 3500,
+    "new": "=ROUNDDOWN(MAX(0,B147)*MAX(0,MIN(1,B148)),0)",
+    "why": "Sustituye constante de mercado por cálculo dinámico."
+  },
+  "J141": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I141*$B$149,0)",
+    "new": "=ROUNDDOWN(P141,0)+IF(R141<=IF($H$145=0,0,$B$149)-SUM(ROUNDDOWN(P141,0),ROUNDDOWN(P142,0),ROUNDDOWN(P143,0),ROUNDDOWN(P144,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J142": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I142*$B$149,0)",
+    "new": "=ROUNDDOWN(P142,0)+IF(R142<=IF($H$145=0,0,$B$149)-SUM(ROUNDDOWN(P141,0),ROUNDDOWN(P142,0),ROUNDDOWN(P143,0),ROUNDDOWN(P144,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J143": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I143*$B$149,0)",
+    "new": "=ROUNDDOWN(P143,0)+IF(R143<=IF($H$145=0,0,$B$149)-SUM(ROUNDDOWN(P141,0),ROUNDDOWN(P142,0),ROUNDDOWN(P143,0),ROUNDDOWN(P144,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J144": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I144*$B$149,0)",
+    "new": "=ROUNDDOWN(P144,0)+IF(R144<=IF($H$145=0,0,$B$149)-SUM(ROUNDDOWN(P141,0),ROUNDDOWN(P142,0),ROUNDDOWN(P143,0),ROUNDDOWN(P144,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J153": {
+    "kind": "Valor / etiqueta",
+    "old": "Unidades Vendidas",
+    "new": "Demanda potencial",
+    "why": ""
+  },
+  "D154": {
+    "kind": "Fórmula",
+    "old": 7,
+    "new": "=$T$7",
+    "why": "Empresa A es el jugador. Reputación previa fija para este ciclo; evita circularidad producción-demanda."
+  },
+  "E154": {
+    "kind": "Fórmula",
+    "old": "=ROUND((D154/$D$132)*100,0)",
+    "new": "=$K$58",
+    "why": "Calidad del producto independiente de reputación, vinculada a su receta."
+  },
+  "F154": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C154-$M$153)/$M$153*100)",
+    "new": "=IF($M$153<=0,0,MAX(0,MIN(100,100-ABS(C154-$M$153)/$M$153*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G154": {
+    "kind": "Fórmula",
+    "old": "=D154*10",
+    "new": "=10*MAX(0,MIN(10,D154))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H154": {
+    "kind": "Fórmula",
+    "old": "=$M$150*F154+$M$151*G154+$M$152*E154",
+    "new": "=IF(SUM($M$150:$M$152)=0,0,($M$150*F154+$M$151*G154+$M$152*MAX(0,MIN(100,E154)))/SUM($M$150:$M$152))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I154": {
+    "kind": "Fórmula",
+    "old": "=H154/$H$158",
+    "new": "=IF($H$158=0,0,H154/$H$158)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E155": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D155/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F155": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C155-$M$153)/$M$153*100)",
+    "new": "=IF($M$153<=0,0,MAX(0,MIN(100,100-ABS(C155-$M$153)/$M$153*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G155": {
+    "kind": "Fórmula",
+    "old": "=D155*10",
+    "new": "=10*MAX(0,MIN(10,D155))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H155": {
+    "kind": "Fórmula",
+    "old": "=$M$150*F155+$M$151*G155+$M$152*E155",
+    "new": "=IF(SUM($M$150:$M$152)=0,0,($M$150*F155+$M$151*G155+$M$152*MAX(0,MIN(100,E155)))/SUM($M$150:$M$152))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I155": {
+    "kind": "Fórmula",
+    "old": "=H155/$H$158",
+    "new": "=IF($H$158=0,0,H155/$H$158)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E156": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D156/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F156": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C156-$M$153)/$M$153*100)",
+    "new": "=IF($M$153<=0,0,MAX(0,MIN(100,100-ABS(C156-$M$153)/$M$153*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G156": {
+    "kind": "Fórmula",
+    "old": "=D156*10",
+    "new": "=10*MAX(0,MIN(10,D156))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H156": {
+    "kind": "Fórmula",
+    "old": "=$M$150*F156+$M$151*G156+$M$152*E156",
+    "new": "=IF(SUM($M$150:$M$152)=0,0,($M$150*F156+$M$151*G156+$M$152*MAX(0,MIN(100,E156)))/SUM($M$150:$M$152))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I156": {
+    "kind": "Fórmula",
+    "old": "=H156/$H$158",
+    "new": "=IF($H$158=0,0,H156/$H$158)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "E157": {
+    "kind": "Valor / etiqueta",
+    "old": "=ROUND((D157/$D$132)*100,0)",
+    "new": 50,
+    "why": "Calidad competidora desconocida. Supuesto neutral editable de 50/100 para el ejemplo; no es dato observado."
+  },
+  "F157": {
+    "kind": "Fórmula",
+    "old": "=100-(ABS(C157-$M$153)/$M$153*100)",
+    "new": "=IF($M$153<=0,0,MAX(0,MIN(100,100-ABS(C157-$M$153)/$M$153*100)))",
+    "why": "Protege precios iguales o referencia cero y evita puntajes negativos o superiores a 100."
+  },
+  "G157": {
+    "kind": "Fórmula",
+    "old": "=D157*10",
+    "new": "=10*MAX(0,MIN(10,D157))",
+    "why": "Normaliza reputación de 0–10 a 0–100 y acota la entrada 10,2 del ejemplo."
+  },
+  "H157": {
+    "kind": "Fórmula",
+    "old": "=$M$150*F157+$M$151*G157+$M$152*E157",
+    "new": "=IF(SUM($M$150:$M$152)=0,0,($M$150*F157+$M$151*G157+$M$152*MAX(0,MIN(100,E157)))/SUM($M$150:$M$152))",
+    "why": "Ponderación normalizada. La calidad ya no se infiere de reputación ni del total de otro segmento."
+  },
+  "I157": {
+    "kind": "Fórmula",
+    "old": "=H157/$H$158",
+    "new": "=IF($H$158=0,0,H157/$H$158)",
+    "why": "Protege ausencia de puntaje total."
+  },
+  "B162": {
+    "kind": "Fórmula",
+    "old": 800,
+    "new": "=ROUNDDOWN(MAX(0,B160)*MAX(0,MIN(1,B161)),0)",
+    "why": "Sustituye constante de mercado por cálculo dinámico."
+  },
+  "J154": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I154*$B$162,0)",
+    "new": "=ROUNDDOWN(P154,0)+IF(R154<=IF($H$158=0,0,$B$162)-SUM(ROUNDDOWN(P154,0),ROUNDDOWN(P155,0),ROUNDDOWN(P156,0),ROUNDDOWN(P157,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J155": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I155*$B$162,0)",
+    "new": "=ROUNDDOWN(P155,0)+IF(R155<=IF($H$158=0,0,$B$162)-SUM(ROUNDDOWN(P154,0),ROUNDDOWN(P155,0),ROUNDDOWN(P156,0),ROUNDDOWN(P157,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J156": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I156*$B$162,0)",
+    "new": "=ROUNDDOWN(P156,0)+IF(R156<=IF($H$158=0,0,$B$162)-SUM(ROUNDDOWN(P154,0),ROUNDDOWN(P155,0),ROUNDDOWN(P156,0),ROUNDDOWN(P157,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  },
+  "J157": {
+    "kind": "Fórmula",
+    "old": "=ROUND(I157*$B$162,0)",
+    "new": "=ROUNDDOWN(P157,0)+IF(R157<=IF($H$158=0,0,$B$162)-SUM(ROUNDDOWN(P154,0),ROUNDDOWN(P155,0),ROUNDDOWN(P156,0),ROUNDDOWN(P157,0)),1,0)",
+    "why": "Demanda potencial entera por restos mayores. Concilia con el mercado; no equivale a ventas sin límite de inventario."
+  }
+}

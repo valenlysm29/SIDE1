@@ -1,0 +1,142 @@
+[
+  {
+    "cell": "K56",
+    "value": 33.333333333333336,
+    "formula": "=$T$9"
+  },
+  {
+    "cell": "K57",
+    "value": 66.66666666666667,
+    "formula": "=$T$10"
+  },
+  {
+    "cell": "K58",
+    "value": 100.0,
+    "formula": "=$T$11"
+  },
+  {
+    "cell": "T9",
+    "value": 33.333333333333336,
+    "formula": "33.3333333333333"
+  },
+  {
+    "cell": "T10",
+    "value": 66.66666666666667,
+    "formula": "66.6666666666667"
+  },
+  {
+    "cell": "T11",
+    "value": 100.0,
+    "formula": "100"
+  },
+  {
+    "cell": "E141",
+    "value": 66.66666666666667,
+    "formula": "=$K$57"
+  },
+  {
+    "cell": "F141",
+    "value": 80.0,
+    "formula": "=IF($M$140<=0,0,MAX(0,MIN(100,100-ABS(C141-$M$140)/$M$140*100)))"
+  },
+  {
+    "cell": "G141",
+    "value": 70.0,
+    "formula": "=10*MAX(0,MIN(10,D141))"
+  },
+  {
+    "cell": "H141",
+    "value": 73.16666666666667,
+    "formula": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F141+$M$138*G141+$M$139*MAX(0,MIN(100,E141)))/SUM($M$137:$M$139))"
+  },
+  {
+    "cell": "I141",
+    "value": 0.3178165496271628,
+    "formula": "=IF($H$145=0,0,H141/$H$145)"
+  },
+  {
+    "cell": "J141",
+    "value": 1112.0,
+    "formula": "=ROUNDDOWN(P141,0)+IF(R141<=IF($H$145=0,0,$B$149)-SUM(ROUNDDOWN(P141,0),ROUNDDOWN(P142,0),ROUNDDOWN(P143,0),ROUNDDOWN(P144,0)),1,0)"
+  },
+  {
+    "cell": "E142",
+    "value": 50.0,
+    "formula": "50"
+  },
+  {
+    "cell": "H142",
+    "value": 61.55,
+    "formula": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F142+$M$138*G142+$M$139*MAX(0,MIN(100,E142)))/SUM($M$137:$M$139))"
+  },
+  {
+    "cell": "E143",
+    "value": 50.0,
+    "formula": "50"
+  },
+  {
+    "cell": "H143",
+    "value": 51.5,
+    "formula": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F143+$M$138*G143+$M$139*MAX(0,MIN(100,E143)))/SUM($M$137:$M$139))"
+  },
+  {
+    "cell": "E144",
+    "value": 50.0,
+    "formula": "50"
+  },
+  {
+    "cell": "H144",
+    "value": 44.0,
+    "formula": "=IF(SUM($M$137:$M$139)=0,0,($M$137*F144+$M$138*G144+$M$139*MAX(0,MIN(100,E144)))/SUM($M$137:$M$139))"
+  },
+  {
+    "cell": "H145",
+    "value": 230.21666666666667,
+    "formula": "=SUM(H141:H144)"
+  },
+  {
+    "cell": "M137",
+    "value": 0.4,
+    "formula": "0.4"
+  },
+  {
+    "cell": "M138",
+    "value": 0.35,
+    "formula": "0.35"
+  },
+  {
+    "cell": "M139",
+    "value": 0.25,
+    "formula": "0.25"
+  },
+  {
+    "cell": "J154",
+    "value": 225.0,
+    "formula": "=ROUNDDOWN(P154,0)+IF(R154<=IF($H$158=0,0,$B$162)-SUM(ROUNDDOWN(P154,0),ROUNDDOWN(P155,0),ROUNDDOWN(P156,0),ROUNDDOWN(P157,0)),1,0)"
+  },
+  {
+    "cell": "N5",
+    "value": 397.0,
+    "formula": "=ROUNDDOWN(MAX(0,L5*M5),0)"
+  },
+  {
+    "cell": "E56",
+    "value": 191.0,
+    "formula": "=ROUNDDOWN(D56,0)"
+  },
+  {
+    "cell": "E57",
+    "value": 137.0,
+    "formula": "=ROUNDDOWN(D57,0)"
+  },
+  {
+    "cell": "E58",
+    "value": 69.0,
+    "formula": "=ROUNDDOWN(D58,0)"
+  },
+  {
+    "cell": "G75",
+    "value": 5.006733191242008,
+    "formula": "=IF(SUM($T$12:$T$15)=0,$T$7,MAX(0,MIN(10,(C75*$T$12+D75*$T$13+E75*$T$14+F75*$T$15)/SUM($T$12:$T$15))))"
+  }
+]

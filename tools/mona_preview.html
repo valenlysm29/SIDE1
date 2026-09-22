@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SIDE · Mona</title>
+<style>body{margin:0;font:16px system-ui;background:#dfe5e8;color:#19323c}header{position:absolute;left:24px;top:20px}h1{font-size:24px;margin:0}p{margin:8px 0}canvas{display:block}button{font:inherit;padding:8px 12px}</style></head>
+<body><header><h1>Mona · NPC de SIDE</h1><p>Arrastra para girar. Rueda para acercar.</p><button id="turn">Ver espalda</button></header>
+<script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.js","three/addons/":"../vendor/three/examples/jsm/"}}</script>
+<script src="../simulator3d-config.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {loadMonaTemplate,createMonaNpc} from '../services/mona_npc.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color('#dfe5e8');
+const camera=new THREE.PerspectiveCamera(34,innerWidth/innerHeight,.01,40);camera.position.set(0,1,3.5);camera.lookAt(0,.86,0);
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe7efff,0x8c8679,2));const sun=new THREE.DirectionalLight(0xfff4e5,2.5);sun.position.set(-3,5,4);scene.add(sun);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.MeshStandardMaterial({color:0xc6d0d3,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.006;scene.add(floor);
+const original=new URLSearchParams(location.search).has('original');
+const config={...SIDE3D_CONFIG.NPCS.mona,position:{x:0,z:0},model:original?'../tools/model-sources/mona/mona.original.glb':'../assets/models3d/npcs/mona.glb'};
+try{
+const template=await loadMonaTemplate(THREE,GLTFLoader,config),model=createMonaNpc(THREE,template,config);scene.add(model);
+let drag=false,lastX=0;renderer.domElement.onpointerdown=e=>{drag=true;lastX=e.clientX;renderer.domElement.setPointerCapture(e.pointerId)};renderer.domElement.onpointerup=()=>drag=false;renderer.domElement.onpointermove=e=>{if(drag){model.rotation.y+=(e.clientX-lastX)*.008;lastX=e.clientX}};renderer.domElement.onwheel=e=>{camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.002,1.6,6)};
+document.querySelector('#turn').onclick=()=>{model.rotation.y+=Math.PI};
+window.preview={model,camera,scene,renderer,template,bounds:new THREE.Box3().setFromObject(model)};
+function frame(){requestAnimationFrame(frame);renderer.render(scene,camera)}frame();window.ready=true;
+}catch(error){document.querySelector('p').textContent='No se pudo cargar Mona.';console.error(error);window.previewError=error.message;}
+</script></body></html>

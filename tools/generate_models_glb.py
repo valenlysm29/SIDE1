@@ -4,7 +4,7 @@ import trimesh
 from trimesh.transformations import translation_matrix, rotation_matrix
 from trimesh.visual.material import PBRMaterial
 
-OUT='/mnt/data/side_glb_upgrade/UNIFORME_ADECUADO_3D_REF_REALISMO/assets/models3d'
+OUT=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'assets', 'models3d')
 os.makedirs(OUT, exist_ok=True)
 
 def rgba(hexv, a=255):

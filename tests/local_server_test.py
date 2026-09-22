@@ -5,7 +5,7 @@ from pathlib import Path
 from threading import Thread
 from urllib.request import urlopen
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from servidor_local import create_server
+from servidor_local import create_server, VERSION
 
 class LocalServerTest(unittest.TestCase):
     def setUp(self):
@@ -22,11 +22,11 @@ class LocalServerTest(unittest.TestCase):
             with urlopen(self.base+'/'+path,timeout=5) as response:
                 self.assertEqual(response.status,200)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')
-                self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.17.3')
+                self.assertEqual(response.headers['X-SIDE-Build'],VERSION)
                 self.assertIn(needle,response.read().decode())
         with urlopen(self.base+'/assets/models/yuka.glb',timeout=5) as response:
             self.assertEqual(response.status,200)
-            self.assertEqual(response.headers['X-SIDE-Build'],'2026.09.17.3')
+            self.assertEqual(response.headers['X-SIDE-Build'],VERSION)
             self.assertEqual(response.read(4),b'glTF')
             response.read()
     def test_busy_port_does_not_bind_another_server(self):
