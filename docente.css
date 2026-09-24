@@ -139,6 +139,11 @@ button:disabled{cursor:not-allowed;opacity:.6}
 
 .hidden{display:none!important}
 
+.company-grade{margin:14px 0;padding-top:12px;border-top:1px solid #ffffff22}
+.company-grade>div{display:flex;gap:8px;align-items:center}
+.company-grade input{width:90px;min-width:0;margin:0}
+.company-grade small{display:block;margin-top:8px;color:var(--muted)}
+.report-detail details{padding:10px 0}.report-detail summary{cursor:pointer;font-weight:700}
 /* Teacher setup: compact event picker and explicit start. */
 .integration-note{padding:16px;margin:14px 0;border:1px solid #ffd32955;border-radius:12px;background:#ffd3290a}.integration-note strong{color:var(--gold)}.integration-note p{font-size:12px;line-height:1.7;color:var(--muted);margin:8px 0 0}
 .events-config-summary{margin-top:22px}.enabled-events-summary{display:flex;flex-wrap:wrap;gap:8px;max-height:130px;overflow:auto}.enabled-event-chip{padding:8px 12px;border-radius:20px;background:#163551;font-size:12px}.events-config-summary .card-title p{font-size:13px;color:var(--muted)}

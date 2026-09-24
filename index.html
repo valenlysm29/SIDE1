@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260910-2">
+  <link rel="stylesheet" href="styles.css?v=20260924-lifecycle">
   <link rel="stylesheet" href="simulator3d.css?v=20260910-2">
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
@@ -152,19 +152,21 @@
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>
           <div class="student-finance-mini">
-            <div><span>ESTADO DE RESULTADOS</span><strong id="studentIncomeResult">S/ 0</strong><small>Utilidad acumulada</small></div>
+            <div><span>ESTADO DE RESULTADOS</span><strong id="studentIncomeResult">S/ 0</strong><small>Utilidad del ciclo</small></div>
             <div><span>BALANCE DE CAJA</span><strong id="studentCashResult">S/ 0</strong><small>Caja disponible</small></div>
-            <div><span>FLUJO DE CAJA</span><strong id="studentFlowResult">S/ 0</strong><small>Flujo neto acumulado</small></div>
+            <div><span>FLUJO DE CAJA</span><strong id="studentFlowResult">S/ 0</strong><small>Flujo neto del ciclo</small></div>
           </div>
           <div class="student-result-breakdown">
-            <div><strong>ESTADO DE RESULTADOS</strong><span>Ingresos <b id="studentERIngresos">S/ 0</b></span><span>Costos <b id="studentERCostos">S/ 0</b></span><span>Impacto de eventos <b id="studentEREventos">S/ 0</b></span><span>Utilidad <b id="studentERUtilidad">S/ 0</b></span></div>
-            <div><strong>BALANCE DE CAJA</strong><span>Caja inicial <b id="studentBCInicial">S/ 0</b></span><span>Crédito utilizado <b id="studentBCPrestamos">S/ 0</b></span><span>Caja final <b id="studentBCFinal">S/ 0</b></span></div>
-            <div><strong>FLUJO DE CAJA</strong><span>Operación <b id="studentFCOperacion">S/ 0</b></span><span>Financiamiento <b id="studentFCFinanciamiento">S/ 0</b></span><span>Eventos <b id="studentFCEventos">S/ 0</b></span><span>Flujo neto <b id="studentFCNeto">S/ 0</b></span></div>
+            <div><strong>ESTADO DE RESULTADOS</strong><span>Ingresos <b id="studentERIngresos">S/ 0</b></span><span>Gastos operativos <b id="studentERCostos">S/ 0</b></span><span>Impacto de eventos <b id="studentEREventos">S/ 0</b></span><span>Devoluciones <b id="studentERDevoluciones">S/ 0</b></span><span>Resultado de venta de activos <b id="studentERActivos">S/ 0</b></span><span>Otros movimientos <b id="studentEROtros">S/ 0</b></span><span>Utilidad <b id="studentERUtilidad">S/ 0</b></span></div>
+            <div><strong>BALANCE DE CAJA</strong><span>Caja inicial <b id="studentBCInicial">S/ 0</b></span><span>Entradas <b id="studentBCEntradas">S/ 0</b></span><span>Salidas <b id="studentBCSalidas">S/ 0</b></span><span>Caja final <b id="studentBCFinal">S/ 0</b></span></div>
+            <div><strong>FLUJO DE CAJA</strong><span>Operación <b id="studentFCOperacion">S/ 0</b></span><span>Inversión <b id="studentFCInversion">S/ 0</b></span><span>Financiamiento <b id="studentFCFinanciamiento">S/ 0</b></span><span>Flujo neto <b id="studentFCNeto">S/ 0</b></span></div>
           </div>
+          <div id="studentFinancialDetail"></div>
           <p id="studentEventImpactText" class="student-event-impact">Los eventos que te afecten aparecerán en Noticias del ciclo y se reflejarán en estos resultados.</p>
           <p class="lobby-welcome">Te has unido correctamente. Revisa el tiempo y las noticias antes de tomar decisiones.</p>
         </div>
         <footer class="lobby-actions" aria-label="Acciones de la partida">
+          <button id="resumeWorldBtn" class="primary-gold lobby-start hidden" type="button">ENTRAR / VOLVER AL MUNDO 3D</button>
           <button id="enterDecisionsBtn" class="primary-gold lobby-start" type="button">ENTRAR AL MENÚ DE DECISIONES</button>
           <div class="lobby-secondary-actions">
             <button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
@@ -203,7 +205,7 @@
         <div class="sim3d-brand"><img src="assets/side_logo.png" alt="SIDE"><div><span>SIMULADOR 3D</span><strong>TU EMPRESA</strong></div></div>
         <div class="sim3d-stats">
           <div class="sim3d-stat cash"><span>CAJA</span><strong id="simCash">S/ 100,000</strong></div>
-          <div class="sim3d-stat revenue"><span>UTILIDAD</span><strong id="simNetProfit">S/ 0</strong></div>
+          <div class="sim3d-stat revenue"><span>UTILIDAD DEL CICLO</span><strong id="simNetProfit">S/ 0</strong></div>
           <div class="sim3d-stat lost"><span>CLIENTES PERDIDOS</span><strong id="simLostCustomers">0</strong></div>
           <div class="sim3d-stat stock"><span>STOCK</span><strong id="simTotalStock">0</strong></div>
           <div class="sim3d-stat time"><span>TIEMPO</span><strong id="simTime">5:00</strong></div>
@@ -357,9 +359,9 @@
         <div class="admin-pages">
           <section data-admin-page="dashboard" class="active">
             <div class="admin-metrics">
-              <div><span>INGRESOS</span><strong id="adminRevenue">S/ 0</strong></div>
-              <div><span>GASTOS</span><strong id="adminExpenses">S/ 0</strong></div>
-              <div><span>UTILIDAD</span><strong id="adminProfit">S/ 0</strong></div>
+              <div><span>VENTAS NETAS DEL CICLO</span><strong id="adminRevenue">S/ 0</strong></div>
+              <div><span>GASTOS OPERATIVOS DEL CICLO</span><strong id="adminExpenses">S/ 0</strong></div>
+              <div><span>UTILIDAD DEL CICLO</span><strong id="adminProfit">S/ 0</strong></div>
               <div><span>REPUTACIÓN</span><strong id="adminRepMetric">80%</strong></div>
             </div>
             <div class="admin-pipeline"><h3>Producción</h3><div><span>Materia prima</span><i></i><span>Corte</span><i></i><span>Ensamble</span><i></i><span>Acabado</span><i></i><span>Almacén</span></div><p id="adminProductionText">Producción activa.</p></div>
@@ -405,7 +407,7 @@
           <div><span>CLIENTES ATENDIDOS</span><strong id="summaryServed">0</strong></div>
           <div><span>CLIENTES PERDIDOS</span><strong id="summaryLost">0</strong></div>
           <div><span>SATISFACCIÓN</span><strong id="summarySatisfaction">100%</strong></div>
-          <div><span>UTILIDAD</span><strong id="summaryProfit">S/ 0</strong></div>
+          <div><span>UTILIDAD DEL CICLO</span><strong id="summaryProfit">S/ 0</strong></div>
           <div><span>REPUTACIÓN</span><strong id="summaryReputation">80%</strong></div>
           <div><span>DEVOLUCIONES</span><strong id="summaryReturns">0</strong></div>
         </div>
@@ -480,10 +482,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260920-2"></script>
-<script src="services/partida_service.js?v=20260922-teacher-final"></script>
+<script src="services/partida_service.js?v=20260924-lifecycle"></script>
 <script src="services/empresa_service.js?v=20260920-2"></script>
-<script src="services/decisiones_service.js?v=20260921-rep"></script>
-<script src="side_rules.js?v=20260922-teacher-final"></script>
+<script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
+<script src="side_rules.js?v=20260924-lifecycle"></script>
 <script src="icon_bank.js?v=20260910-2"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
 <script src="decision_catalog.js?v=20260910-2"></script>
@@ -504,7 +506,8 @@
 <script src="production_model.js?v=20260910-2"></script>
 <script src="decision_review_model.js?v=20260910-2"></script>
 <script src="production_dop.js?v=20260917-visual"></script>
-<script src="app.js?v=20260922-teacher-final"></script>
+<script src="financial_model.js?v=20260922-finance"></script>
+<script src="app.js?v=20260924-lifecycle"></script>
 <script src="company_summary.js?v=20260922-teacher-final"></script>
 </body>
 </html>

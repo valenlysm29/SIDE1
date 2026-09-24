@@ -1,5 +1,9 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
+## Corrección del inicio de partidas — septiembre de 2026
+
+El flujo nuevo separa integración y Ciclo 1, incorpora inicio manual y plazo automático persistido en Supabase, y corrige la selección de eventos. **Antes de usarlo entre dispositivos, ejecutar `supabase_game_lifecycle.sql`.** Consulta [instalación, archivos modificados y pruebas](CORRECCION_INICIO_PARTIDA.md). Las instrucciones de versiones anteriores se conservan debajo como historial.
+
 ## Mona y carpeta unificada
 
 Se integró el modelo de Mona como NPC de orientación junto a la entrada de la

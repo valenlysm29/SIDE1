@@ -67,7 +67,7 @@
   const qty = (id) => sum(saved(id)?.quantities || {});
   const owned = (id) => allPurchases(saved(id));
   const currentRoundSafe = () => bridge().currentRound?.() || (typeof window.currentRound === 'function' ? window.currentRound() : 1);
-  const decisionCash = () => bridge().cash?.() || (typeof window.cashBalance === 'function' ? window.cashBalance() : 100000);
+  const decisionCash = () => bridge().cash?.() ?? (typeof window.cashBalance === 'function' ? window.cashBalance() : 100000);
   const simLedgerKey = () => `${currentRoundSafe()}:SIM_VENTAS`;
   const salesLedger = () => Number(bridge().ledger?.[simLedgerKey()] || 0);
 
@@ -111,6 +111,10 @@
   function loadBusinessState() {
     try { businessState = JSON.parse(localStorage.getItem(businessKey()) || 'null'); } catch { businessState = null; }
     if (!businessState) businessState = createBusinessState();
+    if(!businessState.economicLedgerVersion&&bridge().recordOperatingExpense){
+      if(Number(businessState.expenses)>0)bridge().recordOperatingExpense(Number(businessState.expenses));
+      businessState.economicLedgerVersion=1;
+    }
     businessState.prices ||= { esencial: 75, urbano: 95, premium: 125 };
     businessState.upgrades ||= { display: 0, checkout: 0, warehouse: 0 };
     businessState.production ||= { producedToday: 0, stage: 0 };
@@ -132,13 +136,14 @@
   }
 
   function operationalCash() {
-    return decisionCash() - Number(businessState?.expenses || 0);
+    return decisionCash() - (bridge().recordOperatingExpense ? 0 : Number(businessState?.expenses || 0));
   }
 
-  function applyExpense(amount, reason) {
+  function applyExpense(amount, reason, kind='SIM_GASTOS') {
     if (!businessState) loadBusinessState();
     const a = Math.max(0, Number(amount) || 0);
     businessState.expenses += a;
+    bridge().recordOperatingExpense?.(a,kind);
     saveBusinessState();
     showCashFx(`− ${fmt(a)}`);
     addBusinessLog(`${reason}: −${fmt(a)}`);
@@ -523,7 +528,7 @@
     $3('summaryServed').textContent = String(gameSession.served);
     $3('summaryLost').textContent = String(gameSession.lost);
     $3('summarySatisfaction').textContent = `${Math.round(gameSession.satisfaction)}%`;
-    if($3('summaryProfit')) $3('summaryProfit').textContent=fmt(gameSession.revenue-Number(businessState?.expenses||0));
+    if($3('summaryProfit')) $3('summaryProfit').textContent=fmt(bridge().financialReport?.().estadoResultados.utilidad ?? gameSession.revenue-Number(businessState?.expenses||0));
     if($3('summaryReputation')) $3('summaryReputation').textContent=`${Math.round(businessState?.reputation||80)}%`;
     if($3('summaryReturns')) $3('summaryReturns').textContent=String(businessState?.returns||0);
     const replay = $3('sim3dReplayBtn'); if (replay) replay.textContent = met ? 'JUGAR SIGUIENTE DÍA' : 'REINTENTAR DÍA';
@@ -572,7 +577,7 @@
     if ($3('simTime')) $3('simTime').textContent = gameSession ? formatTime(gameSession.timeLeft) : '5:00';
     if ($3('simRating')) $3('simRating').textContent = gameSession ? `${Math.round(gameSession.satisfaction)}%` : `${Math.round(businessState?.reputation || 80)}%`;
     if ($3('simRevenue')) $3('simRevenue').textContent = gameSession ? fmt(gameSession.revenue) : fmt(0);
-    if ($3('simNetProfit')) $3('simNetProfit').textContent = fmt(Number(gameSession?.revenue || 0) - Number(businessState?.expenses || 0));
+    if ($3('simNetProfit')) $3('simNetProfit').textContent = fmt(bridge().financialReport?.().estadoResultados.utilidad ?? Number(gameSession?.revenue || 0) - Number(businessState?.expenses || 0));
     if ($3('simOperatingLosses')) $3('simOperatingLosses').textContent = fmt(Number(businessState?.expenses || 0));
     if ($3('simLostCustomers')) $3('simLostCustomers').textContent = String(gameSession?.lost || 0);
     const lost = gameSession?.lostReasons || businessState?.lostReasons || {};
@@ -1113,11 +1118,12 @@
 
   function refreshAdminUI() {
     if (!businessState) return;
-    const rev = Number(gameSession?.revenue || 0), exp = Number(businessState.expenses || 0);
+    const er=bridge().financialReport?.().estadoResultados;
+    const rev=er?.ventasNetas??Number(gameSession?.revenue||0),exp=er?.costos??Number(businessState.expenses||0);
     if ($3('adminReputation')) $3('adminReputation').textContent = `Reputación ${Math.round(businessState.reputation)}%`;
     if ($3('adminRevenue')) $3('adminRevenue').textContent = fmt(rev);
     if ($3('adminExpenses')) $3('adminExpenses').textContent = fmt(exp);
-    if ($3('adminProfit')) $3('adminProfit').textContent = fmt(rev - exp);
+    if ($3('adminProfit')) $3('adminProfit').textContent = fmt(er?.utilidad??rev-exp);
     if ($3('adminRepMetric')) $3('adminRepMetric').textContent = `${Math.round(businessState.reputation)}%`;
     PRODUCTS.forEach(p => { const el=$3(`price-${p.id}-input`); if(el && document.activeElement!==el) el.value=String(p.price); });
     const rows=$3('adminStockRows');
@@ -1246,7 +1252,7 @@
     loadBusinessState(); const current=Number(businessState.upgrades[type]||0);
     if(current>=max) { message('Esta mejora ya está al máximo.'); return; }
     if(operationalCash()<cost) { message('No hay caja suficiente para esta expansión.'); return; }
-    businessState.upgrades[type]=current+1; applyExpense(cost,`Expansión: ${type}`); saveBusinessState();
+    businessState.upgrades[type]=current+1; applyExpense(cost,`Expansión: ${type}`,'SIM_INVERSION'); saveBusinessState();
     rebuildDynamicWorld(); refreshAdminUI();
     message('Expansión aplicada. Ya puedes verla en la tienda.');
   }
@@ -2048,7 +2054,8 @@
     }
     npc.routeBlocked=Boolean(requested.length&&!npc.route.length);
     npc.routeIndex = 0;
-    npc.wait = 0;  }
+    npc.wait = 0;
+  }
 
   function leaveStore(npc) {
     npc.leavingWorld = true;
@@ -2252,6 +2259,7 @@
     if(npc.isReturn){
       const refund=Number(npc.productPrice||product.price);
       businessState.returns=Number(businessState.returns||0)+1; businessState.expenses=Number(businessState.expenses||0)+refund;
+      bridge().recordOperatingExpense?.(refund,'SIM_DEVOLUCIONES');
       inventory.reserve[product.id]=(inventory.reserve[product.id]||0)+1; saveInventory(); saveBusinessState(); renderInventoryDisplays();
       updateReputation(-2,'Devolución procesada'); showCashFx(`− ${fmt(refund)}`); playSfx('lost');
       message(`Reembolso procesado: ${product.name} · ${fmt(refund)}.`);
@@ -2829,6 +2837,7 @@
       hideSummaryOverlay();
       stopAmbient();
       if (typeof window.showScreen === 'function') window.showScreen('studentLobby');
+      window.updateIntegrationUI?.();
     });
     $3('sim3dAudioBtn')?.addEventListener('click', () => {
       audioEnabled = !audioEnabled;
@@ -2935,6 +2944,10 @@
       window.toast?.('El ciclo cambió durante la carga. Revisa sus decisiones y vuelve a iniciar el mundo 3D.');
       return false;
     }
+    if(gameSession&&!gameSession.shiftEnded&&sessionContext===requestedContext){
+      returnFromDecisions();
+      return true;
+    }
     running = false;
     clearSessionOverlays();
     window.__SIDE_RETURN_TO_3D = false;
@@ -2980,6 +2993,8 @@
     startAmbient();
     clock?.getDelta();
     message('Cambios aplicados: la boutique, el taller y la atención en caja fueron actualizados con tus decisiones.');
+    setTimeout(() => { resize(); $3('side3dCanvas')?.focus?.(); }, 40);
+    return true;
   }
 
   function diagnostics() {

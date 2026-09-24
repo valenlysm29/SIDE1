@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "description": "Pruebas de integración del flujo de partidas SIDE con PostgreSQL local y Chromium",
+  "scripts": {
+    "lifecycle:db": "node game_lifecycle_db.cjs",
+    "lifecycle:ui": "node game_lifecycle_ui.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "playwright": "1.62.1"
+  }
+}

@@ -71,6 +71,11 @@
       if (userError || !userData || !userData.user) {
         return { success: false, error: 'Debes iniciar sesión como profesor.' };
       }
+      if(d.configuracion?.lifecycleVersion===2){
+        // Read-only readiness check: do not leave an unusable lobby in an old DB.
+        const {error:readinessError}=await sb.rpc('controlar_partida',{p_partida_id:null,p_accion:'sincronizar'});
+        if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica docs/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
+      }
       const payload = {
         profesor_id: userData.user.id,
         nombre: d.nombre,
@@ -121,11 +126,14 @@
     if (!sb) return offline();
     if (!partidaId) return { success: false, error: 'Falta partidaId.' };
     try {
-      const { data, error } = await sb
+      let { data, error } = await sb
         .from('participantes')
-        .select('id, nombre, empresa, empresa_id, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
+        .select('id, nombre, empresa, empresa_id, puntaje_docente, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
         .eq('partida_id', partidaId)
         .order('created_at', { ascending: true });
+      if(error&&/puntaje_docente/.test(error.message||'')){
+        ({data,error}=await sb.from('participantes').select('id, nombre, empresa, empresa_id, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)').eq('partida_id',partidaId).order('created_at',{ascending:true}));
+      }
       if (error) return { success: false, error: error.message };
       return { success: true, data: data || [] };
     } catch (err) {
@@ -165,7 +173,7 @@
     if (!partidaId) return { success: false, error: 'Falta partidaId.' };
     try {
       const { data, error } = await sb.from('partidas')
-        .select('id, codigo, nombre, curso, estado')
+        .select('id, codigo, nombre, curso, estado, configuracion')
         .eq('id', partidaId).maybeSingle();
       if (error) return { success: false, error: error.message };
       return { success: true, data: data || null };
@@ -175,6 +183,7 @@
   }
 
   async function actualizarConfiguracion(partidaId, configuracion) {
+    if(configuracion.lifecycleVersion===2)return controlar(partidaId,'guardar',configuracion);
     const sb=client();if(!sb)return offline();
     try{
       const {error}=await sb.from('partidas').update({configuracion,eventos_habilitados:configuracion.enabledEvents||[]}).eq('id',partidaId);
@@ -182,5 +191,18 @@
     }catch(error){return {success:false,error:error.message};}
   }
   global.SIDE = global.SIDE || {};
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion };
+  async function guardarPuntaje(partidaId,empresaId,puntaje){
+    const sb=client();if(!sb)return offline();
+    if(!Number.isFinite(puntaje)||puntaje<0||puntaje>20)return {success:false,error:'La nota debe estar entre 0 y 20.'};
+    try{const {data,error}=await sb.rpc('guardar_puntaje_docente',{p_partida_id:partidaId,p_empresa_id:empresaId,p_puntaje:puntaje});return error||data?.error?{success:false,error:error?.message||data.error}:{success:true};}
+    catch(error){return {success:false,error:error.message};}
+  }
+  async function controlar(partidaId,accion,config=null,expectedRound=null){
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('controlar_partida',{p_partida_id:partidaId,p_accion:accion,p_config:config,p_expected_round:expectedRound});
+      return error||data?.error?{success:false,error:error?.message||data.error}:{success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar };
 })(window);

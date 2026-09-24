@@ -15,7 +15,7 @@ function runtime(){
     setInterval(){},clearInterval(){},setTimeout(){},clearTimeout(){},requestAnimationFrame(){},
     ResizeObserver:class{observe(){}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,String(v)),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i],get length(){return storage.size}}});
   context.window=context;context.addEventListener=()=>{};context.scrollTo=()=>{};
-  for(const name of ['side_rules.js','decision_catalog.js','production_model.js','decision_review_model.js','production_dop.js','app.js','company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
+  for(const name of ['side_rules.js','decision_catalog.js','production_model.js','decision_review_model.js','production_dop.js','financial_model.js','app.js','company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
   const run=code=>vm.runInContext(code,context);
   // Peripheral effects are outside these tests; all selection/save/calculation handlers are real.
   run('updateHud=()=>{};updateSectionCost=()=>{};syncStudentReportPreview=()=>{};animateCash=()=>{};syncStudentTimer=()=>{};');

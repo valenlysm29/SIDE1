@@ -41,7 +41,7 @@
   function creditAvailable(ctx){return Math.max(0,n(ctx.creditAvailable??(approvedCreditLine(ctx)-creditOutstanding(ctx))));}
   function breakdown(item,ctx){
     const d=draft(item,ctx),e=ctx.state?.[item.id];
-    const out={id:item.id,name:item.name,type:item.type,rows:[],outflow:0,assetIncome:0,financing:0,recurring:0,note:''};
+    const out={id:item.id,name:item.name,type:item.type,rows:[],outflow:0,assetIncome:0,bookValueDisposed:0,financing:0,recurring:0,note:''};
     const add=(label,quantity,unit,outflow=0,income=0,detail='')=>out.rows.push({label,quantity,unitCost:unit,outflow,income,detail});
     if(item.type==='info'){
       const channels=ctx.drafts?.CANALES||ctx.state?.CANALES,stores=ctx.rules.storeCount(channels);
@@ -72,6 +72,7 @@
         let cost=Math.max(0,q)*price,income=0;
         if(item.asset){
           income=q<0?-q*price*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
+          if(q<0)out.bookValueDisposed+=-q*price;
           detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
         }
         const historical=item.asset?have:sum(Object.entries(ctx.state?.[item.id]?.quantities||{}).filter(()=>false).map(()=>0));

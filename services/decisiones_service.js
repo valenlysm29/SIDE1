@@ -59,6 +59,7 @@
         p_decisiones: decisiones
       });
       if (error) return { success: false, error: error.message };
+      if (data?.error) return { success: false, error: data.error };
       return { success: true, data };
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };

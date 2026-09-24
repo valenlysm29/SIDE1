@@ -33,11 +33,13 @@ function fixture(name){
  assert.match(await page.locator('#enabledEventsSummary').innerText(),/1 habilitados/);
  await page.locator('#startGame').click();
  assert.equal(await page.locator('[data-tab="rondas"]').isVisible(),true);
- assert.equal(await page.evaluate(()=>runtime().duration),3600);
- assert.equal(await page.locator('#advanceRound').isDisabled(),true);
+ assert.equal(await page.evaluate(()=>runtime().duration),600);
+ assert.equal(await page.evaluate(()=>runtime().phase),'decisions');
+ assert.equal(await page.locator('#advanceRound').isDisabled(),false);
  await page.evaluate(()=>{const reports=[{partida:$('gameCode').value,empresa:'Empresa A',nombre:'Ana',score:50,conectada:true,updatedAt:new Date().toISOString()}];localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));window.dispatchEvent(new StorageEvent('storage',{key:'SIDE_STUDENT_REPORTS'}));});
  await page.waitForFunction(()=>document.querySelector('#companiesGrid').textContent.includes('Empresa A'));
- await page.clock.fastForward(3600000);
+ await page.clock.fastForward(600000);
+ await page.evaluate(()=>controlGame('avanzar'));
  assert.equal(await page.evaluate(()=>state.round),2);
  assert.equal(await page.evaluate(()=>runtime().duration),600);
  assert.equal(await page.locator('#advanceRound').isDisabled(),false);
