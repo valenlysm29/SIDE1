@@ -42,6 +42,7 @@
     return {status:'running',round:index+1,remaining:Math.max(0,Math.ceil((cycle.end-now)/1000)),startedAt:cycle.start};
   }
   function gameAccess(config={}, status={}, runtime={}, existing=false, now=Date.now()) {
+    if(config.cancelledAt||status.cancelledAt||runtime.phase==='cancelled')return {round:Number(runtime.round||1),phase:'cancelled',cancelled:true,integration:false,canJoin:false,canOperate:false,reason:'La partida ha sido cancelada por el profesor. No se pueden enviar más decisiones. Puedes volver al inicio para ingresar a otra partida.'};
     if(config.lifecycleVersion===2){
       const phase=runtime.phase||config.phase||'integration',round=Number(runtime.round||config.round||1);
       const finished=phase==='finished'||Boolean(status.finishedAt);
@@ -82,7 +83,7 @@
   // Proyección para la demostración local. En multijugador manda la respuesta RPC.
   function resolveRuntime(config, now=Date.now()) {
     let r={...config.runtime};
-    if(config.lifecycleVersion!==2||r.phase==='finished')return r;
+    if(config.lifecycleVersion!==2||['finished','cancelled'].includes(r.phase)||config.cancelledAt)return r;
     if(config.cycleCloseMode==='automatic'){
       const plan=cycleSchedule(config),p=schedulePosition(plan,now);
       if(!p||p.status==='scheduled')return r;

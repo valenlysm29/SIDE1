@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260924-lifecycle">
+  <link rel="stylesheet" href="styles.css?v=20260924-observations">
   <link rel="stylesheet" href="simulator3d.css?v=20260910-2">
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
@@ -104,7 +104,7 @@
       <form id="studentForm" class="student-join-form">
         <div class="join-field join-code-field">
           <label for="gameCode">Código de partida</label>
-          <input id="gameCode" placeholder="Ej. SIDE-4821" maxlength="12" autocomplete="off" required>
+          <input id="gameCode" placeholder="Ej. SIDE-027" maxlength="12" autocomplete="off" required>
         </div>
         <div class="join-field">
           <label for="companyLegalName">Nombre de tu empresa</label>
@@ -149,6 +149,7 @@
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
           <p id="studentIntegrationNotice" class="hint hidden" role="status" aria-live="polite"></p>
+          <button id="cancelledBackToProfiles" class="ghost-btn hidden" type="button">VOLVER AL INICIO</button>
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>
           <div class="student-finance-mini">
@@ -167,7 +168,7 @@
         </div>
         <footer class="lobby-actions" aria-label="Acciones de la partida">
           <button id="resumeWorldBtn" class="primary-gold lobby-start hidden" type="button">ENTRAR / VOLVER AL MUNDO 3D</button>
-          <button id="enterDecisionsBtn" class="primary-gold lobby-start" type="button">ENTRAR AL MENÚ DE DECISIONES</button>
+          <button id="enterDecisionsBtn" class="primary-gold lobby-start" type="button" disabled>ENTRAR AL MENÚ DE DECISIONES</button>
           <div class="lobby-secondary-actions">
             <button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
             <button id="backToProfiles" class="ghost-btn" type="button">VOLVER</button>
@@ -481,11 +482,11 @@
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=20260910-2"></script>
-<script src="services/supabase_client.js?v=20260920-2"></script>
-<script src="services/partida_service.js?v=20260924-lifecycle"></script>
+<script src="services/supabase_client.js?v=20260924-observations"></script>
+<script src="services/partida_service.js?v=20260924-observations"></script>
 <script src="services/empresa_service.js?v=20260920-2"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
-<script src="side_rules.js?v=20260924-lifecycle"></script>
+<script src="side_rules.js?v=20260924-observations"></script>
 <script src="icon_bank.js?v=20260910-2"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
 <script src="decision_catalog.js?v=20260910-2"></script>
@@ -502,12 +503,12 @@
   }
 </script>
 <script src="simulator3d-config.js?v=20260922-npcs2"></script>
-<script src="simulator3d.js?v=20260922-cycle-restart"></script>
+<script src="simulator3d.js?v=20260924-observations"></script>
 <script src="production_model.js?v=20260910-2"></script>
 <script src="decision_review_model.js?v=20260910-2"></script>
 <script src="production_dop.js?v=20260917-visual"></script>
 <script src="financial_model.js?v=20260922-finance"></script>
-<script src="app.js?v=20260924-lifecycle"></script>
+<script src="app.js?v=20260924-observations"></script>
 <script src="company_summary.js?v=20260922-teacher-final"></script>
 </body>
 </html>

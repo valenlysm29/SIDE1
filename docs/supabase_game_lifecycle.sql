@@ -2,6 +2,47 @@
 -- Migración transaccional, repetible; las partidas sin lifecycleVersion=2 se conservan.
 begin;
 
+create or replace function public.side_game_features()
+returns jsonb language sql immutable as $$select '{"observationsVersion":1}'::jsonb$$;
+revoke all on function public.side_game_features() from public,anon;
+grant execute on function public.side_game_features() to authenticated;
+
+-- Three decimal digits, unique across games; lock allocation to avoid races.
+create or replace function public.side_next_game_code()
+returns text language plpgsql volatile security definer set search_path=public as $$
+declare code text;
+begin
+  perform pg_advisory_xact_lock(731924);
+  select 'SIDE-'||lpad(n::text,3,'0') into code from generate_series(0,999) n
+    where not exists(select 1 from public.partidas p where p.codigo='SIDE-'||lpad(n::text,3,'0'))
+    order by n limit 1;
+  if code is null then raise exception 'Se agotaron los 1000 códigos de tres dígitos. Contacta al administrador para ampliar el formato.'; end if;
+  return code;
+end $$;
+revoke all on function public.side_next_game_code() from public,anon;
+grant execute on function public.side_next_game_code() to authenticated;
+alter table public.partidas alter column codigo set default public.side_next_game_code();
+alter table public.participantes add column if not exists last_seen_at timestamptz;
+
+-- The server stores outcomes once, including empty draws; later edits never reroll history.
+create table if not exists public.side_individual_event_schedule (
+  empresa_id bigint references public.empresas(id) on delete cascade,
+  ciclo integer not null,
+  events jsonb not null default '[]',
+  primary key(empresa_id,ciclo)
+);
+alter table public.side_individual_event_schedule enable row level security;
+revoke all on public.side_individual_event_schedule from public,anon,authenticated;
+
+create or replace function public.side_valid_event_rules(rules jsonb)
+returns boolean language sql immutable set search_path=public as $$
+  select case when jsonb_typeof(rules) is distinct from 'object' then false else not exists(
+    select 1 from jsonb_each(rules) e where jsonb_typeof(e.value) is distinct from 'object'
+      or jsonb_typeof(e.value->'repeat') is distinct from 'boolean'
+      or coalesce(e.value->>'firstRound','') !~ '^[1-9][0-9]{0,2}$'
+  ) end;
+$$;
+
 create table if not exists public.side_event_catalog (
   id text primary key, scope text not null check(scope in ('group','individual')),
   probability numeric not null check(probability between 0 and 100)
@@ -115,7 +156,7 @@ declare
   cycle integer;
 begin
   if p_config->>'lifecycleVersion' is distinct from '2' then return r; end if;
-  if r->>'phase'='finished' then return r; end if;
+  if r->>'phase' in ('finished','cancelled') or p_config ? 'cancelledAt' then return r; end if;
   if p_config->>'cycleCloseMode'='automatic' then
     if deadline is null or p_now<deadline then return r; end if;
     cycle := least(total,1+floor(extract(epoch from p_now-deadline)/duration)::integer);
@@ -157,6 +198,7 @@ begin
     'gameStartAt',start_at,'gameStartedAt',null,'round',1,'eventSchedule','{}'::jsonb,
     'runtime',jsonb_build_object('round',1,'phase','integration','status','waiting','running',false,
       'mode',c->>'cycleCloseMode','duration',duration,'remaining',duration));
+  if not public.side_valid_event_rules(coalesce(c->'eventRules','{}')) then raise exception 'Configuración de eventos inválida'; end if;
   new.configuracion:=c; new.estado:='esperando'; new.inicio_programado:=start_at;
   new.eventos_habilitados:=coalesce(c->'enabledEvents','[]');
   return new;
@@ -180,7 +222,11 @@ begin
         if not schedule ? n::text then
           select coalesce(jsonb_agg(id),'[]') into selected from (
             select id from public.side_event_catalog where scope='group'
-              and coalesce(c->'enabledEvents','[]') ? id and random()*100<probability order by random() limit 2
+              and coalesce(c->'enabledEvents','[]') ? id
+              and n>=coalesce((c#>>array['eventRules',id,'firstRound'])::integer,1)
+              and (coalesce((c#>>array['eventRules',id,'repeat'])::boolean,true)
+                or not exists(select 1 from jsonb_each(schedule) past where (past.value->'group') ? id))
+              and random()*100<probability order by random() limit 2
           ) candidates;
           schedule:=jsonb_set(schedule,array[n::text],jsonb_build_object('group',selected));
         end if;
@@ -188,7 +234,7 @@ begin
       c:=c||jsonb_build_object('gameStartedAt',coalesce(c->>'gameStartedAt',c->>'gameStartAt',r->>'startedAt'));
     end if;
     c:=c||jsonb_build_object('runtime',r,'phase',r->>'phase','round',r->'round','eventSchedule',schedule);
-    final_state:=case r->>'phase' when 'finished' then 'finalizada' when 'integration' then 'esperando' else 'activa' end;
+    final_state:=case r->>'phase' when 'finished' then 'finalizada' when 'cancelled' then 'finalizada' when 'integration' then 'esperando' else 'activa' end;
     if c is distinct from p.configuracion or final_state<>p.estado then
       update public.partidas set configuracion=c,estado=final_state where id=p_id returning * into p;
       update public.empresas set ciclo_actual=(r->>'round')::integer where id in
@@ -208,12 +254,21 @@ begin
   perform public.side_sync_game(p_partida_id);
   select * into p from public.partidas where id=p_partida_id;
   c:=p.configuracion; r:=coalesce(c->'runtime','{}'); cycle:=coalesce((r->>'round')::integer,1);
+  if p_accion='cancelar' then
+    if p.estado<>'finalizada' then
+      c:=c||jsonb_build_object('cancelledAt',clock_timestamp(),'phase','cancelled',
+        'runtime',r||jsonb_build_object('phase','cancelled','status','simulation-finished','running',false,'remaining',0));
+      update public.partidas set estado='finalizada',configuracion=c where id=p_partida_id returning * into p;
+    end if;
+    return to_jsonb(p)||jsonb_build_object('serverTime',clock_timestamp());
+  end if;
   if c->>'lifecycleVersion' is distinct from '2' then return to_jsonb(p)||jsonb_build_object('serverTime',clock_timestamp()); end if;
   duration:=greatest(60,(c->>'roundHours')::integer*3600+(c->>'roundMinutes')::integer*60);
   if p_accion='guardar' then
     if jsonb_typeof(p_config->'enabledEvents') is distinct from 'array' then return jsonb_build_object('error','Selección de eventos inválida'); end if;
     if exists(select 1 from jsonb_array_elements_text(p_config->'enabledEvents') selected(id) where not exists(select 1 from public.side_event_catalog e where e.id=selected.id)) then return jsonb_build_object('error','Evento desconocido'); end if;
-    c:=c||jsonb_build_object('enabledEvents',p_config->'enabledEvents','eventSelectionMode',p_config->'eventSelectionMode','randomEventCount',p_config->'randomEventCount');
+    if not public.side_valid_event_rules(coalesce(p_config->'eventRules','{}')) then return jsonb_build_object('error','Configuración de eventos inválida'); end if;
+    c:=c||jsonb_build_object('eventRules',coalesce(p_config->'eventRules',c->'eventRules','{}'),'enabledEvents',p_config->'enabledEvents','eventSelectionMode',p_config->'eventSelectionMode','randomEventCount',p_config->'randomEventCount');
   elsif p_accion='iniciar' and p.estado<>'finalizada' and r->>'phase'='integration' and c->>'cycleCloseMode'='manual' then
     c:=c||jsonb_build_object('gameStartAt',now(),'gameStartedAt',now());
     r:=r||jsonb_build_object('phase','decisions','status','running','running',true,'startedAt',now(),'remaining',duration,'duration',duration);
@@ -413,8 +468,12 @@ declare
   v_estado text;
 begin
   perform public.side_sync_game(pt.partida_id) from public.participantes pt where pt.empresa_id=p_empresa_id;
+  -- Polls confirm presence in the database; a roster read never fabricates activity.
+  update public.participantes set last_seen_at=clock_timestamp()
+    where empresa_id=p_empresa_id and (last_seen_at is null or last_seen_at<clock_timestamp()-interval '15 seconds');
   select p.configuracion,p.estado into v_config,v_estado from public.partidas p
     join public.participantes pt on pt.partida_id=p.id where pt.empresa_id=p_empresa_id limit 1;
+  if v_config ? 'cancelledAt' then return jsonb_build_object('error','La partida ha sido cancelada por el profesor.'); end if;
   if v_config->>'lifecycleVersion'='2' then
     if v_estado<>'activa' or v_config#>>'{runtime,phase}'<>'decisions' or p_ciclo<>public.side_ciclo_actual(v_config) then
       return jsonb_build_object('error','Las decisiones solo se permiten en el ciclo operativo actual.');
@@ -487,9 +546,12 @@ language plpgsql
 security definer
 set search_path = public
 as $$
-declare result jsonb; c jsonb; events jsonb; n integer;
+declare result jsonb; c jsonb; events jsonb; chosen jsonb; n integer;
 begin
   perform public.side_sync_game(pt.partida_id) from public.participantes pt where pt.empresa_id=p_empresa_id;
+  -- Polls confirm presence in the database; a roster read never fabricates activity.
+  update public.participantes set last_seen_at=clock_timestamp()
+    where empresa_id=p_empresa_id and (last_seen_at is null or last_seen_at<clock_timestamp()-interval '15 seconds');
   select jsonb_build_object(
     'empresa', (
       select row_to_json(e) from public.empresas e
@@ -541,12 +603,24 @@ begin
   if c->>'lifecycleVersion'='2' then
     events:='{}';
     if c#>>'{runtime,phase}'<>'integration' then
+      -- Serializes event draws for duplicate reads from the same company.
+      perform 1 from public.empresas where id=p_empresa_id for update;
       for n in 1..public.side_ciclo_actual(c) loop
-        events:=jsonb_set(events,array[n::text],coalesce((select jsonb_agg(id) from (
-          select id from public.side_event_catalog where scope='individual' and coalesce(c->'enabledEvents','[]') ? id
-          and (('x'||substr(md5(p_empresa_id::text||'|'||n::text||'|'||id),1,8))::bit(32)::bigint%100)<probability
-          order by id limit 2
-        ) candidates),'[]'));
+        select h.events into chosen from public.side_individual_event_schedule h where h.empresa_id=p_empresa_id and h.ciclo=n;
+        if not found and c#>>'{runtime,phase}'='cancelled' then
+          chosen:='[]';
+        elsif not found then
+          select coalesce(jsonb_agg(id),'[]') into chosen from (
+            select id from public.side_event_catalog where scope='individual' and coalesce(c->'enabledEvents','[]') ? id
+              and n>=coalesce((c#>>array['eventRules',id,'firstRound'])::integer,1)
+              and (coalesce((c#>>array['eventRules',id,'repeat'])::boolean,true)
+                or not exists(select 1 from public.side_individual_event_schedule h where h.empresa_id=p_empresa_id and h.ciclo<n and h.events ? id))
+              and (('x'||substr(md5(p_empresa_id::text||'|'||n::text||'|'||id),1,8))::bit(32)::bigint%100)<probability
+            order by id limit 2
+          ) candidates;
+          insert into public.side_individual_event_schedule values(p_empresa_id,n,chosen);
+        end if;
+        events:=jsonb_set(events,array[n::text],coalesce((select jsonb_agg(id) from jsonb_array_elements_text(chosen) e(id) where coalesce(c->'enabledEvents','[]') ? id),'[]'));
       end loop;
     end if;
     result:=result||jsonb_build_object('individualEvents',events);

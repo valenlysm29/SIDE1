@@ -1,6 +1,6 @@
 const cfg = window.SIDE_CONFIG || {};
 const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') && cfg.SUPABASE_PUBLISHABLE_KEY && !cfg.SUPABASE_PUBLISHABLE_KEY.includes('TU-PUBLISHABLE');
-const supabaseClient = hasConfig && window.supabase ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_PUBLISHABLE_KEY) : null;
+const supabaseClient = window.SIDE?.SupabaseClient?.get() || null;
 const $ = id => document.getElementById(id);
 const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','simulationLoading','simulator3d','decisionMenu'];
 const modals = ['teacherLoginModal','teacherRegisterModal','studentModal'];
@@ -88,6 +88,9 @@ function studentAccess(existing=true){
 }
 function updateIntegrationUI(){
   const access=studentAccess(),button=$('enterDecisionsBtn'),notice=$('studentIntegrationNotice');
+  $('studentLobby')?.classList.toggle('game-cancelled',Boolean(access.cancelled));
+  $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
+  if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation());
   if(button)button.disabled=!access.canOperate;
   if(notice){
@@ -101,11 +104,20 @@ function updateIntegrationUI(){
       else notice.append(' Puedes permanecer en esta pantalla.');
     }
   }
+  if(access.cancelled){
+    autoEnterDecisions=false;
+    if(!cancellationShown){cancellationShown=true;toast('La partida ha sido cancelada por el profesor.');}
+    if(typeof closeCompanyReview==='function')closeCompanyReview();
+    if($('studentLobby')?.classList.contains('hidden'))showScreen('studentLobby');
+    playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
+    window.SIDE3D?.suspend?.();syncStudentTimer();
+  }
   if(access.integration)autoEnterDecisions=true;
   if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
 
   if(!access.canOperate&&!$('decisionMenu')?.classList.contains('hidden')){playerIsDeciding=false;showScreen('studentLobby');}
 }
+let cancellationShown=false;
 let studentConnected=false,remoteStateBusy=false,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null;
 function studentNow(){return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function startStudentSync(){
@@ -122,7 +134,7 @@ function applyStudentGameState(partida,round=1){
   if(config.runtime)localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(config.runtime));
   else localStorage.removeItem('SIDE_ROUND_RUNTIME');
   localStorage.setItem('SIDE_ACTIVE_ROUND',String(config.runtime?.round||round));
-  localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:partida.estado!=='finalizada'&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
+  localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:config.cancelledAt||null,active:partida.estado!=='finalizada'&&!config.cancelledAt&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
 }
 async function refreshStudentGame(){
   if(!studentConnected)return;
@@ -214,7 +226,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
   const brandName=$('companyBrandName')?.value.trim()||legalName||COMPANY_NAME;
   if(!legalName||!brandName){message('studentMessage','Ingresa el nombre y el nombre comercial de tu empresa.',true);return}
   const localCfg=teacherConfig(),localCode=String(localCfg.codigo||'SIDE-000').toUpperCase();
-  if((code===localCode&&!localStorage.getItem('SIDE_REMOTE_GAME_'+code)&&!localStorage.getItem('SIDE_PARTIDA_ID'))||code==='SIDE-000'){
+  if(!hasConfig&&code===localCode&&!localStorage.getItem('SIDE_REMOTE_GAME_'+code)&&!localStorage.getItem('SIDE_PARTIDA_ID')){
     let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
     const previous=reports.find(r=>r.partida===code&&r.empresa.trim().toUpperCase()===brandName.toUpperCase());
     const access=studentAccess(Boolean(previous));
@@ -259,7 +271,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     currentStudent={name:'Jugador',company:brandName,legalName,participantId,empresaId,game:found,returning};
     localStorage.setItem('SIDE_REMOTE_GAME_'+code,'1');
   }
-  studentConnected=true;autoEnterDecisions=false;
+  studentConnected=true;autoEnterDecisions=false;cancellationShown=false;
   try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
   startStudentSync();
   loadDecisionState();
@@ -278,7 +290,7 @@ async function prepareLobby(){
   const returning=currentStudent.returning||localStorage.getItem(visitedKey)==='1';
   localStorage.setItem(visitedKey,'1');
   if(teacherConfig().lifecycleVersion===2){showScreen('studentLobby');autoEnterDecisions=true;updateIntegrationUI();}
-  else if(studentAccess().integration||returning)showScreen('studentLobby');else await openStudentTutorial();
+  else if(studentAccess().integration||returning){showScreen('studentLobby');autoEnterDecisions=studentAccess().integration;updateIntegrationUI();}else await openStudentTutorial();
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
@@ -286,6 +298,7 @@ async function openStudentTutorial(){
   if(typeof window.initSIDETutorial==='function')window.initSIDETutorial(()=>showScreen('studentLobby'));
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
+$('cancelledBackToProfiles')?.addEventListener('click',()=>$('backToProfiles').click());
 $('resumeWorldBtn')?.addEventListener('click',()=>startSimulationLoading());
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
 $('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;playerIsDeciding=false;autoEnterDecisions=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
@@ -822,11 +835,12 @@ function activeStudentEvents(){
   if(conf.lifecycleVersion===2&&studentAccess().integration)return [];
   const remoteEvents=conf.lifecycleVersion===2&&currentStudent.empresaId;
   let individual={};if(remoteEvents){try{individual=JSON.parse(localStorage.getItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey())||'{}');}catch{}stored={};}
-  for(let r=Number(teacherConfig().integrationMinutes)===60?2:1;r<=round;r++)if(!stored[r]){const ids=[];(schedule[r]?.group||[]).forEach(id=>{if(enabled.has(id))ids.push(id)});if(remoteEvents){(individual[r]||[]).filter(id=>enabled.has(id)).forEach(id=>ids.push(id));}else EVENT_CATALOG.filter(e=>e.scope==='individual'&&enabled.has(e.id)).forEach(e=>{if(ids.filter(id=>EVENT_CATALOG.find(x=>x.id===id)?.scope==='individual').length>=2)return;if(deterministicChance(`${storageKey()}|${r}|${e.id}`,e.probability))ids.push(e.id)});stored[r]=ids}
+  for(let r=Number(teacherConfig().integrationMinutes)===60?2:1;r<=round;r++)if(!stored[r]){const ids=[];(schedule[r]?.group||[]).forEach(id=>{if(enabled.has(id))ids.push(id)});if(remoteEvents){(individual[r]||[]).filter(id=>enabled.has(id)).forEach(id=>ids.push(id));}else EVENT_CATALOG.filter(e=>e.scope==='individual'&&enabled.has(e.id)&&r>=Number(conf.eventRules?.[e.id]?.firstRound||1)&&(conf.eventRules?.[e.id]?.repeat!==false||!Object.entries(stored).some(([cycle,ids])=>Number(cycle)<r&&ids.includes(e.id)))).forEach(e=>{if(ids.filter(id=>EVENT_CATALOG.find(x=>x.id===id)?.scope==='individual').length>=2)return;if(deterministicChance(`${storageKey()}|${r}|${e.id}`,e.probability))ids.push(e.id)});stored[r]=ids}
   localStorage.setItem(eventStoreKey(),JSON.stringify(stored));
   const active=[];Object.entries(stored).forEach(([trigger,ids])=>(ids||[]).forEach(id=>{const ev=EVENT_CATALOG.find(e=>e.id===id);if(!ev||!enabled.has(id))return;const effectiveStart=Number(trigger)+Number(ev.cycleOffset||0),effectiveEnd=effectiveStart+Math.max(1,Number(ev.cycles||1));if(round>=effectiveStart&&round<effectiveEnd)active.push({...ev,triggerRound:Number(trigger),startRound:effectiveStart})}));return active;
 }
 function applyEventCashEffects(){
+  if(studentAccess().cancelled)return;
   const events=activeStudentEvents();
   events.forEach(ev=>{const delta=Number(ev.effect?.cashDelta||0);if(!delta)return;const key=`${ev.startRound}:EVENT:${ev.id}`;if(cashLedger[key]===undefined)cashLedger[key]=delta;});
   if(events.some(ev=>ev.effect?.revenuePct||ev.effect?.costPct)||cashLedger[`${currentRound()}:EVENT:PERCENT`]!==undefined){
@@ -1024,6 +1038,7 @@ function syncStudentTimer(){
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
   if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note=conf.cycleCloseMode==='automatic'?'Inicio automático configurado':'Esperando al profesor';}
+  if(conf.cancelledAt||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
   if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;
   if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;
@@ -1064,4 +1079,10 @@ function tickStudentGame(){
   await refreshStudentGame();startStudentSync();await prepareLobby();
 })();
 
+// Shared links fill the join form; the game code is still verified by the server.
+const invitationCode=new URLSearchParams(window.location.search).get('partida');
+if(invitationCode&&/^SIDE-[A-Z0-9]{3,4}$/i.test(invitationCode)){
+  $('gameCode').value=invitationCode.toUpperCase();showScreen('profiles');showModal('studentModal');
+}
+window.addEventListener('online',()=>{if(studentConnected)refreshStudentGame();});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});

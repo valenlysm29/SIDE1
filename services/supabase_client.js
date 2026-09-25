@@ -18,9 +18,6 @@
   /** @type {object|null} Cliente Supabase (singleton). */
   let client = null;
 
-  /** @type {boolean} Indica si ya se intentó inicializar. */
-  let initialized = false;
-
   /**
    * Lee la configuración global inyectada por config.js.
    * @returns {{url: string, key: string}|null} Config o null si inválida.
@@ -40,8 +37,7 @@
    * @returns {object|null} Cliente Supabase o null si no se pudo crear.
    */
   function init() {
-    if (initialized) return client;
-    initialized = true;
+    if (client) return client;
     const cfg = readConfig();
     if (!cfg) return null;
     if (!global.supabase || typeof global.supabase.createClient !== 'function') {
@@ -62,12 +58,12 @@
    * @returns {object|null} Cliente Supabase o null.
    */
   function get() {
-    if (!initialized) init();
+    if (!client) init();
     return client;
   }
 
   /**
-   * Indica si hay conexión usable con Supabase.
+   * Indica si el cliente está inicializado; no prueba la conexión de red.
    * @returns {boolean} true si el cliente existe.
    */
   function isReady() {

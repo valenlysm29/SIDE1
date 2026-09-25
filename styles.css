@@ -1507,3 +1507,10 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 
 /* Cuenta regresiva de integración: reutiliza los colores del lobby. */
 #integrationCountdown{display:block;margin:10px 0;color:#ffd329;font-size:clamp(26px,5vw,36px);font-variant-numeric:tabular-nums;line-height:1.2}
+
+/* Waiting and cancelled games show disabled actions clearly. */
+#enterDecisionsBtn:disabled{opacity:.45;filter:grayscale(.65);cursor:not-allowed;box-shadow:none;transform:none}
+#studentLobby.game-cancelled #studentIntegrationNotice{padding:16px;border:1px solid #ff8198;border-radius:12px;color:#ffdce3;background:#4b1729;font-weight:700;line-height:1.5}
+#studentLobby.game-cancelled #lobbySegment{color:#ffb6c5;border-color:#ff8198;background:#391c2b}
+#studentLobby.game-cancelled .lobby-welcome,#studentLobby.game-cancelled #reopenTutorialBtn{display:none}
+#cancelledBackToProfiles{margin:0 auto 16px;min-height:44px}

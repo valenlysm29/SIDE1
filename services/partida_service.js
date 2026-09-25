@@ -72,6 +72,9 @@
         return { success: false, error: 'Debes iniciar sesión como profesor.' };
       }
       if(d.configuracion?.lifecycleVersion===2){
+        const {data:features,error:featuresError}=await sb.rpc('side_game_features');
+        if(featuresError&&!/PGRST202|42883/.test(featuresError.code||''))return {success:false,error:featuresError.message||'No se pudo comprobar Supabase. Vuelve a intentarlo.'};
+        if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con docs/supabase_game_lifecycle.sql para habilitar códigos de tres dígitos, cancelación y eventos sin repetición.'};
         // Read-only readiness check: do not leave an unusable lobby in an old DB.
         const {error:readinessError}=await sb.rpc('controlar_partida',{p_partida_id:null,p_accion:'sincronizar'});
         if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica docs/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
@@ -128,9 +131,12 @@
     try {
       let { data, error } = await sb
         .from('participantes')
-        .select('id, nombre, empresa, empresa_id, puntaje_docente, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
+        .select('id, nombre, empresa, empresa_id, puntaje_docente, last_seen_at, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
         .eq('partida_id', partidaId)
         .order('created_at', { ascending: true });
+      if(error&&/last_seen_at/.test(error.message||'')){
+        ({data,error}=await sb.from('participantes').select('id, nombre, empresa, empresa_id, puntaje_docente, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)').eq('partida_id',partidaId).order('created_at',{ascending:true}));
+      }
       if(error&&/puntaje_docente/.test(error.message||'')){
         ({data,error}=await sb.from('participantes').select('id, nombre, empresa, empresa_id, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)').eq('partida_id',partidaId).order('created_at',{ascending:true}));
       }
@@ -201,6 +207,11 @@
     const sb=client();if(!sb)return offline();
     try{
       const {data,error}=await sb.rpc('controlar_partida',{p_partida_id:partidaId,p_accion:accion,p_config:config,p_expected_round:expectedRound});
+      if(!error&&!data?.error&&accion==='guardar'&&config?.eventRules&&JSON.stringify(config.eventRules)!==JSON.stringify(data?.configuracion?.eventRules||{})){
+        // JSONB can reorder keys; compare each rule instead of its serialization.
+        const saved=data?.configuracion?.eventRules||{};
+        if(Object.entries(config.eventRules).some(([id,rule])=>saved[id]?.firstRound!==rule.firstRound||saved[id]?.repeat!==rule.repeat))return {success:false,error:'No se guardaron las reglas de eventos. Actualiza docs/supabase_game_lifecycle.sql en Supabase.'};
+      }
       return error||data?.error?{success:false,error:error?.message||data.error}:{success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }

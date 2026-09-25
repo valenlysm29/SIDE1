@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="docente.css?v=20260922-teacher-final">
+  <link rel="stylesheet" href="docente.css?v=20260924-observations">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
 </head>
 <body>
@@ -36,7 +36,10 @@
       </div>
       <div class="top-actions">
         <span id="gameCodeBadge" class="code-badge">SIDE-000</span>
+        <button id="copyGameCode" class="secondary" type="button">Copiar código</button>
+        <button id="copyGameLink" class="secondary" type="button">Copiar enlace</button>
         <button id="saveAll" class="secondary">Guardar configuración</button>
+        <button id="cancelGame" class="secondary danger hidden" type="button">Cancelar partida</button>
 
       </div>
     </header>
@@ -165,9 +168,15 @@
           <span id="eventVisibleCount" class="event-visible-count"></span>
         </div>
         <div class="event-bank-help"><strong>GRUPAL</strong><span>Si el evento ocurre, afecta a todas las empresas.</span><strong>INDIVIDUAL</strong><span>Se evalúa empresa por empresa con la probabilidad indicada.</span><strong>OCURRENCIA</strong><span>Es la probabilidad de que el evento se active; no significa que ocurrirá siempre.</span></div>
-        <div class="event-table-wrap"><table class="event-table"><thead><tr><th>Usar</th><th>Descripción</th><th>Afectados</th><th>Ciclos por afectar</th><th>Implicancia</th><th>Ocurrencia</th></tr></thead><tbody id="eventBankBody"></tbody></table></div>
+        <p class="hint">Configura desde qué ciclo puede ocurrir cada evento. Desmarca «Repetir» para que ocurra una sola vez por partida (o por empresa si es individual). Su efecto conserva la duración indicada.</p>
+        <div class="event-table-wrap"><table class="event-table"><thead><tr><th>Usar</th><th>Descripción</th><th>Afectados</th><th>Ciclos por afectar</th><th>Implicancia</th><th>Ocurrencia</th><th>Desde ciclo</th><th>Repetir</th></tr></thead><tbody id="eventBankBody"></tbody></table></div>
         <p class="hint event-mode-hint">Ejemplo: <b>+0</b> = mismo ciclo, <b>+1</b> = siguiente ciclo, <b>+2</b> = el efecto empieza después de dos ciclos. Si un evento dura más de un ciclo, se indica dentro de la implicancia.</p>
       </div>
+</dialog>
+<dialog id="cancelGameDialog" class="event-picker" aria-labelledby="cancelGameTitle">
+  <h2 id="cancelGameTitle">Cancelar partida</h2>
+  <p>Los estudiantes recibirán un aviso y dejarán de poder tomar decisiones. Los resultados registrados se conservarán.</p>
+  <div class="top-actions"><button id="keepGame" class="secondary" type="button">Continuar partida</button><button id="confirmCancelGame" class="secondary danger" type="button">Sí, cancelar partida</button></div>
 </dialog>
 
 <div id="pdfModal" class="modal hidden"><div class="modal-panel"><button id="closePdf" class="modal-close">×</button><h2>Reporte PDF de la simulación</h2><iframe id="pdfFrame" title="Vista previa PDF"></iframe></div></div>
@@ -175,12 +184,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="config.js?v=20260910-2"></script>
-<script src="services/supabase_client.js?v=20260920-2"></script>
-<script src="services/partida_service.js?v=20260924-lifecycle"></script>
+<script src="services/supabase_client.js?v=20260924-observations"></script>
+<script src="services/partida_service.js?v=20260924-observations"></script>
 <script src="services/empresa_service.js?v=20260920-2"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
-<script src="side_rules.js?v=20260924-lifecycle"></script>
+<script src="side_rules.js?v=20260924-observations"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
-<script src="docente.js?v=20260924-lifecycle"></script>
+<script src="docente.js?v=20260924-observations"></script>
 </body>
 </html>
