@@ -166,6 +166,9 @@ begin
     if p_now>=deadline+make_interval(secs=>total*duration) then
       r := r||jsonb_build_object('phase','finished','status','simulation-finished','running',false,'remaining',0);
     end if;
+  elsif r->>'phase'='integration' and deadline is not null and p_now>=deadline then
+    r:=jsonb_build_object('round',1,'phase','decisions','status','running','running',true,
+      'mode','manual','duration',duration,'remaining',duration,'startedAt',deadline);
   elsif r->>'phase'='decisions' and (r->>'running')::boolean then
     started := (r->>'startedAt')::timestamptz;
     if p_now>=started+make_interval(secs=>(r->>'duration')::integer) then
@@ -189,11 +192,9 @@ begin
   if coalesce(c->>'roundHours','') !~ '^[0-9]{1,4}$' or coalesce(c->>'roundMinutes','') !~ '^([0-9]|[1-5][0-9])$' then raise exception 'Duración de ciclo inválida'; end if;
   duration:=(c->>'roundHours')::integer*3600+(c->>'roundMinutes')::integer*60;
   if duration<60 then raise exception 'La duración mínima es un minuto'; end if;
-  if c->>'cycleCloseMode'='automatic' then
-    if coalesce(c->>'integrationDurationMinutes','') !~ '^([1-9]|[1-5][0-9]|60)$' then raise exception 'El tiempo de integración debe ser un entero entre 1 y 60 minutos'; end if;
-    minutes:=(c->>'integrationDurationMinutes')::integer;
-    start_at:=greatest(now(),coalesce(nullif(c->>'scheduledStart','')::timestamptz,now()))+make_interval(mins=>minutes);
-  end if;
+  if coalesce(c->>'integrationDurationMinutes','') !~ '^([1-9]|[1-5][0-9]|60)$' then raise exception 'El tiempo de integración debe ser un entero entre 1 y 60 minutos'; end if;
+  minutes:=(c->>'integrationDurationMinutes')::integer;
+  start_at:=greatest(now(),case when c->>'cycleCloseMode'='automatic' then coalesce(nullif(c->>'scheduledStart','')::timestamptz,now()) else now() end)+make_interval(mins=>minutes);
   c:=c||jsonb_build_object('codigo',new.codigo,'phase','integration','integrationMinutes',0,'integrationStartTime',coalesce(start_at-make_interval(mins=>minutes),now()),
     'gameStartAt',start_at,'gameStartedAt',null,'round',1,'eventSchedule','{}'::jsonb,
     'runtime',jsonb_build_object('round',1,'phase','integration','status','waiting','running',false,
@@ -269,9 +270,6 @@ begin
     if exists(select 1 from jsonb_array_elements_text(p_config->'enabledEvents') selected(id) where not exists(select 1 from public.side_event_catalog e where e.id=selected.id)) then return jsonb_build_object('error','Evento desconocido'); end if;
     if not public.side_valid_event_rules(coalesce(p_config->'eventRules','{}')) then return jsonb_build_object('error','Configuración de eventos inválida'); end if;
     c:=c||jsonb_build_object('eventRules',coalesce(p_config->'eventRules',c->'eventRules','{}'),'enabledEvents',p_config->'enabledEvents','eventSelectionMode',p_config->'eventSelectionMode','randomEventCount',p_config->'randomEventCount');
-  elsif p_accion='iniciar' and p.estado<>'finalizada' and r->>'phase'='integration' and c->>'cycleCloseMode'='manual' then
-    c:=c||jsonb_build_object('gameStartAt',now(),'gameStartedAt',now());
-    r:=r||jsonb_build_object('phase','decisions','status','running','running',true,'startedAt',now(),'remaining',duration,'duration',duration);
   elsif p_accion in ('avanzar','pausar','reanudar','cerrar') and c->>'cycleCloseMode'='manual'
     and r->>'phase' in ('decisions','results') and p.estado<>'finalizada' and p_expected_round=cycle then
     if p_accion='avanzar' then

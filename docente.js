@@ -9,6 +9,7 @@ try{state.partidaId=localStorage.getItem('SIDE_PARTIDA_ID')||null}catch{state.pa
 
 function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2800)}
 function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
+function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function escapeAttr(v){return escapeHtml(v)}
 function gameStatus(){try{return JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{return null}}
@@ -23,12 +24,12 @@ function refreshSetupSummary(){
   const integration=r?.phase==='integration',modern=state.lifecycleVersion===2;
   $('configCycleCount').textContent=`${state.round} / ${count}`;
   $('configReadySummary').textContent=`${count} ciclos operativos de ${$('roundHours').value||0} h ${$('roundMinutes').value||0} min. La integración es previa al Ciclo 1.`;
-  $('gameStatusBanner').textContent=integration?(cycleMode()==='manual'?'Estudiantes en período de integración. Pulsa Iniciar partida.':`Inicio automático configurado · ${getConfig().integrationDurationMinutes} minutos de integración.`):active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración para abrir el ingreso de estudiantes.';
+  $('gameStatusBanner').textContent=integration?`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración para abrir el ingreso de estudiantes.';
   document.querySelector('[data-tab="rondas"]')?.classList.toggle('hidden',!active&&!status?.finishedAt);
   document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>input.disabled=active);
   ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)});
-  $('startCycle1Btn')?.classList.toggle('hidden',!(active&&integration&&cycleMode()==='manual'));
-  if(integration)$('roundState').textContent=cycleMode()==='manual'?'Esperando inicio del Ciclo 1':'Esperando inicio automático';
+  $('startCycle1Btn')?.classList.toggle('hidden',true);
+  if(integration)$('roundState').textContent=`Sala de espera · inicio en ${formatStudentTime(state.seconds)}`;
   else if(active&&modern)$('roundState').textContent=r?.phase==='results'?'Ciclo cerrado':`Ciclo ${state.round} en curso`;
   $('cancelGame')?.classList.toggle('hidden',!active);
   ['copyGameCode','copyGameLink'].forEach(id=>{if($(id))$(id).disabled=!active;});
@@ -82,14 +83,14 @@ function getConfig(){return {
 function saveConfig(silent=false){
   renderAcademicCalendar();const c=getConfig();
   const numericPlan=RULES.cycleSchedule({...c,scheduledStart:c.scheduledStart||'2026-01-01T00:00'});
-  if(c.lifecycleVersion===2&&c.cycleCloseMode==='automatic'&&(!Number.isInteger(c.integrationDurationMinutes)||c.integrationDurationMinutes<1||c.integrationDurationMinutes>60)){if(!silent)toast('Indica entre 1 y 60 minutos de integración.');return false}
+  if(c.lifecycleVersion===2&&(!Number.isInteger(c.integrationDurationMinutes)||c.integrationDurationMinutes<1||c.integrationDurationMinutes>60)){if(!silent)toast('Indica entre 1 y 60 minutos de integración.');return false}
   if(numericPlan.error){if(!silent)toast(numericPlan.error);return false}
   if(c.capitalMode==='random'&&c.capitalMax<c.capitalMin){toast('El rango máximo de caja debe ser mayor o igual al mínimo.');return false}
   localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));$('gameCodeBadge').textContent=c.codigo;updateRoundDisplay();refreshSetupSummary();publishGameState();
   if(!silent)toast('Configuración guardada.');return true;
 }
 function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=c.codigo||generateGameCode();localStorage.setItem('SIDE_ASSIGNED_GAME_CODE',$('gameCode').value);const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){$('interest').disabled=true;if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
-function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('automaticCycleConfig').classList.toggle('hidden',cycleMode()!=='automatic');$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el docente decide cuándo inicia y cuándo avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
+function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El servidor inicia el Ciclo 1 al terminar la integración desde la fecha programada. Puedes cerrar el navegador.':'El servidor inicia el Ciclo 1 al terminar la integración. El docente controla el reloj y el avance de los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
 
 
 function calendarDuration(milliseconds){
@@ -319,7 +320,6 @@ function applyTeacherState(partida){
 function paintTeacherClock(){
   const r=runtime(),c=state.authoritative;if(!c||!r)return;
   state.seconds=r.phase==='integration'&&c.gameStartAt?Math.max(0,Math.ceil((Date.parse(c.gameStartAt)-teacherNow())/1000)):r.running?Math.max(0,Math.ceil((Date.parse(r.startedAt)+r.duration*1000-teacherNow())/1000)):Number(r.remaining||0);
-  if(r.phase==='integration'&&c.cycleCloseMode==='manual')state.seconds=0;
   updateTimer();$('startTimer').textContent=r.running?'Pausar':'Reanudar';
 }
 async function refreshTeacherGame(){
@@ -349,7 +349,7 @@ async function prepareGame(){
   if(!await ensureSupabasePartida(getConfig()))return false;
   if(!state.partidaId){
     const c=getConfig(),now=Date.now();
-    c.gameStartAt=c.cycleCloseMode==='automatic'?new Date(Math.max(now,Date.parse(c.scheduledStart)||now)+c.integrationDurationMinutes*60000).toISOString():null;
+    c.gameStartAt=new Date(Math.max(now,c.cycleCloseMode==='automatic'?(Date.parse(c.scheduledStart)||now):now)+c.integrationDurationMinutes*60000).toISOString();
     c.gameStartedAt=null;c.integrationStartTime=new Date(now).toISOString();c.phase='integration';c.eventSchedule={};
     c.runtime={round:1,phase:'integration',status:'waiting',running:false,duration:roundSeconds(),remaining:roundSeconds(),mode:cycleMode()};
     applyTeacherState({configuracion:c,estado:'esperando'});
@@ -442,9 +442,9 @@ async function purgeForeignProfessorState(){
 function refreshStartButton(){
   const btn=$('startGame');if(!btn)return;
   const active=Boolean(gameStatus()?.active);
-  const waiting=runtime()?.phase==='integration'&&cycleMode()==='manual';
-  btn.textContent=state.starting?'Iniciando…':active&&!waiting?(runtime()?.phase==='integration'?'Inicio automático configurado':'Partida iniciada'):'Iniciar partida';
-  btn.disabled=state.starting||(active&&!waiting);
+  const waiting=runtime()?.phase==='integration';
+  btn.textContent=state.starting?'Iniciando…':active&&waiting?'Sala de espera':active?'Partida iniciada':'Iniciar partida';
+  btn.disabled=state.starting||active;
 }
 /**
  * Cierra la partida en Supabase al finalizar la simulación.

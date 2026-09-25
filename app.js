@@ -1037,7 +1037,7 @@ function syncStudentTimer(){
     note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente';
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
-  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note=conf.cycleCloseMode==='automatic'?'Inicio automático configurado':'Esperando al profesor';}
+  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note='Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado';}
   if(conf.cancelledAt||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
   if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;
