@@ -19,13 +19,13 @@ def asset_uri(relative):
 def embed_assets(text):
     return re.sub(r'''(['"])(assets/[^'"\s]+\.(?:png|gif|svg|jpg|webp))\1''',lambda m:m[1]+asset_uri(m[2])+m[1],text)
 def document(name, storage=None):
-    text=(ROOT/name).read_text()
+    text=(ROOT/name).read_text(encoding='utf-8')
     text=re.sub(r'<link[^>]*href="https://[^>]+>', '',text)
-    text=re.sub(r'<link[^>]*href="([^"\s]+\.css)(?:\?[^"]*)?"[^>]*>',lambda m:'<style>'+embed_assets((ROOT/m[1]).read_text())+'</style>',text)
+    text=re.sub(r'<link[^>]*href="([^"\s]+\.css)(?:\?[^"]*)?"[^>]*>',lambda m:'<style>'+embed_assets((ROOT/m[1]).read_text(encoding='utf-8'))+'</style>',text)
     def script(m):
         src=m[1].split('?',1)[0]
         if src.startswith('https://'):return ''
-        code=embed_assets((ROOT/src).read_text()).replace('</script','<\\/script')
+        code=embed_assets((ROOT/src).read_text(encoding='utf-8')).replace('</script','<\\/script')
         return '<script>'+code+'</script>'
     text=re.sub(r'<script src="([^"]+)"></script>',script,text)
     text=embed_assets(text)

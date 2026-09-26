@@ -3,6 +3,8 @@ __pycache__/
 node_modules/
 .cache/
 tests/output/
+tests/.python-deps/
+/output/
 
 # Paquete local de entrega
 /SIDE_corregido.zip

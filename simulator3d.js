@@ -18,9 +18,11 @@
   let productInteractables = [], productInspectOpen = false;
   let inventory = null, gameSession = null, sessionContext = '';
   let audioCtx = null, ambientTimer = null, storeMusicTimer = null, audioEnabled = true, nextAutoServeAt = 0, nextManagerBoostAt = 0;
+  let vehicleAudio = null;
   let entryDoorLeft = null, entryDoorRight = null, entryDoorProgress = 0;
   let perfMode = 'auto', renderScale = 1.15, perfAccum = 0, perfFrames = 0, perfLastCheck = 0;
   let lastHudTick = 0, lastPromptTick = 0, lastLightTick = 0;
+  let pausedFrameDrawn = false;
   let hemiLight = null, sunLight = null, checkoutOpen = false, checkoutScanned = false, checkoutPayment = 'cash';
   let adminMesh = null, newsPanelMesh = null, adminOpen = false, newsOpen = false, businessState = null, nextEventAt = 0, nextProductionAt = 0, supplierDeliveryAt = 0, tutorialIndex = 0, secondRegisterMesh = null;
   let trafficPhase = 0, trafficLight = 'vehicles', trafficSignalMeshes = [], visibilityPaused = false, debugPerformance = false, npcModelTemplate = null;
@@ -35,6 +37,8 @@
   let currentInterior = 'store', hubReturnPoint = null, cameraSnap = true;
   let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
   let hubVehicles = null, driving = null;
+  let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
+  let cameraZoom = 5.2, lastCameraInputAt = 0;
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
@@ -147,15 +151,18 @@
     return decisionCash() - (bridge().recordOperatingExpense ? 0 : Number(businessState?.expenses || 0));
   }
 
-  function applyExpense(amount, reason, kind='SIM_GASTOS') {
+  function applyExpense(amount, reason, kind='SIM_GASTOS',businessPatch={}) {
     if (!businessState) loadBusinessState();
+    if(bridge().canOperate?.()===false)return false;
     const a = Math.max(0, Number(amount) || 0);
-    businessState.expenses += a;
-    bridge().recordOperatingExpense?.(a,kind);
+    const next={...businessState,...businessPatch,expenses:Number(businessState.expenses||0)+a};
+    if(bridge().recordOperatingExpense?.(a,kind,{[businessKey()]:JSON.stringify(next)})===false)return false;
+    businessState=next;
     saveBusinessState();
     showCashFx(`− ${fmt(a)}`);
     addBusinessLog(`${reason}: −${fmt(a)}`);
     updateHUD();
+    return true;
   }
 
   function updateReputation(delta, reason='') {
@@ -179,21 +186,29 @@
 
   function targetProduction() { return Math.max(0, Math.round(Number(saved('PRODUCCION_META')?.value || 0))); }
   function productionSnapshot() { try{return bridge().productionPlan?.()||null}catch{return null} }
+  function cycleProductionRecord() {
+    try{
+      const stored=JSON.parse(localStorage.getItem(inventoryKey())||'null'),value=stored?.producedUnits;
+      if(value===null||value===undefined||!Number.isFinite(Number(value))||Number(value)<0)return null;
+      return {round:currentRoundSafe(),producedUnits:Number(value)};
+    }catch{return null;}
+  }
 
   function createInitialInventory() {
     const plan=productionSnapshot();
     const planned=Array.isArray(plan?.productLines)?plan.productLines.map(line=>Math.max(0,Math.round(Number(line.plannedUnits||0)))):[];
     const totalFromPlan=planned.reduce((amount,value)=>amount+value,0);
-    const total=Math.max(0,totalFromPlan||(targetProduction()?0:24));
-    const split=totalFromPlan?planned.slice(0,3):[Math.ceil(total*.4),Math.ceil(total*.35),0];
-    if(!totalFromPlan)split[2]=Math.max(0,total-split[0]-split[1]);
+    const explicitPlan=Array.isArray(plan?.productLines);
+    const total=Math.max(0,explicitPlan?totalFromPlan:plan?Number(plan.producibleUnits)||0:(targetProduction()?0:24));
+    const split=explicitPlan?PRODUCTS.map((_,i)=>planned[i]||0):[Math.ceil(total*.4),Math.ceil(total*.35),0];
+    if(!explicitPlan)split[2]=Math.max(0,total-split[0]-split[1]);
     const display = {}, reserve = {};
     PRODUCTS.forEach((product, i) => {
       const show = Math.min(4, split[i]);
       display[product.id] = show;
       reserve[product.id] = Math.max(0, split[i] - show);
     });
-    return { schemaVersion:2,totalTarget: total, display, reserve, sold: { esencial: 0, urbano: 0, premium: 0 } };
+    return { schemaVersion:2,totalTarget: total,producedUnits:total, display, reserve, sold: { esencial: 0, urbano: 0, premium: 0 } };
   }
 
   function loadInventory() {
@@ -201,11 +216,16 @@
     if (!inventory || inventory.schemaVersion!==2 || !inventory.display || !inventory.reserve) inventory = createInitialInventory();
     const planned=productionSnapshot()?.producibleUnits;
     const desired = Math.max(0,Number.isFinite(Number(planned))?Number(planned):(targetProduction()||inventory.totalTarget||24));
-    const currentUnits = PRODUCTS.reduce((n, p) => n + Number(inventory.display[p.id] || 0) + Number(inventory.reserve[p.id] || 0) + Number(inventory.sold?.[p.id] || 0), 0);
+    // Supplier stock and customer reservations do not change recorded production.
+    // Legacy saves without an output record stay unknown; their saved target is
+    // only an allocation baseline, never reported as realized productivity.
+    const hasOutput=inventory.producedUnits!=null&&Number.isFinite(Number(inventory.producedUnits));
+    const currentUnits=hasOutput?Number(inventory.producedUnits):Math.max(0,Number(inventory.totalTarget??desired));
     if (desired > currentUnits) {
       let extra = desired - currentUnits;
       let i = 0;
       while (extra-- > 0) { const product = PRODUCTS[i++ % PRODUCTS.length]; inventory.reserve[product.id] = Number(inventory.reserve[product.id] || 0) + 1; }
+      if(hasOutput)inventory.producedUnits=desired;
     }
     inventory.totalTarget = Math.max(inventory.totalTarget || 0, desired);
     inventory.sold = inventory.sold || { esencial: 0, urbano: 0, premium: 0 };
@@ -270,22 +290,53 @@
     if (!audioEnabled) return;
     ensureAudio();
     ambientTimer = setInterval(() => {
-      if (!running || !audioEnabled || !gameSession || gameSession.shiftEnded) return;
+      if (!running || !audioEnabled || document.hidden || $3(rootId)?.classList.contains('hidden') || !gameSession || gameSession.shiftEnded) return;
       playTone(196, 1.6, 'sine', 0.005, 0);
       playTone(246, 1.4, 'triangle', 0.0035, 0.18);
     }, 3200);
     playStoreMusicLoop();
     storeMusicTimer = setInterval(() => {
-      if (!running || !audioEnabled || !gameSession || gameSession.shiftEnded) return;
+      if (!running || !audioEnabled || document.hidden || $3(rootId)?.classList.contains('hidden') || !gameSession || gameSession.shiftEnded) return;
       playStoreMusicLoop();
     }, 4200);
   }
 
   function stopAmbient() {
+    stopVehicleAudio();
     if (ambientTimer) clearInterval(ambientTimer);
     ambientTimer = null;
     if (storeMusicTimer) clearInterval(storeMusicTimer);
     storeMusicTimer = null;
+  }
+
+  function stopVehicleAudio() {
+    if (!vehicleAudio) return;
+    vehicleAudio.osc.stop();
+    vehicleAudio.osc.disconnect();
+    vehicleAudio.filter.disconnect();
+    vehicleAudio.gain.disconnect();
+    vehicleAudio = null;
+  }
+
+  function updateVehicleAudio() {
+    if (!driving || !running || !audioEnabled || visibilityPaused || document.hidden) {
+      stopVehicleAudio();
+      return;
+    }
+    const ctx = ensureAudio();
+    if (!ctx || ctx.state !== 'running') return;
+    if (!vehicleAudio) {
+      const osc = ctx.createOscillator(), filter = ctx.createBiquadFilter(), gain = ctx.createGain();
+      osc.type = 'sawtooth'; filter.type = 'lowpass'; filter.frequency.value = 260;
+      gain.gain.value = 0;
+      osc.connect(filter).connect(gain).connect(ctx.destination); osc.start();
+      vehicleAudio = {osc, filter, gain};
+    }
+    const speed = Math.min(1, Math.abs(driving.speed) / 19);
+    // Synthetic, quiet engine; one persistent voice, no allocation per frame.
+    vehicleAudio.osc.frequency.setTargetAtTime(38 + speed * 105, ctx.currentTime, .12);
+    vehicleAudio.filter.frequency.setTargetAtTime(180 + speed * 480, ctx.currentTime, .15);
+    vehicleAudio.gain.gain.setTargetAtTime(.012 + speed * .014, ctx.currentTime, .08);
   }
 
   function playStoreMusicLoop() {
@@ -508,7 +559,10 @@
   }
 
   function syncSessionContext() {
-    if (!sessionContext || sessionContext === storageContext()) return;
+    if (!sessionContext) return;
+    const changed = sessionContext !== storageContext();
+    const closed = bridge().canOperate?.() === false;
+    if (!changed && !closed) return;
     // Stop the old shift before it can record activity under the new cycle's keys.
     running = false;
     sessionContext = '';
@@ -519,7 +573,7 @@
     window.__SIDE_RETURN_TO_3D = false;
     if (!$3(rootId)?.classList.contains('hidden')) {
       window.openDecisionMenu?.();
-      window.toast?.('El ciclo cambió. Revisa y envía sus decisiones para iniciar el mundo 3D.');
+      window.toast?.(changed ? 'El ciclo cambió. Revisa y envía sus decisiones para iniciar el mundo 3D.' : 'El ciclo está cerrado. Revisa los resultados de tu empresa.');
     }
   }
 
@@ -586,6 +640,9 @@
     if ($3('simTime')) $3('simTime').textContent = gameSession ? formatTime(gameSession.timeLeft) : '5:00';
     if ($3('simRating')) $3('simRating').textContent = gameSession ? `${Math.round(gameSession.satisfaction)}%` : `${Math.round(businessState?.reputation || 80)}%`;
     if ($3('simRevenue')) $3('simRevenue').textContent = gameSession ? fmt(gameSession.revenue) : fmt(0);
+    const productivity=window.SIDE_PRODUCTION_MODEL?.cycleProductivity?.(productionSnapshot(),cycleProductionRecord(),currentRoundSafe());
+    if($3('simProducedUnits'))$3('simProducedUnits').textContent=productivity?.produced==null?'Sin registro':`${productivity.produced} u.`;
+    if($3('simProductionCompliance'))$3('simProductionCompliance').textContent=productivity?.compliance==null?'—':`${Math.round(productivity.compliance)}%`;
     if ($3('simNetProfit')) $3('simNetProfit').textContent = fmt(bridge().financialReport?.().estadoResultados.utilidad ?? Number(gameSession?.revenue || 0) - Number(businessState?.expenses || 0));
     if ($3('simOperatingLosses')) $3('simOperatingLosses').textContent = fmt(Number(businessState?.expenses || 0));
     if ($3('simLostCustomers')) $3('simLostCustomers').textContent = String(gameSession?.lost || 0);
@@ -1000,6 +1057,18 @@
   }
 
   function setPersonPose(g, cycle = 0, moving = false, frameDt = null) {
+    // Keep navigation/customer decisions at full rate; only distant rig posing
+    // is reduced. Accumulated time preserves gait speed when it is updated.
+    if (g !== playerAvatar && camera && Math.hypot(g.position.x-player.x,g.position.z-player.z)>28) {
+      const now=performance.now()/1000;
+      const elapsed=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastLodAt||now-.016)));
+      g.userData.lastLodAt=now;
+      g.userData.poseElapsed=(g.userData.poseElapsed||0)+elapsed;
+      if(g.userData.poseElapsed<.08)return;
+      frameDt=g.userData.poseElapsed;g.userData.poseElapsed=0;
+    } else if(g.userData.poseElapsed) {
+      frameDt=(frameDt||.016)+g.userData.poseElapsed;g.userData.poseElapsed=0;
+    }
     if(g.userData.motion){
       const now=performance.now()/1000;
       const dt=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));
@@ -1230,38 +1299,50 @@
     nextProductionAt = now + productionIntervalMs();
     const plan=productionSnapshot();
     const plannedTotal=Math.max(0,Number(plan?.producibleUnits??targetProduction()));
-    const accounted=totalReserveStock()+totalDisplayStock()+PRODUCTS.reduce((total,p)=>total+Number(inventory?.sold?.[p.id]||0),0);
+    const accounted=Math.max(0,Number(inventory?.producedUnits??inventory?.totalTarget??plannedTotal));
     if(accounted>=plannedTotal||totalReserveStock()+totalDisplayStock()>=warehouseCapacity())return;
     let cursor=accounted%Math.max(1,plannedTotal),productIndex=0;
     for(let index=0;index<(plan?.productLines||[]).length;index++){const amount=Math.max(0,Number(plan.productLines[index].plannedUnits||0));if(cursor<amount){productIndex=index;break}cursor-=amount;}
     const p=PRODUCTS[productIndex]||PRODUCTS[businessState.production.producedToday%PRODUCTS.length];
     inventory.reserve[p.id]=(inventory.reserve[p.id]||0)+1;
+    if(inventory.producedUnits!=null)inventory.producedUnits=Number(inventory.producedUnits)+1;
     businessState.production.producedToday+=1; businessState.production.stage=(businessState.production.stage+1)%5;
     saveInventory(); saveBusinessState(); renderInventoryDisplays(); refreshAdminUI(); updateHUD();
   }
 
   function orderSupplierStock() {
-    if(supplierDeliveryAt) { message('Ya existe un pedido en camino.'); return; }
+    if(bridge().canOperate?.()===false)return;
+    if(businessState.pendingSupplierOrder) { message('Ya existe un pedido en camino.'); return; }
     if(operationalCash()<360) { message('No hay caja suficiente para este pedido.'); return; }
-    applyExpense(360,'Pedido a proveedor');
-    supplierDeliveryAt=performance.now()+(businessState.supplierDelay?24000:12000);
+    const orderedAt=Date.now(),sequence=Number(businessState.supplierOrderSequence||0)+1;
+    const pendingSupplierOrder={id:`${storageContext()}:${sequence}`,orderedAt,
+      dueAt:orderedAt+(businessState.supplierDelay?24000:12000),units:12};
+    if(!applyExpense(360,'Pedido a proveedor','SIM_GASTOS',{pendingSupplierOrder,supplierOrderSequence:sequence}))return;
     addBusinessLog('Pedido de 12 unidades enviado al proveedor.');
     message(businessState.supplierDelay?'Pedido enviado: llegará con retraso.':'Pedido enviado: mercancía en camino.');
   }
 
   function tickSupplier(now) {
-    if(!supplierDeliveryAt || now<supplierDeliveryAt) return;
-    supplierDeliveryAt=0; businessState.supplierDelay=false;
-    PRODUCTS.forEach(p=>inventory.reserve[p.id]=(inventory.reserve[p.id]||0)+4);
+    const order=businessState?.pendingSupplierOrder;
+    if(!order||Date.now()<order.dueAt||bridge().canOperate?.()===false)return;
+    // Persist the receipt with stock before clearing the order. If interrupted,
+    // replay sees the receipt and cannot deliver the same goods twice.
+    if(inventory.lastSupplierOrderId!==order.id){
+      PRODUCTS.forEach(p=>inventory.reserve[p.id]=(inventory.reserve[p.id]||0)+4);
+      inventory.lastSupplierOrderId=order.id;
+      saveInventory();
+    }
+    businessState.pendingSupplierOrder=null;businessState.supplierDelay=false;
     saveInventory(); saveBusinessState(); renderInventoryDisplays(); refreshAdminUI(); updateHUD(); playSfx('restock');
     showEvent('Proveedor entregó mercancía','Llegaron 12 bolsos nuevos al almacén.'); addBusinessLog('Proveedor entregó 12 unidades.');
   }
 
   function buyUpgrade(type,cost,max) {
+    if(bridge().canOperate?.()===false)return;
     loadBusinessState(); const current=Number(businessState.upgrades[type]||0);
     if(current>=max) { message('Esta mejora ya está al máximo.'); return; }
     if(operationalCash()<cost) { message('No hay caja suficiente para esta expansión.'); return; }
-    businessState.upgrades[type]=current+1; applyExpense(cost,`Expansión: ${type}`,'SIM_INVERSION'); saveBusinessState();
+    if(!applyExpense(cost,`Expansión: ${type}`,'SIM_INVERSION',{upgrades:{...businessState.upgrades,[type]:current+1}}))return;
     rebuildDynamicWorld(); refreshAdminUI();
     message('Expansión aplicada. Ya puedes verla en la tienda.');
   }
@@ -2201,14 +2282,15 @@
   }
 
   function recordSale(productId, price) {
+    if(bridge().canOperate?.()===false)return false;
     const product = productById(productId);
     const salePrice = Math.max(0, Number(price || product.price));
-    simSales++;
-    localStorage.setItem(salesCountKey(), String(simSales));
-    if (inventory) {
-      inventory.sold[product.id] = Number(inventory.sold[product.id] || 0) + 1;
-      saveInventory();
-    }
+    const nextInventory=inventory?{...inventory,sold:{...inventory.sold,[product.id]:Number(inventory.sold?.[product.id]||0)+1}}:null;
+    const writes={[salesCountKey()]:String(simSales+1),...(nextInventory?{[inventoryKey()]:JSON.stringify(nextInventory)}:{})};
+    if(bridge().recordSimulatedSale?.(salePrice,writes)===false)return false;
+    if(!bridge().recordSimulatedSale)for(const [key,value] of Object.entries(writes))localStorage.setItem(key,value);
+    simSales++;if(nextInventory)inventory=nextInventory;
+    try{
     if (gameSession) {
       gameSession.revenue += salePrice;
       gameSession.served += 1;
@@ -2216,13 +2298,14 @@
       gameSession.bestCombo = Math.max(gameSession.bestCombo || 0, gameSession.combo);
       adjustSatisfaction(1.2 + Math.min(1, gameSession.combo * 0.08));
     }
-    bridge().recordSimulatedSale?.(salePrice);
     updateHUD();
     showCashFx(`+ ${fmt(salePrice)}`);
     playSfx('sale');
     updateReputation(0.35);
     if (simSales % 3 === 0) addBusinessLog(`Venta: ${product.name} por ${fmt(salePrice)}.`);
     if (simSales % 5 === 0) message(`¡${simSales} ventas! La tienda está agarrando ritmo.`);
+    }catch(error){console.error('SIDE: venta confirmada; feedback pendiente',error);}
+    return true;
   }
 
   function openCheckout() {
@@ -2263,37 +2346,40 @@
 
   function confirmCheckout() {
     if (!checkoutOpen || !checkoutScanned) return;
+    if(!serveNextQueuedCustomer(false))return;
     closeCheckout(false);
-    serveNextQueuedCustomer(false);
     setTimeout(()=>$3('side3dCanvas')?.requestPointerLock?.(),80);
   }
 
   function serveNextQueuedCustomer(autoServed = false) {
+    if(bridge().canOperate?.()===false)return;
     if (!checkoutQueue.length) {
       message('No hay clientes en la cola de caja.');
       return;
     }
     if(checkoutQueue[0].state!==NPC_STATE.QUEUE){if(!autoServed)message('El cliente se está acercando a la caja.');return;}
-    const npc = checkoutQueue.shift();
-    attachBagToNpc(npc);
-    showReceipt(npc);
-    if (npc.obj.userData.orderLabel) { npc.obj.remove(npc.obj.userData.orderLabel); npc.obj.userData.orderLabel = null; }
-    setNpcState(npc,NPC_STATE.PAY);npc.route=[];npc.wait=.55;
+    const npc = checkoutQueue[0];
     const product = productById(npc.productId);
     if(npc.isReturn){
       const refund=Number(npc.productPrice||product.price);
-      businessState.returns=Number(businessState.returns||0)+1; businessState.expenses=Number(businessState.expenses||0)+refund;
-      bridge().recordOperatingExpense?.(refund,'SIM_DEVOLUCIONES');
-      inventory.reserve[product.id]=(inventory.reserve[product.id]||0)+1; saveInventory(); saveBusinessState(); renderInventoryDisplays();
+      const nextInventory={...inventory,reserve:{...inventory.reserve,[product.id]:Number(inventory.reserve[product.id]||0)+1}};
+      const nextBusiness={...businessState,returns:Number(businessState.returns||0)+1,expenses:Number(businessState.expenses||0)+refund};
+      if(bridge().recordOperatingExpense?.(refund,'SIM_DEVOLUCIONES',{[inventoryKey()]:JSON.stringify(nextInventory),[businessKey()]:JSON.stringify(nextBusiness)})===false)return false;
+      inventory=nextInventory;businessState=nextBusiness;
+      if(!bridge().recordOperatingExpense){saveInventory();saveBusinessState();}renderInventoryDisplays();
       updateReputation(-2,'Devolución procesada'); showCashFx(`− ${fmt(refund)}`); playSfx('lost');
       message(`Reembolso procesado: ${product.name} · ${fmt(refund)}.`);
       addBusinessLog(`Devolución de ${product.name}: −${fmt(refund)}.`);
     } else {
-      recordSale(npc.productId, npc.productPrice);
+      if(!recordSale(npc.productId, npc.productPrice))return false;
       const who = autoServed ? 'Tu equipo atendió' : 'Cobraste';
       message(`${who}: ${product.name} por ${fmt(npc.productPrice)} · ${checkoutPayment==='card'?'tarjeta':'efectivo'}.`);
     }
-    reflowQueue();
+    checkoutQueue.shift();
+    attachBagToNpc(npc);showReceipt(npc);
+    if(npc.obj.userData.orderLabel){npc.obj.remove(npc.obj.userData.orderLabel);npc.obj.userData.orderLabel=null;}
+    setNpcState(npc,NPC_STATE.PAY);npc.route=[];npc.wait=.55;
+    reflowQueue();return true;
   }
 
   function prepareNpcNextStep(n) {
@@ -2502,6 +2588,8 @@
       }
     });
     updateTraffic(dt);
+    // Visual idle frames (help/results/decisions) must never create transactions.
+    if (!running || !gameSession || gameSession.shiftEnded) return;
     if (salesStaff() > 0 && time - lastAutoRestock > Math.max(10, 22 - salesStaff() * 3)) {
       lastAutoRestock = time;
       restockDisplays(false);
@@ -2535,6 +2623,9 @@
     scene.add(businessWorld);
     const {createHubWorld}=await import('./services/hub_world.js');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    const {deriveObjective}=await import('./services/gameplay_objectives.mjs');
+    hubWorld.deriveObjective=deriveObjective;
+    playerMotion=await import('./services/player_motion.mjs');
     const {createHubVehicles}=await import('./services/hub_vehicles.js');
     hubVehicles=createHubVehicles(hubWorld,HUB_OFFSET);
     try {
@@ -2585,20 +2676,39 @@
   }
 
   function updateHubObjective() {
-    if(!hubWorld)return;
-    const visited=businessState?.exploredHub||[];
-    const next=['store','production','warehouse'].find(id=>!visited.includes(id))||'store';
-    const destination=hubWorld.entrances.find(e=>e.id===next);
-    if(!destination)return;
-    const distance=Math.round(Math.hypot(destination.x-player.x,destination.z-player.z));
-    const names={store:'la tienda',production:'producción',warehouse:'el almacén'};
-    if($3('simHubObjective'))$3('simHubObjective').textContent=inHub?(visited.length<3?`CONOCE TU EMPRESA · ${visited.length}/3`:'TU TURNO · OPERA LA TIENDA'):'GESTIONA TU EMPRESA';
-    if($3('simHubDestination'))$3('simHubDestination').textContent=inHub?`Visita ${names[next]} · ${distance} m`:'E interactuar · PLAZA para salir';
-    if(hubWaypoint){hubWaypoint.visible=inHub&&distance>2;hubWaypoint.position.set(destination.x,0,destination.z);hubWaypoint.children[1].position.y=1.8+Math.sin(performance.now()*.003)*.12;}
-    if($3('simHubDirection')){$3('simHubDirection').hidden=!inHub;$3('simHubDirection').style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}
+    if(!hubWorld?.deriveObjective)return;
+    const objective=hubWorld.deriveObjective({
+      visited:businessState?.exploredHub||[],shiftEnded:gameSession?.shiftEnded,
+      queue:checkoutQueue.length,stockKnown:Boolean(inventory),display:totalDisplayStock(),
+      reserve:totalReserveStock(),deliveryPending:Boolean(businessState?.pendingSupplierOrder)
+    });
+    const entrance=hubWorld.entrances.find(e=>e.id===objective.region);
+    // All business entrances lead into the existing shared interior. These are
+    // approach positions beside the existing stations, not new transactions.
+    const stations={register:{x:-8.4,z:7.25},restock:{x:8.4,z:-.35},admin:{x:10.4,z:5.05}};
+    const destination=inHub?entrance:(stations[objective.interaction]||null);
+    const distance=destination?Math.round(Math.hypot(destination.x-player.x,destination.z-player.z)):0;
+    const title=$3('simHubObjective');
+    if(title&&title.textContent!==objective.title)title.textContent=objective.title;
+    const detail=inHub&&entrance?`${entrance.name} · ${distance} m · E para entrar`:(!destination&&entrance?`PLAZA → ${entrance.name}`:objective.instruction);
+    if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
+    const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
+    const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
+    if(orderStatus){
+      orderStatus.hidden=!order;
+      if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-Date.now())/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
+    }
+    if(hubWaypoint){
+      hubWaypoint.visible=Boolean(destination)&&distance>2&&!gameSession?.shiftEnded;
+      if(destination)hubWaypoint.position.set(destination.x,0,destination.z);
+      hubWaypoint.children[1].position.y=1.8+Math.sin(performance.now()*.003)*.12;
+    }
+    const direction=$3('simHubDirection');
+    if(direction){direction.hidden=!destination;if(destination)direction.style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}
   }
 
   function positionPlayer(x,z,facing=0) {
+    vehicleTransition=null;playerMode='PLAYER_ON_FOOT';player.locomotion='IDLE';
     if(driving){driving.speed=0;driving=null;$3(rootId)?.classList.remove('is-driving');if($3('simDriveHud'))$3('simDriveHud').hidden=true;}
     Object.assign(player,{x,z,y:player.baseY,vx:0,vz:0,vy:0,speed:0,grounded:true,headBobX:0,headBobY:0});
     yaw=targetYaw=facing;pitch=targetPitch=-.16;keys={};jumpQueued=false;cameraSnap=true;
@@ -2661,28 +2771,58 @@
   }
 
   function toggleDriving() {
-    if(!inHub||!running||hubDirectoryOpen||checkoutOpen||adminOpen||newsOpen||productInspectOpen)return;
-    if(driving){
-      if(Math.abs(driving.speed)>.5){message('Frena con ESPACIO antes de bajar.');return;}
-      for(const side of [1,-1]) {
-        const x=driving.x+Math.cos(driving.yaw)*2.15*side,z=driving.z-Math.sin(driving.yaw)*2.15*side;
-        if(collision(x,z))continue;
-        const facing=driving.yaw;positionPlayer(x,z,facing);message('A pie · SHIFT para correr · E para interactuar');return;
-      }
-      message('No hay espacio para abrir la puerta. Mueve el auto.');return;
-    }
-    const car=hubVehicles?.nearest(player.x,player.z);if(!car)return;
-    driving=car;keys={};jumpQueued=false;cameraSnap=true;yaw=targetYaw=car.yaw;pitch=targetPitch=-.12;
-    player.x=car.x;player.z=car.z;player.vx=player.vz=player.speed=0;
-    $3(rootId)?.classList.add('is-driving');message('W acelerar · S frenar / retroceder · A/D girar · ESPACIO freno · F bajar');
+    if(!inHub||!running||vehicleTransition||hubDirectoryOpen||checkoutOpen||adminOpen||newsOpen||productInspectOpen)return;
+    const car=driving||hubVehicles?.nearest(player.x,player.z);if(!car)return;
+    if(driving&&Math.abs(car.speed)>.5){message('Frena con ESPACIO antes de bajar.');return;}
+    if(!driving&&!player.grounded){message('Apoya los pies en el suelo antes de entrar.');return;}
+    const doors=[1,-1].map(side=>({x:car.x+Math.cos(car.yaw)*2.15*side,z:car.z-Math.sin(car.yaw)*2.15*side,side}));
+    doors.sort((a,b)=>Math.hypot(a.x-player.x,a.z-player.z)-Math.hypot(b.x-player.x,b.z-player.z));
+    const door=doors.find(point=>{
+      if(collision(point.x,point.z))return false;
+      // A nearby car is not reachable through a wall or across its chassis.
+      const start=driving?{x:car.x+Math.cos(car.yaw)*1.5*point.side,z:car.z-Math.sin(car.yaw)*1.5*point.side}:player;
+      for(let i=0;i<=12;i++){const t=i/12;if(collision(start.x+(point.x-start.x)*t,start.z+(point.z-start.z)*t))return false;}
+      return true;
+    });
+    if(!door){message('No hay una puerta accesible. Acércate por un costado del auto.');return;}
+    const exiting=Boolean(driving);
+    car.speed=0;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;
+    playerMode=exiting?'EXITING_VEHICLE':'ENTERING_VEHICLE';
+    // No seated/door clip is provided by these rigs. Reveal the avatar outside
+    // the door, then animate the safe step away without crossing the chassis.
+    if(exiting){player.x=car.x+Math.cos(car.yaw)*1.5*door.side;player.z=car.z-Math.sin(car.yaw)*1.5*door.side;}
+    vehicleTransition={car,elapsed:0,duration:.55,from:{x:player.x,z:player.z},to:door,exiting};
+    if(exiting){driving=null;$3(rootId)?.classList.remove('is-driving');}
+    message(exiting?'Bajando del vehículo…':'Acercándose a la puerta…');
   }
 
   function updateDriving(dt) {
     if(!inHub||!hubVehicles)return;
     const paused=hubDirectoryOpen||checkoutOpen||adminOpen||newsOpen||productInspectOpen;
-    const input={throttle:paused?0:(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer:paused?0:(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0),brake:paused||Boolean(keys.Space)};
+    if(vehicleTransition&&!paused){
+      const transition=vehicleTransition,result=playerMotion.advanceVehicleTransition(transition,dt);
+      if(collision(result.x,result.z)){
+        vehicleTransition=null;playerMode='PLAYER_ON_FOOT';player.vx=player.vz=player.speed=0;keys={};jumpQueued=false;
+        message('Paso bloqueado. Espera a que la puerta esté despejada.');return;
+      }
+      const dx=result.x-player.x,dz=result.z-player.z;
+      player.x=result.x;player.z=result.z;player.vx=dx/Math.max(dt,.001);player.vz=dz/Math.max(dt,.001);player.speed=Math.hypot(dx,dz)/Math.max(dt,.001);
+      if(result.done){
+        vehicleTransition=null;player.vx=player.vz=player.speed=0;keys={};jumpQueued=false;
+        if(transition.exiting){playerMode='PLAYER_ON_FOOT';message('A pie · SHIFT para correr · E para interactuar');}
+        else{driving=transition.car;playerMode='DRIVING';player.x=driving.x;player.z=driving.z;targetYaw=driving.yaw;targetPitch=-.12;$3(rootId)?.classList.add('is-driving');message('W acelerar · S frenar / retroceder · A/D girar · ESPACIO freno · F bajar');}
+      }
+    }
+    const blocked=paused||Boolean(vehicleTransition);
+    const input={throttle:blocked?0:(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer:blocked?0:(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0),brake:blocked||Boolean(keys.Space)};
     hubVehicles.update(dt,{active:driving,input,player,people:hubActors.map(a=>a.obj.position),bounds:hubBounds});
-    if(driving){player.x=driving.x;player.z=driving.z;player.speed=0;if(Math.abs(driving.speed)>1){targetYaw+=Math.atan2(Math.sin(driving.yaw-targetYaw),Math.cos(driving.yaw-targetYaw))*(1-Math.exp(-dt*2));}}
+    if(driving){
+      player.x=driving.x;player.z=driving.z;player.speed=0;
+      if(Math.abs(driving.speed)>1&&performance.now()-lastCameraInputAt>1500){
+        const heading=driving.yaw+driving.steer*Math.min(1.2,Math.abs(driving.speed)*.07);
+        targetYaw+=Math.atan2(Math.sin(heading-targetYaw),Math.cos(heading-targetYaw))*(1-Math.exp(-dt*2));
+      }
+    }
     const hud=$3('simDriveHud');if(hud){hud.hidden=!driving;if(driving){$3('simDriveSpeed').textContent=String(Math.round(Math.abs(driving.speed)*3.6)).padStart(2,'0');$3('simDriveGear').textContent=driving.speed<-.2?'R':Math.abs(driving.speed)<.2?'N':'D';}}
   }
 
@@ -2706,10 +2846,12 @@
     if(driving){
       playerAvatar.visible=false;
       const focus=new THREE.Vector3(driving.x,1.15,driving.z);
-      const distance=6.8+Math.abs(driving.speed)*.1;
+      const distance=cameraZoom+1.6+Math.abs(driving.speed)*.1;
       const desired=new THREE.Vector3(driving.x+Math.sin(yaw)*distance,3.6-Math.sin(pitch)*2,driving.z+Math.cos(yaw)*distance);
-      for(let t=.08;t<=1;t+=.035){const x=focus.x+(desired.x-focus.x)*t,z=focus.z+(desired.z-focus.z)*t;if(hubWorld.colliders.some(c=>x>c.minX-.2&&x<c.maxX+.2&&z>c.minZ-.2&&z<c.maxZ+.2)){desired.lerpVectors(focus,desired,Math.max(.06,t-.05));break;}}
+      const clear=playerMotion.constrainCamera(focus,desired,hubWorld.colliders);
+      desired.set(clear.x,clear.y,clear.z);
       if(cameraSnap)camera.position.copy(desired);else camera.position.lerp(desired,1-Math.exp(-6*dt));
+      const safe=playerMotion.constrainCamera(focus,camera.position,hubWorld.colliders);camera.position.set(safe.x,safe.y,safe.z);
       camera.lookAt(focus);camera.fov+=(62+Math.abs(driving.speed)*.55-camera.fov)*(1-Math.exp(-dt*4));camera.updateProjectionMatrix();cameraSnap=false;
       hubWorld.sky?.position.copy(camera.position);
       if(sunLight){sunLight.target.position.set(player.x,0,player.z);sunLight.position.set(player.x-28,42,player.z+24);sunLight.target.updateMatrixWorld();}
@@ -2718,8 +2860,15 @@
     if(playerAvatar){
       playerAvatar.visible=cameraMode==='third';playerAvatar.position.set(player.x,Math.max(.025,player.y-player.baseY+.025),player.z);
       if(player.speed>.12){const desired=Math.atan2(player.vx,player.vz),turn=Math.atan2(Math.sin(desired-playerAvatar.rotation.y),Math.cos(desired-playerAvatar.rotation.y));playerAvatar.rotation.y+=turn*(1-Math.exp(-12*dt));}
-      const action=playerAvatar.userData.actions?.walk;if(action)action.setEffectiveTimeScale(Math.max(.4,player.speed/1.5));
+      const action=playerAvatar.userData.actions?.walk;if(action)action.setEffectiveTimeScale(Math.max(.4,Math.min(1.8,player.speed/1.5)));
       setPersonPose(playerAvatar,player.bob,player.grounded&&player.speed>.15,dt);
+    }
+    const footFov=cameraMode==='third'?(player.locomotion==='RUN'?65:58):(player.locomotion==='RUN'?76:70);
+    camera.fov+=(footFov-camera.fov)*(1-Math.exp(-7*dt));camera.updateProjectionMatrix();
+    if(cameraMode==='third'&&!vehicleTransition&&player.speed>.5&&(keys.KeyW||keys.ArrowUp)&&!keys.KeyA&&!keys.KeyD&&!keys.ArrowLeft&&!keys.ArrowRight&&performance.now()-lastCameraInputAt>2500){
+      const behind=playerAvatar.rotation.y-Math.PI;
+      targetYaw+=Math.atan2(Math.sin(behind-targetYaw),Math.cos(behind-targetYaw))*(1-Math.exp(-dt*.65));
+      targetPitch+=(-.16-targetPitch)*(1-Math.exp(-dt*.6));
     }
     if(cameraMode==='first'){
       const sideBobX=player.headBobX||0;
@@ -2728,12 +2877,12 @@
     } else {
       const orbitPitch=Math.max(-.85,Math.min(.32,pitch));
       const focus=new THREE.Vector3(player.x,player.y-.22,player.z);
-      const desired=new THREE.Vector3(player.x+Math.sin(yaw)*5.2,Math.max(.55,focus.y+1.15-Math.sin(orbitPitch)*5.2),player.z+Math.cos(yaw)*5.2);
+      const distance=cameraZoom+Math.max(0,player.speed-2.65)*.18;
+      const desired=new THREE.Vector3(player.x+Math.sin(yaw)*distance,Math.max(.55,focus.y+1.15-Math.sin(orbitPitch)*distance),player.z+Math.cos(yaw)*distance);
       const blocks=inHub?hubWorld?.colliders||[]:[...colliders,...dynamicColliders];
-      // Shorten the chase camera before crossing a wall, even while the player turns.
-      for(let fraction=.08;fraction<=1;fraction+=.035){const x=focus.x+(desired.x-focus.x)*fraction,z=focus.z+(desired.z-focus.z)*fraction;
-        if(blocks.some(c=>x>c.minX-.18&&x<c.maxX+.18&&z>c.minZ-.18&&z<c.maxZ+.18)){desired.lerpVectors(focus,desired,Math.max(.04,fraction-.06));break;}}
+      const clear=playerMotion.constrainCamera(focus,desired,blocks);desired.set(clear.x,clear.y,clear.z);
       if(cameraSnap)camera.position.copy(desired);else camera.position.lerp(desired,1-Math.exp(-12*dt));
+      const safe=playerMotion.constrainCamera(focus,camera.position,blocks);camera.position.set(safe.x,safe.y,safe.z);
       camera.lookAt(focus);playerAvatar.visible=camera.position.distanceTo(focus)>1.05;
     }
     cameraSnap=false;
@@ -2775,42 +2924,17 @@
   }
 
   function updatePlayer(dt) {
-    if (checkoutOpen || productInspectOpen || hubDirectoryOpen || adminOpen || newsOpen) { player.vx=player.vz=player.speed=0; return; }
-    if(driving){jumpQueued=false;return;}
+    if (checkoutOpen || productInspectOpen || hubDirectoryOpen || adminOpen || newsOpen) { player.vx=player.vz=player.speed=0;player.locomotion='IDLE';jumpQueued=false;return; }
+    if(driving||vehicleTransition){jumpQueued=false;return;}
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
-    const inputLen = Math.hypot(forward, side);
-    const sprinting = Boolean((keys.ShiftLeft || keys.ShiftRight) && inputLen > 0);
-    const maxSpeed = sprinting ? 5.2 : 2.65;
-    const accel = player.grounded ? (sprinting ? 8 : 12) : 2.4;
-    const decel = player.grounded ? 15 : 1.2;
-
-    let desiredX = 0, desiredZ = 0;
-    if (inputLen > 0) {
-      const f = forward / inputLen, s = side / inputLen;
-      const sin = Math.sin(yaw), cos = Math.cos(yaw);
-      desiredX = (s * cos - f * sin) * maxSpeed;
-      desiredZ = (-f * cos - s * sin) * maxSpeed;
-    }
-
-    const blend = 1 - Math.exp(-(inputLen ? accel : decel) * dt);
-    player.vx += (desiredX - player.vx) * blend;
-    player.vz += (desiredZ - player.vz) * blend;
-    player.speed = Math.hypot(player.vx, player.vz);
-
-    const previousX=player.x,previousZ=player.z;
-    const nx = player.x + player.vx * dt;
-    const nz = player.z + player.vz * dt;
-    if (!collision(nx, player.z)) player.x = nx; else player.vx = 0;
-    if (!collision(player.x, nz)) player.z = nz; else player.vz = 0;
-    const travelled=Math.hypot(player.x-previousX,player.z-previousZ);
-    player.speed=travelled/Math.max(.001,dt);
+    const {travelled,sprinting}=playerMotion.stepPlayerMotion(player,{forward,side,sprint:keys.ShiftLeft||keys.ShiftRight,yaw},dt,collision);
     if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
 
     if (jumpQueued && player.grounded) {
       player.vy = 5.1;
       player.grounded = false;
-      playTone(330, .07, 'triangle', .012, 0);
+      player.locomotion='AIRBORNE';playTone(330, .07, 'triangle', .012, 0);
     }
     jumpQueued = false;
     if (!player.grounded) {
@@ -2828,11 +2952,7 @@
     player.headBobY = Math.sin(player.bob * 2) * bobAmount;
     player.headBobX = Math.cos(player.bob) * bobAmount * .45;
 
-    if (camera) {
-      const targetFov = cameraMode==='third'?(sprinting?65:58):(sprinting?76:70);
-      camera.fov += (targetFov - camera.fov) * (1 - Math.exp(-7 * dt));
-      camera.updateProjectionMatrix();
-    }
+
   }
 
   function playFootstep() {
@@ -2958,6 +3078,7 @@
   }
 
   function resize() {
+    pausedFrameDrawn=false;
     if (!renderer || !camera) return;
     const c = $3('side3dCanvas');
     const w = c.clientWidth || innerWidth;
@@ -2994,7 +3115,20 @@
     const elapsed = clock.getDelta();
     const dt = Math.min(0.04, elapsed);
     const time = performance.now() * 0.001;
-    if(visibilityPaused){raf=requestAnimationFrame(frame);return;}
+    if(visibilityPaused || $3(rootId)?.classList.contains('hidden')){
+      // Retain one lightweight wake-up callback; no GPU work or business ticks
+      // while another application screen is active.
+      perfAccum=0;perfFrames=0;perfLastCheck=now;
+      stopVehicleAudio();pausedFrameDrawn=false;
+      raf=requestAnimationFrame(frame);return;
+    }
+    if(!running){
+      stopVehicleAudio();
+      if(!pausedFrameDrawn){updateHUD();renderer.render(scene,camera);pausedFrameDrawn=true;}
+      perfAccum=0;perfFrames=0;perfLastCheck=now;
+      raf=requestAnimationFrame(frame);return;
+    }
+    pausedFrameDrawn=false;
     if (running) {
       if (gameSession && !gameSession.shiftEnded) {
         gameSession.timeLeft -= dt;
@@ -3008,6 +3142,7 @@
       pitch += (targetPitch - pitch) * (1 - Math.exp(-24 * dt));
       updatePlayer(dt);
       updateDriving(dt);
+      updateVehicleAudio();
       updateGameplayCamera(dt);
       updateHubActors(dt);
       if (!gameSession?.shiftEnded) {
@@ -3023,11 +3158,6 @@
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
       if (now - lastHudTick > 220) { updateHUD(); updateMinimap();updateHubObjective(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
-    } else {
-      animateActors(time,dt);
-      updateEntryDoors(dt);
-      if (now - lastLightTick > 350) { updateDayLighting(dt); lastLightTick = now; }
-      if (now - lastHudTick > 350) { updateHUD(); lastHudTick = now; }
     }
     updateAdaptiveQuality(elapsed, now);
     renderer.render(scene, camera);
@@ -3036,15 +3166,19 @@
 
   function bind() {
     const canvas = $3('side3dCanvas');
+    canvas.addEventListener('wheel',event=>{
+      if(!running||hubDirectoryOpen||adminOpen||checkoutOpen||newsOpen||productInspectOpen||(!driving&&cameraMode==='first'))return;
+      cameraZoom=Math.max(3.2,Math.min(7.4,cameraZoom+event.deltaY*.004));lastCameraInputAt=performance.now();event.preventDefault();
+    },{passive:false});
     canvas.addEventListener('click', () => { if (running&&!hubDirectoryOpen) canvas.requestPointerLock?.(); });
     let touchLookId=null,touchLookX=0,touchLookY=0;
     canvas.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'||!running)return;touchLookId=event.pointerId;touchLookX=event.clientX;touchLookY=event.clientY;canvas.setPointerCapture?.(event.pointerId);});
-    canvas.addEventListener('pointermove',event=>{if(event.pointerId!==touchLookId||!running)return;const dx=event.clientX-touchLookX,dy=event.clientY-touchLookY;touchLookX=event.clientX;touchLookY=event.clientY;targetYaw-=dx*.006;targetPitch=Math.max(-1.3,Math.min(1.3,targetPitch-dy*.005));});
+    canvas.addEventListener('pointermove',event=>{if(event.pointerId!==touchLookId||!running)return;const dx=event.clientX-touchLookX,dy=event.clientY-touchLookY;touchLookX=event.clientX;touchLookY=event.clientY;lastCameraInputAt=performance.now();targetYaw-=dx*.006;targetPitch=Math.max(-1.3,Math.min(1.3,targetPitch-dy*.005));});
     const clearTouchLook=event=>{if(event.pointerId===touchLookId)touchLookId=null;};canvas.addEventListener('pointerup',clearTouchLook);canvas.addEventListener('pointercancel',clearTouchLook);
     document.addEventListener('pointerlockchange', () => { locked = document.pointerLockElement === canvas; });
     document.addEventListener('mousemove', (e) => {
       if (!running || !locked) return;
-      targetYaw -= e.movementX * 0.00215;
+      lastCameraInputAt=performance.now();targetYaw -= e.movementX * 0.00215;
       targetPitch -= e.movementY * 0.00185;
       targetPitch = Math.max(-1.3, Math.min(1.3, targetPitch));
     });
@@ -3067,7 +3201,7 @@
       }
       if (productInspectOpen && e.code === 'Escape') { closeProductInspect(); e.preventDefault(); return; }
       if (e.code === 'Space') { jumpQueued = true; e.preventDefault(); }
-      if (e.code === 'KeyE') interact();
+      if (e.code === 'KeyE'&&!e.repeat&&!vehicleTransition) interact();
       if(e.code==='KeyF'&&!e.repeat&&running){toggleDriving();e.preventDefault();}
       if(e.code==='KeyV'&&!e.repeat&&running)setCameraMode(cameraMode==='third'?'first':'third');
       if (e.code === 'Escape') document.exitPointerLock?.();
@@ -3085,7 +3219,7 @@
       const code=button.dataset.touchKey;const down=event=>{event.preventDefault();keys[code]=true;button.setPointerCapture?.(event.pointerId);};const up=event=>{event.preventDefault();keys[code]=false;};
       button.addEventListener('pointerdown',down);button.addEventListener('pointerup',up);button.addEventListener('pointercancel',up);button.addEventListener('lostpointercapture',up);
     });
-    $3('simTouchInteract')?.addEventListener('pointerdown',event=>{event.preventDefault();if(running)interact();});
+    $3('simTouchInteract')?.addEventListener('pointerdown',event=>{event.preventDefault();if(running&&!vehicleTransition)interact();});
     $3('simTouchJump')?.addEventListener('pointerdown',event=>{event.preventDefault();if(running)jumpQueued=true;});
     $3('simTouchDrive')?.addEventListener('click',toggleDriving);
     $3('simTouchJump')?.addEventListener('pointerdown',()=>{if(driving)keys.Space=true;});
@@ -3180,7 +3314,7 @@
       if (typeof window.showScreen === 'function') window.showScreen('studentLobby');
     });
     window.addEventListener('resize', resize);
-    document.addEventListener('visibilitychange',()=>{visibilityPaused=document.hidden;if(!visibilityPaused)clock?.getDelta();});
+    document.addEventListener('visibilitychange',()=>{visibilityPaused=document.hidden;if(visibilityPaused){keys={};jumpQueued=false;stopVehicleAudio();}else clock?.getDelta();});
   }
 
   async function init() {
@@ -3302,8 +3436,9 @@
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:businessState?.exploredHub||[],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
       driving:driving?{speed:driving.speed,yaw:driving.yaw}:null,vehicles:hubVehicles?.cars.map(c=>({x:c.x,z:c.z,speed:c.speed,traffic:c.traffic}))||[],
+      playerControl:{mode:playerMode,locomotion:player.locomotion||'IDLE',zoom:cameraZoom,transition:vehicleTransition?vehicleTransition.elapsed/vehicleTransition.duration:null},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
-  function suspend(){running=false;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
+  window.SIDE3D = { prepare, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

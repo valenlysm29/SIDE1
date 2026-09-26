@@ -443,8 +443,9 @@ function refreshStartButton(){
   const btn=$('startGame');if(!btn)return;
   const active=Boolean(gameStatus()?.active);
   const waiting=runtime()?.phase==='integration';
-  btn.textContent=state.starting?'Iniciando…':active&&waiting?'Sala de espera':active?'Partida iniciada':'Iniciar partida';
-  btn.disabled=state.starting||active;
+  const canStartWaiting=active&&waiting&&cycleMode()==='manual';
+  btn.textContent=state.starting?'Iniciando…':canStartWaiting?'Iniciar ciclo 1':active&&waiting?'Sala de espera':active?'Partida iniciada':'Iniciar partida';
+  btn.disabled=state.starting||(active&&!canStartWaiting);
 }
 /**
  * Cierra la partida en Supabase al finalizar la simulación.
@@ -462,6 +463,7 @@ function finishSupabasePartida(){
     }
   }catch(error){console.error('SIDE: supabase finish failed',error)}
   // Keep the completed game linked so its online companies and results remain available.
+  const active=Boolean(gameStatus()?.active);
   $('cancelGame')?.classList.toggle('hidden',!active);
   ['copyGameCode','copyGameLink'].forEach(id=>{if($(id))$(id).disabled=!active;});
   refreshStartButton();

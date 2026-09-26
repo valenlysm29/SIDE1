@@ -43,6 +43,6 @@ test('simulator source connects events, production and financial sales',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
   assert.match(source,/activeEvents\?\.\(\)/);
   assert.match(source,/productionPlan\?\.\(\)/);
-  assert.match(source,/recordSimulatedSale\?\.\(salePrice\)/);
+  assert.match(source,/recordSimulatedSale\?\.\(salePrice,/);
   assert.match(source,/trafficLight==='pedestrians'/);
 });

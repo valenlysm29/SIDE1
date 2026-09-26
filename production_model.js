@@ -172,5 +172,11 @@
 
   function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
-  return Object.freeze({calculate,yieldFor,materialUnit,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  function cycleProductivity(plan={},record=null,round=1){
+    const target=Number(plan?.target),value=record?.producedUnits;
+    const produced=record&&Number(record.round)===Number(round)&&value!==null&&value!==undefined&&Number.isFinite(Number(value))&&Number(value)>=0?Number(value):null;
+    return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
+      difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
+  }
+  return Object.freeze({calculate,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });

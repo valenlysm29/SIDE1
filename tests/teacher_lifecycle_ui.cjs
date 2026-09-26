@@ -12,7 +12,8 @@ function fixture(name){
  const page=await browser.newPage({viewport:{width:1366,height:768}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>r.abort());
  await page.clock.install();
- const teacher=fixture('docente.html'),student=fixture('index.html');
+ // This suite covers the supported unconfigured/local lifecycle; RPC coverage is in game_lifecycle_ui.
+ const teacher=fixture('docente.html').replace('<script>const cfg=','<script>window.SIDE_CONFIG={};const cfg='),student=fixture('index.html');
  await page.setContent(teacher,{waitUntil:'load'});
  assert.equal(await page.locator('#startGame').innerText(),'Iniciar partida');
  assert.equal(await page.locator('[data-tab="rondas"]').isVisible(),false);

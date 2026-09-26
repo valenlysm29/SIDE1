@@ -231,7 +231,7 @@
       <button id="sim3dAudioBtn" class="sim3d-btn" type="button">AUDIO: ON</button>
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
     </div>
-    <div class="sim-world-location"><span>DISTRITO COMERCIAL</span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div></div>
+    <div class="sim-world-location"><span>DISTRITO COMERCIAL · <b id="simHubCycle">CICLO 1</b></span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective" role="status">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div><small id="simHubOrder" class="sim-world-order" hidden></small></div>
     <div class="sim-world-controls"><kbd>WASD</kbd> Mover / conducir <kbd>SHIFT</kbd> Correr <kbd>E</kbd> Interactuar <kbd>F</kbd> Auto <kbd>V</kbd> Cámara</div>
     <div id="simDriveHud" class="sim-drive-hud" hidden><span>SIDE CRUISER · COSTA</span><div><b id="simDriveSpeed">00</b><small>KM/H</small><strong id="simDriveGear">N</strong></div><p>W / S acelerar y frenar · A / D girar<br>ESPACIO freno · F bajar</p></div>
     <div id="simHubDirectory" class="sim-hub-directory hidden" role="dialog" aria-modal="true" aria-labelledby="simHubDirectoryTitle">
@@ -294,6 +294,8 @@
         <div><span>CLIENTES</span><strong id="simVisitors">0</strong></div>
         <div><span>VENTAS</span><strong id="simSales">0</strong></div>
         <div><span>INGRESOS</span><strong id="simRevenue">S/ 0</strong></div>
+        <div><span>PRODUCCIÓN REGISTRADA</span><strong id="simProducedUnits">Sin registro</strong></div>
+        <div><span>CUMPLIMIENTO DE META</span><strong id="simProductionCompliance">—</strong></div>
         <div><span>GASTOS Y DEVOLUCIONES</span><strong id="simOperatingLosses">S/ 0</strong></div>
       </div>
       <h3>Clientes perdidos</h3>

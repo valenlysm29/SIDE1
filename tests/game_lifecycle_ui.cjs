@@ -33,7 +33,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  }
  try{
   const t=await teacher();
-  assert.equal(await t.locator('#automaticCycleConfig').isVisible(),false);
+  assert.equal(await t.locator('#integrationDurationMinutes').isVisible(),true);
   assert.equal(await t.locator('#copyGameCode').isDisabled(),true);
   await t.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.copiedText=value;}}}));
   await t.locator('#saveAll').click();await t.waitForFunction(()=>runtime()?.phase==='integration');
@@ -44,8 +44,10 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   const invitation=await page(studentHTML);await invitation.goto('http://side.test/index.html?partida='+game.codigo);
   assert.equal(await invitation.locator('#studentModal').isVisible(),true);assert.equal(await invitation.locator('#gameCode').inputValue(),game.codigo);await invitation.close();
   const s1=await student(game,'First'),s2=await student(game,'Second');
-  assert.match(await s1.locator('#studentIntegrationNotice').innerText(),/Esperando que el profesor/);
+  assert.match(await s1.locator('#studentIntegrationNotice').innerText(),/Sala de espera/);
   assert.equal(await s1.locator('#enterDecisionsBtn').isDisabled(),true);
+  assert.equal(await t.locator('#startGame').isEnabled(),true);
+  assert.equal(await t.locator('#startGame').innerText(),'Iniciar ciclo 1');
   await t.locator('#startGame').click();
   await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
   assert.equal(await s1.evaluate(()=>currentRound()),1);assert.equal(await s2.evaluate(()=>studentAccess().canOperate),true);

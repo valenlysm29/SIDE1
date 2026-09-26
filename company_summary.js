@@ -34,7 +34,7 @@ function migrateCurrentReceipts(){
   if(changed)writeDecisionBatch({[receiptKey()]:JSON.stringify(receipts)});
 }
 function comparableSummaryDraft(item,d){
-  if(item.type==='production-plan')return {moldTargets:Object.entries(d.moldTargets||{}).sort()};
+  if(item.type==='production-plan')return {moldTargets:Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Number(value)||0]).filter(([,value])=>value!==0).sort()};
   if(item.type==='number')return {value:Number(d.value)||0};
   if(item.type==='loan')return {amount:Number(d.amount)||0};
   if(item.asset||item.type==='quantity'||item.type==='quantity-choice')return (item.options||[]).map(o=>[o.id,Number(d.quantities?.[o.id])||0]);

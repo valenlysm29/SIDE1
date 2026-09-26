@@ -23,12 +23,13 @@ test('zero or absent target, absent output and output from another cycle are saf
 });
 test('legacy multiple stores normalize to one, keeping its district and first contract',()=>{
   const old={round:2,optionIds:['web','miraflores','sjl'],quantities:{miraflores:3,sjl:4},storeContracts:{miraflores:[{round:1,quantity:2},{round:2,quantity:1}]}};
-  const snapshot=JSON.stringify(old),single=rules.singleStore(old);
+  const snapshot=JSON.stringify(old),single=rules.singleStoreSelection(old,3);
   assert.deepEqual(single.optionIds,['web','miraflores']);assert.deepEqual(single.quantities,{miraflores:1});
   assert.equal(rules.storeCount(single),1);assert.equal(rules.committedQuantity(single,'miraflores',3),1);
   assert.deepEqual(rules.nextStoreBatches(single,'miraflores',1,3),[{round:1,quantity:1}]);
-  assert.equal(JSON.stringify(old),snapshot);assert.deepEqual(rules.singleStore(single),single);
-  assert.equal(rules.storeCount(rules.singleStore({optionIds:['web']})),1);
+  assert.equal(JSON.stringify(old),snapshot);assert.deepEqual(rules.singleStoreSelection(single,3),single);
+  // A web-only channel never creates a physical store or a store commission.
+  assert.equal(rules.storeCount(rules.singleStoreSelection({optionIds:['web']})),0);
 });
 test('production record is scoped to active company and cycle, never reconstructed from inventory',()=>{
   const data=new Map();let round=1,company='Example';

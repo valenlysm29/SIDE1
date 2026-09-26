@@ -20,6 +20,14 @@
 .sim-world-location {position:absolute;top:94px;left:20px;z-index:8;pointer-events:none;text-shadow:0 2px 8px #000b}
 .sim-world-location>span {display:block;font-size:8px;letter-spacing:2.2px;color:#f6d580;font-weight:800;margin-bottom:5px}
 .sim-world-location>strong {display:block;color:#fff;font-size:18px;letter-spacing:.25px}
+.sim-world-location {max-width:330px}
+#simulator3d.in-hub .sim-world-location>span {color:#f6d580;letter-spacing:1.5px}
+.sim-world-route>div {min-width:0}
+.sim-world-route b {overflow-wrap:anywhere;line-height:1.45}
+.sim-world-route>span[hidden] {display:none}
+.sim-world-order {display:block;margin-top:7px;padding:6px 8px;border-radius:4px;background:#10292deb;color:#a6e0d1;font:700 9px/1.4 system-ui;letter-spacing:.3px;text-shadow:none}
+.sim-world-order[hidden] {display:none}
+.simulator-screen .sim3d-message {top:auto;bottom:95px;max-width:min(500px,60vw);text-align:center}
 .sim-world-route {display:flex;align-items:center;gap:10px;margin-top:13px;padding:9px 12px;border-left:2px solid #f5ca59;background:#152a31d9;border-radius:0 5px 5px 0;text-shadow:none}
 .sim-world-route>span {font-size:26px;color:#f5ca59;display:block}
 .sim-world-route small {display:block;font-size:7px;color:#d9bc7b;letter-spacing:.8px}
@@ -73,7 +81,8 @@
   .simulator-screen .sim3d-stat {padding:6px 8px}
   .simulator-screen .sim3d-stat span {font-size:6px}
   .simulator-screen .sim3d-stat strong {font-size:12px}
-  .simulator-screen .sim3d-stat.stock,.simulator-screen .sim3d-stat.rating {display:none}
+  .simulator-screen .sim3d-stat.stock,.simulator-screen .sim3d-stat.rating {display:block}
+  .simulator-screen .sim3d-stat.revenue,.simulator-screen .sim3d-stat.lost {display:none}
   .sim-world-location {left:12px;top:19px;max-width:40%}
   .sim-world-location>span {font-size:7px;letter-spacing:1px}
   .sim-world-location>strong {font-size:13px;line-height:1.5}
@@ -86,7 +95,17 @@
   .simulator-screen .sim3d-actionbar {bottom:12px;right:10px;max-width:calc(100% - 20px);gap:4px}
   .simulator-screen .sim3d-btn.primary {font-size:8px;min-width:120px;min-height:36px}
   .sim-world-controls {display:none}
-  .simulator-screen .sim3d-missions {display:none}
+  .simulator-screen .sim3d-missions {display:block;left:auto;right:10px;top:137px;width:53%;max-width:215px;padding:7px;max-height:145px;overflow:auto}
+  .simulator-screen .sim3d-missions-head {gap:4px}
+  .simulator-screen .sim3d-missions-head>span {display:none}
+  .simulator-screen .sim3d-missions-head button {width:28px;height:28px}
+  .simulator-screen .sim3d-mission-list>div {padding:3px;gap:4px}
+  .simulator-screen .sim3d-mission-list p {gap:4px;flex-wrap:wrap}
+  .simulator-screen .sim3d-mission-list b {font-size:8px}
+  .simulator-screen .sim3d-mission-list small {font-size:7px;color:#c1d0d6}
+  .simulator-screen .sim3d-missions.collapsed {width:auto}
+  .sim-world-order {font-size:8px}
+  .simulator-screen .sim3d-message {bottom:285px;max-width:calc(100vw - 26px);width:max-content;font-size:9px;padding:9px 12px}
   #sim3dCameraBtn:before {content:'◉'}
   #sim3dHubBtn:before {content:'⌂'}
   .sim-hub-directory {padding:12px}
@@ -95,6 +114,18 @@
   .sim-hub-districts button {min-height:65px;gap:8px;padding:12px}
 }
 @media(hover:none) and (pointer:coarse) {
-  .simulator-screen .sim-minimap {bottom:auto;top:125px;width:100px}
+  .simulator-screen .sim-minimap {bottom:auto;top:180px;width:100px}
   .simulator-screen .sim3d-touch-controls {bottom:90px}
+}
+@media(max-height:550px) and (max-width:950px) {
+  .simulator-screen .sim3d-missions {display:none}
+  .sim-world-location {top:18px;left:12px;max-width:37%}
+  .sim-world-route {margin-top:5px}
+  .simulator-screen .sim-minimap {top:auto;bottom:90px;width:95px}
+  .simulator-screen .mini-map-area {height:65px}
+  .simulator-screen .sim3d-brand {display:none}
+  .simulator-screen .sim3d-stats {grid-template-columns:repeat(4,minmax(70px,1fr));max-width:53%}
+  .simulator-screen .sim3d-stat.revenue,.simulator-screen .sim3d-stat.lost {display:none}
+  .simulator-screen .sim3d-stat.stock,.simulator-screen .sim3d-stat.rating {display:block}
+  .simulator-screen .sim3d-message {bottom:65px;max-width:55vw;font-size:9px}
 }

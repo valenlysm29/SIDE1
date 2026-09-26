@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three/build/three.module.js';
-import {stepVehicle,vehicleHits} from './vehicle_motion.mjs';
+import {stepVehicle,vehicleHits,vehiclesOverlap} from './vehicle_motion.mjs';
 
 export function createHubVehicles(world,offsetX) {
   const resources=new Set(),cars=[];
@@ -58,7 +58,6 @@ export function createHubVehicles(world,offsetX) {
   function placeTraffic(c){const t=(c.distance%length)/length,p=path.getPoint(t),v=path.getTangent(t);c.x=p.x;c.z=p.z;c.yaw=Math.atan2(-v.x,-v.z);}
   function sync(c,dt){c.root.position.set(c.x-offsetX,.125,c.z);c.root.rotation.y=c.yaw;c.body.rotation.z+=(c.steer*c.speed*.009-c.body.rotation.z)*(1-Math.exp(-dt*7));for(const w of c.wheels){w.pivot.rotation.y=w.front?c.steer:0;w.spin.rotation.x=-c.wheelAngle;}}
   cars.forEach(c=>sync(c,1));
-  function obstacles(except){return cars.filter(c=>c!==except).map(c=>({minX:c.x-1.1,maxX:c.x+1.1,minZ:c.z-1.1,maxZ:c.z+1.1}));}
   return {
     cars,cruiser,
     nearest(x,z){return Math.hypot(cruiser.x-x,cruiser.z-z)<3.5?cruiser:null;},
@@ -69,13 +68,17 @@ export function createHubVehicles(world,offsetX) {
           const ahead={x:c.x-Math.sin(c.yaw)*5,z:c.z-Math.cos(c.yaw)*5};
           const stop=[...people,...(active?[]:[player]),...cars.filter(o=>o!==c)].some(p=>Math.hypot(p.x-ahead.x,p.z-ahead.z)<3.5||Math.hypot(p.x-c.x,p.z-c.z)<2.7);
           const previous=c.speed;c.speed+=( (stop?0:6.5)-c.speed)*(1-Math.exp(-dt*(stop?12:1.2)));
-          c.rear.emissiveIntensity=stop?3:.7;c.distance+=c.speed*dt;c.wheelAngle+=c.speed*dt/.36;
-          const oldYaw=c.yaw;placeTraffic(c);c.steer=Math.atan2(Math.sin(c.yaw-oldYaw),Math.cos(c.yaw-oldYaw))*2.65/Math.max(.001,c.speed*dt);
+          const old={x:c.x,z:c.z,yaw:c.yaw,distance:c.distance};
+          c.rear.emissiveIntensity=stop?3:.7;c.distance+=c.speed*dt;placeTraffic(c);
+          const pedestrians=[...people,...(active?[]:[player])];
+          if(cars.some(other=>other!==c&&vehiclesOverlap(c,other,.12))||pedestrians.some(p=>vehicleHits(c.x,c.z,c.yaw,[{minX:p.x-.42,maxX:p.x+.42,minZ:p.z-.42,maxZ:p.z+.42}]))){Object.assign(c,old);c.speed=0;c.rear.emissiveIntensity=3;}
+          c.wheelAngle+=c.speed*dt/.36;
+          c.steer=Math.atan2(Math.sin(c.yaw-old.yaw),Math.cos(c.yaw-old.yaw))*2.65/Math.max(.001,c.speed*dt);
           c.body.rotation.x=(previous-c.speed)*.015;
         }else{
-          const blockers=[...world.colliders,...obstacles(c),...people.map(p=>({minX:p.x-.4,maxX:p.x+.4,minZ:p.z-.4,maxZ:p.z+.4}))];
-          stepVehicle(c,active===c?input:{brake:true},dt,(x,z,yaw)=>vehicleHits(x,z,yaw,blockers,bounds));
-          c.rear.emissiveIntensity=input.brake||input.throttle<0?3:.7;
+          const blockers=[...world.colliders,...people.map(p=>({minX:p.x-.4,maxX:p.x+.4,minZ:p.z-.4,maxZ:p.z+.4}))];
+          stepVehicle(c,active===c?input:{brake:true},dt,(x,z,yaw)=>vehicleHits(x,z,yaw,blockers,bounds)||cars.some(other=>other!==c&&vehiclesOverlap({x,z,yaw},other)));
+          c.rear.emissiveIntensity=active===c&&(input.brake||input.throttle<0)?3:.7;
         }
         sync(c,dt);
       }

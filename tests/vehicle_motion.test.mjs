@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {stepVehicle,vehicleHits} from '../services/vehicle_motion.mjs';
+import {stepVehicle,vehicleHits,vehiclesOverlap} from '../services/vehicle_motion.mjs';
 const make=()=>({x:0,z:0,yaw:0,speed:0,steer:0,wheelAngle:0});
 function run(car,input,seconds,hz=60,blocked){for(let i=0;i<seconds*hz;i++)stepVehicle(car,input,1/hz,blocked);return car;}
 test('acceleration and steering are stable across frame rates',()=>{
@@ -21,4 +21,12 @@ test('rotated chassis and world bounds are respected',()=>{
   assert.equal(vehicleHits(0,0,Math.PI/2,[wall]),true);
   assert.equal(vehicleHits(0,0,0,[wall]),false);
   assert.equal(vehicleHits(0,9,0,[],{minX:-10,maxX:10,minZ:-10,maxZ:10}),true);
+});
+
+test('vehicle pairs include bumpers and rotation for both chassis',()=>{
+  assert.equal(vehiclesOverlap({x:0,z:0,yaw:0},{x:0,z:4,yaw:0}),true);
+  assert.equal(vehiclesOverlap({x:0,z:0,yaw:0},{x:0,z:4.7,yaw:0}),false);
+  assert.equal(vehiclesOverlap({x:0,z:0,yaw:Math.PI/2},{x:3,z:0,yaw:0}),true);
+  const car=run(make(),{throttle:1},3,60,(x,z,yaw)=>vehiclesOverlap({x,z,yaw},{x:0,z:-8,yaw:0}));
+  assert.ok(car.z>-3.43);assert.equal(car.speed,0);
 });

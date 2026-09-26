@@ -205,6 +205,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     for (const dx of [-2.2, 2.2]) { cyl(x + dx, .84, -10.83, .095, 1.4, m.yellow); box(x + dx, .87, -10.83, .21, .12, .21, m.black); }
   }
   box(-9.5, 3.1, -19, 7, 5.95, 14, m.mint); box(-9.5, 6.2, -19, 7.3, .22, 14.3, m.white);
+  label('OFICINA SIDE', 'ADMINISTRACIÓN · ACCESO POR LA TIENDA', -9.5, 3.15, -11.74, 6.2, .82);
   for (const x of [-11.6, -8.1]) for (const y of [1.7, 4.5]) {
     box(x, y, -11.94, 2.25, 1.65, .12, m.darkSteel); box(x, y, -11.83, 2.02, 1.4, .07, m.opaqueGlass);
     box(x, y, -11.75, .065, 1.45, .07, m.white);
@@ -360,6 +361,10 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     }); collider(x, z, .8, .55, 'sign');
   }
   entranceMarker(-16.3, 26, 'TIENDA', '01'); entranceMarker(-16.2, -9.1, 'ALMACÉN', '02'); entranceMarker(22, -9.1, 'PRODUCCIÓN', '03');
+  // Guidance sits on existing facades; no new street obstacles or fake services.
+  label('01 / COMERCIO', 'CAJA · PRECIOS · ADMINISTRACIÓN', -19, 3.67, 25.17, 6.4, .6);
+  label('02 / LOGÍSTICA', 'INVENTARIO · REPOSICIÓN · PEDIDOS', -20, 1.85, -11.5, 3.5, .54);
+  label('03 / OPERACIONES', 'PRODUCCIÓN · DECISIONES', 20, 4.85, -11.53, 5, .62);
 
   // Three unbranded road vehicles use shared geometry and the same light/wheel language.
   function vehicle(x, z, yaw, color, crossover = false) {
@@ -423,19 +428,19 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     collider(x, z, w, d, 'building');
   });
 
-  // Pastel boulevard silhouettes and emissive architectural trim, batched with
+  // SIDE mint and warm brass architectural trim, batched with
   // the city instead of adding expensive shadow-casting lights to each sign.
-  const pink=mat(0xff82c4,{emissive:0xff3897,emissiveIntensity:2.2});
-  const cyan=mat(0x8af5e6,{emissive:0x21d9d0,emissiveIntensity:1.8});
+  const warmTrim=mat(0xdcb854,{emissive:0x8d6427,emissiveIntensity:.32});
+  const mintTrim=mat(0x83c4b9,{emissive:0x376e65,emissiveIntensity:.32});
   for(const [x,z,w,h,d] of skyline) {
-    box(x,h-.6,z,w+.15,.12,d+.15,x<0?pink:cyan);
+    box(x,h-.6,z,w+.15,.12,d+.15,x<0?warmTrim:mintTrim);
     box(x,h+.9,z,w*.42,1.4,d*.45,m.darkSteel);
-    for(const side of [-1,1])box(x+side*(w/2-.35),h/2,z+d/2+.06,.13,h-1,.12,x<0?pink:cyan);
+    for(const side of [-1,1])box(x+side*(w/2-.35),h/2,z+d/2+.06,.13,h-1,.12,x<0?warmTrim:mintTrim);
   }
   label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
-  label('HOTEL PALM','MIRAFLORES · 24 HORAS',-7,20,-42.4,11,2.3,'#294951');
+  label('PASEO COSTA','BARRIO COMERCIAL',-7,20,-42.4,11,2.3,'#294951');
   for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2);
-  for(const [x,z] of [[-19,25.15],[-20,-9.3],[20,-9.3]])box(x,4.03,z,12,.065,.09,cyan);
+  for(const [x,z] of [[-19,25.15],[-20,-9.3],[20,-9.3]])box(x,4.03,z,12,.065,.09,mintTrim);
 
   let instanceCount = 0;
   batches.forEach(({ geo, material, matrices }) => {

@@ -270,6 +270,13 @@ begin
     if exists(select 1 from jsonb_array_elements_text(p_config->'enabledEvents') selected(id) where not exists(select 1 from public.side_event_catalog e where e.id=selected.id)) then return jsonb_build_object('error','Evento desconocido'); end if;
     if not public.side_valid_event_rules(coalesce(p_config->'eventRules','{}')) then return jsonb_build_object('error','Configuración de eventos inválida'); end if;
     c:=c||jsonb_build_object('eventRules',coalesce(p_config->'eventRules',c->'eventRules','{}'),'enabledEvents',p_config->'enabledEvents','eventSelectionMode',p_config->'eventSelectionMode','randomEventCount',p_config->'randomEventCount');
+  elsif p_accion='iniciar' and c->>'cycleCloseMode'='manual'
+    and r->>'phase'='integration' and p.estado<>'finalizada' then
+    -- Explicit teacher start may end integration early. Repeated starts preserve
+    -- the original clock; automatic games continue to use their saved deadline.
+    c:=c||jsonb_build_object('gameStartAt',now(),'gameStartedAt',now());
+    r:=r||jsonb_build_object('round',1,'phase','decisions','status','running',
+      'running',true,'startedAt',now(),'duration',duration,'remaining',duration);
   elsif p_accion in ('avanzar','pausar','reanudar','cerrar') and c->>'cycleCloseMode'='manual'
     and r->>'phase' in ('decisions','results') and p.estado<>'finalizada' and p_expected_round=cycle then
     if p_accion='avanzar' then

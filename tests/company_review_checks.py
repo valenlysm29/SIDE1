@@ -26,13 +26,16 @@ def tab(page,cat):
     page.locator(f'.decision-tab[data-cat="{cat}"]').click()
 def qty(page,item,opt,value):
     page.locator(f'[data-qty="{item}"][data-option="{opt}"]').fill(str(value))
-def choice(page,item,opt):page.locator(f'[data-choice="{item}"][data-option="{opt}"]').check()
+def choice(page,item,opt):
+    control=page.locator(f'[data-choice="{item}"][data-option="{opt}"]')
+    if not control.is_checked():control.locator('..').click()
+    expect(control).to_be_checked()
 def clear_rect(page,selector):
     return page.locator(selector).evaluate('''el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&[[r.left+3,r.top+3],[r.right-3,r.bottom-3],[r.left+r.width/2,r.top+r.height/2]].every(([x,y])=>el.contains(document.elementFromPoint(x,y)));}''')
 def capture_summary(page,name):
     page.evaluate('''()=>{const mount=document.getElementById('companySummaryMount'),stage=document.getElementById('decisionMenu'),head=document.getElementById('decisionStickyHead');stage.scrollTop+=mount.getBoundingClientRect().top-head.getBoundingClientRect().bottom-12;}''')
     page.screenshot(path=str(OUT/name))
-minimal={'MOLDE':{'optionIds':['molde_1']},'PRODUCCION_META':{'value':10},'CUERO':{'quantities':{'cuero_sint':3}},'ACCESORIOS':{'quantities':{'acc_eco':10}},'HILO':{'quantities':{'hilo_std':1}},'GARANTIA_PT':{'optionIds':['pt_30']},'CANALES':{'optionIds':['web'],'quantities':{}},'INV_MARKETING':{'optionIds':['mkt_baja']}}
+minimal={'MOLDE':{'optionIds':['molde_1']},'PRODUCCION_META':{'moldTargets':{'molde_1':10}},'CUERO':{'quantities':{'cuero_sint':3}},'ACCESORIOS':{'quantities':{'acc_eco':10}},'HILO':{'quantities':{'hilo_std':1}},'GARANTIA_PT':{'optionIds':['pt_30']},'CANALES':{'optionIds':['web'],'quantities':{}},'INV_MARKETING':{'optionIds':['mkt_baja']}}
 try:
  with sync_playwright() as p:
     browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
@@ -60,7 +63,8 @@ try:
     tab(page,'C')
     qty(page,'PERS_CORTE','corte_basico',2);qty(page,'PERS_ENSAMBLE','ens_personal_ind',1);qty(page,'PERS_ACABADO','aca_personal_basico',1)
     choice(page,'JEFATURA','si_jefatura')
-    page.locator('[data-number="PRODUCCION_META"]').fill('100')
+    page.locator('[data-mold-target="molde_2"]').fill('100')
+    page.locator('[data-mold-target="molde_2"]').press('Tab')
     choice(page,'GARANTIA_PT','pt_90')
     expected_c=3000+2800+1500+3000+600
     page.locator('#sendDecisionSection').click()
@@ -72,14 +76,14 @@ try:
     page.locator('#sendDecisionSection').click()
     ok('Logistics receipt includes purchasing, all materials and supplier guarantee',abs(page.evaluate("readReviewReceipts().F.outflow")-expected_f)<.001 and page.evaluate("readReviewReceipts().F.items.length===categoryByCat('F').items.length"))
     tab(page,'D');choice(page,'CANALES','web')
-    for district,value in [('los_olivos',2),('miraflores',1),('sjl',3)]:
-        choice(page,'CANALES',district);page.locator(f'[data-store-qty="{district}"]').fill(str(value))
+    for district in ['los_olivos','miraflores','sjl']:
+        choice(page,'CANALES',district)
     page.locator('#saveDecisionSection').click();saved_cash=page.evaluate('cashBalance()')
     ok('Saved sales are not marked as sent in Resumen',not page.evaluate("liveCompanyReview().sections.find(s=>s.cat==='D').submitted"))
     page.locator('#sendDecisionSection').click()
-    expected_d=500+3600+3500+6600
+    expected_d=500+1800+3500+2200
     ok('Sending an already saved sales section never charges it twice',page.evaluate('cashBalance()')==saved_cash)
-    ok('All three store counts and six sellers appear in sent receipt',page.evaluate("readReviewReceipts().D.outflow")==expected_d and page.evaluate("readReviewReceipts().D.items.find(i=>i.id==='PERSONAL_VENTAS').rows[0].quantity")==6)
+    ok('All three selected stores and three sellers appear in sent receipt',page.evaluate("readReviewReceipts().D.outflow")==expected_d and page.evaluate("readReviewReceipts().D.items.find(i=>i.id==='PERSONAL_VENTAS').rows[0].quantity")==3)
     tab(page,'E');choice(page,'INV_RRHH','cap_baja');choice(page,'INV_MARKETING','mkt_media');page.locator('[data-loan-number="PRESTAMO"]').fill('10000')
     tab(page,'A')
     ok('Resumen contains all decision items',page.locator('#companySummaryMount [data-summary-item]').count()==page.evaluate('allDecisionItems().length'))
@@ -89,9 +93,8 @@ try:
     page.locator('[data-summary-filter="all"]').click()
     expected_outflow=expected_b+expected_c+expected_f+expected_d+7000
     f=page.evaluate('liveCompanyReview().financial')
-    (OUT/'financial-debug.json').write_text(json.dumps({'actual':f,'expected_outflow':expected_outflow,'drafts':page.evaluate('decisionDrafts'),'state':page.evaluate('decisionState'),'ledger':page.evaluate('cashLedger')},indent=2))
     ok('Four financial concepts reconcile exactly with selections and saved cash',abs(f['outflow']-expected_outflow)<.001 and abs(f['projectedCash']-(100000-expected_outflow+10000))<.001)
-    ok('Contract commitments exclude this cycle and disclose after-game amounts',f['contracts']['total']==(3600+3500+6600)*11 and f['contracts']['beyondGame']==(3600+3500+6600)*6)
+    ok('Contract commitments exclude this cycle and disclose after-game amounts',f['contracts']['total']==(1800+3500+2200)*11 and f['contracts']['beyondGame']==(1800+3500+2200)*6)
     capture_summary(page,'empresa-resumen-escritorio.png')
     before=business(page);page.locator('#topSubmitAllDecisions').click()
     ok('Opening complete review does not change decisions, cash or sent flags',business(page)==before)
@@ -119,6 +122,7 @@ try:
     ok('Receipts and cash survive reconstructing the page from saved Web Storage',page.evaluate('readReviewReceipts()')==receipts1 and abs(page.evaluate('cashBalance()')-f['projectedCash'])<.001)
     page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');lastObservedRound=2;loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory()")
     ok('New cycle is not incorrectly marked as already sent',page.evaluate("!decisionsSubmitted()&&!sectionSubmitted('B')"))
+    tab(page,'A')
     page.locator('#companySummaryCycle').select_option('1')
     ok('Historical cycle shows the five immutable submitted sections',page.locator('#companySummaryMount [data-summary-section]').count()==5 and page.evaluate('readReviewReceipts(1)')==receipts1)
     ok('History does not invent an old projected cash value',page.locator('#companySummaryMount .cs-metric').count()==0)
@@ -131,7 +135,7 @@ try:
     expect(page.locator('#confirmCompanyReview')).to_be_enabled();page.locator('#confirmCompanyReview').click()
     ok('Loan and purchases can be confirmed together without a category-order cash failure',page.evaluate('decisionsSubmitted()') and abs(page.evaluate('cashBalance()')-loan_projection)<.001)
     # Shortage warnings remain advisory; financial impossibility blocks the batch.
-    ready_fixture(page,'Advertencias',100000,{**minimal,'PRODUCCION_META':{'value':100}})
+    ready_fixture(page,'Advertencias',100000,{**minimal,'PRODUCCION_META':{'moldTargets':{'molde_1':100}}})
     page.locator('#topSubmitAllDecisions').click()
     ok('Capacity and material shortages produce visible advisory warnings',page.locator('.cs-notice-warning').count()>0 and page.locator('#confirmCompanyReview').is_enabled())
     page.locator('#cancelCompanyReview').click()
@@ -158,5 +162,5 @@ try:
     browser.close()
 finally:
  pass
-(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.10.2','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP browser navigation is unavailable in the environment. No production Supabase or complete 3D game tested.'},indent=2))
+(OUT/'company-review-results.json').write_text(json.dumps({'build':'2026.09.10.2','passed':len(checks),'checks':checks,'page_errors':errors,'scope':'Isolated Chromium DOM with delivered HTML/CSS/JS and Web Storage double; external requests blocked. HTTP navigation, production Supabase and complete 3D game are outside this isolated DOM test.'},indent=2))
 print('TOTAL PASS',len(checks),flush=True)

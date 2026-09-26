@@ -31,3 +31,13 @@ export function vehicleHits(x,z,yaw,obstacles,bounds) {
   }
   return false;
 }
+
+// Use the same rotated chassis for both participants, including bumpers.
+export function vehiclesOverlap(a,b,margin=0) {
+  for(const alongA of [-1.35,0,1.35])for(const alongB of [-1.35,0,1.35]) {
+    const dx=a.x+Math.sin(a.yaw)*alongA-b.x-Math.sin(b.yaw)*alongB;
+    const dz=a.z+Math.cos(a.yaw)*alongA-b.z-Math.cos(b.yaw)*alongB;
+    if(Math.hypot(dx,dz)<1.88+margin)return true;
+  }
+  return false;
+}

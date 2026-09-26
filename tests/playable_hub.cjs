@@ -30,7 +30,7 @@ const source=fs.readFileSync(path.join(root,'simulator3d.js'),'utf8');
 assert.ok(source.includes('  window.SIDE3D = {'),'simulator diagnostics injection point');
 const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebGLRenderer({preserveDrawingBuffer:true,').replace('  window.SIDE3D = {',`  window.hubQA={
   place(x,z,heading=0){keys={};Object.assign(player,{x,z,y:player.baseY,vx:0,vz:0,vy:0,speed:0,grounded:true});yaw=targetYaw=heading;pitch=targetPitch=0;cameraSnap=true;},
-  camera(){return {position:camera.position.toArray(),rotation:camera.rotation.toArray().slice(0,3)};},
+  camera(){return {position:camera.position.toArray(),rotation:camera.rotation.toArray().slice(0,3),fov:camera.fov};},
   inspect(){
     let meshes=0,skinned=0;scene.traverse(n=>{if(n.isMesh)meshes++;if(n.isSkinnedMesh)skinned++});
     return {meshes,skinned,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,backgroundImage:getComputedStyle(renderer.domElement).backgroundImage};
@@ -95,6 +95,17 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     assert.notDeepEqual(after.camera.position,before.camera.position,'camera follows walking');
     await page.screenshot({path:path.join(output,'hub-thirdperson.png')});
     checks.push({walking:{before,after}});
+    await page.keyboard.down('KeyW');await page.keyboard.down('ShiftLeft');
+    await page.evaluate(()=>hubQA.stepPlayer(.4));
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.locomotion),'RUN');
+    await page.keyboard.up('KeyW');await page.keyboard.up('ShiftLeft');await page.evaluate(()=>hubQA.stepPlayer(.7));
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.locomotion),'IDLE');
+    await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:10000});
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.zoom),7.4,'zoom upper limit');
+    await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:-10000});
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.zoom),3.2,'zoom lower limit');
+    await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:500});
+
 
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
     assert.ok(actorsBefore.length>=3&&actorsBefore.every(a=>a.bones>=15),'all outdoor pedestrians have articulated rigs');
@@ -106,9 +117,22 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
 
     const cruiser=await page.evaluate(()=>SIDE3D.diagnostics().vehicles.find(c=>!c.traffic));
     assert.ok(cruiser,'the plaza contains a drivable car');
+    await page.evaluate(c=>{
+      hubQA.place(c.x,c.z+3.3);
+      hubQA.world().colliders.push({minX:c.x-.8,maxX:c.x+.8,minZ:c.z+2.5,maxZ:c.z+2.6});
+    },cruiser);
+    await page.keyboard.press('KeyF');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'PLAYER_ON_FOOT','cannot enter through a wall');
+    await page.evaluate(()=>hubQA.world().colliders.pop());
+
     await page.evaluate(c=>hubQA.place(c.x,c.z+2.4),cruiser);
     await page.keyboard.press('KeyF');
-    assert.ok(await page.evaluate(()=>SIDE3D.diagnostics().driving),'F enters the car');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'ENTERING_VEHICLE','F begins a door approach');
+    await page.keyboard.press('KeyF');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'ENTERING_VEHICLE','repeated F cannot interrupt transition');
+    await page.evaluate(()=>hubQA.stepDriving(.65));
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'DRIVING');
+    assert.ok(await page.evaluate(()=>SIDE3D.diagnostics().driving),'door approach completes before driving');
     await page.keyboard.down('KeyW');await page.evaluate(()=>hubQA.stepDriving(1));await page.keyboard.up('KeyW');
     const moving=await page.evaluate(()=>SIDE3D.diagnostics());
     assert.ok(moving.driving.speed>2,'throttle accelerates');
@@ -117,7 +141,14 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     await page.keyboard.down('Space');await page.evaluate(()=>hubQA.stepDriving(1));await page.keyboard.up('Space');
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().driving.speed),0,'handbrake stops the vehicle');
     await page.screenshot({path:path.join(output,'hub-driving.png')});
-    await page.keyboard.press('KeyF');assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().driving),null,'F exits at a safe door');
+    await page.keyboard.press('KeyF');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'EXITING_VEHICLE');
+    await page.evaluate(()=>hubQA.stepDriving(.65));
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().driving),null,'F exits at a safe door');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.mode),'PLAYER_ON_FOOT');
+    await page.evaluate(()=>hubQA.stepPlayer(.7));
+    assert.ok(Math.abs((await page.evaluate(()=>hubQA.camera())).fov-58)<.2,'foot FOV is restored after leaving the vehicle');
+    assert.equal(await page.evaluate(()=>hubQA.state().collision),false,'exit position is collision-free');
     const trafficBefore=moving.vehicles.filter(c=>c.traffic);
     await page.evaluate(()=>hubQA.stepDriving(3));
     const trafficAfter=await page.evaluate(()=>SIDE3D.diagnostics().vehicles.filter(c=>c.traffic));
@@ -131,6 +162,10 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
 
     const building=await page.evaluate(()=>hubQA.world().colliders.find(c=>c.maxX-c.minX>10&&c.maxZ-c.minZ>6));
     assert.ok(building,'large exterior buildings have collision volumes');
+    await page.evaluate(c=>{hubQA.place(c.maxX+.8,(c.minZ+c.maxZ)/2,-Math.PI/2);hubQA.draw();},building);
+    const obstructedCamera=await page.evaluate(()=>hubQA.camera());
+    assert.ok(obstructedCamera.position[0]>building.maxX+.18,'camera pulls forward before a building wall');
+
     await page.evaluate(c=>hubQA.place(c.maxX+.8,(c.minZ+c.maxZ)/2,Math.PI/2),building);
     await page.keyboard.down('KeyW');
     await page.evaluate(()=>hubQA.stepPlayer(2));

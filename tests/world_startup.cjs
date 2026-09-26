@@ -13,7 +13,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   for(const mode of ['all','sections']){
    const context=await browser.newContext({viewport:{width:1440,height:900}}),page=await context.newPage(),errors=[],failedLocal=[];
    page.on('pageerror',error=>errors.push(error.message));
-   page.on('requestfailed',request=>{if(request.url().startsWith(url))failedLocal.push(request.url())});
+   page.on('requestfailed',request=>{if(request.url().startsWith(url))failedLocal.push({url:request.url(),error:request.failure()?.errorText})});
    // All third-party hosts are unavailable. The 3D engine and its assets must load locally.
    await context.route('**/*',route=>route.request().url().startsWith(url)?route.continue():route.abort());
    await page.goto(url,{waitUntil:'domcontentloaded'});
@@ -63,7 +63,19 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&Math.abs(c.x-3.8)<.3&&Math.abs(c.z-4.75)<.25),'male stands in the clear sales aisle');
    assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&Math.abs(c.x-6)<.3&&Math.abs(c.z-4.75)<.25),'female stands in the clear sales aisle');
    await page.screenshot({path:path.join(output,`world-${mode}.png`)});
-   assert.deepEqual(errors,[]);assert.deepEqual(failedLocal,[]);
+   assert.deepEqual(errors,[]);
+   assert.deepEqual(diagnostic.suppliedNpcs.errors,{});
+   assert.equal(diagnostic.suppliedNpcs.loaded.length,3);
+   assert.equal(diagnostic.mona.loaded,true);
+   // Chromium can report ERR_ABORTED after FileLoader has consumed a GLB stream.
+   // Accept only a fully transferred file with its exact on-disk size; missing
+   // templates, partial downloads and every other network error still fail.
+   const transfers=await page.evaluate(()=>performance.getEntriesByType('resource').map(e=>({url:e.name,bytes:e.decodedBodySize})));
+   for(const failure of failedLocal){
+    const relative=decodeURIComponent(new URL(failure.url).pathname).replace(/^\//,'');
+    const asset=path.resolve(__dirname,'..',relative);
+    assert.ok(failure.error==='net::ERR_ABORTED'&&failure.url.endsWith('.glb')&&fs.existsSync(asset)&&transfers.some(t=>t.url===failure.url&&t.bytes===fs.statSync(asset).size),JSON.stringify(failure));
+   }
    results.push({mode,passed:true,loadMs:Date.now()-start,diagnostic});
    console.log('PASS',mode,JSON.stringify(results.at(-1)));
    await context.close();

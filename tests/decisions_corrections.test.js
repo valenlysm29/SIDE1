@@ -11,7 +11,7 @@ function runtime(){
     addEventListener(type,fn){this.handlers[type]=fn},setAttribute(){},querySelector(){return element()},querySelectorAll(){return []},focus(){}};}
   const document={getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id)},
     querySelector(){return null},querySelectorAll(selector){return selector==='[data-choice]'?inputs:[]},addEventListener(){}};
-  const context=vm.createContext({document,console:{log(){},warn(){},error(...args){errors.push(args)}},
+  const context=vm.createContext({document,URLSearchParams,location:{search:''},console:{log(){},warn(){},error(...args){errors.push(args)}},
     setInterval(){},clearInterval(){},setTimeout(){},clearTimeout(){},requestAnimationFrame(){},
     ResizeObserver:class{observe(){}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,String(v)),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i],get length(){return storage.size}}});
   context.window=context;context.addEventListener=()=>{};context.scrollTo=()=>{};
@@ -23,6 +23,15 @@ function runtime(){
   run("currentCategory='D';bindDecisionControls();");
   return {run,elements,errors,select(id,checked=true){const input=inputs.find(i=>i.dataset.option===id);input.checked=checked;input.handlers.change();},json:code=>JSON.parse(JSON.stringify(run(code)))};
 }
+
+test('untouched zero production stays pending and a changed target becomes a draft',()=>{
+  const r=runtime();
+  assert.equal(r.run("liveCompanyReview().sections.find(s=>s.cat==='C').status"),'pending');
+  r.run("decisionDrafts.PRODUCCION_META.moldTargets.molde_1='12'");
+  assert.equal(r.run("liveCompanyReview().sections.find(s=>s.cat==='C').status"),'draft');
+  r.run("decisionDrafts.PRODUCCION_META.moldTargets.molde_1='0'");
+  assert.equal(r.run("liveCompanyReview().sections.find(s=>s.cat==='C').status"),'pending');
+});
 test('current store selection normalizes duplicates without mutating legacy data',()=>{
   const legacy={optionIds:['web','los_olivos','miraflores'],quantities:{los_olivos:4,miraflores:2},storeContracts:{los_olivos:[{round:1,quantity:4}],miraflores:[{round:2,quantity:2}]}};
   const before=JSON.stringify(legacy),single=rules.singleStoreSelection(legacy,3);

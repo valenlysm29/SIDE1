@@ -179,7 +179,8 @@ function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${curr
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
-function canStartSimulation(){return studentAccess().canOperate&&simulationSubmissionComplete()&&(decisionProgressPercent()===100||localStorage.getItem(worldAdmissionKey())==='1')}
+function canOperateWorld(){return studentAccess().canOperate&&readRoundRuntime()?.status!=='paused'}
+function canStartSimulation(){return canOperateWorld()&&simulationSubmissionComplete()&&(decisionProgressPercent()===100||localStorage.getItem(worldAdmissionKey())==='1')}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 window.SIDE_GAME_BRIDGE={
@@ -189,22 +190,30 @@ window.SIDE_GAME_BRIDGE={
   cash:()=>cashBalance(),
   decisionProgress:()=>decisionProgressPercent(),
   canStartSimulation:()=>canStartSimulation(),
+  canOperate:()=>canOperateWorld(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
   activeEvents:()=>activeStudentEvents(),
   productionPlan:()=>productionPlan(),
   financialReport:()=>financialReport(),
-  recordOperatingExpense(amount,kind='SIM_GASTOS'){
+  recordOperatingExpense(amount,kind='SIM_GASTOS',storageWrites={}){
+    if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
     const key=`${currentRound()}:${['SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES'].includes(kind)?kind:'SIM_GASTOS'}`;
-    cashLedger[key]=Number(cashLedger[key]||0)-Math.max(0,Number(amount)||0);
-    persistGameState();syncStudentReportPreview();queueFinancialSync();
+    const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)-Number(amount)};
+    if(!writeDecisionBatch({...storageWrites,[ledgerKey()]:JSON.stringify(ledger)}))return false;
+    cashLedger=ledger;
+    try{syncStudentReportPreview();queueFinancialSync();}catch(error){console.error('SIDE: gasto guardado; actualización visual pendiente',error);}
+    return true;
   },
-  recordSimulatedSale(amount=75){
+  recordSimulatedSale(amount=75,storageWrites={}){
+    if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
     const sale=Math.max(0,Number(amount)||0),key=`${currentRound()}:SIM_VENTAS`;
-    cashLedger[key]=Number(cashLedger[key]||0)+sale;
+    const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)+sale};
     const physicalStores=RULES.storeCount(savedEntry(findDecisionItem('CANALES')));
-    if(physicalStores>0){const commissionKey=`${currentRound()}:COMISION_VENTAS`;cashLedger[commissionKey]=Number(cashLedger[commissionKey]||0)-sale*0.01}
-    persistGameState();syncStudentReportPreview();renderStudentStatus();queueFinancialSync();
+    if(physicalStores>0){const commissionKey=`${currentRound()}:COMISION_VENTAS`;ledger[commissionKey]=Number(ledger[commissionKey]||0)-sale*0.01}
+    if(!writeDecisionBatch({...storageWrites,[ledgerKey()]:JSON.stringify(ledger)}))return false;
+    cashLedger=ledger;
+    try{syncStudentReportPreview();renderStudentStatus();queueFinancialSync();}catch(error){console.error('SIDE: venta guardada; actualización visual pendiente',error);}
     return cashLedger[key];
   }
 };
