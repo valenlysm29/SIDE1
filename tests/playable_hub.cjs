@@ -36,6 +36,7 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     return {meshes,skinned,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,backgroundImage:getComputedStyle(renderer.domElement).backgroundImage};
   },
   world(){return hubWorld;},
+  stepDriving(seconds){for(let i=0;i<Math.round(seconds*60);i++){updateDriving(1/60);updateGameplayCamera(1/60)}renderer.render(scene,camera);},
   screenVersion(){const maps=new Set();hubWorld.group.traverse(n=>{for(const m of n.isMesh?(Array.isArray(n.material)?n.material:[n.material]):[])if(m.map)maps.add(m.map)});return [...maps].reduce((sum,map)=>sum+map.version,0);},
   actors(){return hubActors.map(a=>{const m=a.obj.userData.motion;return {kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:m?.phase,distance:m?.distance,knee:m?.bones.ShinL.rotation.x,bones:m?Object.keys(m.bones).length:0};});},
   state(){return {keys,visibilityPaused,running,hubDirectoryOpen,player:{...player},collision:collision(player.x,player.z-.1),actors:this.actors()};},
@@ -102,6 +103,26 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     assert.ok(actorsAfter.every((actor,i)=>actor.distance-actorsBefore[i].distance>.15),'every pedestrian walks along its route');
     assert.ok(actorsAfter.some((actor,i)=>Math.abs(actor.knee-actorsBefore[i].knee)>.005),'walking changes knee pose');
     checks.push({pedestrians:{before:actorsBefore,after:actorsAfter}});
+
+    const cruiser=await page.evaluate(()=>SIDE3D.diagnostics().vehicles.find(c=>!c.traffic));
+    assert.ok(cruiser,'the plaza contains a drivable car');
+    await page.evaluate(c=>hubQA.place(c.x,c.z+2.4),cruiser);
+    await page.keyboard.press('KeyF');
+    assert.ok(await page.evaluate(()=>SIDE3D.diagnostics().driving),'F enters the car');
+    await page.keyboard.down('KeyW');await page.evaluate(()=>hubQA.stepDriving(1));await page.keyboard.up('KeyW');
+    const moving=await page.evaluate(()=>SIDE3D.diagnostics());
+    assert.ok(moving.driving.speed>2,'throttle accelerates');
+    assert.ok(moving.player.x<cruiser.x-1,'car and player move together');
+    await page.keyboard.press('KeyF');assert.ok(await page.evaluate(()=>SIDE3D.diagnostics().driving),'cannot exit a moving car');
+    await page.keyboard.down('Space');await page.evaluate(()=>hubQA.stepDriving(1));await page.keyboard.up('Space');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().driving.speed),0,'handbrake stops the vehicle');
+    await page.screenshot({path:path.join(output,'hub-driving.png')});
+    await page.keyboard.press('KeyF');assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().driving),null,'F exits at a safe door');
+    const trafficBefore=moving.vehicles.filter(c=>c.traffic);
+    await page.evaluate(()=>hubQA.stepDriving(3));
+    const trafficAfter=await page.evaluate(()=>SIDE3D.diagnostics().vehicles.filter(c=>c.traffic));
+    assert.ok(trafficAfter.every((c,i)=>Math.hypot(c.x-trafficBefore[i].x,c.z-trafficBefore[i].z)>1),'traffic advances around the boulevard');
+    checks.push({driving:{cruiser,moving:moving.driving,trafficAfter}});
 
     await page.locator('#sim3dCameraBtn').click();
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.mode),'first');

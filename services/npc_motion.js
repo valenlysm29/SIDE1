@@ -105,23 +105,25 @@ export function animateNpc(group,dt,moving=true) {
   m.pivotBlend+=(pivotTarget-m.pivotBlend)*(1-Math.exp(-dt*12));
   const target=m.speed>.025?1:0;
   m.blend+=(target-m.blend)*(1-Math.exp(-dt*(target?10:9)));
-  const stride=.93*m.profile.height/1.75;
+  const run=clamp((m.pace-1.8)/2.7,0,1);
+  const stance=STANCE-run*.15;
+  const stride=(.93+run*1.05)*m.profile.height/1.75;
   m.phase=(m.phase+travelled/stride)%1;
   const b=m.bones,r=m.rest,h=m.profile.height,w=m.blend,pivot=m.pivotBlend*(1-w),weight=Math.max(w,pivot);
   const cycle=w>.15?m.phase:m.pivotPhase, gait=Math.sin(m.phase*TAU),pace=clamp(m.pace/.95,.4,1.3);
   for(const [name,bone] of Object.entries(b)){bone.position.copy(r[name]);bone.rotation.set(0,0,0)}
-  b.Hips.position.y-=h*(.030+.004*Math.cos(m.phase*TAU*2))*w+.016*pivot;
+  b.Hips.position.y-=h*(.030+(.004+run*.013)*Math.cos(m.phase*TAU*2))*w+.016*pivot;
   b.Hips.position.x-=h*.009*gait*w;
   b.Hips.rotation.y=.022*gait*w;
   b.Hips.rotation.z=.012*gait*w;
   group.updateMatrixWorld(true);
   for(const [side,offset] of [['L',0],['R',.5]]) {
-    const phase=(cycle+offset)%1,foot=m.feet[side],sign=side==='L'?-1:1,t=(phase-STANCE)/(1-STANCE);
+    const phase=(cycle+offset)%1,foot=m.feet[side],sign=side==='L'?-1:1,t=(phase-stance)/(1-stance);
     const travelWeight=weight?w/weight:0,x=m.profile.legX*h*sign,ankle=m.profile.ankle*h;
     const footTarget=foot.target.set(x,ankle,0);
     let soleYaw=0,solePitch=0;
-    if(phase<STANCE){
-      footTarget.z=stride*(STANCE*.5-phase)*travelWeight;
+    if(phase<stance){
+      footTarget.z=stride*(stance*.5-phase)*travelWeight;
       if(!foot.planted||phase<foot.phase){
         foot.anchor.copy(footTarget);group.localToWorld(foot.anchor);foot.yaw=group.rotation.y;foot.planted=true;
       }
@@ -132,12 +134,12 @@ export function animateNpc(group,dt,moving=true) {
     }else{
       if(foot.planted){
         group.worldToLocal(foot.release.copy(foot.anchor));
-        foot.release.x-=x;foot.release.y-=ankle;foot.release.z+=stride*STANCE*.5*travelWeight;
+        foot.release.x-=x;foot.release.y-=ankle;foot.release.z+=stride*stance*.5*travelWeight;
         foot.planted=false;
       }
-      footTarget.z=stride*STANCE*(smooth(t)-.5)*travelWeight;
+      footTarget.z=stride*stance*(smooth(t)-.5)*travelWeight;
       footTarget.addScaledVector(foot.release,1-smooth(t));
-      footTarget.y=ankle+(h*.047*travelWeight+h*.032*(1-travelWeight))*Math.sin(Math.PI*t)**2;
+      footTarget.y=ankle+(h*(.047+run*.085)*travelWeight+h*.032*(1-travelWeight))*Math.sin(Math.PI*t)**2;
       solePitch=-.09*Math.sin(Math.PI*t);
     }
     foot.phase=phase;
@@ -145,9 +147,9 @@ export function animateNpc(group,dt,moving=true) {
     legIK(m,side,footTarget,weight,soleYaw,solePitch);
     if(m.profile.freeArms.includes(sign)) {
       const swing=Math.cos((m.phase+offset)*TAU),arm=b['UpperArm'+side],forearm=b['Forearm'+side];
-      arm.rotation.x=swing*.33*pace*w;
+      arm.rotation.x=swing*(.33+run*.3)*pace*w;
       arm.rotation.z=sign*(.022*w+.006*Math.sin(m.time*1.35));
-      forearm.rotation.x=(-.09-.13*Math.max(0,-swing))*w;
+      forearm.rotation.x=(-.09-run*.85-.13*Math.max(0,-swing))*w;
       b['Hand'+side].rotation.x=.035*Math.sin((m.phase+offset)*TAU-.4)*w;
     }
   }
@@ -155,7 +157,7 @@ export function animateNpc(group,dt,moving=true) {
   b.Spine.rotation.y=-gait*.030*w;
   b.Spine.rotation.z=-b.Hips.rotation.z*.65;
   b.Chest.rotation.y=-gait*.048*w+m.turnRate*.018;
-  b.Chest.rotation.x=.008*breath+.026*w;
+  b.Chest.rotation.x=.008*breath+(.026+run*.1)*w;
   b.Chest.position.y+=h*.0013*breath;
   b.Head.rotation.y=.040*Math.sin(m.time*.63)*(1-w)+clamp(m.turnRate*.065,-.16,.16);
   b.Head.rotation.x=-.007*breath-.014*w;

@@ -232,7 +232,8 @@
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
     </div>
     <div class="sim-world-location"><span>DISTRITO COMERCIAL</span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div></div>
-    <div class="sim-world-controls"><kbd>WASD</kbd> Caminar <kbd>SHIFT</kbd> Correr <kbd>E</kbd> Interactuar <kbd>V</kbd> Cámara</div>
+    <div class="sim-world-controls"><kbd>WASD</kbd> Mover / conducir <kbd>SHIFT</kbd> Correr <kbd>E</kbd> Interactuar <kbd>F</kbd> Auto <kbd>V</kbd> Cámara</div>
+    <div id="simDriveHud" class="sim-drive-hud" hidden><span>SIDE CRUISER · COSTA</span><div><b id="simDriveSpeed">00</b><small>KM/H</small><strong id="simDriveGear">N</strong></div><p>W / S acelerar y frenar · A / D girar<br>ESPACIO freno · F bajar</p></div>
     <div id="simHubDirectory" class="sim-hub-directory hidden" role="dialog" aria-modal="true" aria-labelledby="simHubDirectoryTitle">
       <div class="sim-hub-directory-card">
         <button id="simHubDirectoryClose" class="sim-hub-close" type="button" aria-label="Cerrar directorio">×</button>
@@ -255,7 +256,7 @@
         <button data-touch-key="KeyS" class="down" type="button" aria-label="Retroceder">▼</button>
         <button data-touch-key="KeyD" class="right" type="button" aria-label="Derecha">▶</button>
       </div>
-      <div class="sim3d-touch-actions"><button id="simTouchInteract" type="button">E</button><button id="simTouchJump" type="button">↥</button></div>
+      <div class="sim3d-touch-actions"><button id="simTouchDrive" type="button" aria-label="Subir o bajar del auto">F</button><button id="simTouchInteract" type="button">E</button><button id="simTouchJump" type="button" aria-label="Saltar o frenar">↥</button></div>
     </div>
     <div id="sim3dMessage" class="sim3d-message" aria-live="polite"></div>
     <div id="sim3dReceipt" class="sim3d-receipt" aria-live="polite">

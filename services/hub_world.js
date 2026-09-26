@@ -74,7 +74,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     grass: textured('grass'), white: mat(0xe9e4d8), black: mat(0x19252c, { roughness: .47 }),
     steel: mat(0x73838c, { metalness: .75, roughness: .4 }), darkSteel: mat(0x263a45, { metalness: .62, roughness: .46 }),
     glass: mat(0x93bac3, { metalness: .25, roughness: .12, transparent: true, opacity: .33, depthWrite: false }),
-    opaqueGlass: mat(0x41616c, { metalness: .62, roughness: .13 }), mint: mat(0x779c94), coral: mat(0xbc8065),
+    opaqueGlass: mat(0x41616c, { metalness: .62, roughness: .13 }), mint: mat(0x83c4b9), coral: mat(0xe4a08f),
     yellow: mat(0xdcb854), paint: mat(0xe6e1cd, { roughness: .96 }), bark: textured('wood', 0x89877a),
     foliage: mat(0x52764c, { side: THREE.DoubleSide }), foliageLight: mat(0x728f5c, { side: THREE.DoubleSide }),
     light: mat(0xfff3d7, { emissive: 0xffe5af, emissiveIntensity: 1.5 }),
@@ -374,7 +374,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
       const verts = [-.82,.89+rise,-.85, .82,.89+rise,-.85, -.66,1.51+rise,-.38, .66,1.51+rise,-.38,
         -.82,.89+rise,1.12, .82,.89+rise,1.12, -.68,1.51+rise,.67, .68,1.51+rise,.67];
       const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-      geo.setIndex([0,1,2,1,3,2,4,6,5,5,6,7,0,2,4,4,2,6,1,5,3,5,7,3,2,3,6,3,7,6]); geo.computeVertexNormals(); resources.add(geo);
+      geo.setIndex([0,1,2,1,3,2,4,6,5,5,6,7,0,2,4,4,2,6,1,5,3,5,7,3,2,3,6,3,7,6].reverse()); geo.computeVertexNormals(); resources.add(geo);
       const cabin = add(new THREE.Mesh(geo, m.opaqueGlass)); cabin.castShadow = true;
       box(0, 1.54 + rise, .15, 1.38, .065, 1.13, body);
       for (const side of [-1, 1]) {
@@ -422,6 +422,20 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     }
     collider(x, z, w, d, 'building');
   });
+
+  // Pastel boulevard silhouettes and emissive architectural trim, batched with
+  // the city instead of adding expensive shadow-casting lights to each sign.
+  const pink=mat(0xff82c4,{emissive:0xff3897,emissiveIntensity:2.2});
+  const cyan=mat(0x8af5e6,{emissive:0x21d9d0,emissiveIntensity:1.8});
+  for(const [x,z,w,h,d] of skyline) {
+    box(x,h-.6,z,w+.15,.12,d+.15,x<0?pink:cyan);
+    box(x,h+.9,z,w*.42,1.4,d*.45,m.darkSteel);
+    for(const side of [-1,1])box(x+side*(w/2-.35),h/2,z+d/2+.06,.13,h-1,.12,x<0?pink:cyan);
+  }
+  label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
+  label('HOTEL PALM','MIRAFLORES · 24 HORAS',-7,20,-42.4,11,2.3,'#294951');
+  for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2);
+  for(const [x,z] of [[-19,25.15],[-20,-9.3],[20,-9.3]])box(x,4.03,z,12,.065,.09,cyan);
 
   let instanceCount = 0;
   batches.forEach(({ geo, material, matrices }) => {

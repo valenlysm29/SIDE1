@@ -34,6 +34,7 @@
   let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
   let currentInterior = 'store', hubReturnPoint = null, cameraSnap = true;
   let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
+  let hubVehicles = null, driving = null;
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
@@ -1301,6 +1302,13 @@
     const nz=Math.max(0,Math.min(1,inHub?(player.z-area.minZ)/(area.maxZ-area.minZ):(area.maxZ-player.z)/(area.maxZ-area.minZ)));
     dot.style.left=`${7+nx*86}%`; dot.style.top=`${7+nz*86}%`;
     dot.style.rotate=`${-yaw*180/Math.PI}deg`;
+    if(hubVehicles){
+      let marker=$3('miniCruiser');
+      if(!marker){marker=document.createElement('span');marker.id='miniCruiser';marker.className='mini-cruiser';marker.title='SIDE Cruiser · F para conducir';dot.parentElement.append(marker);}
+      marker.hidden=!inHub||Boolean(driving);
+      marker.style.left=`${7+(hubVehicles.cruiser.x-hubBounds.minX)/(hubBounds.maxX-hubBounds.minX)*86}%`;
+      marker.style.top=`${7+(hubVehicles.cruiser.z-hubBounds.minZ)/(hubBounds.maxZ-hubBounds.minZ)*86}%`;
+    }
   }
 
   function registerAnimatedActor(def) {
@@ -2527,6 +2535,8 @@
     scene.add(businessWorld);
     const {createHubWorld}=await import('./services/hub_world.js');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    const {createHubVehicles}=await import('./services/hub_vehicles.js');
+    hubVehicles=createHubVehicles(hubWorld,HUB_OFFSET);
     try {
       const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
       const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
@@ -2536,7 +2546,7 @@
     // A continuous sky gradient, rendered as geometry; no background photograph.
     const sky=new THREE.Mesh(new THREE.SphereGeometry(260,24,12),new THREE.ShaderMaterial({
       side:THREE.BackSide,depthWrite:false,
-      uniforms:{top:{value:new THREE.Color(0x4d8fc4)},horizon:{value:new THREE.Color(0xd8e4e6)}},
+      uniforms:{top:{value:new THREE.Color(0x596fbd)},horizon:{value:new THREE.Color(0xffbd94)}},
       vertexShader:'varying vec3 vDirection; void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
       fragmentShader:'uniform vec3 top;uniform vec3 horizon;varying vec3 vDirection;void main(){float h=pow(max(normalize(vDirection).y,0.0),0.55);gl_FragColor=vec4(mix(horizon,top,h),1.0);}'
     }));
@@ -2551,7 +2561,7 @@
       obj.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(obj);
       hubActors.push({obj,patrol,index:1,route:[],pause:i*.8,speed:.9+i*.07,state:{speed:0}});
     });
-    playerAvatar=person({execModel:'casual',bodyScale:1});
+    playerAvatar=person({execModel:'chico2',bodyScale:1});
     playerAvatar.name='PlayerAvatar';playerAvatar.userData.modelKind='player';
     playerAvatar.getObjectByName('NpcNameLabel')?.removeFromParent();scene.add(playerAvatar);
     hubWaypoint=new THREE.Group();hubWaypoint.name='Next destination';
@@ -2589,6 +2599,7 @@
   }
 
   function positionPlayer(x,z,facing=0) {
+    if(driving){driving.speed=0;driving=null;$3(rootId)?.classList.remove('is-driving');if($3('simDriveHud'))$3('simDriveHud').hidden=true;}
     Object.assign(player,{x,z,y:player.baseY,vx:0,vz:0,vy:0,speed:0,grounded:true,headBobX:0,headBobY:0});
     yaw=targetYaw=facing;pitch=targetPitch=-.16;keys={};jumpQueued=false;cameraSnap=true;
     if(playerAvatar){playerAvatar.position.set(x,.025,z);playerAvatar.rotation.y=facing+Math.PI;playerAvatar.userData.motion&&npcMotion.resetMotion(playerAvatar);}
@@ -2649,11 +2660,37 @@
     selectedDistrict=id;hubWorld?.updateDistrict(id);refreshHubUI();
   }
 
+  function toggleDriving() {
+    if(!inHub||!running||hubDirectoryOpen||checkoutOpen||adminOpen||newsOpen||productInspectOpen)return;
+    if(driving){
+      if(Math.abs(driving.speed)>.5){message('Frena con ESPACIO antes de bajar.');return;}
+      for(const side of [1,-1]) {
+        const x=driving.x+Math.cos(driving.yaw)*2.15*side,z=driving.z-Math.sin(driving.yaw)*2.15*side;
+        if(collision(x,z))continue;
+        const facing=driving.yaw;positionPlayer(x,z,facing);message('A pie · SHIFT para correr · E para interactuar');return;
+      }
+      message('No hay espacio para abrir la puerta. Mueve el auto.');return;
+    }
+    const car=hubVehicles?.nearest(player.x,player.z);if(!car)return;
+    driving=car;keys={};jumpQueued=false;cameraSnap=true;yaw=targetYaw=car.yaw;pitch=targetPitch=-.12;
+    player.x=car.x;player.z=car.z;player.vx=player.vz=player.speed=0;
+    $3(rootId)?.classList.add('is-driving');message('W acelerar · S frenar / retroceder · A/D girar · ESPACIO freno · F bajar');
+  }
+
+  function updateDriving(dt) {
+    if(!inHub||!hubVehicles)return;
+    const paused=hubDirectoryOpen||checkoutOpen||adminOpen||newsOpen||productInspectOpen;
+    const input={throttle:paused?0:(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer:paused?0:(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0),brake:paused||Boolean(keys.Space)};
+    hubVehicles.update(dt,{active:driving,input,player,people:hubActors.map(a=>a.obj.position),bounds:hubBounds});
+    if(driving){player.x=driving.x;player.z=driving.z;player.speed=0;if(Math.abs(driving.speed)>1){targetYaw+=Math.atan2(Math.sin(driving.yaw-targetYaw),Math.cos(driving.yaw-targetYaw))*(1-Math.exp(-dt*2));}}
+    const hud=$3('simDriveHud');if(hud){hud.hidden=!driving;if(driving){$3('simDriveSpeed').textContent=String(Math.round(Math.abs(driving.speed)*3.6)).padStart(2,'0');$3('simDriveGear').textContent=driving.speed<-.2?'R':Math.abs(driving.speed)<.2?'N':'D';}}
+  }
+
   function updateHubActors(dt) {
     if(!inHub)return;
     for(const actor of hubActors) {
       const obj=actor.obj;
-      if(!running||hubDirectoryOpen||actor.pause>0||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
+      if(!running||hubDirectoryOpen||actor.pause>0||hubVehicles?.occupied(obj.position.x,obj.position.z,.8)||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
       if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
       const target=actor.route[0];if(!target){actor.index=(actor.index+1)%actor.patrol.length;continue;}
       Object.assign(actor.state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
@@ -2666,6 +2703,18 @@
 
   function updateGameplayCamera(dt) {
     if(!camera)return;
+    if(driving){
+      playerAvatar.visible=false;
+      const focus=new THREE.Vector3(driving.x,1.15,driving.z);
+      const distance=6.8+Math.abs(driving.speed)*.1;
+      const desired=new THREE.Vector3(driving.x+Math.sin(yaw)*distance,3.6-Math.sin(pitch)*2,driving.z+Math.cos(yaw)*distance);
+      for(let t=.08;t<=1;t+=.035){const x=focus.x+(desired.x-focus.x)*t,z=focus.z+(desired.z-focus.z)*t;if(hubWorld.colliders.some(c=>x>c.minX-.2&&x<c.maxX+.2&&z>c.minZ-.2&&z<c.maxZ+.2)){desired.lerpVectors(focus,desired,Math.max(.06,t-.05));break;}}
+      if(cameraSnap)camera.position.copy(desired);else camera.position.lerp(desired,1-Math.exp(-6*dt));
+      camera.lookAt(focus);camera.fov+=(62+Math.abs(driving.speed)*.55-camera.fov)*(1-Math.exp(-dt*4));camera.updateProjectionMatrix();cameraSnap=false;
+      hubWorld.sky?.position.copy(camera.position);
+      if(sunLight){sunLight.target.position.set(player.x,0,player.z);sunLight.position.set(player.x-28,42,player.z+24);sunLight.target.updateMatrixWorld();}
+      return;
+    }
     if(playerAvatar){
       playerAvatar.visible=cameraMode==='third';playerAvatar.position.set(player.x,Math.max(.025,player.y-player.baseY+.025),player.z);
       if(player.speed>.12){const desired=Math.atan2(player.vx,player.vz),turn=Math.atan2(Math.sin(desired-playerAvatar.rotation.y),Math.cos(desired-playerAvatar.rotation.y));playerAvatar.rotation.y+=turn*(1-Math.exp(-12*dt));}
@@ -2692,7 +2741,7 @@
     if(sunLight){sunLight.target.position.set(player.x,0,player.z);sunLight.position.set(player.x-28,42,player.z+24);sunLight.target.updateMatrixWorld();}
   }
 
-  const SKY_DAY_HEX = 0xc6d9e2, SKY_DUSK_HEX = 0x7f8d9e;
+  const SKY_DAY_HEX = 0xeeb39b, SKY_DUSK_HEX = 0x806893;
   let skyDayColor = null, skyDuskColor = null;
 
   function updateDayLighting(dt) {
@@ -2702,6 +2751,7 @@
     const dusk = Math.max(0, (progress - 0.62) / 0.38);
     scene.background.lerpColors(skyDayColor, skyDuskColor, dusk * 0.82);
     if (scene.fog) scene.fog.color.copy(scene.background);
+    if(hubWorld?.sky){hubWorld.sky.material.uniforms.horizon.value.copy(scene.background);hubWorld.sky.material.uniforms.top.value.setRGB(.28-dusk*.12,.36-dusk*.18,.65-dusk*.22);}
     if (sunLight) {
       sunLight.intensity = 2.7 - dusk * 1.1;
       sunLight.color.setRGB(1.0, 0.94 - dusk * 0.10, 0.84 - dusk * 0.18);
@@ -2713,6 +2763,7 @@
     if(inHub&&hubWorld){
       if(x<hubBounds.minX||x>hubBounds.maxX||z<hubBounds.minZ||z>hubBounds.maxZ)return true;
       if(hubWorld.colliders.some(c=>x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius))return true;
+      if(hubVehicles?.occupied(x,z,player.radius))return true;
       return hubActors.some(a=>Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27);
     }
     if (x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ) return true;
@@ -2725,13 +2776,14 @@
 
   function updatePlayer(dt) {
     if (checkoutOpen || productInspectOpen || hubDirectoryOpen || adminOpen || newsOpen) { player.vx=player.vz=player.speed=0; return; }
+    if(driving){jumpQueued=false;return;}
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
     const inputLen = Math.hypot(forward, side);
     const sprinting = Boolean((keys.ShiftLeft || keys.ShiftRight) && inputLen > 0);
     const maxSpeed = sprinting ? 5.2 : 2.65;
-    const accel = sprinting ? 24 : 20;
-    const decel = 13;
+    const accel = player.grounded ? (sprinting ? 8 : 12) : 2.4;
+    const decel = player.grounded ? 15 : 1.2;
 
     let desiredX = 0, desiredZ = 0;
     if (inputLen > 0) {
@@ -2749,8 +2801,8 @@
     const previousX=player.x,previousZ=player.z;
     const nx = player.x + player.vx * dt;
     const nz = player.z + player.vz * dt;
-    if (!collision(nx, player.z)) player.x = nx; else player.vx *= -0.08;
-    if (!collision(player.x, nz)) player.z = nz; else player.vz *= -0.08;
+    if (!collision(nx, player.z)) player.x = nx; else player.vx = 0;
+    if (!collision(player.x, nz)) player.z = nz; else player.vz = 0;
     const travelled=Math.hypot(player.x-previousX,player.z-previousZ);
     player.speed=travelled/Math.max(.001,dt);
     if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
@@ -2835,6 +2887,8 @@
     const p = $3('sim3dPrompt');
     const it = nearestInteractable();
     if (!p) return;
+    const vehicle=inHub&&hubVehicles?.nearest(player.x,player.z);
+    if(driving||vehicle){p.replaceChildren();const key=document.createElement('kbd');key.textContent='F';p.append(key,driving?' Bajar del auto · detente primero':' Conducir SIDE Cruiser');p.classList.add('show');return;}
     if(hubDirectoryOpen){p.classList.remove('show');return;}
     if(it?.type.startsWith('hub')){p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` ${it.label}`);p.classList.add('show');return;}
     if (it?.type === 'mona') {
@@ -2879,6 +2933,7 @@
   }
 
   function interact() {
+    if(driving)return;
     if(!running||hubDirectoryOpen)return;
     const it = nearestInteractable();
     if (!it) return;
@@ -2952,6 +3007,7 @@
       yaw += (targetYaw - yaw) * (1 - Math.exp(-24 * dt));
       pitch += (targetPitch - pitch) * (1 - Math.exp(-24 * dt));
       updatePlayer(dt);
+      updateDriving(dt);
       updateGameplayCamera(dt);
       updateHubActors(dt);
       if (!gameSession?.shiftEnded) {
@@ -3012,6 +3068,7 @@
       if (productInspectOpen && e.code === 'Escape') { closeProductInspect(); e.preventDefault(); return; }
       if (e.code === 'Space') { jumpQueued = true; e.preventDefault(); }
       if (e.code === 'KeyE') interact();
+      if(e.code==='KeyF'&&!e.repeat&&running){toggleDriving();e.preventDefault();}
       if(e.code==='KeyV'&&!e.repeat&&running)setCameraMode(cameraMode==='third'?'first':'third');
       if (e.code === 'Escape') document.exitPointerLock?.();
     });
@@ -3030,6 +3087,9 @@
     });
     $3('simTouchInteract')?.addEventListener('pointerdown',event=>{event.preventDefault();if(running)interact();});
     $3('simTouchJump')?.addEventListener('pointerdown',event=>{event.preventDefault();if(running)jumpQueued=true;});
+    $3('simTouchDrive')?.addEventListener('click',toggleDriving);
+    $3('simTouchJump')?.addEventListener('pointerdown',()=>{if(driving)keys.Space=true;});
+    for(const event of ['pointerup','pointercancel','pointerleave'])$3('simTouchJump')?.addEventListener(event,()=>{keys.Space=false;});
     $3('inspectCloseBtn')?.addEventListener('click', closeProductInspect);
     $3('payCashBtn')?.addEventListener('click',()=>{checkoutPayment='cash';$3('payCashBtn').classList.add('active');$3('payCardBtn').classList.remove('active');});
     $3('payCardBtn')?.addEventListener('click',()=>{checkoutPayment='card';$3('payCardBtn').classList.add('active');$3('payCashBtn').classList.remove('active');});
@@ -3241,6 +3301,7 @@
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:businessState?.exploredHub||[],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
+      driving:driving?{speed:driving.speed,yaw:driving.yaw}:null,vehicles:hubVehicles?.cars.map(c=>({x:c.x,z:c.z,speed:c.speed,traffic:c.traffic}))||[],
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;document.exitPointerLock?.();stopAmbient();}
