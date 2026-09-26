@@ -89,7 +89,9 @@ const seed = {
         companySummaryRound='1';renderDecisionCategory();
       });
       const oldData=await page.evaluate(()=>({key:cycleQA.inventoryKey(),data:localStorage.getItem(cycleQA.inventoryKey())}));
-      await page.evaluate(round=>localStorage.setItem('SIDE_ACTIVE_ROUND',String(round)),round);
+      // This local fixture bypasses login, so no student polling loop is started.
+      // Deliver the same tick that a connected student's timer receives.
+      await page.evaluate(round=>{localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));studentConnected=true;tickStudentGame();},round);
       await page.waitForFunction(round=>lastObservedRound===round && SIDE3D.diagnostics().session===null,round);
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().running),false);
       assert.equal(await page.locator('#decisionMenu').isVisible(),true);

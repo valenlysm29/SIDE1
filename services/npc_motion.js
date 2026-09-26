@@ -5,6 +5,8 @@ const TAU=Math.PI*2;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
+const STANCE=.60;
+const IDENTITY=new THREE.Quaternion(),UP=new THREE.Vector3(0,1,0);
 let shadowGeometry,shadowMaterial;
 function contactShadow() {
   if(!shadowMaterial) {
@@ -43,32 +45,45 @@ export function createNpc(template, kind) {
   avatar.traverse(node=>{if(node.isBone)bones[node.name]=node});
   group.name=kind;
   const rest={};for(const [name,bone] of Object.entries(bones))rest[name]=bone.position.clone();
-  group.userData={modelKind:kind,modelAvatar:avatar,motion:{bones,rest,profile:template.profile,phase:0,blend:0,pivotPhase:0,pivotBlend:0,lastYaw:null,time:0,lastPosition:null,distance:0,speed:0}};
+  // A stable offset keeps a crowd from breathing and looking around in unison.
+  const seed=[...kind].reduce((v,c)=>(v*31+c.charCodeAt(0))%997,0),variation=(seed*137%997)/997;
+  const feet={};
+  for(const side of ['L','R'])feet[side]={anchor:new THREE.Vector3(),release:new THREE.Vector3(),target:new THREE.Vector3(),planted:false,phase:0,yaw:0};
+  group.userData={modelKind:kind,modelAvatar:avatar,motion:{bones,rest,profile:template.profile,phase:0,blend:0,pivotPhase:0,pivotBlend:0,lastYaw:null,time:variation*TAU,lastPosition:null,distance:0,speed:0,pace:0,turnRate:0,feet,
+    scratch:{target:new THREE.Vector3(),direction:new THREE.Vector3(),bend:new THREE.Vector3(),knee:new THREE.Vector3(),lower:new THREE.Vector3(),axis:new THREE.Vector3(),inverse:new THREE.Quaternion(),upper:new THREE.Quaternion(),shin:new THREE.Quaternion(),sole:new THREE.Quaternion()}}};
   animateNpc(group,1/60,false);
   return group;
 }
 
 export function resetMotion(group) {
   const m=group.userData.motion;
-  if(m){m.lastPosition=null;m.lastYaw=null;m.blend=0;m.pivotBlend=0;m.pivotPhase=0;m.phase=0;m.speed=0;m.distance=0}
+  if(m){m.lastPosition=null;m.lastYaw=null;m.blend=0;m.pivotBlend=0;m.pivotPhase=0;m.phase=0;m.speed=0;m.pace=0;m.turnRate=0;m.distance=0;for(const foot of Object.values(m.feet)){foot.planted=false;foot.phase=0}}
 }
 
-// Two-bone sagittal IK. Rest axes follow the supplied pose; feet counter-rotate
-// against hips/knees so the soles stay level during the support part of a step.
-function legIK(m,side,footZ,lift,blend) {
-  const b=m.bones, r=m.rest, thigh=b['Thigh'+side], shin=b['Shin'+side], foot=b['Foot'+side];
-  const upper=r['Shin'+side], lower=r['Foot'+side];
-  const l1=Math.hypot(upper.y,upper.z),l2=Math.hypot(lower.y,lower.z);
-  const dy=m.profile.ankle*m.profile.height+lift-(b.Hips.position.y+thigh.position.y);
-  const dz=footZ, length=clamp(Math.hypot(dy,dz),.001,l1+l2-.0001);
-  const forward=Math.atan2(dz,-dy), bend=Math.acos(clamp((l1*l1+length*length-l2*l2)/(2*l1*length),-1,1));
-  const upperAngle=forward+bend;
-  const kneeY=-Math.cos(upperAngle)*l1,kneeZ=Math.sin(upperAngle)*l1;
-  const lowerAngle=Math.atan2(dz-kneeZ,-(dy-kneeY));
-  const hipAngle=-upperAngle-Math.atan2(-upper.z,-upper.y);
-  const kneeAngle=-lowerAngle-Math.atan2(-lower.z,-lower.y)-hipAngle;
-  thigh.rotation.x=wrap(hipAngle)*blend;shin.rotation.x=wrap(kneeAngle)*blend;
-  foot.rotation.x=-(thigh.rotation.x+shin.rotation.x);
+// Solve the complete leg in 3D. This compensates lateral weight transfer and
+// steering, rather than forcing every knee/ankle into one sagittal plane.
+function legIK(m,side,target,blend,soleYaw=0,solePitch=0) {
+  const b=m.bones,r=m.rest,s=m.scratch,thigh=b['Thigh'+side],shin=b['Shin'+side],foot=b['Foot'+side];
+  const upper=r['Shin'+side],lower=r['Foot'+side],l1=upper.length(),l2=lower.length();
+  s.inverse.copy(b.Hips.quaternion).invert();
+  s.target.copy(target).sub(b.Hips.position).applyQuaternion(s.inverse).sub(thigh.position);
+  const length=clamp(s.target.length(),.001,l1+l2-.0001);
+  s.direction.copy(s.target).normalize();
+  s.bend.set(0,0,1).addScaledVector(s.direction,-s.direction.z).normalize();
+  const along=(l1*l1+length*length-l2*l2)/(2*length);
+  s.knee.copy(s.direction).multiplyScalar(along).addScaledVector(s.bend,Math.sqrt(Math.max(0,l1*l1-along*along)));
+  s.upper.setFromUnitVectors(s.axis.copy(upper).normalize(),s.lower.copy(s.knee).normalize());
+  s.inverse.copy(s.upper).invert();
+  s.lower.copy(s.direction).multiplyScalar(length).sub(s.knee).applyQuaternion(s.inverse).normalize();
+  s.shin.setFromUnitVectors(s.axis.copy(lower).normalize(),s.lower);
+  thigh.quaternion.copy(IDENTITY).slerp(s.upper,blend);
+  shin.quaternion.copy(IDENTITY).slerp(s.shin,blend);
+  // Preserve the planted sole's heading through a turn and keep it flat on the
+  // floor. Only the free foot dorsiflexes while it clears the ground.
+  s.sole.copy(b.Hips.quaternion).multiply(thigh.quaternion).multiply(shin.quaternion).invert();
+  s.inverse.setFromAxisAngle(UP,soleYaw*blend);s.sole.multiply(s.inverse);
+  s.inverse.setFromAxisAngle(s.axis.set(1,0,0),solePitch*blend);
+  foot.quaternion.copy(s.sole).multiply(s.inverse);
 }
 
 export function animateNpc(group,dt,moving=true) {
@@ -77,38 +92,73 @@ export function animateNpc(group,dt,moving=true) {
   const p=group.position;
   const distance=m.lastPosition?Math.hypot(p.x-m.lastPosition.x,p.z-m.lastPosition.z):0;
   // Repositioning/pooling is not walking. It must not advance the gait.
-  const travelled=distance<.5&&moving?distance:0;
+  const teleported=distance>=.5;
+  const travelled=!teleported&&moving?distance:0;
+  if(teleported)for(const foot of Object.values(m.feet)){foot.planted=false;foot.release.set(0,0,0)}
   m.lastPosition={x:p.x,z:p.z};m.distance+=travelled;m.time+=dt;
   m.speed=travelled/dt;
-  const turn=m.lastYaw===null?0:Math.abs(wrap(group.rotation.y-m.lastYaw));m.lastYaw=group.rotation.y;
-  m.pivotPhase=(m.pivotPhase+turn/2.8)%1;
-  const pivotTarget=clamp(turn/dt/2.6,0,1)*(m.speed<.1?1:0);
+  const signedTurn=m.lastYaw===null?0:wrap(group.rotation.y-m.lastYaw),turn=Math.abs(signedTurn);m.lastYaw=group.rotation.y;
+  m.turnRate+=(clamp(signedTurn/dt,-3,3)-m.turnRate)*(1-Math.exp(-dt*8));
+  m.pace+=(m.speed-m.pace)*(1-Math.exp(-dt*6));
+  m.pivotPhase=(m.pivotPhase+turn/1.6)%1;
+  const pivotTarget=clamp(turn/dt/1.5,0,1)*(m.speed<.1?1:0);
   m.pivotBlend+=(pivotTarget-m.pivotBlend)*(1-Math.exp(-dt*12));
   const target=m.speed>.025?1:0;
-  m.blend+=(target-m.blend)*(1-Math.exp(-dt*(target?10:13)));
+  m.blend+=(target-m.blend)*(1-Math.exp(-dt*(target?10:9)));
   const stride=.93*m.profile.height/1.75;
   m.phase=(m.phase+travelled/stride)%1;
-  const b=m.bones, r=m.rest, h=m.profile.height, w=m.blend;
+  const b=m.bones,r=m.rest,h=m.profile.height,w=m.blend,pivot=m.pivotBlend*(1-w),weight=Math.max(w,pivot);
+  const cycle=w>.15?m.phase:m.pivotPhase, gait=Math.sin(m.phase*TAU),pace=clamp(m.pace/.95,.4,1.3);
   for(const [name,bone] of Object.entries(b)){bone.position.copy(r[name]);bone.rotation.set(0,0,0)}
-  b.Hips.position.y-=h*(.030+.004*Math.cos(m.phase*TAU*2))*w+.008*m.pivotBlend;
+  b.Hips.position.y-=h*(.030+.004*Math.cos(m.phase*TAU*2))*w+.016*pivot;
+  b.Hips.position.x-=h*.009*gait*w;
+  b.Hips.rotation.y=.022*gait*w;
+  b.Hips.rotation.z=.012*gait*w;
+  group.updateMatrixWorld(true);
   for(const [side,offset] of [['L',0],['R',.5]]) {
-    const phase=(m.phase+offset)%1, stance=.60;
-    let z,lift=0;
-    if(phase<stance)z=stride*(stance*.5-phase);
-    else {const t=(phase-stance)/(1-stance);z=stride*stance*(smooth(t)-.5);lift=.070*h/1.75*Math.sin(Math.PI*t)**2}
-    const pivot=m.pivotBlend*(1-w),weight=Math.max(w,pivot);
-    const pivotLift=.035*Math.max(0,Math.sin((m.pivotPhase+offset)*TAU))**2*pivot;
-    legIK(m,side,z*(weight?w/weight:0),lift+ pivotLift,weight);
-    const sign=side==='L'?-1:1;
+    const phase=(cycle+offset)%1,foot=m.feet[side],sign=side==='L'?-1:1,t=(phase-STANCE)/(1-STANCE);
+    const travelWeight=weight?w/weight:0,x=m.profile.legX*h*sign,ankle=m.profile.ankle*h;
+    const footTarget=foot.target.set(x,ankle,0);
+    let soleYaw=0,solePitch=0;
+    if(phase<STANCE){
+      footTarget.z=stride*(STANCE*.5-phase)*travelWeight;
+      if(!foot.planted||phase<foot.phase){
+        foot.anchor.copy(footTarget);group.localToWorld(foot.anchor);foot.yaw=group.rotation.y;foot.planted=true;
+      }
+      // World-space contact survives both translation and a change of heading.
+      group.worldToLocal(footTarget.copy(foot.anchor));
+      footTarget.y=ankle;
+      soleYaw=clamp(wrap(foot.yaw-group.rotation.y),-.55,.55);
+    }else{
+      if(foot.planted){
+        group.worldToLocal(foot.release.copy(foot.anchor));
+        foot.release.x-=x;foot.release.y-=ankle;foot.release.z+=stride*STANCE*.5*travelWeight;
+        foot.planted=false;
+      }
+      footTarget.z=stride*STANCE*(smooth(t)-.5)*travelWeight;
+      footTarget.addScaledVector(foot.release,1-smooth(t));
+      footTarget.y=ankle+(h*.047*travelWeight+h*.032*(1-travelWeight))*Math.sin(Math.PI*t)**2;
+      solePitch=-.09*Math.sin(Math.PI*t);
+    }
+    foot.phase=phase;
+    if(weight<.001){foot.planted=false;foot.release.set(0,0,0)}
+    legIK(m,side,footTarget,weight,soleYaw,solePitch);
     if(m.profile.freeArms.includes(sign)) {
-      b['UpperArm'+side].rotation.x=Math.sin(phase*TAU)*.23*w;
-      b['Forearm'+side].rotation.x=-.05*w-.08*Math.max(0,Math.sin(phase*TAU))*w;
+      const swing=Math.cos((m.phase+offset)*TAU),arm=b['UpperArm'+side],forearm=b['Forearm'+side];
+      arm.rotation.x=swing*.33*pace*w;
+      arm.rotation.z=sign*(.022*w+.006*Math.sin(m.time*1.35));
+      forearm.rotation.x=(-.09-.13*Math.max(0,-swing))*w;
+      b['Hand'+side].rotation.x=.035*Math.sin((m.phase+offset)*TAU-.4)*w;
     }
   }
-  b.Spine.rotation.y=Math.sin(m.phase*TAU)*.026*w;
-  b.Chest.rotation.y=-Math.sin(m.phase*TAU)*.045*w;
-  b.Chest.rotation.x=.006*Math.sin(m.time*1.8)+.018*w;
-  b.Head.rotation.y=.018*Math.sin(m.time*.63)*(1-w);
-  b.Head.rotation.x=-.006*Math.sin(m.time*1.8)-.009*w;
+  const breath=Math.sin(m.time*1.8);
+  b.Spine.rotation.y=-gait*.030*w;
+  b.Spine.rotation.z=-b.Hips.rotation.z*.65;
+  b.Chest.rotation.y=-gait*.048*w+m.turnRate*.018;
+  b.Chest.rotation.x=.008*breath+.026*w;
+  b.Chest.position.y+=h*.0013*breath;
+  b.Head.rotation.y=.040*Math.sin(m.time*.63)*(1-w)+clamp(m.turnRate*.065,-.16,.16);
+  b.Head.rotation.x=-.007*breath-.014*w;
+  b.Head.rotation.z=-b.Hips.rotation.z*.35;
   group.updateMatrixWorld(true);
 }

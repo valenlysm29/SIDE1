@@ -1,4 +1,4 @@
-import {loadTemplate,createNpc} from './npc_motion.js';
+import {loadTemplate,createNpc} from './npc_motion.js?v=20260925';
 /* Mona uses the shared articulated rig; the original remains available for comparison. */
 export async function loadMonaTemplate(THREE, GLTFLoader, config) {
   if(!config.model.includes('.original.glb'))return loadTemplate(GLTFLoader,config.model);

@@ -30,6 +30,13 @@
   let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
   const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
+  let hubWorld = null, businessWorld = null, hubActors = [], playerAvatar = null;
+  let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
+  let currentInterior = 'store', hubReturnPoint = null, cameraSnap = true;
+  let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
+  const HUB_OFFSET = 150;
+  const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
+  const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
 
   const PRODUCTS = [
     { id: 'esencial', name: 'Bolso Básico', price: 75, color: 0xc46b59, accent: '#ff9b89' },
@@ -490,12 +497,13 @@
 
   function clearSessionOverlays() {
     checkoutOpen = checkoutScanned = productInspectOpen = adminOpen = newsOpen = false;
+    hubDirectoryOpen = false;
     controlsOpenedFromHelp = false;
     keys = {};
     jumpQueued = false;
     clearTimeout(showEvent.t);
     ['simCheckout', 'simProductInspect', 'simAdmin', 'simNewsPanel', 'sim3dSummary',
-      'sim3dStart', 'simTutorial3d', 'simEventToast'].forEach(id => $3(id)?.classList.add('hidden'));
+      'sim3dStart', 'simTutorial3d', 'simEventToast', 'simHubDirectory'].forEach(id => $3(id)?.classList.add('hidden'));
   }
 
   function syncSessionContext() {
@@ -664,7 +672,7 @@
   async function loadMonaModel() {
     if (monaTemplate) return true;
     try {
-      monaModule = await import('./services/mona_npc.js');
+      monaModule = await import('./services/mona_npc.js?v=20260925');
       monaTemplate = await monaModule.loadMonaTemplate(THREE, GLTFLoader, CONFIG.NPCS.mona);
       monaLoadError = '';
       return true;
@@ -676,7 +684,7 @@
   }
 
   async function loadSuppliedNpcs() {
-    [npcMotion,npcNavigation,npcNames] = await Promise.all([import('./services/npc_motion.js'),import('./services/npc_navigation.mjs'),import('./services/npc_names.js')]);
+    [npcMotion,npcNavigation,npcNames] = await Promise.all([import('./services/npc_motion.js?v=20260925'),import('./services/npc_navigation.mjs'),import('./services/npc_names.js')]);
     await Promise.all(['chico1','chico2','chico3'].map(async id => {
       try { suppliedTemplates[id]=await npcMotion.loadTemplate(GLTFLoader,CONFIG.NPCS[id].model); }
       catch(error) { suppliedErrors[id]=error.message; console.warn(`No se pudo cargar ${id}; se usará el personaje de respaldo.`,error); }
@@ -998,7 +1006,7 @@
       npcMotion.animateNpc(g,dt,moving);return;
     }
     if(g.userData?.mixer){
-      const now=performance.now()/1000,delta=Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));g.userData.lastAnimAt=now;
+      const now=performance.now()/1000,delta=frameDt??Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));g.userData.lastAnimAt=now;
       const next=moving?'walk':'idle';if(next!==g.userData.currentAction){const actions=g.userData.actions||{},previous=actions[g.userData.currentAction],current=actions[next];previous?.fadeOut(.22);current?.reset().fadeIn(.22).play();g.userData.currentAction=next;}
       g.userData.mixer.update(delta);return;
     }
@@ -1260,11 +1268,14 @@
   function setGraphicsQuality(mode) {
     perfMode=mode; businessState.graphics=mode; saveBusinessState();
     const map={low:.72,medium:1.0,high:Math.min(devicePixelRatio,1.35),auto:1.05}; renderScale=map[mode]||1.05;
-    renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale)); resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
+    renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale));
+    if(renderer&&sunLight){renderer.shadowMap.enabled=mode!=='low';sunLight.castShadow=mode!=='low';renderer.shadowMap.needsUpdate=true;}
+    resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
 
   const TUTORIAL_STEPS=[
-    [`Bienvenida a ${companyName()}`,'Muévete con WASD y mira con el mouse. La tienda abre y cierra por jornadas.'],
+    [`Bienvenida a ${companyName()}`,'Haz clic en el mundo para mirar con el mouse. WASD para caminar, Shift para correr y V para cambiar de cámara.'],
+    ['Explora la plaza','Sigue la flecha hasta las tres entradas y pulsa E. El kiosco central permite elegir un distrito; PLAZA te devuelve al exterior.'],
     ['Atiende la caja','Acércate al POS y presiona E. Escanea el producto y después cobra.'],
     ['Controla el stock','Acércate al almacén y repón los exhibidores. El personal también ayuda automáticamente.'],
     ['Administra la empresa','Busca la computadora de administración. Allí cambias precios, pides stock y amplías la tienda.'],
@@ -1285,9 +1296,11 @@
 
   function updateMinimap() {
     const dot=$3('miniPlayer'); if(!dot) return;
-    const nx=Math.max(0,Math.min(1,(player.x-bounds.minX)/(bounds.maxX-bounds.minX)));
-    const nz=Math.max(0,Math.min(1,(bounds.maxZ-player.z)/(bounds.maxZ-bounds.minZ)));
+    const area=inHub?hubBounds:bounds;
+    const nx=Math.max(0,Math.min(1,(player.x-area.minX)/(area.maxX-area.minX)));
+    const nz=Math.max(0,Math.min(1,inHub?(player.z-area.minZ)/(area.maxZ-area.minZ):(area.maxZ-player.z)/(area.maxZ-area.minZ)));
     dot.style.left=`${7+nx*86}%`; dot.style.top=`${7+nz*86}%`;
+    dot.style.rotate=`${-yaw*180/Math.PI}deg`;
   }
 
   function registerAnimatedActor(def) {
@@ -1454,25 +1467,28 @@
     scene.background = new THREE.Color(0x9bc4e5);
     scene.fog = new THREE.Fog(0x9bc4e5, 48, 105);
 
-    camera = new THREE.PerspectiveCamera(72, 1, .08, 180);
+    camera = new THREE.PerspectiveCamera(58, 1, .08, 300);
     camera.rotation.order = 'YXZ';
     player.x = 0; player.z = 11.5; player.y = player.baseY; player.vx = player.vz = player.vy = 0;
     yaw = 0; pitch = -.035; targetYaw = yaw; targetPitch = pitch;
 
     renderer = new THREE.WebGLRenderer({canvas:$3('side3dCanvas'),antialias:perfMode!=='low',powerPreference:'high-performance'});
     renderer.setPixelRatio(Math.min(devicePixelRatio, renderScale));
-    renderer.shadowMap.enabled = perfMode === 'high';
+    renderer.shadowMap.enabled = perfMode !== 'low';
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.06;
+    renderer.toneMappingExposure = 1.0;
 
-    hemiLight = new THREE.HemisphereLight(0xe7f5ff,0x58636d,1.7);
-    sunLight = new THREE.DirectionalLight(0xfff0d6,2.0);
+    hemiLight = new THREE.HemisphereLight(0xc6deff,0x807363,1.05);
+    sunLight = new THREE.DirectionalLight(0xffedcf,2.7);
     sunLight.position.set(18,24,14);
-    sunLight.castShadow = perfMode === 'high';
-    if (sunLight.castShadow) { sunLight.shadow.mapSize.set(1024,1024); sunLight.shadow.camera.left=-24; sunLight.shadow.camera.right=24; sunLight.shadow.camera.top=32; sunLight.shadow.camera.bottom=-18; }
-    scene.add(hemiLight,sunLight);
+    sunLight.castShadow = perfMode !== 'low';
+    sunLight.shadow.mapSize.set(perfMode==='high'?2048:1024,perfMode==='high'?2048:1024);
+    Object.assign(sunLight.shadow.camera,{left:-32,right:32,top:32,bottom:-32,near:1,far:130});
+    sunLight.shadow.camera.updateProjectionMatrix();
+    sunLight.shadow.normalBias=.025;sunLight.shadow.bias=-.00015;
+    scene.add(hemiLight,sunLight,sunLight.target);
 
     const addWall = (w,d,x,z) => {
       const wall=box(w,4.7,d,0x263746,x,2.35,z,.8,.04); scene.add(wall);
@@ -2503,7 +2519,180 @@
     entryDoorRight.position.x = 0.92 + entryDoorProgress * 0.82;
   }
 
-  const SKY_DAY_HEX = 0xa6c8ea, SKY_DUSK_HEX = 0x5c6f8d;
+  // The business simulation keeps its original coordinates and state. The outdoor
+  // hub is a separate walkable scene region with doors into those same interiors.
+  async function buildPlayableHub() {
+    businessWorld=new THREE.Group();businessWorld.name='BusinessInteriors';
+    for(const child of [...scene.children])if(![hemiLight,sunLight,sunLight.target].includes(child))businessWorld.add(child);
+    scene.add(businessWorld);
+    const {createHubWorld}=await import('./services/hub_world.js');
+    hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    try {
+      const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
+      const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
+      scene.environment=pmrem.fromScene(room,.06).texture;
+      scene.environmentIntensity=.3;room.dispose();pmrem.dispose();
+    } catch(error) {console.warn('Se conserva la iluminación directa del mundo.',error);}
+    // A continuous sky gradient, rendered as geometry; no background photograph.
+    const sky=new THREE.Mesh(new THREE.SphereGeometry(260,24,12),new THREE.ShaderMaterial({
+      side:THREE.BackSide,depthWrite:false,
+      uniforms:{top:{value:new THREE.Color(0x4d8fc4)},horizon:{value:new THREE.Color(0xd8e4e6)}},
+      vertexShader:'varying vec3 vDirection; void main(){vDirection=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+      fragmentShader:'uniform vec3 top;uniform vec3 horizon;varying vec3 vDirection;void main(){float h=pow(max(normalize(vDirection).y,0.0),0.55);gl_FragColor=vec4(mix(horizon,top,h),1.0);}'
+    }));
+    sky.name='ProceduralSky';sky.renderOrder=-1;sky.frustumCulled=false;scene.add(sky);
+    hubWorld.sky=sky;
+    const actorIds=['chico1','chico2','chico3'];
+    const fallbackRoutes=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
+    actorIds.forEach((id,i)=>{
+      const obj=person({execModel:id});obj.getObjectByName('NpcNameLabel')?.removeFromParent();
+      obj.userData.role='hub-pedestrian';
+      const patrol=hubWorld.patrolRoutes?.[i]?.map(p=>Array.isArray(p)?p:[p.x,p.z])||fallbackRoutes[i].map(([x,z])=>[x+HUB_OFFSET,z]);
+      obj.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(obj);
+      hubActors.push({obj,patrol,index:1,route:[],pause:i*.8,speed:.9+i*.07,state:{speed:0}});
+    });
+    playerAvatar=person({execModel:'casual',bodyScale:1});
+    playerAvatar.name='PlayerAvatar';playerAvatar.userData.modelKind='player';
+    playerAvatar.getObjectByName('NpcNameLabel')?.removeFromParent();scene.add(playerAvatar);
+    hubWaypoint=new THREE.Group();hubWaypoint.name='Next destination';
+    const waypointMaterial=new THREE.MeshBasicMaterial({color:0xf4cd78,transparent:true,opacity:.8,depthWrite:false});
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.045,6,40),waypointMaterial);ring.rotation.x=-Math.PI/2;ring.position.y=.07;
+    const arrow=new THREE.Mesh(new THREE.ConeGeometry(.2,.4,4),waypointMaterial);arrow.rotation.z=Math.PI;arrow.position.y=1.8;
+    hubWaypoint.add(ring,arrow);scene.add(hubWaypoint);
+    enterHub(false);
+  }
+
+  function refreshHubUI() {
+    const root=$3(rootId);root?.classList.toggle('in-hub',inHub);root?.classList.toggle('third-person',cameraMode==='third');
+    $3('simMinimap')?.classList.toggle('hub-map',inHub);
+    const label=inHub?'PLAZA SIDE':{store:'TIENDA',warehouse:'ALMACÉN',production:'PRODUCCIÓN'}[currentInterior];
+    if($3('simWorldLocation'))$3('simWorldLocation').textContent=`${label} · ${DISTRICTS[selectedDistrict]}`;
+    if($3('sim3dCameraBtn')){$3('sim3dCameraBtn').textContent=cameraMode==='third'?'CÁMARA · 3.ª':'CÁMARA · 1.ª';$3('sim3dCameraBtn').setAttribute('aria-pressed',String(cameraMode==='third'));}
+    document.querySelectorAll('[data-hub-district]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.hubDistrict===selectedDistrict)));
+    if($3('simHubSelected'))$3('simHubSelected').textContent=`Destino: ${DISTRICTS[selectedDistrict]}`;
+    updateHubObjective();
+    updateMinimap();
+  }
+
+  function updateHubObjective() {
+    if(!hubWorld)return;
+    const visited=businessState?.exploredHub||[];
+    const next=['store','production','warehouse'].find(id=>!visited.includes(id))||'store';
+    const destination=hubWorld.entrances.find(e=>e.id===next);
+    if(!destination)return;
+    const distance=Math.round(Math.hypot(destination.x-player.x,destination.z-player.z));
+    const names={store:'la tienda',production:'producción',warehouse:'el almacén'};
+    if($3('simHubObjective'))$3('simHubObjective').textContent=inHub?(visited.length<3?`CONOCE TU EMPRESA · ${visited.length}/3`:'TU TURNO · OPERA LA TIENDA'):'GESTIONA TU EMPRESA';
+    if($3('simHubDestination'))$3('simHubDestination').textContent=inHub?`Visita ${names[next]} · ${distance} m`:'E interactuar · PLAZA para salir';
+    if(hubWaypoint){hubWaypoint.visible=inHub&&distance>2;hubWaypoint.position.set(destination.x,0,destination.z);hubWaypoint.children[1].position.y=1.8+Math.sin(performance.now()*.003)*.12;}
+    if($3('simHubDirection')){$3('simHubDirection').hidden=!inHub;$3('simHubDirection').style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}
+  }
+
+  function positionPlayer(x,z,facing=0) {
+    Object.assign(player,{x,z,y:player.baseY,vx:0,vz:0,vy:0,speed:0,grounded:true,headBobX:0,headBobY:0});
+    yaw=targetYaw=facing;pitch=targetPitch=-.16;keys={};jumpQueued=false;cameraSnap=true;
+    if(playerAvatar){playerAvatar.position.set(x,.025,z);playerAvatar.rotation.y=facing+Math.PI;playerAvatar.userData.motion&&npcMotion.resetMotion(playerAvatar);}
+  }
+
+  function setWorldRegion(exterior) {
+    inHub=exterior;
+    if(businessWorld)businessWorld.visible=!inHub;
+    if(hubWorld)hubWorld.group.visible=inHub;
+    hubActors.forEach(a=>a.obj.visible=inHub);
+    scene.fog=new THREE.Fog(0xc6d9e2,inHub?72:38,inHub?180:100);
+    refreshHubUI();
+  }
+
+  function enterHub(announce=true) {
+    if(!hubWorld)return;
+    closeHubDirectory(false);
+    const spawn=hubReturnPoint||hubWorld.spawn;
+    setWorldRegion(true);positionPlayer(spawn.x,spawn.z,spawn.rotation||0);
+    updateGameplayCamera(1);refreshHubUI();
+    if(announce)message('Plaza SIDE · Camina hasta una entrada y pulsa E. V cambia la cámara.');
+  }
+
+  function enterHubInterior(id) {
+    const target={store:[0,7.3],warehouse:[8.4,-6.1],production:[-3.2,-2.4]}[id];
+    if(!target||!hubWorld)return;
+    const entrance=hubWorld.entrances.find(e=>e.id===id);
+    hubReturnPoint=entrance?{x:entrance.x,z:entrance.z+1.2,rotation:Math.PI}:null;
+    currentInterior=id;closeHubDirectory(false);setWorldRegion(false);
+    if(businessState){
+      businessState.exploredHub||=[];
+      if(!businessState.exploredHub.includes(id)){businessState.exploredHub.push(id);saveBusinessState();playSfx('start');}
+    }
+    positionPlayer(target[0],target[1]);updateGameplayCamera(1);
+    updateHubObjective();
+    message(businessState?.exploredHub?.length===3?'Empresa explorada. Tu siguiente reto: atender clientes y completar las misiones del turno.':'Pulsa E junto a productos, caja o terminales. El botón PLAZA te lleva al exterior.');
+  }
+
+  function setCameraMode(mode) {
+    cameraMode=mode==='first'?'first':'third';cameraSnap=true;
+    refreshHubUI();updateGameplayCamera(1);
+  }
+
+  function openHubDirectory() {
+    if(!inHub||!running)return;
+    hubDirectoryOpen=true;keys={};player.vx=player.vz=0;document.exitPointerLock?.();
+    $3('simHubDirectory')?.classList.remove('hidden');refreshHubUI();
+    document.querySelector(`[data-hub-district="${selectedDistrict}"]`)?.focus();
+  }
+
+  function closeHubDirectory(focus=true) {
+    hubDirectoryOpen=false;keys={};jumpQueued=false;$3('simHubDirectory')?.classList.add('hidden');
+    if(focus)$3('side3dCanvas')?.focus();
+  }
+
+  function selectHubDistrict(id) {
+    if(!Object.hasOwn(DISTRICTS,id))return;
+    selectedDistrict=id;hubWorld?.updateDistrict(id);refreshHubUI();
+  }
+
+  function updateHubActors(dt) {
+    if(!inHub)return;
+    for(const actor of hubActors) {
+      const obj=actor.obj;
+      if(!running||hubDirectoryOpen||actor.pause>0||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
+      if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
+      const target=actor.route[0];if(!target){actor.index=(actor.index+1)%actor.patrol.length;continue;}
+      Object.assign(actor.state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
+      const neighbors=hubActors.filter(a=>a!==actor).map(a=>a.obj.position).concat({x:player.x,z:player.z});
+      const moved=npcNavigation.advance(actor.state,{x:target[0],z:target[1]},dt,hubWorld.colliders,neighbors,actor.speed);
+      obj.position.set(actor.state.x,.025,actor.state.z);obj.rotation.y=actor.state.yaw;setPersonPose(obj,0,moved.distance>.00001,dt);
+      if(moved.arrived){actor.route.shift();if(!actor.route.length){actor.index=(actor.index+1)%actor.patrol.length;actor.pause=.7;}}
+    }
+  }
+
+  function updateGameplayCamera(dt) {
+    if(!camera)return;
+    if(playerAvatar){
+      playerAvatar.visible=cameraMode==='third';playerAvatar.position.set(player.x,Math.max(.025,player.y-player.baseY+.025),player.z);
+      if(player.speed>.12){const desired=Math.atan2(player.vx,player.vz),turn=Math.atan2(Math.sin(desired-playerAvatar.rotation.y),Math.cos(desired-playerAvatar.rotation.y));playerAvatar.rotation.y+=turn*(1-Math.exp(-12*dt));}
+      const action=playerAvatar.userData.actions?.walk;if(action)action.setEffectiveTimeScale(Math.max(.4,player.speed/1.5));
+      setPersonPose(playerAvatar,player.bob,player.grounded&&player.speed>.15,dt);
+    }
+    if(cameraMode==='first'){
+      const sideBobX=player.headBobX||0;
+      camera.position.set(player.x+Math.cos(yaw)*sideBobX,player.y+(player.headBobY||0),player.z-Math.sin(yaw)*sideBobX);
+      camera.rotation.set(pitch,yaw,0,'YXZ');
+    } else {
+      const orbitPitch=Math.max(-.85,Math.min(.32,pitch));
+      const focus=new THREE.Vector3(player.x,player.y-.22,player.z);
+      const desired=new THREE.Vector3(player.x+Math.sin(yaw)*5.2,Math.max(.55,focus.y+1.15-Math.sin(orbitPitch)*5.2),player.z+Math.cos(yaw)*5.2);
+      const blocks=inHub?hubWorld?.colliders||[]:[...colliders,...dynamicColliders];
+      // Shorten the chase camera before crossing a wall, even while the player turns.
+      for(let fraction=.08;fraction<=1;fraction+=.035){const x=focus.x+(desired.x-focus.x)*fraction,z=focus.z+(desired.z-focus.z)*fraction;
+        if(blocks.some(c=>x>c.minX-.18&&x<c.maxX+.18&&z>c.minZ-.18&&z<c.maxZ+.18)){desired.lerpVectors(focus,desired,Math.max(.04,fraction-.06));break;}}
+      if(cameraSnap)camera.position.copy(desired);else camera.position.lerp(desired,1-Math.exp(-12*dt));
+      camera.lookAt(focus);playerAvatar.visible=camera.position.distanceTo(focus)>1.05;
+    }
+    cameraSnap=false;
+    if(hubWorld?.sky)hubWorld.sky.position.copy(camera.position);
+    if(sunLight){sunLight.target.position.set(player.x,0,player.z);sunLight.position.set(player.x-28,42,player.z+24);sunLight.target.updateMatrixWorld();}
+  }
+
+  const SKY_DAY_HEX = 0xc6d9e2, SKY_DUSK_HEX = 0x7f8d9e;
   let skyDayColor = null, skyDuskColor = null;
 
   function updateDayLighting(dt) {
@@ -2514,15 +2703,18 @@
     scene.background.lerpColors(skyDayColor, skyDuskColor, dusk * 0.82);
     if (scene.fog) scene.fog.color.copy(scene.background);
     if (sunLight) {
-      sunLight.intensity = 2.1 - dusk * 1.15;
+      sunLight.intensity = 2.7 - dusk * 1.1;
       sunLight.color.setRGB(1.0, 0.94 - dusk * 0.10, 0.84 - dusk * 0.18);
-      sunLight.position.y = 22 - progress * 8;
-      sunLight.position.x = 16 - progress * 12;
     }
-    if (hemiLight) hemiLight.intensity = 1.95 - dusk * 0.65;
+    if (hemiLight) hemiLight.intensity = 1.05 - dusk * 0.3;
   }
 
   function collision(x, z) {
+    if(inHub&&hubWorld){
+      if(x<hubBounds.minX||x>hubBounds.maxX||z<hubBounds.minZ||z>hubBounds.maxZ)return true;
+      if(hubWorld.colliders.some(c=>x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius))return true;
+      return hubActors.some(a=>Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27);
+    }
     if (x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ) return true;
     for(const c of colliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
     for(const c of dynamicColliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
@@ -2532,12 +2724,12 @@
   }
 
   function updatePlayer(dt) {
-    if (checkoutOpen || productInspectOpen) { player.vx *= 0.7; player.vz *= 0.7; return; }
+    if (checkoutOpen || productInspectOpen || hubDirectoryOpen || adminOpen || newsOpen) { player.vx=player.vz=player.speed=0; return; }
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
     const inputLen = Math.hypot(forward, side);
     const sprinting = Boolean((keys.ShiftLeft || keys.ShiftRight) && inputLen > 0);
-    const maxSpeed = sprinting ? 6.8 : 4.4;
+    const maxSpeed = sprinting ? 5.2 : 2.65;
     const accel = sprinting ? 24 : 20;
     const decel = 13;
 
@@ -2554,10 +2746,14 @@
     player.vz += (desiredZ - player.vz) * blend;
     player.speed = Math.hypot(player.vx, player.vz);
 
+    const previousX=player.x,previousZ=player.z;
     const nx = player.x + player.vx * dt;
     const nz = player.z + player.vz * dt;
     if (!collision(nx, player.z)) player.x = nx; else player.vx *= -0.08;
     if (!collision(player.x, nz)) player.z = nz; else player.vz *= -0.08;
+    const travelled=Math.hypot(player.x-previousX,player.z-previousZ);
+    player.speed=travelled/Math.max(.001,dt);
+    if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
 
     if (jumpQueued && player.grounded) {
       player.vy = 5.1;
@@ -2581,10 +2777,21 @@
     player.headBobX = Math.cos(player.bob) * bobAmount * .45;
 
     if (camera) {
-      const targetFov = sprinting ? 78 : 74;
+      const targetFov = cameraMode==='third'?(sprinting?65:58):(sprinting?76:70);
       camera.fov += (targetFov - camera.fov) * (1 - Math.exp(-7 * dt));
       camera.updateProjectionMatrix();
     }
+  }
+
+  function playFootstep() {
+    if(!audioEnabled||!audioCtx||audioCtx.state!=='running')return;
+    if(!footstepBuffer){
+      footstepBuffer=audioCtx.createBuffer(1,Math.floor(audioCtx.sampleRate*.12),audioCtx.sampleRate);
+      const samples=footstepBuffer.getChannelData(0);for(let i=0;i<samples.length;i++)samples[i]=(Math.random()*2-1)*Math.exp(-i/samples.length*7);
+    }
+    const sound=audioCtx.createBufferSource(),filter=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();
+    sound.buffer=footstepBuffer;sound.playbackRate.value=.85+Math.random()*.2;filter.type='lowpass';filter.frequency.value=inHub?1100:650;
+    gain.gain.value=.055;sound.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);sound.onended=()=>{sound.disconnect();filter.disconnect();gain.disconnect();};sound.start();
   }
 
   function openProductInspect(productId) {
@@ -2610,11 +2817,17 @@
 
   function nearestInteractable() {
     let best = null, dist = 2.2;
+    if(inHub&&hubWorld){
+      const choices=[...hubWorld.entrances.map(e=>({...e,type:'hubDoor',label:`Entrar a ${e.name||e.id}`})),{...hubWorld.kiosk,type:'hubDirectory',label:'Elegir tienda por distrito'}];
+      for(const choice of choices){const d=Math.hypot(player.x-choice.x,player.z-choice.z);if(d<dist){dist=d;best=choice;}}
+      return best;
+    }
     interactables.forEach((it) => {
       const p = it.mesh.getWorldPosition(new THREE.Vector3());
       const d = Math.hypot(player.x - p.x, player.z - p.z);
       if (d < dist) { dist = d; best = it; }
     });
+    if(Math.hypot(player.x,player.z-8.3)<1.5)best={type:'hubReturn',label:'Salir a la plaza'};
     return best;
   }
 
@@ -2622,6 +2835,8 @@
     const p = $3('sim3dPrompt');
     const it = nearestInteractable();
     if (!p) return;
+    if(hubDirectoryOpen){p.classList.remove('show');return;}
+    if(it?.type.startsWith('hub')){p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` ${it.label}`);p.classList.add('show');return;}
     if (it?.type === 'mona') {
       p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` Hablar con ${CONFIG.NPCS.mona.name}`);
       p.classList.add('show');
@@ -2664,9 +2879,13 @@
   }
 
   function interact() {
+    if(!running||hubDirectoryOpen)return;
     const it = nearestInteractable();
     if (!it) return;
-    if (it.type === 'decisions') openDecisionsFrom3D();
+    if(it.type==='hubDoor')enterHubInterior(it.id);
+    else if(it.type==='hubDirectory')openHubDirectory();
+    else if(it.type==='hubReturn')enterHub();
+    else if (it.type === 'decisions') openDecisionsFrom3D();
     else if (it.type === 'register') openCheckout();
     else if (it.type === 'restock') restockDisplays(true);
     else if (it.type === 'product') openProductInspect(it.productId);
@@ -2717,7 +2936,8 @@
   function frame(now = performance.now()) {
     if (!initialized) return;
     syncSessionContext();
-    const dt = Math.min(0.04, clock.getDelta());
+    const elapsed = clock.getDelta();
+    const dt = Math.min(0.04, elapsed);
     const time = performance.now() * 0.001;
     if(visibilityPaused){raf=requestAnimationFrame(frame);return;}
     if (running) {
@@ -2732,10 +2952,8 @@
       yaw += (targetYaw - yaw) * (1 - Math.exp(-24 * dt));
       pitch += (targetPitch - pitch) * (1 - Math.exp(-24 * dt));
       updatePlayer(dt);
-      const sideBobX = player.headBobX || 0;
-      camera.position.set(player.x + Math.cos(yaw) * sideBobX, player.y + (player.headBobY || 0), player.z - Math.sin(yaw) * sideBobX);
-      camera.rotation.y = yaw;
-      camera.rotation.x = pitch;
+      updateGameplayCamera(dt);
+      updateHubActors(dt);
       if (!gameSession?.shiftEnded) {
         spawnNpc(now);
         triggerRandomEvent(now);
@@ -2748,21 +2966,21 @@
       updateEntryDoors(dt);
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
-      if (now - lastHudTick > 220) { updateHUD(); updateMinimap(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
+      if (now - lastHudTick > 220) { updateHUD(); updateMinimap();updateHubObjective(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
     } else {
       animateActors(time,dt);
       updateEntryDoors(dt);
       if (now - lastLightTick > 350) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastHudTick > 350) { updateHUD(); lastHudTick = now; }
     }
-    updateAdaptiveQuality(dt, now);
+    updateAdaptiveQuality(elapsed, now);
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);
   }
 
   function bind() {
     const canvas = $3('side3dCanvas');
-    canvas.addEventListener('click', () => { if (running) canvas.requestPointerLock?.(); });
+    canvas.addEventListener('click', () => { if (running&&!hubDirectoryOpen) canvas.requestPointerLock?.(); });
     let touchLookId=null,touchLookX=0,touchLookY=0;
     canvas.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'||!running)return;touchLookId=event.pointerId;touchLookX=event.clientX;touchLookY=event.clientY;canvas.setPointerCapture?.(event.pointerId);});
     canvas.addEventListener('pointermove',event=>{if(event.pointerId!==touchLookId||!running)return;const dx=event.clientX-touchLookX,dy=event.clientY-touchLookY;touchLookX=event.clientX;touchLookY=event.clientY;targetYaw-=dx*.006;targetPitch=Math.max(-1.3,Math.min(1.3,targetPitch-dy*.005));});
@@ -2776,6 +2994,11 @@
     });
     document.addEventListener('keydown', (e) => {
       if ($3(rootId)?.classList.contains('hidden')) return;
+      if(hubDirectoryOpen){
+        if(e.code==='Escape'){closeHubDirectory();e.preventDefault();}
+        if(e.code==='Tab'){const buttons=[...$3('simHubDirectory').querySelectorAll('button')],index=buttons.indexOf(document.activeElement);buttons[(index+(e.shiftKey?-1:1)+buttons.length)%buttons.length]?.focus();e.preventDefault();}
+        return;
+      }
       if(newsOpen){if(e.code==='Escape')closeNewsPanel();return;}
       if (adminOpen) { if(e.code==='Escape') closeAdmin(); return; }
       if (productInspectOpen && e.code !== 'Escape') return;
@@ -2789,9 +3012,18 @@
       if (productInspectOpen && e.code === 'Escape') { closeProductInspect(); e.preventDefault(); return; }
       if (e.code === 'Space') { jumpQueued = true; e.preventDefault(); }
       if (e.code === 'KeyE') interact();
+      if(e.code==='KeyV'&&!e.repeat&&running)setCameraMode(cameraMode==='third'?'first':'third');
       if (e.code === 'Escape') document.exitPointerLock?.();
     });
     document.addEventListener('keyup', (e) => { keys[e.code] = false; });
+    window.addEventListener('blur',()=>{keys={};jumpQueued=false;});
+    $3('sim3dCameraBtn')?.addEventListener('click',()=>setCameraMode(cameraMode==='third'?'first':'third'));
+    $3('sim3dHubBtn')?.addEventListener('click',()=>{if(running&&!checkoutOpen&&!adminOpen&&!newsOpen&&!productInspectOpen)enterHub();});
+    $3('simHubDirectoryClose')?.addEventListener('click',()=>closeHubDirectory());
+    document.querySelectorAll('[data-hub-district]').forEach(button=>button.addEventListener('click',()=>selectHubDistrict(button.dataset.hubDistrict)));
+    $3('simHubVisitStore')?.addEventListener('click',()=>{
+      enterHubInterior('store');
+    });
     document.querySelectorAll('[data-touch-key]').forEach(button=>{
       const code=button.dataset.touchKey;const down=event=>{event.preventDefault();keys[code]=true;button.setPointerCapture?.(event.pointerId);};const up=event=>{event.preventDefault();keys[code]=false;};
       button.addEventListener('pointerdown',down);button.addEventListener('pointerup',up);button.addEventListener('pointercancel',up);button.addEventListener('lostpointercapture',up);
@@ -2904,13 +3136,14 @@
     buildStaticWorld();
     buildAmbientNpcs();
     await initNavigation();
+    await buildPlayableHub();
     loadAudioSetting();
     clock = new THREE.Clock();
     bind();
     resize();
     rebuildDynamicWorld();
     syncSalesFromLedger();
-    camera.position.set(player.x, player.y, player.z);
+    updateGameplayCamera(1);
     initialized = true;
     frame();
     return true;
@@ -2968,6 +3201,7 @@
     keys = {};
     player.x = 0; player.z = 11.4; player.y = player.baseY; player.vx = 0; player.vz = 0; player.vy = 0; player.grounded = true; player.bob = 0; yaw = 0; pitch = -0.04; targetYaw = yaw; targetPitch = pitch;
     rebuildDynamicWorld();
+    hubReturnPoint=null;enterHub(false);
     syncSalesFromLedger();
     updateHUD();
     clock.getDelta();
@@ -3006,6 +3240,7 @@
       navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
+      hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:businessState?.exploredHub||[],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;document.exitPointerLock?.();stopAmbient();}

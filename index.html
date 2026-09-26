@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260924-observations">
-  <link rel="stylesheet" href="simulator3d.css?v=20260910-2">
+  <link rel="stylesheet" href="simulator3d.css?v=20260925-playable-hub">
+  <link rel="stylesheet" href="hub-world.css?v=20260925-playable-hub">
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
   <link rel="stylesheet" href="production.css?v=20260922-fixedbar">
@@ -223,10 +224,29 @@
 
     <div class="sim3d-actionbar">
       <button id="sim3dDecisionsBtn" class="sim3d-btn primary" type="button">TABLET DE DECISIONES</button>
+      <button id="sim3dHubBtn" class="sim3d-btn" type="button" aria-label="Volver a la plaza">PLAZA</button>
+      <button id="sim3dCameraBtn" class="sim3d-btn" type="button" aria-label="Cambiar cámara entre primera y tercera persona" aria-pressed="true">CÁMARA · 3.ª</button>
       <button id="sim3dMetricsBtn" class="sim3d-btn" type="button" aria-expanded="false">INDICADORES</button>
       <button id="sim3dHelpBtn" class="sim3d-btn" type="button">AYUDA</button>
       <button id="sim3dAudioBtn" class="sim3d-btn" type="button">AUDIO: ON</button>
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
+    </div>
+    <div class="sim-world-location"><span>DISTRITO COMERCIAL</span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div></div>
+    <div class="sim-world-controls"><kbd>WASD</kbd> Caminar <kbd>SHIFT</kbd> Correr <kbd>E</kbd> Interactuar <kbd>V</kbd> Cámara</div>
+    <div id="simHubDirectory" class="sim-hub-directory hidden" role="dialog" aria-modal="true" aria-labelledby="simHubDirectoryTitle">
+      <div class="sim-hub-directory-card">
+        <button id="simHubDirectoryClose" class="sim-hub-close" type="button" aria-label="Cerrar directorio">×</button>
+        <span class="sim-hub-eyebrow">DIRECTORIO SIDE</span>
+        <h2 id="simHubDirectoryTitle">¿A dónde vamos?</h2>
+        <p>Selecciona un distrito y visita la tienda.</p>
+        <div class="sim-hub-districts">
+          <button data-hub-district="miraflores" type="button" aria-pressed="true"><span>01</span><strong>MIRAFLORES</strong><i aria-hidden="true">↗</i></button>
+          <button data-hub-district="olivos" type="button" aria-pressed="false"><span>02</span><strong>LOS OLIVOS</strong><i aria-hidden="true">↗</i></button>
+          <button data-hub-district="sjl" type="button" aria-pressed="false"><span>03</span><strong>SAN JUAN DE LURIGANCHO</strong><i aria-hidden="true">↗</i></button>
+        </div>
+        <p id="simHubSelected" aria-live="polite">Destino: Miraflores</p>
+        <button id="simHubVisitStore" class="sim-hub-visit" type="button">VISITAR TIENDA <span aria-hidden="true">→</span></button>
+      </div>
     </div>
     <div class="sim3d-touch-controls" aria-label="Controles táctiles">
       <div class="sim3d-touch-pad">
@@ -259,6 +279,7 @@
           <div><strong>SHIFT</strong><span>Correr</span></div>
           <div><strong>SPACE</strong><span>Saltar</span></div>
           <div><strong>E</strong><span>Interactuar</span></div>
+          <div><strong>V</strong><span>Primera / tercera persona</span></div>
           <div><strong>ESC</strong><span>Liberar el cursor</span></div>
         </div>
         <label class="sim3d-start-choice"><input id="sim3dNeverShowControls" type="checkbox" checked> No volver a mostrar para esta empresa</label>
@@ -335,7 +356,7 @@
     </div>
 
     <div id="simTutorial3d" class="sim-tutorial3d hidden">
-      <span id="tutorialStepLabel">TUTORIAL 1/5</span>
+      <span id="tutorialStepLabel">TUTORIAL 1/6</span>
       <strong id="tutorialStepTitle">Abre tu tienda</strong>
       <p id="tutorialStepText">Recorre tu empresa y aprende las acciones principales.</p>
       <button id="tutorialNextBtn" type="button">SIGUIENTE</button>
@@ -503,7 +524,7 @@
   }
 </script>
 <script src="simulator3d-config.js?v=20260922-npcs2"></script>
-<script src="simulator3d.js?v=20260924-observations"></script>
+<script src="simulator3d.js?v=20260925-playable-hub"></script>
 <script src="production_model.js?v=20260910-2"></script>
 <script src="decision_review_model.js?v=20260910-2"></script>
 <script src="production_dop.js?v=20260917-visual"></script>
