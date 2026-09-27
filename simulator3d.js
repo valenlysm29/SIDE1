@@ -39,7 +39,8 @@
   let hubVehicles = null, driving = null;
   let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
   let cameraZoom = 5.2, lastCameraInputAt = 0;
-  let preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 5;
+  let preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 6;
+  let studioEnvironment = null, detailsPromise = null, detailsTimer = 0, detailsComplete = false;
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
@@ -669,16 +670,12 @@
     if (THREE && GLTFLoader && SkeletonUtils) return true;
     try {
       THREE = await import('three');
-      const optional = await Promise.allSettled([
+      const modules = await Promise.all([
         import('three/addons/loaders/GLTFLoader.js'),
-        import('three/addons/utils/SkeletonUtils.js'),
-        import('@recast-navigation/core'),
-        import('@recast-navigation/generators')
+        import('three/addons/utils/SkeletonUtils.js')
       ]);
-      if (optional[0].status === 'fulfilled') GLTFLoader = optional[0].value.GLTFLoader;
-      if (optional[1].status === 'fulfilled') SkeletonUtils = optional[1].value;
-      if (optional[2].status === 'fulfilled') recastCore = optional[2].value;
-      if (optional[3].status === 'fulfilled') recastGenerators = optional[3].value;
+      GLTFLoader = modules[0].GLTFLoader;
+      SkeletonUtils = modules[1];
       return true;
     } catch (err) {
       console.error(err);
@@ -696,25 +693,56 @@
     if (initialized) return true;
     if (!preloadPromise) {
       preloadPromise = (async () => {
-        publishLoading('Cargando motor 3D y navegación');
+        publishLoading('Cargando motor 3D');
         if (!await loadThree()) return false;
-        loadingLoaded = 1; publishLoading('Cargando personajes esenciales');
-        await Promise.all([loadExecModelTemplates(), loadSuppliedNpcs(), loadMonaModel()]);
-        loadingLoaded = 4; publishLoading('Recursos esenciales listos');
-        if (Object.values(execModelTemplates).some(model => !model)) await loadNpcModelTemplate();
-        loadingLoaded = 5; publishLoading('Mundo 3D listo para iniciar');
+        publishLoading('Cargando avatar y personajes de la ciudad',1);
+        await Promise.all([loadSuppliedNpcs(), loadMonaModel(), loadStartupEnvironment()]);
+        publishLoading('Recursos básicos listos',3);
         window.dispatchEvent(new CustomEvent('side3d:ready'));
         return true;
       })().catch(error => {
         console.error('SIDE: precarga 3D', error);
         publishLoading('No se pudo precargar el mundo 3D');
         return false;
-      });
+      }).then(ok=>{if(!ok)preloadPromise=null;return ok;});
     }
     return preloadPromise;
   }
 
   function loadingStatus() { return { phase: loadingPhase, loaded: loadingLoaded, total: loadingTotal }; }
+
+  async function loadStartupEnvironment() {
+    try {
+      const {loadStudioEnvironment}=await import('./services/startup_environment.mjs?v=20260927-entry');
+      studioEnvironment=await loadStudioEnvironment();
+    } catch(error) {console.warn('Se conserva la iluminación directa del mundo.',error);}
+  }
+
+  // Indoor staff are not needed to walk or drive in the city. Lobby preloading
+  // may request them early; cold entry schedules them after its first frame.
+  async function preloadDetails() {
+    if(detailsPromise)return detailsPromise;
+    detailsPromise=(async()=>{
+      if(!await preload())return false;
+      await loadExecModelTemplates();
+      if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
+      refreshBusinessCharacters();detailsComplete=true;return true;
+    })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
+      .then(ok=>{if(!ok)detailsPromise=null;return ok;});
+    return detailsPromise;
+  }
+
+  function refreshBusinessCharacters() {
+    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors){
+      const previous=actor.object,style=previous.userData.pendingCharacterStyle;
+      if(!style||!execModelTemplates[style.execModel])continue;
+      const replacement=person(style);
+      replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
+      replacement.visible=previous.visible;replacement.name=previous.name;replacement.userData.role=previous.userData.role;
+      replacement.getObjectByName('NpcNameLabel')?.removeFromParent();
+      room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
+    }
+  }
 
   async function loadNpcModelTemplate() {
     if(npcModelTemplate||!GLTFLoader||!SkeletonUtils?.clone)return Boolean(npcModelTemplate);
@@ -729,7 +757,8 @@
 
   async function loadExecModelTemplates() {
     if (!GLTFLoader || !SkeletonUtils?.clone) return false;
-    const specs = [['male', 'npc_realistic_male'], ['female', 'npc_realistic_female'], ['casual', 'npc_realistic_male_casual']];
+    const specs = [['male', 'npc_realistic_male'], ['female', 'npc_realistic_female']];
+    if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id]))specs.push(['casual', 'npc_realistic_male_casual']);
     await Promise.all(specs.map(async ([kind, file]) => {
       if (execModelTemplates[kind]) return;
       try {
@@ -783,8 +812,10 @@
 
   async function initNavigation() {
     navReady = false;
-    if (!recastCore || !recastGenerators) return false;
     try {
+      // Historical compatibility only: normal city startup never downloads Recast.
+      if(!recastCore||!recastGenerators)[recastCore,recastGenerators]=await Promise.all([import('@recast-navigation/core'),import('@recast-navigation/generators')]);
+      if (!recastCore || !recastGenerators) return false;
       await recastCore.init();
       const positions = [], indices = [];
       const addRect = (minX,maxX,minZ,maxZ) => {
@@ -1085,6 +1116,7 @@
     g.scale.setScalar(bodyScale);
     g.userData.parts = { torso, hips, head, armL, armR, foreL, foreR, handL, handR, legL, legR, shoeL, shoeR };
     g.userData.gender = female ? 'female' : 'male';
+    if(['male','female'].includes(cfg.execModel))g.userData.pendingCharacterStyle={...cfg};
     return g;
   }
 
@@ -2308,7 +2340,8 @@
 
   function findNpcSpawn() {
     const entry=hubWorld?.entrances.find(e=>e.id==='store');if(!entry)return null;
-    const options=[entry.portal.x-.55,entry.portal.x,entry.portal.x+.55].sort(()=>Math.random()-.5);
+    // Fill the separated sidewalk lanes first; a random center slot could block both.
+    const options=[entry.portal.x-.55,entry.portal.x+.55,entry.portal.x];
     for(const z of [entry.portal.z+3.2,entry.portal.z+4.2])for(const x of options) {
       if(Math.hypot(player.x-x,player.z-z)<.85)continue;
       if(npcs.every(n=>n.dead||Math.hypot(n.obj.position.x-x,n.obj.position.z-z)>.85))return {x,z};
@@ -2701,12 +2734,7 @@
     playerMotion=await import('./services/player_motion.mjs');
     const {createHubVehicles}=await import('./services/hub_vehicles.js?v=20260927-continuous-world');
     hubVehicles=createHubVehicles(hubWorld,HUB_OFFSET);
-    try {
-      const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
-      const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment();
-      scene.environment=pmrem.fromScene(room,.06).texture;
-      scene.environmentIntensity=.3;room.dispose();pmrem.dispose();
-    } catch(error) {console.warn('Se conserva la iluminación directa del mundo.',error);}
+    scene.environment=studioEnvironment;scene.environmentIntensity=.3;
     // A continuous sky gradient, rendered as geometry; no background photograph.
     const sky=new THREE.Mesh(new THREE.SphereGeometry(260,24,12),new THREE.ShaderMaterial({
       side:THREE.BackSide,depthWrite:false,
@@ -3251,6 +3279,7 @@
     }
     updateAdaptiveQuality(elapsed, now);
     renderer.render(scene, camera);
+    if(!detailsPromise&&!detailsTimer)detailsTimer=setTimeout(()=>{detailsTimer=0;preloadDetails();},1500);
     raf = requestAnimationFrame(frame);
   }
 
@@ -3413,10 +3442,12 @@
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
+    publishLoading('Construyendo la ciudad y sus accesos',3);
     buildStaticWorld();
     // New city navigation uses the same obstacle graph as physical collisions.
     navReady=false;navMesh=null;navQuery=null;
     await buildPlayableHub();
+    publishLoading('Preparando materiales gráficos',4);
     loadAudioSetting();
     clock = new THREE.Clock();
     bind();
@@ -3424,6 +3455,11 @@
     rebuildDynamicWorld();
     syncSalesFromLedger();
     updateGameplayCamera(1);
+    businessInteriors?.tick(0,player,0);
+    // Compile while the loading UI remains responsive, before enabling controls.
+    publishLoading('Preparando shaders para el primer frame',5);
+    if(renderer.compileAsync)await renderer.compileAsync(scene,camera);
+    publishLoading('Mundo 3D listo para iniciar',6);
     initialized = true;
     frame();
     return true;
@@ -3521,6 +3557,7 @@
     });
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
       navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct'},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
       hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
@@ -3530,5 +3567,5 @@
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, preload, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  window.SIDE3D = { prepare, preload, preloadDetails, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

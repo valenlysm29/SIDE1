@@ -16,7 +16,7 @@ const server=http.createServer((request,response)=>{
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const output=path.join(__dirname,'output/continuous');fs.mkdirSync(output,{recursive:true});
   const scripts=process.argv.slice(2);
-  const suites=scripts.length?scripts:['playable_hub.cjs','continuous_world.cjs','gameplay_hud.cjs','world_business_ui.cjs','world_cycle_restart.cjs','world_startup.cjs','world_loading.cjs','supplied_npcs.cjs','mona_npc.cjs','npc_locomotion.cjs','game_lifecycle_db.cjs','game_observations_db.cjs','game_lifecycle_ui.cjs','decisions_cycle_ui.cjs','teacher_lifecycle_ui.cjs'];
+  const suites=scripts.length?scripts:['playable_hub.cjs','continuous_world.cjs','gameplay_hud.cjs','world_business_ui.cjs','world_cycle_restart.cjs','world_startup.cjs','world_loading.cjs','world_entry_assets.cjs','supplied_npcs.cjs','mona_npc.cjs','npc_locomotion.cjs','game_lifecycle_db.cjs','game_observations_db.cjs','game_lifecycle_ui.cjs','decisions_cycle_ui.cjs','teacher_lifecycle_ui.cjs'];
   const results=[];
   try{
     for(const script of suites){

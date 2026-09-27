@@ -63,10 +63,13 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    assert.equal(await page.locator('#sim3dStart').isVisible(),false,'autostart must not leave another blocking overlay');
    await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().world.legacyActive),false);
+   // Indoor staff stream after entry; reaching the city never waits for them.
+   await page.waitForFunction(()=>SIDE3D.diagnostics().assets.detailsReady);
    await page.evaluate(()=>startupQA.storeVisit());
    const diagnostic=await page.evaluate(()=>SIDE3D.diagnostics());
    assert.equal(diagnostic.running,true);assert.equal(diagnostic.navigationReady,true);
-   assert.deepEqual(diagnostic.models.sort(),['casual','female','male']);
+   assert.deepEqual(diagnostic.models.sort(),['female','male']);
+   assert.equal(await page.evaluate(()=>performance.getEntriesByType('resource').some(e=>e.name.includes('npc_realistic_male_casual.glb'))),false,'unused casual fallback is not downloaded when city models load');
    assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&c.x>123&&c.x<139&&c.z>14&&c.z<24),'male cashier belongs to the physically connected store');
    assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&c.x>123&&c.x<139&&c.z>14&&c.z<24),'female sales assistant belongs to the physically connected store');
    assert.equal(diagnostic.hub.interior,'store');

@@ -2,6 +2,8 @@
 
 Fecha: 27 de septiembre de 2026. Repositorio: SIDE1. Rama: main.
 
+La medición de carga de este informe corresponde al estado anterior a la optimización de entrada. Los resultados posteriores y la separación de recursos críticos/diferidos se documentan en [world_entry_optimization.md](world_entry_optimization.md).
+
 ## Mundo e interiores
 
 El flujo normal inicializa exclusivamente `side-city`. Los constructores históricos permanecen sin llamadas desde el inicio, movimiento, directorio, edificios ni ciclos. La instrumentación de Chromium registró **cero invocaciones** de los cuatro constructores retirados.

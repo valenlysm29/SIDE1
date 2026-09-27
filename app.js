@@ -306,7 +306,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
 });
 function startJoinLoading(){return prepareLobby()}
 function preloadStudentWorld(){
-  if(typeof window.SIDE3D?.preload==='function')window.SIDE3D.preload().catch(error=>console.warn('SIDE: precarga pendiente',error));
+  if(typeof window.SIDE3D?.preload==='function')window.SIDE3D.preload().then(ready=>ready&&window.SIDE3D.preloadDetails?.()).catch(error=>console.warn('SIDE: precarga pendiente',error));
 }
 window.addEventListener('side3d:ready',()=>{if(studentConnected&&studentAccess().integration)preloadStudentWorld();});
 async function prepareLobby(){
