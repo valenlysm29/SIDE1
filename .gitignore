@@ -6,6 +6,12 @@ tests/output/
 tests/.python-deps/
 /output/
 
+# Carpetas auxiliares centralizadas; conservar sólo sus marcadores.
+/outputs/*
+!/outputs/.gitkeep
+/.codex-work/*
+!/.codex-work/.gitkeep
+
 # Paquete local de entrega
 /SIDE_corregido.zip
 /SIDE_corregido.sha256
