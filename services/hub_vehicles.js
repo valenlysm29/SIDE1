@@ -4,22 +4,28 @@ import {stepVehicle,vehicleHits,vehiclesOverlap} from './vehicle_motion.mjs';
 export function createHubVehicles(world,offsetX) {
   const resources=new Set(),cars=[];
   const geometry=new THREE.BoxGeometry(1,1,1);resources.add(geometry);
+  const tireGeometry=new THREE.CylinderGeometry(.36,.36,.22,16);resources.add(tireGeometry);
+  const cabinGeometry=new THREE.BufferGeometry();
+  cabinGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
+    -.8,.86,-1.05,.8,.86,-1.05,-.68,1.43,-.52,.68,1.43,-.52,
+    -.8,.86,1.2,.8,.86,1.2,-.68,1.43,.78,.68,1.43,.78
+  ],3));
+  cabinGeometry.setIndex([0,1,2,1,3,2,4,6,5,5,6,7,0,2,4,4,2,6,1,5,3,5,7,3,2,3,6,3,7,6].reverse());
+  cabinGeometry.computeVertexNormals();resources.add(cabinGeometry);
   const material=(color,extra={})=>{const m=new THREE.MeshStandardMaterial({color,roughness:.34,metalness:.45,...extra});resources.add(m);return m;};
   const rubber=material(0x151723,{roughness:.9}),glass=material(0x243d59,{metalness:.8,roughness:.15}),chrome=material(0xbacbd3);
   const lamp=material(0xffe5ab,{emissive:0xffdb89,emissiveIntensity:2});
   function make(x,z,yaw,color,traffic=false) {
-    const root=new THREE.Group(),body=new THREE.Group(),paint=material(color),wheels=[];
+    const root=new THREE.Group(),body=new THREE.Group(),paint=material(color),wheels=[],bodyParts=new Map();
     const rear=material(0xfa335a,{emissive:0xff183c,emissiveIntensity:.7});
     root.add(body);
-    function box(parent,x,y,z,w,h,d,mat){const mesh=new THREE.Mesh(geometry,mat);mesh.position.set(x,y,z);mesh.scale.set(w,h,d);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;}
+    // Static body pieces share one draw per material. Keep transform objects
+    // until assembly finishes so pillars retain their existing rotations.
+    function box(parent,x,y,z,w,h,d,mat){
+      const part=new THREE.Object3D();part.position.set(x,y,z);part.scale.set(w,h,d);
+      if(!bodyParts.has(mat))bodyParts.set(mat,[]);bodyParts.get(mat).push(part);return part;
+    }
     box(body,0,.62,0,1.8,.5,4.1,paint);box(body,0,.4,0,1.86,.18,4.2,rubber);
-    const cabinGeometry=new THREE.BufferGeometry();
-    cabinGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
-      -.8,.86,-1.05,.8,.86,-1.05,-.68,1.43,-.52,.68,1.43,-.52,
-      -.8,.86,1.2,.8,.86,1.2,-.68,1.43,.78,.68,1.43,.78
-    ],3));
-    cabinGeometry.setIndex([0,1,2,1,3,2,4,6,5,5,6,7,0,2,4,4,2,6,1,5,3,5,7,3,2,3,6,3,7,6].reverse());
-    cabinGeometry.computeVertexNormals();resources.add(cabinGeometry);
     const cabin=new THREE.Mesh(cabinGeometry,glass);cabin.castShadow=true;body.add(cabin);
     box(body,0,1.45,.13,1.4,.08,1.34,paint);
     box(body,0,.91,-1.43,1.78,.15,1.18,paint);
@@ -34,13 +40,20 @@ export function createHubVehicles(world,offsetX) {
       for(const axle of [-1.28,1.28]) {
         const pivot=new THREE.Group();pivot.position.set(side*.94,.39,axle);root.add(pivot);
         const spin=new THREE.Group();pivot.add(spin);
-        const geo=new THREE.CylinderGeometry(.36,.36,.22,16);resources.add(geo);
-        const tire=new THREE.Mesh(geo,rubber);tire.rotation.z=Math.PI/2;tire.castShadow=true;spin.add(tire);
-        box(spin,side*.12,0,0,.03,.48,.075,chrome);box(spin,side*.12,0,0,.03,.075,.48,chrome);
+        const tire=new THREE.Mesh(tireGeometry,rubber);tire.rotation.z=Math.PI/2;tire.castShadow=true;spin.add(tire);
+        const rim=new THREE.InstancedMesh(geometry,chrome,2),transform=new THREE.Object3D();
+        transform.position.set(side*.12,0,0);transform.scale.set(.03,.48,.075);transform.updateMatrix();rim.setMatrixAt(0,transform.matrix);
+        transform.scale.set(.03,.075,.48);transform.updateMatrix();rim.setMatrixAt(1,transform.matrix);
+        rim.instanceMatrix.needsUpdate=true;rim.castShadow=true;rim.receiveShadow=true;rim.computeBoundingSphere();spin.add(rim);
         wheels.push({pivot,spin,front:axle<0});
       }
     }
     box(body,0,.58,-2.09,.7,.17,.025,rubber);box(body,0,.57,2.09,.4,.14,.025,chrome);
+    for(const [mat,parts] of bodyParts){
+      const batch=new THREE.InstancedMesh(geometry,mat,parts.length);
+      parts.forEach((part,i)=>{part.updateMatrix();batch.setMatrixAt(i,part.matrix);});
+      batch.instanceMatrix.needsUpdate=true;batch.castShadow=true;batch.receiveShadow=true;batch.computeBoundingSphere();body.add(batch);
+    }
     root.name=traffic?'City traffic':'SIDE cruiser';world.group.add(root);
     const car={x:offsetX+x,z,yaw,speed:0,steer:0,wheelAngle:0,root,body,wheels,rear,traffic,distance:0};cars.push(car);return car;
   }
@@ -83,6 +96,6 @@ export function createHubVehicles(world,offsetX) {
         sync(c,dt);
       }
     },
-    dispose(){cars.forEach(c=>c.root.removeFromParent());resources.forEach(r=>r.dispose());}
+    dispose(){cars.forEach(c=>{c.root.traverse(object=>{if(object.isInstancedMesh)object.dispose();});c.root.removeFromParent();});resources.forEach(r=>r.dispose());}
   };
 }

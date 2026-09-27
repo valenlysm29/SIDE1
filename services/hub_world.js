@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three/build/three.module.js';
-import { crossedEntrance, crossedInteriorExit } from './world_portals.mjs';
+import { crossedEntrance } from './world_portals.mjs';
 
 // Every visible surface is world geometry. No screenshot, backdrop render, or
 // generated image is used; the hub works from ground level and from orbit.
@@ -162,101 +162,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     cyl(x, .17, z, .44, .07, m.steel);
   }
 
-  // Retail: a real interior behind the glazed frontage, with a roof and side walls.
-  box(-19, .18, 19, 16.5, .3, 10.5, m.concrete);
-  box(-27, 2.9, 19, .28, 5.5, 10, m.plaster); box(-11, 2.9, 19, .28, 5.5, 10, m.plaster);
-  box(-19, 2.9, 14, 16, 5.5, .3, m.plaster);
-  box(-19, 5.58, 19, 16.8, .3, 10.8, m.roof);
-  box(-19, 4.83, 24.22, 16.8, 1.35, .58, m.darkSteel);
-  label('SIDE', 'DISEÑO PARA TU DÍA A DÍA', -19, 4.85, 24.53, 6.5, 1.03);
-  box(-19, 4.1, 25.06, 16.6, .17, 2.1, m.mint);
-  for (const x of [-26.65, -23, -20.4, -17.6, -15, -11.35]) box(x, 2.1, 24.02, .09, 3.85, .12, m.darkSteel);
-  for (const x of [-24.83, -21.7, -16.3, -13.18]) box(x, 2.1, 24, 2.45, 3.65, .07, m.glass);
-  box(-19, .38, 24, 2.5, .1, .42, m.steel);
-  box(-19, 2.1, 24.07, 2.52, 3.65, .06, m.glass);
-  for (const x of [-19.15, -18.85]) box(x, 1.5, 24.2, .035, .48, .045, m.steel);
-  box(-19, 3.98, 24.12, 16.1, .09, .1, m.darkSteel);
-  ground(-19, 19, 15.7, 9.7, m.concrete, .35, 9);
-  for (const x of [-24.4, -14]) {
-    box(x, 1.3, 16, 3.1, 2, .35, m.wood);
-    for (let y = .65; y < 2.7; y += .62) {
-      box(x, y, 16.45, 3.15, .06, 1, m.darkSteel);
-      for (let a = -1; a <= 1; a++) {
-        box(x + a * .88, y + .24, 16.46, .53, .4, .32, a === 0 ? m.coral : m.mint);
-        box(x + a * .88, y + .47, 16.46, .26, .07, .13, m.darkSteel);
-      }
-    }
-  }
-  box(-19, .97, 19, 4.4, 1.1, 1.4, m.wood); box(-19, 1.55, 19, 4.55, .1, 1.55, m.white);
-  for (const x of [-21.8, -16.2]) box(x, 5.35, 19, .08, .03, 6.5, m.light);
-  box(-24, 6.12, 18, 2.3, .8, 1.6, m.steel); box(-14, 6.05, 18, 1.7, .65, 1.6, m.steel);
-  for (let x = -27; x <= -11; x += 1.5) box(x, 5.77, 19, .045, .05, 10.3, m.steel);
-  collider(-19, 18.95, 16.3, 10.3, 'building');
-
-  // Warehouse and attached two-storey office retain their original footprints.
-  box(-20.5, 3.45, -19, 15, 6.65, 14, m.plaster);
-  box(-20.5, .62, -11.82, 15.4, 1, 1.35, m.concrete);
-  box(-20.5, 6.85, -19, 15.5, .25, 14.5, m.roof);
-  box(-20.5, 5.93, -11.94, 15.5, .8, .28, m.mint);
-  label('ALMACÉN SIDE', 'LOGÍSTICA · RECEPCIÓN · DISTRIBUCIÓN', -20.5, 5.97, -11.77, 9, .66);
-  for (const x of [-24.7, -19.7]) {
-    box(x, 2.61, -11.84, 4.12, 4.4, .23, m.darkSteel);
-    box(x, 2.62, -11.65, 3.7, 4, .08, m.steel);
-    for (let y = .82; y < 4.6; y += .35) box(x, y, -11.58, 3.72, .045, .04, m.darkSteel);
-    for (const dx of [-2.2, 2.2]) { cyl(x + dx, .84, -10.83, .095, 1.4, m.yellow); box(x + dx, .87, -10.83, .21, .12, .21, m.black); }
-  }
-  box(-9.5, 3.1, -19, 7, 5.95, 14, m.mint); box(-9.5, 6.2, -19, 7.3, .22, 14.3, m.white);
-  label('OFICINA SIDE', 'ADMINISTRACIÓN · ACCESO POR LA TIENDA', -9.5, 3.15, -11.74, 6.2, .82);
-  for (const x of [-11.6, -8.1]) for (const y of [1.7, 4.5]) {
-    box(x, y, -11.94, 2.25, 1.65, .12, m.darkSteel); box(x, y, -11.83, 2.02, 1.4, .07, m.opaqueGlass);
-    box(x, y, -11.75, .065, 1.45, .07, m.white);
-  }
-  for (const z of [-23, -18, -14]) {
-    box(-5.95, 4.4, z, .1, 1.8, 2.9, m.darkSteel); box(-5.86, 4.4, z, .06, 1.55, 2.65, m.opaqueGlass);
-  }
-  for (let z = -25; z <= -13; z += 1.5) box(-20.5, 7.02, z, 15.2, .045, .04, m.steel);
-  collider(-17, -19, 22, 14.3, 'building');
-  // Pallets occupy the service strip while leaving the south-side approach open.
-  for (const [x, z] of [[-31, -22], [-31, -18]]) {
-    box(x, .33, z, 1.5, .23, 1.2, m.wood);
-    for (const a of [-.42, .42]) box(x + a, .91, z, .73, .94, 1.02, m.coral);
-    collider(x, z, 1.6, 1.3);
-  }
-
-  // Production: service doors, rooftop plant, vent stacks, downpipes and a yard.
-  box(20, 4.16, -19, 16, 8, 14, m.plaster); box(20, .62, -19, 16.2, .9, 14.2, m.darkSteel);
-  box(20, 8.31, -19, 16.65, .27, 14.6, m.roof);
-  box(20, 6.88, -11.94, 16.4, 1.12, .28, m.darkSteel);
-  label('PRODUCCIÓN SIDE', 'TALLER · CALIDAD · INNOVACIÓN', 20, 6.9, -11.77, 10.5, .92);
-  for (const x of [15.2, 24.8]) {
-    box(x, 3.18, -11.89, 5.25, 4.55, .23, m.darkSteel); box(x, 3.18, -11.72, 4.85, 4.16, .08, m.steel);
-    for (let y = 1.3; y < 5.1; y += .4) box(x, y, -11.64, 4.85, .045, .04, m.darkSteel);
-  }
-  box(20, 1.8, -11.78, 1.44, 3.2, .18, m.darkSteel); box(20, 2.16, -11.65, 1.18, 2.1, .08, m.opaqueGlass);
-  for (const x of [13, 27]) cyl(x, 4.2, -11.54, .075, 8.1, m.steel);
-  for (const z of [-24, -20, -16]) for (const side of [-1, 1]) {
-    box(20 + side * 8.06, 6.5, z, .12, 1.15, 2.7, m.darkSteel);
-    box(20 + side * 8.14, 6.5, z, .06, .94, 2.48, m.opaqueGlass);
-  }
-  for (const [x, z] of [[16, -21], [23.5, -18]]) {
-    box(x, 9.15, z, 3.4, 1.38, 2.6, m.steel);
-    for (let a = -.9; a <= 1; a += .3) box(x + a, 9.16, z + 1.32, .09, 1.12, .03, m.darkSteel);
-    cyl(x, 9.94, z, .71, .17, m.darkSteel);
-    for (let a = 0; a < 4; a++) box(x, 10.04, z, 1.1, .05, .13, m.steel, a * Math.PI / 4);
-  }
-  for (const x of [15, 18]) {
-    cyl(x, 10.35, -24, .42, 4.1, m.steel); cyl(x, 12.45, -24, .62, .18, m.darkSteel);
-    cyl(x, 12.68, -24, .53, .14, m.steel);
-  }
-  box(21, 9.15, -23, 7, .6, .8, m.steel);
-  for (let x = 12.5; x <= 28; x += 1.7) box(x, 8.5, -19, .04, .04, 14.3, m.steel);
-  collider(20, -19, 16.35, 14.3, 'building');
-  ground(20, -30, 21, 6, m.concrete, .14, 7);
-  for (const x of [11, 16, 21, 26, 30]) {
-    cyl(x, 1.02, -33, .06, 1.7, m.steel);
-    box(x, .55, -33, 4.8, .045, .045, m.steel); box(x, 1.53, -33, 4.8, .045, .045, m.steel);
-  }
-  for (const x of [28.6, 30.3]) { cyl(x, .81, -27.7, .57, 1.3, m.mint); cyl(x, 1.48, -27.7, .6, .09, m.steel); collider(x, -27.7, 1.2, 1.2); }
+  // Business shells and interiors are built together in business_interiors.mjs.
 
   // Plaza: the open pedestrian routes cross between planted corners and the kiosk.
   ground(19, 19, 27, 27, m.paving, .147, 11);
@@ -362,10 +268,8 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     }); collider(x, z, .8, .55, 'sign');
   }
   entranceMarker(-16.3, 26, 'TIENDA', '01'); entranceMarker(-16.2, -9.1, 'ALMACÉN', '02'); entranceMarker(22, -9.1, 'PRODUCCIÓN', '03');
-  // Guidance sits on existing facades; no new street obstacles or fake services.
-  label('01 / COMERCIO', 'CAJA · PRECIOS · ADMINISTRACIÓN', -19, 3.67, 25.17, 6.4, .6);
-  label('02 / LOGÍSTICA', 'INVENTARIO · REPOSICIÓN · PEDIDOS', -20, 1.85, -11.5, 3.5, .54);
-  label('03 / OPERACIONES', 'PRODUCCIÓN · DECISIONES', 20, 4.85, -11.53, 5, .62);
+  // Business signage is attached to each actual facade by business_interiors.
+  // Freestanding entrance markers remain beside, rather than across, the doors.
 
   // Three unbranded road vehicles use shared geometry and the same light/wheel language.
   function vehicle(x, z, yaw, color, crossover = false) {
@@ -441,7 +345,6 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
   label('PASEO COSTA','BARRIO COMERCIAL',-7,20,-42.4,11,2.3,'#294951');
   for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2);
-  for(const [x,z] of [[-19,25.15],[-20,-9.3],[20,-9.3]])box(x,4.03,z,12,.065,.09,mintTrim);
 
   let instanceCount = 0;
   batches.forEach(({ geo, material, matrices }) => {
@@ -461,7 +364,6 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   return {
     group, colliders, entrances, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
     crossedEntrance: (previous, next) => crossedEntrance(previous, next, entrances),
-    crossedInteriorExit,
     spawn: { x: offsetX + 16, z: 27 }, groundY: .025,
     patrolRoutes: [
       [[13.5, 13.5], [24.5, 13.5], [24.5, 24.5], [13.5, 24.5]],

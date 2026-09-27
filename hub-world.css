@@ -27,6 +27,11 @@
 .sim-world-route>span[hidden] {display:none}
 .sim-world-order {display:block;margin-top:7px;padding:6px 8px;border-radius:4px;background:#10292deb;color:#a6e0d1;font:700 9px/1.4 system-ui;letter-spacing:.3px;text-shadow:none}
 .sim-world-order[hidden] {display:none}
+.sim-business-context {margin-top:7px;padding:7px 9px;border-left:2px solid #91caba;border-radius:0 4px 4px 0;background:#10292ded;color:#d8eee7;font:600 10px/1.5 system-ui;text-shadow:none;overflow-wrap:anywhere}
+.sim-business-context[hidden] {display:none}
+.simulator-screen[data-world-zone="store"] .sim3d-missions,
+.simulator-screen[data-world-zone="warehouse"] .sim3d-missions,
+.simulator-screen[data-world-zone="production"] .sim3d-missions {top:280px}
 .simulator-screen .sim3d-message {top:auto;bottom:95px;max-width:min(500px,60vw);text-align:center}
 .sim-world-route {display:flex;align-items:center;gap:10px;margin-top:13px;padding:9px 12px;border-left:2px solid #f5ca59;background:#152a31d9;border-radius:0 5px 5px 0;text-shadow:none}
 .sim-world-route>span {font-size:26px;color:#f5ca59;display:block}
@@ -105,6 +110,8 @@
   .simulator-screen .sim3d-mission-list small {font-size:7px;color:#c1d0d6}
   .simulator-screen .sim3d-missions.collapsed {width:auto}
   .sim-world-order {font-size:8px}
+  .sim-business-context {font-size:8px;padding:6px}
+  .simulator-screen[data-world-zone] .sim3d-missions {top:137px}
   .simulator-screen .sim3d-message {bottom:285px;max-width:calc(100vw - 26px);width:max-content;font-size:9px;padding:9px 12px}
   #sim3dCameraBtn:before {content:'◉'}
   #sim3dHubBtn:before {content:'⌂'}

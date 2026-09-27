@@ -6,7 +6,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.mjs':'applicati
 const source=fs.readFileSync(path.join(root,'simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.objectiveQA={
   freeze(){cancelAnimationFrame(raf);},
   update(){updateHubObjective();},
-  enter(id){enterHubInterior(id);},
+  enter(id){const e=hubWorld.entrances.find(e=>e.id===id);positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++)updatePlayer(1/60);keys={};},
   pending(){businessState.pendingSupplierOrder={id:'qa-pending',units:12,dueAt:Date.now()+60000};updateHubObjective();},
   snapshot(){return JSON.stringify({inventory,businessState,ledger:bridge().ledger});},
   state(){return {waypoint:hubWaypoint.visible,position:hubWaypoint.position.toArray()};}
@@ -44,10 +44,13 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     assert.match(await page.locator('#simHubCycle').innerText(),/CICLO 1/);
     await page.screenshot({path:path.join(output,'desktop.png')});
     await page.evaluate(()=>objectiveQA.enter('warehouse'));
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),false);
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true);
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),'warehouse');
     await page.screenshot({path:path.join(output,'interior.png')});
     await page.setViewportSize({width:390,height:844});
     await page.locator('#sim3dHubBtn').click();
+    assert.equal(await page.locator('#simHubDirectory').isVisible(),true);
+    await page.keyboard.press('Escape');
     assert.equal(await page.locator('.sim3d-missions').isVisible(),true,'portrait missions remain available');
     assert.equal(await page.locator('#simHubObjective').isVisible(),true);
     assert.equal(await page.locator('#simTotalStock').isVisible(),true,'mobile keeps inventory visible');

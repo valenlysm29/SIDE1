@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css?v=20260924-observations">
   <link rel="stylesheet" href="simulator3d.css?v=20260925-playable-hub">
-  <link rel="stylesheet" href="hub-world.css?v=20260925-playable-hub">
+  <link rel="stylesheet" href="hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
   <link rel="stylesheet" href="production.css?v=20260922-fixedbar">
@@ -221,14 +221,14 @@
 
     <div class="sim3d-actionbar">
       <button id="sim3dDecisionsBtn" class="sim3d-btn primary" type="button">TABLET DE DECISIONES</button>
-      <button id="sim3dHubBtn" class="sim3d-btn" type="button" aria-label="Volver a la plaza">PLAZA</button>
+      <button id="sim3dHubBtn" class="sim3d-btn" type="button" aria-label="Abrir directorio del barrio">DIRECTORIO</button>
       <button id="sim3dCameraBtn" class="sim3d-btn" type="button" aria-label="Cambiar cámara entre primera y tercera persona" aria-pressed="true">CÁMARA · 3.ª</button>
       <button id="sim3dMetricsBtn" class="sim3d-btn" type="button" aria-expanded="false">INDICADORES</button>
       <button id="sim3dHelpBtn" class="sim3d-btn" type="button">AYUDA</button>
       <button id="sim3dAudioBtn" class="sim3d-btn" type="button">AUDIO: ON</button>
       <button id="sim3dLobbyBtn" class="sim3d-btn" type="button">VOLVER A SALA</button>
     </div>
-    <div class="sim-world-location"><span>DISTRITO COMERCIAL · <b id="simHubCycle">CICLO 1</b></span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective" role="status">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div><small id="simHubOrder" class="sim-world-order" hidden></small></div>
+    <div class="sim-world-location"><span>DISTRITO COMERCIAL · <b id="simHubCycle">CICLO 1</b></span><strong id="simWorldLocation">PLAZA SIDE · Miraflores</strong><div class="sim-world-route"><span id="simHubDirection" aria-hidden="true">↑</span><div><small id="simHubObjective" role="status">CONOCE TU EMPRESA · 0/3</small><b id="simHubDestination">Visita la tienda</b></div></div><small id="simHubOrder" class="sim-world-order" hidden></small><div id="simBusinessContext" class="sim-business-context" role="status" hidden></div></div>
     <div class="sim-world-controls"><kbd>WASD</kbd> Mover / conducir <kbd>SHIFT</kbd> Correr <kbd>E</kbd> Interactuar <kbd>F</kbd> Auto <kbd>V</kbd> Cámara</div>
     <div id="simDriveHud" class="sim-drive-hud" hidden><span>SIDE CRUISER · COSTA</span><div><b id="simDriveSpeed">00</b><small>KM/H</small><strong id="simDriveGear">N</strong></div><p>W / S acelerar y frenar · A / D girar<br>ESPACIO freno · F bajar</p></div>
     <div id="simHubDirectory" class="sim-hub-directory hidden" role="dialog" aria-modal="true" aria-labelledby="simHubDirectoryTitle">
@@ -236,14 +236,14 @@
         <button id="simHubDirectoryClose" class="sim-hub-close" type="button" aria-label="Cerrar directorio">×</button>
         <span class="sim-hub-eyebrow">DIRECTORIO SIDE</span>
         <h2 id="simHubDirectoryTitle">¿A dónde vamos?</h2>
-        <p>Selecciona un distrito y visita la tienda.</p>
+        <p>Elige el distrito de tu negocio. Recorre la ciudad para visitar sus locales.</p>
         <div class="sim-hub-districts">
           <button data-hub-district="miraflores" type="button" aria-pressed="true"><span>01</span><strong>MIRAFLORES</strong><i aria-hidden="true">↗</i></button>
           <button data-hub-district="olivos" type="button" aria-pressed="false"><span>02</span><strong>LOS OLIVOS</strong><i aria-hidden="true">↗</i></button>
           <button data-hub-district="sjl" type="button" aria-pressed="false"><span>03</span><strong>SAN JUAN DE LURIGANCHO</strong><i aria-hidden="true">↗</i></button>
         </div>
         <p id="simHubSelected" aria-live="polite">Destino: Miraflores</p>
-        <button id="simHubVisitStore" class="sim-hub-visit" type="button">VISITAR TIENDA <span aria-hidden="true">→</span></button>
+        <button id="simHubVisitStore" class="sim-hub-visit" type="button">MOSTRAR RUTA A PIE <span aria-hidden="true">→</span></button>
       </div>
     </div>
     <div class="sim3d-touch-controls" aria-label="Controles táctiles">
@@ -524,7 +524,7 @@
   }
 </script>
 <script src="simulator3d-config.js?v=20260922-npcs2"></script>
-<script src="simulator3d.js?v=20260925-playable-hub"></script>
+<script src="simulator3d.js?v=20260927-continuous-world"></script>
 <script src="production_model.js?v=20260910-2"></script>
 <script src="decision_review_model.js?v=20260910-2"></script>
 <script src="production_dop.js?v=20260917-visual"></script>

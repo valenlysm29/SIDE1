@@ -95,9 +95,16 @@ const seed = {
       await page.waitForFunction(round=>lastObservedRound===round && SIDE3D.diagnostics().session===null,round);
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().running),false);
       assert.equal(await page.locator('#decisionMenu').isVisible(),true);
-      assert.equal(await page.evaluate(()=>startSimulationLoading()),false,'new cycle requires its own decisions');
+      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'new cycle blocks financial operations until its own decisions are sent');
       assert.equal(await page.evaluate(()=>localStorage.getItem(cycleQA.inventoryKey())),null,'old stock must not leak into new cycle');
       assert.equal(await page.evaluate(key=>localStorage.getItem(key),oldData.key),oldData.data);
+      const beforeExploration=await page.evaluate(()=>JSON.stringify(cashLedger));
+      assert.equal(await page.evaluate(()=>startSimulationLoading()),true,'the current city remains explorable while preparing new cycle decisions');
+      await active();
+      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.recordOperatingExpense(360)),false,'preparation cannot charge procurement');
+      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.recordSimulatedSale(100)),false,'preparation cannot record sales');
+      assert.equal(await page.evaluate(()=>JSON.stringify(cashLedger)),beforeExploration);
+      await page.evaluate(()=>cycleQA.openDecisionsFrom3D());
       assert.equal(await submit(round,round===2),true);
       assert.equal(await page.evaluate(()=>companySummaryRound),'current');
       await page.locator('#companyStartWorld').waitFor({state:'visible'});

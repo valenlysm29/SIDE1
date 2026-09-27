@@ -160,8 +160,8 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     await page.keyboard.press('KeyV');
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.mode),'third');
 
-    const building=await page.evaluate(()=>hubQA.world().colliders.find(c=>c.maxX-c.minX>10&&c.maxZ-c.minZ>6));
-    assert.ok(building,'large exterior buildings have collision volumes');
+    const building=await page.evaluate(()=>hubQA.world().colliders.find(c=>c.kind==='wall'&&c.zone==='store'&&c.maxX-c.minX<1&&c.maxZ-c.minZ>6));
+    assert.ok(building,'the connected store has a solid side wall within playable bounds');
     await page.evaluate(c=>{hubQA.place(c.maxX+.8,(c.minZ+c.maxZ)/2,-Math.PI/2);hubQA.draw();},building);
     const obstructedCamera=await page.evaluate(()=>hubQA.camera());
     assert.ok(obstructedCamera.position[0]>building.maxX+.18,'camera pulls forward before a building wall');
@@ -181,16 +181,18 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     await page.keyboard.down('KeyW');
     await page.evaluate(()=>hubQA.stepPlayer(1));
     await page.keyboard.up('KeyW');
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),false,'walking across the door enters without an external button');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true,'walking across the door keeps the same city active');
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),'store');
-    assert.ok(await page.evaluate(()=>Math.abs(SIDE3D.diagnostics().player.x)<20),'interior remains in the existing business world');
+    assert.ok(await page.evaluate(x=>Math.abs(SIDE3D.diagnostics().player.x-x)<.1,entrance.x),'interior preserves the facade world coordinate');
     await page.evaluate(()=>hubQA.stepPlayer(.5));
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),false,'interior arrival cannot bounce through the exit');
-    await page.evaluate(()=>hubQA.place(0,7.3,Math.PI));
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),'store','interior arrival cannot bounce through the exit');
+    await page.evaluate(e=>hubQA.place(e.x,e.portal.z-.8,Math.PI),entrance);
     await page.keyboard.down('KeyW');
     await page.evaluate(()=>hubQA.stepPlayer(1));
     await page.keyboard.up('KeyW');
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true,'walking through the exit returns directly to the new hub');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),null,'exit clears the interior context');
+    assert.ok(await page.evaluate(e=>Math.abs(SIDE3D.diagnostics().player.x-e.x)<.1&&SIDE3D.diagnostics().player.z>e.portal.z,entrance),'exit stays directly in front of the same building');
     await page.evaluate(()=>hubQA.stepPlayer(.5));
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true,'returning outside cannot bounce into the shop');
     checks.push({storeEntrance:entrance});
@@ -202,7 +204,9 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
       await page.keyboard.up('KeyW');
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),id);
       assert.equal(await page.evaluate(()=>hubQA.state().collision),false,'interior spawn is walkable');
-      await page.locator('#sim3dHubBtn').click();
+      await page.evaluate(e=>hubQA.place(e.x,e.portal.z-.8,Math.PI),door);
+      await page.keyboard.down('KeyW');await page.evaluate(()=>hubQA.stepPlayer(1));await page.keyboard.up('KeyW');
+      assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),null,'each building exits by walking through its own door');
     }
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.visited.length),3,'all three destinations complete exploration');
 
@@ -230,10 +234,14 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     await page.screenshot({path:path.join(output,'hub-directory.png')});
     await page.locator('#simHubVisitStore').click();
     assert.equal(await page.locator('#simHubDirectory').isVisible(),false);
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),false);
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.district),'sjl','destination persists inside the shop');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true);
+    assert.deepEqual(await page.evaluate(()=>SIDE3D.diagnostics().player),stationary,'directory offers walking directions without teleporting');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.district),'sjl','destination persists after route selection');
     await page.locator('#sim3dHubBtn').click();
-    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.district),'sjl','destination persists on return to the plaza');
+    assert.equal(await page.locator('#simHubDirectory').isVisible(),true,'toolbar opens a directory instead of transporting the player');
+    assert.deepEqual(await page.evaluate(()=>SIDE3D.diagnostics().player),stationary);
+    await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.district),'sjl','destination persists in the same city');
     checks.push({directory:{kiosk,district:'sjl',preservedFinances:true}});
 
     const actorCount=await page.evaluate(()=>SIDE3D.diagnostics().hub.actors);

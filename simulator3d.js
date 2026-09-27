@@ -32,9 +32,9 @@
   let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
   const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
-  let hubWorld = null, businessWorld = null, hubActors = [], playerAvatar = null;
+  let hubWorld = null, businessWorld = null, businessInteriors = null, hubActors = [], playerAvatar = null;
   let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
-  let currentInterior = 'store', hubReturnPoint = null, cameraSnap = true;
+  let currentInterior = null, hubReturnPoint = null, cameraSnap = true;
   let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
   let hubVehicles = null, driving = null;
   let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
@@ -65,9 +65,9 @@
     { gender: 'female', execModel: 'female', shirt: 0xf2ede2, pants: 0xc9a877, hair: 0x2a2019, skin: 0xcd8f66, formal: false, longHair: true, buttons: true, forceProcedural: true, bodyScale: 0.96 }
   ];
 
-  const player = { x: 0, y: 1.72, z: 11.4, radius: 0.36, baseY: 1.72, vx: 0, vz: 0, vy: 0, grounded: true, bob: 0, speed: 0 };
+  const player = { x: HUB_OFFSET+16, y: 1.72, z: 27, radius: 0.36, baseY: 1.72, vx: 0, vz: 0, vy: 0, grounded: true, bob: 0, speed: 0 };
   const bounds = WORLD.bounds || { minX: -30, maxX: 30, minZ: -12.6, maxZ: 33 };
-  const queueSlots = WORLD.checkoutQueue || [{x:-6.4,z:6.2},{x:-4.9,z:6.2},{x:-3.4,z:6.2},{x:-1.9,z:6.2}];
+  const queueSlots = [];
 
   const $3 = (id) => document.getElementById(id);
   const fmt = (n) => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
@@ -463,6 +463,7 @@
   }
 
   function resetGameSession(resetInventory = false, advanceDay = false) {
+    clearCustomerFlow(!resetInventory&&sessionContext===storageContext());
     sessionContext = storageContext();
     loadBusinessState();
     let day = loadDay();
@@ -566,6 +567,7 @@
     if (!changed && !closed) return;
     // Stop the old shift before it can record activity under the new cycle's keys.
     running = false;
+    clearCustomerFlow(!changed);
     sessionContext = '';
     gameSession = null;
     stopAmbient();
@@ -1089,7 +1091,8 @@
   function setPersonPose(g, cycle = 0, moving = false, frameDt = null) {
     // Keep navigation/customer decisions at full rate; only distant rig posing
     // is reduced. Accumulated time preserves gait speed when it is updated.
-    if (g !== playerAvatar && camera && Math.hypot(g.position.x-player.x,g.position.z-player.z)>28) {
+    const worldPosition=camera?g.getWorldPosition(g.userData.poseWorldPosition||(g.userData.poseWorldPosition=new THREE.Vector3())):g.position;
+    if (g !== playerAvatar && camera && Math.hypot(worldPosition.x-player.x,worldPosition.z-player.z)>28) {
       const now=performance.now()/1000;
       const elapsed=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastLodAt||now-.016)));
       g.userData.lastLodAt=now;
@@ -1245,9 +1248,11 @@
     if($3('upgradeWarehouseBtn')) $3('upgradeWarehouseBtn').disabled=Number(up.warehouse||0)>=2;
   }
 
-  function openAdmin() {
+  function openAdmin(page='dashboard') {
     adminOpen=true; running=false; document.exitPointerLock?.();
     refreshAdminUI();
+    document.querySelectorAll('[data-admin-tab]').forEach(button=>button.classList.toggle('active',button.dataset.adminTab===page));
+    document.querySelectorAll('[data-admin-page]').forEach(section=>section.classList.toggle('active',section.dataset.adminPage===page));
     $3('simAdmin')?.classList.remove('hidden');
   }
   function closeAdmin() {
@@ -1301,9 +1306,8 @@
     const prod=PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
     const npc=createNpcRecord(p,spawnX,archetype,{isReturn:true,productId:prod.id,productPrice:prod.price});
     attachBagToNpc(npc);
-    setNpcRoute(npc,NPC_STATE.WALK_TO_STORE,[
-      [WORLD.crosswalkNorth?.x||0,WORLD.crosswalkNorth?.z||24.8]
-    ]);
+    const entry=hubWorld?.entrances.find(e=>e.id==='store');if(!entry)return;
+    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
     npcs.push(npc); simVisitors++; updateHUD();
   }
 
@@ -1374,7 +1378,7 @@
     if(operationalCash()<cost) { message('No hay caja suficiente para esta expansión.'); return; }
     if(!applyExpense(cost,`Expansión: ${type}`,'SIM_INVERSION',{upgrades:{...businessState.upgrades,[type]:current+1}}))return;
     rebuildDynamicWorld(); refreshAdminUI();
-    message('Expansión aplicada. Ya puedes verla en la tienda.');
+    message('Mejora aplicada. La capacidad y el servicio usan la nueva configuración.');
   }
 
   function setGraphicsQuality(mode) {
@@ -1387,7 +1391,7 @@
 
   const TUTORIAL_STEPS=[
     [`Bienvenida a ${companyName()}`,'Haz clic en el mundo para mirar con el mouse. WASD para caminar, Shift para correr y V para cambiar de cámara.'],
-    ['Explora la plaza','Sigue la flecha hasta las tres entradas y pulsa E. El kiosco central permite elegir un distrito; PLAZA te devuelve al exterior.'],
+    ['Explora la ciudad','Sigue la flecha hasta una entrada y atraviesa la puerta caminando. Para salir, vuelve por la misma puerta. El directorio indica destinos.'],
     ['Atiende la caja','Acércate al POS y presiona E. Escanea el producto y después cobra.'],
     ['Controla el stock','Acércate al almacén y repón los exhibidores. El personal también ayuda automáticamente.'],
     ['Administra la empresa','Busca la computadora de administración. Allí cambias precios, pides stock y amplías la tienda.'],
@@ -1588,7 +1592,7 @@
 
     camera = new THREE.PerspectiveCamera(58, 1, .08, 300);
     camera.rotation.order = 'YXZ';
-    player.x = 0; player.z = 11.5; player.y = player.baseY; player.vx = player.vz = player.vy = 0;
+    player.x = HUB_OFFSET+16; player.z = 27; player.y = player.baseY; player.vx = player.vz = player.vy = 0;
     yaw = 0; pitch = -.035; targetYaw = yaw; targetPitch = pitch;
 
     renderer = new THREE.WebGLRenderer({canvas:$3('side3dCanvas'),antialias:perfMode!=='low',powerPreference:'high-performance'});
@@ -1609,6 +1613,13 @@
     sunLight.shadow.normalBias=.025;sunLight.shadow.bias=-.00015;
     scene.add(hemiLight,sunLight,sunLight.target);
 
+    dynamicGroup=new THREE.Group();npcGroup=new THREE.Group();
+    dynamicGroup.name='Business state anchors';npcGroup.name='SIDE store customers';
+    scene.add(dynamicGroup,npcGroup);
+  }
+
+  // Historical builder retained for compatibility; never called by gameplay.
+  function buildRetiredStaticInterior() {
     const addWall = (w,d,x,z) => {
       const wall=box(w,4.7,d,0x263746,x,2.35,z,.8,.04); scene.add(wall);
       addCollider(x-w/2-.05,x+w/2+.05,z-d/2-.05,z+d/2+.05); return wall;
@@ -1923,7 +1934,32 @@
     }
   }
 
-  function renderInventoryDisplays() {
+  // A read-only projection of the existing business model. Geometry owns no money,
+  // inventory, delivery clock or production calculation.
+  function businessVisualSnapshot() {
+    const plan=productionSnapshot(),display=totalDisplayStock(),reserve=totalReserveStock();
+    const shelfCapacity=PRODUCTS.length*displayCapacity(),capacity=warehouseCapacity();
+    const plannedTotal=Math.max(0,Number(plan?.producibleUnits??targetProduction()));
+    const accounted=Math.max(0,Number(inventory?.producedUnits??inventory?.totalTarget??plannedTotal));
+    return {displayStock:display,reserveStock:reserve,displayCapacity:shelfCapacity,warehouseCapacity:capacity,
+      storeFill:Math.min(1,display/Math.max(1,shelfCapacity)),warehouseFill:Math.min(1,reserve/Math.max(1,capacity)),
+      pendingUnits:businessState?.pendingSupplierOrder?.units||0,
+      productionActive:running&&!gameSession?.shiftEnded&&bridge().canOperate?.()!==false&&accounted<plannedTotal&&display+reserve<capacity,
+      producedUnits:inventory?.producedUnits??null,plannedUnits:plan?.producibleUnits??0,productionPlan:plan,
+      cash:decisionCash(),round:currentRoundSafe(),
+      machines:{cutting:owned('MESA_CORTE'),assembly:owned('ENSAMBLE'),finishing:owned('ACABADOS')},
+      workers:{cutting:qty('PERS_CORTE'),assembly:qty('PERS_ENSAMBLE'),finishing:qty('PERS_ACABADO')},
+      products:PRODUCTS.map(p=>({id:p.id,color:p.color,display:displayStock(p.id),reserve:reserveStock(p.id)}))};
+  }
+
+  function renderInventoryDisplays() { businessInteriors?.sync(businessVisualSnapshot()); }
+
+  function rebuildDynamicWorld() {
+    if(!businessInteriors)return;
+    loadInventory();renderInventoryDisplays();updateHUD();
+  }
+
+  function renderRetiredInventoryDisplays() {
     if (!dynamicGroup || !THREE) return;
     interactables = interactables.filter(it => it.type !== 'product');
     productInteractables = [];
@@ -1997,7 +2033,7 @@
     message(`${CONFIG.NPCS.mona.name}: ${advice}`, 6500);
   }
 
-  function rebuildDynamicWorld() {
+  function rebuildRetiredDynamicWorld() {
     if (!dynamicGroup) return;
     clearGroup(dynamicGroup);
     interactables = interactables.filter(it => it.type !== 'mona');
@@ -2101,6 +2137,24 @@
 
   function queueCapacity() { return queueSlots.length; }
 
+  // Decisions within the same turn preserve customer flow; a new turn/cycle
+  // clears it so an old reservation cannot be charged to a different ledger.
+  function clearCustomerFlow(restoreReservations=false) {
+    let restored=false;
+    for(const customer of npcs){
+      if(restoreReservations&&inventory&&!customer.isReturn&&customer.productId&&[NPC_STATE.TAKE_PRODUCT,NPC_STATE.WALK_TO_CHECKOUT,NPC_STATE.QUEUE].includes(customer.state)){
+        const productId=customer.productId;
+        if(displayStock(productId)<displayCapacity())inventory.display[productId]=displayStock(productId)+1;
+        else inventory.reserve[productId]=reserveStock(productId)+1;
+        restored=true;
+      }
+      recycleNpcPerson(customer);
+    }
+    if(restored)saveInventory();
+    npcs=[];checkoutQueue=[];crossingPedestrians=[];
+    lastSpawn=0;
+  }
+
   function createNpcRecord(obj, spawnX, archetype, extra = {}) {
     const npc = {
       obj,
@@ -2160,7 +2214,8 @@
 
   function leaveStore(npc) {
     npc.leavingWorld = true;
-    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[-3.0,7.2],[npc.spawnX,9.9],[npc.spawnX,WORLD.crosswalkSouth?.z||13.0]]);
+    const entry=hubWorld.entrances.find(e=>e.id==='store');
+    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[entry.portal.x,entry.portal.z-1.3],[entry.portal.x,entry.portal.z+1.4],[entry.portal.x,entry.portal.z+3.2]]);
   }
 
   function releaseCrossing(npc) {
@@ -2192,12 +2247,16 @@
         leaveStore(npc);
         return;
       }
-      const sellers=animatedActors.filter(actor=>actor.type==='salesperson');
+      const interiorSellers=businessInteriors?.rooms.find(room=>room.id==='store')?.actors.filter(actor=>actor.object.userData.role==='salesperson')||[];
+      const sellers=[...animatedActors.filter(actor=>actor.type==='salesperson'),...interiorSellers];
       const seller=sellers[Math.floor(Math.random()*Math.max(1,sellers.length))];
-      const sx=seller?.obj?.position?.x ?? 4.2, sz=seller?.obj?.position?.z ?? 5.0;
+      const assistant=businessInteriors?.salesAssistantPoint||businessInteriors?.browsePoints?.[0];
+      const sellerObject=seller?.obj||seller?.object;
+      const sellerPosition=sellerObject?.getWorldPosition(new THREE.Vector3());
+      const sx=assistant?.x ?? sellerPosition?.x ?? HUB_OFFSET-19, sz=assistant?.z ?? sellerPosition?.z ?? 19;
       npc.assignedSeller=seller||null;
       if (seller) seller.state='desplazándose';
-      setNpcRoute(npc,NPC_STATE.SEEK_SALES_ASSISTANT,[[sx-.8,sz-.5]]);
+      setNpcRoute(npc,NPC_STATE.SEEK_SALES_ASSISTANT,[[sx,sz]]);
       return;
     }
     const marketingBoost=optSelected('INV_MARKETING','mkt_alta') ? .18 : optSelected('INV_MARKETING','mkt_media') ? .10 : 0;
@@ -2241,15 +2300,16 @@
   function tryJoinQueue(n) {
     if (checkoutQueue.length >= queueCapacity()) return false;
     n.queueIndex = checkoutQueue.length;
-    setNpcRoute(n,NPC_STATE.WALK_TO_CHECKOUT,[[-4.9,6.2],[queueSlots[n.queueIndex].x,queueSlots[n.queueIndex].z]]);
+    setNpcRoute(n,NPC_STATE.WALK_TO_CHECKOUT,[[queueSlots[n.queueIndex].x,queueSlots[n.queueIndex].z]]);
     checkoutQueue.push(n);
     updateHUD();
     return true;
   }
 
   function findNpcSpawn() {
-    const options=[-1.05,0,1.05].sort(()=>Math.random()-.5);
-    for(const z of [29.5,30.4])for(const x of options) {
+    const entry=hubWorld?.entrances.find(e=>e.id==='store');if(!entry)return null;
+    const options=[entry.portal.x-.55,entry.portal.x,entry.portal.x+.55].sort(()=>Math.random()-.5);
+    for(const z of [entry.portal.z+3.2,entry.portal.z+4.2])for(const x of options) {
       if(Math.hypot(player.x-x,player.z-z)<.85)continue;
       if(npcs.every(n=>n.dead||Math.hypot(n.obj.position.x-x,n.obj.position.z-z)>.85))return {x,z};
     }
@@ -2257,6 +2317,7 @@
   }
 
   function spawnNpc(now) {
+    if(currentInterior!=='store')return;
     const score = npcDemandScore();
     const dayBoost = gameSession?.difficulty || 1;
     const rush = businessState?.rushBoostUntil > now ? 1.65 : 1;
@@ -2271,7 +2332,8 @@
     p.position.set(spawnX,.025,spawn.z);
     npcGroup.add(p);
     const npc=createNpcRecord(p,spawnX,archetype);
-    setNpcRoute(npc,NPC_STATE.WALK_TO_STORE,[[spawnX,WORLD.crosswalkNorth?.z||24.8]]);
+    const entry=hubWorld.entrances.find(e=>e.id==='store');
+    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
     npcs.push(npc);
     simVisitors++;
     updateHUD();
@@ -2383,14 +2445,16 @@
     if(n.state===NPC_STATE.WALK_TO_STORE){setNpcState(n,NPC_STATE.WAIT_CROSSWALK);n.route=[];return;}
     if(n.state===NPC_STATE.CROSS_STREET){
       releaseCrossing(n);
-      if(n.leavingWorld){setNpcRoute(n,NPC_STATE.DESPAWN,[[n.spawnX,(WORLD.customerSpawn?.z||29.4)+1.2]]);}
-      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[n.spawnX,WORLD.storeApproach?.z||11.6],[n.spawnX,WORLD.storeDoor?.z||8.55],[n.spawnX,7.4]]);
+      const entry=hubWorld?.entrances.find(e=>e.id==='store');
+      if(!entry){recycleNpcPerson(n);n.dead=true;return;}
+      if(n.leavingWorld)leaveStore(n);
+      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
       return;
     }
     if(n.state===NPC_STATE.ENTER_STORE){
       if(n.isReturn){ if(!tryJoinQueue(n)){leaveStore(n);markLostCustomer('queue');} return; }
-      const selected=[...(WORLD.browsePoints||[])].sort(()=>Math.random()-.5).slice(0,2),points=[];
-      selected.forEach(p=>{points.push([p.x,4.35],[p.x+(Math.random()-.5)*.45,p.z+(Math.random()-.5)*.25]);});
+      const selected=[...(businessInteriors?.browsePoints||[{x:HUB_OFFSET-19,z:18},{x:HUB_OFFSET-19,z:21}])].sort(()=>Math.random()-.5).slice(0,2),points=[];
+      selected.forEach(p=>points.push([p.x,p.z]));
       setNpcRoute(n,NPC_STATE.BROWSE,points);return;
     }
     if(n.state===NPC_STATE.BROWSE){setNpcState(n,NPC_STATE.COMPARE);n.route=[];n.wait=1.2+Math.random()*1.2;return;}
@@ -2403,7 +2467,7 @@
       return;
     }
     if(n.state===NPC_STATE.WALK_TO_CHECKOUT){setNpcState(n,NPC_STATE.QUEUE);n.route=[];n.queueWait=0;return;}
-    if(n.state===NPC_STATE.LEAVE_STORE){setNpcState(n,NPC_STATE.WAIT_CROSSWALK);n.route=[];return;}
+    if(n.state===NPC_STATE.LEAVE_STORE){recycleNpcPerson(n);n.dead=true;return;}
     if(n.state===NPC_STATE.DESPAWN){recycleNpcPerson(n);n.dead=true;}
   }
 
@@ -2414,8 +2478,9 @@
       setPersonPose(n.obj,n.walkCycle+=dt*2,false,dt);
       if(trafficLight==='pedestrians'){
         n.crossing=true;if(!crossingPedestrians.includes(n))crossingPedestrians.push(n);
-        const destination=n.leavingWorld?WORLD.crosswalkNorth:WORLD.crosswalkSouth;
-        setNpcRoute(n,NPC_STATE.CROSS_STREET,[[n.spawnX,destination?.z||(n.leavingWorld?24.8:13)]]);
+        const entry=hubWorld?.entrances.find(e=>e.id==='store');
+        if(!entry)return;
+        setNpcRoute(n,NPC_STATE.CROSS_STREET,[[entry.portal.x,entry.portal.z+(n.leavingWorld?3.2:1)]]);
       }
       return;
     }
@@ -2423,7 +2488,7 @@
       n.queueWait = (n.queueWait || 0) + dt;
       if (n.queueWait > (n.patienceLimit || 16)) {
         removeFromQueue(n);
-        if (n.productId && inventory) {
+        if (n.productId && inventory && !n.isReturn) {
           inventory.display[n.productId] = Math.min(displayCapacity(), Number(inventory.display[n.productId] || 0) + 1);
           saveInventory();
           renderInventoryDisplays();
@@ -2458,7 +2523,7 @@
     Object.assign(state,{x:n.obj.position.x,z:n.obj.position.z,yaw:n.obj.rotation.y});
     const neighbors=npcNeighbors(n.obj);
     const result=npcNavigation.advance(state,{x:target[0],z:target[1]},dt,npcObstacles(),neighbors,n.speed,n.routeIndex===n.route.length-1);
-    n.obj.position.set(state.x,state.z>9?.025:0,state.z);n.obj.rotation.y=state.yaw;
+    n.obj.position.set(state.x,.025,state.z);n.obj.rotation.y=state.yaw;
     n.walkCycle+=result.distance*6.5;
     setPersonPose(n.obj,n.walkCycle,result.distance>.00001,dt);
     if(result.arrived)prepareNpcNextStep(n);
@@ -2528,10 +2593,11 @@
     const neighbors=[{x:player.x,z:player.z}];
     for(const other of npcs)if(other.obj!==obj&&!other.dead)neighbors.push({x:other.obj.position.x,z:other.obj.position.z});
     for(const actor of animatedActors)if(actor.obj&&actor.obj!==obj&&['visitor','guide','salesperson'].includes(actor.type))neighbors.push({x:actor.obj.position.x,z:actor.obj.position.z});
+    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors||[])if(actor.object!==obj)neighbors.push({x:actor.object.position.x+HUB_OFFSET,z:actor.object.position.z});
     return neighbors;
   }
 
-  function npcObstacles() {return [...colliders,...dynamicColliders.filter(c=>!c.npcId)]}
+  function npcObstacles() {return hubWorld?.colliders||businessInteriors?.colliders||[];}
 
   function animatePatrol(actor,dt) {
     const obj=actor.obj;
@@ -2611,18 +2677,29 @@
     entryDoorRight.position.x = 0.92 + entryDoorProgress * 0.82;
   }
 
-  // The business simulation keeps its original coordinates and state. The outdoor
-  // hub is a separate walkable scene region with doors into those same interiors.
+  // One scene, one coordinate system. Crossing a door changes only the HUD zone.
   async function buildPlayableHub() {
-    businessWorld=new THREE.Group();businessWorld.name='BusinessInteriors';
-    for(const child of [...scene.children])if(![hemiLight,sunLight,sunLight.target].includes(child))businessWorld.add(child);
-    scene.add(businessWorld);
-    const {createHubWorld}=await import('./services/hub_world.js');
+    const {createHubWorld}=await import('./services/hub_world.js?v=20260927-continuous-world');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260927-continuous-world');
+    businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
+      createNpc(role){const obj=person(role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{execModel:role==='supervisor'?'chico2':'chico3'});obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;},
+      animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
+    businessWorld=businessInteriors.group;
+    hubWorld.colliders.push(...businessInteriors.colliders);
+    hubWorld.entrances.splice(0,hubWorld.entrances.length,...businessInteriors.entrances);
+    queueSlots.splice(0,queueSlots.length,...(businessInteriors.queueSlots||businessInteriors.checkoutQueueSlots||[]));
+    // Translate environmental stations to the existing business actions.
+    // No station keeps a second ledger or an independent inventory.
+    interactables=(businessInteriors.interactionPoints||businessInteriors.hotspots||[]).map(point=>({
+      ...point,type:({finance:'register',inventory:'restock',supplier:'admin',production:'admin'})[point.type]||point.type,
+      adminPage:point.type==='supplier'||point.type==='inventory'?'stock':point.type==='production'?'dashboard':undefined
+    }));
+    productInteractables=interactables.filter(point=>point.type==='product');
     const {deriveObjective}=await import('./services/gameplay_objectives.mjs');
     hubWorld.deriveObjective=deriveObjective;
     playerMotion=await import('./services/player_motion.mjs');
-    const {createHubVehicles}=await import('./services/hub_vehicles.js');
+    const {createHubVehicles}=await import('./services/hub_vehicles.js?v=20260927-continuous-world');
     hubVehicles=createHubVehicles(hubWorld,HUB_OFFSET);
     try {
       const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
@@ -2639,6 +2716,12 @@
     }));
     sky.name='ProceduralSky';sky.renderOrder=-1;sky.frustumCulled=false;scene.add(sky);
     hubWorld.sky=sky;
+    const guide=monaTemplate?monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona):person({execModel:'chico1'});
+    guide.name=CONFIG.NPCS.mona.name;guide.userData.role='guide';guide.userData.modelKind=monaTemplate?'mona':'mona-fallback';
+    npcNames.setNpcName(guide,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
+    guide.position.set(HUB_OFFSET+14,.025,26);scene.add(guide);
+    animatedActors.push({type:'guide',obj:guide,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
+    interactables.push({mesh:guide,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
     const actorIds=['chico1','chico2','chico3'];
     const fallbackRoutes=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
     actorIds.forEach((id,i)=>{
@@ -2662,7 +2745,8 @@
   function refreshHubUI() {
     const root=$3(rootId);root?.classList.toggle('in-hub',inHub);root?.classList.toggle('third-person',cameraMode==='third');
     $3('simMinimap')?.classList.toggle('hub-map',inHub);
-    const label=inHub?'PLAZA SIDE':{store:'TIENDA',warehouse:'ALMACÉN',production:'PRODUCCIÓN'}[currentInterior];
+    const label={store:'TIENDA',warehouse:'ALMACÉN',production:'PRODUCCIÓN'}[currentInterior]||'PLAZA SIDE';
+    root?.setAttribute('data-world-zone',currentInterior||'city');
     if($3('simWorldLocation'))$3('simWorldLocation').textContent=`${label} · ${DISTRICTS[selectedDistrict]}`;
     if($3('sim3dCameraBtn')){$3('sim3dCameraBtn').textContent=cameraMode==='third'?'CÁMARA · 3.ª':'CÁMARA · 1.ª';$3('sim3dCameraBtn').setAttribute('aria-pressed',String(cameraMode==='third'));}
     document.querySelectorAll('[data-hub-district]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.hubDistrict===selectedDistrict)));
@@ -2679,18 +2763,18 @@
       reserve:totalReserveStock(),deliveryPending:Boolean(businessState?.pendingSupplierOrder)
     });
     const entrance=hubWorld.entrances.find(e=>e.id===objective.region);
-    // All business entrances lead into the existing shared interior. These are
-    // approach positions beside the existing stations, not new transactions.
-    const stations={register:{x:-8.4,z:7.25},restock:{x:8.4,z:-.35},admin:{x:10.4,z:5.05}};
-    const destination=inHub?entrance:(stations[objective.interaction]||null);
+    const station=interactables.find(p=>p.zone===objective.region&&p.type===objective.interaction);
+    const destination=station||entrance;
     const distance=destination?Math.round(Math.hypot(destination.x-player.x,destination.z-player.z)):0;
     const title=$3('simHubObjective');
     if(title&&title.textContent!==objective.title)title.textContent=objective.title;
     const preparing=bridge().canOperate?.()===false;
     if(preparing&&title)title.textContent='PREPARA TU EMPRESA';
-    const detail=preparing?(inHub?'Camina hasta la tienda · Usa su terminal de decisiones':'E junto a la tablet de decisiones · Envía tus apartados para operar'):inHub&&entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:(!destination&&entrance?`PLAZA → ${entrance.name}`:objective.instruction);
+    const detail=preparing?'Camina hasta la tienda · Usa su terminal de decisiones':currentInterior===objective.region&&station?`${station.label} · ${distance} m · E para interactuar`:entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:objective.instruction;
     if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
     const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
+    const contextual=$3('simBusinessContext');
+    if(contextual){contextual.hidden=!currentInterior;contextual.textContent=currentInterior==='warehouse'?`Inventario ${totalReserveStock()}/${warehouseCapacity()} · ${businessState?.pendingSupplierOrder?'Pedido pendiente':'Recepción disponible'}`:currentInterior==='production'?`Producción ${inventory?.producedUnits||0}/${productionSnapshot()?.producibleUnits||0} · Capacidad y productividad en terminal`:`Exhibición ${totalDisplayStock()} · Clientes ${checkoutQueue.length} · Ventas ${fmt(salesLedger())}`;}
     const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
     if(orderStatus){
       orderStatus.hidden=!order;
@@ -2713,37 +2797,38 @@
     if(playerAvatar){playerAvatar.position.set(x,.025,z);playerAvatar.rotation.y=facing+Math.PI;playerAvatar.userData.motion&&npcMotion.resetMotion(playerAvatar);}
   }
 
-  function setWorldRegion(exterior) {
-    inHub=exterior;
-    if(businessWorld)businessWorld.visible=!inHub;
-    if(hubWorld)hubWorld.group.visible=inHub;
-    hubActors.forEach(a=>a.obj.visible=inHub);
-    scene.fog=new THREE.Fog(0xc6d9e2,inHub?72:38,inHub?180:100);
+  function setWorldRegion() {
+    inHub=true;
+    if(businessWorld)businessWorld.visible=true;
+    if(hubWorld)hubWorld.group.visible=true;
+    scene.fog=new THREE.Fog(0xc6d9e2,72,180);
     refreshHubUI();
   }
 
   function enterHub(announce=true) {
     if(!hubWorld)return;
-    closeHubDirectory(false);
-    const spawn=hubReturnPoint||hubWorld.spawn;
-    setWorldRegion(true);positionPlayer(spawn.x,spawn.z,spawn.rotation||0);
+    closeHubDirectory(false);currentInterior=null;setWorldRegion();
+    positionPlayer(hubWorld.spawn.x,hubWorld.spawn.z,0);
     updateGameplayCamera(1);refreshHubUI();
     if(announce)message('Plaza SIDE · Camina por la entrada de un negocio. V cambia la cámara.');
   }
 
-  function enterHubInterior(id) {
-    const target={store:[0,7.3],warehouse:[8.4,-6.1],production:[-3.2,-2.4]}[id];
-    if(!target||!hubWorld)return;
-    const entrance=hubWorld.entrances.find(e=>e.id===id);
-    hubReturnPoint=entrance?{x:entrance.x,z:entrance.z+1.2,rotation:Math.PI}:null;
-    currentInterior=id;closeHubDirectory(false);setWorldRegion(false);
-    if(businessState){
+  function updateBusinessZone() {
+    const zone=driving?null:businessInteriors?.zoneAt(player)||null;
+    if(zone===currentInterior)return;
+    currentInterior=zone;
+    if(zone&&businessState){
       businessState.exploredHub||=[];
-      if(!businessState.exploredHub.includes(id)){businessState.exploredHub.push(id);saveBusinessState();playSfx('start');}
+      if(!businessState.exploredHub.includes(zone)){businessState.exploredHub.push(zone);saveBusinessState();}
     }
-    positionPlayer(target[0],target[1]);updateGameplayCamera(1);
-    updateHubObjective();
-    message('E junto a productos, caja o terminales. Camina por la puerta principal para volver a la plaza.');
+    refreshHubUI();
+  }
+
+  // Compatibility API now selects a walking destination; it never moves a player.
+  function enterHubInterior(id) {
+    const entrance=hubWorld?.entrances.find(e=>e.id===id);if(!entrance)return;
+    closeHubDirectory();message(entrance.name+' · Sigue el camino y cruza su puerta a pie.');
+    if(hubWaypoint){hubWaypoint.visible=true;hubWaypoint.position.set(entrance.x,0,entrance.z);}
   }
 
   function setCameraMode(mode) {
@@ -2877,10 +2962,17 @@
       const focus=new THREE.Vector3(player.x,player.y-.22,player.z);
       const distance=cameraZoom+Math.max(0,player.speed-2.65)*.18;
       const desired=new THREE.Vector3(player.x+Math.sin(yaw)*distance,Math.max(.55,focus.y+1.15-Math.sin(orbitPitch)*distance),player.z+Math.cos(yaw)*distance);
-      const blocks=inHub?hubWorld?.colliders||[]:[...colliders,...dynamicColliders];
+      const room=businessInteriors?.zones.find(zone=>zone.id===currentInterior);
+      const nearDoor=hubWorld?.entrances.some(entrance=>Math.abs(player.x-entrance.portal.x)<entrance.portal.halfWidth+1&&Math.abs(player.z-entrance.portal.z)<3);
+      // Keep the third-person orbit below the 3.1m lintel while crossing a
+      // doorway. Tall industrial roofs do not imply an overhead camera.
+      const ceilingLimit=room||nearDoor?Math.min(2.8,room?.ceilingY-.25||2.8):Infinity;
+      desired.y=Math.min(desired.y,ceilingLimit);
+      const blocks=hubWorld?.colliders||[];
       const clear=playerMotion.constrainCamera(focus,desired,blocks);desired.set(clear.x,clear.y,clear.z);
       if(cameraSnap)camera.position.copy(desired);else camera.position.lerp(desired,1-Math.exp(-12*dt));
       const safe=playerMotion.constrainCamera(focus,camera.position,blocks);camera.position.set(safe.x,safe.y,safe.z);
+      camera.position.y=Math.min(camera.position.y,ceilingLimit);
       camera.lookAt(focus);playerAvatar.visible=camera.position.distanceTo(focus)>1.05;
     }
     cameraSnap=false;
@@ -2907,18 +2999,17 @@
   }
 
   function collision(x, z) {
-    if(inHub&&hubWorld){
+    if(hubWorld){
       if(x<hubBounds.minX||x>hubBounds.maxX||z<hubBounds.minZ||z>hubBounds.maxZ)return true;
       if(hubWorld.colliders.some(c=>x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius))return true;
       if(hubVehicles?.occupied(x,z,player.radius))return true;
+      if(npcs.some(n=>!n.dead&&Math.hypot(x-n.obj.position.x,z-n.obj.position.z)<player.radius+.27))return true;
+      if((businessInteriors?.rooms||[]).some(room=>(room.actors||[]).some(actor=>Math.hypot(x-(actor.object.position.x+HUB_OFFSET),z-actor.object.position.z)<player.radius+.27)))return true;
       return hubActors.some(a=>Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27);
     }
-    if (x < -12.5 || x > 12.5 || z < -11.8 || z > 8.5) return true;
-    for(const c of colliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
-    for(const c of dynamicColliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
-    for(const n of npcs)if(!n.dead&&Math.hypot(x-n.obj.position.x,z-n.obj.position.z)<player.radius+.27)return true;
-    for(const a of animatedActors)if(a.type==='visitor'&&Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27)return true;
-    return false;
+    // Until the city is ready, movement stays blocked. Historical colliders
+    // can never become a fallback gameplay world.
+    return true;
   }
 
   function updatePlayer(dt) {
@@ -2926,13 +3017,8 @@
     if(driving||vehicleTransition){jumpQueued=false;return;}
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
-    const previous={x:player.x,z:player.z};
     const {travelled,sprinting}=playerMotion.stepPlayerMotion(player,{forward,side,sprint:keys.ShiftLeft||keys.ShiftRight,yaw},dt,collision);
-    if(running&&player.grounded&&hubWorld){
-      const entrance=inHub?hubWorld.crossedEntrance?.(previous,player):null;
-      if(entrance){enterHubInterior(entrance.id);return;}
-      if(!inHub&&hubWorld.crossedInteriorExit?.(previous,player)){enterHub();return;}
-    }
+    if(running&&hubWorld)updateBusinessZone();
     if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
 
     if (jumpQueued && player.grounded) {
@@ -2992,18 +3078,18 @@
   }
 
   function nearestInteractable() {
-    let best = null, dist = 2.2;
-    if(inHub&&hubWorld){
-      const choices=[...hubWorld.entrances.map(e=>({...e,type:'hubDoor',label:`Entrar a ${e.name||e.id}`})),{...hubWorld.kiosk,type:'hubDirectory',label:'Elegir tienda por distrito'}];
-      for(const choice of choices){const d=Math.hypot(player.x-choice.x,player.z-choice.z);if(d<dist){dist=d;best=choice;}}
-      return best;
+    let best=null,dist=2.2;
+    const choices=[...interactables,...(hubWorld?[{...hubWorld.kiosk,type:'hubDirectory',label:'Consultar directorio del barrio'}]:[])];
+    for(const choice of choices){
+      if(choice.zone&&choice.zone!==currentInterior)continue;
+      const point=choice.mesh?choice.mesh.getWorldPosition(new THREE.Vector3()):choice;
+      const distance=Math.hypot(player.x-point.x,player.z-point.z);
+      if(distance>=dist)continue;
+      // A contextual terminal cannot be used through an adjacent wall or shelf.
+      const lineEnd={x:point.x,z:point.z};
+      if(npcNavigation&&!npcNavigation.segmentClear(player,lineEnd,hubWorld?.colliders||[]))continue;
+      best=choice;dist=distance;
     }
-    interactables.forEach((it) => {
-      const p = it.mesh.getWorldPosition(new THREE.Vector3());
-      const d = Math.hypot(player.x - p.x, player.z - p.z);
-      if (d < dist) { dist = d; best = it; }
-    });
-    if(Math.hypot(player.x,player.z-8.3)<1.5)best={type:'hubReturn',label:'Salir a la plaza'};
     return best;
   }
 
@@ -3044,7 +3130,7 @@
       return;
     }
     if (it?.type === 'admin') {
-      p.innerHTML = '<kbd>E</kbd> Abrir computadora de administración';
+      p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` ${it.label||'Abrir computadora de administración'}`);
       p.classList.add('show');
       return;
     }
@@ -3061,14 +3147,12 @@
     if(!running||hubDirectoryOpen)return;
     const it = nearestInteractable();
     if (!it) return;
-    if(it.type==='hubDoor')enterHubInterior(it.id);
-    else if(it.type==='hubDirectory')openHubDirectory();
-    else if(it.type==='hubReturn')enterHub();
+    if(it.type==='hubDirectory')openHubDirectory();
     else if (it.type === 'decisions') openDecisionsFrom3D();
     else if (it.type === 'register') openCheckout();
     else if (it.type === 'restock') restockDisplays(true);
     else if (it.type === 'product') openProductInspect(it.productId);
-    else if (it.type === 'admin') openAdmin();
+    else if (it.type === 'admin') openAdmin(it.adminPage);
     else if (it.type === 'news') openNewsPanel();
     else if (it.type === 'mona') talkToMona();
   }
@@ -3150,19 +3234,20 @@
       updateVehicleAudio();
       updateGameplayCamera(dt);
       updateHubActors(dt);
+      businessInteriors?.tick(dt,player,time);
       if (operating && !gameSession?.shiftEnded) {
         spawnNpc(now);
         triggerRandomEvent(now);
         tickProduction(now);
         tickSupplier(now);
-        npcs.forEach((n) => moveNpc(n, dt));
+        if(currentInterior==='store')npcs.forEach((n) => moveNpc(n, dt));
         npcs = npcs.filter((n) => !n.dead);
       }
-      animateActors(time,dt);
-      updateEntryDoors(dt);
+      if(currentInterior==='store')animateActors(time,dt);
+      for(const npc of npcs)npc.obj.visible=currentInterior==='store'||Math.hypot(npc.obj.position.x-player.x,npc.obj.position.z-player.z)<18;
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
-      if (now - lastHudTick > 220) { updateHUD(); updateMinimap();updateHubObjective(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
+      if (now - lastHudTick > 220) { renderInventoryDisplays();updateHUD(); updateMinimap();updateHubObjective(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
     }
     updateAdaptiveQuality(elapsed, now);
     renderer.render(scene, camera);
@@ -3214,7 +3299,7 @@
     document.addEventListener('keyup', (e) => { keys[e.code] = false; });
     window.addEventListener('blur',()=>{keys={};jumpQueued=false;});
     $3('sim3dCameraBtn')?.addEventListener('click',()=>setCameraMode(cameraMode==='third'?'first':'third'));
-    $3('sim3dHubBtn')?.addEventListener('click',()=>{if(running&&!checkoutOpen&&!adminOpen&&!newsOpen&&!productInspectOpen)enterHub();});
+    $3('sim3dHubBtn')?.addEventListener('click',()=>{if(running&&!checkoutOpen&&!adminOpen&&!newsOpen&&!productInspectOpen)openHubDirectory();});
     $3('simHubDirectoryClose')?.addEventListener('click',()=>closeHubDirectory());
     document.querySelectorAll('[data-hub-district]').forEach(button=>button.addEventListener('click',()=>selectHubDistrict(button.dataset.hubDistrict)));
     $3('simHubVisitStore')?.addEventListener('click',()=>{
@@ -3329,7 +3414,8 @@
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
     buildStaticWorld();
-    await initNavigation();
+    // New city navigation uses the same obstacle graph as physical collisions.
+    navReady=false;navMesh=null;navQuery=null;
     await buildPlayableHub();
     loadAudioSetting();
     clock = new THREE.Clock();
@@ -3393,7 +3479,7 @@
     resetGameSession(false);
     running = autoStart||controlsSeen;
     keys = {};
-    player.x = 0; player.z = 11.4; player.y = player.baseY; player.vx = 0; player.vz = 0; player.vy = 0; player.grounded = true; player.bob = 0; yaw = 0; pitch = -0.04; targetYaw = yaw; targetPitch = pitch;
+    player.bob=0;
     rebuildDynamicWorld();
     hubReturnPoint=null;enterHub(false);
     syncSalesFromLedger();
@@ -3428,13 +3514,17 @@
   function diagnostics() {
     const characters = [];
     scene?.traverse(node => {
-      if (node.userData?.modelKind) characters.push({kind:node.userData.modelKind, name:node.userData.displayName||'', x:node.position.x, z:node.position.z});
+      if (node.userData?.modelKind) {
+        const position=node.getWorldPosition(new THREE.Vector3());
+        characters.push({kind:node.userData.modelKind, name:node.userData.displayName||'', x:position.x, z:position.z});
+      }
     });
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
-      navigationReady:navReady, models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
-      hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:businessState?.exploredHub||[],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
+      hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
+      world:{id:'side-city',continuous:true,legacyActive:Boolean(businessWorld&&businessWorld!==businessInteriors?.group&&businessWorld.visible),interiors:businessInteriors?.stats()||null,queueCapacity:queueSlots.length},
       driving:driving?{speed:driving.speed,yaw:driving.yaw}:null,vehicles:hubVehicles?.cars.map(c=>({x:c.x,z:c.z,speed:c.speed,traffic:c.traffic}))||[],
       playerControl:{mode:playerMode,locomotion:player.locomotion||'IDLE',zoom:cameraZoom,transition:vehicleTransition?vehicleTransition.elapsed/vehicleTransition.duration:null},
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};

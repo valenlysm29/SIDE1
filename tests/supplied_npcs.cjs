@@ -8,11 +8,21 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
 const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     manual(){cancelAnimationFrame(raf)},
-    spawn(){lastSpawn=-1e9;spawnNpc(performance.now())},
+    enterStore(){
+      const entry=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(entry.x,entry.z,0);
+      keys={KeyW:true};for(let i=0;i<90;i++)updatePlayer(1/60);keys={};
+      if(currentInterior!=='store')throw new Error('Production movement failed to cross the store doorway');
+      // Stand in a clear customer area after crossing the production doorway.
+      positionPlayer(entry.portal.x,entry.portal.z-7,0);updateBusinessZone();
+      businessInteriors.tick(1/60,player,0);return currentInterior;
+    },
+    spawn(){lastSpawn=-1e9;spawnNpc(performance.now());return npcs.length},
+    actors(){return [...hubActors,...animatedActors.filter(a=>a.type==='guide')].map(a=>({kind:a.obj.userData.modelKind,role:a.obj.userData.role,rigged:Boolean(a.obj.userData.motion),distance:a.obj.userData.motion?.distance||0,x:a.obj.position.x,z:a.obj.position.z}))},
     queueScenario(){
-      npcs.forEach(recycleNpcPerson);npcs=[];checkoutQueue=[];
-      const obj=acquireNpcPerson({execModel:'chico1'});obj.position.set(1.1,0,3);npcGroup.add(obj);
-      const npc=createNpcRecord(obj,1.05,{...CUSTOMER_ARCHETYPES[0],patience:100});npc.speed=1;
+      clearCustomerFlow(true);
+      const point=businessInteriors.browsePoints[0];
+      const obj=acquireNpcPerson({execModel:'chico1'});obj.position.set(point.x,.025,point.z);npcGroup.add(obj);
+      const npc=createNpcRecord(obj,point.x,{...CUSTOMER_ARCHETYPES[0],patience:100});npc.speed=1;
       inventory.display[PRODUCTS[0].id]=2;reserveProductForNpc(npc,PRODUCTS[0]);attachBagToNpc(npc);npcs.push(npc);tryJoinQueue(npc);
       return {boneAttached:Boolean(obj.userData.heldBag.parent.isBone),revenue:gameSession.revenue};
     },
@@ -21,14 +31,14 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
       const states=new Set(),violations=[];
       for(let i=0;i<Math.round(seconds*60);i++){
         npcs.forEach(n=>{if(!n.dead)states.add(n.state);moveNpc(n,1/60);if(!n.dead)states.add(n.state)});
-        npcs=npcs.filter(n=>!n.dead);animateActors(i/60,1/60);
+        npcs=npcs.filter(n=>!n.dead);animateActors(i/60,1/60);updateHubActors(1/60);businessInteriors.tick(1/60,player,i/60);
         for(const n of npcs)for(const c of npcObstacles()){
           if(n.obj.position.x>c.minX-.28&&n.obj.position.x<c.maxX+.28&&n.obj.position.z>c.minZ-.28&&n.obj.position.z<c.maxZ+.28){if(violations.length<8)violations.push({state:n.state,x:n.obj.position.x,z:n.obj.position.z,collider:c})};
         }
       }
       renderer.render(scene,camera);return {states:[...states],violations,diag:diagnostics()};
     },
-    view(){camera.position.set(0,2.2,17);camera.lookAt(0,1.3,10.8);renderer.render(scene,camera)},
+    view(){const entry=hubWorld.entrances.find(e=>e.id==='store');camera.position.set(entry.portal.x,2.2,entry.portal.z-1.4);camera.lookAt(entry.portal.x,1.3,entry.portal.z-5);renderer.render(scene,camera)},
     obstacleData(){return [...colliders,...dynamicColliders]},
     inspect(){return npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,route:n.route,index:n.routeIndex,blocked:n.blockedFor,routeBlocked:n.routeBlocked}))}
   };
@@ -39,6 +49,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
  const results=[];
  try {
   const context=await browser.newContext({viewport:{width:1400,height:900}}),page=await context.newPage(),errors=[];
+  page.setDefaultTimeout(90000);
   page.on('pageerror',e=>errors.push(e.message));
   await context.route('**/*',route=>route.request().url().startsWith(base)?route.continue():route.abort());
   await page.goto(base+'tools/npc_preview.html?manual');await page.waitForFunction(()=>window.ready||window.previewError,null,{timeout:60000});
@@ -89,6 +100,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
   results.push({preview:'passed',pose,timing,stopped,contact});await context.close();
   for(const fallback of [false,true]) {
     const ctx=await browser.newContext({viewport:{width:1280,height:800}}),p=await ctx.newPage(),pageErrors=[];
+    p.setDefaultTimeout(90000);
     p.on('pageerror',e=>pageErrors.push(e.message));
     await ctx.route('**/*',async route=>{
       const url=route.request().url();
@@ -102,18 +114,22 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     await p.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);await p.evaluate(()=>__npcTest.manual());
     const initial=await p.evaluate(()=>SIDE3D.diagnostics());
     assert.equal(initial.suppliedNpcs.loaded.length,fallback?0:3);assert.equal(initial.mona.loaded,!fallback);
-    assert.equal(initial.suppliedNpcs.actors.length,4);assert.equal(initial.mona.instances,1);
-    for(const name of ['Joel','Miguel','Gonzalo','Valeria'])assert.ok(initial.characters.some(c=>c.name===name),`visible name: ${name}`);
-    if(!fallback)assert.ok(initial.suppliedNpcs.actors.every(a=>a.rigged));
-    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal(d.suppliedNpcs.actors.length,4);assert.equal(d.mona.instances,1)}
-    await p.evaluate(()=>{__npcTest.spawn();__npcTest.spawn();__npcTest.spawn()});
+    const actors=await p.evaluate(()=>__npcTest.actors());
+    assert.equal(actors.length,4);assert.equal(initial.mona.instances,1);
+    assert.equal(actors.filter(a=>a.role==='hub-pedestrian').length,3);
+    if(!fallback)for(const model of ['chico1','chico2','chico3'])assert.ok(actors.some(c=>c.kind===model),`city pedestrian: ${model}`);
+    if(!fallback)assert.ok(actors.every(a=>a.rigged));
+    assert.equal(initial.world.id,'side-city');assert.equal(initial.world.legacyActive,false);
+    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,4);assert.equal(d.mona.instances,1)}
+    assert.equal(await p.evaluate(()=>__npcTest.enterStore()),'store');
+    assert.equal(await p.evaluate(()=>{__npcTest.spawn();__npcTest.spawn();return __npcTest.spawn()}),3,'normal customer spawns use the physical city store');
     const travel=await p.evaluate(()=>__npcTest.step(100));
     fs.writeFileSync(path.join(output,fallback?'fallback-travel.json':'travel.json'),JSON.stringify({travel,details:await p.evaluate(()=>__npcTest.inspect())},null,2));
     assert.deepEqual(travel.violations,[],'customers must not intersect furniture');
     assert.ok(travel.states.includes('ENTER_STORE'),'customers enter through the door');
     assert.ok(travel.states.includes('BROWSE'),'customers reach products');
     assert.ok(travel.states.includes('LEAVE_STORE')||travel.states.includes('QUEUE'),'customers complete a decision');
-    if(!fallback)assert.ok(travel.diag.suppliedNpcs.actors.every(a=>a.distance>1),'all four patrol');
+    if(!fallback)assert.ok((await p.evaluate(()=>__npcTest.actors())).filter(a=>a.role==='hub-pedestrian').every(a=>a.distance>1),'three city pedestrians patrol while Mona remains at her guidance point');
     const basket=await p.evaluate(()=>__npcTest.queueScenario());
     assert.equal(basket.boneAttached,!fallback);
     assert.equal(await p.evaluate(()=>__npcTest.charge()),basket.revenue,'no charge while the customer is still walking to the till');

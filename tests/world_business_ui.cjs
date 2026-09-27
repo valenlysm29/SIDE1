@@ -6,7 +6,7 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D = {',`  window.businessQA={
   freeze(){cancelAnimationFrame(raf);},
   resume(){clock.getDelta();raf=requestAnimationFrame(frame);},
-  open(){enterHubInterior('warehouse');openAdmin();},
+  open(){const e=hubWorld.entrances.find(e=>e.id==='warehouse');positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++)updatePlayer(1/60);keys={};openAdmin();},
   due(){if(businessState.pendingSupplierOrder){businessState.pendingSupplierOrder.dueAt=Date.now()-1;saveBusinessState();}tickSupplier();},
   tick:tickSupplier,
   snapshot(){return {stock:totalDisplayStock()+totalReserveStock(),pending:businessState.pendingSupplierOrder,ledger:JSON.stringify(bridge().ledger),cash:decisionCash(),time:gameSession.timeLeft,frames:renderer.info.render.frame};}

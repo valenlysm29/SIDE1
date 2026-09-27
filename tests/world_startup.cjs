@@ -5,6 +5,9 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const url=process.env.SIDE_TEST_URL||'http://127.0.0.1:8771/';
 const output=path.join(__dirname,'output');fs.mkdirSync(output,{recursive:true});
+const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.startupQA={
+  storeVisit(){cancelAnimationFrame(raf);const e=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++){updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);}keys={};renderInventoryDisplays();updateGameplayCamera(1);renderer.render(scene,camera);}
+};\n  window.SIDE3D = {`);
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
@@ -15,7 +18,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    page.on('pageerror',error=>errors.push(error.message));
    page.on('requestfailed',request=>{if(request.url().startsWith(url))failedLocal.push({url:request.url(),error:request.failure()?.errorText})});
    // All third-party hosts are unavailable. The 3D engine and its assets must load locally.
-   await context.route('**/*',route=>route.request().url().startsWith(url)?route.continue():route.abort());
+   await context.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA',company:'QA MUNDO',game:DEMO_GAME};openDecisionMenu();});
    assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),true,'the world is available before decisions are submitted');
@@ -59,11 +62,14 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    assert.equal(await page.locator('#simulator3d').isVisible(),true);
    assert.equal(await page.locator('#sim3dStart').isVisible(),false,'autostart must not leave another blocking overlay');
    await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
+   assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().world.legacyActive),false);
+   await page.evaluate(()=>startupQA.storeVisit());
    const diagnostic=await page.evaluate(()=>SIDE3D.diagnostics());
    assert.equal(diagnostic.running,true);assert.equal(diagnostic.navigationReady,true);
    assert.deepEqual(diagnostic.models.sort(),['casual','female','male']);
-   assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&Math.abs(c.x-3.8)<.3&&Math.abs(c.z-4.75)<.25),'male stands in the clear sales aisle');
-   assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&Math.abs(c.x-6)<.3&&Math.abs(c.z-4.75)<.25),'female stands in the clear sales aisle');
+   assert.ok(diagnostic.characters.some(c=>c.kind==='male'&&c.x>123&&c.x<139&&c.z>14&&c.z<24),'male cashier belongs to the physically connected store');
+   assert.ok(diagnostic.characters.some(c=>c.kind==='female'&&c.x>123&&c.x<139&&c.z>14&&c.z<24),'female sales assistant belongs to the physically connected store');
+   assert.equal(diagnostic.hub.interior,'store');
    await page.screenshot({path:path.join(output,`world-${mode}.png`)});
    assert.deepEqual(errors,[]);
    assert.deepEqual(diagnostic.suppliedNpcs.errors,{});
