@@ -419,7 +419,7 @@ function channelDraft(){
 function storeMinimum(id){return RULES.committedQuantity(savedEntry(findDecisionItem('CANALES')),id,currentRound())}
 function renderChannelChoices(item,locked){
   const d=channelDraft();
-  return `<div class="choice-strip store-channel-grid">${item.options.map(option=>{
+  return `<div class="choice-strip checkbox-options store-channel-grid">${item.options.map(option=>{
     const id=option.id,selected=(d.optionIds||[]).includes(id),physical=option.channel==='store';
     const remaining=optionCommitRemaining(item,id),disabled=locked||(physical&&storeMinimum(id)>0);
     return `<div class="store-channel-card ${selected?'selected':''}" data-channel-card="${id}">
