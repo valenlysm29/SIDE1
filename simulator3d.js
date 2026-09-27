@@ -39,6 +39,7 @@
   let hubVehicles = null, driving = null;
   let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
   let cameraZoom = 5.2, lastCameraInputAt = 0;
+  let preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 5;
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
@@ -561,7 +562,7 @@
   function syncSessionContext() {
     if (!sessionContext) return;
     const changed = sessionContext !== storageContext();
-    const closed = bridge().canOperate?.() === false;
+    const closed = (bridge().canExplore?.() ?? bridge().canOperate?.()) === false;
     if (!changed && !closed) return;
     // Stop the old shift before it can record activity under the new cycle's keys.
     running = false;
@@ -683,6 +684,35 @@
       return false;
     }
   }
+
+  function publishLoading(phase, loaded = loadingLoaded) {
+    loadingPhase = phase; loadingLoaded = Math.max(0, Math.min(loadingTotal, loaded));
+    window.dispatchEvent(new CustomEvent('side3d:loading', { detail: { phase, loaded: loadingLoaded, total: loadingTotal } }));
+  }
+
+  async function preload() {
+    if (initialized) return true;
+    if (!preloadPromise) {
+      preloadPromise = (async () => {
+        publishLoading('Cargando motor 3D y navegación');
+        if (!await loadThree()) return false;
+        loadingLoaded = 1; publishLoading('Cargando personajes esenciales');
+        await Promise.all([loadExecModelTemplates(), loadSuppliedNpcs(), loadMonaModel()]);
+        loadingLoaded = 4; publishLoading('Recursos esenciales listos');
+        if (Object.values(execModelTemplates).some(model => !model)) await loadNpcModelTemplate();
+        loadingLoaded = 5; publishLoading('Mundo 3D listo para iniciar');
+        window.dispatchEvent(new CustomEvent('side3d:ready'));
+        return true;
+      })().catch(error => {
+        console.error('SIDE: precarga 3D', error);
+        publishLoading('No se pudo precargar el mundo 3D');
+        return false;
+      });
+    }
+    return preloadPromise;
+  }
+
+  function loadingStatus() { return { phase: loadingPhase, loaded: loadingLoaded, total: loadingTotal }; }
 
   async function loadNpcModelTemplate() {
     if(npcModelTemplate||!GLTFLoader||!SkeletonUtils?.clone)return Boolean(npcModelTemplate);
@@ -1590,40 +1620,12 @@
       [.25,1.0,1.78].forEach(y=>{const s=mesh(new THREE.BoxGeometry(w+.12,.08,.72),shelfMat);s.position.set(0,y,0);g.add(s)});
       g.position.set(x,0,z);scene.add(g);addCollider(x-w/2-.15,x+w/2+.15,z-.46,z+.46);return g;
     };
-    const addTrafficSignal = (x,z,rotate=0) => {
-      const g=new THREE.Group();
-      const post=cylinder(.08,.1,3.1,0x27333c,0,1.55,0,12,.55,.3);
-      const housing=box(.38,.92,.28,0x111820,0,2.75,0,.42,.18);
-      const red=mesh(new THREE.SphereGeometry(.105,12,8),mat(0x4c1111,.3,0,{emissive:0x330000,emissiveIntensity:.2}));red.position.set(0,3.02,.15);
-      const green=mesh(new THREE.SphereGeometry(.105,12,8),mat(0x123b25,.3,0,{emissive:0x002a10,emissiveIntensity:.2}));green.position.set(0,2.48,.15);
-      const pedBox=box(.48,.58,.18,0x17212a,.48,2.35,0,.5,.16);
-      const pedRed=mesh(new THREE.SphereGeometry(.07,10,8),mat(0x4c1111,.3,0,{emissive:0x330000,emissiveIntensity:.2}));pedRed.position.set(.48,2.50,.11);
-      const pedGreen=mesh(new THREE.SphereGeometry(.07,10,8),mat(0x123b25,.3,0,{emissive:0x002a10,emissiveIntensity:.2}));pedGreen.position.set(.48,2.20,.11);
-      g.add(post,housing,red,green,pedBox,pedRed,pedGreen);g.position.set(x,0,z);g.rotation.y=rotate;scene.add(g);
-      trafficSignalMeshes.push({red,green,pedRed,pedGreen});
-    };
-
-    // Ciudad frontal: dos veredas, calle, cruce seguro y edificios de bajo coste.
-    scene.add(plane(190,190,0x8ea87b,0,-.05,16,-Math.PI/2,0,1,0));
-    scene.add(texturedPlane(64,10,'road',0,.005,19,18,4));
-    scene.add(texturedPlane(64,4.4,'sidewalk',0,.02,11.5,18,2));
-    scene.add(texturedPlane(64,4.4,'sidewalk',0,.02,26.5,18,2));
-    scene.add(plane(64,.18,0xf5d965,0,.025,19,-Math.PI/2,0,.4,0));
-    for(let z=14;z<=24;z+=1.05) scene.add(plane(3.8,.54,0xffffff,0,.045,z,-Math.PI/2,0,.75,0));
-    for(let x=-28;x<=28;x+=6) { scene.add(plane(2.7,.12,0xf7f1d3,x,.04,16.6,-Math.PI/2)); scene.add(plane(2.7,.12,0xf7f1d3,x,.04,21.4,-Math.PI/2)); }
-    addTrafficSignal(-2.8,13.2,Math.PI); addTrafficSignal(2.8,24.8,0);
-    [-20,-11,11,20].forEach(x=>{scene.add(buildStreetLamp(x,11.0));scene.add(buildStreetLamp(x,27.2))});
-    [-18,-8,17].forEach(x=>scene.add(buildTree(x,28.3)));
-    scene.add(buildBench(-11,27.2));
-    const cityBuildings=[[-25,-2,8,10,13,0x485b72],[25,-2,8,10,15,0x53677c],[-25,31,9,10,14,0x506578],[24,32,10,11,16,0x41586f],[-14,38,10,10,13,0x56697a],[0,39,11,10,17,0x465d73],[14,38,10,10,12,0x5b6c7c]];
-    cityBuildings.forEach(spec=>scene.add(buildBuilding(...spec)));
-
-    // Panel exterior enlazado a los eventos reales del ciclo.
-    const newsFrame=box(5.3,2.7,.28,0x172535,WORLD.newsPanel?.x||8.2,1.9,WORLD.newsPanel?.z||27.2,.42,.25);
-    const newsGlow=box(4.8,2.22,.04,0x123a58,WORLD.newsPanel?.x||8.2,1.9,(WORLD.newsPanel?.z||27.2)-.17,.22,.08);
-    const newsPostL=box(.16,1.6,.16,0x26333e,(WORLD.newsPanel?.x||8.2)-2.0,.8,WORLD.newsPanel?.z||27.2,.55,.25);
-    const newsPostR=box(.16,1.6,.16,0x26333e,(WORLD.newsPanel?.x||8.2)+2.0,.8,WORLD.newsPanel?.z||27.2,.55,.25);
-    newsPanelMesh=newsGlow;scene.add(newsFrame,newsGlow,newsPostL,newsPostR,addTextLabel('NOTICIAS DEL CICLO',WORLD.newsPanel?.x||8.2,2.45,(WORLD.newsPanel?.z||27.2)-.34,'#ffd329',.58,'rgba(4,14,24,.92)'));
+    // Panel interior enlazado a los eventos reales del ciclo.
+    const newsFrame=box(5.3,2.7,.28,0x172535,8.2,1.9,-11.8,.42,.25);
+    const newsGlow=box(4.8,2.22,.04,0x123a58,8.2,1.9,(-11.8)-.17,.22,.08);
+    const newsPostL=box(.16,1.6,.16,0x26333e,(8.2)-2.0,.8,-11.8,.55,.25);
+    const newsPostR=box(.16,1.6,.16,0x26333e,(8.2)+2.0,.8,-11.8,.55,.25);
+    newsPanelMesh=newsGlow;scene.add(newsFrame,newsGlow,newsPostL,newsPostR,addTextLabel('NOTICIAS DEL CICLO',8.2,2.45,(-11.8)-.34,'#ffd329',.58,'rgba(4,14,24,.92)'));
     interactables.push({mesh:newsPanelMesh,type:'news',label:'Leer noticias del ciclo'});
 
     // Local con tres ambientes físicamente separados.
@@ -1679,12 +1681,6 @@
     [6.2,10.3].forEach(x=>addCeilingLight(x,-6.5,false,false));
     dynamicGroup=new THREE.Group();npcGroup=new THREE.Group();scene.add(dynamicGroup,npcGroup);
 
-    // Vehículos reciclables: el semáforo decide su avance; no se crean objetos por frame.
-    const carLimit=Number((PERF[perfMode]||PERF.auto||{maxCars:3}).maxCars||3);
-    [[-28,16.7,0xb94e4e,1],[28,21.3,0x416fa7,-1],[-12,16.7,0xd29a38,1],[13,21.3,0x4a8f68,-1]].slice(0,carLimit).forEach(([x,z,color,dir],i)=>{
-      const car=buildCar(x,z,color,dir);scene.add(car);const actor={type:'traffic',obj:car,speed:3.2+i*.35,dir,minX:-30,maxX:30,laneZ:z,state:'circulando'};trafficCars.push(actor);registerAnimatedActor(actor);
-    });
-    updateTrafficSignals();
   }
 
   function buildLegacyWorld() {
@@ -2589,7 +2585,7 @@
     });
     updateTraffic(dt);
     // Visual idle frames (help/results/decisions) must never create transactions.
-    if (!running || !gameSession || gameSession.shiftEnded) return;
+    if (!running || !gameSession || gameSession.shiftEnded || bridge().canOperate?.()===false) return;
     if (salesStaff() > 0 && time - lastAutoRestock > Math.max(10, 22 - salesStaff() * 3)) {
       lastAutoRestock = time;
       restockDisplays(false);
@@ -2690,7 +2686,9 @@
     const distance=destination?Math.round(Math.hypot(destination.x-player.x,destination.z-player.z)):0;
     const title=$3('simHubObjective');
     if(title&&title.textContent!==objective.title)title.textContent=objective.title;
-    const detail=inHub&&entrance?`${entrance.name} · ${distance} m · E para entrar`:(!destination&&entrance?`PLAZA → ${entrance.name}`:objective.instruction);
+    const preparing=bridge().canOperate?.()===false;
+    if(preparing&&title)title.textContent='PREPARA TU EMPRESA';
+    const detail=preparing?(inHub?'Camina hasta la tienda · Usa su terminal de decisiones':'E junto a la tablet de decisiones · Envía tus apartados para operar'):inHub&&entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:(!destination&&entrance?`PLAZA → ${entrance.name}`:objective.instruction);
     if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
     const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
     const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
@@ -2730,7 +2728,7 @@
     const spawn=hubReturnPoint||hubWorld.spawn;
     setWorldRegion(true);positionPlayer(spawn.x,spawn.z,spawn.rotation||0);
     updateGameplayCamera(1);refreshHubUI();
-    if(announce)message('Plaza SIDE · Camina hasta una entrada y pulsa E. V cambia la cámara.');
+    if(announce)message('Plaza SIDE · Camina por la entrada de un negocio. V cambia la cámara.');
   }
 
   function enterHubInterior(id) {
@@ -2745,7 +2743,7 @@
     }
     positionPlayer(target[0],target[1]);updateGameplayCamera(1);
     updateHubObjective();
-    message(businessState?.exploredHub?.length===3?'Empresa explorada. Tu siguiente reto: atender clientes y completar las misiones del turno.':'Pulsa E junto a productos, caja o terminales. El botón PLAZA te lleva al exterior.');
+    message('E junto a productos, caja o terminales. Camina por la puerta principal para volver a la plaza.');
   }
 
   function setCameraMode(mode) {
@@ -2915,7 +2913,7 @@
       if(hubVehicles?.occupied(x,z,player.radius))return true;
       return hubActors.some(a=>Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27);
     }
-    if (x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ) return true;
+    if (x < -12.5 || x > 12.5 || z < -11.8 || z > 8.5) return true;
     for(const c of colliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
     for(const c of dynamicColliders)if(x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius)return true;
     for(const n of npcs)if(!n.dead&&Math.hypot(x-n.obj.position.x,z-n.obj.position.z)<player.radius+.27)return true;
@@ -2928,7 +2926,13 @@
     if(driving||vehicleTransition){jumpQueued=false;return;}
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
+    const previous={x:player.x,z:player.z};
     const {travelled,sprinting}=playerMotion.stepPlayerMotion(player,{forward,side,sprint:keys.ShiftLeft||keys.ShiftRight,yaw},dt,collision);
+    if(running&&player.grounded&&hubWorld){
+      const entrance=inHub?hubWorld.crossedEntrance?.(previous,player):null;
+      if(entrance){enterHubInterior(entrance.id);return;}
+      if(!inHub&&hubWorld.crossedInteriorExit?.(previous,player)){enterHub();return;}
+    }
     if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
 
     if (jumpQueued && player.grounded) {
@@ -3130,7 +3134,8 @@
     }
     pausedFrameDrawn=false;
     if (running) {
-      if (gameSession && !gameSession.shiftEnded) {
+      const operating=bridge().canOperate?.()!==false;
+      if (operating && gameSession && !gameSession.shiftEnded) {
         gameSession.timeLeft -= dt;
         if (gameSession.timeLeft <= 0) {
           gameSession.timeLeft = 0;
@@ -3145,7 +3150,7 @@
       updateVehicleAudio();
       updateGameplayCamera(dt);
       updateHubActors(dt);
-      if (!gameSession?.shiftEnded) {
+      if (operating && !gameSession?.shiftEnded) {
         spawnNpc(now);
         triggerRandomEvent(now);
         tickProduction(now);
@@ -3319,16 +3324,11 @@
 
   async function init() {
     if (initialized) return true;
-    if (!await loadThree()) return false;
-    await loadExecModelTemplates();
-    await loadSuppliedNpcs();
-    await loadMonaModel();
-    if (Object.values(execModelTemplates).some(model=>!model)) await loadNpcModelTemplate();
+    if (!await preload()) return false;
     debugPerformance=new URLSearchParams(location.search).get('side3dDebug')==='1';
     if(debugPerformance&&!$3('simPerfMonitor')){const monitor=document.createElement('div');monitor.id='simPerfMonitor';monitor.className='sim-perf-monitor';monitor.textContent='Midiendo rendimiento…';$3(rootId)?.appendChild(monitor);}
     loadBusinessState();
     buildStaticWorld();
-    buildAmbientNpcs();
     await initNavigation();
     await buildPlayableHub();
     loadAudioSetting();
@@ -3440,5 +3440,5 @@
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  window.SIDE3D = { prepare, preload, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

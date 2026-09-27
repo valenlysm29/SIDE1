@@ -47,10 +47,10 @@
       const phase=runtime.phase||config.phase||'integration',round=Number(runtime.round||config.round||1);
       const finished=phase==='finished'||Boolean(status.finishedAt);
       const integration=!finished&&phase==='integration';
-      const remaining=integration&&config.gameStartAt?Math.max(0,Math.ceil((Date.parse(config.gameStartAt)-now)/1000)):null;
+      const remaining=integration&&config.cycleCloseMode==='automatic'&&config.gameStartAt?Math.max(0,Math.ceil((Date.parse(config.gameStartAt)-now)/1000)):null;
       return {round,phase,integration,remaining,canJoin:!finished,
         canOperate:!finished&&phase==='decisions',
-        reason:finished?'La partida ha finalizado.':integration?'Sala de espera. El Ciclo 1 comenzará automáticamente al terminar el tiempo configurado.':phase==='results'?'Ciclo cerrado. Esperando el siguiente ciclo.':''};
+        reason:finished?'La partida ha finalizado.':integration?(config.cycleCloseMode==='automatic'?'Sala de espera. El Ciclo 1 comenzará automáticamente al terminar el tiempo configurado.':'Sala de espera. Esperando que el profesor inicie la partida.'):phase==='results'?'Ciclo cerrado. Esperando el siguiente ciclo.':''};
     }
     // integrationMinutes===0 => sin período de integración; acceso inmediato al operar
     const intMin=Number(config.integrationMinutes);
@@ -88,9 +88,6 @@
       const plan=cycleSchedule(config),p=schedulePosition(plan,now);
       if(!p||p.status==='scheduled')return r;
       r={...r,...p,phase:p.status==='simulation-finished'?'finished':'decisions',running:p.status==='running',duration:plan.duration/1000,startedAt:new Date(p.startedAt).toISOString()};
-    }else if(r.phase==='integration'&&config.gameStartAt&&now>=Date.parse(config.gameStartAt)){
-      const duration=Math.max(60,Number(config.roundHours||0)*3600+Number(config.roundMinutes||0)*60);
-      r={...r,round:1,phase:'decisions',status:'running',mode:'manual',running:true,duration,remaining:duration,startedAt:new Date(config.gameStartAt).toISOString()};
     }else if(r.phase==='decisions'&&r.running&&now>=Date.parse(r.startedAt)+r.duration*1000){
       r={...r,phase:'results',status:'finished',running:false,remaining:0};
     }

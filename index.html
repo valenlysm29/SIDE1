@@ -145,7 +145,7 @@
         <img src="assets/side_logo.png" class="dash-logo" alt="SIDE">
         <div class="lobby-content" tabindex="0" role="region" aria-label="Partida, noticias y resultados; contenido desplazable">
           <p class="eyebrow">PARTIDA</p>
-          <h1 id="lobbyCode">SIDE-0000</h1>
+          <h1 id="lobbyCode">SIDE-000</h1>
           <h2 id="lobbyGameName">Esperando...</h2>
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
@@ -165,13 +165,13 @@
           </div>
           <div id="studentFinancialDetail"></div>
           <p id="studentEventImpactText" class="student-event-impact">Los eventos que te afecten aparecerán en Noticias del ciclo y se reflejarán en estos resultados.</p>
-          <p class="lobby-welcome">Te has unido correctamente. Revisa el tiempo y las noticias antes de tomar decisiones.</p>
+          <p class="lobby-welcome">Conectado correctamente. Al iniciar la partida entrarás automáticamente al mundo 3D.</p>
         </div>
         <footer class="lobby-actions" aria-label="Acciones de la partida">
           <button id="resumeWorldBtn" class="primary-gold lobby-start hidden" type="button">ENTRAR / VOLVER AL MUNDO 3D</button>
-          <button id="enterDecisionsBtn" class="primary-gold lobby-start" type="button" disabled>ENTRAR AL MENÚ DE DECISIONES</button>
+          <button id="enterDecisionsBtn" class="primary-gold lobby-start hidden" type="button" disabled>ENTRAR AL MENÚ DE DECISIONES</button>
           <div class="lobby-secondary-actions">
-            <button id="reopenTutorialBtn" class="tutorial-reopen-btn" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
+            <button id="reopenTutorialBtn" class="tutorial-reopen-btn hidden" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
             <button id="backToProfiles" class="ghost-btn" type="button">VOLVER</button>
           </div>
           <small class="lobby-build">SIDE · v2026.09.22.2</small>
@@ -184,18 +184,15 @@
     <div class="simulation-loading-bg" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <div class="simulation-loading-card">
       <img src="assets/side_logo.png" class="simulation-loading-logo" alt="SIDE">
-      <span class="simulation-loading-kicker">DECISIONES COMPLETADAS · 100%</span>
-      <h1>CONSTRUYENDO TU EMPRESA</h1>
-      <p id="simulationLoadingText">Preparando tu empresa a partir de las decisiones guardadas...</p>
+      <span class="simulation-loading-kicker">SIDE · CIUDAD EMPRESARIAL</span>
+      <h1>PREPARANDO MUNDO 3D…</h1>
+      <p id="simulationLoadingText" role="status" aria-live="polite">Preparando escena y controles...</p>
       <div class="simulation-loading-visual" aria-hidden="true">
         <div class="loading-store"><span class="store-roof"></span><span class="store-door"></span><span class="store-window left"></span><span class="store-window right"></span></div>
         <div class="loading-person p1"></div><div class="loading-person p2"></div><div class="loading-person p3"></div>
       </div>
-      <div class="simulation-progress-line"><div id="simulationLoadingBar"></div></div>
-      <div class="simulation-progress-meta"><strong id="simulationLoadingPercent">0%</strong><span id="simulationLoadingStage">Validando decisiones</span></div>
-      <div class="simulation-loading-steps">
-        <span data-load-step="1">01 · Local</span><span data-load-step="2">02 · Recursos</span><span data-load-step="3">03 · Clientes NPC</span>
-      </div>
+      <div class="simulation-progress-meta"><strong id="simulationLoadingPercent"></strong><span id="simulationLoadingStage">Preparando escena y controles</span></div>
+      <button id="retryWorldBtn" class="primary-gold hidden" type="button">Reintentar carga</button>
     </div>
   </section>
 

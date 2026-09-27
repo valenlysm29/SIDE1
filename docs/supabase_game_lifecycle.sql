@@ -166,9 +166,6 @@ begin
     if p_now>=deadline+make_interval(secs=>total*duration) then
       r := r||jsonb_build_object('phase','finished','status','simulation-finished','running',false,'remaining',0);
     end if;
-  elsif r->>'phase'='integration' and deadline is not null and p_now>=deadline then
-    r:=jsonb_build_object('round',1,'phase','decisions','status','running','running',true,
-      'mode','manual','duration',duration,'remaining',duration,'startedAt',deadline);
   elsif r->>'phase'='decisions' and (r->>'running')::boolean then
     started := (r->>'startedAt')::timestamptz;
     if p_now>=started+make_interval(secs=>(r->>'duration')::integer) then

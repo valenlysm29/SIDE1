@@ -162,3 +162,29 @@ existentes de ciclos, decisiones, docente, startup, vehículo y revisión empres
 
 La fase de implementación se cierra con regresión y publicación de Git. No se
 dejan cambios de fórmulas ni nuevas funcionalidades dentro de este cierre.
+
+## Integración del nuevo mundo 3D y cierre de carga
+
+- El flujo del estudiante queda `ingreso → sala de espera → mundo 3D → decisiones`.
+  `canExplore` permite preparar y recorrer la ciudad cuando la partida está en
+  `PLAYING`; `canOperate` mantiene bloqueadas las compras, ventas y demás
+  operaciones financieras hasta que las decisiones obligatorias estén enviadas.
+  Durante `WAITING` la navegación a decisiones o al mundo es rechazada también
+  si se intenta forzarla desde estado local.
+- El modo automático sólo cambia de `integration` a `decisions` mediante la
+  programación del servidor. El modo manual conserva `integration` aunque venza
+  el reloj y requiere la acción docente `iniciar`.
+- El hub nuevo es la escena activa. `buildLegacyWorld` se conserva únicamente
+  para compatibilidad histórica y no tiene llamadas desde la inicialización ni
+  desde la ruta de entrada. Las entradas de tiendas, almacén y producción usan
+  cruces de portal físicos; la salida interior vuelve al hub nuevo y se limita a
+  sus colisionadores, sin coordenadas del mapa antiguo.
+- La sala de espera llama a `SIDE3D.preload()` una sola vez. La precarga carga el
+  motor, modelos esenciales y navegación sin crear canvas, escena de negocio ni
+  bucle RAF. `prepare()` reutiliza esa promesa y muestra progreso real; si falla,
+  queda una pantalla controlada con reintento y nunca redirige al mapa antiguo.
+- Medición en Chromium con SwiftShader (`tests/world_loading.cjs`): carga fría,
+  19.890 s de preparación y 41.236 s hasta movimiento; con precarga de lobby,
+  3.694 s de preparación y 8.577 s hasta movimiento. La primera renderización
+  pasó de 41.224 s a 8.567 s en ese entorno. Ambas mediciones descargaron 66
+  recursos (~78 MB); el resultado depende del hardware y del backend WebGL.

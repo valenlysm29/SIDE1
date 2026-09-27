@@ -28,7 +28,11 @@ let cashLedger = {};
 let currentCategory = null;
 let playerIsDeciding = false;
 
-function showScreen(id){screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0)}
+function showScreen(id){
+  if(['decisionMenu','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld())id='studentLobby';
+  screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
+  return id;
+}
 function showModal(id){$('modalRoot').classList.remove('hidden');modals.forEach(m=>$(m)?.classList.toggle('hidden',m!==id));setTimeout(()=>$(id)?.querySelector('input')?.focus(),80)}
 function closeModal(){$('modalRoot').classList.add('hidden');modals.forEach(m=>$(m)?.classList.add('hidden'))}
 function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__sideToast);window.__sideToast=setTimeout(()=>t.classList.remove('show'),2600)}
@@ -84,6 +88,11 @@ function loanInitialReference(){return creditApprovedLine()}
 function currentRound(){const config=teacherConfig();const scheduled=config.cycleCloseMode==='automatic'?readRoundRuntime()?.round:null;return Math.max(1,Number(scheduled||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1))}
 function studentAccess(existing=true){
   let status={},r={};try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'{}')||{};r=JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'{}')||{}}catch{}
+  if(currentStudent.empresaId&&studentConnected){
+    if(!authoritativeStudentState||authoritativeStudentState.empresaId!==currentStudent.empresaId)return {canOperate:false,canJoin:false,integration:true,reason:'Verificando el estado de la partida…'};
+    const s=authoritativeStudentState;
+    return RULES.gameAccess(s.config,s.status,s.runtime,existing,studentNow());
+  }
   return RULES.gameAccess(teacherConfig(),status,{...r,round:currentRound()},existing,studentNow());
 }
 function updateIntegrationUI(){
@@ -110,14 +119,14 @@ function updateIntegrationUI(){
     if(typeof closeCompanyReview==='function')closeCompanyReview();
     if($('studentLobby')?.classList.contains('hidden'))showScreen('studentLobby');
     playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
-    window.SIDE3D?.suspend?.();syncStudentTimer();
+    window.SIDE3D?.suspend?.();syncStudentTimer();stopStudentSync();
   }
-  if(access.integration)autoEnterDecisions=true;
-  if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
+  if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
+  if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;startSimulationLoading();}
 
-  if(!access.canOperate&&!$('decisionMenu')?.classList.contains('hidden')){playerIsDeciding=false;showScreen('studentLobby');}
+  if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
-let cancellationShown=false;
+let cancellationShown=false,authoritativeStudentState=null;
 let studentConnected=false,remoteStateBusy=false,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null;
 function studentNow(){return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function startStudentSync(){
@@ -135,6 +144,7 @@ function applyStudentGameState(partida,round=1){
   else localStorage.removeItem('SIDE_ROUND_RUNTIME');
   localStorage.setItem('SIDE_ACTIVE_ROUND',String(config.runtime?.round||round));
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:config.cancelledAt||null,active:partida.estado!=='finalizada'&&!config.cancelledAt&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
+  if(currentStudent.empresaId)authoritativeStudentState={empresaId:currentStudent.empresaId,config:deepClone(config),status:JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')),runtime:{...(config.runtime||{}),round:config.runtime?.round||round}};
 }
 async function refreshStudentGame(){
   if(!studentConnected)return;
@@ -179,8 +189,13 @@ function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${curr
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
-function canOperateWorld(){return studentAccess().canOperate&&readRoundRuntime()?.status!=='paused'}
-function canStartSimulation(){return canOperateWorld()&&simulationSubmissionComplete()&&(decisionProgressPercent()===100||localStorage.getItem(worldAdmissionKey())==='1')}
+function canExploreWorld(){return studentAccess().canOperate&&(currentStudent.empresaId&&authoritativeStudentState?authoritativeStudentState.runtime:readRoundRuntime())?.status!=='paused'}
+function canOperateWorld(){
+  const explore=typeof canExploreWorld==='function'?canExploreWorld():studentAccess().canOperate&&readRoundRuntime()?.status!=='paused';
+  const submitted=typeof simulationSubmissionComplete==='function'?simulationSubmissionComplete():true;
+  return explore&&submitted;
+}
+function canStartSimulation(){return canExploreWorld()}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 window.SIDE_GAME_BRIDGE={
@@ -190,6 +205,7 @@ window.SIDE_GAME_BRIDGE={
   cash:()=>cashBalance(),
   decisionProgress:()=>decisionProgressPercent(),
   canStartSimulation:()=>canStartSimulation(),
+  canExplore:()=>canExploreWorld(),
   canOperate:()=>canOperateWorld(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
@@ -288,18 +304,16 @@ $('studentForm')?.addEventListener('submit',async e=>{
   syncStudentReportPreview();
   closeModal();startJoinLoading();
 });
-function startJoinLoading(){showScreen('studentLoading');let p=0,step=0;const texts=['Sincronizando partida','Cargando escenario empresarial','Preparando decisiones','¡Todo listo!'];$('joinProgress').style.width='0%';const i=setInterval(()=>{p+=4;$('joinProgress').style.width=p+'%';if(p%25===0&&step<3)$('joinLoadingText').textContent=texts[++step];if(p>=100){clearInterval(i);prepareLobby()}},55)}
+function startJoinLoading(){return prepareLobby()}
+function preloadStudentWorld(){
+  if(typeof window.SIDE3D?.preload==='function')window.SIDE3D.preload().catch(error=>console.warn('SIDE: precarga pendiente',error));
+}
+window.addEventListener('side3d:ready',()=>{if(studentConnected&&studentAccess().integration)preloadStudentWorld();});
 async function prepareLobby(){
   $('lobbyCode').textContent=currentStudent.game.codigo;$('lobbyGameName').textContent=currentStudent.game.nombre;
   $('lobbyStudent').textContent=currentStudent.legalName&&currentStudent.legalName!==currentStudent.company?`${currentStudent.company} · ${currentStudent.legalName}`:currentStudent.company;
-  $('lobbySegment').textContent='EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES';
-  renderStudentStatus(); syncStudentTimer();
-  updateIntegrationUI();
-  const visitedKey='SIDE_TUTORIAL_SEEN_'+storageKey().trim().toUpperCase();
-  const returning=currentStudent.returning||localStorage.getItem(visitedKey)==='1';
-  localStorage.setItem(visitedKey,'1');
-  if(teacherConfig().lifecycleVersion===2){showScreen('studentLobby');autoEnterDecisions=true;updateIntegrationUI();}
-  else if(studentAccess().integration||returning){showScreen('studentLobby');autoEnterDecisions=studentAccess().integration;updateIntegrationUI();}else await openStudentTutorial();
+  renderStudentStatus();syncStudentTimer();showScreen('studentLobby');
+  autoEnterDecisions=true;updateIntegrationUI();
 }
 async function openStudentTutorial(){
   showScreen('tutorial'); const mount=$('tutorialMount');
@@ -779,48 +793,46 @@ function sendCurrentSection(){
 $('sendDecisionSection')?.addEventListener('click',sendCurrentSection);
 
 
-let simulationLoadingTimer=null;
 let simulationLoadingActive=false;
+function paintWorldLoading(){
+  const status=window.SIDE3D?.loadingStatus?.()||{};
+  if($('simulationLoadingPercent'))$('simulationLoadingPercent').textContent=status.total>0?`${status.loaded||0} / ${status.total} recursos`:'';
+  if($('simulationLoadingStage'))$('simulationLoadingStage').textContent=status.phase||'Preparando escena y controles';
+}
+window.addEventListener('side3d:loading',paintWorldLoading);
 async function startSimulationLoading(){
   if(simulationLoadingActive)return false;
-  if(!studentAccess().canOperate){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason);return false;}
+  if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
   loadDecisionState();
-  if(decisionProgressPercent()!==100&&localStorage.getItem(worldAdmissionKey())!=='1'){toast('Completa y guarda todas las decisiones obligatorias antes de iniciar el juego 3D.');openDecisionMenu();return false}
-  if(!simulationSubmissionComplete()){toast('Envía todos los apartados o confirma ENVIAR TODO antes de abrir el mundo.');openDecisionMenu();return false}
-  if(location.protocol==='file:'){toast('Abre INICIAR_JUEGO.bat para ejecutar el mundo desde el servidor local.');return false}
   simulationLoadingActive=true;
+  const gameId=currentStudent.game?.id,company=currentStudent.company,connected=studentConnected;
   document.querySelectorAll('[data-start-world],#startSimulationBtn').forEach(button=>button.disabled=true);
-  let loadingDeadline=null;
+  $('retryWorldBtn')?.classList.add('hidden');
+  if($('simulationLoadingText'))$('simulationLoadingText').textContent='Preparando mundo 3D…';
+  showScreen('simulationLoading');paintWorldLoading();
   try{
-  if(simulationLoadingTimer){clearInterval(simulationLoadingTimer);simulationLoadingTimer=null}
-  const bar=$('simulationLoadingBar'),pctEl=$('simulationLoadingPercent'),text=$('simulationLoadingText'),stage=$('simulationLoadingStage');
-  const stepEls=[...document.querySelectorAll('[data-load-step]')];
-  let p=0;showScreen('simulationLoading');
-  const paint=(value)=>{p=Math.max(0,Math.min(100,value));if(bar)bar.style.width=p+'%';if(pctEl)pctEl.textContent=Math.round(p)+'%';let step=1,label='Construyendo local y distribución';if(p>=38){step=2;label='Aplicando maquinaria, personal y stock'}if(p>=72){step=3;label='Preparando inventario, clientes NPC y caja'}if(p>=96)label=`Abriendo ${currentStudent.company||COMPANY_NAME}`;if(stage)stage.textContent=label;if(text)text.textContent=p<38?'Levantando tu tienda según la infraestructura elegida...':p<72?'Colocando físicamente los recursos que compraste y contrataste...':p<96?'Activando stock físico, rutas de clientes, reposición y sistema de ventas...':'Todo listo. Entrando a tu empresa...';stepEls.forEach((el,i)=>el.classList.toggle('active',i<step));};
-  paint(0);
-  let engineReady=false;
-  if(typeof window.SIDE3D?.prepare!=='function')throw new Error('No se encontró el motor 3D. Recarga la página.');
-  const enginePromise=window.SIDE3D.prepare().then(ok=>{engineReady=!!ok;return ok});
-  simulationLoadingTimer=setInterval(()=>{if(p<88)paint(p+2);else if(p<94&&engineReady)paint(p+1)},34);
-  const ok=await Promise.race([enginePromise,new Promise((_,reject)=>{loadingDeadline=setTimeout(()=>reject(new Error('La carga tardó demasiado. Puedes volver a intentarlo sin reenviar decisiones.')),90000)})]);
-  clearTimeout(loadingDeadline);
+  if(typeof window.SIDE3D?.prepare!=='function')throw new Error('El motor 3D todavía no está disponible. Comprueba la conexión y vuelve a intentar.');
+  const ok=await window.SIDE3D.prepare();
+  if((connected&&!studentConnected)||currentStudent.game?.id!==gameId||currentStudent.company!==company||!canExploreWorld()){window.SIDE3D?.suspend?.();updateIntegrationUI();return false;}
   if(!ok)throw new Error(window.SIDE3D.getLastError?.()||'No se pudo preparar el mundo 3D. Revisa que el navegador permita WebGL.');
-  clearInterval(simulationLoadingTimer);simulationLoadingTimer=null;
-  for(let v=Math.max(94,p);v<=100;v+=2){paint(v);await new Promise(r=>setTimeout(r,45))}
-  paint(100);
-  await new Promise(r=>setTimeout(r,180));
-  if(!await window.SIDE3D.enter({autoStart:true}))throw new Error('No se pudo abrir el mundo. Tus decisiones siguen guardadas.');
+  if(!await window.SIDE3D.enter({autoStart:true}))throw new Error('No se pudo abrir el mundo 3D. Puedes volver a intentarlo.');
   localStorage.setItem(worldAdmissionKey(),'1');
   return true;
   }catch(error){
     console.error('SIDE: inicio del mundo 3D',error);
-    openDecisionMenu();toast(error.message||'No se pudo abrir el mundo 3D. Vuelve a intentarlo.');
+    if(canExploreWorld()){
+      showScreen('simulationLoading');
+      if($('simulationLoadingText'))$('simulationLoadingText').textContent=error.message||'No se pudo preparar el mundo 3D.';
+      if($('simulationLoadingStage'))$('simulationLoadingStage').textContent='Carga interrumpida';
+      $('retryWorldBtn')?.classList.remove('hidden');
+    }else updateIntegrationUI();
     return false;
   }finally{
-    clearTimeout(loadingDeadline);clearInterval(simulationLoadingTimer);simulationLoadingTimer=null;simulationLoadingActive=false;
+    simulationLoadingActive=false;
     document.querySelectorAll('[data-start-world],#startSimulationBtn').forEach(button=>button.disabled=false);
   }
 }
+$('retryWorldBtn')?.addEventListener('click',startSimulationLoading);
 $('startSimulationBtn')?.addEventListener('click',startSimulationLoading);
 function animateCash(netMovement){
   const fx=$('cashFx');if(!fx||!netMovement)return;fx.querySelector('span').textContent=(netMovement>0?'+ ':'− ')+money(Math.abs(netMovement));fx.classList.remove('gain','spend','play');fx.classList.add(netMovement>0?'gain':'spend');void fx.offsetWidth;fx.classList.add('play');setTimeout(()=>fx.classList.remove('play'),1150);
@@ -1046,7 +1058,7 @@ function syncStudentTimer(){
     note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente';
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
-  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note='Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado';}
+  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note=conf.cycleCloseMode==='automatic'?'Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado':'Sala de espera · esperando que el profesor inicie la partida';}
   if(conf.cancelledAt||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
   if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;

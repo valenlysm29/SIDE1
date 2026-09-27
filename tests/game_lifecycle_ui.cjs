@@ -6,7 +6,10 @@ const root=path.resolve(__dirname,'..');
 function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c',`import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('${name}'))`],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}});}
 (async()=>{
  const db=await database(),browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
- const errors=[],teacherHTML=fixture('docente.html'),studentHTML=fixture('index.html');
+ const errors=[],teacherHTML=fixture('docente.html'),studentHTML=fixture('index.html').replace('const cfg = window.SIDE_CONFIG || {};',`
+ window.worldCalls={preload:0,prepare:0,enter:0,suspend:0};
+ window.SIDE3D={preload:async()=>{worldCalls.preload++;return true},prepare:async()=>{worldCalls.prepare++;return !window.rejectWorld},enter:async()=>{worldCalls.enter++;showScreen('simulator3d');return true},suspend:()=>{worldCalls.suspend++},getLastError:()=> 'Carga no disponible'};
+ const cfg = window.SIDE_CONFIG || {};`);
  const output=path.join(__dirname,'output');fs.mkdirSync(output,{recursive:true});
  async function page(html){const p=await browser.newPage({viewport:{width:1366,height:900}});p.on('pageerror',e=>errors.push(e.message));await p.route('**/*',r=>r.abort());await p.route('http://side.test/**',r=>r.fulfill({contentType:'text/html',body:html}));await p.goto('http://side.test/');return p;}
  async function teacher(){
@@ -46,11 +49,26 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   const s1=await student(game,'First'),s2=await student(game,'Second');
   assert.match(await s1.locator('#studentIntegrationNotice').innerText(),/Sala de espera/);
   assert.equal(await s1.locator('#enterDecisionsBtn').isDisabled(),true);
+  assert.equal(await s1.evaluate(()=>{showScreen('decisionMenu');return openDecisionMenu()}),false);
+  assert.equal(await s1.locator('#decisionMenu').isVisible(),false);
+  assert.equal(await s1.evaluate(()=>worldCalls.prepare),0,'waiting preloads assets without initializing business');
+  assert.ok(await s1.evaluate(()=>worldCalls.preload)>0);
+  await s1.evaluate(()=>{localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({lifecycleVersion:2,phase:'decisions'}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,phase:'decisions'}));showScreen('simulator3d');});
+  assert.equal(await s1.locator('#simulator3d').isVisible(),false,'cached state cannot bypass authoritative waiting');
+  await s1.evaluate(()=>refreshStudentGame());
   assert.equal(await t.locator('#startGame').isEnabled(),true);
   assert.equal(await t.locator('#startGame').innerText(),'Iniciar ciclo 1');
   await t.locator('#startGame').click();
-  await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
+  await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));await s2.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await s1.evaluate(()=>currentRound()),1);assert.equal(await s2.evaluate(()=>studentAccess().canOperate),true);
+  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canExplore()),true);
+  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'exploration does not charge or sell before submitted decisions');
+  await s1.evaluate(()=>{window.rejectWorld=true;return startSimulationLoading()});
+  assert.equal(await s1.locator('#simulationLoading').isVisible(),true);
+  assert.equal(await s1.locator('#decisionMenu').isVisible(),false);
+  assert.equal(await s1.locator('#tutorial').isVisible(),false);
+  await s1.evaluate(()=>{window.rejectWorld=false});await s1.locator('#retryWorldBtn').click();
+  await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await t.locator('#startCycle1Btn').isVisible(),false);
   await t.evaluate(()=>switchTab('configuracion'));
   assert.equal(await t.locator('#startGame').isDisabled(),true);
@@ -86,6 +104,8 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    assert.equal(await p.locator('#studentLobby').isVisible(),true);assert.equal(await p.locator('#enterDecisionsBtn').isDisabled(),true);
    assert.match(await p.locator('#studentIntegrationNotice').innerText(),/cancelada por el profesor/);
    assert.equal(await p.evaluate(()=>openDecisionMenu()),false);
+   assert.ok(await p.evaluate(()=>worldCalls.suspend)>0);
+   assert.equal(await p.evaluate(()=>studentPoll===null&&studentTick===null),true);
   }
   await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.equal(await s1.locator('#studentTimerNote').innerText(),'Partida cancelada');await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
   await t.evaluate(()=>{switchTab('empresas');state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
@@ -128,8 +148,8 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await late.setViewportSize({width:390,height:844});await late.screenshot({path:path.join(output,'lifecycle-student-countdown.png')});
   await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()+interval '2 seconds')) where id=$1`,[autoGame.id]);
   await Promise.all([auto,late,reload].map(p=>p.evaluate(()=>refreshStudentGame())));
-  for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
-  const after=await student(autoGame,'After UI');assert.equal(await after.locator('#decisionMenu').isVisible(),true);
+  for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
+  const after=await student(autoGame,'After UI');await after.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await after.evaluate(()=>currentRound()),1);
   await after.evaluate(()=>$('backToProfiles').click());
   assert.equal(await after.evaluate(()=>studentPoll===null&&studentTick===null&&!studentConnected),true);

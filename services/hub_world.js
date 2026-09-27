@@ -1,4 +1,5 @@
 import * as THREE from '../vendor/three/build/three.module.js';
+import { crossedEntrance, crossedInteriorExit } from './world_portals.mjs';
 
 // Every visible surface is world geometry. No screenshot, backdrop render, or
 // generated image is used; the hub works from ground level and from orbit.
@@ -453,12 +454,14 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   group.userData.geometryInstances = instanceCount;
   group.userData.drawCalls = group.children.filter(child => child.isMesh).length;
   const entrances = [
-    { id: 'store', name: 'Tienda SIDE', x: offsetX - 19, z: 26, rotation: Math.PI },
-    { id: 'warehouse', name: 'Almacén SIDE', x: offsetX - 20, z: -9, rotation: Math.PI },
-    { id: 'production', name: 'Lugar de Producción', x: offsetX + 20, z: -9, rotation: Math.PI }
+    { id: 'store', name: 'Tienda SIDE', x: offsetX - 19, z: 26, rotation: Math.PI, portal: { x: offsetX - 19, z: 24.75, halfWidth: 1.05 } },
+    { id: 'warehouse', name: 'Almacén SIDE', x: offsetX - 20, z: -9, rotation: Math.PI, portal: { x: offsetX - 20, z: -11.1, halfWidth: 1.05 } },
+    { id: 'production', name: 'Lugar de Producción', x: offsetX + 20, z: -9, rotation: Math.PI, portal: { x: offsetX + 20, z: -11.1, halfWidth: .65 } }
   ];
   return {
     group, colliders, entrances, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
+    crossedEntrance: (previous, next) => crossedEntrance(previous, next, entrances),
+    crossedInteriorExit,
     spawn: { x: offsetX + 16, z: 27 }, groundY: .025,
     patrolRoutes: [
       [[13.5, 13.5], [24.5, 13.5], [24.5, 24.5], [13.5, 24.5]],

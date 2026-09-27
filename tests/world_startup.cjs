@@ -18,7 +18,8 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    await context.route('**/*',route=>route.request().url().startsWith(url)?route.continue():route.abort());
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA',company:'QA MUNDO',game:DEMO_GAME};openDecisionMenu();});
-   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),false,'incomplete decisions must block entry');
+   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),true,'the world is available before decisions are submitted');
+   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'financial operations remain locked until decisions are submitted');
    if(mode==='all'){
     await page.evaluate(seed=>{Object.assign(decisionDrafts,seed);renderDecisionCategory();openCompanyReview()},seed);
     assert.deepEqual(await page.evaluate(()=>reviewProblems(liveCompanyReview())),[]);
@@ -26,7 +27,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    }else{
     const cats=await page.evaluate(()=>decisionCategories().map(c=>c.cat));
     for(let i=0;i<cats.length;i++){
-     const result=await page.evaluate(({cat,seed})=>{currentCategory=cat;Object.assign(decisionDrafts,seed);renderDecisionCategory();const ok=commitReviewedSections([cat],false);return {ok,ready:SIDE_GAME_BRIDGE.canStartSimulation()}},{cat:cats[i],seed});
+     const result=await page.evaluate(({cat,seed})=>{currentCategory=cat;Object.assign(decisionDrafts,seed);renderDecisionCategory();const ok=commitReviewedSections([cat],false);return {ok,ready:SIDE_GAME_BRIDGE.canOperate()}},{cat:cats[i],seed});
      assert.equal(result.ok,true,`submit section ${cats[i]}`);
      assert.equal(result.ready,i===cats.length-1,'all sections are required');
     }
@@ -42,12 +43,13 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     const before=await page.evaluate(()=>({ledger:JSON.stringify(cashLedger),state:JSON.stringify(decisionState)}));
     await page.evaluate(()=>{window.realPrepare=SIDE3D.prepare;SIDE3D.prepare=async()=>{throw new Error('QA: error controlado')};});
     assert.equal(await page.evaluate(()=>startSimulationLoading()),false);
-    assert.equal(await page.locator('#companyStartWorld').isEnabled(),true);
+    assert.equal(await page.locator('#simulationLoading').isVisible(),true);
+    assert.equal(await page.locator('#retryWorldBtn').isVisible(),true);
     assert.deepEqual(await page.evaluate(()=>({ledger:JSON.stringify(cashLedger),state:JSON.stringify(decisionState)})),before);
     await page.evaluate(()=>{SIDE3D.prepare=window.realPrepare;delete window.realPrepare});
     await page.setViewportSize({width:390,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'mobile summary overflow');
-    await page.locator('#companyStartWorld').scrollIntoViewIfNeeded();
+    await page.locator('#retryWorldBtn').scrollIntoViewIfNeeded();
     await page.screenshot({path:path.join(output,'world-start-mobile.png')});
     await page.setViewportSize({width:1440,height:900});
    }
