@@ -1,0 +1,1063 @@
+{
+  "coordinate_system": "right-handed, Y-up, meters",
+  "origin_policy": "base at Y=0; centered in X and Z",
+  "optimization_policy": "Preserve licensed low-poly geometry and PBR material groups; flatten source node transforms; remove unreferenced vertices; embed all GLB data; replace the rejected textured sewing machine with an original texture-free SIDE procedural model.",
+  "budget": {
+    "target_min_bytes": 204800,
+    "target_max_bytes": 307200,
+    "actual_bytes": 244956,
+    "status": "within"
+  },
+  "assets": [
+    {
+      "source": "box-large.glb",
+      "source_sha256": "f5c7a7b4d7ec48c2695dc5241d62a38dbb54b487e6be0f089548582c91bacdfd",
+      "license": "CC0-1.0",
+      "target_size_m": 0.55,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.550000011920929,
+            0.0,
+            -0.5
+          ],
+          [
+            0.550000011920929,
+            0.550000011920929,
+            0.5
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.9999999783255843,
+          0.9999999783255843,
+          0.9999999783255843
+        ],
+        "triangles": 70
+      },
+      "file": "assets/models3d/props/warehouse_box_large.glb",
+      "bytes": 4248,
+      "sha256": "a3f92045e4c4dc31448067509345622df4b22a1878e899c373e34d2030cde296",
+      "bounds_m": [
+        [
+          -0.55,
+          0.0,
+          -0.5
+        ],
+        [
+          0.55,
+          0.55,
+          0.5
+        ]
+      ],
+      "extents_m": [
+        1.1,
+        0.55,
+        1.0
+      ],
+      "triangles": 70,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "box-long.glb",
+      "source_sha256": "6a6d7bfed3058809a9833606a6a3e78a156b6f3d898fba59fc054c62b5499c94",
+      "license": "CC0-1.0",
+      "target_size_m": 0.45,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.550000011920929,
+            0.0,
+            -0.25
+          ],
+          [
+            0.550000011920929,
+            0.550000011920929,
+            0.25
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.8181818004482052,
+          0.8181818004482052,
+          0.8181818004482052
+        ],
+        "triangles": 70
+      },
+      "file": "assets/models3d/props/warehouse_box_long.glb",
+      "bytes": 4284,
+      "sha256": "ffb01541d68c346e77efb25880f24b1e5a927058ced632651cb0ea653b4cf599",
+      "bounds_m": [
+        [
+          -0.45,
+          0.0,
+          -0.204545
+        ],
+        [
+          0.45,
+          0.45,
+          0.204545
+        ]
+      ],
+      "extents_m": [
+        0.9,
+        0.45,
+        0.409091
+      ],
+      "triangles": 70,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "box-small.glb",
+      "source_sha256": "fd2ea1ac4f24a9515dc9c53a4a589a8897c824fa5865771799f965a252f684f0",
+      "license": "CC0-1.0",
+      "target_size_m": 0.35,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.29750001430511475,
+            0.0,
+            -0.25
+          ],
+          [
+            0.29749998450279236,
+            0.550000011920929,
+            0.25
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.6363636225708262,
+          0.6363636225708262,
+          0.6363636225708262
+        ],
+        "triangles": 70
+      },
+      "file": "assets/models3d/props/warehouse_box_small.glb",
+      "bytes": 4284,
+      "sha256": "90f89d34ec3f88b6710291aa1bf20ca830b688d29ed143b0bbc4e60d329b5442",
+      "bounds_m": [
+        [
+          -0.189318,
+          0.0,
+          -0.159091
+        ],
+        [
+          0.189318,
+          0.35,
+          0.159091
+        ]
+      ],
+      "extents_m": [
+        0.378636,
+        0.35,
+        0.318182
+      ],
+      "triangles": 70,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "box-wide.glb",
+      "source_sha256": "41507d9e035b23e586cbf6bcc63427c810aefd428620264bebefc25c98922ff4",
+      "license": "CC0-1.0",
+      "target_size_m": 0.45,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.29750001430511475,
+            0.0,
+            -0.5
+          ],
+          [
+            0.29749998450279236,
+            0.550000011920929,
+            0.5
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.8181818004482052,
+          0.8181818004482052,
+          0.8181818004482052
+        ],
+        "triangles": 70
+      },
+      "file": "assets/models3d/props/warehouse_box_wide.glb",
+      "bytes": 4284,
+      "sha256": "6fef0eb834b8efff9d92784026729ceefb504347f3662f71f188a73f79e57862",
+      "bounds_m": [
+        [
+          -0.243409,
+          0.0,
+          -0.409091
+        ],
+        [
+          0.243409,
+          0.45,
+          0.409091
+        ]
+      ],
+      "extents_m": [
+        0.486818,
+        0.45,
+        0.818182
+      ],
+      "triangles": 70,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "door-wide-closed.glb",
+      "source_sha256": "987837d7b45bca466c5f2268fa0193e014374cc0d2ef0784f6c37092856b71d0",
+      "license": "CC0-1.0",
+      "target_size_m": 2.8,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.8999999761581421,
+            4.51194631754889e-17,
+            0.4000000059604645
+          ],
+          [
+            0.8999999761581421,
+            1.600000023841858,
+            0.4000000059604645
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          1.7499999739229681,
+          1.7499999739229681,
+          1.7499999739229681
+        ],
+        "triangles": 22
+      },
+      "file": "assets/models3d/props/warehouse_loading_door.glb",
+      "bytes": 2076,
+      "sha256": "661cc44ac4ecd77aa72ebf690dc23dc808c6f3b6689ce95aa73137f521e7da30",
+      "bounds_m": [
+        [
+          -1.575,
+          0.0,
+          0.0
+        ],
+        [
+          1.575,
+          2.8,
+          0.0
+        ]
+      ],
+      "extents_m": [
+        3.15,
+        2.8,
+        0.0
+      ],
+      "triangles": 22,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "structure-window-wide.glb",
+      "source_sha256": "447f0e5a4eca379a02c3ade829e04b4df2fc517ab23f0b4f99fd31ae439ac19e",
+      "license": "CC0-1.0",
+      "target_size_m": 3.0,
+      "conversion": {
+        "source_bounds": [
+          [
+            -1.0,
+            4.51194631754889e-17,
+            -0.5
+          ],
+          [
+            1.0,
+            3.0,
+            1.5
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "triangles": 274
+      },
+      "file": "assets/models3d/props/warehouse_high_window.glb",
+      "bytes": 12660,
+      "sha256": "354e3c04ff8f7c6ab8b764ae900ab539841ca4550ec1c2dd1ff5d7cc4fef30a5",
+      "bounds_m": [
+        [
+          -1.0,
+          0.0,
+          -1.0
+        ],
+        [
+          1.0,
+          3.0,
+          1.0
+        ]
+      ],
+      "extents_m": [
+        2.0,
+        3.0,
+        2.0
+      ],
+      "triangles": 274,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "indicator-special-arrow.glb",
+      "source_sha256": "3cd514de3e283705df2baccf7cea62a70ba64e87311252fe26788be4377c0d49",
+      "license": "CC0-1.0",
+      "target_size_m": 0.9,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.5,
+            0.0,
+            -0.5
+          ],
+          [
+            0.5,
+            0.0,
+            0.5
+          ]
+        ],
+        "scale_reference": "footprint",
+        "scale_xyz": [
+          0.9,
+          0.9,
+          0.9
+        ],
+        "triangles": 15
+      },
+      "file": "assets/models3d/props/warehouse_floor_arrow.glb",
+      "bytes": 1612,
+      "sha256": "88117a32f4ef5d9669c80dd462c6fee12b748ab636514d28b0688c688b21b9bc",
+      "bounds_m": [
+        [
+          -0.45,
+          0.0,
+          -0.45
+        ],
+        [
+          0.45,
+          0.0,
+          0.45
+        ]
+      ],
+      "extents_m": [
+        0.9,
+        0.0,
+        0.9
+      ],
+      "triangles": 15,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "warning-traffic.glb",
+      "source_sha256": "b231e97424839b252e80555bc97d7360d2f04006cb3919675725a297bae049cd",
+      "license": "CC0-1.0",
+      "target_size_m": 1.1,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.20000000298023224,
+            0.0,
+            -0.20000000298023224
+          ],
+          [
+            0.20000000298023224,
+            1.5511152744293213,
+            0.20000000298023224
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.7091671509744539,
+          0.7091671509744539,
+          0.7091671509744539
+        ],
+        "triangles": 176
+      },
+      "file": "assets/models3d/props/warehouse_warning_beacon.glb",
+      "bytes": 9652,
+      "sha256": "643a3a0de011e01eda19dd021d69c62cb2497fdd4ba4b8aae0bb721b716b22c7",
+      "bounds_m": [
+        [
+          -0.141833,
+          0.0,
+          -0.141833
+        ],
+        [
+          0.141833,
+          1.1,
+          0.141833
+        ]
+      ],
+      "extents_m": [
+        0.283667,
+        1.1,
+        0.283667
+      ],
+      "triangles": 176,
+      "geometries": 1,
+      "materials": [
+        "colormap"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "pallet_quaternius.glb",
+      "source_sha256": "5f4d74d00ad2a8eb5dbd887d645a794b7e8cecc280335215a274844fee75d383",
+      "license": "CC0-1.0",
+      "target_size_m": 0.15,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.43646316044032574,
+            0.0022615246456123483,
+            -0.6084817926342194
+          ],
+          [
+            0.45607173815369606,
+            0.14230877528065963,
+            0.6084817989535879
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          1.0710670814301728,
+          1.0710670814301728,
+          1.0710670814301728
+        ],
+        "triangles": 240
+      },
+      "file": "assets/models3d/props/warehouse_pallet.glb",
+      "bytes": 13720,
+      "sha256": "b6043b59d9e24b1aca4c43d7eab7d181d9130357dbf810569a08a9fe74961be4",
+      "bounds_m": [
+        [
+          -0.477982,
+          0.0,
+          -0.651725
+        ],
+        [
+          0.477982,
+          0.15,
+          0.651725
+        ]
+      ],
+      "extents_m": [
+        0.955965,
+        0.15,
+        1.30345
+      ],
+      "triangles": 240,
+      "geometries": 1,
+      "materials": [
+        "Atlas.029"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "shelf-tall_quaternius.glb",
+      "source_sha256": "e57a99b889abb509aee0773adac4a3d6cbddca742f0f7fad614a06408200bb29",
+      "license": "CC0-1.0",
+      "target_size_m": 2.4,
+      "conversion": {
+        "source_bounds": [
+          [
+            -1.0284585878252983,
+            0.0035080488025213945,
+            -0.40539546021534006
+          ],
+          [
+            1.0284585878252983,
+            3.1102070698118096,
+            0.4053949909604776
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.772524143397805,
+          0.772524143397805,
+          0.772524143397805
+        ],
+        "triangles": 536
+      },
+      "file": "assets/models3d/props/warehouse_rack_tall.glb",
+      "bytes": 20304,
+      "sha256": "ca5f2e6eee978eda267d85f78f61db93552c6610c859ad581d32e5a9572bd968",
+      "bounds_m": [
+        [
+          -0.794509,
+          0.0,
+          -0.313178
+        ],
+        [
+          0.794509,
+          2.4,
+          0.313178
+        ]
+      ],
+      "extents_m": [
+        1.589018,
+        2.4,
+        0.626355
+      ],
+      "triangles": 536,
+      "geometries": 3,
+      "materials": [
+        "Accent",
+        "DarkGrey",
+        "Main"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "bags_quaternius.glb",
+      "source_sha256": "ad5ebf8f6c7082662cbefd93e960dc33a9a70239d36b23d0ec0c7fdcc8588c95",
+      "license": "CC0-1.0",
+      "target_size_m": 0.45,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.13991728192195296,
+            -0.0005225487282118323,
+            -0.12126614056206209
+          ],
+          [
+            0.12981859035789967,
+            0.10656404347528774,
+            0.11795569261857068
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          4.20220674447136,
+          4.20220674447136,
+          4.20220674447136
+        ],
+        "triangles": 912
+      },
+      "file": "assets/models3d/props/warehouse_bag_stack.glb",
+      "bytes": 18988,
+      "sha256": "4211923976182942586d039b2287508d6f08bc71503be37e8b37433e10fb9256",
+      "bounds_m": [
+        [
+          -0.566743,
+          0.0,
+          -0.50263
+        ],
+        [
+          0.566743,
+          0.45,
+          0.50263
+        ]
+      ],
+      "extents_m": [
+        1.133486,
+        0.45,
+        1.00526
+      ],
+      "triangles": 912,
+      "geometries": 1,
+      "materials": [
+        "Bag"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "workbench_kenney.glb",
+      "source_sha256": "a88889ea0d1c27567c845eabc9a0a49f96bea5db1f9f3b1f9a78f92e0e15f12d",
+      "license": "CC0-1.0",
+      "target_size_m": 0.9,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.13438749313354492,
+            0.0,
+            -0.13438749313354492
+          ],
+          [
+            0.15438750386238098,
+            0.25529998540878296,
+            0.13438749313354492
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          3.525264596309835,
+          3.525264596309835,
+          3.525264596309835
+        ],
+        "triangles": 226
+      },
+      "file": "assets/models3d/props/warehouse_cutting_table.glb",
+      "bytes": 15580,
+      "sha256": "03288b300f7413b5d2f481180e4ccacbc2d7048bd434f111c3dff4a77bc087f0",
+      "bounds_m": [
+        [
+          -0.509004,
+          0.0,
+          -0.473751
+        ],
+        [
+          0.509004,
+          0.9,
+          0.473751
+        ]
+      ],
+      "extents_m": [
+        1.018008,
+        0.9,
+        0.947503
+      ],
+      "triangles": 226,
+      "geometries": 5,
+      "materials": [
+        "metal",
+        "rock",
+        "wood",
+        "woodDark"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "light-ceiling_quaternius.glb",
+      "source_sha256": "6beb5d0886af85f41bb375176879b97f4b1032e2049fe3cabec319b105c0fb38",
+      "license": "CC0-1.0",
+      "target_size_m": 0.55,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.22025536745786667,
+            -0.8231360840429142,
+            -0.2225201120567082
+          ],
+          [
+            0.22025536745786667,
+            -0.0010976467308834344,
+            0.21350681688966144
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.6690684705674294,
+          0.6690684705674294,
+          0.6690684705674294
+        ],
+        "triangles": 269
+      },
+      "file": "assets/models3d/props/warehouse_pendant_light.glb",
+      "bytes": 8416,
+      "sha256": "97d9b44cdca46b83e8e8ddcf1b48bf6ec18f02b9cc46185a20a22cd46d6c106d",
+      "bounds_m": [
+        [
+          -0.147366,
+          0.0,
+          -0.145866
+        ],
+        [
+          0.147366,
+          0.55,
+          0.145866
+        ]
+      ],
+      "extents_m": [
+        0.294732,
+        0.55,
+        0.291732
+      ],
+      "triangles": 269,
+      "geometries": 3,
+      "materials": [
+        "Grey",
+        "Light",
+        "LightMetal"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "pallet-truck_kolosstudios.glb",
+      "source_sha256": "76437ca71a6f8d2114d66d1aa68f32729d5823db5bfef2717598c0c351cf50c6",
+      "license": "CC-BY-3.0",
+      "target_size_m": 1.2,
+      "conversion": {
+        "source_bounds": [
+          [
+            50.78478634303751,
+            -0.21430349679225505,
+            2.7498198226446524
+          ],
+          [
+            51.622753116792495,
+            1.4609878269249734,
+            5.158811798964805
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.7162933294117312,
+          0.7162933294117312,
+          0.7162933294117312
+        ],
+        "triangles": 788
+      },
+      "file": "assets/models3d/props/warehouse_pallet_truck.glb",
+      "bytes": 30100,
+      "sha256": "a9a166be8b0ffa9a0cc11d071b551c7f782d403bb14ee4459c358a17e6c95427",
+      "bounds_m": [
+        [
+          -0.300115,
+          0.0,
+          -0.862772
+        ],
+        [
+          0.300115,
+          1.2,
+          0.862772
+        ]
+      ],
+      "extents_m": [
+        0.60023,
+        1.2,
+        1.725545
+      ],
+      "triangles": 788,
+      "geometries": 4,
+      "materials": [
+        "Material.002",
+        "Material.003",
+        "Material.006",
+        "Material.014"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "rolls-of-towels_poly-by-google.glb",
+      "source_sha256": "5d671edc7b11c926f62aabbbd733a500dcc0a3ff0a5027b5fc9ccd333ad278e9",
+      "license": "CC-BY-3.0",
+      "target_size_m": 0.85,
+      "conversion": {
+        "source_bounds": [
+          [
+            -32.022308349609375,
+            0.00011899999663000926,
+            -38.460086822509766
+          ],
+          [
+            32.022308349609375,
+            51.90288162231445,
+            38.460086822509766
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.01637677759438774,
+          0.01637677759438774,
+          0.01637677759438774
+        ],
+        "triangles": 1968
+      },
+      "file": "assets/models3d/props/warehouse_fabric_rolls.glb",
+      "bytes": 48756,
+      "sha256": "9da54216b63aefa33ccc48f426edfe2d252fcebc419cfe07022e122b9e29c423",
+      "bounds_m": [
+        [
+          -0.524422,
+          0.0,
+          -0.629852
+        ],
+        [
+          0.524422,
+          0.85,
+          0.629852
+        ]
+      ],
+      "extents_m": [
+        1.048844,
+        0.85,
+        1.259705
+      ],
+      "triangles": 1968,
+      "geometries": 1,
+      "materials": [
+        "Mat"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "fire-extinguisher_dook.glb",
+      "source_sha256": "cbb7178b9e00d0213fc5d7877ee92d6dd6b5908bbfbbb916390a170a4b7bd58f",
+      "license": "CC-BY-3.0",
+      "target_size_m": 0.62,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.9751269817352295,
+            -1.096256971359253,
+            -1.816480040550232
+          ],
+          [
+            1.1921240091323853,
+            4.571935176849365,
+            1.3963899612426758
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.10938231869855462,
+          0.10938231869855462,
+          0.10938231869855462
+        ],
+        "triangles": 692
+      },
+      "file": "assets/models3d/props/warehouse_fire_extinguisher.glb",
+      "bytes": 32728,
+      "sha256": "77b5e3f1b3e9afd57fc47fb44ad585a41990587d35de20d1a636ba1cd7f51f87",
+      "bounds_m": [
+        [
+          -0.118529,
+          0.0,
+          -0.175716
+        ],
+        [
+          0.118529,
+          0.62,
+          0.175716
+        ]
+      ],
+      "extents_m": [
+        0.237059,
+        0.62,
+        0.351431
+      ],
+      "triangles": 692,
+      "geometries": 3,
+      "materials": [
+        "lambert2"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "source": "procedural:SIDE-sewing-machine-v1",
+      "source_sha256": null,
+      "license": "SIDE-original",
+      "target_size_m": 0.52,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.31,
+            0.0,
+            -0.14
+          ],
+          [
+            0.33899999999999997,
+            0.74,
+            0.14
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          0.7027027027027027,
+          0.7027027027027027,
+          0.7027027027027027
+        ],
+        "triangles": 432
+      },
+      "file": "assets/models3d/props/warehouse_sewing_machine.glb",
+      "bytes": 13264,
+      "sha256": "8d97ef859954c670dda8450d1fc431b38297fe8d04a5f8cfdc1d41bd865bbb28",
+      "bounds_m": [
+        [
+          -0.228027,
+          0.0,
+          -0.098378
+        ],
+        [
+          0.228027,
+          0.52,
+          0.098378
+        ]
+      ],
+      "extents_m": [
+        0.456054,
+        0.52,
+        0.196757
+      ],
+      "triangles": 432,
+      "geometries": 12,
+      "materials": [
+        "MachineAccent",
+        "MachineDark",
+        "MachineIvory",
+        "MachineSteel"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_256_kib": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,432 @@
+{
+  "coordinate_system": "right-handed, Y-up, meters",
+  "origin_policy": "base at Y=0; centered in X and Z",
+  "optimization_policy": "Preserve licensed low-poly geometry and PBR material groups; flatten source node transforms; remove unreferenced vertices; embed all GLB data.",
+  "assets": [
+    {
+      "source": "tableCross.glb",
+      "source_sha256": "f0d83392aff5df82f6c9585cadff694643dbd30a4ff2b8bb01a00a7a161338a3",
+      "license": "CC0-1.0",
+      "target_height_m": 0.75,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.44737332344055175
+          ],
+          [
+            0.8521200370788574,
+            0.3474133336544037,
+            0.0
+          ]
+        ],
+        "scale_xyz": [
+          2.1588117879956714,
+          2.1588117879956714,
+          2.1588117879956714
+        ],
+        "triangles": 178
+      },
+      "file": "assets/models3d/props/shop_table_display.glb",
+      "bytes": 8792,
+      "sha256": "61e79fedc52844006695e503df93b246a52d6830d8eb6d0c204968877c8eed9a",
+      "bounds_m": [
+        [
+          -0.919783,
+          0.0,
+          -0.482897
+        ],
+        [
+          0.919783,
+          0.75,
+          0.482897
+        ]
+      ],
+      "extents_m": [
+        1.839567,
+        0.75,
+        0.965795
+      ],
+      "triangles": 178,
+      "geometries": 1,
+      "materials": [
+        "wood"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "kitchenBar.glb",
+      "source_sha256": "792c3d31e60c8a8d8c7a28cf7d1efe004c5a601adc1b163a8799dde32c1b559d",
+      "license": "CC0-1.0",
+      "target_height_m": 0.95,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.20999999344348907
+          ],
+          [
+            0.4300000071525574,
+            0.41999998688697815,
+            -0.0
+          ]
+        ],
+        "scale_xyz": [
+          2.2619048325247797,
+          2.2619048325247797,
+          2.2619048325247797
+        ],
+        "triangles": 76
+      },
+      "file": "assets/models3d/props/shop_checkout_counter.glb",
+      "bytes": 6516,
+      "sha256": "9230d362ac656e5b89eb9c71d80f38bb1edfcb4eebc0f6004cbb840a1e8dceae",
+      "bounds_m": [
+        [
+          -0.48631,
+          0.0,
+          -0.2375
+        ],
+        [
+          0.48631,
+          0.95,
+          0.2375
+        ]
+      ],
+      "extents_m": [
+        0.972619,
+        0.95,
+        0.475
+      ],
+      "triangles": 76,
+      "geometries": 3,
+      "materials": [
+        "metal",
+        "wood",
+        "woodDark"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "kitchenBarEnd.glb",
+      "source_sha256": "410c6d83defe4ed248a8ec32f81553b56c8b610372d02ecf0e547e3f52cdc0a1",
+      "license": "CC0-1.0",
+      "target_height_m": 0.95,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.20999999344348907
+          ],
+          [
+            0.1015625,
+            0.41999998688697815,
+            -0.0
+          ]
+        ],
+        "scale_xyz": [
+          2.2619048325247797,
+          2.2619048325247797,
+          2.2619048325247797
+        ],
+        "triangles": 152
+      },
+      "file": "assets/models3d/props/shop_checkout_counter_end.glb",
+      "bytes": 8828,
+      "sha256": "556df5693545ff39a4f14525656282f096ff2e2af887acc42f68f7828b2820b5",
+      "bounds_m": [
+        [
+          -0.114862,
+          0.0,
+          -0.2375
+        ],
+        [
+          0.114862,
+          0.95,
+          0.2375
+        ]
+      ],
+      "extents_m": [
+        0.229725,
+        0.95,
+        0.475
+      ],
+      "triangles": 152,
+      "geometries": 2,
+      "materials": [
+        "metal",
+        "wood"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "bookcaseOpen.glb",
+      "source_sha256": "750702218d68c062b15dfef6ab06a4014d1cfa8bd05f02e57c53b7e13bec157c",
+      "license": "CC0-1.0",
+      "target_height_m": 1.85,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.25
+          ],
+          [
+            0.4000000059604645,
+            0.8799999356269836,
+            -0.0
+          ]
+        ],
+        "scale_xyz": [
+          2.102272881056417,
+          2.102272881056417,
+          2.102272881056417
+        ],
+        "triangles": 320
+      },
+      "file": "assets/models3d/props/shop_shelf_tall.glb",
+      "bytes": 13120,
+      "sha256": "1fe1618b5911fd78ae33eecbf3ffbfa93d05abeb391861d86f362777fdd64cc7",
+      "bounds_m": [
+        [
+          -0.420455,
+          0.0,
+          -0.262784
+        ],
+        [
+          0.420455,
+          1.85,
+          0.262784
+        ]
+      ],
+      "extents_m": [
+        0.840909,
+        1.85,
+        0.525568
+      ],
+      "triangles": 320,
+      "geometries": 1,
+      "materials": [
+        "wood"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "bookcaseOpenLow.glb",
+      "source_sha256": "6d4d625faf977a2dbf155f1313cd32c6310e463114a1cd4c08cb9f80a5fb1d75",
+      "license": "CC0-1.0",
+      "target_height_m": 0.92,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.25
+          ],
+          [
+            0.4000000059604645,
+            0.4000000059604645,
+            -0.0
+          ]
+        ],
+        "scale_xyz": [
+          2.29999996572733,
+          2.29999996572733,
+          2.29999996572733
+        ],
+        "triangles": 184
+      },
+      "file": "assets/models3d/props/shop_shelf_low.glb",
+      "bytes": 8448,
+      "sha256": "2f1f85ceea84b582d3123ea81826069f6b1fa257f9eb4519f050798799654710",
+      "bounds_m": [
+        [
+          -0.46,
+          0.0,
+          -0.2875
+        ],
+        [
+          0.46,
+          0.92,
+          0.2875
+        ]
+      ],
+      "extents_m": [
+        0.92,
+        0.92,
+        0.575
+      ],
+      "triangles": 184,
+      "geometries": 1,
+      "materials": [
+        "wood"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "bathroomMirror.glb",
+      "source_sha256": "940b986894101ea59b50541554b6dc608a22b133057975849259009012984175",
+      "license": "CC0-1.0",
+      "target_height_m": 0.88,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            4.443999015351155e-15,
+            -0.04879999905824661
+          ],
+          [
+            0.3013399839401245,
+            0.4346250295639038,
+            0.09560000151395798
+          ]
+        ],
+        "scale_xyz": [
+          2.0247338283370095,
+          2.0247338283370095,
+          0.850388207901544
+        ],
+        "triangles": 72
+      },
+      "file": "assets/models3d/props/shop_mirror_wall.glb",
+      "bytes": 6704,
+      "sha256": "7603c02838c39fe99ea7d670c475d1a4014eef45e8239d07cfc7f3a296280966",
+      "bounds_m": [
+        [
+          -0.305067,
+          0.0,
+          -0.061398
+        ],
+        [
+          0.305067,
+          0.88,
+          0.061398
+        ]
+      ],
+      "extents_m": [
+        0.610133,
+        0.88,
+        0.122796
+      ],
+      "triangles": 72,
+      "geometries": 3,
+      "materials": [
+        "glass",
+        "metal",
+        "wood"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    },
+    {
+      "source": "cash-register_poly-by-google.glb",
+      "source_sha256": "08496e54f1d477f1e142c4454e95d08c541aa933e3609dedaa20aa54cfa9b36a",
+      "license": "CC-BY-3.0",
+      "target_height_m": 0.32,
+      "conversion": {
+        "source_bounds": [
+          [
+            -6.472299098968506,
+            0.0,
+            -5.3525390625
+          ],
+          [
+            6.40846586227417,
+            12.317410469055176,
+            6.178469181060791
+          ]
+        ],
+        "scale_xyz": [
+          0.025979486581528696,
+          0.025979486581528696,
+          0.025979486581528696
+        ],
+        "triangles": 3194
+      },
+      "file": "assets/models3d/props/shop_cash_register.glb",
+      "bytes": 167624,
+      "sha256": "d3b9a7e241c4d9316c09dc08cb26363976e4519596d5ce4ec5ab662e251de53a",
+      "bounds_m": [
+        [
+          -0.167318,
+          0.0,
+          -0.149785
+        ],
+        [
+          0.167318,
+          0.32,
+          0.149785
+        ]
+      ],
+      "extents_m": [
+        0.334636,
+        0.32,
+        0.29957
+      ],
+      "triangles": 3194,
+      "geometries": 1,
+      "materials": [
+        "CashRegister_mat"
+      ],
+      "textures": 0,
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "height_matches_target": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "size_under_1_mib": true
+      }
+    }
+  ]
+}

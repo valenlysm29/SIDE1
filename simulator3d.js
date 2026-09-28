@@ -42,6 +42,19 @@
   let cameraZoom = 5.2, lastCameraInputAt = 0;
   let basePreloadPromise = null, preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 6;
   let studioEnvironment = null, detailsPromise = null, detailsTimer = 0, detailsComplete = false;
+  let storePropsPromise = null, warehousePropsPromise = null;
+  const storePropTemplates = {}, storePropErrors = {}, warehousePropTemplates = {}, warehousePropErrors = {};
+  const STORE_PROP_ASSETS = Object.freeze([
+    ['table', 'shop_table_display'], ['counter', 'shop_checkout_counter'], ['counterEnd', 'shop_checkout_counter_end'],
+    ['shelfTall', 'shop_shelf_tall'], ['shelfLow', 'shop_shelf_low'], ['mirror', 'shop_mirror_wall'], ['register', 'shop_cash_register']
+  ]);
+  const WAREHOUSE_PROP_ASSETS = Object.freeze([
+    ['boxLarge','warehouse_box_large'],['boxLong','warehouse_box_long'],['boxSmall','warehouse_box_small'],['boxWide','warehouse_box_wide'],
+    ['loadingDoor','warehouse_loading_door'],['highWindow','warehouse_high_window'],['floorArrow','warehouse_floor_arrow'],['warningBeacon','warehouse_warning_beacon'],
+    ['pallet','warehouse_pallet'],['rackTall','warehouse_rack_tall'],['bagStack','warehouse_bag_stack'],['cuttingTable','warehouse_cutting_table'],
+    ['pendantLight','warehouse_pendant_light'],['palletTruck','warehouse_pallet_truck'],['fabricRolls','warehouse_fabric_rolls'],
+    ['fireExtinguisher','warehouse_fire_extinguisher'],['sewingMachine','warehouse_sewing_machine']
+  ]);
   let characterManager = null, selectedCharacterId = 'chico2';
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
@@ -781,12 +794,69 @@
 
   // Indoor staff are not needed to walk or drive in the city. Lobby preloading
   // may request them early; cold entry schedules them after its first frame.
+  async function loadStorePropTemplates() {
+    if (storePropsPromise) return storePropsPromise;
+    if (!GLTFLoader || !assetCache) return storePropTemplates;
+    const missing = STORE_PROP_ASSETS.filter(([key]) => !storePropTemplates[key]);
+    storePropsPromise = Promise.all(missing.map(async ([key, file]) => {
+      try {
+        const gltf = await assetCache.loadGLTF(new GLTFLoader(), `assets/models3d/props/${file}.glb`, {priority:ASSET_PRIORITY.LAZY});
+        if (!gltf.scene) throw new Error('El GLB no contiene una escena.');
+        gltf.scene.traverse(node => {
+          if (!node.isMesh) return;
+          node.castShadow = false; node.receiveShadow = true;
+          node.userData.sharedPropResource = true;
+        });
+        gltf.scene.updateMatrixWorld(true);
+        storePropTemplates[key] = gltf.scene; delete storePropErrors[key];
+      } catch (error) {
+        storePropErrors[key] = error.message;
+        console.warn(`No se pudo cargar el prop de tienda ${file}; se conserva su versión procedural.`, error);
+      }
+    })).then(() => {
+      businessInteriors?.installStoreProps(storePropTemplates, perfMode);
+      return storePropTemplates;
+    }).finally(() => { storePropsPromise = null; });
+    return storePropsPromise;
+  }
+
+  async function loadWarehousePropTemplates() {
+    if (warehousePropsPromise) return warehousePropsPromise;
+    if (!GLTFLoader || !assetCache) return warehousePropTemplates;
+    const missing = WAREHOUSE_PROP_ASSETS.filter(([key]) => !warehousePropTemplates[key]);
+    warehousePropsPromise = Promise.all(missing.map(async ([key, file]) => {
+      try {
+        const gltf = await assetCache.loadGLTF(new GLTFLoader(), `assets/models3d/props/${file}.glb`, {priority:ASSET_PRIORITY.LAZY});
+        if (!gltf.scene) throw new Error('El GLB no contiene una escena.');
+        gltf.scene.traverse(node => {
+          if (!node.isMesh) return;
+          node.castShadow = false; node.receiveShadow = true;
+          node.userData.sharedPropResource = true;
+        });
+        gltf.scene.updateMatrixWorld(true);
+        warehousePropTemplates[key] = gltf.scene; delete warehousePropErrors[key];
+      } catch (error) {
+        warehousePropErrors[key] = error.message;
+        console.warn(`No se pudo cargar el prop de almacén ${file}; se conserva su versión procedural.`, error);
+      }
+    })).then(() => {
+      businessInteriors?.installWarehouseProps(warehousePropTemplates, perfMode);
+      return warehousePropTemplates;
+    }).finally(() => { warehousePropsPromise = null; });
+    return warehousePropsPromise;
+  }
+
   async function preloadDetails() {
     if(detailsPromise)return detailsPromise;
     detailsPromise=(async()=>{
       if(!await preload())return false;
-      await Promise.all([characterManager?.preloadRemaining({priority:ASSET_PRIORITY.IMPORTANT}),loadExecModelTemplates()]);
+      // Props can stream beside the supplied characters, but the legacy casual
+      // fallback decision must wait until those character requests settle.
+      // Otherwise a healthy local character set still triggers an unused GLB.
+      const storeProps=loadStorePropTemplates(),warehouseProps=loadWarehousePropTemplates();
+      await characterManager?.preloadRemaining({priority:ASSET_PRIORITY.IMPORTANT});
       for(const id of CHARACTER_IDS){const template=characterManager?.template(id);if(!template)continue;if(id==='mona')monaTemplate=template;else suppliedTemplates[id]=template;}
+      await Promise.all([loadExecModelTemplates(),storeProps,warehouseProps]);
       if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
       refreshBusinessCharacters();ensureHubCharacters();detailsComplete=true;return true;
     })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
@@ -1208,7 +1278,7 @@
       const now=performance.now()/1000;
       const dt=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));
       g.userData.lastAnimAt=now;
-      g.userData.animationController.update(dt,{speed:movementSpeed??(moving?Math.max(.82,g.userData.motion?.speed||0):0),grounded:g===playerAvatar?player.grounded:true});return;
+      g.userData.animationController.update(dt,{speed:movementSpeed??(moving?Math.max(.82,g.userData.motion?.speed||0):0),grounded:g===playerAvatar?player.grounded:true,...(g===playerAvatar?{state:player.locomotion}:null)});return;
     }
     if(g.userData.motion){
       const now=performance.now()/1000;
@@ -1494,6 +1564,7 @@
     const map={low:.72,medium:1.0,high:Math.min(devicePixelRatio,1.35),auto:1.05}; renderScale=map[mode]||1.05;
     renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale));
     if(renderer&&sunLight){renderer.shadowMap.enabled=mode!=='low';sunLight.castShadow=mode!=='low';renderer.shadowMap.needsUpdate=true;}
+    businessInteriors?.setQuality(mode);
     resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
 
@@ -2833,10 +2904,12 @@
   async function buildPlayableHub() {
     const {createHubWorld}=await import('./services/hub_world.js?v=20260927-continuous-world');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
-    const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260927-continuous-world');
+    const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-warehouse-props-2');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
       createNpc(role){const obj=person(role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{execModel:role==='supervisor'?'chico2':'chico3'});obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;},
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
+    businessInteriors.installStoreProps(storePropTemplates,perfMode);
+    businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);
     businessWorld=businessInteriors.group;
     hubWorld.colliders.push(...businessInteriors.colliders);
     hubWorld.entrances.splice(0,hubWorld.entrances.length,...businessInteriors.entrances);
@@ -3682,7 +3755,7 @@
     const selected=activeCharacterId(),selectedInstances=characters.filter(character=>character.characterId===selected).length;
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
       navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
-      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',cache:assetCache?.diagnostics?.()||null},
+      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',storeProps:{loaded:Object.keys(storePropTemplates),errors:{...storePropErrors}},warehouseProps:{loaded:Object.keys(warehousePropTemplates),errors:{...warehousePropErrors}},cache:assetCache?.diagnostics?.()||null},
       character:{selected,name:CONFIG.NPCS[selected]?.name||'',selectedInstances,playerInstances:characters.filter(character=>character.role==='player').length,manager:characterManager?.diagnostics?.()||null,animation:playerAvatar?.userData.animationController?.getSnapshot?.()||null,controllers:controllers.size,mixers:mixers.size},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.characterId==='mona'||c.kind==='mona'||c.kind==='mona-fallback').length},

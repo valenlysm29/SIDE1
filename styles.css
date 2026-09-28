@@ -23,6 +23,8 @@ button,input{font:inherit}
 .loading-track span{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff;text-shadow:0 2px 5px #000}
 .start-link{margin-top:20px;background:none;border:0;color:#ffd21f;font-weight:900;letter-spacing:1px;font-size:21px;cursor:pointer;text-shadow:0 3px 8px #000;transition:.2s}
 .start-link:disabled{opacity:0}.start-link:not(:disabled):hover{transform:scale(1.05);color:#fff}
+.credits-launcher{position:absolute;right:24px;bottom:22px;z-index:5;border:1px solid #ffffff55;border-radius:999px;background:#041329cc;color:#dce9f7;padding:10px 17px;font-size:13px;font-weight:800;letter-spacing:1.4px;cursor:pointer;box-shadow:0 8px 24px #0008;backdrop-filter:blur(4px)}
+.credits-launcher:hover{border-color:#ffd329;color:#ffd329}.credits-launcher:focus-visible,.credits-modal a:focus-visible,.credits-modal button:focus-visible{outline:3px solid #fff;outline-offset:3px}
 
 /* =========================
    SELECCIÓN DE PERFIL
@@ -72,6 +74,11 @@ button,input{font:inherit}
 .switch-line{text-align:center;color:#d9e7f5;margin:22px 0 0}.switch-line button{background:none;border:0;color:#ffd329;font-weight:900;cursor:pointer}
 .form-message{min-height:22px;text-align:center;margin-top:12px;color:#ffdf72}
 .field-hint{display:block;color:#8da4c2;font-size:13px;line-height:1.5;margin-top:6px}
+.credits-modal{width:min(680px,92vw)}
+.credits-list{display:grid;gap:12px}
+.credit-item{padding:16px 18px;border:1px solid #ffffff1c;border-radius:14px;background:#02152dcc}
+.credit-item h3{margin:0 0 5px;color:#fff;font-size:19px}.credit-item p{margin:4px 0;color:#c8d8ea}.credit-item a{color:#ffd329;font-weight:800}.credit-item small{display:block;margin-top:9px;color:#8fa7c2;line-height:1.5;overflow-wrap:anywhere}
+.credits-note{margin:16px 0 0;color:#9eb1c9;font-size:13px;line-height:1.5;text-align:center}.credits-note code{color:#dbe8f8}
 
 /* =========================
    PANEL PROFESOR / LOBBY
@@ -98,6 +105,7 @@ button,input{font:inherit}
   .upch-corner{top:14px;left:14px;width:88px;height:88px;padding:9px}
   .loading-wrap{width:88vw}.loading-track{height:48px}
   .start-link{font-size:19px;margin-top:14px}
+  .credits-launcher{right:14px;top:14px;bottom:auto;padding:9px 14px;font-size:12px}
 
   .profile-side-logo{width:min(260px,68vw)}
   .profile-subtitle{letter-spacing:3px;margin-bottom:16px}

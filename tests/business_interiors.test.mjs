@@ -15,6 +15,9 @@ function fixture(options = {}) {
   const world = createBusinessInteriors({ scene, ...options });
   return { scene, world, close: () => world.dispose() };
 }
+function propTemplate(name, geometry = new THREE.BoxGeometry(.5, .5, .5), material = new THREE.MeshStandardMaterial()) {
+  const root = new THREE.Group(); root.name = name; root.add(new THREE.Mesh(geometry, material)); return root;
+}
 function blocked(world, x, z, radius = .32) {
   return world.colliders.some(b => x > b.minX - radius && x < b.maxX + radius && z > b.minZ - radius && z < b.maxZ + radius);
 }
@@ -148,6 +151,101 @@ test('shared instancing batches stock per room/tier; furniture has metre-scale c
   const camera = constrainCamera(position, { x: 120, y: 3.5, z: 20 }, f.world.colliders);
   assert.ok(camera.x > 123.2);
   f.close();
+});
+
+test('streamed store props preserve routes while quality tiers limit mirrors and shadows', () => {
+  const f = fixture(), templates = {
+    table: propTemplate('table'), counter: propTemplate('counter'), counterEnd: propTemplate('counter end'),
+    shelfTall: propTemplate('tall shelf'), shelfLow: propTemplate('low shelf'), mirror: propTemplate('mirror'), register: propTemplate('register')
+  };
+  const colliders = JSON.stringify(f.world.colliders), routes = JSON.stringify(f.world.npcRoutes), hotspots = JSON.stringify(f.world.hotspots);
+  const installed = f.world.installStoreProps(templates, 'auto');
+  assert.deepEqual(installed.installed, ['checkout', 'mirrors', 'shelves', 'table']);
+  assert.equal(installed.visibleShelfBays, 4); assert.equal(installed.visibleMirrors, 2);
+  const room = f.world.rooms.find(value => value.id === 'store');
+  assert.ok([...room.propFallbacks.values()].every(entry => !entry.group.visible));
+  assert.equal(JSON.stringify(f.world.colliders), colliders); assert.equal(JSON.stringify(f.world.npcRoutes), routes); assert.equal(JSON.stringify(f.world.hotspots), hotspots);
+
+  f.world.setQuality('low'); let state = f.world.stats().storeProps;
+  assert.equal(state.visibleShelfBays, 4, 'stock never floats on a quality-hidden shelf'); assert.equal(state.visibleMirrors, 1);
+  room.propRoot.traverse(object => { if (object.isMesh) assert.equal(object.castShadow, false); });
+  f.world.setQuality('medium'); state = f.world.stats().storeProps;
+  assert.equal(state.visibleShelfBays, 4); assert.equal(state.visibleMirrors, 2);
+  assert.ok(room.propRoot.children.filter(batch => batch.visible && ['checkout', 'table'].includes(batch.userData.category)).some(batch => batch.children.some(mesh => mesh.castShadow)));
+  assert.ok(room.propRoot.children.filter(batch => batch.userData.category === 'shelves').every(batch => batch.children.every(mesh => !mesh.castShadow)));
+  f.world.setQuality('high');
+  assert.ok(room.propRoot.children.filter(batch => batch.userData.category === 'shelves').every(batch => batch.children.every(mesh => mesh.castShadow)));
+  f.close();
+});
+
+test('prop installation is idempotent, falls back per category and never disposes cached resources', () => {
+  const geometry = new THREE.BoxGeometry(.5, .5, .5), material = new THREE.MeshStandardMaterial();
+  let geometryDisposed = 0, materialDisposed = 0;
+  geometry.addEventListener('dispose', () => geometryDisposed++); material.addEventListener('dispose', () => materialDisposed++);
+  const f = fixture(), room = f.world.rooms.find(value => value.id === 'store');
+  const templates = { table: propTemplate('table', geometry, material) };
+  f.world.installStoreProps(templates, 'auto');
+  assert.equal(room.propFallbacks.get('table').group.visible, false);
+  for (const category of ['checkout', 'shelves', 'mirrors']) assert.equal(room.propFallbacks.get(category).group.visible, true);
+  const first = [...room.propRoot.children];
+  f.world.installStoreProps(templates, 'high');
+  assert.deepEqual(room.propRoot.children, first, 'same templates do not allocate duplicate batches');
+  f.world.installStoreProps({}, 'auto');
+  assert.equal(room.propRoot.children.length, 0);
+  assert.ok([...room.propFallbacks.values()].every(entry => entry.group.visible));
+  f.close();
+  assert.equal(geometryDisposed, 0); assert.equal(materialDisposed, 0);
+  geometry.dispose(); material.dispose();
+});
+
+test('warehouse streamed props keep physical contracts and tier complete supported stock safely', () => {
+  const geometry = new THREE.BoxGeometry(.4, .4, .4), material = new THREE.MeshStandardMaterial();
+  const keys = ['boxLarge','boxLong','boxSmall','boxWide','loadingDoor','highWindow','floorArrow','warningBeacon','pallet','rackTall',
+    'bagStack','cuttingTable','pendantLight','palletTruck','fabricRolls','fireExtinguisher','sewingMachine'];
+  const templates = Object.fromEntries(keys.map(key => [key, propTemplate(key, geometry, material)]));
+  const f = fixture(), room = f.world.rooms.find(value => value.id === 'warehouse');
+  const physical = { colliders: JSON.stringify(f.world.colliders), routes: JSON.stringify(f.world.npcRoutes), hotspots: JSON.stringify(f.world.hotspots) };
+  const auto = f.world.installWarehouseProps(templates, 'auto');
+  assert.deepEqual(auto.installed, ['lighting','loadingDoor','pallet','palletTruck','racks','safety','windows','workbench']);
+  assert.equal(auto.rackBays, 4); assert.equal(auto.lights, 4);
+  assert.ok([...room.propFallbacks.values()].every(entry => !entry.group.visible));
+  assert.ok(room.propRoot.children.every(batch => batch.children.every(mesh => mesh.geometry === geometry && mesh.material === material)));
+  assert.deepEqual({ colliders: JSON.stringify(f.world.colliders), routes: JSON.stringify(f.world.npcRoutes), hotspots: JSON.stringify(f.world.hotspots) }, physical);
+
+  f.world.setQuality('low'); let state = f.world.stats().warehouseProps;
+  assert.equal(state.rackBays, 4, 'inventory racks stay under every visible stock group'); assert.equal(state.lights, 2);
+  assert.ok(state.visibleInstances < state.instances, 'low hides only unsupported decorative detail');
+  assert.ok(room.propRoot.children.filter(batch => ['racks','workbench','pallet'].includes(batch.userData.category)).every(batch => batch.visible));
+  room.propRoot.traverse(object => { if (object.isMesh) assert.equal(object.castShadow, false); });
+  f.world.setQuality('medium'); state = f.world.stats().warehouseProps;
+  assert.equal(state.rackBays, 4); assert.equal(state.lights, 4);
+  assert.ok(room.propRoot.children.filter(batch => ['workbench','palletTruck'].includes(batch.userData.category)).every(batch => batch.children.every(mesh => mesh.castShadow)));
+  assert.ok(room.propRoot.children.filter(batch => batch.userData.category === 'racks').every(batch => batch.children.every(mesh => !mesh.castShadow)));
+  f.world.setQuality('high');
+  assert.ok(room.propRoot.children.filter(batch => batch.userData.category === 'racks').every(batch => batch.children.every(mesh => mesh.castShadow)));
+  f.close(); geometry.dispose(); material.dispose();
+});
+
+test('warehouse installation is idempotent with partial fallback and cached resources survive disposal', () => {
+  const geometry = new THREE.BoxGeometry(.5, .5, .5), material = new THREE.MeshStandardMaterial();
+  let geometryDisposed = 0, materialDisposed = 0;
+  geometry.addEventListener('dispose', () => geometryDisposed++); material.addEventListener('dispose', () => materialDisposed++);
+  const f = fixture(), room = f.world.rooms.find(value => value.id === 'warehouse');
+  const templates = { rackTall: propTemplate('rack', geometry, material) };
+  f.world.installWarehouseProps(templates, 'auto');
+  assert.equal(room.propFallbacks.get('racks').group.visible, false);
+  for (const category of ['workbench','pallet','palletTruck','loadingDoor','windows','lighting','safety']) {
+    assert.equal(room.propFallbacks.get(category).group.visible, true, category);
+  }
+  const first = [...room.propRoot.children];
+  f.world.installWarehouseProps(templates, 'high');
+  assert.deepEqual(room.propRoot.children, first, 'same warehouse templates retain batches');
+  f.world.installWarehouseProps({}, 'auto');
+  assert.equal(room.propRoot.children.length, 0);
+  assert.ok([...room.propFallbacks.values()].every(entry => entry.group.visible));
+  f.close();
+  assert.equal(geometryDisposed, 0); assert.equal(materialDisposed, 0);
+  geometry.dispose(); material.dispose();
 });
 
 test('repeat business model updates retain one scene and disposal is idempotent', () => {

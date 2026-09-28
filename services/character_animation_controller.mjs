@@ -33,7 +33,9 @@ const DEFAULT_ALIASES=Object.freeze({
   AIRBORNE:['airborne','jump','fall','falling']
 });
 
-const DEFAULT_SPEEDS=Object.freeze({walk:1.45,run:4.2});
+// Match SIDE's actual on-foot target speeds. Authorised clips can override
+// these values with their measured root-motion speeds when registered.
+const DEFAULT_SPEEDS=Object.freeze({walk:2.65,run:5.2});
 const normalizeName=value=>String(value??'').trim().toLowerCase().replace(/[^a-z0-9]+/g,' ');
 const normalizeState=value=>{
   const state=String(value??'').trim().toUpperCase();
@@ -82,7 +84,7 @@ export class CharacterAnimationController{
     fallback=null,
     fadeDuration=.24,
     walkThreshold=.08,
-    runThreshold=2.35,
+    runThreshold=3.2,
     referenceSpeeds=DEFAULT_SPEEDS,
     timeScaleRange=[.65,1.45],
     aliases={},
@@ -92,7 +94,7 @@ export class CharacterAnimationController{
     this.mixer=mixer;
     this.fadeDuration=Math.max(0,finite(fadeDuration,.24));
     this.walkThreshold=Math.max(0,finite(walkThreshold,.08));
-    this.runThreshold=Math.max(this.walkThreshold,finite(runThreshold,2.35));
+    this.runThreshold=Math.max(this.walkThreshold,finite(runThreshold,3.2));
     this.referenceSpeeds={...DEFAULT_SPEEDS,...referenceSpeeds};
     this.timeScaleRange=[finite(timeScaleRange?.[0],.65),finite(timeScaleRange?.[1],1.45)].sort((a,b)=>a-b);
     this.aliases={...DEFAULT_ALIASES,...aliases};

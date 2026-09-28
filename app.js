@@ -3,7 +3,7 @@ const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') 
 const supabaseClient = window.SIDE?.SupabaseClient?.get() || null;
 const $ = id => document.getElementById(id);
 const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','characterSelection','simulationLoading','simulator3d','decisionMenu'];
-const modals = ['teacherLoginModal','teacherRegisterModal','studentModal'];
+const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','creditsModal'];
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
@@ -33,8 +33,36 @@ function showScreen(id){
   screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
   return id;
 }
-function showModal(id){$('modalRoot').classList.remove('hidden');modals.forEach(m=>$(m)?.classList.toggle('hidden',m!==id));setTimeout(()=>$(id)?.querySelector('input')?.focus(),80)}
-function closeModal(){$('modalRoot').classList.add('hidden');modals.forEach(m=>$(m)?.classList.add('hidden'))}
+let modalTrigger = null;
+function showModal(id){
+  if($('modalRoot')?.classList.contains('hidden'))modalTrigger=document.activeElement;
+  $('modalRoot')?.classList.remove('hidden');
+  modals.forEach(m=>$(m)?.classList.toggle('hidden',m!==id));
+  setTimeout(()=>$(id)?.querySelector('input,button,a[href]')?.focus(),80);
+}
+function closeModal(){
+  $('modalRoot')?.classList.add('hidden');
+  modals.forEach(m=>$(m)?.classList.add('hidden'));
+  const trigger=modalTrigger;modalTrigger=null;
+  if(trigger?.isConnected)trigger.focus();
+}
+function renderCredits(){
+  const list=$('creditsList'),credits=Array.isArray(window.SIDE_CREDITS)?window.SIDE_CREDITS:[];
+  if(!list||list.dataset.rendered==='true')return;
+  list.replaceChildren();
+  for(const credit of credits){
+    const item=document.createElement('article');item.className='credit-item';
+    const heading=document.createElement('h3');heading.textContent=credit.title;
+    const author=document.createElement('p');author.textContent=`Por ${credit.author}`;
+    const links=document.createElement('p');links.className='credit-links';
+    const source=document.createElement('a');source.href=credit.sourceUrl;source.target='_blank';source.rel='noopener noreferrer';source.textContent=credit.source;
+    const separator=document.createTextNode(' · ');
+    const license=document.createElement('a');license.href=credit.licenseUrl;license.target='_blank';license.rel='noopener noreferrer';license.textContent=credit.license;
+    const assets=document.createElement('small');assets.textContent=credit.assets.join(' · ');
+    links.append(source,separator,license);item.append(heading,author,links,assets);list.append(item);
+  }
+  list.dataset.rendered='true';
+}
 function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__sideToast);window.__sideToast=setTimeout(()=>t.classList.remove('show'),2600)}
 function message(id,msg,error=false){const el=$(id);if(!el)return;el.textContent=msg;el.style.color=error?'#ff9d9d':'#ffe06a'}
 function requireSupabase(){if(!supabaseClient){toast('Modo local activo: configura Supabase para sincronización.');return false}return true}
@@ -251,6 +279,7 @@ window.SIDE_GAME_BRIDGE={
 // Landing / acceso
 const loadingTimer=setInterval(()=>{const bar=$('loadingBar');if(!bar){clearInterval(loadingTimer);return}const p=Math.min(100,(Number(bar.dataset.p)||0)+1);bar.dataset.p=p;bar.style.width=p+'%';$('loadingPercent').textContent=p+'%';if(p>=100){clearInterval(loadingTimer);$('startBtn').disabled=false}},28);
 $('startBtn')?.addEventListener('click',()=>showScreen('profiles'));
+$('openCreditsBtn')?.addEventListener('click',()=>{renderCredits();showModal('creditsModal')});
 document.querySelector('.modal-backdrop')?.addEventListener('click',closeModal);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));

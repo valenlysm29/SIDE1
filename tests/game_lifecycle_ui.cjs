@@ -65,7 +65,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await s1.evaluate(()=>currentRound()),1);assert.equal(await s2.evaluate(()=>studentAccess().canOperate),true);
   assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canExplore()),true);
-  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'exploration does not charge or sell before submitted decisions');
+  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),true,'submitted decisions enable business operations in the 3D world');
   await s1.evaluate(()=>{window.rejectWorld=true;return startSimulationLoading()});
   assert.equal(await s1.locator('#simulationLoading').isVisible(),true);
   assert.equal(await s1.locator('#decisionMenu').isVisible(),false);
@@ -111,7 +111,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    assert.equal(await p.evaluate(()=>studentPoll===null&&studentTick===null),true);
   }
   await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.equal(await s1.locator('#studentTimerNote').innerText(),'Partida cancelada');await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
-  await t.evaluate(()=>{switchTab('empresas');state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
+  await t.evaluate(()=>{clearInterval(teacherPoll);teacherPoll=null;clearInterval(companiesPoll);companiesPoll=null;switchTab('empresas');state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
   await t.setViewportSize({width:390,height:844});await t.evaluate(()=>$('toast').classList.remove('show'));await t.locator('.company-card').screenshot({path:path.join(output,'observations-company-mobile.png')});
   assert.match(await t.locator('.company-status-line').innerText(),/CONECTADA/);
   await t.evaluate(()=>{state.reports[0].lastSeenAt=new Date(teacherNow()-120000).toISOString();renderCompanies();});

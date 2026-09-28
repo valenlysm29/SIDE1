@@ -93,13 +93,16 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     const after=await page.evaluate(()=>({player:SIDE3D.diagnostics().player,camera:hubQA.camera()}));
     assert.ok(Math.hypot(after.player.x-before.player.x,after.player.z-before.player.z)>.7,'WASD moves the player');
     assert.notDeepEqual(after.camera.position,before.camera.position,'camera follows walking');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().character.animation.state),'WALK','animation follows the WALK physics state');
     await page.screenshot({path:path.join(output,'hub-thirdperson.png')});
     checks.push({walking:{before,after}});
     await page.keyboard.down('KeyW');await page.keyboard.down('ShiftLeft');
     await page.evaluate(()=>hubQA.stepPlayer(.4));
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.locomotion),'RUN');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().character.animation.state),'RUN','animation follows the RUN physics state');
     await page.keyboard.up('KeyW');await page.keyboard.up('ShiftLeft');await page.evaluate(()=>hubQA.stepPlayer(.7));
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.locomotion),'IDLE');
+    assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().character.animation.state),'IDLE','animation returns to IDLE with movement physics');
     await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:10000});
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.zoom),7.4,'zoom upper limit');
     await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:-10000});
@@ -110,7 +113,10 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     // controllable frame; wait explicitly before validating their articulated rigs.
     await page.evaluate(()=>SIDE3D.preloadDetails());
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
-    assert.ok(actorsBefore.length>=3&&actorsBefore.every(a=>a.bones>=15),'all outdoor pedestrians have articulated rigs');
+    const activeCharacter=await page.evaluate(()=>SIDE3D.diagnostics().character.selected);
+    assert.equal(actorsBefore.length,2,'the two non-player chico identities patrol outdoors');
+    assert.ok(actorsBefore.every(a=>a.bones>=15),'all outdoor pedestrians have articulated rigs');
+    assert.equal(actorsBefore.some(a=>a.kind===activeCharacter),false,'the selected player identity is not duplicated as a pedestrian');
     await page.evaluate(()=>hubQA.stepActors(5));
     const actorsAfter=await page.evaluate(()=>hubQA.actors());
     assert.ok(actorsAfter.every((actor,i)=>actor.distance-actorsBefore[i].distance>.15),'every pedestrian walks along its route');

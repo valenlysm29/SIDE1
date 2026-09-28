@@ -27,6 +27,13 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   const geometry = new THREE.BoxGeometry(1, 1, 1); resources.add(geometry);
   const cylinder = new THREE.CylinderGeometry(1, 1, 1, 12); resources.add(cylinder);
   const scratch = new THREE.Object3D();
+  const STORE_PROP_KEYS = Object.freeze(['table', 'counter', 'counterEnd', 'shelfTall', 'shelfLow', 'mirror', 'register']);
+  const WAREHOUSE_PROP_KEYS = Object.freeze([
+    'boxLarge', 'boxLong', 'boxSmall', 'boxWide', 'loadingDoor', 'highWindow', 'floorArrow', 'warningBeacon',
+    'pallet', 'rackTall', 'bagStack', 'cuttingTable', 'pendantLight', 'palletTruck', 'fabricRolls', 'fireExtinguisher', 'sewingMachine'
+  ]);
+  const qualityRank = mode => mode === 'low' ? 1 : mode === 'high' ? 3 : 2;
+  let storePropQuality = 'auto', installedStoreTemplates = {}, installedWarehouseTemplates = {};
   const material = (color, extra = {}) => {
     const value = new THREE.MeshStandardMaterial({ color, roughness: .78, ...extra }); resources.add(value); return value;
   };
@@ -69,6 +76,45 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         parent.userData.geometryInstances = instances; parent.userData.drawCalls = batches.size;
       }
     };
+  }
+  function clearPropModels(root) {
+    root?.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
+    root?.clear();
+  }
+  function propMatrix({ x, y = 0, z, yaw = 0, scale = [1, 1, 1] }) {
+    const [sx, sy, sz] = scale;
+    return new THREE.Matrix4().compose(
+      new THREE.Vector3(x, y, z),
+      new THREE.Quaternion().setFromEuler(new THREE.Euler(0, yaw, 0)),
+      new THREE.Vector3(sx, sy, sz)
+    );
+  }
+  // Static GLBs keep their cached geometry and materials. Repeated modules are
+  // emitted as InstancedMesh batches, so installing props never clones PBR
+  // resources or turns a row of shelves into one draw call per copy.
+  function addPropBatch(root, template, placements, metadata) {
+    if (!template?.traverse || !placements.length) return null;
+    template.updateMatrixWorld?.(true);
+    const sources = [];
+    template.traverse(object => { if (object.isMesh && !object.isSkinnedMesh && object.geometry && object.material) sources.push(object); });
+    if (!sources.length) return null;
+    const batch = new THREE.Group();
+    const zone = metadata.zone || 'store';
+    batch.name = `${zone} prop ${metadata.kind}`;
+    batch.userData.streamedPropBatch = true;
+    batch.userData[zone === 'warehouse' ? 'warehousePropBatch' : 'storePropBatch'] = true;
+    Object.assign(batch.userData, metadata, { zone, instanceCount: placements.length, bays: [...new Set(placements.map(p => p.bay).filter(Boolean))] });
+    const placementMatrices = placements.map(propMatrix);
+    for (const source of sources) {
+      const instance = new THREE.InstancedMesh(source.geometry, source.material, placements.length);
+      placementMatrices.forEach((placement, index) => instance.setMatrixAt(index, placement.clone().multiply(source.matrixWorld)));
+      instance.instanceMatrix.needsUpdate = true;
+      instance.name = `${batch.name} shared mesh`;
+      instance.castShadow = false; instance.receiveShadow = true;
+      instance.computeBoundingSphere();
+      batch.add(instance);
+    }
+    root.add(batch); return batch;
   }
   function sign(parent, text, subtitle, x, y, z, w, h, yaw = 0) {
     const canvas = document.createElement('canvas'); canvas.width = 768; canvas.height = Math.round(768 * h / w);
@@ -190,8 +236,17 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
 
   for (const layout of BUSINESS_LAYOUTS) {
     const detail = new THREE.Group(); detail.name = `${layout.id} nearby detail`; group.add(detail);
-    const room = { id: layout.id, layout, detail, stock: [], actors: [], routes: [], lights: [], stockLevel: 0 }; rooms.push(room);
+    const propRoot = new THREE.Group(); propRoot.name = `${layout.id} streamed props`; detail.add(propRoot);
+    const room = { id: layout.id, layout, detail, stock: [], actors: [], routes: [], lights: [], stockLevel: 0,
+      propRoot, propFallbacks: new Map() }; rooms.push(room);
     const b = batchBuilder(detail);
+    const fallback = category => {
+      if (!room.propFallbacks.has(category)) {
+        const fallbackGroup = new THREE.Group(); fallbackGroup.name = `${room.id} ${category} procedural fallback`; detail.add(fallbackGroup);
+        room.propFallbacks.set(category, { group: fallbackGroup, batch: batchBuilder(fallbackGroup) });
+      }
+      return room.propFallbacks.get(category).batch;
+    };
     // Floor joints, skirting and ceiling beams keep metre-scale surfaces legible.
     for(const side of [-1,1])b.box(layout.x+side*(layout.width/2-.16),.1,layout.z,.045,.17,layout.depth-.3,m.dark);
     b.box(layout.x,.1,layout.z-layout.depth/2+.16,layout.width-.3,.17,.045,m.dark);
@@ -200,24 +255,33 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     for(let z=layout.z-layout.depth/2+joint;z<layout.z+layout.depth/2;z+=joint)b.box(layout.x,.026,z,layout.width-.25,.002,.009,m.grout);
     if(room.id!=='store')for(let z=layout.z-5;z<layout.z+6;z+=3)b.box(layout.x,layout.height-.23,z,layout.width-.3,.24,.14,m.steel);
     // Ceiling lights share emissive batches; only this room's two fill lights activate.
+    // Warehouse fixtures can later be swapped for streamed pendant-light GLBs.
+    const ceilingFixtures = room.id === 'warehouse' ? fallback('lighting') : b;
     for (const x of [layout.x - 4, layout.x + 4]) for (const z of [layout.z - 3, layout.z + 2]) {
-      b.box(x, layout.height - .21, z, 2, .1, .35, m.white); b.box(x, layout.height - .27, z, 1.8, .025, .26, m.light);
+      ceilingFixtures.box(x, layout.height - .21, z, 2, .1, .35, m.white); ceilingFixtures.box(x, layout.height - .27, z, 1.8, .025, .26, m.light);
     }
     for (const z of [layout.z - 2.7, layout.z + 2.7]) {
       const light = new THREE.PointLight(0xfff0d6, 28, 15, 1.1); light.position.set(layout.x, Math.min(4, layout.height - .7), z);
       light.castShadow = false; light.visible = false; detail.add(light); room.lights.push(light);
     }
     if (room.id === 'store') {
-      for (const x of [-24, -14]) { shelf(room, b, x, 15.0); shelf(room, b, x, 18.1); }
+      const shelfFallback = fallback('shelves'), checkoutFallback = fallback('checkout');
+      const tableFallback = fallback('table'), mirrorFallback = fallback('mirrors');
+      for (const x of [-24, -14]) { shelf(room, shelfFallback, x, 15.0); shelf(room, shelfFallback, x, 18.1); }
       // Central aisle (x=-19) stays clear from door to rear. Cash register is to the east.
-      solid(room, b, -13.9, .52, 21.4, 3.25, 1.03, .85, m.wood, 'counter');
-      b.box(-13.9, 1.075, 21.4, 3.4, .09, 1, m.white);
-      b.box(-14.4, 1.18, 21.36, .52, .16, .42, m.dark); b.box(-14.4, 1.39, 21.37, .055, .32, .055, m.steel);
-      b.box(-14.4, 1.57, 21.4, .49, .32, .055, m.screen); b.box(-13.65, 1.2, 21.37, .23, .14, .33, m.dark);
-      b.box(-14.4, 1.27, 21.58, .5, .018, .06, m.black);
-      solid(room, b, -24.6, .37, 21.7, 2.1, .72, 1.05, m.wood, 'display');
+      solid(room, checkoutFallback, -13.9, .52, 21.4, 3.25, 1.03, .85, m.wood, 'counter');
+      checkoutFallback.box(-13.9, 1.075, 21.4, 3.4, .09, 1, m.white);
+      checkoutFallback.box(-14.4, 1.18, 21.36, .52, .16, .42, m.dark); checkoutFallback.box(-14.4, 1.39, 21.37, .055, .32, .055, m.steel);
+      checkoutFallback.box(-14.4, 1.57, 21.4, .49, .32, .055, m.screen); checkoutFallback.box(-13.65, 1.2, 21.37, .23, .14, .33, m.dark);
+      checkoutFallback.box(-14.4, 1.27, 21.58, .5, .018, .06, m.black);
+      solid(room, tableFallback, -24.6, .37, 21.7, 2.1, .72, 1.05, m.wood, 'display');
       const db = stockBatch(room, 1);
       for (const x of [-25.15, -24.55, -23.95]) handbag(db, x, .75, 21.7, m.tan, 1.12);
+      // Mirrors keep a cheap procedural representation until their GLB arrives.
+      for (const [x, z] of [[-26.86, 19.7], [-11.14, 17]]) {
+        mirrorFallback.box(x, 1.55, z, .08, 1.28, 1.0, m.wood);
+        mirrorFallback.box(x + (x < -19 ? .045 : -.045), 1.55, z, .018, 1.13, .86, m.glass);
+      }
       sign(detail, 'COLECCIÓN SIDE', 'ESENCIAL · URBANO · PREMIUM', -19, 2.7, 14.15, 5.6, .65);
       sign(detail, 'CAJA / ATENCIÓN', '', -13.95, 2.5, 23.79, 2.9, .38, Math.PI);
       // A small stock preparation alcove, with a walkable side opening.
@@ -237,21 +301,28 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       route(room, 'customer', [[-21.5, 20], [-21.5, 16.6], [-19, 16.6], [-19, 20]]);
       route(room, 'customer', [[-16.5, 16.7], [-16.5, 19.9], [-18, 19.9], [-18, 16.7]]);
     } else if (room.id === 'warehouse') {
-      for (const x of [-25.2, -15.8]) for (const z of [-23.7, -19.5]) shelf(room, b, x, z, 3.1, true);
+      const rackFallback = fallback('racks'), workbenchFallback = fallback('workbench');
+      const palletFallback = fallback('pallet'), truckFallback = fallback('palletTruck');
+      const doorFallback = fallback('loadingDoor'), windowFallback = fallback('windows'), safetyFallback = fallback('safety');
+      for (const x of [-25.2, -15.8]) for (const z of [-23.7, -19.5]) shelf(room, rackFallback, x, z, 3.1, true);
       // Receiving and packing stations flank the 3.6m doorway and wide main aisle.
-      table(room, b, -25.2, -15.1, 3.2, 1.2); carton(b, -25.8, 1.22, -15.1, .6);
-      b.box(-24.5, 1.1, -15.1, .52, .16, .39, m.dark); b.box(-24.5, 1.44, -15.25, .5, .34, .06, m.screen);
-      pallet(b, -15.7, -15.4); collider(-15.7, -15.4, 1.25, 1, 'pallet', room.id);
+      table(room, workbenchFallback, -25.2, -15.1, 3.2, 1.2); carton(workbenchFallback, -25.8, 1.22, -15.1, .6);
+      workbenchFallback.box(-24.5, 1.1, -15.1, .52, .16, .39, m.dark); workbenchFallback.box(-24.5, 1.44, -15.25, .5, .34, .06, m.screen);
+      pallet(palletFallback, -15.7, -15.4); collider(-15.7, -15.4, 1.25, 1, 'pallet', room.id);
       // Pending goods have not arrived: show a receiving marker rather than
       // drawing physical cartons that imply immediately available inventory.
       const pending = new THREE.Group(); pending.name = 'Pending delivery marker'; detail.add(pending); room.pending = pending;
       sign(pending, 'PEDIDO EN CAMINO', 'RECEPCIÓN PENDIENTE', -15.7, 1.25, -15.4, 2.1, .55);
       pending.visible = false;
       // Pallet jack parked outside the walking route.
-      b.box(-27, .18, -16.5, .45, .18, .65, m.yellow);
-      for (const x of [-27.23, -26.77]) { b.box(x, .12, -17.05, .12, .12, 1.2, m.yellow); b.cyl(x, .11, -17.5, .1, .12, m.black, 0, Math.PI / 2); }
-      b.box(-27, .68, -16.24, .05, .9, .06, m.steel); b.box(-27, 1.14, -16.24, .42, .045, .06, m.dark);
+      truckFallback.box(-27, .18, -16.5, .45, .18, .65, m.yellow);
+      for (const x of [-27.23, -26.77]) { truckFallback.box(x, .12, -17.05, .12, .12, 1.2, m.yellow); truckFallback.cyl(x, .11, -17.5, .1, .12, m.black, 0, Math.PI / 2); }
+      truckFallback.box(-27, .68, -16.24, .05, .9, .06, m.steel); truckFallback.box(-27, 1.14, -16.24, .42, .045, .06, m.dark);
       collider(-27, -16.9, .75, 1.6, 'equipment', room.id);
+      // Structural props are decorative overlays on the existing solid shell.
+      doorFallback.box(-20.5, 1.4, -25.84, 3.2, 2.8, .05, m.steel);
+      for (const x of [-25, -16]) windowFallback.box(x, 4.85, -25.83, 2, 2.25, .04, m.screen);
+      safetyFallback.cyl(-27.72, 1.1, -14.2, .12, .62, m.orange);
       for (const x of [-22.2, -18.2]) b.box(x, .038, -19, .075, .018, 11.8, m.yellow);
       sign(detail, 'RESERVA DE PRODUCTO TERMINADO', 'BOLSOS · INVENTARIO DE LA EMPRESA', -20.5, 4.4, -25.84, 10, .75);
       sign(detail, 'RECEPCIÓN', 'PEDIDOS A PROVEEDORES', -25, 2.3, -14.45, 3.5, .6);
@@ -297,11 +368,209 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       route(room, 'cutting-operator', [[14.8, -14.2]], true);
     }
     b.finish();
+    room.propFallbacks.forEach(entry => entry.batch.finish());
     room.stock.forEach(stock => stock.batch.finish());
   }
 
   const npcRoutes = rooms.flatMap(room => room.routes);
   const zoneAt = position => zones.find(zone => position && position.x > zone.minX + .12 && position.x < zone.maxX - .12 && position.z > zone.minZ + .12 && position.z < zone.maxZ)?.id || null;
+  const storeRoom = rooms.find(room => room.id === 'store');
+  const warehouseRoom = rooms.find(room => room.id === 'warehouse');
+  function templateValue(templates, key) { return templates instanceof Map ? templates.get(key) : templates?.[key]; }
+  function sameStoreTemplates(next) { return STORE_PROP_KEYS.every(key => (templateValue(installedStoreTemplates, key) || null) === (templateValue(next, key) || null)); }
+  function sameWarehouseTemplates(next) { return WAREHOUSE_PROP_KEYS.every(key => (templateValue(installedWarehouseTemplates, key) || null) === (templateValue(next, key) || null)); }
+  function setWarehouseQuality(mode = 'auto') {
+    const rank = qualityRank(mode);
+    warehouseRoom?.propRoot?.children.forEach(batch => {
+      batch.visible = rank >= Number(batch.userData.minQuality || 1);
+      const category = batch.userData.category;
+      const cast = rank > 1 && (category === 'workbench' || category === 'palletTruck' || (rank > 2 && ['racks', 'pallet'].includes(category)));
+      batch.traverse(object => {
+        if (!object.isMesh) return;
+        object.castShadow = cast; object.receiveShadow = rank > 1;
+      });
+    });
+  }
+  function setQuality(mode = 'auto') {
+    storePropQuality = ['low', 'medium', 'high', 'auto'].includes(mode) ? mode : 'auto';
+    const rank = qualityRank(storePropQuality);
+    storeRoom?.propRoot?.children.forEach(batch => {
+      batch.visible = rank >= Number(batch.userData.minQuality || 1);
+      const category = batch.userData.category;
+      const cast = rank > 1 && (category === 'checkout' || category === 'table' || (rank > 2 && category === 'shelves'));
+      batch.traverse(object => {
+        if (!object.isMesh) return;
+        object.castShadow = cast; object.receiveShadow = rank > 1;
+      });
+    });
+    setWarehouseQuality(storePropQuality);
+    return storePropQuality;
+  }
+  function installStoreProps(templates = {}, mode = storePropQuality) {
+    if (!storeRoom) return { installed: [], quality: setQuality(mode) };
+    if (sameStoreTemplates(templates) && storeRoom.propRoot.children.length) {
+      setQuality(mode); return storePropState();
+    }
+    clearPropModels(storeRoom.propRoot);
+    installedStoreTemplates = Object.fromEntries(STORE_PROP_KEYS.map(key => [key, templateValue(templates, key) || null]));
+    const installed = new Set(), root = storeRoom.propRoot;
+    const add = (key, placements, metadata) => addPropBatch(root, installedStoreTemplates[key], placements, metadata);
+
+    if (installedStoreTemplates.table) {
+      add('table', [{ x: -24.6, z: 21.7, scale: [1.05, 1, 1.05], bay: 'display' }],
+        { kind: 'display-table', category: 'table', minQuality: 1 });
+      installed.add('table');
+    }
+    if (installedStoreTemplates.counter && installedStoreTemplates.register) {
+      add('counter', [-14.88, -13.9, -12.92].map(x => ({ x, z: 21.4, bay: 'checkout' })),
+        { kind: 'checkout-counter', category: 'checkout', minQuality: 1 });
+      if (installedStoreTemplates.counterEnd) add('counterEnd', [
+        { x: -15.47, z: 21.4, bay: 'checkout' }, { x: -12.33, z: 21.4, yaw: Math.PI, bay: 'checkout' }
+      ], { kind: 'checkout-ends', category: 'checkout', minQuality: 1 });
+      add('register', [{ x: -14.4, y: .96, z: 21.36, yaw: Math.PI, bay: 'checkout' }],
+        { kind: 'cash-register', category: 'checkout', minQuality: 1 });
+      installed.add('checkout');
+    }
+    if (installedStoreTemplates.shelfTall || installedStoreTemplates.shelfLow) {
+      const tall = installedStoreTemplates.shelfTall ? 'shelfTall' : 'shelfLow';
+      const low = installedStoreTemplates.shelfLow ? 'shelfLow' : tall;
+      add(tall, [
+        { x: -24, z: 15, scale: [2.9, 1, 1.15], bay: 'rear-left' },
+        { x: -14, z: 15, scale: [2.9, 1, 1.15], bay: 'rear-right' }
+      ], { kind: 'shelves-rear', category: 'shelves', minQuality: 1 });
+      add(low, [
+        { x: -24, z: 18.1, scale: [2.65, 1, 1.1], bay: 'front-left' },
+        { x: -24, y: .925, z: 18.1, scale: [2.65, 1, 1.1], bay: 'front-left' },
+        { x: -14, z: 18.1, scale: [2.65, 1, 1.1], bay: 'front-right' },
+        { x: -14, y: .925, z: 18.1, scale: [2.65, 1, 1.1], bay: 'front-right' }
+      ], { kind: 'shelves-front', category: 'shelves', minQuality: 1 });
+      installed.add('shelves');
+    }
+    if (installedStoreTemplates.mirror) {
+      add('mirror', [{ x: -26.86, y: .55, z: 19.7, yaw: Math.PI / 2, scale: [1.75, 2.25, .65], bay: 'west' }],
+        { kind: 'mirror-west', category: 'mirrors', minQuality: 1 });
+      add('mirror', [{ x: -11.14, y: .55, z: 17, yaw: -Math.PI / 2, scale: [1.75, 2.25, .65], bay: 'east' }],
+        { kind: 'mirror-east', category: 'mirrors', minQuality: 2 });
+      installed.add('mirrors');
+    }
+    storeRoom.propFallbacks.forEach((entry, category) => { entry.group.visible = !installed.has(category); });
+    setQuality(mode);
+    return storePropState();
+  }
+  function storePropState() {
+    const batches = storeRoom?.propRoot?.children.filter(child => child.userData.storePropBatch) || [];
+    const visible = batches.filter(batch => batch.visible);
+    return {
+      quality: storePropQuality,
+      installed: [...new Set(batches.map(batch => batch.userData.category))].sort(),
+      batches: batches.length,
+      instances: batches.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      visibleInstances: visible.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      visibleShelfBays: [...new Set(visible.filter(batch => batch.userData.category === 'shelves').flatMap(batch => batch.userData.bays || []))].length,
+      visibleMirrors: visible.filter(batch => batch.userData.category === 'mirrors').reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0)
+    };
+  }
+  function installWarehouseProps(templates = {}, mode = storePropQuality) {
+    if (!warehouseRoom) return { installed: [], quality: setQuality(mode) };
+    if (sameWarehouseTemplates(templates) && warehouseRoom.propRoot.children.length) {
+      setQuality(mode); return warehousePropState();
+    }
+    clearPropModels(warehouseRoom.propRoot);
+    installedWarehouseTemplates = Object.fromEntries(WAREHOUSE_PROP_KEYS.map(key => [key, templateValue(templates, key) || null]));
+    const installed = new Set(), root = warehouseRoom.propRoot;
+    const add = (key, placements, metadata) => addPropBatch(root, installedWarehouseTemplates[key], placements, {...metadata, zone: 'warehouse'});
+
+    if (installedWarehouseTemplates.rackTall) {
+      const placements = [];
+      for (const x of [-25.2, -15.8]) for (const z of [-23.7, -19.5]) for (const offset of [-.78, .78]) {
+        placements.push({ x: x + offset, z, scale: [.95, 1.4, 1.8], bay: `${x}:${z}` });
+      }
+      add('rackTall', placements, { kind: 'rack-bays', category: 'racks', minQuality: 1 });
+      if (installedWarehouseTemplates.bagStack) add('bagStack', [
+        { x: -25.2, y: 3.36, z: -23.7, scale: [.8, .8, .8], bay: '-25.2:-23.7' }
+      ], { kind: 'rack-bag-stack', category: 'racks', minQuality: 1 });
+      installed.add('racks');
+    }
+    if (installedWarehouseTemplates.cuttingTable && installedWarehouseTemplates.sewingMachine) {
+      add('cuttingTable', [
+        { x: -25.95, z: -15.1, scale: [1.25, 1, 1.05], bay: 'receiving-left' },
+        { x: -24.55, z: -15.1, scale: [1.25, 1, 1.05], bay: 'receiving-right' }
+      ], { kind: 'receiving-workbenches', category: 'workbench', minQuality: 1 });
+      add('sewingMachine', [{ x: -24.55, y: .91, z: -15.1, bay: 'receiving-right' }],
+        { kind: 'sewing-station', category: 'workbench', minQuality: 1 });
+      if (installedWarehouseTemplates.fabricRolls) add('fabricRolls', [
+        { x: -25.95, y: .91, z: -15.1, scale: [.5, .5, .5], bay: 'receiving-left' }
+      ], { kind: 'fabric-station', category: 'workbench', minQuality: 1 });
+      installed.add('workbench');
+    }
+    if (installedWarehouseTemplates.pallet) {
+      add('pallet', [{ x: -15.7, z: -15.4, yaw: Math.PI / 2, scale: [.94, .94, .94], bay: 'receiving-pallet' }],
+        { kind: 'receiving-pallet', category: 'pallet', minQuality: 1 });
+      const cargo = [
+        ['boxLarge', { x: -15.7, y: .15, z: -15.4, scale: [.62, .62, .62], bay: 'receiving-pallet' }],
+        ['boxLong', { x: -15.7, y: .50, z: -15.4, scale: [.68, .68, .68], bay: 'receiving-pallet' }],
+        ['boxSmall', { x: -15.95, y: .81, z: -15.4, scale: [.75, .75, .75], bay: 'receiving-pallet' }],
+        ['boxWide', { x: -15.50, y: .81, z: -15.4, scale: [.65, .65, .65], bay: 'receiving-pallet' }]
+      ];
+      for (const [key, placement] of cargo) if (installedWarehouseTemplates[key]) {
+        add(key, [placement], { kind: key, category: 'pallet', minQuality: 1 });
+      }
+      installed.add('pallet');
+    }
+    if (installedWarehouseTemplates.palletTruck) {
+      add('palletTruck', [{ x: -27, z: -16.9, scale: [.9, .9, .9], bay: 'pallet-truck' }],
+        { kind: 'pallet-truck', category: 'palletTruck', minQuality: 1 });
+      installed.add('palletTruck');
+    }
+    if (installedWarehouseTemplates.loadingDoor) {
+      add('loadingDoor', [{ x: -20.5, z: -25.83, bay: 'rear-loading' }],
+        { kind: 'loading-door', category: 'loadingDoor', minQuality: 1 });
+      installed.add('loadingDoor');
+    }
+    if (installedWarehouseTemplates.highWindow) {
+      add('highWindow', [-25, -16].map(x => ({ x, y: 3.7, z: -25.82, scale: [1, .8, .04], bay: `window-${x}` })),
+        { kind: 'high-windows', category: 'windows', minQuality: 2 });
+      installed.add('windows');
+    }
+    if (installedWarehouseTemplates.pendantLight) {
+      add('pendantLight', [{ x: -24.5, y: 5.75, z: -22, bay: 'light-1' }, { x: -16.5, y: 5.75, z: -16, bay: 'light-2' }],
+        { kind: 'essential-lights', category: 'lighting', minQuality: 1 });
+      add('pendantLight', [{ x: -16.5, y: 5.75, z: -22, bay: 'light-3' }, { x: -24.5, y: 5.75, z: -16, bay: 'light-4' }],
+        { kind: 'detail-lights', category: 'lighting', minQuality: 2 });
+      installed.add('lighting');
+    }
+    if (installedWarehouseTemplates.fireExtinguisher) {
+      add('fireExtinguisher', [{ x: -27.72, y: .8, z: -14.2, yaw: Math.PI / 2, bay: 'west-safety' }],
+        { kind: 'fire-extinguisher', category: 'safety', minQuality: 1 });
+      if (installedWarehouseTemplates.floorArrow) {
+        add('floorArrow', [{ x: -20, y: .04, z: -14, yaw: Math.PI, bay: 'arrow-entry' }],
+          { kind: 'essential-floor-arrow', category: 'safety', minQuality: 1 });
+        add('floorArrow', [{ x: -20, y: .04, z: -18, yaw: Math.PI, bay: 'arrow-mid' }, { x: -20, y: .04, z: -22, yaw: Math.PI, bay: 'arrow-rear' }],
+          { kind: 'detail-floor-arrows', category: 'safety', minQuality: 2 });
+      }
+      if (installedWarehouseTemplates.warningBeacon) add('warningBeacon', [
+        { x: -27.2, z: -13.2, bay: 'beacon-west' }, { x: -13.8, z: -13.2, bay: 'beacon-east' }
+      ], { kind: 'warning-beacons', category: 'safety', minQuality: 2 });
+      installed.add('safety');
+    }
+    warehouseRoom.propFallbacks.forEach((entry, category) => { entry.group.visible = !installed.has(category); });
+    setQuality(mode);
+    return warehousePropState();
+  }
+  function warehousePropState() {
+    const batches = warehouseRoom?.propRoot?.children.filter(child => child.userData.warehousePropBatch) || [];
+    const visible = batches.filter(batch => batch.visible);
+    return {
+      quality: storePropQuality,
+      installed: [...new Set(batches.map(batch => batch.userData.category))].sort(),
+      batches: batches.length,
+      instances: batches.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      visibleBatches: visible.length,
+      visibleInstances: visible.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      rackBays: [...new Set(visible.filter(batch => batch.userData.category === 'racks').flatMap(batch => batch.userData.bays || []))].length,
+      lights: visible.filter(batch => batch.userData.category === 'lighting').reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0)
+    };
+  }
   let snapshot = {}, disposed = false;
   function sync(value = {}) {
     // `simulator3d.js` owns the financial model and sends a read-only
@@ -371,7 +640,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   return {
     group, colliders, entrances, zones, hotspots, interactionPoints: hotspots, npcRoutes, rooms,
     queueSlots, checkoutQueueSlots: queueSlots, browsePoints, salesAssistantPoint,
-    zoneAt, sync, update: sync, tick,
+    zoneAt, sync, update: sync, tick, installStoreProps, installWarehouseProps, setQuality,
     stats() {
       let instancedBatches = 0, geometryInstances = 0, visibleBatches = 0;
       group.traverse(object => {
@@ -383,7 +652,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         activeNpcs: rooms.filter(r => r.id === group.userData.activeZone).reduce((n, r) => n + r.actors.length, 0),
         activeLights: rooms.reduce((n, r) => n + r.lights.filter(l => l.visible && r.detail.visible).length, 0),
         instancedBatches, geometryInstances, visibleBatches,
-        sharedGeometries: 2, stockBatches: rooms.reduce((n, room) => n + room.stock.reduce((s, stock) => s + stock.group.children.length, 0), 0)
+        sharedGeometries: 2, stockBatches: rooms.reduce((n, room) => n + room.stock.reduce((s, stock) => s + stock.group.children.length, 0), 0),
+        storeProps: storePropState(), warehouseProps: warehousePropState()
       };
     },
     dispose() {

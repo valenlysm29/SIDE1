@@ -6,7 +6,7 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
   pause(){cancelAnimationFrame(raf);},
   store(){const e=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(e.x,e.z,0);keys={KeyW:true};for(let i=0;i<95;i++){updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);}keys={};updateGameplayCamera(1);return currentInterior;},
   move(){const z=player.z;keys={KeyW:true};updatePlayer(.04);keys={};return Math.abs(player.z-z);},
-  stats(){const room=businessInteriors.rooms.find(r=>r.id==='store');return {scene:scene.uuid,children:scene.children.length,actors:room.actors.map(a=>({role:a.object.userData.role,kind:a.object.userData.modelKind,pending:Boolean(a.object.userData.pendingCharacterStyle),x:a.object.position.x,z:a.object.position.z})),ledger:JSON.stringify(bridge().ledger)};},
+  stats(){const room=businessInteriors.rooms.find(r=>r.id==='store'),streamedCharacters=hubActors.length+animatedActors.filter(a=>a.type==='guide').length;return {scene:scene.uuid,children:scene.children.length,streamedCharacters,actors:room.actors.map(a=>({role:a.object.userData.role,kind:a.object.userData.modelKind,pending:Boolean(a.object.userData.pendingCharacterStyle),x:a.object.position.x,z:a.object.position.z})),ledger:JSON.stringify(bridge().ledger)};},
   render(){renderer.render(scene,camera);}
 };\n  window.SIDE3D = {`);
 (async()=>{
@@ -32,14 +32,19 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
     await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>0);await page.evaluate(()=>entryQA.pause());
     assert.ok(await page.evaluate(()=>entryQA.move())>0,'controls work while staff network is stalled');
     await page.evaluate(()=>{window.detailsA=SIDE3D.preloadDetails();window.detailsB=SIDE3D.preloadDetails();});
-    await page.waitForTimeout(250);assert.equal(held.length,2,'parallel callers share the two staff requests');
+    const staffDeadline=Date.now()+60000;
+    while(held.length<2&&Date.now()<staffDeadline)await page.waitForTimeout(100);
+    assert.equal(held.length,2,'parallel callers share the two staff requests');
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().assets.detailsReady),false);
     assert.equal(await page.evaluate(()=>entryQA.store()),'store','door works even before indoor staff arrive');
     const before=await page.evaluate(()=>entryQA.stats());assert.equal(before.actors.length,4);
     assert.equal(before.actors.filter(a=>a.pending).length,2,'two temporary workers keep the room populated');
     release();await page.evaluate(()=>Promise.all([detailsA,detailsB]));
     const after=await page.evaluate(()=>entryQA.stats());
-    assert.equal(after.scene,before.scene);assert.equal(after.children,before.children);assert.equal(after.actors.length,before.actors.length);assert.equal(after.ledger,before.ledger);
+    assert.equal(after.scene,before.scene);
+    assert.equal(after.streamedCharacters-before.streamedCharacters,3,'details stream two pedestrians and the guide');
+    assert.equal(after.children-before.children,after.streamedCharacters-before.streamedCharacters,'only streamed characters extend the existing scene');
+    assert.equal(after.actors.length,before.actors.length);assert.equal(after.ledger,before.ledger);
     for(const role of ['cashier','salesperson']){
       const a=after.actors.find(a=>a.role===role),b=before.actors.find(a=>a.role===role);assert.equal(a.pending,false);assert.equal(a.x,b.x);assert.equal(a.z,b.z);
       assert.equal(a.kind,role==='cashier'?'male':'female');
@@ -47,7 +52,8 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
     await page.evaluate(()=>entryQA.render());
     await page.screenshot({path:path.join(__dirname,'output/continuous/entry-streaming.png')});
     const resources=await page.evaluate(()=>performance.getEntriesByType('resource').map(e=>e.name));
-    assert.equal(resources.some(name=>name.includes('recast')||name.includes('npc_realistic_male_casual.glb')),false);
+    assert.equal(resources.some(name=>name.includes('recast')),false,'entry does not load unused recast navigation');
+    assert.equal(resources.some(name=>name.includes('npc_realistic_male_casual.glb')),false,'entry does not load the legacy casual model');
     assert.deepEqual(errors,[]);console.log('PASS nonblocking entry, shared asset requests, staff upgrade in place, unchanged scene/ledger and no unused navigation/model');
   }finally{release();await browser.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -33,6 +33,7 @@
         <button id="startBtn" class="start-link" disabled>HAZ CLIC PARA EMPEZAR</button>
       </div>
     </div>
+    <button id="openCreditsBtn" class="credits-launcher" type="button" aria-haspopup="dialog" aria-controls="creditsModal">CRÉDITOS</button>
   </section>
 
   <section id="profiles" class="screen profile-screen hidden" aria-label="Elegir perfil">
@@ -120,6 +121,15 @@
         <button class="primary-gold join-submit" type="submit">ENTRAR A LA PARTIDA</button>
       </form>
       <div id="studentMessage" class="form-message"></div>
+    </section>
+
+    <section id="creditsModal" class="modal credits-modal hidden" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" aria-describedby="creditsIntro">
+      <button class="close-btn" data-close aria-label="Cerrar créditos">×</button>
+      <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
+      <h2 id="creditsTitle">Créditos</h2>
+      <p id="creditsIntro" class="modal-lead">Modelos 3D creados por artistas y bibliotecas que hacen posible el mundo de SIDE.</p>
+      <div id="creditsList" class="credits-list" aria-live="polite"></div>
+      <p class="credits-note">Las atribuciones y licencias completas también están registradas en <code>CREDITS.md</code>.</p>
     </section>
   </div>
 
@@ -556,6 +566,7 @@
 <script src="icon_bank.js?v=20260910-2"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
 <script src="decision_catalog.js?v=20260910-2"></script>
+<script src="services/credits_data.js?v=20260927-warehouse"></script>
 <script src="tutorial.js?v=20260910-2"></script>
 <script src="services/character_selection.js?v=20260927-selector"></script>
 <script type="importmap">

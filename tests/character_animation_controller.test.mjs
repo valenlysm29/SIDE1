@@ -49,10 +49,10 @@ test('central states use smooth mixer crossfades without restarting the active s
 
 test('walk and run playback rates follow real speed within safe bounds',()=>{
   const controller=new CharacterAnimationController({mixer:new MockMixer(),clips:clips()});
-  controller.playWalk(.725);assert.equal(controller.activeAction.timeScale,.65);
-  controller.update(1/60,{speed:2.9,grounded:true});
+  controller.playWalk(1.325);assert.equal(controller.activeAction.timeScale,.65);
+  controller.update(1/60,{speed:4,grounded:true});
   assert.equal(controller.state,CHARACTER_ANIMATION_STATES.RUN);
-  assert.ok(Math.abs(controller.activeAction.timeScale-2.9/4.2)<1e-12);
+  assert.ok(Math.abs(controller.activeAction.timeScale-4/5.2)<1e-12);
   controller.update(1/60,{speed:20,grounded:true});assert.equal(controller.activeAction.timeScale,1.45);
 });
 
@@ -62,11 +62,21 @@ test('update owns locomotion, talk, interaction and airborne decisions and advan
   const controller=new CharacterAnimationController({mixer,clips:clips(),interactions:{wave}});
   controller.update(1/60,{speed:0});assert.equal(controller.state,'IDLE');
   controller.update(1/60,{speed:1});assert.equal(controller.state,'WALK');
-  controller.update(1/60,{speed:3});assert.equal(controller.state,'RUN');
+  controller.update(1/60,{speed:3.3});assert.equal(controller.state,'RUN');
   controller.update(1/60,{speed:0,talking:true});assert.equal(controller.state,'TALK');
   controller.update(1/60,{interaction:'wave'});assert.equal(controller.state,'INTERACTION');
   controller.update(1/60,{grounded:false});assert.equal(controller.state,'AIRBORNE');
   assert.equal(mixer.updates.length,6);
+});
+
+test('an explicit player locomotion state keeps WALK and RUN synchronized with movement physics',()=>{
+  const controller=new CharacterAnimationController({mixer:new MockMixer(),clips:clips()});
+  controller.update(1/60,{speed:2.65,state:'WALK',grounded:true});
+  assert.equal(controller.state,'WALK');
+  assert.equal(controller.activeAction.timeScale,1);
+  controller.update(1/60,{speed:5.2,state:'RUN',grounded:true});
+  assert.equal(controller.state,'RUN');
+  assert.equal(controller.activeAction.timeScale,1);
 });
 
 test('npc_motion adapter is a non-blocking procedural fallback and creates no loop',()=>{
