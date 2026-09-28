@@ -6,6 +6,7 @@
   const NPC_STATE = CONFIG.NPC_STATES || {};
   const PERF = CONFIG.PERFORMANCE || {};
   let THREE = null, GLTFLoader = null, SkeletonUtils = null;
+  let assetCache = null, CharacterManager = null, ASSET_PRIORITY = null, CharacterAnimationController = null, createNpcMotionAdapter = null;
   let recastCore = null, recastGenerators = null, navMesh = null, navQuery = null, navReady = false;
   let renderer = null, scene = null, camera = null, clock = null, raf = 0;
   let initialized = false, running = false, locked = false;
@@ -39,8 +40,9 @@
   let hubVehicles = null, driving = null;
   let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
   let cameraZoom = 5.2, lastCameraInputAt = 0;
-  let preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 6;
+  let basePreloadPromise = null, preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 6;
   let studioEnvironment = null, detailsPromise = null, detailsTimer = 0, detailsComplete = false;
+  let characterManager = null, selectedCharacterId = 'chico2';
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
@@ -73,6 +75,13 @@
   const $3 = (id) => document.getElementById(id);
   const fmt = (n) => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
   const bridge = () => window.SIDE_GAME_BRIDGE || {};
+  const CHARACTER_IDS = ['chico1','chico2','chico3','mona'];
+  const validCharacterId = id => CHARACTER_IDS.includes(id);
+  const activeCharacterId = () => {
+    const requested=bridge().selectedCharacter?.();
+    if(validCharacterId(requested))selectedCharacterId=requested;
+    return selectedCharacterId;
+  };
   const companyName = () => String(bridge().companyName?.() || 'MI EMPRESA').trim() || 'MI EMPRESA';
   const saved = (id) => bridge().decisions?.[id] || null;
   const sum = (o = {}) => Object.values(o).reduce((a, b) => a + (Number(b) || 0), 0);
@@ -365,8 +374,9 @@
     const casual = [0x20242a,0x394d69,0x6a4f78,0x5b765f,0xa26059,0xc38b5c,0xd7d7d2];
     const premium = [0x1d2736,0x283047,0x473c50,0x846d5c];
     const palette = archetype?.id === 'premium' ? premium : casual;
+    const available=['chico1','chico2','chico3'].filter(id=>id!==activeCharacterId());
     return {
-      execModel: ['chico1','chico2','chico3'][customerModelIndex++ % 3],
+      execModel: available[customerModelIndex++ % available.length],
       gender: Math.random() < 0.5 ? 'female' : 'male',
       shirt: palette[Math.floor(Math.random()*palette.length)],
       pants: [0x202a36,0x2c3440,0x40506b,0x61574d][Math.floor(Math.random()*4)],
@@ -667,15 +677,23 @@
   }
 
   async function loadThree() {
-    if (THREE && GLTFLoader && SkeletonUtils) return true;
+    if (THREE && GLTFLoader && SkeletonUtils && assetCache && CharacterManager && CharacterAnimationController) return true;
     try {
       THREE = await import('three');
       const modules = await Promise.all([
         import('three/addons/loaders/GLTFLoader.js'),
-        import('three/addons/utils/SkeletonUtils.js')
+        import('three/addons/utils/SkeletonUtils.js'),
+        import('./services/asset_manager.mjs'),
+        import('./services/character_manager.mjs'),
+        import('./services/character_animation_controller.mjs')
       ]);
       GLTFLoader = modules[0].GLTFLoader;
       SkeletonUtils = modules[1];
+      assetCache = modules[2].assetManager;
+      CharacterManager = modules[3].CharacterManager;
+      ASSET_PRIORITY = modules[3].ASSET_PRIORITY;
+      CharacterAnimationController = modules[4].CharacterAnimationController;
+      createNpcMotionAdapter = modules[4].createNpcMotionAdapter;
       return true;
     } catch (err) {
       console.error(err);
@@ -689,14 +707,57 @@
     window.dispatchEvent(new CustomEvent('side3d:loading', { detail: { phase, loaded: loadingLoaded, total: loadingTotal } }));
   }
 
+  async function ensureCharacterRuntime() {
+    if(!await loadThree())return false;
+    if(!npcMotion||!npcNavigation||!npcNames||!monaModule){
+      [npcMotion,npcNavigation,npcNames,monaModule]=await Promise.all([
+        import('./services/npc_motion.js?v=20260927-characters'),
+        import('./services/npc_navigation.mjs'),
+        import('./services/npc_names.js'),
+        import('./services/mona_npc.js?v=20260927-characters')
+      ]);
+    }
+    if(!characterManager){
+      characterManager=new CharacterManager({storage:null,loadTemplate:descriptor=>descriptor.id==='mona'
+        ? monaModule.loadMonaTemplate(THREE,GLTFLoader,CONFIG.NPCS.mona)
+        : npcMotion.loadTemplate(GLTFLoader,descriptor.model)});
+    }
+    characterManager.select(activeCharacterId(),{persist:false});
+    return true;
+  }
+
+  async function loadCharacter(id, priority) {
+    if(!validCharacterId(id)||!await ensureCharacterRuntime())return false;
+    try{
+      const template=await characterManager.preload(id,{priority:priority||ASSET_PRIORITY.IMPORTANT});
+      if(id==='mona'){monaTemplate=template;monaLoadError='';}
+      else {suppliedTemplates[id]=template;delete suppliedErrors[id];}
+      return true;
+    }catch(error){
+      if(id==='mona')monaLoadError=error.message;else suppliedErrors[id]=error.message;
+      console.warn(`No se pudo cargar ${CONFIG.NPCS[id]?.name||id}; se usará el personaje de respaldo.`,error);
+      return false;
+    }
+  }
+
+  async function preloadBase() {
+    if(!basePreloadPromise)basePreloadPromise=(async()=>{
+      publishLoading('Cargando motor 3D');
+      if(!await loadThree())return false;
+      publishLoading('Preparando iluminación esencial',1);
+      await loadStartupEnvironment();
+      return true;
+    })().catch(error=>{console.error('SIDE: precarga base 3D',error);return false;}).then(ok=>{if(!ok)basePreloadPromise=null;return ok;});
+    return basePreloadPromise;
+  }
+
   async function preload() {
     if (initialized) return true;
     if (!preloadPromise) {
       preloadPromise = (async () => {
-        publishLoading('Cargando motor 3D');
-        if (!await loadThree()) return false;
-        publishLoading('Cargando avatar y personajes de la ciudad',1);
-        await Promise.all([loadSuppliedNpcs(), loadMonaModel(), loadStartupEnvironment()]);
+        if (!await preloadBase()) return false;
+        publishLoading(`Cargando ${CONFIG.NPCS?.[activeCharacterId()]?.name||'personaje'} como avatar`,2);
+        await loadCharacter(activeCharacterId(),ASSET_PRIORITY.CRITICAL);
         publishLoading('Recursos básicos listos',3);
         window.dispatchEvent(new CustomEvent('side3d:ready'));
         return true;
@@ -724,9 +785,10 @@
     if(detailsPromise)return detailsPromise;
     detailsPromise=(async()=>{
       if(!await preload())return false;
-      await loadExecModelTemplates();
+      await Promise.all([characterManager?.preloadRemaining({priority:ASSET_PRIORITY.IMPORTANT}),loadExecModelTemplates()]);
+      for(const id of CHARACTER_IDS){const template=characterManager?.template(id);if(!template)continue;if(id==='mona')monaTemplate=template;else suppliedTemplates[id]=template;}
       if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
-      refreshBusinessCharacters();detailsComplete=true;return true;
+      refreshBusinessCharacters();ensureHubCharacters();detailsComplete=true;return true;
     })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
       .then(ok=>{if(!ok)detailsPromise=null;return ok;});
     return detailsPromise;
@@ -747,7 +809,7 @@
   async function loadNpcModelTemplate() {
     if(npcModelTemplate||!GLTFLoader||!SkeletonUtils?.clone)return Boolean(npcModelTemplate);
     try{
-      const gltf=await new GLTFLoader().loadAsync('assets/models/yuka.glb');
+      const gltf=await assetCache.loadGLTF(new GLTFLoader(),'assets/models/yuka.glb',{priority:ASSET_PRIORITY.LAZY});
       const idle=THREE.AnimationClip.findByName(gltf.animations,'Character_Idle')||gltf.animations[0];
       const walk=THREE.AnimationClip.findByName(gltf.animations,'Character_Walk')||gltf.animations[1]||idle;
       npcModelTemplate={scene:gltf.scene,animations:{idle,walk}};
@@ -762,7 +824,7 @@
     await Promise.all(specs.map(async ([kind, file]) => {
       if (execModelTemplates[kind]) return;
       try {
-        const gltf = await new GLTFLoader().loadAsync(`assets/models3d/${file}.glb`);
+        const gltf = await assetCache.loadGLTF(new GLTFLoader(),`assets/models3d/${file}.glb`,{priority:ASSET_PRIORITY.IMPORTANT});
         const idle = THREE.AnimationClip.findByName(gltf.animations, 'Idle');
         const walk = THREE.AnimationClip.findByName(gltf.animations, 'Walk');
         if (!gltf.scene || !idle || !walk) throw new Error('El personaje necesita escena, reposo y marcha.');
@@ -790,24 +852,12 @@
 
   async function loadMonaModel() {
     if (monaTemplate) return true;
-    try {
-      monaModule = await import('./services/mona_npc.js?v=20260925');
-      monaTemplate = await monaModule.loadMonaTemplate(THREE, GLTFLoader, CONFIG.NPCS.mona);
-      monaLoadError = '';
-      return true;
-    } catch (error) {
-      monaLoadError = error.message;
-      console.warn('No se pudo cargar Mona; su puesto conserva un personaje de respaldo.', error);
-      return false;
-    }
+    return loadCharacter('mona',ASSET_PRIORITY.IMPORTANT);
   }
 
   async function loadSuppliedNpcs() {
-    [npcMotion,npcNavigation,npcNames] = await Promise.all([import('./services/npc_motion.js?v=20260925'),import('./services/npc_navigation.mjs'),import('./services/npc_names.js')]);
-    await Promise.all(['chico1','chico2','chico3'].map(async id => {
-      try { suppliedTemplates[id]=await npcMotion.loadTemplate(GLTFLoader,CONFIG.NPCS[id].model); }
-      catch(error) { suppliedErrors[id]=error.message; console.warn(`No se pudo cargar ${id}; se usará el personaje de respaldo.`,error); }
-    }));
+    await ensureCharacterRuntime();
+    await Promise.all(['chico1','chico2','chico3'].map(id=>loadCharacter(id,ASSET_PRIORITY.IMPORTANT)));
   }
 
   async function initNavigation() {
@@ -999,12 +1049,23 @@
     return g;
   }
 
-  function person(style = 0x5aa9ff) {
+  function attachProceduralController(group) {
+    if(!group?.userData?.motion||group.userData.animationController||!CharacterAnimationController||!createNpcMotionAdapter)return group;
+    const fallback=createNpcMotionAdapter({group,animateNpc:npcMotion.animateNpc,resetMotion:npcMotion.resetMotion});
+    group.userData.animationController=new CharacterAnimationController({fallback,metadata:{rig:'SIDE-17',retargeted:false}});
+    group.userData.animationController.playIdle();
+    return group;
+  }
+
+  function person(style = 0x5aa9ff, characterRole = 'npc') {
     const cfg = typeof style === 'object' ? style : { shirt: style };
-    const modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
+    let modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
+    if(characterRole!=='player'&&validCharacterId(modelKind)&&modelKind===activeCharacterId()){
+      modelKind=CHARACTER_IDS.find(id=>id!=='mona'&&id!==activeCharacterId()&&suppliedTemplates[id])||(cfg.gender === 'female'?'female':'casual');
+    }
     if (suppliedTemplates[modelKind]) {
       const group=npcMotion.createNpc(suppliedTemplates[modelKind],modelKind);
-      npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);return group;
+      npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);return attachProceduralController(group);
     }
     const template = execModelTemplates[modelKind] || (modelKind.startsWith('chico') ? execModelTemplates.casual : null);
     if (template && SkeletonUtils?.clone) {
@@ -1018,7 +1079,9 @@
       const mixer = new THREE.AnimationMixer(avatar);
       const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(clip)]));
       actions.idle.play();mixer.update(0);
-      group.userData = {modelAvatar:avatar, modelKind, mixer, actions, currentAction:'idle', lastAnimAt:performance.now()/1000};
+      const animationController=new CharacterAnimationController({mixer,actions:{IDLE:actions.idle,WALK:actions.walk,TALK:actions.gesture},metadata:{rig:'embedded',retargeted:false}});
+      animationController.playIdle();
+      group.userData = {modelAvatar:avatar, modelKind, mixer, actions, animationController, currentAction:'idle', lastAnimAt:performance.now()/1000};
       if(CONFIG.NPCS[modelKind])npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);
       return group;
     }
@@ -1033,7 +1096,9 @@
         if(cfg.formal){const badge=box(.11,.16,.025,cfg.tie??0x315f9c,.16,1.18,.15,.3,.15);g.add(badge);}
         const mixer=new THREE.AnimationMixer(avatar),idle=npcModelTemplate.animations.idle,walk=npcModelTemplate.animations.walk;
         const idleAction=idle?mixer.clipAction(idle):null,walkAction=walk?mixer.clipAction(walk):null;
-        idleAction?.play();g.userData.modelAvatar=avatar;g.userData.mixer=mixer;g.userData.actions={idle:idleAction,walk:walkAction};g.userData.currentAction='idle';g.userData.lastAnimAt=performance.now()/1000;
+        const actions={idle:idleAction,walk:walkAction};
+        const animationController=new CharacterAnimationController({mixer,actions:{IDLE:idleAction,WALK:walkAction},metadata:{rig:'embedded-fallback',retargeted:false}});animationController.playIdle();
+        g.userData.modelAvatar=avatar;g.userData.mixer=mixer;g.userData.actions=actions;g.userData.animationController=animationController;g.userData.currentAction='idle';g.userData.lastAnimAt=performance.now()/1000;
         return g;
       }catch(error){console.warn('No se pudo clonar el avatar; se usa el fallback procedural.',error);}
     }
@@ -1120,19 +1185,30 @@
     return g;
   }
 
-  function setPersonPose(g, cycle = 0, moving = false, frameDt = null) {
+  function setPersonPose(g, cycle = 0, moving = false, frameDt = null, movementSpeed = null) {
     // Keep navigation/customer decisions at full rate; only distant rig posing
     // is reduced. Accumulated time preserves gait speed when it is updated.
     const worldPosition=camera?g.getWorldPosition(g.userData.poseWorldPosition||(g.userData.poseWorldPosition=new THREE.Vector3())):g.position;
-    if (g !== playerAvatar && camera && Math.hypot(worldPosition.x-player.x,worldPosition.z-player.z)>28) {
+    const playerDistance=camera?Math.hypot(worldPosition.x-player.x,worldPosition.z-player.z):0;
+    const shadowed=g===playerAvatar||playerDistance<18;
+    if(g.userData.characterShadowed!==shadowed){g.userData.characterShadowed=shadowed;g.traverse?.(node=>{if(node.isMesh)node.castShadow=shadowed;});}
+    if (g !== playerAvatar && camera && playerDistance>16) {
       const now=performance.now()/1000;
       const elapsed=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastLodAt||now-.016)));
       g.userData.lastLodAt=now;
       g.userData.poseElapsed=(g.userData.poseElapsed||0)+elapsed;
-      if(g.userData.poseElapsed<.08)return;
+      const farFps=Number((PERF[perfMode]||PERF.auto||{}).farAnimationFps||12);
+      const interval=playerDistance>48?0.2:playerDistance>28?1/Math.max(5,farFps):1/30;
+      if(g.userData.poseElapsed<interval)return;
       frameDt=g.userData.poseElapsed;g.userData.poseElapsed=0;
     } else if(g.userData.poseElapsed) {
       frameDt=(frameDt||.016)+g.userData.poseElapsed;g.userData.poseElapsed=0;
+    }
+    if(g.userData.animationController){
+      const now=performance.now()/1000;
+      const dt=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));
+      g.userData.lastAnimAt=now;
+      g.userData.animationController.update(dt,{speed:movementSpeed??(moving?Math.max(.82,g.userData.motion?.speed||0):0),grounded:g===playerAvatar?player.grounded:true});return;
     }
     if(g.userData.motion){
       const now=performance.now()/1000;
@@ -1924,7 +2000,8 @@
       const child = group.children[0];
       group.remove(child);
       child.traverse?.((c) => {
-        if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
+        if(c.userData?.animationController)c.userData.animationController.dispose();
+        else if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
         if (c.isSkinnedMesh) c.skeleton?.dispose?.();
         if (c.userData?.sharedCharacterResource) return;
         c.userData?.ownedTexture?.dispose?.();
@@ -2711,6 +2788,48 @@
   }
 
   // One scene, one coordinate system. Crossing a door changes only the HUD zone.
+  const HUB_CHARACTER_ROUTES=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
+
+  function ensureHubCharacters() {
+    if(!scene||!hubWorld||!npcNames)return;
+    const selected=activeCharacterId();
+    for(let i=hubActors.length-1;i>=0;i--){
+      const actor=hubActors[i],id=actor.obj.userData.characterId;
+      if(id!==selected)continue;
+      actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal);hubActors.splice(i,1);
+    }
+    const guide=animatedActors.find(actor=>actor.type==='guide');
+    if(guide?.obj.userData.characterId===selected){
+      interactables=interactables.filter(item=>item.mesh!==guide.obj);guide.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(guide.obj);clearGroup(disposal);
+      animatedActors=animatedActors.filter(actor=>actor!==guide);
+    }
+    if(selected!=='mona'&&monaTemplate&&!animatedActors.some(actor=>actor.type==='guide')){
+      const object=attachProceduralController(monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona));
+      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide',characterId:'mona'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
+      object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
+      animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
+      interactables.push({mesh:object,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
+    }
+    ['chico1','chico2','chico3'].forEach((id,index)=>{
+      if(id===selected||!suppliedTemplates[id]||hubActors.some(actor=>actor.obj.userData.characterId===id))return;
+      const object=person({execModel:id});object.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(object.userData,{role:'hub-pedestrian',characterId:id});
+      const source=hubWorld.patrolRoutes?.[index]||HUB_CHARACTER_ROUTES[index].map(([x,z])=>[x+HUB_OFFSET,z]);
+      const patrol=source.map(point=>Array.isArray(point)?point:[point.x,point.z]);object.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(object);
+      hubActors.push({obj:object,patrol,index:1,route:[],pause:index*.8,speed:.9+index*.07,state:{speed:0}});
+    });
+  }
+
+  function createPlayableCharacter(id) {
+    characterManager?.select(id,{persist:false});
+    let object=characterManager?.create(id,{role:'player',factory:(template,kind)=>kind==='mona'
+      ? monaModule.createMonaNpc(THREE,template,CONFIG.NPCS.mona)
+      : npcMotion.createNpc(template,kind)});
+    if(!object)object=person({execModel:id,bodyScale:1},'player');
+    attachProceduralController(object);
+    object.name='PlayerAvatar';Object.assign(object.userData,{modelKind:'player',characterId:id,characterRole:'player',displayName:CONFIG.NPCS[id]?.name||id});
+    object.getObjectByName('NpcNameLabel')?.removeFromParent();return object;
+  }
+
   async function buildPlayableHub() {
     const {createHubWorld}=await import('./services/hub_world.js?v=20260927-continuous-world');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
@@ -2744,24 +2863,8 @@
     }));
     sky.name='ProceduralSky';sky.renderOrder=-1;sky.frustumCulled=false;scene.add(sky);
     hubWorld.sky=sky;
-    const guide=monaTemplate?monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona):person({execModel:'chico1'});
-    guide.name=CONFIG.NPCS.mona.name;guide.userData.role='guide';guide.userData.modelKind=monaTemplate?'mona':'mona-fallback';
-    npcNames.setNpcName(guide,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
-    guide.position.set(HUB_OFFSET+14,.025,26);scene.add(guide);
-    animatedActors.push({type:'guide',obj:guide,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
-    interactables.push({mesh:guide,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
-    const actorIds=['chico1','chico2','chico3'];
-    const fallbackRoutes=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
-    actorIds.forEach((id,i)=>{
-      const obj=person({execModel:id});obj.getObjectByName('NpcNameLabel')?.removeFromParent();
-      obj.userData.role='hub-pedestrian';
-      const patrol=hubWorld.patrolRoutes?.[i]?.map(p=>Array.isArray(p)?p:[p.x,p.z])||fallbackRoutes[i].map(([x,z])=>[x+HUB_OFFSET,z]);
-      obj.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(obj);
-      hubActors.push({obj,patrol,index:1,route:[],pause:i*.8,speed:.9+i*.07,state:{speed:0}});
-    });
-    playerAvatar=person({execModel:'chico2',bodyScale:1});
-    playerAvatar.name='PlayerAvatar';playerAvatar.userData.modelKind='player';
-    playerAvatar.getObjectByName('NpcNameLabel')?.removeFromParent();scene.add(playerAvatar);
+    ensureHubCharacters();
+    playerAvatar=createPlayableCharacter(activeCharacterId());scene.add(playerAvatar);
     hubWaypoint=new THREE.Group();hubWaypoint.name='Next destination';
     const waypointMaterial=new THREE.MeshBasicMaterial({color:0xf4cd78,transparent:true,opacity:.8,depthWrite:false});
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.045,6,40),waypointMaterial);ring.rotation.x=-Math.PI/2;ring.position.y=.07;
@@ -2972,7 +3075,7 @@
       playerAvatar.visible=cameraMode==='third';playerAvatar.position.set(player.x,Math.max(.025,player.y-player.baseY+.025),player.z);
       if(player.speed>.12){const desired=Math.atan2(player.vx,player.vz),turn=Math.atan2(Math.sin(desired-playerAvatar.rotation.y),Math.cos(desired-playerAvatar.rotation.y));playerAvatar.rotation.y+=turn*(1-Math.exp(-12*dt));}
       const action=playerAvatar.userData.actions?.walk;if(action)action.setEffectiveTimeScale(Math.max(.4,Math.min(1.8,player.speed/1.5)));
-      setPersonPose(playerAvatar,player.bob,player.grounded&&player.speed>.15,dt);
+      setPersonPose(playerAvatar,player.bob,player.grounded&&player.speed>.15,dt,player.speed);
     }
     const footFov=cameraMode==='third'?(player.locomotion==='RUN'?65:58):(player.locomotion==='RUN'?76:70);
     camera.fov+=(footFov-camera.fov)*(1-Math.exp(-7*dt));camera.updateProjectionMatrix();
@@ -3478,6 +3581,24 @@
     return initializationPromise;
   }
 
+  function selectCharacter(id) {
+    if(!validCharacterId(id)){console.warn(`SIDE: personaje desconocido ${id}.`);return false;}
+    if(initialized&&playerAvatar&&playerAvatar.userData.characterId!==id){
+      console.warn('SIDE: la identidad del jugador se conserva durante la simulación activa. Vuelve al selector antes de crear el mundo para cambiarla.');
+      return false;
+    }
+    selectedCharacterId=id;
+    characterManager?.select(id,{persist:false});
+    return true;
+  }
+
+  async function preloadCharacter(id=activeCharacterId()) {
+    if(!selectCharacter(id))return false;
+    if(!await preloadBase())return false;
+    publishLoading(`Cargando ${CONFIG.NPCS?.[id]?.name||'personaje'} como avatar`,2);
+    return loadCharacter(id,ASSET_PRIORITY.CRITICAL);
+  }
+
   async function enter(options = {}) {
     if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
     if (bridge().canStartSimulation && !bridge().canStartSimulation()) {
@@ -3549,17 +3670,22 @@
 
   function diagnostics() {
     const characters = [];
+    const controllers=new Set(),mixers=new Set();
     scene?.traverse(node => {
+      if(node.userData?.animationController)controllers.add(node.userData.animationController);
+      if(node.userData?.mixer)mixers.add(node.userData.mixer);
       if (node.userData?.modelKind) {
         const position=node.getWorldPosition(new THREE.Vector3());
-        characters.push({kind:node.userData.modelKind, name:node.userData.displayName||'', x:position.x, z:position.z});
+        characters.push({kind:node.userData.modelKind, characterId:node.userData.characterId||null, role:node.userData.characterRole||node.userData.role||'', name:node.userData.displayName||'', x:position.x, z:position.z});
       }
     });
+    const selected=activeCharacterId(),selectedInstances=characters.filter(character=>character.characterId===selected).length;
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
       navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
-      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct'},
+      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',cache:assetCache?.diagnostics?.()||null},
+      character:{selected,name:CONFIG.NPCS[selected]?.name||'',selectedInstances,playerInstances:characters.filter(character=>character.role==='player').length,manager:characterManager?.diagnostics?.()||null,animation:playerAvatar?.userData.animationController?.getSnapshot?.()||null,controllers:controllers.size,mixers:mixers.size},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
-      mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.kind==='mona'||c.kind==='mona-fallback').length},
+      mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.characterId==='mona'||c.kind==='mona'||c.kind==='mona-fallback').length},
       hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
       world:{id:'side-city',continuous:true,legacyActive:Boolean(businessWorld&&businessWorld!==businessInteriors?.group&&businessWorld.visible),interiors:businessInteriors?.stats()||null,queueCapacity:queueSlots.length},
       driving:driving?{speed:driving.speed,yaw:driving.yaw}:null,vehicles:hubVehicles?.cars.map(c=>({x:c.x,z:c.z,speed:c.speed,traffic:c.traffic}))||[],
@@ -3567,5 +3693,5 @@
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, preload, preloadDetails, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  window.SIDE3D = { prepare, preloadBase, preload, preloadCharacter, selectCharacter, preloadDetails, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

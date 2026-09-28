@@ -59,7 +59,10 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.locator('#startGame').isEnabled(),true);
   assert.equal(await t.locator('#startGame').innerText(),'Iniciar ciclo 1');
   await t.locator('#startGame').click();
-  await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));await s2.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
+  await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
+  assert.equal(await s1.evaluate(()=>worldCalls.enter),0,'waiting room must open decisions before the 3D world');
+  await s1.evaluate(()=>{setDecisionsSubmitted(true);localStorage.setItem(characterSelectionKey(),'miguel');characterSelectionConfirmed=true;return requestWorldEntry();});
+  await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await s1.evaluate(()=>currentRound()),1);assert.equal(await s2.evaluate(()=>studentAccess().canOperate),true);
   assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canExplore()),true);
   assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'exploration does not charge or sell before submitted decisions');
@@ -92,7 +95,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.evaluate(()=>state.enabledEvents.size),0);
   await t.locator('#eventRandomize').click();assert.equal(await t.evaluate(()=>state.enabledEvents.size),0);
   await t.locator('#closeEventPicker').click();await t.screenshot({path:path.join(output,'lifecycle-teacher.png')});
-  console.log('PASS UI manual: prepare, two live students auto-navigate to Cycle 1; all/individual/random/zero events');
+  console.log('PASS UI manual: prepare, two live students auto-navigate to decisions before the 3D world; all/individual/random/zero events');
   await t.locator('#cancelGame').click();await t.locator('#keepGame').click();assert.equal(await t.evaluate(()=>gameStatus().active),true);
   await t.evaluate(()=>{window.originalControl=SIDE.PartidaService.controlar;SIDE.PartidaService.controlar=async()=>({success:false,error:'Fallo simulado de conexión'});});
   await t.locator('#cancelGame').click();await t.locator('#confirmCancelGame').click();
@@ -148,12 +151,12 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await late.setViewportSize({width:390,height:844});await late.screenshot({path:path.join(output,'lifecycle-student-countdown.png')});
   await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()+interval '2 seconds')) where id=$1`,[autoGame.id]);
   await Promise.all([auto,late,reload].map(p=>p.evaluate(()=>refreshStudentGame())));
-  for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
-  const after=await student(autoGame,'After UI');await after.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
+  for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
+  const after=await student(autoGame,'After UI');await after.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
   assert.equal(await after.evaluate(()=>currentRound()),1);
   await after.evaluate(()=>$('backToProfiles').click());
   assert.equal(await after.evaluate(()=>studentPoll===null&&studentTick===null&&!studentConnected),true);
-  console.log('PASS UI automatic: 2-minute configuration/countdown, teacher closed, late join, real browser reload, clock skew, multiple clients, post-start join');
+  console.log('PASS UI automatic: 2-minute configuration/countdown, teacher closed, late join, real browser reload, clock skew, multiple clients, post-start join to decisions');
   assert.deepEqual(errors,[]);console.log('PASS no browser JavaScript errors');
  }finally{await browser.close();await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

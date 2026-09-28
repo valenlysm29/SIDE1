@@ -106,7 +106,9 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.zoom),3.2,'zoom lower limit');
     await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:500});
 
-
+    // Non-player identities are IMPORTANT assets and stream after the first
+    // controllable frame; wait explicitly before validating their articulated rigs.
+    await page.evaluate(()=>SIDE3D.preloadDetails());
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
     assert.ok(actorsBefore.length>=3&&actorsBefore.every(a=>a.bones>=15),'all outdoor pedestrians have articulated rigs');
     await page.evaluate(()=>hubQA.stepActors(5));

@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
   <link rel="stylesheet" href="production.css?v=20260922-fixedbar">
+  <link rel="stylesheet" href="character-selection.css?v=20260927-selector">
 </head>
 <body>
 <main id="app">
@@ -165,7 +166,7 @@
           </div>
           <div id="studentFinancialDetail"></div>
           <p id="studentEventImpactText" class="student-event-impact">Los eventos que te afecten aparecerán en Noticias del ciclo y se reflejarán en estos resultados.</p>
-          <p class="lobby-welcome">Conectado correctamente. Al iniciar la partida entrarás automáticamente al mundo 3D.</p>
+          <p class="lobby-welcome">Conectado correctamente. Al iniciar la partida entrarás automáticamente al menú de decisiones; después de enviarlas podrás entrar al mundo 3D.</p>
         </div>
         <footer class="lobby-actions" aria-label="Acciones de la partida">
           <button id="resumeWorldBtn" class="primary-gold lobby-start hidden" type="button">ENTRAR / VOLVER AL MUNDO 3D</button>
@@ -177,6 +178,50 @@
           <small class="lobby-build">SIDE · v2026.09.22.2</small>
         </footer>
       </div>
+    </div>
+  </section>
+
+  <section id="characterSelection" class="screen character-selection-screen hidden" aria-labelledby="characterSelectionTitle" aria-hidden="true">
+    <div class="character-selection-bg" aria-hidden="true"></div>
+    <div class="character-selection-shell">
+      <header class="character-selection-header">
+        <img src="assets/side_logo.png" class="character-selection-logo" alt="SIDE">
+        <p class="character-selection-kicker">TU IDENTIDAD EN SIDE</p>
+        <h1 id="characterSelectionTitle">SELECCIONA TU PERSONAJE</h1>
+        <p>Elige quién te representará durante este ciclo de simulación.</p>
+      </header>
+
+      <div id="characterSelectionGrid" class="character-selection-grid" role="group" aria-label="Personajes disponibles">
+        <button class="character-card" type="button" data-character="miguel" aria-pressed="false" aria-describedby="characterHintMiguel">
+          <span class="character-card-portrait"><img src="assets/characters/thumbnails/chico2.webp" alt="Miguel, personaje jugable" draggable="false"></span>
+          <span class="character-card-copy"><strong>MIGUEL</strong><small id="characterHintMiguel">Seleccionar personaje</small></span>
+          <span class="character-card-check" aria-hidden="true">&#10003;</span>
+        </button>
+        <button class="character-card" type="button" data-character="joel" aria-pressed="false" aria-describedby="characterHintJoel">
+          <span class="character-card-portrait"><img src="assets/characters/thumbnails/chico1.webp" alt="Joel, personaje jugable" draggable="false"></span>
+          <span class="character-card-copy"><strong>JOEL</strong><small id="characterHintJoel">Seleccionar personaje</small></span>
+          <span class="character-card-check" aria-hidden="true">&#10003;</span>
+        </button>
+        <button class="character-card" type="button" data-character="gonzalo" aria-pressed="false" aria-describedby="characterHintGonzalo">
+          <span class="character-card-portrait"><img src="assets/characters/thumbnails/chico3.webp" alt="Gonzalo, personaje jugable" draggable="false"></span>
+          <span class="character-card-copy"><strong>GONZALO</strong><small id="characterHintGonzalo">Seleccionar personaje</small></span>
+          <span class="character-card-check" aria-hidden="true">&#10003;</span>
+        </button>
+        <button class="character-card" type="button" data-character="valeria" aria-pressed="false" aria-describedby="characterHintValeria">
+          <span class="character-card-portrait"><img src="assets/characters/thumbnails/mona.webp" alt="Valeria, personaje jugable" draggable="false"></span>
+          <span class="character-card-copy"><strong>VALERIA</strong><small id="characterHintValeria">Seleccionar personaje</small></span>
+          <span class="character-card-check" aria-hidden="true">&#10003;</span>
+        </button>
+      </div>
+
+      <footer class="character-selection-footer">
+        <p id="characterSelectionStatus" class="character-selection-status" role="status" aria-live="polite">
+          Personaje seleccionado: <strong>NINGUNO</strong>
+        </p>
+        <button id="confirmCharacterBtn" class="character-confirm-btn" type="button" disabled>
+          <span>ENTRAR AL MUNDO</span><span aria-hidden="true">&#8594;</span>
+        </button>
+      </footer>
     </div>
   </section>
 
@@ -512,6 +557,7 @@
 <script src="events_catalog.js?v=20260910-2"></script>
 <script src="decision_catalog.js?v=20260910-2"></script>
 <script src="tutorial.js?v=20260910-2"></script>
+<script src="services/character_selection.js?v=20260927-selector"></script>
 <script type="importmap">
   {
     "imports": {

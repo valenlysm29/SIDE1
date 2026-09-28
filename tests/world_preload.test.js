@@ -8,8 +8,8 @@ function fixture(engine=async()=>true,details=async()=>true){
       details:async()=>{counts.details++;await details();},upgrade:()=>counts.upgrade++},
     localStorage:{getItem:()=>null,setItem(){throw Error('Preloading must not write financial storage');}}};
   const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  loadThree=window.engine;
-  loadSuppliedNpcs=window.city;loadMonaModel=window.guide;loadStartupEnvironment=window.lighting;
-  loadExecModelTemplates=window.details;loadNpcModelTemplate=async()=>false;refreshBusinessCharacters=window.upgrade;
+  loadCharacter=window.city;loadStartupEnvironment=window.lighting;ASSET_PRIORITY={CRITICAL:'CRITICAL',IMPORTANT:'IMPORTANT'};
+  loadExecModelTemplates=window.details;loadNpcModelTemplate=async()=>false;refreshBusinessCharacters=window.upgrade;ensureHubCharacters=()=>{};
   window.SIDE3D = {`);
   vm.runInNewContext(source,context);return {api:context.window.SIDE3D,counts,events};
 }
@@ -18,7 +18,7 @@ test('concurrent lobby and entry preload share critical requests without loading
   let ready;const gate=new Promise(resolve=>ready=resolve),r=fixture(()=>gate);
   const a=r.api.preload(),b=r.api.preload();assert.equal(r.counts.engine,1);assert.equal(r.counts.details,0);
   ready(true);assert.deepEqual(await Promise.all([a,b]),[true,true]);
-  assert.deepEqual(r.counts,{engine:1,city:1,guide:1,lighting:1,details:0,upgrade:0});
+  assert.deepEqual(r.counts,{engine:1,city:1,guide:0,lighting:1,details:0,upgrade:0});
   assert.equal(await r.api.preload(),true);assert.equal(r.counts.city,1);
 });
 

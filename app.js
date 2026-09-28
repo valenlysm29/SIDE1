@@ -2,7 +2,7 @@ const cfg = window.SIDE_CONFIG || {};
 const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') && cfg.SUPABASE_PUBLISHABLE_KEY && !cfg.SUPABASE_PUBLISHABLE_KEY.includes('TU-PUBLISHABLE');
 const supabaseClient = window.SIDE?.SupabaseClient?.get() || null;
 const $ = id => document.getElementById(id);
-const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','simulationLoading','simulator3d','decisionMenu'];
+const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','characterSelection','simulationLoading','simulator3d','decisionMenu'];
 const modals = ['teacherLoginModal','teacherRegisterModal','studentModal'];
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
@@ -29,7 +29,7 @@ let currentCategory = null;
 let playerIsDeciding = false;
 
 function showScreen(id){
-  if(['decisionMenu','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld())id='studentLobby';
+  if(['decisionMenu','characterSelection','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld())id='studentLobby';
   screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
   return id;
 }
@@ -97,11 +97,12 @@ function studentAccess(existing=true){
 }
 function updateIntegrationUI(){
   const access=studentAccess(),button=$('enterDecisionsBtn'),notice=$('studentIntegrationNotice');
+  const decisionsComplete=simulationSubmissionComplete();
   $('studentLobby')?.classList.toggle('game-cancelled',Boolean(access.cancelled));
   $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
-  if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation());
-  if(button)button.disabled=!access.canOperate;
+  if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
+  if(button){button.disabled=!access.canOperate;button.classList.toggle('hidden',!access.canOperate||decisionsComplete);}
   if(notice){
     notice.classList.toggle('hidden',access.canOperate);
     notice.textContent=access.reason||'';
@@ -122,7 +123,7 @@ function updateIntegrationUI(){
     window.SIDE3D?.suspend?.();syncStudentTimer();stopStudentSync();
   }
   if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
-  if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;startSimulationLoading();}
+  if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
 
   if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
@@ -189,6 +190,18 @@ function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${curr
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
+const CHARACTER_MODEL_IDS=Object.freeze({miguel:'chico2',joel:'chico1',gonzalo:'chico3',valeria:'mona'});
+const CHARACTER_SLUGS=Object.freeze(Object.fromEntries(Object.entries(CHARACTER_MODEL_IDS).map(([slug,id])=>[id,slug])));
+function characterSelectionKey(){return `SIDE_SELECTED_CHARACTER_${storageKey()}`}
+function selectedCharacterSlug(){
+  let value=null;try{value=localStorage.getItem(characterSelectionKey())}catch{}
+  if(!CHARACTER_MODEL_IDS[value]){
+    const current=window.CharacterSelection?.getSelected?.();if(CHARACTER_MODEL_IDS[current])value=current;
+  }
+  return CHARACTER_MODEL_IDS[value]?value:null;
+}
+function selectedCharacterModel(){return CHARACTER_MODEL_IDS[selectedCharacterSlug()]||null}
+let characterSelectionConfirmed=false;
 function canExploreWorld(){return studentAccess().canOperate&&(currentStudent.empresaId&&authoritativeStudentState?authoritativeStudentState.runtime:readRoundRuntime())?.status!=='paused'}
 function canOperateWorld(){
   const explore=typeof canExploreWorld==='function'?canExploreWorld():studentAccess().canOperate&&readRoundRuntime()?.status!=='paused';
@@ -209,6 +222,7 @@ window.SIDE_GAME_BRIDGE={
   canOperate:()=>canOperateWorld(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
+  selectedCharacter:()=>selectedCharacterModel()||'chico2',
   activeEvents:()=>activeStudentEvents(),
   productionPlan:()=>productionPlan(),
   financialReport:()=>financialReport(),
@@ -306,7 +320,8 @@ $('studentForm')?.addEventListener('submit',async e=>{
 });
 function startJoinLoading(){return prepareLobby()}
 function preloadStudentWorld(){
-  if(typeof window.SIDE3D?.preload==='function')window.SIDE3D.preload().then(ready=>ready&&window.SIDE3D.preloadDetails?.()).catch(error=>console.warn('SIDE: precarga pendiente',error));
+  const preload=window.SIDE3D?.preloadBase||window.SIDE3D?.preload;
+  if(typeof preload==='function')preload().catch(error=>console.warn('SIDE: precarga pendiente',error));
 }
 window.addEventListener('side3d:ready',()=>{if(studentConnected&&studentAccess().integration)preloadStudentWorld();});
 async function prepareLobby(){
@@ -322,9 +337,9 @@ async function openStudentTutorial(){
 }
 $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
 $('cancelledBackToProfiles')?.addEventListener('click',()=>$('backToProfiles').click());
-$('resumeWorldBtn')?.addEventListener('click',()=>startSimulationLoading());
+$('resumeWorldBtn')?.addEventListener('click',requestWorldEntry);
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
-$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;playerIsDeciding=false;autoEnterDecisions=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
+$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
 $('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStudentReportPreview();if(window.__SIDE_RETURN_TO_3D){window.__SIDE_RETURN_TO_3D=false;window.SIDE3D?.returnFromDecisions?.();}else showScreen('studentLobby')});
 $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 
@@ -800,9 +815,40 @@ function paintWorldLoading(){
   if($('simulationLoadingStage'))$('simulationLoadingStage').textContent=status.phase||'Preparando escena y controles';
 }
 window.addEventListener('side3d:loading',paintWorldLoading);
-async function startSimulationLoading(){
+function openCharacterSelection(){
+  if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
+  const selector=window.CharacterSelection;
+  if(!selector){console.error('SIDE: selector de personaje no disponible.');return startSimulationLoading({selectedCharacter:selectedCharacterModel()||'chico2'});}
+  const selectorStorageKey=characterSelectionKey(),initialSelection=selectedCharacterSlug();
+  selector.init({storageKey:selectorStorageKey,initialSelection,
+    onSelectionChange(slug){
+      const id=CHARACTER_MODEL_IDS[slug];if(!id)return;
+      window.SIDE3D?.selectCharacter?.(id);
+      window.SIDE3D?.preloadCharacter?.(id).catch(error=>console.warn(`SIDE: ${slug} usará el movimiento de respaldo.`,error));
+    },
+    onConfirm(slug){
+      const id=CHARACTER_MODEL_IDS[slug];if(!id)return;
+      characterSelectionConfirmed=true;selector.close();startSimulationLoading({selectedCharacter:id});
+    }
+  });
+  showScreen('characterSelection');selector.open({storageKey:selectorStorageKey,initialSelection});
+  const initialId=CHARACTER_MODEL_IDS[initialSelection];
+  if(initialId){window.SIDE3D?.selectCharacter?.(initialId);window.SIDE3D?.preloadCharacter?.(initialId).catch(()=>{});}
+  const preload=window.SIDE3D?.preloadBase||window.SIDE3D?.preload;
+  preload?.().catch(error=>console.warn('SIDE: el mundo continuará cargando al confirmar.',error));
+  return true;
+}
+function requestWorldEntry(){
+  if(!simulationSubmissionComplete())return openDecisionMenu();
+  const admitted=localStorage.getItem(worldAdmissionKey())==='1';
+  if((characterSelectionConfirmed||admitted)&&selectedCharacterModel())return startSimulationLoading({selectedCharacter:selectedCharacterModel()});
+  return openCharacterSelection();
+}
+async function startSimulationLoading(options={}){
   if(simulationLoadingActive)return false;
   if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
+  const requestedCharacter=CHARACTER_SLUGS[options?.selectedCharacter]?options.selectedCharacter:(selectedCharacterModel()||'chico2');
+  if(window.SIDE3D?.selectCharacter&&!window.SIDE3D.selectCharacter(requestedCharacter))return false;
   loadDecisionState();
   simulationLoadingActive=true;
   const gameId=currentStudent.game?.id,company=currentStudent.company,connected=studentConnected;
@@ -833,7 +879,7 @@ async function startSimulationLoading(){
   }
 }
 $('retryWorldBtn')?.addEventListener('click',startSimulationLoading);
-$('startSimulationBtn')?.addEventListener('click',startSimulationLoading);
+$('startSimulationBtn')?.addEventListener('click',requestWorldEntry);
 function animateCash(netMovement){
   const fx=$('cashFx');if(!fx||!netMovement)return;fx.querySelector('span').textContent=(netMovement>0?'+ ':'− ')+money(Math.abs(netMovement));fx.classList.remove('gain','spend','play');fx.classList.add(netMovement>0?'gain':'spend');void fx.offsetWidth;fx.classList.add('play');setTimeout(()=>fx.classList.remove('play'),1150);
   const cash=$('cashBalance');cash.classList.remove('cash-pulse');void cash.offsetWidth;cash.classList.add('cash-pulse');

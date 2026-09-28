@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Generador de retratos SIDE</title>
+<style>
+  html,body{margin:0;width:512px;height:640px;overflow:hidden;background:#dbe3e1}
+  canvas{display:block;width:512px;height:640px}
+</style>
+<script type="importmap">{"imports":{"three":"../vendor/three/build/three.module.js","three/addons/":"../vendor/three/examples/jsm/"}}</script>
+<script type="module">
+  import * as THREE from 'three';
+  import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+  import {loadTemplate,createNpc,animateNpc} from '../services/npc_motion.js';
+
+  const catalog={
+    chico1:'../assets/models3d/npcs/chico1.glb',
+    chico2:'../assets/models3d/npcs/chico2.glb',
+    chico3:'../assets/models3d/npcs/chico3.glb',
+    mona:'../assets/models3d/npcs/mona.glb'
+  };
+  const id=new URLSearchParams(location.search).get('id');
+  if(!catalog[id])throw Error('Personaje desconocido');
+  const scene=new THREE.Scene();scene.background=new THREE.Color(0xdbe3e1);
+  scene.fog=new THREE.Fog(0xdbe3e1,5,9);
+  const camera=new THREE.PerspectiveCamera(27,512/640,.01,20);camera.position.set(0,1.22,3.85);camera.lookAt(0,1.13,0);
+  const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:false,powerPreference:'high-performance'});
+  renderer.setSize(512,640,false);renderer.setPixelRatio(1);renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;document.body.append(renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xf8fbff,0x7c817a,2.25));
+  const key=new THREE.DirectionalLight(0xfff1dc,3.4);key.position.set(-2.8,4.5,4);key.castShadow=true;key.shadow.mapSize.set(1024,1024);scene.add(key);
+  const fill=new THREE.DirectionalLight(0xbfdfff,1.55);fill.position.set(3,2.4,2);scene.add(fill);
+  const rim=new THREE.DirectionalLight(0xffffff,.9);rim.position.set(0,2,-3);scene.add(rim);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.25,48),new THREE.MeshStandardMaterial({color:0xc7d0cd,roughness:1}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=-.006;floor.receiveShadow=true;scene.add(floor);
+  const template=await loadTemplate(GLTFLoader,catalog[id]);
+  const avatar=createNpc(template,id);avatar.position.y=.01;avatar.rotation.y=0;scene.add(avatar);animateNpc(avatar,1/60,false);
+  renderer.render(scene,camera);renderer.render(scene,camera);
+  window.exportThumbnail=()=>{
+    const data=renderer.domElement.toDataURL('image/webp',.9);
+    renderer.dispose();renderer.forceContextLoss?.();
+    return data;
+  };
+  window.thumbnailReady=true;
+</script>
+</html>
