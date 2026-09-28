@@ -42,8 +42,8 @@
   let cameraZoom = 5.2, lastCameraInputAt = 0;
   let basePreloadPromise = null, preloadPromise = null, loadingPhase = 'Esperando precarga', loadingLoaded = 0, loadingTotal = 6;
   let studioEnvironment = null, detailsPromise = null, detailsTimer = 0, detailsComplete = false;
-  let storePropsPromise = null, warehousePropsPromise = null;
-  const storePropTemplates = {}, storePropErrors = {}, warehousePropTemplates = {}, warehousePropErrors = {};
+  let storePropsPromise = null, warehousePropsPromise = null, outdoorPropsPromise = null;
+  const storePropTemplates = {}, storePropErrors = {}, warehousePropTemplates = {}, warehousePropErrors = {}, outdoorPropTemplates = {}, outdoorPropErrors = {};
   const STORE_PROP_ASSETS = Object.freeze([
     ['table', 'shop_table_display'], ['counter', 'shop_checkout_counter'], ['counterEnd', 'shop_checkout_counter_end'],
     ['shelfTall', 'shop_shelf_tall'], ['shelfLow', 'shop_shelf_low'], ['mirror', 'shop_mirror_wall'], ['register', 'shop_cash_register']
@@ -54,6 +54,11 @@
     ['pallet','warehouse_pallet'],['rackTall','warehouse_rack_tall'],['bagStack','warehouse_bag_stack'],['cuttingTable','warehouse_cutting_table'],
     ['pendantLight','warehouse_pendant_light'],['palletTruck','warehouse_pallet_truck'],['fabricRolls','warehouse_fabric_rolls'],
     ['fireExtinguisher','warehouse_fire_extinguisher'],['sewingMachine','warehouse_sewing_machine']
+  ]);
+  const OUTDOOR_PROP_ASSETS = Object.freeze([
+    ['treeDefault','outdoor_tree_default'],['treeOak','outdoor_tree_oak'],['treeTall','outdoor_tree_tall'],['bush','outdoor_bush'],
+    ['bench','outdoor_bench'],['fountain','outdoor_fountain'],['trafficLight','outdoor_traffic_light'],['streetLight','outdoor_street_light'],
+    ['planter','outdoor_planter'],['trashcan','outdoor_trashcan'],['stopSign','outdoor_stop_sign'],['birdBrown','outdoor_bird_brown']
   ]);
   let characterManager = null, selectedCharacterId = 'chico2';
   const HUB_OFFSET = 150;
@@ -846,6 +851,32 @@
     return warehousePropsPromise;
   }
 
+  async function loadOutdoorPropTemplates() {
+    if (outdoorPropsPromise) return outdoorPropsPromise;
+    if (!GLTFLoader || !assetCache) return outdoorPropTemplates;
+    const missing = OUTDOOR_PROP_ASSETS.filter(([key]) => !outdoorPropTemplates[key]);
+    outdoorPropsPromise = Promise.all(missing.map(async ([key, file]) => {
+      try {
+        const gltf = await assetCache.loadGLTF(new GLTFLoader(), `assets/models3d/props/${file}.glb`, {priority:ASSET_PRIORITY.LAZY});
+        if (!gltf.scene) throw new Error('El GLB no contiene una escena.');
+        gltf.scene.traverse(node => {
+          if (!node.isMesh) return;
+          node.castShadow = false; node.receiveShadow = true;
+          node.userData.sharedPropResource = true;
+        });
+        gltf.scene.updateMatrixWorld(true);
+        outdoorPropTemplates[key] = gltf.scene; delete outdoorPropErrors[key];
+      } catch (error) {
+        outdoorPropErrors[key] = error.message;
+        console.warn(`No se pudo cargar el prop exterior ${file}; se conserva su versión procedural.`, error);
+      }
+    })).then(() => {
+      hubWorld?.installOutdoorProps(outdoorPropTemplates, perfMode);
+      return outdoorPropTemplates;
+    }).finally(() => { outdoorPropsPromise = null; });
+    return outdoorPropsPromise;
+  }
+
   async function preloadDetails() {
     if(detailsPromise)return detailsPromise;
     detailsPromise=(async()=>{
@@ -853,12 +884,12 @@
       // Props can stream beside the supplied characters, but the legacy casual
       // fallback decision must wait until those character requests settle.
       // Otherwise a healthy local character set still triggers an unused GLB.
-      const storeProps=loadStorePropTemplates(),warehouseProps=loadWarehousePropTemplates();
+      const storeProps=loadStorePropTemplates(),warehouseProps=loadWarehousePropTemplates(),outdoorProps=loadOutdoorPropTemplates();
       await characterManager?.preloadRemaining({priority:ASSET_PRIORITY.IMPORTANT});
       for(const id of CHARACTER_IDS){const template=characterManager?.template(id);if(!template)continue;if(id==='mona')monaTemplate=template;else suppliedTemplates[id]=template;}
-      await Promise.all([loadExecModelTemplates(),storeProps,warehouseProps]);
+      await Promise.all([loadExecModelTemplates(),storeProps,warehouseProps,outdoorProps]);
       if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
-      refreshBusinessCharacters();ensureHubCharacters();detailsComplete=true;return true;
+      refreshBusinessCharacters();ensureHubCharacters({allowFallback:true});detailsComplete=true;return true;
     })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
       .then(ok=>{if(!ok)detailsPromise=null;return ok;});
     return detailsPromise;
@@ -1565,6 +1596,7 @@
     renderer?.setPixelRatio(Math.min(devicePixelRatio,renderScale));
     if(renderer&&sunLight){renderer.shadowMap.enabled=mode!=='low';sunLight.castShadow=mode!=='low';renderer.shadowMap.needsUpdate=true;}
     businessInteriors?.setQuality(mode);
+    hubWorld?.setQuality(mode);
     resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
 
@@ -2861,7 +2893,7 @@
   // One scene, one coordinate system. Crossing a door changes only the HUD zone.
   const HUB_CHARACTER_ROUTES=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
 
-  function ensureHubCharacters() {
+  function ensureHubCharacters({allowFallback=false}={}) {
     if(!scene||!hubWorld||!npcNames)return;
     const selected=activeCharacterId();
     for(let i=hubActors.length-1;i>=0;i--){
@@ -2869,21 +2901,36 @@
       if(id!==selected)continue;
       actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal);hubActors.splice(i,1);
     }
-    const guide=animatedActors.find(actor=>actor.type==='guide');
+    let guide=animatedActors.find(actor=>actor.type==='guide');
     if(guide?.obj.userData.characterId===selected){
       interactables=interactables.filter(item=>item.mesh!==guide.obj);guide.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(guide.obj);clearGroup(disposal);
       animatedActors=animatedActors.filter(actor=>actor!==guide);
+      guide=null;
     }
-    if(selected!=='mona'&&monaTemplate&&!animatedActors.some(actor=>actor.type==='guide')){
-      const object=attachProceduralController(monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona));
-      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide',characterId:'mona'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
+    if(guide?.obj.userData.modelKind==='mona-fallback'&&monaTemplate){
+      interactables=interactables.filter(item=>item.mesh!==guide.obj);guide.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(guide.obj);clearGroup(disposal);
+      animatedActors=animatedActors.filter(actor=>actor!==guide);guide=null;
+    }
+    if(selected!=='mona'&&!guide&&(monaTemplate||allowFallback)){
+      const object=monaTemplate
+        ? attachProceduralController(monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona))
+        : person({gender:'female',forceProcedural:true,bodyScale:.96});
+      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide',characterId:'mona',modelKind:monaTemplate?'mona':'mona-fallback'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
       object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
       animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
       interactables.push({mesh:object,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
     }
     ['chico1','chico2','chico3'].forEach((id,index)=>{
-      if(id===selected||!suppliedTemplates[id]||hubActors.some(actor=>actor.obj.userData.characterId===id))return;
-      const object=person({execModel:id});object.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(object.userData,{role:'hub-pedestrian',characterId:id});
+      if(id===selected)return;
+      const current=hubActors.find(actor=>actor.obj.userData.characterId===id);
+      if(current&&current.obj.userData.modelKind===`${id}-fallback`&&suppliedTemplates[id]){
+        current.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(current.obj);clearGroup(disposal);hubActors.splice(hubActors.indexOf(current),1);
+      }else if(current)return;
+      if(!suppliedTemplates[id]&&!allowFallback)return;
+      const object=suppliedTemplates[id]
+        ? person({execModel:id})
+        : person({forceProcedural:true,gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62][index]});
+      object.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(object.userData,{role:'hub-pedestrian',characterId:id,modelKind:suppliedTemplates[id]?id:`${id}-fallback`});
       const source=hubWorld.patrolRoutes?.[index]||HUB_CHARACTER_ROUTES[index].map(([x,z])=>[x+HUB_OFFSET,z]);
       const patrol=source.map(point=>Array.isArray(point)?point:[point.x,point.z]);object.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(object);
       hubActors.push({obj:object,patrol,index:1,route:[],pause:index*.8,speed:.9+index*.07,state:{speed:0}});
@@ -2902,8 +2949,9 @@
   }
 
   async function buildPlayableHub() {
-    const {createHubWorld}=await import('./services/hub_world.js?v=20260927-continuous-world');
+    const {createHubWorld}=await import('./services/hub_world.js?v=20260928-outdoor-props-3');
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-warehouse-props-2');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
       createNpc(role){const obj=person(role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{execModel:role==='supervisor'?'chico2':'chico3'});obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;},
@@ -3438,6 +3486,7 @@
       updateVehicleAudio();
       updateGameplayCamera(dt);
       updateHubActors(dt);
+      hubWorld?.tickOutdoorProps(dt,player,time);
       businessInteriors?.tick(dt,player,time);
       if (operating && !gameSession?.shiftEnded) {
         spawnNpc(now);
@@ -3755,11 +3804,11 @@
     const selected=activeCharacterId(),selectedInstances=characters.filter(character=>character.characterId===selected).length;
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
       navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
-      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',storeProps:{loaded:Object.keys(storePropTemplates),errors:{...storePropErrors}},warehouseProps:{loaded:Object.keys(warehousePropTemplates),errors:{...warehousePropErrors}},cache:assetCache?.diagnostics?.()||null},
+      assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',storeProps:{loaded:Object.keys(storePropTemplates),errors:{...storePropErrors}},warehouseProps:{loaded:Object.keys(warehousePropTemplates),errors:{...warehousePropErrors}},outdoorProps:{loaded:Object.keys(outdoorPropTemplates),errors:{...outdoorPropErrors}},cache:assetCache?.diagnostics?.()||null},
       character:{selected,name:CONFIG.NPCS[selected]?.name||'',selectedInstances,playerInstances:characters.filter(character=>character.role==='player').length,manager:characterManager?.diagnostics?.()||null,animation:playerAvatar?.userData.animationController?.getSnapshot?.()||null,controllers:controllers.size,mixers:mixers.size},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.characterId==='mona'||c.kind==='mona'||c.kind==='mona-fallback').length},
-      hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0},
+      hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0,outdoorProps:hubWorld?.outdoorProps?.()||null},
       world:{id:'side-city',continuous:true,legacyActive:Boolean(businessWorld&&businessWorld!==businessInteriors?.group&&businessWorld.visible),interiors:businessInteriors?.stats()||null,queueCapacity:queueSlots.length},
       driving:driving?{speed:driving.speed,yaw:driving.yaw}:null,vehicles:hubVehicles?.cars.map(c=>({x:c.x,z:c.z,speed:c.speed,traffic:c.traffic}))||[],
       playerControl:{mode:playerMode,locomotion:player.locomotion||'IDLE',zoom:cameraZoom,transition:vehicleTransition?vehicleTransition.elapsed/vehicleTransition.duration:null},

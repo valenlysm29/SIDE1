@@ -56,6 +56,11 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   const group = new THREE.Group(); group.name = 'SIDE explorable urban hub'; group.position.set(offsetX, -.125, 0);
   scene?.add(group);
   const colliders = [], resources = new Set(), batches = new Map();
+  const outdoorPropRoot = new THREE.Group(); outdoorPropRoot.name = 'SIDE streamed outdoor props'; group.add(outdoorPropRoot);
+  const fallbackObjects = new Map();
+  const OUTDOOR_PROP_KEYS = Object.freeze(['treeDefault', 'treeOak', 'treeTall', 'bush', 'bench', 'fountain', 'trafficLight', 'streetLight', 'planter', 'trashcan', 'stopSign', 'birdBrown']);
+  const qualityRank = mode => mode === 'low' ? 1 : mode === 'high' ? 3 : 2;
+  let outdoorQuality = 'auto', installedOutdoorTemplates = {}, fallbackCategory = '';
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 1, 12);
   const sphereGeometry = new THREE.SphereGeometry(1, 9, 7);
@@ -83,11 +88,22 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     redLight: mat(0xb72626, { emissive: 0x7c0909, emissiveIntensity: .6 }),
     rubber: mat(0x14191d, { roughness: .94 }), soil: mat(0x4d4634), water: mat(0x55908b, { roughness: .16, metalness: .35 })
   };
+  function rememberFallback(object, category = fallbackCategory) {
+    if (!category) return object;
+    object.userData.fallbackCategory = category;
+    if (!fallbackObjects.has(category)) fallbackObjects.set(category, []);
+    fallbackObjects.get(category).push(object);
+    return object;
+  }
+  function withFallback(category, build) {
+    const previous = fallbackCategory; fallbackCategory = category;
+    try { return build(); } finally { fallbackCategory = previous; }
+  }
   function instance(geo, material, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0) {
     temp.position.set(x, y, z); temp.rotation.set(rx, ry, rz); temp.scale.set(sx, sy, sz); temp.updateMatrix();
     const matrix = new THREE.Matrix4().multiplyMatrices(frame, temp.matrix);
-    const key = `${geo.uuid}:${material.uuid}`;
-    if (!batches.has(key)) batches.set(key, { geo, material, matrices: [] });
+    const key = `${fallbackCategory || 'world'}:${geo.uuid}:${material.uuid}`;
+    if (!batches.has(key)) batches.set(key, { geo, material, matrices: [], fallbackCategory });
     batches.get(key).matrices.push(matrix);
   }
   const box = (x, y, z, w, h, d, material, ry = 0, rx = 0, rz = 0) => instance(boxGeometry, material, x, y, z, w, h, d, rx, ry, rz);
@@ -99,7 +115,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   }
   function add(object, x = 0, y = 0, z = 0, ry = 0, rx = 0) {
     object.position.set(x, y, z); object.rotation.set(rx, ry, 0); object.updateMatrix();
-    object.applyMatrix4(frame); object.receiveShadow = true; group.add(object); return object;
+    object.applyMatrix4(frame); object.receiveShadow = true; group.add(object); return rememberFallback(object);
   }
   function collider(x, z, w, d, kind = 'obstacle') {
     colliders.push({ minX: offsetX + x - w / 2, maxX: offsetX + x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, kind });
@@ -188,8 +204,10 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     });
     const swap = Math.abs(Math.sin(yaw)) > .5; collider(x, z, swap ? .8 : 2.3, swap ? 2.3 : .8, 'bench');
   }
-  bench(19, 9.4); bench(19, 28.6, Math.PI); bench(9.4, 19, Math.PI / 2); bench(28.6, 19, -Math.PI / 2);
-  bench(-25, 29); bench(-13, 29);
+  withFallback('benches', () => {
+    bench(19, 9.4); bench(19, 28.6, Math.PI); bench(9.4, 19, Math.PI / 2); bench(28.6, 19, -Math.PI / 2);
+    bench(-25, 29); bench(-13, 29);
+  });
 
   function palm(x, z, height = 7.5, rotation = 0) {
     const trunk = new THREE.CylinderGeometry(.16, .28, height, 9, 6); resources.add(trunk);
@@ -209,15 +227,19 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
         }
       }
       const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); geo.setIndex(indices); geo.computeVertexNormals(); resources.add(geo);
-      const leaf = new THREE.Mesh(geo, a % 3 === 0 ? m.foliageLight : m.foliage); leaf.castShadow = true; leaf.receiveShadow = true; group.add(leaf);
+      const leaf = new THREE.Mesh(geo, a % 3 === 0 ? m.foliageLight : m.foliage); leaf.castShadow = true; leaf.receiveShadow = true; group.add(leaf); rememberFallback(leaf);
     }
     collider(x, z, .66, .66, 'tree');
   }
-  [[8.8, 8.8, 6.7], [29.2, 8.8, 8], [8.8, 29.2, 7.3], [29.2, 29.2, 7.8], [-30.5, 8.7, 7.2], [-8.5, 30.5, 8.2], [-30.5, 30.5, 6.8], [31.4, -8, 8.5], [-30.5, -8, 7.1]].forEach(([x, z, h], i) => palm(x, z, h, i * .41));
-  for (const [x, z] of [[8.8, 8.8], [29.2, 8.8], [8.8, 29.2], [29.2, 29.2]]) for (let a = 0; a < 7; a++) {
-    const angle = a * Math.PI * 2 / 7;
-    instance(sphereGeometry, a % 2 ? m.foliage : m.foliageLight, x + Math.cos(angle) * 1.25, 1.03, z + Math.sin(angle) * 1.25, .54, .31, .56);
-  }
+  withFallback('trees', () => {
+    [[8.8, 8.8, 6.7], [29.2, 8.8, 8], [8.8, 29.2, 7.3], [29.2, 29.2, 7.8], [-30.5, 8.7, 7.2], [-8.5, 30.5, 8.2], [-30.5, 30.5, 6.8], [31.4, -8, 8.5], [-30.5, -8, 7.1]].forEach(([x, z, h], i) => palm(x, z, h, i * .41));
+  });
+  withFallback('bushes', () => {
+    for (const [x, z] of [[8.8, 8.8], [29.2, 8.8], [8.8, 29.2], [29.2, 29.2]]) for (let a = 0; a < 7; a++) {
+      const angle = a * Math.PI * 2 / 7;
+      instance(sphereGeometry, a % 2 ? m.foliage : m.foliageLight, x + Math.cos(angle) * 1.25, 1.03, z + Math.sin(angle) * 1.25, .54, .31, .56);
+    }
+  });
 
   function lamp(x, z, yaw = 0) {
     framed(x, z, yaw, () => {
@@ -226,10 +248,45 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
       box(1.14, 6.13, 0, .82, .13, .3, m.darkSteel); box(1.14, 6.06, 0, .64, .025, .22, m.light);
     }); collider(x, z, .4, .4, 'lamp');
   }
-  [[-7, -29, Math.PI], [-7, 12, Math.PI], [-29, -7, -Math.PI / 2], [12, -7, -Math.PI / 2], [7, -29, 0], [7, 30, 0], [-29, 7, Math.PI / 2], [30, 7, Math.PI / 2], [33, 23, Math.PI], [-33, 23, 0]].forEach(([x, z, a]) => lamp(x, z, a));
-  for (const [x, z] of [[13, 28.8], [25, 9.2], [-10, 26.5]]) {
-    cyl(x, .68, z, .32, 1.05, m.darkSteel); cyl(x, 1.21, z, .34, .075, m.steel); collider(x, z, .7, .7, 'bin');
-  }
+  withFallback('streetLights', () => {
+    [[-7, -29, Math.PI], [-7, 12, Math.PI], [-29, -7, -Math.PI / 2], [12, -7, -Math.PI / 2], [7, -29, 0], [7, 30, 0], [-29, 7, Math.PI / 2], [30, 7, Math.PI / 2], [33, 23, Math.PI], [-33, 23, 0]].forEach(([x, z, a]) => lamp(x, z, a));
+  });
+  withFallback('trashcans', () => {
+    for (const [x, z] of [[13, 28.8], [25, 9.2], [-10, 26.5]]) {
+      cyl(x, .68, z, .32, 1.05, m.darkSteel); cyl(x, 1.21, z, .34, .075, m.steel); collider(x, z, .7, .7, 'bin');
+    }
+  });
+
+  // Cheap category-complete fallbacks remain allocated until their streamed
+  // equivalent is ready. They add no navigation geometry and disappear as a
+  // category, never one object at a time, so partial downloads cannot leave
+  // doubled street furniture behind.
+  withFallback('fountain', () => {
+    cyl(29.2, .91, 29.2, 1.48, .22, m.concrete); cyl(29.2, 1.04, 29.2, 1.22, .08, m.water);
+    cyl(29.2, 1.45, 29.2, .18, .88, m.steel); cyl(29.2, 1.9, 29.2, .46, .08, m.water);
+  });
+  withFallback('trafficSignals', () => {
+    for (const [x, z, yaw] of [[-5.9,-5.9,0],[5.9,-5.9,Math.PI/2],[5.9,5.9,Math.PI],[-5.9,5.9,-Math.PI/2]]) framed(x, z, yaw, () => {
+      cyl(0, 1.55, 0, .07, 3, m.darkSteel); box(0, 2.75, 0, .28, .72, .24, m.black);
+      for (const [y, material] of [[2.98,m.redLight],[2.75,m.yellow],[2.52,m.foliage]]) cyl(0, y, -.13, .075, .025, material, Math.PI / 2);
+    });
+  });
+  withFallback('planters', () => {
+    for (const [x, z] of [[7.55,7.55],[30.45,7.55],[7.55,30.45],[30.45,30.45]]) {
+      cyl(x, .48, z, .28, .62, m.concrete); instance(sphereGeometry, m.foliageLight, x, 1.02, z, .42, .46, .42);
+    }
+  });
+  withFallback('signage', () => {
+    for (const [x, z, yaw] of [[-15.25,24.9,0],[-15.05,-10.8,0],[23.15,-10.8,0]]) framed(x, z, yaw, () => {
+      cyl(0, 1.05, 0, .045, 2, m.darkSteel); box(0, 1.87, 0, .42, .42, .07, m.redLight, Math.PI / 4);
+    });
+  });
+  withFallback('birds', () => {
+    for (const [x, y, z, yaw] of [[14,7.1,14,0],[25,7.8,15,1.5],[24,6.8,26,3],[13,8.2,24,4.5]]) framed(x, z, yaw, () => {
+      instance(sphereGeometry, m.bark, 0, y, 0, .16, .09, .24);
+      box(-.14, y+.02, 0, .2, .025, .12, m.bark, 0, 0, -.28); box(.14, y+.02, 0, .2, .025, .12, m.bark, 0, 0, .28);
+    });
+  });
 
   // Physical directory. The HTML selector can call updateDistrict to keep this
   // readable screen in sync with the active simulation store.
@@ -344,23 +401,148 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   }
   label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
   label('PASEO COSTA','BARRIO COMERCIAL',-7,20,-42.4,11,2.3,'#294951');
-  for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2);
+  withFallback('trees', () => { for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2); });
 
   let instanceCount = 0;
-  batches.forEach(({ geo, material, matrices }) => {
+  batches.forEach(({ geo, material, matrices, fallbackCategory: category }) => {
     const mesh = new THREE.InstancedMesh(geo, material, matrices.length);
     matrices.forEach((matrix, index) => mesh.setMatrixAt(index, matrix));
     mesh.instanceMatrix.needsUpdate = true; mesh.castShadow = material !== m.glass && material !== m.paint && material !== m.light;
     mesh.receiveShadow = true; mesh.computeBoundingSphere(); mesh.name = 'Hub shared geometry';
-    group.add(mesh); instanceCount += matrices.length;
+    group.add(mesh); rememberFallback(mesh, category); instanceCount += matrices.length;
   });
   group.userData.geometryInstances = instanceCount;
   group.userData.drawCalls = group.children.filter(child => child.isMesh).length;
+
+  const OUTDOOR_SEED = 4107;
+  const treeFootprints = [[8.8,.82,8.8],[29.2,.82,8.8],[8.8,.82,29.2],[-30.5,.15,8.7],[-8.5,.15,30.5],[-30.5,.15,30.5],[31.4,.15,-8],[-30.5,.15,-8]];
+  const treeRow = [-29,-17,-5,7,19,29].map(x => [x,.15,45.5]);
+  const benchPlacements = [[19,.15,9.4,0],[19,.15,28.6,Math.PI],[9.4,.15,19,Math.PI/2],[28.6,.15,19,-Math.PI/2],[-25,.15,29,0],[-13,.15,29,0]];
+  const lampPlacements = [[-7,.15,-29,Math.PI],[-7,.15,12,Math.PI],[-29,.15,-7,-Math.PI/2],[12,.15,-7,-Math.PI/2],[7,.15,-29,0],[7,.15,30,0],[-29,.15,7,Math.PI/2],[30,.15,7,Math.PI/2],[33,.15,23,Math.PI],[-33,.15,23,0]];
+  const trafficPlacements = [[-5.9,.15,-5.9,0],[5.9,.15,-5.9,Math.PI/2],[5.9,.15,5.9,Math.PI],[-5.9,.15,5.9,-Math.PI/2]];
+  const birdFlights = [
+    { cx: 15, cz: 15, y: 7.1, radius: 3.2, speed: .42, phase: 0 },
+    { cx: 24, cz: 15, y: 7.8, radius: 4.0, speed: .35, phase: 1.7 },
+    { cx: 24, cz: 25, y: 6.8, radius: 3.5, speed: .47, phase: 3.2 },
+    { cx: 14, cz: 24, y: 8.2, radius: 4.3, speed: .31, phase: 4.8 }
+  ];
+  const placementRandom = seededRandom(OUTDOOR_SEED);
+  const decorate = ([x,y,z], bay) => ({ x, y, z, yaw: placementRandom() * Math.PI * 2, scale: (() => { const s=.92+placementRandom()*.17; return [s,s,s]; })(), bay });
+  const treePlacements = [...treeFootprints, ...treeRow].map((point, index) => decorate(point, `tree-${index}`));
+  const bushPlacements = [];
+  for (const [x,z] of [[8.8,8.8],[29.2,8.8],[8.8,29.2]]) for (let a=0;a<7;a++) {
+    const angle=a*Math.PI*2/7, s=.82+placementRandom()*.22;
+    bushPlacements.push({x:x+Math.cos(angle)*1.25,y:.82,z:z+Math.sin(angle)*1.25,yaw:placementRandom()*Math.PI*2,scale:[s,s,s],bay:`bush-${x}-${z}-${a}`});
+  }
+  const placementPayload = JSON.stringify({ seed:OUTDOOR_SEED, trees:treePlacements, bushes:bushPlacements, benches:benchPlacements, lamps:lampPlacements, traffic:trafficPlacements });
+  let placementHash=2166136261;
+  for(let index=0;index<placementPayload.length;index++){placementHash^=placementPayload.charCodeAt(index);placementHash=Math.imul(placementHash,16777619);}
+  const placementSignature = `${OUTDOOR_SEED}:${(placementHash>>>0).toString(16).padStart(8,'0')}`;
+  group.userData.outdoorPlacementSeed = OUTDOOR_SEED;
+  group.userData.outdoorPlacementSignature = placementSignature;
+
+  function propMatrix({ x, y = .15, z, yaw = 0, scale = [1,1,1] }) {
+    return new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,yaw,0)),new THREE.Vector3(...scale));
+  }
+  function clearOutdoorProps() {
+    outdoorPropRoot.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
+    outdoorPropRoot.clear();
+  }
+  function addOutdoorPropBatch(template, placements, metadata) {
+    if (!template?.traverse || !placements.length) return null;
+    template.updateMatrixWorld?.(true);
+    const sources=[];
+    template.traverse(object => { if(object.isMesh&&!object.isSkinnedMesh&&object.geometry&&object.material)sources.push(object); });
+    if (!sources.length) return null;
+    const batch=new THREE.Group(); batch.name=`outdoor prop ${metadata.kind}`;
+    Object.assign(batch.userData,metadata,{outdoorPropBatch:true,instanceCount:placements.length,bays:[...new Set(placements.map(p=>p.bay).filter(Boolean))]});
+    const matrices=placements.map(propMatrix);
+    for(const source of sources){
+      const mesh=new THREE.InstancedMesh(source.geometry,source.material,placements.length);
+      matrices.forEach((placement,index)=>mesh.setMatrixAt(index,placement.clone().multiply(source.matrixWorld)));
+      mesh.instanceMatrix.needsUpdate=true;mesh.name=`${batch.name} shared mesh`;mesh.castShadow=false;mesh.receiveShadow=true;mesh.computeBoundingSphere();
+      mesh.userData.sourceMatrix=source.matrixWorld.clone();batch.add(mesh);
+    }
+    outdoorPropRoot.add(batch);return batch;
+  }
+  function templateValue(source,key){return source&&Object.prototype.hasOwnProperty.call(source,key)?source[key]:null;}
+  function sameOutdoorTemplates(next){return OUTDOOR_PROP_KEYS.every(key=>(templateValue(installedOutdoorTemplates,key)||null)===(templateValue(next,key)||null));}
+  function setFallbackVisibility(installed, rank){
+    const detailCategories=new Set(['bushes','fountain','planters','signage','birds']);
+    fallbackObjects.forEach((objects,category)=>objects.forEach(object=>{
+      object.visible=!installed.has(category)&&rank>=(detailCategories.has(category)?2:1);
+      if(category==='birds'&&object.isInstancedMesh){
+        object.userData.fallbackBaseCount??=object.count;
+        const birds=rank<2?0:rank>2?4:2;
+        object.count=Math.round(object.userData.fallbackBaseCount*birds/4);
+      }
+    }));
+  }
+  function setOutdoorQuality(mode='auto'){
+    outdoorQuality=['low','medium','high','auto'].includes(mode)?mode:'auto';
+    const rank=qualityRank(outdoorQuality), installed=new Set(outdoorPropRoot.children.map(batch=>batch.userData.category));
+    outdoorPropRoot.children.forEach(batch=>{
+      const visible=rank>=Number(batch.userData.minQuality||1);batch.userData.qualityVisible=visible;batch.visible=visible;
+      const cast=rank>1&&Boolean(batch.userData.shadowMedium||rank>2&&batch.userData.shadowHigh);
+      batch.traverse(object=>{if(object.isMesh){object.castShadow=cast;object.receiveShadow=rank>1;}});
+    });
+    const birdBatch=outdoorPropRoot.children.find(batch=>batch.userData.category==='birds');
+    if(birdBatch){const count=rank<2?0:rank>2?4:2;birdBatch.userData.activeInstances=count;birdBatch.traverse(object=>{if(object.isInstancedMesh)object.count=count;});birdBatch.visible=count>0;birdBatch.userData.qualityVisible=count>0;}
+    setFallbackVisibility(installed,rank);return outdoorQuality;
+  }
+  function installOutdoorProps(templates={},mode=outdoorQuality){
+    if(sameOutdoorTemplates(templates)&&outdoorPropRoot.children.length){setOutdoorQuality(mode);return outdoorPropState();}
+    clearOutdoorProps();installedOutdoorTemplates=Object.fromEntries(OUTDOOR_PROP_KEYS.map(key=>[key,templateValue(templates,key)||null]));
+    const add=(key,placements,metadata)=>addOutdoorPropBatch(installedOutdoorTemplates[key],placements,metadata);
+    const treeKeys=['treeDefault','treeOak','treeTall'].filter(key=>installedOutdoorTemplates[key]);
+    if(treeKeys.length)for(const [index,key] of treeKeys.entries())add(key,treePlacements.filter((_,i)=>i%treeKeys.length===index),{kind:key,category:'trees',minQuality:1,shadowHigh:true});
+    if(installedOutdoorTemplates.bush)add('bush',bushPlacements,{kind:'bushes',category:'bushes',minQuality:2,maxDistance:52,center:[19,19]});
+    if(installedOutdoorTemplates.bench)add('bench',benchPlacements.map(([x,y,z,yaw],i)=>({x,y,z,yaw,bay:`bench-${i}`})),{kind:'benches',category:'benches',minQuality:1,shadowMedium:true});
+    if(installedOutdoorTemplates.fountain)add('fountain',[{x:29.2,y:.82,z:29.2,bay:'plaza-fountain'}],{kind:'fountain',category:'fountain',minQuality:2,maxDistance:58,center:[29.2,29.2]});
+    if(installedOutdoorTemplates.trafficLight)add('trafficLight',trafficPlacements.map(([x,y,z,yaw],i)=>({x,y,z,yaw,bay:`crossing-${i}`})),{kind:'traffic-signals',category:'trafficSignals',minQuality:1});
+    if(installedOutdoorTemplates.streetLight)add('streetLight',lampPlacements.map(([x,y,z,yaw],i)=>({x,y,z,yaw,bay:`lamp-${i}`})),{kind:'street-lights',category:'streetLights',minQuality:1});
+    if(installedOutdoorTemplates.planter)add('planter',[[7.55,7.55],[30.45,7.55],[7.55,30.45],[30.45,30.45]].map(([x,z],i)=>({x,y:.15,z,yaw:i*.73,bay:`planter-${i}`})),{kind:'planters',category:'planters',minQuality:2,maxDistance:58,center:[19,19]});
+    if(installedOutdoorTemplates.trashcan)add('trashcan',[[13,28.8],[25,9.2],[-10,26.5]].map(([x,z],i)=>({x,y:.15,z,yaw:i*1.1,bay:`trash-${i}`})),{kind:'trashcans',category:'trashcans',minQuality:1});
+    if(installedOutdoorTemplates.stopSign)add('stopSign',[[-15.25,24.9,0],[-15.05,-10.8,0],[23.15,-10.8,0]].map(([x,z,yaw],i)=>({x,y:.15,z,yaw,bay:`sign-${i}`})),{kind:'urban-signage',category:'signage',minQuality:2,maxDistance:55,center:[0,7]});
+    if(installedOutdoorTemplates.birdBrown)add('birdBrown',birdFlights.map((flight,i)=>({x:flight.cx+flight.radius,y:flight.y,z:flight.cz,yaw:Math.PI/2,bay:`bird-${i}`})),{kind:'birds',category:'birds',minQuality:2,maxDistance:58,center:[19,19],animated:true});
+    setOutdoorQuality(mode);return outdoorPropState();
+  }
+  function tickOutdoorProps(dt=0,observer=null,time=0){
+    const localX=Number(observer?.x)-offsetX, localZ=Number(observer?.z), hasObserver=Number.isFinite(localX)&&Number.isFinite(localZ);
+    outdoorPropRoot.children.forEach(batch=>{
+      if(batch.userData.category==='birds')return;
+      const center=batch.userData.center,maxDistance=Number(batch.userData.maxDistance||0);
+      const near=!maxDistance||!hasObserver||Math.hypot(localX-center[0],localZ-center[1])<=maxDistance;
+      batch.userData.distanceVisible=near;batch.visible=Boolean(batch.userData.qualityVisible&&near);
+    });
+    const birdBatch=outdoorPropRoot.children.find(batch=>batch.userData.category==='birds');
+    if(!birdBatch)return;
+    const active=Number(birdBatch.userData.activeInstances||0),near=!hasObserver||Math.hypot(localX-19,localZ-19)<=58;
+    birdBatch.visible=Boolean(active&&near);birdBatch.userData.distanceVisible=near;
+    if(!birdBatch.visible)return;
+    birdBatch.children.forEach(mesh=>{
+      if(!mesh.isInstancedMesh)return;
+      for(let i=0;i<active;i++){
+        const flight=birdFlights[i],angle=time*flight.speed+flight.phase;
+        const placement=propMatrix({x:flight.cx+Math.cos(angle)*flight.radius,y:flight.y+Math.sin(angle*2.1)*.28,z:flight.cz+Math.sin(angle)*flight.radius,yaw:-angle,scale:[1,1,1]});
+        mesh.setMatrixAt(i,placement.multiply(mesh.userData.sourceMatrix));
+      }
+      mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
+    });
+  }
+  function outdoorPropState(){
+    const batches=outdoorPropRoot.children.filter(child=>child.userData.outdoorPropBatch),visible=batches.filter(batch=>batch.visible);
+    let drawables=0,triangles=0,shadows=0;
+    visible.forEach(batch=>batch.traverse(object=>{if(!object.isMesh)return;drawables++;const count=object.isInstancedMesh?object.count:1;triangles+=(object.geometry?.index?.count||object.geometry?.attributes?.position?.count||0)/3*count;if(object.castShadow)shadows++;}));
+    const categories={};for(const batch of visible)categories[batch.userData.category]=(categories[batch.userData.category]||0)+Number(batch.userData.activeInstances??batch.userData.instanceCount??0);
+    return {quality:outdoorQuality,seed:OUTDOOR_SEED,placementSignature,installed:[...new Set(batches.map(batch=>batch.userData.category))].sort(),batches:batches.length,instances:batches.reduce((sum,b)=>sum+Number(b.userData.instanceCount||0),0),visibleBatches:visible.length,visibleInstances:visible.reduce((sum,b)=>sum+Number(b.userData.activeInstances??b.userData.instanceCount??0),0),drawables,triangles:Math.round(triangles),shadows,categories,birds:categories.birds||0,fallbackVisible:[...fallbackObjects].filter(([,objects])=>objects.some(object=>object.visible)).map(([category])=>category).sort()};
+  }
   const entrances = [
     { id: 'store', name: 'Tienda SIDE', x: offsetX - 19, z: 26, rotation: Math.PI, portal: { x: offsetX - 19, z: 24.75, halfWidth: 1.05 } },
     { id: 'warehouse', name: 'Almacén SIDE', x: offsetX - 20, z: -9, rotation: Math.PI, portal: { x: offsetX - 20, z: -11.1, halfWidth: 1.05 } },
     { id: 'production', name: 'Lugar de Producción', x: offsetX + 20, z: -9, rotation: Math.PI, portal: { x: offsetX + 20, z: -11.1, halfWidth: .65 } }
   ];
+  setOutdoorQuality('auto');
   return {
     group, colliders, entrances, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
     crossedEntrance: (previous, next) => crossedEntrance(previous, next, entrances),
@@ -370,7 +552,9 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
       [[7, 12.5], [7, 25], [12.5, 25], [12.5, 12.5]],
       [[11, -9.9], [28.7, -9.9], [28.7, -6.1], [11, -6.1]]
     ].map(route => route.map(([x, z]) => ({ x: x + offsetX, z }))),
-    updateDistrict,
+    updateDistrict, installOutdoorProps, setQuality: setOutdoorQuality, tickOutdoorProps,
+    outdoorProps: outdoorPropState,
+    stats() { return { colliders: colliders.length, entrances: entrances.length, patrolRoutes: 3, outdoorProps: outdoorPropState() }; },
     dispose() {
       group.removeFromParent(); group.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
       resources.forEach(resource => resource.dispose()); group.clear();

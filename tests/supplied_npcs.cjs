@@ -3,6 +3,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const base=process.env.SIDE_TEST_URL||'http://127.0.0.1:8772/';
 const output=path.join(__dirname,'output/npcs');fs.mkdirSync(output,{recursive:true});
+const captureScreenshots=process.env.SIDE_SKIP_SCREENSHOTS!=='1';
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};
 // Instrument only the test response, so production does not expose mutation/debug APIs.
 const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
@@ -62,7 +63,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
   });
   assert.equal(pose.initial.length,4);assert.ok(pose.initial.every(a=>a.bones===17));
   assert.ok(pose.moving.every(a=>a.distance>1.3&&Math.abs(a.knee)>.025&&a.blend>.99));
-  await page.screenshot({path:path.join(output,'four-npcs-walking.png')});
+  if(captureScreenshots)await page.screenshot({path:path.join(output,'four-npcs-walking.png')});
   // Same distance must produce the same gait phase at different update frequencies.
   const timing=await page.evaluate(()=>{
     const result=[];
@@ -111,16 +112,20 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     await p.goto(base);
     await p.evaluate(seed=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA NPC',company:'QA NPC',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seed);renderDecisionCategory();openCompanyReview()},seed);
     await p.locator('#confirmCompanyReview').click();assert.equal(await p.evaluate(()=>startSimulationLoading()),true);
-    await p.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);await p.evaluate(()=>__npcTest.manual());
+    await p.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
+    await p.evaluate(()=>SIDE3D.preloadDetails());
+    await p.evaluate(()=>__npcTest.manual());
     const initial=await p.evaluate(()=>SIDE3D.diagnostics());
     assert.equal(initial.suppliedNpcs.loaded.length,fallback?0:3);assert.equal(initial.mona.loaded,!fallback);
     const actors=await p.evaluate(()=>__npcTest.actors());
-    assert.equal(actors.length,4);assert.equal(initial.mona.instances,1);
-    assert.equal(actors.filter(a=>a.role==='hub-pedestrian').length,3);
-    if(!fallback)for(const model of ['chico1','chico2','chico3'])assert.ok(actors.some(c=>c.kind===model),`city pedestrian: ${model}`);
+    assert.equal(actors.length,3);assert.equal(initial.mona.instances,1);
+    assert.equal(actors.filter(a=>a.role==='hub-pedestrian').length,2);
+    if(!fallback)for(const model of ['chico1','chico3'])assert.ok(actors.some(c=>c.kind===model),`city pedestrian: ${model}`);
+    if(fallback)for(const model of ['chico1-fallback','chico3-fallback'])assert.ok(actors.some(c=>c.kind===model),`procedural city pedestrian: ${model}`);
+    assert.equal(actors.some(c=>c.kind===initial.character.selected||c.kind===`${initial.character.selected}-fallback`),false,'the selected player identity is excluded from the pedestrian pool');
     if(!fallback)assert.ok(actors.every(a=>a.rigged));
     assert.equal(initial.world.id,'side-city');assert.equal(initial.world.legacyActive,false);
-    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,4);assert.equal(d.mona.instances,1)}
+    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,3);assert.equal(d.mona.instances,1)}
     assert.equal(await p.evaluate(()=>__npcTest.enterStore()),'store');
     assert.equal(await p.evaluate(()=>{__npcTest.spawn();__npcTest.spawn();return __npcTest.spawn()}),3,'normal customer spawns use the physical city store');
     const travel=await p.evaluate(()=>__npcTest.step(100));
@@ -129,7 +134,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     assert.ok(travel.states.includes('ENTER_STORE'),'customers enter through the door');
     assert.ok(travel.states.includes('BROWSE'),'customers reach products');
     assert.ok(travel.states.includes('LEAVE_STORE')||travel.states.includes('QUEUE'),'customers complete a decision');
-    if(!fallback)assert.ok((await p.evaluate(()=>__npcTest.actors())).filter(a=>a.role==='hub-pedestrian').every(a=>a.distance>1),'three city pedestrians patrol while Mona remains at her guidance point');
+    if(!fallback)assert.ok((await p.evaluate(()=>__npcTest.actors())).filter(a=>a.role==='hub-pedestrian').every(a=>a.distance>1),'the two non-player city identities patrol while Mona remains at her guidance point');
     const basket=await p.evaluate(()=>__npcTest.queueScenario());
     assert.equal(basket.boneAttached,!fallback);
     assert.equal(await p.evaluate(()=>__npcTest.charge()),basket.revenue,'no charge while the customer is still walking to the till');
@@ -137,7 +142,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     fs.writeFileSync(path.join(output,fallback?'queue-fallback.json':'queue.json'),JSON.stringify({queue,details:await p.evaluate(()=>__npcTest.inspect())},null,2));
     assert.ok(queue.states.includes('QUEUE'),'the customer reaches the checkout queue');assert.deepEqual(queue.violations,[]);
     const revenue=await p.evaluate(()=>__npcTest.charge());assert.equal(revenue,basket.revenue+75,'the existing checkout still records the sale');
-    await p.evaluate(()=>__npcTest.view());await p.screenshot({path:path.join(output,fallback?'game-fallback.png':'game-npcs.png')});
+    await p.evaluate(()=>__npcTest.view());if(captureScreenshots)await p.screenshot({path:path.join(output,fallback?'game-fallback.png':'game-npcs.png')});
     await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
     assert.deepEqual(pageErrors,[]);results.push({fallback,initial,travel,queue:queue.states,basket,status:'passed'});console.log('PASS NPC world',fallback?'fallback':'four GLB');await ctx.close();
   }

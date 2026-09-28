@@ -65,6 +65,76 @@
         'shop_mirror_wall.glb'
       ]),
       attributionRequired: false
+    }),
+    Object.freeze({
+      id: 'outdoor-kenney-nature-kit',
+      title: 'Nature Kit',
+      author: 'Kenney',
+      source: 'Kenney',
+      sourceUrl: 'https://kenney.nl/assets/nature-kit',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze([
+        'outdoor_tree_default.glb',
+        'outdoor_tree_oak.glb',
+        'outdoor_tree_tall.glb',
+        'outdoor_bush.glb'
+      ]),
+      attributionRequired: false
+    }),
+    Object.freeze({
+      id: 'outdoor-kenney-city-roads',
+      title: 'City Kit (Roads)',
+      author: 'Kenney',
+      source: 'Kenney',
+      sourceUrl: 'https://kenney.nl/assets/city-kit-roads',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze([
+        'outdoor_traffic_light.glb',
+        'outdoor_street_light.glb',
+        'outdoor_stop_sign.glb'
+      ]),
+      attributionRequired: false
+    }),
+    Object.freeze({
+      id: 'outdoor-kenney-furniture-kit',
+      title: 'Furniture Kit',
+      author: 'Kenney',
+      source: 'Kenney',
+      sourceUrl: 'https://kenney.nl/assets/furniture-kit',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze([
+        'outdoor_bench.glb',
+        'outdoor_planter.glb',
+        'outdoor_trashcan.glb'
+      ]),
+      attributionRequired: false
+    }),
+    Object.freeze({
+      id: 'outdoor-fountain',
+      title: 'Fountain',
+      author: 'Isa Lousberg',
+      source: 'Poly Pizza',
+      sourceUrl: 'https://poly.pizza/m/WHc7dwttlk',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze(['outdoor_fountain.glb']),
+      attributionRequired: false,
+      modification: 'Escala, origen y materiales normalizados para SIDE.'
+    }),
+    Object.freeze({
+      id: 'outdoor-brown-bird',
+      title: 'Brown Bird',
+      author: 'AssetQuest',
+      source: 'Poly Pizza',
+      sourceUrl: 'https://poly.pizza/m/aDrUGRtDcm',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze(['outdoor_bird_brown.glb']),
+      attributionRequired: false,
+      modification: 'Escala, origen y materiales normalizados para SIDE.'
     })
   ]);
 })(window);

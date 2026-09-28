@@ -80,3 +80,59 @@ Créditos requeridos y conservados por SIDE:
   under CC BY 3.0.** El modelo se adapta como rollos de tela.
 - **“Fire Extinguisher” by dook, downloaded from Poly Pizza, licensed under CC
   BY 3.0.**
+
+## Exteriores — vegetación y mobiliario urbano
+
+Todos los assets seleccionados para esta tanda están publicados bajo
+[Creative Commons Zero 1.0 Universal (CC0-1.0)](https://creativecommons.org/publicdomain/zero/1.0/).
+La atribución no es obligatoria, pero SIDE la conserva para mantener la
+trazabilidad. Los GLB finales son versiones normalizadas y optimizadas de los
+archivos fuente indicados.
+
+### Kenney — Nature Kit
+
+Autor y distribuidor: **Kenney**
+
+Fuente canónica: [Nature Kit](https://kenney.nl/assets/nature-kit)
+
+| Asset en SIDE | Archivo fuente exacto | Uso |
+| --- | --- | --- |
+| `outdoor_tree_default.glb` | `tree_default.glb` | Árbol frondoso A |
+| `outdoor_tree_oak.glb` | `tree_oak.glb` | Árbol frondoso B |
+| `outdoor_tree_tall.glb` | `tree_tall.glb` | Árbol alto |
+| `outdoor_bush.glb` | `plant_bush.glb` | Arbusto |
+
+### Kenney — City Kit (Roads)
+
+Autor y distribuidor: **Kenney**
+
+Fuente canónica: [City Kit (Roads)](https://kenney.nl/assets/city-kit-roads)
+
+| Asset en SIDE | Archivo fuente exacto | Uso |
+| --- | --- | --- |
+| `outdoor_traffic_light.glb` | `traffic-light.glb` | Semáforo vertical con poste |
+| `outdoor_street_light.glb` | `light-square.glb` | Farola |
+| `outdoor_stop_sign.glb` | `road-sign-stop.glb` | Señal urbana de pare |
+
+### Kenney — Furniture Kit
+
+Autor y distribuidor: **Kenney**
+
+Fuente canónica: [Furniture Kit](https://kenney.nl/assets/furniture-kit)
+
+| Asset en SIDE | Archivo fuente exacto | Uso |
+| --- | --- | --- |
+| `outdoor_bench.glb` | `bench.glb` | Banca de plaza |
+| `outdoor_planter.glb` | `pottedPlant.glb` | Maceta exterior |
+| `outdoor_trashcan.glb` | `trashcan.glb` | Papelera |
+
+### Assets CC0 distribuidos por Poly Pizza
+
+| Asset en SIDE | Archivo fuente exacto | Autor | Fuente canónica | Licencia |
+| --- | --- | --- | --- | --- |
+| `outdoor_fountain.glb` | `fountain_isa-lousberg.glb` | Isa Lousberg | [Fountain](https://poly.pizza/m/WHc7dwttlk) | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `outdoor_bird_brown.glb` | `brown-bird_assetquest.glb` | AssetQuest | [Brown Bird](https://poly.pizza/m/aDrUGRtDcm) | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+
+Los modelos fueron seleccionados por su bajo coste, y los archivos finales se
+modifican para normalizar escala, origen y materiales. `Brown Bird` no contiene
+esqueleto ni animaciones; SIDE lo anima mediante transformaciones simples.

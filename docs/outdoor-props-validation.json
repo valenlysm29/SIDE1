@@ -1,0 +1,793 @@
+{
+  "coordinate_system": "right-handed, Y-up, meters",
+  "origin_policy": "base at Y=0; centered in X and Z",
+  "optimization_policy": "Preserve licensed low-poly geometry and PBR material groups; flatten source node transforms; remove unreferenced vertices; export self-contained GLB files without external textures.",
+  "budget": {
+    "ideal_max_bytes": 204800,
+    "maximum_bytes": 358400,
+    "actual_bytes": 130772,
+    "status": "ideal"
+  },
+  "totals": {
+    "assets": 12,
+    "bytes": 130772,
+    "triangles": 2928,
+    "geometries": 20
+  },
+  "assets": [
+    {
+      "source": "tree_default.glb",
+      "source_sha256": "562d29638c902de3c7bee465d3a53bb77117efbc392ae04ed894faf6b5dc691d",
+      "license": "CC0-1.0",
+      "target_size_m": 4.8,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.3775000274181366,
+            -0.05,
+            -0.32692450284957886
+          ],
+          [
+            0.3775000274181366,
+            1.6578874111175537,
+            0.32692450284957886
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          2.810489713053817,
+          2.810489713053817,
+          2.810489713053817
+        ],
+        "triangles": 114
+      },
+      "file": "assets/models3d/props/outdoor_tree_default.glb",
+      "bytes": 7540,
+      "sha256": "273e24872f6e2a1f87129ed952c934e0fa069a8674af0f8add25560bd3c09164",
+      "bounds_m": [
+        [
+          -1.06096,
+          0.0,
+          -0.918818
+        ],
+        [
+          1.06096,
+          4.8,
+          0.918818
+        ]
+      ],
+      "extents_m": [
+        2.12192,
+        4.8,
+        1.837636
+      ],
+      "triangles": 114,
+      "geometries": 2,
+      "material_count": 2,
+      "materials": [
+        "leafsGreen",
+        "woodBark"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "tree_oak.glb",
+      "source_sha256": "d7fd8773674928c50c11b66d12c636d49bdcc15a8b1c7fbb98e6f63a3439a3f3",
+      "license": "CC0-1.0",
+      "target_size_m": 4.2,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.32027706503868103,
+            -0.05,
+            -0.36982399225234985
+          ],
+          [
+            0.3202769458293915,
+            1.1762399196624755,
+            0.36982399225234985
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          3.425104608530488,
+          3.425104608530488,
+          3.425104608530488
+        ],
+        "triangles": 196
+      },
+      "file": "assets/models3d/props/outdoor_tree_oak.glb",
+      "bytes": 11148,
+      "sha256": "9595dca6439fcdc117c0f1d63c10ad0a7d1c6701e10e83fb2053238930875556",
+      "bounds_m": [
+        [
+          -1.096982,
+          0.0,
+          -1.266686
+        ],
+        [
+          1.096982,
+          4.2,
+          1.266686
+        ]
+      ],
+      "extents_m": [
+        2.193964,
+        4.2,
+        2.533372
+      ],
+      "triangles": 196,
+      "geometries": 2,
+      "material_count": 2,
+      "materials": [
+        "leafsGreen",
+        "woodBark"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "tree_tall.glb",
+      "source_sha256": "3515a8826044d91e84e011186c86878f62024a487a079b4e32c9ac2e71994411",
+      "license": "CC0-1.0",
+      "target_size_m": 5.6,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.19979162514209747,
+            -0.05,
+            -0.23069950938224792
+          ],
+          [
+            0.19979162514209747,
+            1.6377188682556152,
+            0.23069950938224792
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          3.318088163455814,
+          3.318088163455814,
+          3.318088163455814
+        ],
+        "triangles": 72
+      },
+      "file": "assets/models3d/props/outdoor_tree_tall.glb",
+      "bytes": 5820,
+      "sha256": "71410242981a7e6d101e8f7df802e7bfd8449f3491f00efaa7b495aad8f424f1",
+      "bounds_m": [
+        [
+          -0.662926,
+          0.0,
+          -0.765481
+        ],
+        [
+          0.662926,
+          5.6,
+          0.765481
+        ]
+      ],
+      "extents_m": [
+        1.325852,
+        5.6,
+        1.530963
+      ],
+      "triangles": 72,
+      "geometries": 2,
+      "material_count": 2,
+      "materials": [
+        "leafsGreen",
+        "woodBark"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "plant_bush.glb",
+      "source_sha256": "ae7b1beb39e242b13f5f29e3ec23ef21034b814f82297b8aa00a9bf4e1b09590",
+      "license": "CC0-1.0",
+      "target_size_m": 0.75,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.1979999989271164,
+            -0.05,
+            -0.1979999989271164
+          ],
+          [
+            0.1979999989271164,
+            0.19444358050823213,
+            0.1979999989271164
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          3.068192662047602,
+          3.068192662047602,
+          3.068192662047602
+        ],
+        "triangles": 32
+      },
+      "file": "assets/models3d/props/outdoor_bush.glb",
+      "bytes": 3228,
+      "sha256": "d3a58343d2a5256e6ed6519ebcf753c577df51ea0740b046fd5b14f2235227a2",
+      "bounds_m": [
+        [
+          -0.607502,
+          0.0,
+          -0.607502
+        ],
+        [
+          0.607502,
+          0.75,
+          0.607502
+        ]
+      ],
+      "extents_m": [
+        1.215004,
+        0.75,
+        1.215004
+      ],
+      "triangles": 32,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "grass"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "traffic-light.glb",
+      "source_sha256": "6c9ee253b7370e1043168493b2e662b349484a0cdd02100cff04d9d8d1bd9abb",
+      "license": "CC0-1.0",
+      "target_size_m": 3.2,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.07259999960660934,
+            2.2558181451276527e-17,
+            -0.044999998062849045
+          ],
+          [
+            0.044999998062849045,
+            0.5149999856948853,
+            0.044999998062849045
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          6.21359240560418,
+          6.21359240560418,
+          6.21359240560418
+        ],
+        "triangles": 212
+      },
+      "file": "assets/models3d/props/outdoor_traffic_light.glb",
+      "bytes": 10876,
+      "sha256": "cc4b1102fd461553b3f51d4c537ed278768ff30fec9abf5169410dad3740c0b8",
+      "bounds_m": [
+        [
+          -0.365359,
+          0.0,
+          -0.279612
+        ],
+        [
+          0.365359,
+          3.2,
+          0.279612
+        ]
+      ],
+      "extents_m": [
+        0.730718,
+        3.2,
+        0.559223
+      ],
+      "triangles": 212,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "colormap"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "light-square.glb",
+      "source_sha256": "6230d136c8883d7f9bc1b86f0309077e452e26e5e1e587ef1b77abef3c5f047c",
+      "license": "CC0-1.0",
+      "target_size_m": 4.2,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.02500000037252903,
+            0.0,
+            -0.21250002086162567
+          ],
+          [
+            0.02500000037252903,
+            0.6000000238418579,
+            0.02500000037252903
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          6.999999721845002,
+          6.999999721845002,
+          6.999999721845002
+        ],
+        "triangles": 60
+      },
+      "file": "assets/models3d/props/outdoor_street_light.glb",
+      "bytes": 3964,
+      "sha256": "375dcea3e7bf9e0434f26ad9e66cfa93caa960e66e1649b4ae8c9708eecf26df",
+      "bounds_m": [
+        [
+          -0.175,
+          0.0,
+          -0.83125
+        ],
+        [
+          0.175,
+          4.2,
+          0.83125
+        ]
+      ],
+      "extents_m": [
+        0.35,
+        4.2,
+        1.6625
+      ],
+      "triangles": 60,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "colormap"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "road-sign-stop.glb",
+      "source_sha256": "0991181f37171daf8d2501e436a688e46ea2bcebb5e27aa451640fcbaab107ef",
+      "license": "CC0-1.0",
+      "target_size_m": 2.2,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.051403969526290894,
+            0.0,
+            -0.06910618394613266
+          ],
+          [
+            0.026096034795045853,
+            0.49407491087913513,
+            0.06910618394613266
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          4.452766071617393,
+          4.452766071617393,
+          4.452766071617393
+        ],
+        "triangles": 104
+      },
+      "file": "assets/models3d/props/outdoor_stop_sign.glb",
+      "bytes": 5976,
+      "sha256": "d3e7cd75106df90266d95e96f856ad5aca2b9f4403544b64ea117803e7f8699d",
+      "bounds_m": [
+        [
+          -0.172545,
+          0.0,
+          -0.307714
+        ],
+        [
+          0.172545,
+          2.2,
+          0.307714
+        ]
+      ],
+      "extents_m": [
+        0.345089,
+        2.2,
+        0.615427
+      ],
+      "triangles": 104,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "colormap"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "bench.glb",
+      "source_sha256": "ba05a6d23a5a5a44da016757632070e47ff7587ce10e2f6d6d52328b4cf5489b",
+      "license": "CC0-1.0",
+      "target_size_m": 0.85,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.20000000298023224
+          ],
+          [
+            0.4000000059604645,
+            0.4699999988079071,
+            -0.0
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          4.340425542923809,
+          1.8085106428849205,
+          1.8085106428849205
+        ],
+        "triangles": 170
+      },
+      "file": "assets/models3d/props/outdoor_bench.glb",
+      "bytes": 7908,
+      "sha256": "077dfc0508b0f0b1e90ec0b40d842729ffd421d8c1d74374311aa479d2ab07a5",
+      "bounds_m": [
+        [
+          -0.868085,
+          0.0,
+          -0.180851
+        ],
+        [
+          0.868085,
+          0.85,
+          0.180851
+        ]
+      ],
+      "extents_m": [
+        1.73617,
+        0.85,
+        0.361702
+      ],
+      "triangles": 170,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "wood"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "pottedPlant.glb",
+      "source_sha256": "5b760eda2766f75fda36b2c5df652a1662f82981ef64cd8fa7fe7bcd386b3a15",
+      "license": "CC0-1.0",
+      "target_size_m": 0.75,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.10602964,
+            0.0,
+            -0.12073097376031036
+          ],
+          [
+            0.10602963431583405,
+            0.6540167939567566,
+            0.1207309738
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          1.146759543378927,
+          1.146759543378927,
+          1.146759543378927
+        ],
+        "triangles": 60
+      },
+      "file": "assets/models3d/props/outdoor_planter.glb",
+      "bytes": 6544,
+      "sha256": "fe0f8fbbb9861ab27f73ac2f9b3a79dccde85597172ff2f694209a3c0c0fef27",
+      "bounds_m": [
+        [
+          -0.121591,
+          0.0,
+          -0.138449
+        ],
+        [
+          0.12159,
+          0.75,
+          0.138449
+        ]
+      ],
+      "extents_m": [
+        0.243181,
+        0.75,
+        0.276899
+      ],
+      "triangles": 60,
+      "geometries": 3,
+      "material_count": 3,
+      "materials": [
+        "plant",
+        "wood",
+        "woodDark"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "trashcan.glb",
+      "source_sha256": "e0ccc1fe50cbd05386477fdff527171d1cf7c0de2ba7ff3233f8d9561feb2561",
+      "license": "CC0-1.0",
+      "target_size_m": 0.85,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.10384673958349042,
+            -2.5062356547304757e-18,
+            -0.11163647669489005
+          ],
+          [
+            0.10384673958349042,
+            0.42786596956182327,
+            0.12248776703312601
+          ]
+        ],
+        "scale_reference": "height",
+        "scale_xyz": [
+          1.9866034236620487,
+          1.9866034236620487,
+          1.9866034236620487
+        ],
+        "triangles": 68
+      },
+      "file": "assets/models3d/props/outdoor_trashcan.glb",
+      "bytes": 5724,
+      "sha256": "4b51c7d9201fe7ffa8571e0ffedfe7a0b790bce04a7c1217d0efb47d4e903e04",
+      "bounds_m": [
+        [
+          -0.206302,
+          0.0,
+          -0.232556
+        ],
+        [
+          0.206302,
+          0.85,
+          0.232556
+        ]
+      ],
+      "extents_m": [
+        0.412605,
+        0.85,
+        0.465112
+      ],
+      "triangles": 68,
+      "geometries": 2,
+      "material_count": 2,
+      "materials": [
+        "metal",
+        "metalDark"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "fountain_isa-lousberg.glb",
+      "source_sha256": "0a8f2884303228dc19764684dfaba94e7de4c305916466d5f33688647122526c",
+      "license": "CC0-1.0",
+      "target_size_m": 3.0,
+      "conversion": {
+        "source_bounds": [
+          [
+            -1.9999947398900986,
+            2.2351718971680337e-08,
+            -2.000000141561048
+          ],
+          [
+            2.0000051707029343,
+            1.5999992703137746,
+            1.9999998179082294
+          ]
+        ],
+        "scale_reference": "footprint",
+        "scale_xyz": [
+          0.7500000075995105,
+          0.7500000075995105,
+          0.7500000075995105
+        ],
+        "triangles": 1646
+      },
+      "file": "assets/models3d/props/outdoor_fountain.glb",
+      "bytes": 54828,
+      "sha256": "07dd0df215be770e2415b2dfdc9302028d6331944a529df9daa816d62a90179f",
+      "bounds_m": [
+        [
+          -1.5,
+          0.0,
+          -1.5
+        ],
+        [
+          1.5,
+          1.199999,
+          1.5
+        ]
+      ],
+      "extents_m": [
+        3.0,
+        1.199999,
+        3.0
+      ],
+      "triangles": 1646,
+      "geometries": 3,
+      "material_count": 1,
+      "materials": [
+        "tiny_treats_1"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    },
+    {
+      "source": "brown-bird_assetquest.glb",
+      "source_sha256": "b3421a6c883bbf446b91cc99c53b1bd9603e975fe9f60b36fdf7f5b6c306fed9",
+      "license": "CC0-1.0",
+      "target_size_m": 0.28,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.06695666164159775,
+            -0.0038133699865603734,
+            -0.05802037840218193
+          ],
+          [
+            0.06695665419101715,
+            0.1705231343633145,
+            0.14060226865404815
+          ]
+        ],
+        "scale_reference": "footprint",
+        "scale_xyz": [
+          1.4097083295880757,
+          1.4097083295880757,
+          1.4097083295880757
+        ],
+        "triangles": 194
+      },
+      "file": "assets/models3d/props/outdoor_bird_brown.glb",
+      "bytes": 7216,
+      "sha256": "31758b3dda3c3e50dd743ecfb58a7f2639cc5a8e6ac117b3eaa31a7b79d4e737",
+      "bounds_m": [
+        [
+          -0.094389,
+          0.0,
+          -0.14
+        ],
+        [
+          0.094389,
+          0.245764,
+          0.14
+        ]
+      ],
+      "extents_m": [
+        0.188779,
+        0.245764,
+        0.28
+      ],
+      "triangles": 194,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "Pond_Pack_MAT"
+      ],
+      "embedded_textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "target_size_matches": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "self_contained_glb": true,
+        "size_under_128_kib": true
+      }
+    }
+  ]
+}
