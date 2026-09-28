@@ -49,6 +49,18 @@
       attributionRequired: true
     }),
     Object.freeze({
+      id: 'shop-atm',
+      title: 'ATM',
+      author: 'J-Toastie',
+      source: 'Poly Pizza',
+      sourceUrl: 'https://poly.pizza/m/p4U0tSF5WN',
+      license: 'CC BY 3.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by/3.0/',
+      assets: Object.freeze(['shop_atm.glb']),
+      attributionRequired: true,
+      modification: 'Escala, origen y materiales normalizados para SIDE.'
+    }),
+    Object.freeze({
       id: 'shop-furniture-kit',
       title: 'Furniture Kit 2.0',
       author: 'Kenney',
@@ -62,9 +74,25 @@
         'shop_checkout_counter_end.glb',
         'shop_shelf_tall.glb',
         'shop_shelf_low.glb',
-        'shop_mirror_wall.glb'
+        'shop_mirror_wall.glb',
+        'shop_entry_door.glb',
+        'shop_window_panel.glb',
+        'shop_ceiling_light.glb',
+        'production_garment_rack.glb'
       ]),
       attributionRequired: false
+    }),
+    Object.freeze({
+      id: 'production-mannequin',
+      title: 'Mannequin',
+      author: 'reyshapes',
+      source: 'Poly Pizza',
+      sourceUrl: 'https://poly.pizza/m/tYwjQJvcFX',
+      license: 'CC0 1.0',
+      licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+      assets: Object.freeze(['production_mannequin.glb']),
+      attributionRequired: false,
+      modification: 'Escala, origen y materiales normalizados para SIDE.'
     }),
     Object.freeze({
       id: 'outdoor-kenney-nature-kit',

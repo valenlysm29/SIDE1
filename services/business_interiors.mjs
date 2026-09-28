@@ -27,13 +27,20 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   const geometry = new THREE.BoxGeometry(1, 1, 1); resources.add(geometry);
   const cylinder = new THREE.CylinderGeometry(1, 1, 1, 12); resources.add(cylinder);
   const scratch = new THREE.Object3D();
-  const STORE_PROP_KEYS = Object.freeze(['table', 'counter', 'counterEnd', 'shelfTall', 'shelfLow', 'mirror', 'register']);
+  const STORE_PROP_KEYS = Object.freeze([
+    'table', 'counter', 'counterEnd', 'shelfTall', 'shelfLow', 'mirror', 'register',
+    'entryDoor', 'windowPanel', 'ceilingLight', 'atm'
+  ]);
   const WAREHOUSE_PROP_KEYS = Object.freeze([
     'boxLarge', 'boxLong', 'boxSmall', 'boxWide', 'loadingDoor', 'highWindow', 'floorArrow', 'warningBeacon',
     'pallet', 'rackTall', 'bagStack', 'cuttingTable', 'pendantLight', 'palletTruck', 'fabricRolls', 'fireExtinguisher', 'sewingMachine'
   ]);
+  const PRODUCTION_PROP_KEYS = Object.freeze([
+    'cuttingTable', 'sewingMachine', 'overlockMachine', 'ironingStation', 'fabricRolls',
+    'rackTall', 'pendantLight', 'mannequin', 'garmentRack'
+  ]);
   const qualityRank = mode => mode === 'low' ? 1 : mode === 'high' ? 3 : 2;
-  let storePropQuality = 'auto', installedStoreTemplates = {}, installedWarehouseTemplates = {};
+  let storePropQuality = 'auto', installedStoreTemplates = {}, installedWarehouseTemplates = {}, installedProductionTemplates = {};
   const material = (color, extra = {}) => {
     const value = new THREE.MeshStandardMaterial({ color, roughness: .78, ...extra }); resources.add(value); return value;
   };
@@ -78,6 +85,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     };
   }
   function clearPropModels(root) {
+    root?.traverse(object => object.userData?.ownedPropGeometries?.forEach(geometry => geometry.dispose()));
     root?.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
     root?.clear();
   }
@@ -92,18 +100,70 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   // Static GLBs keep their cached geometry and materials. Repeated modules are
   // emitted as InstancedMesh batches, so installing props never clones PBR
   // resources or turns a row of shelves into one draw call per copy.
+  function compactPropSources(rawSources) {
+    const groups = new Map();
+    for (const source of rawSources) {
+      const material = Array.isArray(source.material) ? null : source.material;
+      const key = material?.uuid || `unmerged:${source.uuid}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(source);
+    }
+    const sources = [], owned = [];
+    for (const grouped of groups.values()) {
+      if (grouped.length === 1 || !grouped[0].material || Array.isArray(grouped[0].material)) {
+        for (const source of grouped) sources.push({
+          geometry: source.geometry, material: source.material, matrixWorld: source.matrixWorld
+        });
+        continue;
+      }
+      const parts = grouped.map(source => {
+        const geometry = source.geometry.index ? source.geometry.toNonIndexed() : source.geometry.clone();
+        geometry.applyMatrix4(source.matrixWorld);
+        if (!geometry.attributes.normal) geometry.computeVertexNormals();
+        return geometry;
+      });
+      const vertices = parts.reduce((sum, geometry) => sum + geometry.attributes.position.count, 0);
+      const position = new Float32Array(vertices * 3), normal = new Float32Array(vertices * 3);
+      let cursor = 0;
+      for (const geometry of parts) {
+        const p = geometry.attributes.position, n = geometry.attributes.normal;
+        for (let index = 0; index < p.count; index++, cursor++) {
+          position[cursor * 3] = p.getX(index); position[cursor * 3 + 1] = p.getY(index); position[cursor * 3 + 2] = p.getZ(index);
+          normal[cursor * 3] = n.getX(index); normal[cursor * 3 + 1] = n.getY(index); normal[cursor * 3 + 2] = n.getZ(index);
+        }
+        geometry.dispose();
+      }
+      const merged = new THREE.BufferGeometry();
+      merged.setAttribute('position', new THREE.BufferAttribute(position, 3));
+      merged.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
+      merged.computeBoundingBox(); merged.computeBoundingSphere(); owned.push(merged);
+      sources.push({ geometry: merged, material: grouped[0].material, matrixWorld: new THREE.Matrix4() });
+    }
+    return { sources, owned };
+  }
   function addPropBatch(root, template, placements, metadata) {
     if (!template?.traverse || !placements.length) return null;
     template.updateMatrixWorld?.(true);
-    const sources = [];
-    template.traverse(object => { if (object.isMesh && !object.isSkinnedMesh && object.geometry && object.material) sources.push(object); });
-    if (!sources.length) return null;
+    const rawSources = [];
+    template.traverse(object => { if (object.isMesh && !object.isSkinnedMesh && object.geometry && object.material) rawSources.push(object); });
+    if (!rawSources.length) return null;
+    const { sources, owned } = compactPropSources(rawSources);
     const batch = new THREE.Group();
     const zone = metadata.zone || 'store';
     batch.name = `${zone} prop ${metadata.kind}`;
     batch.userData.streamedPropBatch = true;
-    batch.userData[zone === 'warehouse' ? 'warehousePropBatch' : 'storePropBatch'] = true;
-    Object.assign(batch.userData, metadata, { zone, instanceCount: placements.length, bays: [...new Set(placements.map(p => p.bay).filter(Boolean))] });
+    batch.userData[zone === 'warehouse' ? 'warehousePropBatch' : zone === 'production' ? 'productionPropBatch' : 'storePropBatch'] = true;
+    const trianglesPerInstance = sources.reduce((sum, source) => {
+      const indexCount = source.geometry.index?.count;
+      const vertexCount = source.geometry.attributes?.position?.count || 0;
+      return sum + Math.floor((indexCount || vertexCount) / 3);
+    }, 0);
+    Object.assign(batch.userData, metadata, {
+      zone, instanceCount: placements.length, drawables: sources.length,
+      triangles: trianglesPerInstance * placements.length,
+      bays: [...new Set(placements.map(p => p.bay).filter(Boolean))],
+      ownedPropGeometries: owned
+    });
     const placementMatrices = placements.map(propMatrix);
     for (const source of sources) {
       const instance = new THREE.InstancedMesh(source.geometry, source.material, placements.length);
@@ -237,8 +297,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   for (const layout of BUSINESS_LAYOUTS) {
     const detail = new THREE.Group(); detail.name = `${layout.id} nearby detail`; group.add(detail);
     const propRoot = new THREE.Group(); propRoot.name = `${layout.id} streamed props`; detail.add(propRoot);
-    const room = { id: layout.id, layout, detail, stock: [], actors: [], routes: [], lights: [], stockLevel: 0,
-      propRoot, propFallbacks: new Map() }; rooms.push(room);
+    const room = { id: layout.id, layout, detail, stock: [], actors: [], routes: [], lights: [], stockLevel: 0, realLightLimit: 2,
+      propRoot, propFallbacks: new Map(), auxFallbacks: new Map() }; rooms.push(room);
     const b = batchBuilder(detail);
     const fallback = category => {
       if (!room.propFallbacks.has(category)) {
@@ -247,6 +307,13 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       }
       return room.propFallbacks.get(category).batch;
     };
+    const auxFallback = category => {
+      if (!room.auxFallbacks.has(category)) {
+        const fallbackGroup = new THREE.Group(); fallbackGroup.name = `${room.id} ${category} auxiliary fallback`; detail.add(fallbackGroup);
+        room.auxFallbacks.set(category, { group: fallbackGroup, batch: batchBuilder(fallbackGroup) });
+      }
+      return room.auxFallbacks.get(category).batch;
+    };
     // Floor joints, skirting and ceiling beams keep metre-scale surfaces legible.
     for(const side of [-1,1])b.box(layout.x+side*(layout.width/2-.16),.1,layout.z,.045,.17,layout.depth-.3,m.dark);
     b.box(layout.x,.1,layout.z-layout.depth/2+.16,layout.width-.3,.17,.045,m.dark);
@@ -254,11 +321,13 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     for(let x=layout.x-layout.width/2+joint;x<layout.x+layout.width/2;x+=joint)b.box(x,.026,layout.z,.009,.002,layout.depth-.25,m.grout);
     for(let z=layout.z-layout.depth/2+joint;z<layout.z+layout.depth/2;z+=joint)b.box(layout.x,.026,z,layout.width-.25,.002,.009,m.grout);
     if(room.id!=='store')for(let z=layout.z-5;z<layout.z+6;z+=3)b.box(layout.x,layout.height-.23,z,layout.width-.3,.24,.14,m.steel);
-    // Ceiling lights share emissive batches; only this room's two fill lights activate.
-    // Warehouse fixtures can later be swapped for streamed pendant-light GLBs.
-    const ceilingFixtures = room.id === 'warehouse' ? fallback('lighting') : b;
+    // Fixtures can be swapped independently while their very cheap emissive
+    // glow remains available in every tier. Only a bounded number of fill
+    // lights is enabled for the room currently occupied by the player.
+    const ceilingFixtures = room.id === 'store' ? auxFallback('lighting') : fallback('lighting');
     for (const x of [layout.x - 4, layout.x + 4]) for (const z of [layout.z - 3, layout.z + 2]) {
-      ceilingFixtures.box(x, layout.height - .21, z, 2, .1, .35, m.white); ceilingFixtures.box(x, layout.height - .27, z, 1.8, .025, .26, m.light);
+      ceilingFixtures.box(x, layout.height - .21, z, 2, .1, .35, m.white);
+      b.box(x, layout.height - .27, z, 1.8, .025, .26, m.light);
     }
     for (const z of [layout.z - 2.7, layout.z + 2.7]) {
       const light = new THREE.PointLight(0xfff0d6, 28, 15, 1.1); light.position.set(layout.x, Math.min(4, layout.height - .7), z);
@@ -267,6 +336,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     if (room.id === 'store') {
       const shelfFallback = fallback('shelves'), checkoutFallback = fallback('checkout');
       const tableFallback = fallback('table'), mirrorFallback = fallback('mirrors');
+      const atmFallback = auxFallback('atm');
       for (const x of [-24, -14]) { shelf(room, shelfFallback, x, 15.0); shelf(room, shelfFallback, x, 18.1); }
       // Central aisle (x=-19) stays clear from door to rear. Cash register is to the east.
       solid(room, checkoutFallback, -13.9, .52, 21.4, 3.25, 1.03, .85, m.wood, 'counter');
@@ -282,6 +352,11 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         mirrorFallback.box(x, 1.55, z, .08, 1.28, 1.0, m.wood);
         mirrorFallback.box(x + (x < -19 ? .045 : -.045), 1.55, z, .018, 1.13, .86, m.glass);
       }
+      // The ATM is a visual amenity only: it deliberately adds no collider or
+      // interaction point, keeping the entrance and customer routes invariant.
+      atmFallback.box(-22.7, .8, 23.55, .68, 1.6, .55, m.dark);
+      atmFallback.box(-22.7, 1.24, 23.25, .48, .38, .035, m.screen);
+      atmFallback.box(-22.7, .94, 23.24, .34, .06, .05, m.steel);
       sign(detail, 'COLECCIÓN SIDE', 'ESENCIAL · URBANO · PREMIUM', -19, 2.7, 14.15, 5.6, .65);
       sign(detail, 'CAJA / ATENCIÓN', '', -13.95, 2.5, 23.79, 2.9, .38, Math.PI);
       // A small stock preparation alcove, with a walkable side opening.
@@ -332,27 +407,36 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       route(room, 'warehouse-worker', [[-25.2, -16.35]], true);
     } else {
       // SIDE produces bags: leather cutting -> sewing/accessories -> finish/pack.
-      table(room, b, 14.8, -15.5, 3.2, 1.5, 'machine');
-      b.box(14.5, 1.025, -15.5, 1.95, .035, 1.1, m.leather); b.box(15.35, 1.07, -15.65, .42, .05, .72, m.tan);
-      b.box(13.65, 1.1, -15.5, .12, .09, .6, m.steel);
-      for (let i = 0; i < 4; i++) b.cyl(13.5 + i * .47, .55, -18.2, .2, 1.4, i % 2 ? m.tan : m.leather, Math.PI / 2);
-      pallet(b, 14.2, -18.2, 2.1, 1.6); collider(14.2, -18.2, 2.2, 1.65, 'raw-material', room.id);
+      // Visual fallbacks are split by station. Their colliders are still
+      // registered by table/shelf/pallet and therefore survive a GLB swap.
+      const cuttingFallback = fallback('cutting'), sewingFallback = fallback('sewing');
+      const ironingFallback = fallback('ironing'), packingFallback = fallback('packing');
+      const storageFallback = fallback('storage'), decorFallback = fallback('decor');
+      table(room, cuttingFallback, 14.8, -15.5, 3.2, 1.5, 'machine');
+      cuttingFallback.box(14.5, 1.025, -15.5, 1.95, .035, 1.1, m.leather); cuttingFallback.box(15.35, 1.07, -15.65, .42, .05, .72, m.tan);
+      cuttingFallback.box(13.65, 1.1, -15.5, .12, .09, .6, m.steel);
+      for (let i = 0; i < 4; i++) storageFallback.cyl(13.5 + i * .47, .55, -18.2, .2, 1.4, i % 2 ? m.tan : m.leather, Math.PI / 2);
+      pallet(storageFallback, 14.2, -18.2, 2.1, 1.6); collider(14.2, -18.2, 2.2, 1.65, 'raw-material', room.id);
       for (const z of [-20.4, -23.4]) {
-        table(room, b, 15.1, z, 3.1, 1.2, 'machine');
+        table(room, sewingFallback, 15.1, z, 3.1, 1.2, 'machine');
         for (const x of [14.25, 15.9]) {
-          b.box(x, 1.01, z, .64, .055, .49, m.dark); b.box(x + .17, 1.26, z, .19, .46, .28, m.white);
-          b.box(x - .04, 1.48, z, .52, .15, .26, m.white); b.box(x - .23, 1.27, z, .07, .29, .09, m.steel);
-          b.cyl(x + .31, 1.35, z, .15, .07, m.dark, 0, Math.PI / 2); b.cyl(x + .10, 1.68, z, .046, .18, m.tan);
-          const needle = new THREE.Mesh(geometry, m.steel); needle.position.set(x - .23, 1.15, z); needle.scale.set(.016, .1, .016); detail.add(needle);
-          animated.push({ object: needle, y: 1.15, zone: room.id, phase: x });
+          sewingFallback.box(x, 1.01, z, .64, .055, .49, m.dark); sewingFallback.box(x + .17, 1.26, z, .19, .46, .28, m.white);
+          sewingFallback.box(x - .04, 1.48, z, .52, .15, .26, m.white); sewingFallback.box(x - .23, 1.27, z, .07, .29, .09, m.steel);
+          sewingFallback.cyl(x + .31, 1.35, z, .15, .07, m.dark, 0, Math.PI / 2); sewingFallback.cyl(x + .10, 1.68, z, .046, .18, m.tan);
+          sewingFallback.box(x - .23, 1.15, z, .016, .1, .016, m.steel);
         }
       }
-      table(room, b, 24.7, -23.3, 3.5, 1.45, 'machine');
+      table(room, ironingFallback, 24.7, -23.3, 3.5, 1.45, 'machine');
       for (const x of [23.8, 24.6, 25.4]) handbag(stockBatch(room, 1), x, 1.02, -23.3, m.leather);
-      b.box(26, 1.42, -23.55, .055, .86, .055, m.steel); b.box(25.8, 1.87, -23.55, .5, .07, .3, m.light);
-      table(room, b, 24.7, -19.6, 3.5, 1.2, 'worktable'); carton(b, 25.4, 1.28, -19.6, .68);
-      b.box(23.7, 1.14, -19.6, .66, .25, .45, m.steel); b.box(23.7, 1.3, -19.6, .57, .035, .38, m.dark);
-      shelf(room, b, 25.1, -15.2, 2.7, false);
+      ironingFallback.box(26, 1.42, -23.55, .055, .86, .055, m.steel); ironingFallback.box(25.8, 1.87, -23.55, .5, .07, .3, m.light);
+      table(room, packingFallback, 24.7, -19.6, 3.5, 1.2, 'worktable'); carton(packingFallback, 25.4, 1.28, -19.6, .68);
+      packingFallback.box(23.7, 1.14, -19.6, .66, .25, .45, m.steel); packingFallback.box(23.7, 1.3, -19.6, .57, .035, .38, m.dark);
+      shelf(room, storageFallback, 25.1, -15.2, 2.7, false);
+      // Low-cost silhouettes make partial-load failures obvious without adding
+      // physics; streamed decor replaces them on medium/high.
+      decorFallback.cyl(26.7, .88, -17.2, .2, 1.72, m.white);
+      decorFallback.box(23, .95, -25.25, .08, 1.8, .08, m.steel);
+      decorFallback.box(23, 1.78, -25.25, 1.15, .06, .08, m.steel);
       sign(detail, '01 · CORTE', 'CUERO Y PATRONES', 14.8, 2.7, -16.4, 3.5, .55);
       sign(detail, '02 · COSTURA Y ENSAMBLADO', 'CUERO + HILO + ACCESORIOS', 16, 3.05, -25.82, 6.5, .65);
       sign(detail, '03 · ACABADO Y CONTROL', 'INSPECCIÓN · EMPAQUE', 24, 3.05, -25.82, 6.2, .65);
@@ -369,6 +453,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     }
     b.finish();
     room.propFallbacks.forEach(entry => entry.batch.finish());
+    room.auxFallbacks.forEach(entry => entry.batch.finish());
     room.stock.forEach(stock => stock.batch.finish());
   }
 
@@ -376,9 +461,11 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   const zoneAt = position => zones.find(zone => position && position.x > zone.minX + .12 && position.x < zone.maxX - .12 && position.z > zone.minZ + .12 && position.z < zone.maxZ)?.id || null;
   const storeRoom = rooms.find(room => room.id === 'store');
   const warehouseRoom = rooms.find(room => room.id === 'warehouse');
+  const productionRoom = rooms.find(room => room.id === 'production');
   function templateValue(templates, key) { return templates instanceof Map ? templates.get(key) : templates?.[key]; }
   function sameStoreTemplates(next) { return STORE_PROP_KEYS.every(key => (templateValue(installedStoreTemplates, key) || null) === (templateValue(next, key) || null)); }
   function sameWarehouseTemplates(next) { return WAREHOUSE_PROP_KEYS.every(key => (templateValue(installedWarehouseTemplates, key) || null) === (templateValue(next, key) || null)); }
+  function sameProductionTemplates(next) { return PRODUCTION_PROP_KEYS.every(key => (templateValue(installedProductionTemplates, key) || null) === (templateValue(next, key) || null)); }
   function setWarehouseQuality(mode = 'auto') {
     const rank = qualityRank(mode);
     warehouseRoom?.propRoot?.children.forEach(batch => {
@@ -397,13 +484,15 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     storeRoom?.propRoot?.children.forEach(batch => {
       batch.visible = rank >= Number(batch.userData.minQuality || 1);
       const category = batch.userData.category;
-      const cast = rank > 1 && (category === 'checkout' || category === 'table' || (rank > 2 && category === 'shelves'));
+      const cast = rank > 1 && (category === 'checkout' || category === 'table' || category === 'atm' || (rank > 2 && category === 'shelves'));
       batch.traverse(object => {
         if (!object.isMesh) return;
         object.castShadow = cast; object.receiveShadow = rank > 1;
       });
     });
     setWarehouseQuality(storePropQuality);
+    setProductionQuality(storePropQuality);
+    for (const room of rooms) room.realLightLimit = Math.max(0, rank - 1);
     return storePropQuality;
   }
   function installStoreProps(templates = {}, mode = storePropQuality) {
@@ -453,7 +542,32 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         { kind: 'mirror-east', category: 'mirrors', minQuality: 2 });
       installed.add('mirrors');
     }
+    if (installedStoreTemplates.entryDoor) {
+      add('entryDoor', [
+        { x: -20.6, z: 23.92, yaw: Math.PI / 2, bay: 'entry-west' },
+        { x: -17.4, z: 23.92, yaw: -Math.PI / 2, bay: 'entry-east' }
+      ], { kind: 'entry-door-open', category: 'doors', minQuality: 2 });
+      installed.add('doors');
+    }
+    if (installedStoreTemplates.windowPanel) {
+      add('windowPanel', [
+        { x: -23.7, y: .5, z: 23.89, bay: 'front-west' },
+        { x: -14.3, y: .5, z: 23.89, bay: 'front-east' }
+      ], { kind: 'front-window-panels', category: 'windows', minQuality: 2 });
+      installed.add('windows');
+    }
+    if (installedStoreTemplates.ceilingLight) {
+      add('ceilingLight', [-23, -15].flatMap(x => [16, 21].map(z => ({ x, y: 4.25, z, bay: `light-${x}:${z}` }))),
+        { kind: 'ceiling-light-fixtures', category: 'lighting', minQuality: 1 });
+      installed.add('lighting');
+    }
+    if (installedStoreTemplates.atm) {
+      add('atm', [{ x: -22.7, z: 23.55, yaw: Math.PI, bay: 'entry-atm' }],
+        { kind: 'entry-atm', category: 'atm', minQuality: 1 });
+      installed.add('atm');
+    }
     storeRoom.propFallbacks.forEach((entry, category) => { entry.group.visible = !installed.has(category); });
+    storeRoom.auxFallbacks.forEach((entry, category) => { entry.group.visible = !installed.has(category); });
     setQuality(mode);
     return storePropState();
   }
@@ -464,8 +578,12 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       quality: storePropQuality,
       installed: [...new Set(batches.map(batch => batch.userData.category))].sort(),
       batches: batches.length,
+      visibleBatches: visible.length,
       instances: batches.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
       visibleInstances: visible.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      drawables: visible.reduce((sum, batch) => sum + Number(batch.userData.drawables || 0), 0),
+      triangles: visible.reduce((sum, batch) => sum + Number(batch.userData.triangles || 0), 0),
+      realLights: storeRoom?.realLightLimit || 0,
       visibleShelfBays: [...new Set(visible.filter(batch => batch.userData.category === 'shelves').flatMap(batch => batch.userData.bays || []))].length,
       visibleMirrors: visible.filter(batch => batch.userData.category === 'mirrors').reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0)
     };
@@ -571,6 +689,100 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       lights: visible.filter(batch => batch.userData.category === 'lighting').reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0)
     };
   }
+  function setProductionQuality(mode = 'auto') {
+    const rank = qualityRank(mode);
+    const batches = productionRoom?.propRoot?.children || [];
+    const installed = new Set(batches.map(batch => batch.userData.category));
+    // Low keeps the cheapest procedural silhouettes for the mesh-heavy
+    // machinery and luminaires. Medium/high swap those categories to their
+    // detailed GLBs; physics remains unchanged because both are visual-only.
+    const lowFallback = category => rank === 1 && ['sewing', 'ironing', 'storage', 'lighting'].includes(category);
+    productionRoom?.propFallbacks?.forEach((entry, category) => {
+      entry.group.visible = (!installed.has(category) || lowFallback(category)) && (category !== 'decor' || rank >= 2);
+    });
+    batches.forEach(batch => {
+      batch.visible = rank >= Number(batch.userData.minQuality || 1) && !lowFallback(batch.userData.category);
+      const category = batch.userData.category;
+      const cast = rank > 1 && (category === 'cutting' || category === 'ironing' || (rank > 2 && ['sewing', 'storage', 'decor'].includes(category)));
+      batch.traverse(object => {
+        if (!object.isMesh) return;
+        object.castShadow = cast; object.receiveShadow = rank > 1;
+      });
+    });
+  }
+  function installProductionProps(templates = {}, mode = storePropQuality) {
+    if (!productionRoom) return { installed: [], quality: setQuality(mode) };
+    if (sameProductionTemplates(templates) && productionRoom.propRoot.children.length) {
+      setQuality(mode); return productionPropState();
+    }
+    clearPropModels(productionRoom.propRoot);
+    installedProductionTemplates = Object.fromEntries(PRODUCTION_PROP_KEYS.map(key => [key, templateValue(templates, key) || null]));
+    const root = productionRoom.propRoot;
+    const add = (key, placements, metadata) => addPropBatch(root, installedProductionTemplates[key], placements, {...metadata, zone: 'production'});
+
+    if (installedProductionTemplates.cuttingTable) {
+      add('cuttingTable', [13.75, 14.8, 15.85].map((x, index) => ({ x, z: -15.5, scale: [1.05, 1, 1.42], bay: `cutting-${index + 1}` })),
+        { kind: 'cutting-tables', category: 'cutting', minQuality: 1 });
+      add('cuttingTable', [23.65, 24.7, 25.75].map((x, index) => ({ x, z: -19.6, scale: [1.05, 1, 1.15], bay: `packing-${index + 1}` })),
+        { kind: 'packing-tables', category: 'packing', minQuality: 1 });
+    }
+    if (installedProductionTemplates.cuttingTable && installedProductionTemplates.sewingMachine && installedProductionTemplates.overlockMachine) {
+      const sewingPositions = [
+        { x: 14.25, z: -20.4, bay: 'sewing-front' }, { x: 14.25, z: -23.4, bay: 'sewing-rear' }
+      ];
+      const overlockPositions = [
+        { x: 15.9, z: -20.4, bay: 'overlock-front' }, { x: 15.9, z: -23.4, bay: 'overlock-rear' }
+      ];
+      add('cuttingTable', [...sewingPositions, ...overlockPositions].map(p => ({ ...p, scale: [1.32, 1, 1.05] })),
+        { kind: 'sewing-worktables', category: 'sewing', minQuality: 1 });
+      add('sewingMachine', sewingPositions.map(p => ({ ...p, y: .91, yaw: Math.PI })),
+        { kind: 'industrial-sewing-machines', category: 'sewing', minQuality: 1 });
+      add('overlockMachine', overlockPositions.map(p => ({ ...p, y: .91, yaw: Math.PI })),
+        { kind: 'overlock-machines', category: 'sewing', minQuality: 1 });
+    }
+    if (installedProductionTemplates.ironingStation) {
+      add('ironingStation', [{ x: 24.7, z: -23.3, yaw: Math.PI / 2, bay: 'finishing' }],
+        { kind: 'industrial-ironing', category: 'ironing', minQuality: 1 });
+    }
+    if (installedProductionTemplates.fabricRolls && installedProductionTemplates.rackTall) {
+      add('fabricRolls', [{ x: 14.2, z: -18.2, yaw: Math.PI / 2, scale: [1.15, 1.15, 1.15], bay: 'raw-material' }],
+        { kind: 'fabric-roll-storage', category: 'storage', minQuality: 1 });
+      add('rackTall', [{ x: 25.1, z: -15.2, scale: [1.65, .95, 1.05], bay: 'supply-rack' }],
+        { kind: 'production-rack', category: 'storage', minQuality: 1 });
+    }
+    if (installedProductionTemplates.pendantLight) {
+      // One instanced batch is cheaper than splitting the same fixture model
+      // into two identical material groups. Low uses the procedural fixture;
+      // medium/high display all four streamed pendants.
+      add('pendantLight', [
+        { x: 16, y: 5.75, z: -17, bay: 'light-1' }, { x: 24, y: 5.75, z: -22, bay: 'light-2' },
+        { x: 16, y: 5.75, z: -22, bay: 'light-3' }, { x: 24, y: 5.75, z: -17, bay: 'light-4' }
+      ], { kind: 'production-pendant-lights', category: 'lighting', minQuality: 1 });
+    }
+    if (installedProductionTemplates.mannequin && installedProductionTemplates.garmentRack) {
+      add('mannequin', [{ x: 26.7, z: -17.2, yaw: -Math.PI / 4, bay: 'quality-display' }],
+        { kind: 'quality-mannequin', category: 'decor', minQuality: 2 });
+      add('garmentRack', [{ x: 23, z: -25.25, yaw: Math.PI / 2, bay: 'finished-goods' }],
+        { kind: 'finished-garment-rack', category: 'decor', minQuality: 2 });
+    }
+    setQuality(mode);
+    return productionPropState();
+  }
+  function productionPropState() {
+    const batches = productionRoom?.propRoot?.children.filter(child => child.userData.productionPropBatch) || [];
+    const visible = batches.filter(batch => batch.visible);
+    return {
+      quality: storePropQuality,
+      installed: [...new Set(batches.map(batch => batch.userData.category))].sort(),
+      batches: batches.length,
+      instances: batches.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      visibleBatches: visible.length,
+      visibleInstances: visible.reduce((sum, batch) => sum + Number(batch.userData.instanceCount || 0), 0),
+      drawables: visible.reduce((sum, batch) => sum + Number(batch.userData.drawables || 0), 0),
+      triangles: visible.reduce((sum, batch) => sum + Number(batch.userData.triangles || 0), 0),
+      realLights: productionRoom?.realLightLimit || 0
+    };
+  }
   let snapshot = {}, disposed = false;
   function sync(value = {}) {
     // `simulator3d.js` owns the financial model and sends a read-only
@@ -616,7 +828,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     for (const room of rooms) {
       const b = room.layout, distance = position ? Math.hypot(position.x - offsetX - b.x, position.z - b.z) : Infinity;
       room.detail.visible = distance < 24; // preload geometry is allocated once, render only near its parcel
-      const inside = active === room.id; room.lights.forEach(light => { light.visible = inside; });
+      const inside = active === room.id; room.lights.forEach((light, index) => { light.visible = inside && index < Number(room.realLightLimit || 0); });
       for (const actor of room.actors) actor.object.visible = inside;
       if (!inside) continue;
       ensureActors(room);
@@ -640,7 +852,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   return {
     group, colliders, entrances, zones, hotspots, interactionPoints: hotspots, npcRoutes, rooms,
     queueSlots, checkoutQueueSlots: queueSlots, browsePoints, salesAssistantPoint,
-    zoneAt, sync, update: sync, tick, installStoreProps, installWarehouseProps, setQuality,
+    zoneAt, sync, update: sync, tick, installStoreProps, installWarehouseProps, installProductionProps, setQuality,
     stats() {
       let instancedBatches = 0, geometryInstances = 0, visibleBatches = 0;
       group.traverse(object => {
@@ -653,11 +865,12 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         activeLights: rooms.reduce((n, r) => n + r.lights.filter(l => l.visible && r.detail.visible).length, 0),
         instancedBatches, geometryInstances, visibleBatches,
         sharedGeometries: 2, stockBatches: rooms.reduce((n, room) => n + room.stock.reduce((s, stock) => s + stock.group.children.length, 0), 0),
-        storeProps: storePropState(), warehouseProps: warehousePropState()
+        storeProps: storePropState(), warehouseProps: warehousePropState(), productionProps: productionPropState()
       };
     },
     dispose() {
       if (disposed) return; disposed = true; group.removeFromParent();
+      group.traverse(object => object.userData?.ownedPropGeometries?.forEach(geometry => geometry.dispose()));
       group.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
       resources.forEach(resource => resource.dispose()); rooms.forEach(room => { room.actors.length = 0; }); group.clear();
     }

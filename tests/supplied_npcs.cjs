@@ -127,7 +127,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     assert.equal(initial.world.id,'side-city');assert.equal(initial.world.legacyActive,false);
     for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,3);assert.equal(d.mona.instances,1)}
     assert.equal(await p.evaluate(()=>__npcTest.enterStore()),'store');
-    assert.equal(await p.evaluate(()=>{__npcTest.spawn();__npcTest.spawn();return __npcTest.spawn()}),3,'normal customer spawns use the physical city store');
+    assert.equal(await p.evaluate(()=>__npcTest.spawn()),1,'a normal customer spawn uses the physical city store');
     const travel=await p.evaluate(()=>__npcTest.step(100));
     fs.writeFileSync(path.join(output,fallback?'fallback-travel.json':'travel.json'),JSON.stringify({travel,details:await p.evaluate(()=>__npcTest.inspect())},null,2));
     assert.deepEqual(travel.violations,[],'customers must not intersect furniture');

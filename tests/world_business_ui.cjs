@@ -39,6 +39,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   await page.evaluate(()=>{businessQA.tick();businessQA.tick();});
   assert.equal((await page.evaluate(()=>businessQA.snapshot())).stock,delivered.stock);
   console.log('PASS warehouse UI: paid order survives reload, exact stock +12, no repeated debit or delivery');
+  await page.evaluate(()=>SIDE3D.preloadDetails());
   await page.evaluate(()=>{SIDE3D.suspend();businessQA.resume();});
   await page.waitForTimeout(250);
   const paused=await page.evaluate(()=>businessQA.snapshot());await page.waitForTimeout(400);

@@ -136,3 +136,37 @@ Fuente canónica: [Furniture Kit](https://kenney.nl/assets/furniture-kit)
 Los modelos fueron seleccionados por su bajo coste, y los archivos finales se
 modifican para normalizar escala, origen y materiales. `Brown Bird` no contiene
 esqueleto ni animaciones; SIDE lo anima mediante transformaciones simples.
+
+## Detalle de Tienda y Producción
+
+### Kenney — Furniture Kit
+
+Autor y distribuidor: **Kenney**
+Fuente canónica: [Furniture Kit](https://kenney.nl/assets/furniture-kit)
+Licencia: [Creative Commons Zero 1.0 Universal (CC0-1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+
+| Asset en SIDE | Archivo fuente exacto | Uso |
+| --- | --- | --- |
+| `shop_entry_door.glb` | `doorwayFront.glb` | Puerta de entrada de Tienda |
+| `shop_window_panel.glb` | `wallWindowSlide.glb` | Ventana de escaparate |
+| `shop_ceiling_light.glb` | `lampSquareCeiling.glb` | Luminaria interior emisiva |
+| `production_garment_rack.glb` | `coatRackStanding.glb` | Perchero de Producción |
+
+### Assets distribuidos por Poly Pizza
+
+| Asset en SIDE | Archivo fuente exacto | Autor | Fuente canónica | Licencia |
+| --- | --- | --- | --- | --- |
+| `production_mannequin.glb` | `mannequin_reyshapes.glb` | reyshapes | [Mannequin](https://poly.pizza/m/tYwjQJvcFX) | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| `shop_atm.glb` | `atm_j-toastie.glb` | J-Toastie | [ATM](https://poly.pizza/m/p4U0tSF5WN) | **[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)** |
+
+Crédito obligatorio conservado por SIDE:
+
+- **“ATM” by J-Toastie, downloaded from Poly Pizza, licensed under CC BY 3.0.**
+  El modelo se modifica para normalizar escala, origen y materiales.
+
+Producción reutiliza sin duplicar archivos los siguientes assets acreditados de
+la Tanda 2: `warehouse_sewing_machine.glb`, `warehouse_cutting_table.glb`,
+`warehouse_fabric_rolls.glb`, `warehouse_rack_tall.glb` y
+`warehouse_pendant_light.glb`. La overlock y la estación de planchado se generan
+como modelos originales de SIDE porque no se encontró una alternativa adecuada,
+ligera y con licencia verificable en las fuentes autorizadas.

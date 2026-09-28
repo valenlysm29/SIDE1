@@ -62,7 +62,9 @@ const seed = {
       await page.waitForFunction(frame=>SIDE3D.diagnostics().renderedFrames>frame+2,frame);
     }
     assert.equal(await submit(1),true);
-    assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
+    assert.equal(await page.evaluate(()=>requestWorldEntry()),true);
+    await page.locator('[data-character="miguel"]').click();
+    await page.locator('#confirmCharacterBtn').click();
     await active();
 
     // Returning to the same active shift must preserve its clock and mission state.

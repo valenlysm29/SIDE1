@@ -1,0 +1,764 @@
+{
+  "coordinate_system": "right-handed, Y-up, meters",
+  "origin_policy": "base at Y=0; centered in X and Z",
+  "optimization_policy": "Preserve licensed low-poly geometry and material groups; flatten transforms; remove unreferenced vertices; export self-contained texture-free GLBs. Generate original lightweight SIDE machinery where no suitable source exists.",
+  "budget": {
+    "ideal_max_bytes": 184320,
+    "maximum_bytes": 358400,
+    "new_actual_bytes": 112396,
+    "status": "ideal"
+  },
+  "totals": {
+    "new_assets": 8,
+    "new_bytes": 112396,
+    "new_triangles": 2234,
+    "new_geometries": 48,
+    "reused_assets": 5,
+    "reused_bytes": 106320,
+    "reused_triangles": 3431,
+    "effective_unique_assets": 13,
+    "effective_bytes": 218716,
+    "effective_triangles": 5665
+  },
+  "assets": [
+    {
+      "source": "doorway-front_kenney.glb",
+      "source_sha256": "b5b8e4c14ee1f2ffa10ef5c69badc995ae6fbcc868abac240221c61b8c593b0e",
+      "author": "Kenney",
+      "source_url": "https://kenney.nl/assets/furniture-kit",
+      "license": "CC0-1.0",
+      "target_size_m": 2.35,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.10124999285148659
+          ],
+          [
+            0.4859999716281891,
+            1.0095317363739014,
+            0.012149997051486588
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 2.3278119105406985,
+        "triangles": 156
+      },
+      "file": "assets/models3d/props/shop_entry_door.glb",
+      "bytes": 11172,
+      "sha256": "ab12f8d85778bbb042da0be4914840ddd0d7e0f65d93578a96d1058ca9612c8c",
+      "bounds_m": [
+        [
+          -0.565658,
+          0.0,
+          -0.131987
+        ],
+        [
+          0.565658,
+          2.35,
+          0.131987
+        ]
+      ],
+      "extents_m": [
+        1.131317,
+        2.35,
+        0.263974
+      ],
+      "triangles": 156,
+      "geometries": 4,
+      "material_count": 4,
+      "materials": [
+        "carpetWhite",
+        "glass",
+        "metal",
+        "metalDark"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "wall-window-slide_kenney.glb",
+      "source_sha256": "33e51d7ee74f13de318e419b0ebfb31fe7f6e9fd37050f13aa9347641b49376a",
+      "author": "Kenney",
+      "source_url": "https://kenney.nl/assets/furniture-kit",
+      "license": "CC0-1.0",
+      "target_size_m": 2.1,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.06955000013113022
+          ],
+          [
+            1.0,
+            1.2895317077636719,
+            0.01954999938607216
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 1.6284981496436846,
+        "triangles": 152
+      },
+      "file": "assets/models3d/props/shop_window_panel.glb",
+      "bytes": 11940,
+      "sha256": "3be6de5b7fb0ea1a47a2c4a86c30e50cc255098917d91b0bdb2f7497da9385b4",
+      "bounds_m": [
+        [
+          -0.814249,
+          0.0,
+          -0.07255
+        ],
+        [
+          0.814249,
+          2.1,
+          0.07255
+        ]
+      ],
+      "extents_m": [
+        1.628498,
+        2.1,
+        0.145099
+      ],
+      "triangles": 152,
+      "geometries": 7,
+      "material_count": 4,
+      "materials": [
+        "_defaultMat",
+        "glass",
+        "metalDark",
+        "wood"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "lamp-square-ceiling_kenney.glb",
+      "source_sha256": "57066be51583d83ae60071e8179af275189cb2911ecb9fc24953bb930c8bf118",
+      "author": "Kenney",
+      "source_url": "https://kenney.nl/assets/furniture-kit",
+      "license": "CC0-1.0",
+      "target_size_m": 0.32,
+      "conversion": {
+        "source_bounds": [
+          [
+            0.0,
+            0.0,
+            -0.12000000476837158
+          ],
+          [
+            0.12000000476837158,
+            0.23000000417232513,
+            -0.0
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 1.3913043225870696,
+        "triangles": 60
+      },
+      "file": "assets/models3d/props/shop_ceiling_light.glb",
+      "bytes": 5008,
+      "sha256": "43a9f3b13bad9e669748252ded0b51a73355a39c35dc5e130c8ba45fa3aa7b68",
+      "bounds_m": [
+        [
+          -0.083478,
+          0.0,
+          -0.083478
+        ],
+        [
+          0.083478,
+          0.32,
+          0.083478
+        ]
+      ],
+      "extents_m": [
+        0.166957,
+        0.32,
+        0.166957
+      ],
+      "triangles": 60,
+      "geometries": 2,
+      "material_count": 2,
+      "materials": [
+        "lamp",
+        "metal"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "atm_j-toastie.glb",
+      "source_sha256": "c2a9de7147a36d1d1625aa099759f6da324ca6d002a2f5ba0949cea01c4719e4",
+      "author": "J-Toastie",
+      "source_url": "https://poly.pizza/m/p4U0tSF5WN",
+      "license": "CC-BY-3.0",
+      "target_size_m": 1.65,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.11765998229384422,
+            -0.00034106528894548016,
+            -0.1108470991468241
+          ],
+          [
+            0.10403409227728844,
+            0.5465907387494756,
+            0.11793936079652426
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 3.0168294983337445,
+        "triangles": 702
+      },
+      "file": "assets/models3d/props/shop_atm.glb",
+      "bytes": 42040,
+      "sha256": "3f7f8a3e484bfcbf1149a9fc4b9c295139075905fff88775de0cce009a137a1c",
+      "bounds_m": [
+        [
+          -0.334407,
+          0.0,
+          -0.345105
+        ],
+        [
+          0.334407,
+          1.65,
+          0.345105
+        ]
+      ],
+      "extents_m": [
+        0.668813,
+        1.65,
+        0.69021
+      ],
+      "triangles": 702,
+      "geometries": 6,
+      "material_count": 6,
+      "materials": [
+        "blue",
+        "blue_shade2",
+        "gray_shade1",
+        "gray_shade2",
+        "screen",
+        "white"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "coat-rack-standing_kenney.glb",
+      "source_sha256": "d8231c22dab63ceb9fc8678f6c8ceafc62afa8726b51a73b4ce349043d3cdc91",
+      "author": "Kenney",
+      "source_url": "https://kenney.nl/assets/furniture-kit",
+      "license": "CC0-1.0",
+      "target_size_m": 1.85,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.1363999992609024,
+            3.0776935281025807e-29,
+            -0.1363999992609024
+          ],
+          [
+            0.1363999992609024,
+            0.7699999809265137,
+            0.1363999992609024
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 2.4025974621115713,
+        "triangles": 190
+      },
+      "file": "assets/models3d/props/production_garment_rack.glb",
+      "bytes": 9604,
+      "sha256": "a85bb23570b53e54f5c542d563f9ea7759ad7c87793bfdb76e3627774803d3fd",
+      "bounds_m": [
+        [
+          -0.327714,
+          0.0,
+          -0.327714
+        ],
+        [
+          0.327714,
+          1.85,
+          0.327714
+        ]
+      ],
+      "extents_m": [
+        0.655429,
+        1.85,
+        0.655429
+      ],
+      "triangles": 190,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "wood"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "mannequin_reyshapes.glb",
+      "source_sha256": "7d053b5b2625443497a9c92db1c68e8f6b89897ffb80bfc27c427353c41e4f2a",
+      "author": "reyshapes",
+      "source_url": "https://poly.pizza/m/tYwjQJvcFX",
+      "license": "CC0-1.0",
+      "target_size_m": 1.75,
+      "conversion": {
+        "source_bounds": [
+          [
+            -1.2540221214294434,
+            0.00022935867309570312,
+            -0.9052665829658508
+          ],
+          [
+            1.2554786205291748,
+            9.014841437339783,
+            0.9052665829658508
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 0.19412926310400203,
+        "triangles": 462
+      },
+      "file": "assets/models3d/props/production_mannequin.glb",
+      "bytes": 11408,
+      "sha256": "e24453bafc36a4f94e54f23b10812ef46e3e9cdb50ca9c4638ee48077e529e9a",
+      "bounds_m": [
+        [
+          -0.243584,
+          0.0,
+          -0.175739
+        ],
+        [
+          0.243584,
+          1.75,
+          0.175739
+        ]
+      ],
+      "extents_m": [
+        0.487168,
+        1.75,
+        0.351477
+      ],
+      "triangles": 462,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "Material.001"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "procedural:SIDE-overlock-machine-v1",
+      "source_sha256": null,
+      "author": "SIDE",
+      "source_url": "",
+      "license": "SIDE-original",
+      "target_size_m": 0.48,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.24,
+            0.0,
+            -0.155
+          ],
+          [
+            0.24,
+            0.67,
+            0.162
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 0.7164179104477612,
+        "triangles": 288
+      },
+      "file": "assets/models3d/props/production_overlock_machine.glb",
+      "bytes": 10028,
+      "sha256": "af5aced067120cef900d230a1fa94327dcd528105486763902d66b13727c8ee8",
+      "bounds_m": [
+        [
+          -0.17194,
+          0.0,
+          -0.113552
+        ],
+        [
+          0.17194,
+          0.48,
+          0.113552
+        ]
+      ],
+      "extents_m": [
+        0.343881,
+        0.48,
+        0.227104
+      ],
+      "triangles": 288,
+      "geometries": 12,
+      "material_count": 4,
+      "materials": [
+        "OverlockAccent",
+        "OverlockDark",
+        "OverlockIvory",
+        "OverlockSteel"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    },
+    {
+      "source": "procedural:SIDE-ironing-station-v1",
+      "source_sha256": null,
+      "author": "SIDE",
+      "source_url": "",
+      "license": "SIDE-original",
+      "target_size_m": 0.95,
+      "conversion": {
+        "source_bounds": [
+          [
+            -0.68,
+            0.0,
+            -0.24
+          ],
+          [
+            0.68,
+            1.0525,
+            0.295
+          ]
+        ],
+        "scale_reference": "height",
+        "uniform_scale": 0.9026128266033254,
+        "triangles": 224
+      },
+      "file": "assets/models3d/props/production_ironing_station.glb",
+      "bytes": 11196,
+      "sha256": "5d9a3c42ef5c6af659a7642ff41c09e7c48b79cceece64a2372987a95328ec05",
+      "bounds_m": [
+        [
+          -0.613777,
+          0.0,
+          -0.241449
+        ],
+        [
+          0.613777,
+          0.95,
+          0.241449
+        ]
+      ],
+      "extents_m": [
+        1.227553,
+        0.95,
+        0.482898
+      ],
+      "triangles": 224,
+      "geometries": 15,
+      "material_count": 4,
+      "materials": [
+        "PressAccent",
+        "PressDark",
+        "PressPad",
+        "PressSteel"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true,
+        "target_size_matches": true
+      }
+    }
+  ],
+  "reused_assets": [
+    {
+      "use": "Industrial sewing stations",
+      "license": "SIDE-original",
+      "file": "assets/models3d/props/warehouse_sewing_machine.glb",
+      "bytes": 13264,
+      "sha256": "8d97ef859954c670dda8450d1fc431b38297fe8d04a5f8cfdc1d41bd865bbb28",
+      "bounds_m": [
+        [
+          -0.228027,
+          0.0,
+          -0.098378
+        ],
+        [
+          0.228027,
+          0.52,
+          0.098378
+        ]
+      ],
+      "extents_m": [
+        0.456054,
+        0.52,
+        0.196757
+      ],
+      "triangles": 432,
+      "geometries": 12,
+      "material_count": 4,
+      "materials": [
+        "MachineAccent",
+        "MachineDark",
+        "MachineIvory",
+        "MachineSteel"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "use": "Production cutting tables",
+      "license": "CC0-1.0",
+      "file": "assets/models3d/props/warehouse_cutting_table.glb",
+      "bytes": 15580,
+      "sha256": "03288b300f7413b5d2f481180e4ccacbc2d7048bd434f111c3dff4a77bc087f0",
+      "bounds_m": [
+        [
+          -0.509004,
+          0.0,
+          -0.473751
+        ],
+        [
+          0.509004,
+          0.9,
+          0.473751
+        ]
+      ],
+      "extents_m": [
+        1.018008,
+        0.9,
+        0.947503
+      ],
+      "triangles": 226,
+      "geometries": 5,
+      "material_count": 4,
+      "materials": [
+        "metal",
+        "rock",
+        "wood",
+        "woodDark"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "use": "Fabric-roll storage",
+      "license": "CC-BY-3.0",
+      "file": "assets/models3d/props/warehouse_fabric_rolls.glb",
+      "bytes": 48756,
+      "sha256": "9da54216b63aefa33ccc48f426edfe2d252fcebc419cfe07022e122b9e29c423",
+      "bounds_m": [
+        [
+          -0.524422,
+          0.0,
+          -0.629852
+        ],
+        [
+          0.524422,
+          0.85,
+          0.629852
+        ]
+      ],
+      "extents_m": [
+        1.048844,
+        0.85,
+        1.259705
+      ],
+      "triangles": 1968,
+      "geometries": 1,
+      "material_count": 1,
+      "materials": [
+        "Mat"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "use": "Production shelving",
+      "license": "CC0-1.0",
+      "file": "assets/models3d/props/warehouse_rack_tall.glb",
+      "bytes": 20304,
+      "sha256": "ca5f2e6eee978eda267d85f78f61db93552c6610c859ad581d32e5a9572bd968",
+      "bounds_m": [
+        [
+          -0.794509,
+          0.0,
+          -0.313178
+        ],
+        [
+          0.794509,
+          2.4,
+          0.313178
+        ]
+      ],
+      "extents_m": [
+        1.589018,
+        2.4,
+        0.626355
+      ],
+      "triangles": 536,
+      "geometries": 3,
+      "material_count": 3,
+      "materials": [
+        "Accent",
+        "DarkGrey",
+        "Main"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true
+      }
+    },
+    {
+      "use": "Production hanging lights",
+      "license": "CC0-1.0",
+      "file": "assets/models3d/props/warehouse_pendant_light.glb",
+      "bytes": 8416,
+      "sha256": "97d9b44cdca46b83e8e8ddcf1b48bf6ec18f02b9cc46185a20a22cd46d6c106d",
+      "bounds_m": [
+        [
+          -0.147366,
+          0.0,
+          -0.145866
+        ],
+        [
+          0.147366,
+          0.55,
+          0.145866
+        ]
+      ],
+      "extents_m": [
+        0.294732,
+        0.55,
+        0.291732
+      ],
+      "triangles": 269,
+      "geometries": 3,
+      "material_count": 3,
+      "materials": [
+        "Grey",
+        "Light",
+        "LightMetal"
+      ],
+      "textures": 0,
+      "external_uris": [],
+      "checks": {
+        "base_y_is_zero": true,
+        "centered_xz": true,
+        "has_triangles": true,
+        "has_materials": true,
+        "has_no_textures": true,
+        "self_contained_glb": true,
+        "size_under_256_kib": true
+      }
+    }
+  ]
+}
