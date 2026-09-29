@@ -53,6 +53,16 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.mini{font-family:Montserrat,A
 
 
 /* ===== Ajustes UX 31/08/2026 · panel docente ===== */
+.company-results-button{width:100%;margin-top:12px}
+.result-company-card .card-title{display:flex;justify-content:space-between;align-items:center}
+.result-company-card .card-title label{min-width:220px;margin:0}
+.individual-report{max-width:760px;margin:0 auto}.individual-report h3{margin:0 0 6px}
+.financial-section{margin:20px 0}.financial-section h4{color:var(--gold);margin:0 0 8px}
+.financial-rows{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.financial-rows>div{display:grid;grid-template-columns:1fr minmax(130px,auto);gap:18px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.financial-rows>div:last-child{border-bottom:0}.financial-rows span{color:var(--muted)}.financial-rows strong{text-align:right}
+.suggested-podium{display:grid;gap:8px}.suggestion-row{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px}.suggestion-row b{color:var(--gold)}
+.podium-publish{margin-top:18px}
 .section-head{margin-bottom:18px}
 #tab-resultados>.table-card{margin-top:18px}
 #tab-resultados>.table-card+.table-card{margin-top:22px}

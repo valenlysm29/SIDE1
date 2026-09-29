@@ -744,24 +744,20 @@ function teacherFinancialDetail(r){
 function renderResults(){
   const active=state.reports.filter(r=>r.estado!=='eliminada'),totalProfit=active.reduce((s,r)=>s+Number(r.utilidad||0),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
   $('resultStats').innerHTML=[['Empresas',state.reports.length],['Calificadas',graded.length],['Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
-  $('incomeStatementBody').innerHTML=state.reports.map(r=>{const x=r.estadoResultados||{};return `<tr><td><b>${escapeHtml(r.empresa)}</b></td><td>${money(x.ventasNetas??x.ingresos??r.ingresos)}</td><td>${money(x.costos??r.costos)}</td><td>${money(x.impactoEventos)}</td><td>${money(Number(x.resultadoVentaActivos||0)+Number(x.otros||0))}</td><td>${money(x.utilidad??r.utilidad)}</td></tr>`}).join('');
-  $('cashBalanceBody').innerHTML=state.reports.map(r=>{const x=r.balanceCaja||{};return `<tr><td><b>${escapeHtml(r.empresa)}</b></td><td>${money(x.cajaInicial??r.capital)}</td><td>${money(x.entradas)}</td><td>${money(x.salidas)}</td><td>${money(x.cajaFinal??r.caja)}</td></tr>`}).join('');
-  $('cashFlowBody').innerHTML=state.reports.map(r=>{const x=r.flujoCaja||{};return `<tr><td><b>${escapeHtml(r.empresa)}</b></td><td>${money(x.operacion)}</td><td>${money(x.inversion)}</td><td>${money(x.financiamiento)}</td><td>${money(x.flujoNeto)}</td></tr>`}).join('');
-  $('detailReports').innerHTML=state.reports.map(r=>`<div class="report-detail"><h4>${escapeHtml(r.empresa)} · ${gradeLabel(r)}</h4><div class="section-status-row">${sectionBadges(r)}</div>${teacherFinancialDetail(r)}<p><b>Actualizado:</b> ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`).join('')||'<p class="hint">Sin resultados recibidos.</p>';
+  const sel=$('resultCompanySelect');
+  const selected=state.reports.find(r=>r.id===state.resultCompanyId)||state.reports[0];
+  if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}
+  state.resultCompanyId=selected.id;
+  sel.innerHTML=state.reports.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
+  const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
+  const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
+  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',[['Ventas netas',er.ventasNetas??er.ingresos??r.ingresos],['Gastos operativos',er.costos??r.costos],['Impacto de eventos',er.impactoEventos],['Otros resultados',Number(er.resultadoVentaActivos||0)+Number(er.otros||0)],['Utilidad',er.utilidad??r.utilidad]])}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Activos fijos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
 }
-function renderWinnerSelect(){
-  const sel=$('winnerSelect'),selected=sel.value;
-  const active=state.reports.filter(r=>r.estado!=='eliminada');
-  sel.innerHTML=active.map(r=>`<option value="${escapeAttr(r.empresa)}">${escapeHtml(r.empresa)} — ${gradeLabel(r)}</option>`).join('');
-  if(active.some(r=>r.empresa===selected))sel.value=selected;
-  renderPodium();
+function renderWinnerSelect(){renderPodium();
 }
 function publishedPodium(){try{return JSON.parse(localStorage.getItem('SIDE_PUBLISHED_PODIUM')||'null')}catch{return null}}
 function podiumCandidates(){
-  const winner=$('winnerSelect').value,list=state.reports.filter(r=>r.estado!=='eliminada').sort((a,b)=>Number(gradeValue(b)??-1)-Number(gradeValue(a)??-1));
-  const idx=list.findIndex(r=>r.empresa===winner);
-  if(idx>0)[list[0],list[idx]]=[list[idx],list[0]];
-  return list.slice(0,3);
+  return window.SIDE_TEACHER_PODIUM.finalPodium(state.reports,gradeValue);
 }
 function renderPodium(){
   const publication=publishedPodium(),sameGame=publication&&(!publication.code||publication.code===$('gameCode').value);
@@ -771,17 +767,20 @@ function renderPodium(){
   $('podiumState').textContent=visible?'Publicado · 24 horas':sameGame?'Publicación vencida':'Vista previa';
   $('publishStatus').textContent=visible?'Disponible hasta: '+new Date(RULES.podiumExpiry(publication)).toLocaleString('es-PE'):sameGame?'El podio dejó de mostrarse al cumplirse 24 horas.':'El podio será visible durante 24 horas desde su publicación.';
   $('podiumPreview').innerHTML=list.map((r,i)=>`<div class="podium-place ${classes[i]}"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><small>${r.grade!=null?Number(r.grade).toLocaleString('es-PE')+' / 20':visible?'Sin calificar':gradeLabel(r)}</small></div>`).join('')||`<p>${sameGame?'La publicación del podio ha finalizado.':'Sin empresas activas.'}</p>`;
+  $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Sin empresas activas.</p>';
 }
 function publishPodium(){
-  const winner=$('winnerSelect').value;if(!winner){toast('Selecciona una empresa ganadora.');return}
-  const publication={code:$('gameCode').value,publishedAt:new Date().toISOString(),winner,reason:$('winnerReason').value,podium:podiumCandidates().map(r=>({empresa:r.empresa,grade:gradeValue(r)}))};
+  const active=state.reports.filter(r=>r.estado!=='eliminada');
+  if(!active.length||active.some(r=>gradeValue(r)==null)){toast('Califica a todas las empresas activas antes de publicar.');return;}
+  const podium=podiumCandidates();
+  const publication={code:$('gameCode').value,publishedAt:new Date().toISOString(),winner:podium[0].empresa,reason:$('winnerReason').value,podium:podium.map(r=>({empresa:r.empresa,grade:r.grade}))};
   publication.expiresAt=new Date(RULES.podiumExpiry(publication)).toISOString();
   localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(publication));
   renderPodium();toast('Podio publicado por 24 horas.');
 }
 function loadPublished(){
   const p=publishedPodium();
-  if(RULES.podiumVisible(p,$('gameCode').value)){$('winnerSelect').value=p.winner;$('winnerReason').value=p.reason||'';}
+  if(RULES.podiumVisible(p,$('gameCode').value))$('winnerReason').value=p.reason||'';
   renderPodium();
 }
 setInterval(renderPodium,1000);
@@ -832,7 +831,7 @@ $('startTimer')?.addEventListener('click',startTimer);
 $('cutRound')?.addEventListener('click',cutRound);
 $('clearEvents')?.addEventListener('click',()=>{state.events=[];localStorage.removeItem('SIDE_EVENT_LOG');renderEvents();});
 $('publishPodium')?.addEventListener('click',publishPodium);
-$('winnerSelect')?.addEventListener('change',renderPodium);
+$('resultCompanySelect')?.addEventListener('change',event=>{state.resultCompanyId=event.target.value;renderResults();});
 $('viewPdf')?.addEventListener('click',showPdf);
 $('downloadPdf')?.addEventListener('click',downloadPdf);
 $('closePdf')?.addEventListener('click',()=>$('pdfModal').classList.add('hidden'));

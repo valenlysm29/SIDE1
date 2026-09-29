@@ -131,18 +131,16 @@
     <section id="tab-resultados" class="tab-panel">
       <div class="section-head"><div><span class="eyebrow">RESULTADOS</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
       <div class="stats-grid" id="resultStats"></div>
-      <article class="card table-card"><div class="card-title"><h3>Estado de resultados</h3><span>Ventas netas · gastos · eventos · resultado</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ventas netas</th><th>Gastos operativos</th><th>Eventos</th><th>Otros resultados</th><th>Utilidad</th></tr></thead><tbody id="incomeStatementBody"></tbody></table></div></article>
-      <article class="card table-card"><div class="card-title"><h3>Balance de caja</h3><span>Caja inicial + entradas − salidas = caja final</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Caja inicial</th><th>Entradas</th><th>Salidas</th><th>Caja final</th></tr></thead><tbody id="cashBalanceBody"></tbody></table></div></article>
-      <article class="card table-card"><div class="card-title"><h3>Flujo de caja</h3><span>Operación · inversión · financiamiento · flujo neto</span></div><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Operación</th><th>Inversión</th><th>Financiamiento</th><th>Flujo neto</th></tr></thead><tbody id="cashFlowBody"></tbody></table></div></article>
-      <div class="card"><div class="card-title"><h3>Detalle por empresa</h3><span>Apartados terminados y eventos</span></div><div id="detailReports"></div></div>
+      <article class="card result-company-card"><div class="card-title"><h3>Detalle por empresa</h3><label>Empresa<select id="resultCompanySelect" aria-label="Empresa para ver resultados"></select></label></div><div id="detailReports"></div></article>
     </section>
 
     <section id="tab-podio" class="tab-panel">
-      <div class="hero-card winner-hero"><div><span class="eyebrow">DECISIÓN FINAL DEL DOCENTE</span><h2>El sistema propone; el docente decide.</h2><p>Selecciona la empresa ganadora, revisa el podio y publícalo cuando estés listo. El podio se muestra durante 24 horas desde su publicación.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
+      <div class="hero-card winner-hero"><div><span class="eyebrow">PODIO</span><h2>Resultados y calificaciones</h2><p>SIDE muestra una sugerencia financiera. El podio final publicado se ordena exclusivamente por las notas del profesor y se muestra durante 24 horas.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
       <div class="grid two">
-        <article class="card"><div class="card-title"><h3>Elegir ganador</h3><span>Manual</span></div><label>Empresa ganadora<select id="winnerSelect"></select></label><label>Justificación<textarea id="winnerReason" rows="4" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary full">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
+        <article class="card"><div class="card-title"><h3>Sugerencia de SIDE</h3><span>Solo informativa</span></div><p class="hint">Puntaje de 0 a 100: margen de utilidad 35 (20% alcanza el máximo), rentabilidad sobre activos 25 (15%), efectivo/activos 25 (30%) y baja deuda/activos 15. Los indicadores sin datos valen cero.</p><div id="sidePodium" class="suggested-podium"></div></article>
         <article class="card"><div class="card-title"><h3>Podio · publicación de 24 horas</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium"></div></article>
       </div>
+      <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Califica a todas las empresas activas en Empresas para publicar. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
     </section>
   </main>
 </div>
@@ -190,6 +188,7 @@
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="side_rules.js?v=20260924-observations"></script>
 <script src="events_catalog.js?v=20260910-2"></script>
+<script src="teacher_podium.js?v=20260929-1"></script>
 <script src="services/teacher_sync.js?v=20260929-1"></script>
 <script src="docente.js?v=20260924-observations"></script>
 </body>
