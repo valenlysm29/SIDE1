@@ -3,9 +3,9 @@ import {assetManager as sharedAssetManager, ASSET_PRIORITY} from './asset_manage
 export const CHARACTER_IDS = Object.freeze(['chico1', 'chico2', 'chico3', 'mona']);
 
 export const CHARACTER_CATALOG = Object.freeze({
-  chico1: Object.freeze({id: 'chico1', name: 'Joel', gender: 'masculine', model: 'assets/models3d/npcs/chico1.glb'}),
+  chico1: Object.freeze({id: 'chico1', name: 'Gonzalo', gender: 'masculine', model: 'assets/models3d/npcs/chico1.glb'}),
   chico2: Object.freeze({id: 'chico2', name: 'Miguel', gender: 'masculine', model: 'assets/models3d/npcs/chico2.glb'}),
-  chico3: Object.freeze({id: 'chico3', name: 'Gonzalo', gender: 'masculine', model: 'assets/models3d/npcs/chico3.glb'}),
+  chico3: Object.freeze({id: 'chico3', name: 'Joel', gender: 'masculine', model: 'assets/models3d/npcs/chico3.glb'}),
   mona: Object.freeze({id: 'mona', name: 'Valeria', gender: 'feminine', model: 'assets/models3d/npcs/mona.glb'})
 });
 

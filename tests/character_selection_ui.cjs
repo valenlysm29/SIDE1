@@ -3,6 +3,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
+const {pathToFileURL}=require('node:url');
 const {chromium}=require('playwright');
 
 const root=path.resolve(__dirname,'..');
@@ -13,6 +14,11 @@ const section=html.match(/<section id="characterSelection"[\s\S]*?<\/section>/)?
 
 test('selector supports selection, persistence, confirmation, keyboard and target desktop sizes',async()=>{
   assert.ok(section,'character selector markup exists');
+  const {CHARACTER_CATALOG}=await import(pathToFileURL(path.join(root,'services/character_manager.mjs')).href);
+  const characters=[
+    {slug:'joel',name:'Joel',modelId:'chico3'},
+    {slug:'gonzalo',name:'Gonzalo',modelId:'chico1'}
+  ];
     const windowsChrome='C:/Program Files/Google/Chrome/Application/chrome.exe';
     const executablePath=process.env.CHROMIUM_PATH||(fs.existsSync(windowsChrome)?windowsChrome:undefined);
     const browser=await chromium.launch(executablePath?{executablePath,headless:true}:{headless:true});
@@ -32,6 +38,20 @@ test('selector supports selection, persistence, confirmation, keyboard and targe
     assert.equal(await page.evaluate(()=>CharacterSelection.getSelected()),null);
     assert.equal(await page.locator('#confirmCharacterBtn').isDisabled(),true);
 
+    for(const {slug,name,modelId} of characters){
+      const card=page.locator(`[data-character="${slug}"]`);
+      assert.equal(await card.count(),1);
+      assert.equal(await card.getAttribute('data-character'),slug);
+      assert.equal(await card.locator('strong').textContent(),name.toUpperCase());
+      const portrait=card.locator('img');
+      assert.equal(await portrait.getAttribute('alt'),`${name}, personaje jugable`);
+      assert.equal(await portrait.getAttribute('src'),`assets/characters/thumbnails/${modelId}.webp`);
+      assert.ok(fs.existsSync(path.join(root,'assets/characters/thumbnails',`${modelId}.webp`)));
+      assert.equal(CHARACTER_CATALOG[modelId].name,name);
+      assert.equal(CHARACTER_CATALOG[modelId].model,`assets/models3d/npcs/${modelId}.glb`);
+      assert.ok(fs.existsSync(path.join(root,CHARACTER_CATALOG[modelId].model)));
+    }
+
     await page.evaluate(()=>CharacterSelection.open());
     await page.locator('[data-character="joel"]').click();
     assert.equal(await page.locator('[data-character="joel"]').getAttribute('aria-pressed'),'true');
@@ -43,9 +63,9 @@ test('selector supports selection, persistence, confirmation, keyboard and targe
     await page.locator('#confirmCharacterBtn').click();
     assert.equal(await confirmation,'joel');
 
-    await page.locator('[data-character="joel"]').focus();
+    await page.locator('[data-character="gonzalo"]').focus();
     await page.keyboard.press('ArrowRight');
-    assert.equal(await page.evaluate(()=>document.activeElement?.dataset.character),'gonzalo');
+    assert.equal(await page.evaluate(()=>document.activeElement?.dataset.character),'joel');
 
     for(const viewport of [{width:1920,height:1080},{width:1600,height:900},{width:1366,height:768},{width:1280,height:720}]){
       await page.setViewportSize(viewport);

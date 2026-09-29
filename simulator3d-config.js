@@ -59,9 +59,9 @@
   });
 
   const NPCS = Object.freeze({
-    chico1: Object.freeze({name:'Joel',model:'assets/models3d/npcs/chico1.glb',height:1.78}),
+    chico1: Object.freeze({name:'Gonzalo',model:'assets/models3d/npcs/chico1.glb',height:1.78}),
     chico2: Object.freeze({name:'Miguel',model:'assets/models3d/npcs/chico2.glb',height:1.73}),
-    chico3: Object.freeze({name:'Gonzalo',model:'assets/models3d/npcs/chico3.glb',height:1.76}),
+    chico3: Object.freeze({name:'Joel',model:'assets/models3d/npcs/chico3.glb',height:1.76}),
     mona: Object.freeze({
       name: 'Valeria',
       model: 'assets/models3d/npcs/mona.glb',

@@ -323,7 +323,7 @@ function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${curr
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
-const CHARACTER_MODEL_IDS=Object.freeze({miguel:'chico2',joel:'chico1',gonzalo:'chico3',valeria:'mona'});
+const CHARACTER_MODEL_IDS=Object.freeze({miguel:'chico2',joel:'chico3',gonzalo:'chico1',valeria:'mona'});
 const CHARACTER_SLUGS=Object.freeze(Object.fromEntries(Object.entries(CHARACTER_MODEL_IDS).map(([slug,id])=>[id,slug])));
 function characterSelectionKey(){return `SIDE_SELECTED_CHARACTER_${storageKey()}`}
 function selectedCharacterSlug(){

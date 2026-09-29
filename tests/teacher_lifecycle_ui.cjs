@@ -44,10 +44,11 @@ function fixture(name){
  assert.equal(await page.evaluate(()=>state.round),2);
  assert.equal(await page.evaluate(()=>runtime().duration),600);
  assert.equal(await page.locator('#advanceRound').isDisabled(),false);
- await page.evaluate(()=>{switchTab('podio');});await page.waitForFunction(()=>$('winnerSelect').value==='Empresa A');
+ await page.evaluate(()=>{switchTab('podio');const report=state.reports.find(r=>r.empresa==='Empresa A');saveCompanyGrade(report.id,18);});
+ await page.waitForFunction(()=>document.querySelector('#podiumPreview')?.textContent.includes('Empresa A'));
  await page.locator('#publishPodium').click();
  assert.match(await page.locator('#podiumState').innerText(),/24 horas/i);
- await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400000).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));loadPublished();});
+ await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400000).toISOString();p.expiresAt=new Date(Date.now()-1000).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));loadPublished();});
  assert.equal(await page.locator('#podiumPreview .podium-place').count(),0);
  assert.match(await page.locator('#podiumState').innerText(),/vencida/i);
  await page.evaluate(async()=>{

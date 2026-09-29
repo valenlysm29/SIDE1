@@ -12,8 +12,8 @@ El visor `tools/npc_preview.html`, abierto desde el mismo servidor local, permit
 comparar los cuatro, elegir uno, cambiar la velocidad, pausar y girar la cámara.
 No necesita cuentas, servicios de modelos ni acceso a Internet.
 
-Nombres asignados: `chico1` → **Joel**, `chico2` → **Miguel**, `chico3` →
-**Gonzalo**, `mona` → **Valeria**. Se muestran sobre cada personaje y se
+Nombres asignados: `chico1` → **Gonzalo**, `chico2` → **Miguel**, `chico3` →
+**Joel**, `mona` → **Valeria**. Se muestran sobre cada personaje y se
 configuran en `simulator3d-config.js`, campo `NPCS.<id>.name`.
 
 ## Modelos y movimiento
@@ -68,9 +68,9 @@ originales que permanecen en Descargas.
 
 | Modelo | Original, bytes | Juego, bytes | Triángulos del juego | Altura |
 | --- | ---: | ---: | ---: | ---: |
-| Joel | 58.869.440 | 4.058.852 | 35.000 | 1,78 m |
+| Gonzalo | 58.869.440 | 4.058.852 | 35.000 | 1,78 m |
 | Miguel | 59.775.692 | 4.163.056 | 35.000 | 1,73 m |
-| Gonzalo | 61.247.504 | 4.682.424 | 35.000 | 1,76 m |
+| Joel | 61.247.504 | 4.682.424 | 35.000 | 1,76 m |
 | Valeria | 74.999.312 | 4.161.772 | 35.000 | 1,68 m |
 
 Los archivos de juego suman aproximadamente 17,1 MB frente a 254,9 MB originales.
