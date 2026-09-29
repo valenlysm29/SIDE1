@@ -344,6 +344,11 @@ begin
       'serverTime', clock_timestamp()
     ),
     'ciclo_partida', v_ciclo,
+    'empresas_unidas', (
+      select count(distinct joined.empresa_id)
+      from public.participantes joined
+      where joined.partida_id=v_partida.id and joined.empresa_id is not null
+    ),
     'decisiones_ciclo', v_decisiones,
     'decisiones_historial', v_historial,
     'reporte_ciclo', v_reporte,

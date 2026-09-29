@@ -129,6 +129,20 @@ function studentAccess(existing=true){
 function updateIntegrationUI(){
   const access=studentAccess(),button=$('enterDecisionsBtn'),notice=$('studentIntegrationNotice');
   const decisionsComplete=simulationSubmissionComplete();
+  const waiting=Boolean(access.integration&&!access.cancelled),waitingScreen=$('studentWaiting');
+  waitingScreen?.classList.toggle('hidden',!waiting);
+  $('studentLobby')?.classList.toggle('is-waiting',waiting);
+  const waitingTitle=`${currentStudent.game?.nombre||'Partida SIDE'} · ${currentStudent.game?.codigo||''}`;
+  if($('waitingGameName')&&$('waitingGameName').textContent!==waitingTitle)$('waitingGameName').textContent=waitingTitle;
+  if(waiting&&$('waitingCompanies')&&Number.isFinite(studentJoinedCompanies)){
+    const count=Math.max(1,studentJoinedCompanies);
+    const label=`${count} ${count===1?'empresa unida':'empresas unidas'}`;
+    if($('waitingCompanies').textContent!==label)$('waitingCompanies').textContent=label;
+  }
+  if(notice){
+    const destination=waiting?$('waitingCompanies'):$('lobbySegment');
+    if(destination&&notice.previousElementSibling!==destination)destination.after(notice);
+  }
   $('studentLobby')?.classList.toggle('game-cancelled',Boolean(access.cancelled));
   $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
@@ -136,13 +150,17 @@ function updateIntegrationUI(){
   if(button){button.disabled=!access.canOperate;button.classList.toggle('hidden',!access.canOperate||decisionsComplete);}
   if(notice){
     notice.classList.toggle('hidden',access.canOperate);
-    notice.textContent=access.reason||'';
+    const reason=access.reason||'';
+    if(notice.dataset.reason!==reason){notice.dataset.reason=reason;notice.textContent=reason;}
     if(access.integration&&Number.isFinite(access.remaining)){
-      const timer=document.createElement('strong');timer.id='integrationCountdown';
-      const seconds=Math.max(0,access.remaining);timer.textContent=` ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
-      notice.appendChild(timer);
-      if(seconds===0)notice.append(' · Sincronizando el inicio…');
-      else notice.append(' Puedes permanecer en esta pantalla.');
+      let timer=$('integrationCountdown');
+      if(!timer){timer=document.createElement('strong');timer.id='integrationCountdown';notice.appendChild(timer);}
+      const seconds=Math.max(0,access.remaining),label=` ${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+      if(timer.textContent!==label)timer.textContent=label;
+      let suffix=$('integrationWaitSuffix');
+      if(!suffix){suffix=document.createElement('span');suffix.id='integrationWaitSuffix';notice.appendChild(suffix);}
+      const suffixText=seconds===0?' · Sincronizando el inicio…':' Puedes permanecer en esta pantalla.';
+      if(suffix.textContent!==suffixText)suffix.textContent=suffixText;
     }
   }
   if(access.cancelled){
@@ -159,7 +177,7 @@ function updateIntegrationUI(){
   if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
 let cancellationShown=false,authoritativeStudentState=null;
-let studentConnected=false,remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null;
+let studentConnected=false,remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
 function studentNow(){return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
 function studentIdentityKey(student=currentStudent){const i=studentIdentity(student);return `${i.codigo}|${i.nombreLegal}|${i.nombreComercial}`}
@@ -261,6 +279,8 @@ async function refreshStudentGame(options={}){
         if(!studentConnected||studentIdentityKey()!==identityKey)return false;
         if(!r.success||!r.data?.partida||!r.data?.empresa)return false;
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
+        const joined=Number(data.empresas_unidas);
+        if(Number.isSafeInteger(joined)&&joined>=1)studentJoinedCompanies=joined;
         const empresaId=data.empresa_id||empresa.id||currentStudent.empresaId;
         const previousRevision=Math.max(0,Number(currentStudent.snapshotRevision)||0),serverRevision=Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0);
         const canonicalCompany=S.EmpresaService.cleanText(empresa.nombre_comercial||currentStudent.company),canonicalLegal=S.EmpresaService.cleanText(empresa.nombre_legal||currentStudent.legalName);
@@ -276,6 +296,7 @@ async function refreshStudentGame(options={}){
     try{remoteValid=await remoteStateTask;}finally{remoteStateBusy=false;remoteStateTask=null;}
   }
   if(!currentStudent.empresaId&&teacherConfig().lifecycleVersion===2){
+    studentJoinedCompanies=1;
     const c=teacherConfig(),r=RULES.resolveRuntime(c,studentNow());
     applyStudentGameState({configuracion:{...c,runtime:r,phase:r.phase},estado:r.phase==='finished'?'finalizada':'esperando'});
   }
@@ -409,7 +430,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(returning)toast('Bienvenido de vuelta. Tu progreso fue restaurado.');
     localStorage.setItem('SIDE_REMOTE_GAME_'+code,'1');
   }
-  studentConnected=true;studentProgressHydrated=!currentStudent.empresaId||studentProgressHydrated;autoEnterDecisions=false;cancellationShown=false;
+  studentConnected=true;studentProgressHydrated=!currentStudent.empresaId||studentProgressHydrated;autoEnterDecisions=false;cancellationShown=false;studentJoinedCompanies=null;
   try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
   startStudentSync();
   loadDecisionState();
@@ -438,7 +459,8 @@ $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
 $('cancelledBackToProfiles')?.addEventListener('click',()=>$('backToProfiles').click());
 $('resumeWorldBtn')?.addEventListener('click',requestWorldEntry);
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
-$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
+$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;studentJoinedCompanies=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
+$('waitingBackToProfiles')?.addEventListener('click',()=>$('backToProfiles')?.click());
 $('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStudentReportPreview();if(window.__SIDE_RETURN_TO_3D){window.__SIDE_RETURN_TO_3D=false;window.SIDE3D?.returnFromDecisions?.();}else showScreen('studentLobby')});
 $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 

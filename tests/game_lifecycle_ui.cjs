@@ -50,6 +50,9 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   const invitation=await page(studentHTML);await invitation.goto('http://side.test/index.html?partida='+game.codigo);
   assert.equal(await invitation.locator('#studentModal').isVisible(),true);assert.equal(await invitation.locator('#gameCode').inputValue(),game.codigo);await invitation.close();
   const s1=await student(game,'First'),s2=await student(game,'Second');
+  await s1.evaluate(()=>refreshStudentGame());
+  assert.equal(await s1.locator('#studentWaiting').isVisible(),true);
+  assert.match(await s1.locator('#waitingCompanies').innerText(),/2 empresas unidas/);
   assert.match(await s1.locator('#studentIntegrationNotice').innerText(),/Sala de espera/);
   assert.equal(await s1.locator('#enterDecisionsBtn').isDisabled(),true);
   assert.equal(await s1.evaluate(()=>{showScreen('decisionMenu');return openDecisionMenu()}),false);
@@ -63,6 +66,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.locator('#startGame').innerText(),'Iniciar ciclo 1');
   await t.locator('#startGame').click();
   await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
+  assert.equal(await s1.locator('#studentWaiting').isVisible(),false);
   assert.equal(await s1.evaluate(()=>worldCalls.enter),0,'waiting room must open decisions before the 3D world');
   await s1.evaluate(()=>{setDecisionsSubmitted(true);localStorage.setItem(characterSelectionKey(),'miguel');characterSelectionConfirmed=true;return requestWorldEntry();});
   await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));

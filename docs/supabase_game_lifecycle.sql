@@ -559,6 +559,12 @@ begin
       select row_to_json(e) from public.empresas e
       where e.id = p_empresa_id
     ),
+    'empresas_unidas', (
+      select count(distinct joined.empresa_id)
+      from public.participantes owner
+      join public.participantes joined on joined.partida_id=owner.partida_id
+      where owner.empresa_id=p_empresa_id and joined.empresa_id is not null
+    ),
     'partida', (
       select jsonb_build_object(
         'id', p.id,

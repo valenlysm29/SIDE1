@@ -33,7 +33,6 @@
         <button id="startBtn" class="start-link" disabled>HAZ CLIC PARA EMPEZAR</button>
       </div>
     </div>
-    <button id="openCreditsBtn" class="credits-launcher" type="button" aria-haspopup="dialog" aria-controls="creditsModal">CRÉDITOS</button>
   </section>
 
   <section id="profiles" class="screen profile-screen hidden" aria-label="Elegir perfil">
@@ -151,6 +150,19 @@
 
   <section id="studentLobby" class="screen dashboard-screen hidden" aria-label="Sala del estudiante">
     <div class="dashboard-bg" aria-hidden="true"></div>
+    <div id="studentWaiting" class="student-waiting hidden" role="region" aria-label="Sala de espera">
+      <div class="game-loading-bg" aria-hidden="true"></div>
+      <div class="game-loading-content student-waiting-content">
+        <img src="assets/side_logo.png" class="game-loading-logo" alt="SIDE">
+        <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p class="eyebrow">SALA DE ESPERA</p>
+        <h1>PREPARANDO LA PARTIDA...</h1>
+        <p id="waitingGameName"></p>
+        <p id="waitingCompanies" class="waiting-companies" role="status" aria-live="polite">Contando empresas conectadas…</p>
+        <p id="studentIntegrationNotice" class="hint" role="status" aria-live="polite"></p>
+        <button id="waitingBackToProfiles" class="ghost-btn" type="button">VOLVER AL INICIO</button>
+      </div>
+    </div>
     <div class="dashboard-inner lobby">
       <div class="lobby-card">
         <img src="assets/side_logo.png" class="dash-logo" alt="SIDE">
@@ -160,7 +172,6 @@
           <h2 id="lobbyGameName">Esperando...</h2>
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
-          <p id="studentIntegrationNotice" class="hint hidden" role="status" aria-live="polite"></p>
           <button id="cancelledBackToProfiles" class="ghost-btn hidden" type="button">VOLVER AL INICIO</button>
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>

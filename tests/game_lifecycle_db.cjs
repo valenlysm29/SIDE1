@@ -9,6 +9,7 @@ const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
   const join=(game,name)=>rpc(db,'ingresar_empresa',identity(game,name));
   const a=await join(manual,'A'),b=await join(manual,'B');assert.ok(a.empresa_id);assert.ok(b.empresa_id);
   const status=(game,name)=>rpc(db,'obtener_estado_estudiante',identity(game,name));
+  assert.equal((await status(manual,'A')).empresas_unidas,2,'waiting room count comes from this game only');
   const save=(game,name,cycle,revision=0)=>rpc(db,'guardar_decisiones_estudiante',{...identity(game,name),p_ciclo:cycle,p_decisiones:[],p_expected_revision:revision});
   const action=(game,name,extra={})=>rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:name,...extra});
   assert.equal((await status(manual,'A')).partida.configuracion.phase,'integration');
@@ -31,6 +32,7 @@ const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 
   const auto=await createGame(db,config({cycleCloseMode:'automatic',integrationDurationMinutes:2}));
   const c=await join(auto,'Auto');
+  assert.equal((await status(auto,'Auto')).empresas_unidas,1);
   assert.ok(Math.abs(Date.parse(auto.configuracion.gameStartAt)-Date.parse(auto.configuracion.integrationStartTime)-120000)<20);
   const initial=await status(auto,'Auto');assert.equal(initial.partida.configuracion.phase,'integration');
   const autoStart=await action(auto,'iniciar');
@@ -43,6 +45,15 @@ const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
   const d=await join(auto,'After');assert.equal(d.code,'PARTIDA_INICIADA');
   await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '11 minutes')) where id=$1`,[auto.id]);
   assert.equal((await status(auto,'Auto')).partida.configuracion.round,2);
+  const exactStart=Date.parse(auto.configuracion.gameStartAt),seconds=10*60;
+  const transition=await db.query('select side_runtime($1,$2) as before,side_runtime($1,$3) as after,side_runtime($1,$4) as done',[
+    auto.configuracion,new Date(exactStart+seconds*1000-1).toISOString(),new Date(exactStart+seconds*1000).toISOString(),new Date(exactStart+3*seconds*1000).toISOString()
+  ]);
+  assert.equal(transition.rows[0].before.round,1);
+  assert.equal(transition.rows[0].after.round,2);
+  assert.equal(transition.rows[0].after.phase,'decisions');
+  assert.equal(transition.rows[0].done.phase,'finished');
+  assert.equal(transition.rows[0].done.running,false);
   assert.equal((await join(auto,'Cycle2')).code,'PARTIDA_INICIADA');
   console.log('PASS automatic: persistent 2-minute deadline, repeat reads/reload, no teacher, catch-up, late rejection');
 

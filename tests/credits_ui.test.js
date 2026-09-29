@@ -31,13 +31,13 @@ test('credits data contains the required Poly Pizza attribution and traceable CC
   assert.ok(furniture.assets.includes('shop_mirror_wall.glb'));
 });
 
-test('credits modal is reachable from the splash and exposes dialog semantics',()=>{
+test('splash omits credits entry while attribution remains available in the project',()=>{
   const html=read('index.html'),app=read('app.js');
-  assert.match(html,/id="openCreditsBtn"[^>]+aria-haspopup="dialog"[^>]+aria-controls="creditsModal"/);
+  assert.doesNotMatch(html,/id="openCreditsBtn"/);
+  assert.ok(fs.existsSync(path.join(root,'CREDITS.md')));
   assert.match(html,/id="creditsModal"[^>]+role="dialog"[^>]+aria-modal="true"[^>]+aria-labelledby="creditsTitle"/);
   assert.match(html,/services\/credits_data\.js\?v=20260928-production/);
   assert.ok(html.indexOf('services/credits_data.js')<html.indexOf('app.js'));
-  assert.match(app,/renderCredits\(\);showModal\('creditsModal'\)/);
   assert.match(app,/if\(e\.key==='Escape'[^\n]+closeModal\(\)/);
   assert.match(app,/if\(trigger\?\.isConnected\)trigger\.focus\(\)/);
   assert.match(app,/source\.rel='noopener noreferrer'/);
