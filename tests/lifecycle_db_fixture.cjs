@@ -19,6 +19,8 @@ async function database(){
  await db.exec(base);
  const migration=fs.readFileSync(path.join(root,'docs/supabase_game_lifecycle.sql'),'utf8');
  await db.exec(migration);await db.exec(migration); // Repeatable deployment.
+ const studentAdmission=fs.readFileSync(path.join(root,'docs/supabase_student_admission.sql'),'utf8');
+ await db.exec(studentAdmission);await db.exec(studentAdmission); // Repeatable deployment.
  await db.query(`insert into auth.users(id,raw_user_meta_data,email) values($1,'{}','test@example.invalid')`,[professor]);
  await db.query(`select set_config('test.uid',$1,false)`,[professor]);
  return db;

@@ -7,6 +7,8 @@ const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','credi
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
+const JOIN_STARTED_MESSAGE = 'La partida ya inició. No se permiten nuevos ingresos.';
+const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso con los datos proporcionados.';
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
 const CREDIT_INITIAL_PERCENT = 70;
@@ -75,7 +77,7 @@ function teacherConfig(){
   try{return {...defaults,...JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')||'{}')}}catch{return defaults}
 }
 function stableHash(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-function initialCapital(){const c=teacherConfig();if(c.capitalMode!=='random')return Math.max(0,Number(c.capital||100000));let min=Math.max(0,Number(c.capitalMin||80000)),max=Math.max(min,Number(c.capitalMax||120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
+function initialCapital(){const source=currentStudent?.initialCapital,remote=Number(source);if(source!==null&&source!==undefined&&source!==''&&Number.isFinite(remote)&&remote>=0)return remote;const c=teacherConfig();if(c.capitalMode!=='random')return Math.max(0,Number(c.capital||100000));let min=Math.max(0,Number(c.capitalMin||80000)),max=Math.max(min,Number(c.capitalMax||120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
 function creditOutstanding(){
   const prefix=`SIDE_DECISION_RECEIPTS_${storageKey()}_`;
   let total=0;
@@ -156,8 +158,10 @@ function updateIntegrationUI(){
   if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
 let cancellationShown=false,authoritativeStudentState=null;
-let studentConnected=false,remoteStateBusy=false,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null;
+let studentConnected=false,remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null;
 function studentNow(){return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
+function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
+function studentIdentityKey(student=currentStudent){const i=studentIdentity(student);return `${i.codigo}|${i.nombreLegal}|${i.nombreComercial}`}
 function startStudentSync(){
   stopStudentSync();studentPoll=setInterval(refreshStudentGame,3000);studentTick=setInterval(tickStudentGame,1000);
 }
@@ -175,22 +179,100 @@ function applyStudentGameState(partida,round=1){
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:config.cancelledAt||null,active:partida.estado!=='finalizada'&&!config.cancelledAt&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
   if(currentStudent.empresaId)authoritativeStudentState={empresaId:currentStudent.empresaId,config:deepClone(config),status:JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')),runtime:{...(config.runtime||{}),round:config.runtime?.round||round}};
 }
-async function refreshStudentGame(){
-  if(!studentConnected)return;
+function remoteSnapshot(data){
+  const report=data?.reporte_ciclo||data?.reporteCiclo||null;
+  return data?.snapshot||report?.snapshot||report?.estado_juego||report?.estadoJuego||null;
+}
+function legacyRemoteDecisionState(data){
+  const rows=data?.decisiones_historial||data?.decisionesHistorial||data?.decisiones_ciclo||[];
+  if(!Array.isArray(rows)||!rows.length)return {};
+  const state={};
+  for(const row of rows){
+    const itemId=row.decision_key||row.decisionKey||row.decision_codigo;
+    const optionId=row.option_key||row.optionKey||row.opcion_key;
+    const item=findDecisionItem(itemId);if(!item)continue;
+    const round=Math.max(1,Number(row.ciclo)||1),quantity=Number(row.cantidad)||0,cost=Number(row.costo_total)||0;
+    const entry=state[item.id]||(state[item.id]={round,label:item.name,cost:0});
+    entry.round=Math.max(Number(entry.round)||1,round);entry.cost=Number(entry.cost||0)+cost;
+    if(item.asset||item.id==='MOLDE'){
+      if(!optionId)continue;
+      entry.purchases=entry.purchases||{};entry.purchases[round]=entry.purchases[round]||{};entry.purchases[round][optionId]=quantity||1;
+      if(item.id==='MOLDE'){entry.optionIds=entry.optionIds||[];if(!entry.optionIds.includes(optionId))entry.optionIds.push(optionId);entry.optionRounds={...(entry.optionRounds||{}),[optionId]:round};}
+    }else if(item.type==='production-plan'){
+      entry.value=Number(entry.value||0)+Math.max(0,quantity);
+      if(optionId)entry.moldTargets={...(entry.moldTargets||{}),[optionId]:Math.max(0,quantity)};
+    }else if(item.type==='quantity'||item.type==='quantity-choice'){
+      if(!optionId)continue;entry.quantities={...(entry.quantities||{}),[optionId]:quantity};
+      if(item.type==='quantity-choice'){entry.optionIds=entry.optionIds||[];if(!entry.optionIds.includes(optionId))entry.optionIds.push(optionId);}
+    }else if(item.type==='choice'||item.type==='multi-choice'){
+      if(!optionId)continue;entry.optionIds=entry.optionIds||[];if(!entry.optionIds.includes(optionId))entry.optionIds.push(optionId);entry.optionRounds={...(entry.optionRounds||{}),[optionId]:round};
+      if(item.id==='CANALES'&&quantity>0){entry.quantities={...(entry.quantities||{}),[optionId]:quantity};if((item.options||[]).find(option=>option.id===optionId)?.channel==='store')entry.storeContracts={...(entry.storeContracts||{}),[optionId]:[{round,quantity}]};}
+    }else if(item.type==='loan')entry.amount=Math.max(Number(entry.amount)||0,cost);
+    else if(item.type==='number')entry.value=quantity;
+  }
+  return state;
+}
+function hydrateRemoteProgress(data){
+  const snapshot=remoteSnapshot(data);
+  if(!data?.partida||!data?.empresa||!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot))return false;
+  const round=Math.max(1,Number(snapshot?.round||snapshot?.ciclo||data?.ciclo_partida||data?.empresa?.ciclo_actual||currentRound()));
+  const rawDecisionSnapshot=snapshot?.decision_state||snapshot?.decisionState,rawLedgerSnapshot=snapshot?.cash_ledger||snapshot?.cashLedger,rawSectionsSnapshot=snapshot?.financial_sections||snapshot?.financialSections;
+  let decisionSnapshot=rawDecisionSnapshot;
+  if(!decisionSnapshot||typeof decisionSnapshot!=='object'||!Object.keys(decisionSnapshot).length)decisionSnapshot=legacyRemoteDecisionState(data);
+  const ledgerSnapshot=rawLedgerSnapshot;
+  const sectionsSnapshot=rawSectionsSnapshot;
+  const writes={
+    [decisionKey()]:JSON.stringify(decisionSnapshot&&typeof decisionSnapshot==='object'?decisionSnapshot:{}),
+    [ledgerKey()]:JSON.stringify(ledgerSnapshot&&typeof ledgerSnapshot==='object'?ledgerSnapshot:{}),
+    [financialSectionsKey()]:JSON.stringify(sectionsSnapshot&&typeof sectionsSnapshot==='object'?sectionsSnapshot:{})
+  };
+  const submissions=snapshot?.section_submissions||snapshot?.sectionSubmissions;
+  for(const category of decisionCategories())writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${category.cat}`]=null;
+  if(Array.isArray(submissions))for(const cat of submissions)writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${cat}`]='1';
+  else if(submissions&&typeof submissions==='object')for(const [cat,submitted] of Object.entries(submissions))writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${cat}`]=submitted?'1':null;
+  writes[`SIDE_DECISIONS_SUBMITTED_${storageKey()}_${round}`]=(snapshot.decisions_submitted??snapshot.decisionsSubmitted)?'1':null;
+  const character=snapshot?.selected_character||snapshot?.selectedCharacter;writes[characterSelectionKey()]=character?String(character):null;
+  if(!ledgerSnapshot||typeof ledgerSnapshot!=='object'||!Object.keys(ledgerSnapshot).length){
+    const caja=Number(data?.empresa?.caja_actual??data?.reporte_ciclo?.caja_final??data?.reporteCiclo?.caja_final);
+    if(Number.isFinite(caja)&&Math.abs(caja-initialCapital())>0.005)writes[ledgerKey()]=JSON.stringify({[`${round}:REMOTE_SNAPSHOT`]:caja-initialCapital()});
+  }
+  if(Object.keys(writes).length&&!writeDecisionBatch(writes))return false;
+  loadDecisionState();studentProgressHydrated=true;
+  if(!$('decisionMenu')?.classList.contains('hidden')){restoreDraftsForRound();renderTabs();renderDecisionCategory();updateHud();}
+  return true;
+}
+async function refreshStudentGame(options={}){
+  if(!studentConnected)return false;
+  const forceHydrate=Boolean(options.forceHydrate);
   const S=window.SIDE;
-  if(currentStudent.empresaId&&S?.EmpresaService&&!remoteStateBusy){
+  let remoteValid=!currentStudent.empresaId;
+  if(currentStudent.empresaId&&S?.EmpresaService){
+    if(remoteStateBusy){
+      if(!forceHydrate)return false;
+      try{await remoteStateTask;}catch{}
+      if(!studentConnected)return false;
+    }
     remoteStateBusy=true;
-    const empresaId=currentStudent.empresaId;
-    try{
-      const r=await S.EmpresaService.obtenerEstado(empresaId);
-      if(!studentConnected||currentStudent.empresaId!==empresaId)return;
-      if(r.success&&r.data){
-        const partida=r.data.partida||{},config=partida.configuracion;
-        const round=Number(config?.runtime?.round||r.data.ciclo_partida||r.data.empresa?.ciclo_actual||1);
+    const identity=studentIdentity(),identityKey=studentIdentityKey();
+    remoteStateTask=(async()=>{
+      try{
+        const r=await S.EmpresaService.obtenerEstado(identity);
+        if(!studentConnected||studentIdentityKey()!==identityKey)return false;
+        if(!r.success||!r.data?.partida||!r.data?.empresa)return false;
+        const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
+        const empresaId=data.empresa_id||empresa.id||currentStudent.empresaId;
+        const previousRevision=Math.max(0,Number(currentStudent.snapshotRevision)||0),serverRevision=Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0);
+        const canonicalCompany=S.EmpresaService.cleanText(empresa.nombre_comercial||currentStudent.company),canonicalLegal=S.EmpresaService.cleanText(empresa.nombre_legal||currentStudent.legalName);
+        currentStudent={...currentStudent,empresaId,participantId:data.participante_id||currentStudent.participantId,company:canonicalCompany,legalName:canonicalLegal,game:{...partida,codigo:S.EmpresaService.cleanCode(partida.codigo||identity.codigo)},snapshotRevision:serverRevision};
+        const round=Number(config?.runtime?.round||data.ciclo_partida||empresa.ciclo_actual||1);
         applyStudentGameState(partida,round);
-        if(config?.lifecycleVersion===2)localStorage.setItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey(),JSON.stringify(r.data.individualEvents||{}));
-      }
-    }catch(error){console.warn('SIDE: estado remoto pendiente',error)}finally{remoteStateBusy=false;}
+        if(forceHydrate||!studentProgressHydrated||serverRevision!==previousRevision){studentProgressHydrated=false;if(!hydrateRemoteProgress(data))return false;}
+        if(config?.lifecycleVersion===2)localStorage.setItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey(),JSON.stringify(data.individualEvents||{}));
+        try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
+        return true;
+      }catch(error){console.warn('SIDE: estado remoto pendiente');return false;}
+    })();
+    try{remoteValid=await remoteStateTask;}finally{remoteStateBusy=false;remoteStateTask=null;}
   }
   if(!currentStudent.empresaId&&teacherConfig().lifecycleVersion===2){
     const c=teacherConfig(),r=RULES.resolveRuntime(c,studentNow());
@@ -198,6 +280,7 @@ async function refreshStudentGame(){
   }
   updateIntegrationUI();
   if(!document.hidden)syncStudentReportPreview();
+  return remoteValid;
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&studentConnected)refreshStudentGame();});
 window.addEventListener('pagehide',stopStudentSync);
@@ -289,62 +372,42 @@ function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}$('registerForm')?.reset();if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
-  e.preventDefault(); const code=$('gameCode').value.trim().toUpperCase();
-  const legalName=$('companyLegalName')?.value.trim();
-  const brandName=$('companyBrandName')?.value.trim()||legalName||COMPANY_NAME;
+  e.preventDefault();studentProgressHydrated=false;studentSnapshotEpoch++; const S=window.SIDE||{},cleanText=S.EmpresaService?.cleanText||(value=>String(value||'').normalize('NFC').trim().replace(/\s+/g,' ')),cleanCode=S.EmpresaService?.cleanCode||(value=>cleanText(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
+  const code=cleanCode($('gameCode').value);
+  const legalName=cleanText($('companyLegalName')?.value);
+  const brandName=cleanText($('companyBrandName')?.value)||legalName||COMPANY_NAME;
   if(!legalName||!brandName){message('studentMessage','Ingresa el nombre y el nombre comercial de tu empresa.',true);return}
   const localCfg=teacherConfig(),localCode=String(localCfg.codigo||'SIDE-000').toUpperCase();
   if(!hasConfig&&code===localCode&&!localStorage.getItem('SIDE_REMOTE_GAME_'+code)&&!localStorage.getItem('SIDE_PARTIDA_ID')){
     let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
-    const previous=reports.find(r=>r.partida===code&&r.empresa.trim().toUpperCase()===brandName.toUpperCase());
+    const comparable=value=>cleanCode(value),previous=reports.find(r=>comparable(r.partida)===code&&comparable(r.empresa)===comparable(brandName)&&(!r.legalName||comparable(r.legalName)===comparable(legalName)));
     const access=studentAccess(Boolean(previous));
     if(!access.canJoin){message('studentMessage',access.reason,true);return;}
 
     const localGame={...DEMO_GAME,codigo:code,nombre:localCfg.nombre||DEMO_GAME.nombre,curso:localCfg.curso||DEMO_GAME.curso,estado:'activa'};
-    currentStudent={name:'Jugador',company:previous?.empresa||brandName,legalName,participantId:null,game:localGame,returning:Boolean(previous)};
+    currentStudent={name:'Jugador',company:previous?.empresa||brandName,legalName:previous?.legalName||legalName,participantId:null,game:localGame,returning:Boolean(previous)};
   }else{
-    if(!requireSupabase())return; message('studentMessage','Buscando partida...');
-    const S=window.SIDE||{};
-    // Fase A: buscar partida + crear empresa via servicios (RPC crear_empresa).
-    // Si Supabase falla, se usa el flujo local anterior como respaldo.
-    let found=null,empresaId=null,participantId=null,returning=false;
-    if(S.PartidaService){
-      const r=await S.PartidaService.buscarPorCodigo(code);
-      if(!r.success){message('studentMessage',r.error||'Error al buscar partida.',true);return}
-      found=r.data;
-    }else{
-      const{data:game,error}=await supabaseClient.rpc('buscar_partida_por_codigo',{p_codigo:code});if(error){message('studentMessage',error.message,true);return}
-      found=Array.isArray(game)?game[0]:game;
-    }
-    if(!found){message('studentMessage','No encontramos una partida con ese código.',true);return}
-    if(S.EmpresaService){
-      const c=await S.EmpresaService.crear(found.id,{nombreEstudiante:'Jugador',nombreLegal:legalName,nombreComercial:brandName,capital:initialCapital()});
-      if(!c.success){message('studentMessage',c.error||'No se pudo crear la empresa.',true);return}
-      empresaId=c.data?.empresa_id||null;participantId=c.data?.participante_id||null;
-      returning=Boolean(c.data?.reingreso);
-      if(returning)toast('Bienvenido de vuelta.');
-      // Fase A-fix: la partida manda en capital y reglas. Si el navegador no
-      // tiene config propia (incógnito/dispositivo nuevo), se siembra la remota
-      // para que la economía local coincida. Con config propia, manda la local.
-      try{
-        const remoteCfg=c.data?.configuracion;
-        if(remoteCfg&&typeof remoteCfg==='object'){
-          applyStudentGameState({...found,configuracion:remoteCfg},c.data?.ciclo_inicial||1);
-        }
-      }catch(error){console.error('SIDE: no se pudo aplicar config de partida',error)}
-    }else{
-      const{data:participant,error:joinError}=await supabaseClient.from('participantes').insert({partida_id:found.id,nombre:'Jugador',empresa:brandName}).select('id').single();
-      if(joinError){message('studentMessage',joinError.message,true);return} participantId=participant?.id||null;
-    }
-    currentStudent={name:'Jugador',company:brandName,legalName,participantId,empresaId,game:found,returning};
+    if(!requireSupabase())return;message('studentMessage','Validando ingreso...');
+    if(!S.EmpresaService?.ingresar){message('studentMessage','No se pudo validar el ingreso. Actualiza la página e inténtalo nuevamente.',true);return}
+    const ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName});
+    if(!ingreso.success){message('studentMessage',ingreso.code==='PARTIDA_INICIADA'?JOIN_STARTED_MESSAGE:JOIN_INVALID_MESSAGE,true);return}
+    const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
+    const empresaId=data.empresa_id||empresa.id||null,participantId=data.participante_id||null,returning=Boolean(data.reingreso);
+    if(!empresaId||!found.id){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
+    const canonicalBrand=cleanText(empresa.nombre_comercial||data.nombre_comercial||brandName),canonicalLegal=cleanText(empresa.nombre_legal||data.nombre_legal||legalName);
+    const capitalSource=empresa.caja_inicial??data.caja_inicial,currentCapital=Number(capitalSource);
+    currentStudent={name:'Jugador',company:canonicalBrand,legalName:canonicalLegal,participantId,empresaId,snapshotRevision:Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0),...(capitalSource!==null&&capitalSource!==undefined&&Number.isFinite(currentCapital)?{initialCapital:currentCapital}:{}),game:{...found,codigo:cleanCode(found.codigo||code)},returning};
+    const round=Number(data.ciclo_partida||empresa.ciclo_actual||data.ciclo_inicial||1);
+    try{applyStudentGameState(currentStudent.game,round);hydrateRemoteProgress(data);}catch(error){console.error('SIDE: no se pudo restaurar por completo el estado remoto',error)}
+    if(returning)toast('Bienvenido de vuelta. Tu progreso fue restaurado.');
     localStorage.setItem('SIDE_REMOTE_GAME_'+code,'1');
   }
-  studentConnected=true;autoEnterDecisions=false;cancellationShown=false;
+  studentConnected=true;studentProgressHydrated=!currentStudent.empresaId||studentProgressHydrated;autoEnterDecisions=false;cancellationShown=false;
   try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
   startStudentSync();
   loadDecisionState();
   await refreshStudentGame();
-  syncStudentReportPreview();
+  const joinedReport=syncStudentReportPreview();if(currentStudent.empresaId&&studentProgressHydrated)syncReportToSupabase(joinedReport);
   closeModal();startJoinLoading();
 });
 function startJoinLoading(){return prepareLobby()}
@@ -368,7 +431,7 @@ $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
 $('cancelledBackToProfiles')?.addEventListener('click',()=>$('backToProfiles').click());
 $('resumeWorldBtn')?.addEventListener('click',requestWorldEntry);
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
-$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
+$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
 $('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStudentReportPreview();if(window.__SIDE_RETURN_TO_3D){window.__SIDE_RETURN_TO_3D=false;window.SIDE3D?.returnFromDecisions?.();}else showScreen('studentLobby')});
 $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 
@@ -966,7 +1029,7 @@ function syncStudentReportPreview(){
   const utilidad=er.utilidad,cajaFinal=financial.balanceCaja.cajaFinal;
   const events=activeStudentEvents();
   const report={
-    id:currentStudent.participantId||('local-'+storageKey()),nombre:'Jugador',empresa:currentStudent.company,
+    id:currentStudent.participantId||('local-'+storageKey()),nombre:'Jugador',empresa:currentStudent.company,legalName:currentStudent.legalName,
     partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:initialCapital(),
     ingresos:er.ingresos,costos:er.costos,utilidad,rondasActivas:currentRound(),actividad:entries.length,
     canalesVenta:{cantidades:deepClone(savedEntry(findDecisionItem('CANALES'))?.quantities||{}),tiendasFisicas:RULES.storeCount(savedEntry(findDecisionItem('CANALES')))},
@@ -984,6 +1047,53 @@ function syncStudentReportPreview(){
   localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));renderStudentStatus();
   return report;
 }
+function persistStudentSession(){try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}}
+function buildStudentSnapshot(round=currentRound()){
+  return {
+    version:1,round,updated_at:new Date().toISOString(),
+    decision_state:deepClone(decisionState),cash_ledger:deepClone(cashLedger),financial_sections:recordedFinancialSections(),
+    section_submissions:Object.fromEntries(decisionCategories().map(category=>[category.cat,sectionSubmitted(category.cat)])),
+    decisions_submitted:decisionsSubmitted(),selected_character:selectedCharacterSlug()
+  };
+}
+async function recoverStaleStudentState(){
+  studentSnapshotEpoch++;studentProgressHydrated=false;
+  const recovered=await refreshStudentGame({forceHydrate:true});
+  studentSnapshotEpoch++;
+  if(recovered)toast('La empresa se actualizó en otra sesión. Recuperamos el estado más reciente.');
+  else toast('No se pudo sincronizar el estado. Vuelve a ingresar con los datos de tu empresa.');
+  return false;
+}
+function queueStudentSnapshot(snapshot,afterSnapshot=null){
+  const S=window.SIDE||{};if(!S.EmpresaService?.guardarEstado||!currentStudent?.empresaId)return Promise.resolve(false);
+  const epoch=studentSnapshotEpoch,identity=studentIdentity(),identityKey=studentIdentityKey();
+  const save=async()=>{
+    try{
+      if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
+      const expectedRevision=Math.max(0,Number(currentStudent.snapshotRevision)||0);
+      const result=await S.EmpresaService.guardarEstado(identity,snapshot,expectedRevision);
+      if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
+      if(!result.success){
+        if(result.code==='ESTADO_DESACTUALIZADO')return recoverStaleStudentState();
+        if(!result.offline)console.warn('SIDE: el estado remoto quedó pendiente.');
+        return false;
+      }
+      const newRevision=Math.max(expectedRevision+1,Number(result.data?.snapshot_revision??result.data?.snapshotRevision??result.data?.revision)||0);
+      currentStudent.snapshotRevision=newRevision;persistStudentSession();
+      if(typeof afterSnapshot!=='function')return true;
+      const operation=await afterSnapshot(newRevision);
+      if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
+      if(operation?.success)return true;
+      if(operation?.code==='ESTADO_DESACTUALIZADO')return recoverStaleStudentState();
+      if(!operation?.offline)console.warn('SIDE: la operación remota quedó pendiente.');
+      return false;
+    }catch(error){
+      console.warn('SIDE: la sincronización remota quedó pendiente.');return false;
+    }
+  };
+  studentSnapshotQueue=studentSnapshotQueue.then(save,save);
+  return studentSnapshotQueue;
+}
 /**
  * Sincroniza el reporte financiero calculado con Supabase (reportes).
  * Solo se llama en puntos de guardado/confirmación del usuario, nunca en
@@ -994,8 +1104,8 @@ function syncStudentReportPreview(){
 function syncReportToSupabase(report){
   try{
     const S=window.SIDE||{};
-    if(!S.DecisionesService||!currentStudent?.empresaId||!report)return;
-    const round=Number(report.ronda)||currentRound();
+    if(!currentStudent?.empresaId||!report)return;
+    const round=Number(report.ronda)||currentRound(),identity=studentIdentity();
     const payload={
       capital:report.capital,ingresos:report.ingresos,costos:report.costos,
       utilidad:report.utilidad,caja_final:report.caja,
@@ -1004,9 +1114,10 @@ function syncReportToSupabase(report){
       decisiones:report.decisiones||[],eventos:report.eventos||[],
       score:report.score||0,progreso:report.progreso||0
     };
-    S.DecisionesService.guardarReporte(currentStudent.empresaId,round,payload).then(r=>{
-      if(!r.success&&!r.offline)console.warn('SIDE: sync reporte:',r.error);
-    });
+    if(S.EmpresaService?.guardarEstado){
+      const snapshot=buildStudentSnapshot(round);
+      queueStudentSnapshot(snapshot,S.DecisionesService?(newRevision=>S.DecisionesService.guardarReporte(identity,round,payload,newRevision)):null);
+    }
   }catch(error){console.error('SIDE: no se pudo sincronizar el reporte',error)}
 }
 /**
@@ -1030,8 +1141,8 @@ async function syncSectionToSupabase(cat){
     }
     if(omitidas.length)console.info('SIDE: sync omite sin mapeo:',omitidas.join(','));
     if(!decisiones.length)return;
-    const r=await S.DecisionesService.guardar(currentStudent.empresaId,round,decisiones);
-    if(!r.success&&!r.offline)console.warn('SIDE: sync decisiones:',r.error);
+    const identity=studentIdentity(),snapshot=buildStudentSnapshot(round);
+    return await queueStudentSnapshot(snapshot,newRevision=>S.DecisionesService.guardar(identity,round,decisiones,newRevision));
   }catch(error){console.error('SIDE: no se pudo sincronizar la sección',error)}
 }
 /**
@@ -1171,8 +1282,10 @@ function tickStudentGame(){
 (async function restoreStudentSession(){
   let saved;try{saved=JSON.parse(sessionStorage.getItem('SIDE_STUDENT_SESSION')||'null');}catch{}
   if(!saved?.game?.codigo||!saved.company)return;
-  currentStudent=saved;studentConnected=true;loadDecisionState();
-  await refreshStudentGame();startStudentSync();await prepareLobby();
+  studentSnapshotEpoch++;currentStudent=saved;studentConnected=true;studentProgressHydrated=!saved.empresaId;loadDecisionState();
+  const validated=await refreshStudentGame({forceHydrate:Boolean(saved.empresaId)});
+  if(saved.empresaId&&!validated){studentConnected=false;studentProgressHydrated=false;try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles');showModal('studentModal');message('studentMessage',JOIN_INVALID_MESSAGE,true);return;}
+  startStudentSync();await prepareLobby();
 })();
 
 // Shared links fill the join form; the game code is still verified by the server.

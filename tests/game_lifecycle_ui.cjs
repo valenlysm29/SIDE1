@@ -25,12 +25,15 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   });return p;
  }
  async function student(game,name){
-  const joined=await rpc(db,'crear_empresa',{p_partida_id:game.id,p_nombre_estudiante:name,p_nombre_legal:name,p_nombre_comercial:name});assert.ok(joined.empresa_id);
+  const identity={p_codigo:game.codigo,p_nombre_legal:name,p_nombre_comercial:name};
+  const joined=await rpc(db,'ingresar_empresa',identity);assert.ok(joined.empresa_id);
   const p=await page(studentHTML);
-  await p.exposeFunction('dbState',id=>rpc(db,'obtener_estado_juego',{p_empresa_id:id}));
+  await p.exposeFunction('dbState',studentIdentity=>rpc(db,'obtener_estado_estudiante',{
+   p_codigo:studentIdentity.codigo,p_nombre_legal:studentIdentity.nombreLegal,p_nombre_comercial:studentIdentity.nombreComercial
+  }));
   await p.evaluate(async({game,joined,name})=>{
-   SIDE.EmpresaService.obtenerEstado=async id=>({success:true,data:await dbState(id)});
-   currentStudent={game,company:name,legalName:name,name,empresaId:joined.empresa_id,participantId:joined.participante_id};
+   SIDE.EmpresaService.obtenerEstado=async identity=>({success:true,data:await dbState(identity)});
+   currentStudent={game,company:name,legalName:name,name,empresaId:joined.empresa_id,participantId:joined.participante_id,snapshotRevision:joined.snapshot_revision||0};
    studentConnected=true;loadDecisionState();startStudentSync();await refreshStudentGame();await prepareLobby();
   },{game,joined,name});return p;
  }
@@ -134,10 +137,17 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   const late=await student(autoGame,'Late UI');assert.match(await late.locator('#integrationCountdown').innerText(),/0[01]:/);
   const before=await late.evaluate(()=>teacherConfig().gameStartAt);
   await late.evaluate(()=>refreshStudentGame());assert.equal(await late.evaluate(()=>teacherConfig().gameStartAt),before);
+  const savedRemote=await rpc(db,'guardar_estado_estudiante',{
+   p_codigo:autoGame.codigo,p_nombre_legal:'Late UI',p_nombre_comercial:'Late UI',p_expected_revision:0,
+   p_snapshot:{decision_state:{PRECIO:{round:1,label:'Precio',value:77,cost:0}},cash_ledger:{'1:REMOTE':-50},financial_sections:{},section_submissions:{},decisions_submitted:false,selected_character:'valeria'}
+  });
+  assert.equal(Number(savedRemote.snapshot_revision),1);
   // A real browser reload retains sessionStorage and recovers state via the RPC.
   const reload=await browser.newPage();reload.on('pageerror',e=>errors.push(e.message));
-  await reload.exposeFunction('dbState',id=>rpc(db,'obtener_estado_juego',{p_empresa_id:id}));
-  const reloadHTML=studentHTML.replace('const cfg = window.SIDE_CONFIG || {};',"SIDE.EmpresaService.obtenerEstado=async id=>({success:true,data:await dbState(id)});\nconst cfg = window.SIDE_CONFIG || {};");
+  await reload.exposeFunction('dbState',studentIdentity=>rpc(db,'obtener_estado_estudiante',{
+   p_codigo:studentIdentity.codigo,p_nombre_legal:studentIdentity.nombreLegal,p_nombre_comercial:studentIdentity.nombreComercial
+  }));
+  const reloadHTML=studentHTML.replace('const cfg = window.SIDE_CONFIG || {};',"SIDE.EmpresaService.obtenerEstado=async identity=>({success:true,data:await dbState(identity)});\nconst cfg = window.SIDE_CONFIG || {};");
   await reload.route('**/*',r=>r.abort());await reload.route('http://side.test/',r=>r.fulfill({contentType:'text/html',body:reloadHTML}));
   await reload.goto('http://side.test/');
   const savedSession=await late.evaluate(()=>JSON.stringify(currentStudent));
@@ -145,6 +155,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await reload.reload();await reload.waitForFunction(()=>$('integrationCountdown'));
   assert.equal(await reload.evaluate(()=>teacherConfig().gameStartAt),before);
   assert.match(await reload.locator('#integrationCountdown').innerText(),/0[01]:/);
+  assert.deepEqual(await reload.evaluate(()=>({revision:currentStudent.snapshotRevision,price:decisionState.PRECIO?.value,character:selectedCharacterSlug()})),{revision:1,price:77,character:'valeria'});
   // A clock five hours wrong must not affect the countdown (server-time anchor).
   await reload.evaluate(()=>{const old=Date.now;Date.now=()=>old()+5*3600000;updateIntegrationUI();});
   assert.match(await reload.locator('#integrationCountdown').innerText(),/0[01]:/);
@@ -152,11 +163,11 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()+interval '2 seconds')) where id=$1`,[autoGame.id]);
   await Promise.all([auto,late,reload].map(p=>p.evaluate(()=>refreshStudentGame())));
   for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
-  const after=await student(autoGame,'After UI');await after.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
-  assert.equal(await after.evaluate(()=>currentRound()),1);
-  await after.evaluate(()=>$('backToProfiles').click());
-  assert.equal(await after.evaluate(()=>studentPoll===null&&studentTick===null&&!studentConnected),true);
-  console.log('PASS UI automatic: 2-minute configuration/countdown, teacher closed, late join, real browser reload, clock skew, multiple clients, post-start join to decisions');
+  const after=await rpc(db,'ingresar_empresa',{p_codigo:autoGame.codigo,p_nombre_legal:'After UI',p_nombre_comercial:'After UI'});
+  assert.equal(after.code,'PARTIDA_INICIADA');
+  await late.evaluate(()=>$('backToProfiles').click());
+  assert.equal(await late.evaluate(()=>studentPoll===null&&studentTick===null&&!studentConnected),true);
+  console.log('PASS UI automatic: 2-minute configuration/countdown, teacher closed, pre-start joins, real browser reload, clock skew, multiple clients, post-start rejection');
   assert.deepEqual(errors,[]);console.log('PASS no browser JavaScript errors');
  }finally{await browser.close();await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -7,8 +7,9 @@
  * No toca decisiones, reportes ni UI.
  *
  * Funciones:
- *   - crear(partidaId, datos)  → RPC crear_empresa (empresa + participante)
- *   - obtenerEstado(empresaId) → RPC obtener_estado_juego
+ *   - ingresar(datos)                    → RPC ingresar_empresa
+ *   - obtenerEstado(datos)                       → RPC obtener_estado_estudiante
+ *   - guardarEstado(datos, snapshot, revision)  → RPC guardar_estado_estudiante
  *
  * Todas retornan { success: boolean, data?: any, error?: string }.
  * Si Supabase no está disponible retornan { success: false, offline: true }.
@@ -31,31 +32,41 @@
     return { success: false, offline: true, error: 'Supabase no disponible (modo local).' };
   }
 
+  function cleanText(value) {
+    return String(value || '').normalize('NFC').trim().replace(/\s+/g, ' ');
+  }
+
+  function cleanCode(value) {
+    return cleanText(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  }
+
   /**
-   * Crea la empresa del estudiante y su vínculo como participante.
-   * @param {string} partidaId UUID de la partida.
-   * @param {object} datos { nombreEstudiante, nombreLegal, nombreComercial, capital? }
-   * @returns {Promise<{success: boolean, data?: object, error?: string}>}
-   *   data = { empresa_id, participante_id, caja_inicial, ciclo_inicial,
-   *   reingreso, configuracion }. Si el nombre comercial ya existía en la
-   *   partida, devuelve la empresa existente (reingreso: true) sin duplicar.
+   * Valida el código y la identidad empresarial en una sola transacción.
+   * El servidor decide si crea una empresa o reingresa a la existente.
+   * @param {object} datos { codigo, nombreLegal, nombreComercial }
+   * @returns {Promise<{success: boolean, data?: object, code?: string, error?: string}>}
    */
-  async function crear(partidaId, datos) {
+  async function ingresar(datos) {
     const sb = client();
     if (!sb) return offline();
     const d = datos || {};
-    if (!partidaId) return { success: false, error: 'Falta partidaId.' };
-    if (!d.nombreComercial) return { success: false, error: 'Falta el nombre comercial.' };
+    const codigo = cleanCode(d.codigo);
+    const nombreLegal = cleanText(d.nombreLegal);
+    const nombreComercial = cleanText(d.nombreComercial);
+    if (!codigo || !nombreLegal || !nombreComercial) {
+      return { success: false, code: 'DATOS_INCOMPLETOS', error: 'Faltan datos de ingreso.' };
+    }
     try {
-      const { data, error } = await sb.rpc('crear_empresa', {
-        p_partida_id: partidaId,
-        p_nombre_estudiante: d.nombreEstudiante || 'Jugador',
-        p_nombre_legal: d.nombreLegal || d.nombreComercial,
-        p_nombre_comercial: d.nombreComercial,
-        p_capital: Number(d.capital) || 100000
+      const { data: response, error } = await sb.rpc('ingresar_empresa', {
+        p_codigo: codigo,
+        p_nombre_legal: nombreLegal,
+        p_nombre_comercial: nombreComercial
       });
       if (error) return { success: false, error: error.message };
-      if (data && data.error) return { success: false, error: data.error };
+      const data = Array.isArray(response) ? response[0] : response;
+      if (!data || data.success === false || data.error) {
+        return { success: false, code: data && (data.code || data.codigo_error), error: (data && data.error) || 'No se pudo validar el ingreso.' };
+      }
       return { success: true, data };
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };
@@ -64,17 +75,53 @@
 
   /**
    * Obtiene el estado completo del juego para un estudiante.
-   * @param {number} empresaId ID de la empresa.
+   * @param {object} datos { codigo, nombreLegal, nombreComercial }
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
    *   data = { empresa, partida, ciclo_partida, decisiones_ciclo }.
    */
-  async function obtenerEstado(empresaId) {
+  async function obtenerEstado(datos) {
     const sb = client();
     if (!sb) return offline();
-    if (!empresaId) return { success: false, error: 'Falta empresaId.' };
+    const d = datos || {};
+    const codigo = cleanCode(d.codigo);
+    const nombreLegal = cleanText(d.nombreLegal);
+    const nombreComercial = cleanText(d.nombreComercial);
+    if (!codigo || !nombreLegal || !nombreComercial) return { success: false, code: 'CREDENCIALES_INVALIDAS', error: 'No se pudo validar el ingreso.' };
     try {
-      const { data, error } = await sb.rpc('obtener_estado_juego', { p_empresa_id: empresaId });
+      const { data, error } = await sb.rpc('obtener_estado_estudiante', {
+        p_codigo: codigo,
+        p_nombre_legal: nombreLegal,
+        p_nombre_comercial: nombreComercial
+      });
       if (error) return { success: false, error: error.message };
+      if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
+      return { success: true, data };
+    } catch (err) {
+      return { success: false, error: String((err && err.message) || err) };
+    }
+  }
+
+  async function guardarEstado(datos, snapshot, expectedRevision) {
+    const sb = client();
+    if (!sb) return offline();
+    const d = datos || {};
+    const codigo = cleanCode(d.codigo);
+    const nombreLegal = cleanText(d.nombreLegal);
+    const nombreComercial = cleanText(d.nombreComercial);
+    const revision = Number(expectedRevision);
+    if (!codigo || !nombreLegal || !nombreComercial || !snapshot || typeof snapshot !== 'object' || !Number.isSafeInteger(revision) || revision < 0) {
+      return { success: false, error: 'No se pudo preparar el estado del estudiante.' };
+    }
+    try {
+      const { data, error } = await sb.rpc('guardar_estado_estudiante', {
+        p_codigo: codigo,
+        p_nombre_legal: nombreLegal,
+        p_nombre_comercial: nombreComercial,
+        p_snapshot: snapshot,
+        p_expected_revision: revision
+      });
+      if (error) return { success: false, error: error.message };
+      if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
       return { success: true, data };
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };
@@ -82,5 +129,5 @@
   }
 
   global.SIDE = global.SIDE || {};
-  global.SIDE.EmpresaService = { crear, obtenerEstado };
+  global.SIDE.EmpresaService = { ingresar, obtenerEstado, guardarEstado, cleanText, cleanCode };
 })(window);
