@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 
-const STARTED_MESSAGE='La partida ya inició. No se permiten nuevos ingresos.';
+const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
 
 (async()=>{
  // Ejecuta la migracion real sobre datos que ya existian antes de que fueran

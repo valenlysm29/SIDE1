@@ -47,13 +47,13 @@ test('student service does not call the server with any missing identity field',
  assert.equal(calls,0);
 });
 
-test('student service preserves technical Supabase errors for safe UI classification',async()=>{
+test('student service preserves technical Supabase errors for any game and company',async()=>{
  const logged=[];
  const service=loadService(serviceSource,async()=>({
   data:null,
   error:{code:'PGRST202',message:'Could not find the function',details:'Searched for public.ingresar_empresa',hint:'Reload the schema cache',status:404}
  }),'EmpresaService',{error:(...args)=>logged.push(args)});
- const result=await service.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ const result=await service.ingresar({codigo:'SIDE-137',nombreLegal:'Grupo Quilla S.A.C.',nombreComercial:'Quilla'});
  assert.deepEqual(JSON.parse(JSON.stringify(result)),{
   success:false,
   technical:true,
@@ -73,7 +73,7 @@ test('student service logs permission and network failures without relabeling th
  const permissionService=loadService(serviceSource,async()=>({
   data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}
  }),'EmpresaService',{error:(...args)=>permissionLogs.push(args)});
- const permission=await permissionService.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ const permission=await permissionService.ingresar({codigo:'SIDE-208',nombreLegal:'Servicios Misti',nombreComercial:'Misti'});
  assert.equal(permission.success,false);
  assert.equal(permission.technical,true);
  assert.equal(permission.code,'42501');
@@ -83,7 +83,7 @@ test('student service logs permission and network failures without relabeling th
  const networkLogs=[];
  const networkError=Object.assign(new Error('Network request failed'),{name:'TypeError'});
  const networkService=loadService(serviceSource,async()=>{throw networkError;},'EmpresaService',{error:(...args)=>networkLogs.push(args)});
- const network=await networkService.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ const network=await networkService.ingresar({codigo:'SIDE-309',nombreLegal:'Industria Pacífico',nombreComercial:'Pacífico'});
  assert.equal(network.success,false);
  assert.equal(network.technical,true);
  assert.equal(network.code,'RPC_INGRESAR_EMPRESA_EXCEPCION');
@@ -117,16 +117,16 @@ test('real student form shows the server message for technical failures and busi
  try{
   const page=await browser.newPage();
   await page.setContent(html,{waitUntil:'load'});
-  async function submit({response,throwMessage=null,expected}){
-   await page.evaluate(({response,throwMessage})=>{
+  async function submit({response,throwError=null,expected,identity={}}){
+   await page.evaluate(({response,throwError,identity})=>{
     window.__consoleErrors=[];
     window.__rpcResult=response;
-    window.__rpcThrow=throwMessage?Object.assign(new TypeError(throwMessage),{code:'FETCH_ERROR'}):null;
-    $('gameCode').value='SIDE-005';
-    $('companyLegalName').value='demo2';
-    $('companyBrandName').value='demo2';
+    window.__rpcThrow=throwError?Object.assign(new Error(throwError.message),throwError):null;
+    $('gameCode').value=identity.codigo||'SIDE-418';
+    $('companyLegalName').value=identity.nombreLegal||'Cooperativa Ñawi';
+    $('companyBrandName').value=identity.nombreComercial||'Ñawi';
     $('studentForm').requestSubmit();
-   },{response,throwMessage});
+   },{response,throwError,identity});
    await page.waitForFunction(text=>$('studentMessage').textContent===text,expected);
    return {
     message:await page.locator('#studentMessage').textContent(),
@@ -136,10 +136,11 @@ test('real student form shows the server message for technical failures and busi
 
   const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
   const genericMessage='No se pudo validar el ingreso con los datos proporcionados.';
-  const startedMessage='La partida ya inició. No se permiten nuevos ingresos.';
+  const startedMessage='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
   for(const technical of [
    {data:null,error:{code:'PGRST202',message:'Could not find public.ingresar_empresa',status:404}},
-   {data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}}
+   {data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}},
+   {data:null,error:{code:'PGRST205',message:'Could not find public.side_student_state',status:404}}
   ]){
    const result=await submit({response:technical,expected:serverMessage});
    assert.equal(result.message,serverMessage);
@@ -147,17 +148,56 @@ test('real student form shows the server message for technical failures and busi
    assert.ok(result.errors.some(args=>args.some(value=>value&&value.code===technical.error.code)),`console.error debe conservar ${technical.error.code}`);
   }
 
-  const network=await submit({response:{data:null,error:null},throwMessage:'Network request failed',expected:serverMessage});
+  const network=await submit({
+   response:{data:null,error:null},
+   throwError:{name:'TypeError',message:'Network request failed',code:'FETCH_ERROR'},
+   expected:serverMessage
+  });
   assert.equal(network.message,serverMessage);
   assert.notEqual(network.message,genericMessage);
   assert.ok(network.errors.some(args=>args.some(value=>value&&value.message==='Network request failed')));
 
-  const invalid=await submit({response:{data:{success:false,code:'CREDENCIALES_INVALIDAS',error:'safe'},error:null},expected:genericMessage});
-  assert.equal(invalid.message,genericMessage);
-  assert.equal(invalid.errors.length,0);
+  const timeout=await submit({
+   response:{data:null,error:null},
+   throwError:{name:'AbortError',message:'Request timed out',code:'ETIMEDOUT'},
+   expected:serverMessage
+  });
+  assert.equal(timeout.message,serverMessage);
+  assert.notEqual(timeout.message,genericMessage);
+  assert.ok(timeout.errors.some(args=>args.some(value=>value&&value.code==='ETIMEDOUT')));
+
+  const wrongCode=await submit({
+   response:{data:{success:false,code:'CREDENCIALES_INVALIDAS',error:'safe'},error:null},
+   expected:genericMessage,
+   identity:{codigo:'SIDE-999',nombreLegal:'Cooperativa Ñawi',nombreComercial:'Ñawi'}
+  });
+  assert.equal(wrongCode.message,genericMessage);
+  assert.equal(wrongCode.errors.length,0);
+
+  // [6,7] Con código válido y partida iniciada, legal/comercial incorrectos o
+  // intercambiados conservan el texto exacto de PARTIDA_INICIADA.
+  for(const identity of [
+   {codigo:'SIDE-418',nombreLegal:'Legal Incorrecta',nombreComercial:'Ñawi'},
+   {codigo:'SIDE-418',nombreLegal:'Cooperativa Ñawi',nombreComercial:'Marca Incorrecta'},
+   {codigo:'SIDE-418',nombreLegal:'Ñawi',nombreComercial:'Cooperativa Ñawi'}
+  ]){
+   const rejected=await submit({
+    response:{data:{success:false,code:'PARTIDA_INICIADA',error:'safe'},error:null},
+    expected:startedMessage,
+    identity
+   });
+   assert.equal(rejected.message,startedMessage);
+   assert.equal(rejected.errors.length,0);
+  }
   const started=await submit({response:{data:{success:false,code:'PARTIDA_INICIADA',error:'safe'},error:null},expected:startedMessage});
   assert.equal(started.message,startedMessage);
   assert.equal(started.errors.length,0);
+
+  assert.deepEqual(await page.evaluate(()=>({
+   code:$('gameCode').maxLength,
+   legal:$('companyLegalName').maxLength,
+   brand:$('companyBrandName').maxLength
+  })),{code:12,legal:60,brand:40});
  }finally{await browser.close();}
 });
 
@@ -192,7 +232,7 @@ test('student decision/report writes use identity wrappers, never empresaId RPCs
 });
 
 test('frontend maps safe errors, hydrates by identity and recovers stale revisions',()=>{
- assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. No se permiten nuevos ingresos\.'/);
+ assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados\.'/);
  assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'No se pudo validar el ingreso con los datos proporcionados\.'/);
  assert.match(appSource,/JOIN_SERVER_MESSAGE\s*=\s*'No se pudo conectar con el servidor\. Intenta nuevamente en unos minutos\.'/);
  assert.match(appSource,/ingreso\?\.code==='PARTIDA_INICIADA'/);

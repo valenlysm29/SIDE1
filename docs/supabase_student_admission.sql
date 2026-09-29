@@ -10,8 +10,38 @@
 
 begin;
 
--- No depende de unaccent: cubre las tildes del castellano, ignora mayusculas,
--- bordes y cualquier secuencia de espacios en blanco.
+-- Canoniza el whitespace igual que el cliente JavaScript. PostgreSQL no
+-- incluye necesariamente NBSP, separadores Unicode ni BOM en [[:space:]],
+-- por eso se convierten explicitamente a espacio ASCII antes de colapsar.
+create or replace function public.side_limpiar_whitespace_ingreso(p_valor text)
+returns text
+language sql
+immutable
+parallel safe
+set search_path = public
+as $$
+  select btrim(
+    regexp_replace(
+      translate(
+        coalesce(p_valor, ''),
+        chr(160) || chr(5760)
+          || chr(8192) || chr(8193) || chr(8194) || chr(8195)
+          || chr(8196) || chr(8197) || chr(8198) || chr(8199)
+          || chr(8200) || chr(8201) || chr(8202)
+          || chr(8232) || chr(8233) || chr(8239)
+          || chr(8287) || chr(12288) || chr(65279),
+        repeat(' ', 19)
+      ),
+      '[[:space:]]+', ' ', 'g'
+    )
+  );
+$$;
+
+revoke all on function public.side_limpiar_whitespace_ingreso(text)
+from public, anon, authenticated;
+
+-- No depende de unaccent: cubre las tildes del castellano, ignora mayusculas
+-- y reutiliza exactamente la limpieza de whitespace usada al almacenar.
 create or replace function public.side_normalizar_ingreso(p_valor text)
 returns text
 language sql
@@ -19,13 +49,10 @@ immutable
 parallel safe
 set search_path = public
 as $$
-  select regexp_replace(
-    translate(
-      lower(btrim(coalesce(p_valor, ''))),
-      'áéíóúüñ' || chr(769) || chr(776) || chr(771),
-      'aeiouun'
-    ),
-    '[[:space:]]+', ' ', 'g'
+  select translate(
+    lower(public.side_limpiar_whitespace_ingreso(p_valor)),
+    'áéíóúüñ' || chr(769) || chr(776) || chr(771),
+    'aeiouun'
   );
 $$;
 
@@ -87,7 +114,13 @@ where e.id = pt.empresa_id
     or nullif(btrim(pt.nombre_comercial_ingreso), '') is null
   );
 
-create index if not exists idx_side_participante_ingreso
+-- Ambos indices pueden contener claves calculadas por una version anterior de
+-- la funcion IMMUTABLE. Se descartan antes de cualquier consulta de colisiones
+-- para impedir que el planner responda usando claves obsoletas.
+drop index if exists public.ux_side_identidad_ingreso;
+drop index if exists public.idx_side_participante_ingreso;
+
+create index idx_side_participante_ingreso
 on public.participantes (
   partida_id,
   public.side_normalizar_ingreso(nombre_legal_ingreso),
@@ -337,6 +370,10 @@ declare
   v_codigo text := public.side_normalizar_ingreso(p_codigo);
   v_legal text := public.side_normalizar_ingreso(p_nombre_legal);
   v_comercial text := public.side_normalizar_ingreso(p_nombre_comercial);
+  -- Valores canonicos de almacenamiento: conservan caja, tildes y puntuacion,
+  -- pero eliminan whitespace de bordes y colapsan secuencias internas.
+  v_legal_limpio text := public.side_limpiar_whitespace_ingreso(p_nombre_legal);
+  v_comercial_limpio text := public.side_limpiar_whitespace_ingreso(p_nombre_comercial);
   v_partida_id uuid;
   v_partida public.partidas;
   v_participante_id uuid;
@@ -348,6 +385,8 @@ declare
   v_capital_min numeric;
   v_capital_max numeric;
 begin
+  -- La identidad siempre exige una terna no vacia. Ningun registro legacy con
+  -- nombres NULL/vacios se puede recuperar presentando solo whitespace.
   if v_codigo = '' or v_legal = '' or v_comercial = '' then
     return jsonb_build_object(
       'success', false,
@@ -425,12 +464,23 @@ begin
     return jsonb_build_object(
       'success', false,
       'code', 'PARTIDA_INICIADA',
-      'error', 'La partida ya inició. No se permiten nuevos ingresos.'
+      'error', 'La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.'
     );
   end if;
 
   -- Antes del ciclo 1 una terna distinta es un alta valida aunque comparta
   -- solo uno de los nombres con otra empresa. La identidad es la terna total.
+  -- Estos limites se aplican exclusivamente al alta nueva: la busqueda exacta
+  -- anterior permite reingresar identidades legacy sin modificarlas.
+  if char_length(v_legal_limpio) > 60
+    or char_length(v_comercial_limpio) > 40
+  then
+    return jsonb_build_object(
+      'success', false,
+      'code', 'CREDENCIALES_INVALIDAS',
+      'error', 'Los datos ingresados no coinciden con un registro existente.'
+    );
+  end if;
 
   -- El cliente no decide el capital. Incluso el modo aleatorio se calcula
   -- dentro de la transaccion del servidor.
@@ -451,15 +501,15 @@ begin
     insert into public.empresas (
       nombre_legal, nombre_comercial, caja_inicial, caja_actual, ciclo_actual
     ) values (
-      btrim(p_nombre_legal), btrim(p_nombre_comercial), v_capital, v_capital, 1
+      v_legal_limpio, v_comercial_limpio, v_capital, v_capital, 1
     ) returning id into v_empresa_id;
 
     insert into public.participantes (
       partida_id, empresa_id, nombre, empresa,
       nombre_legal_ingreso, nombre_comercial_ingreso, last_seen_at
     ) values (
-      v_partida.id, v_empresa_id, 'Jugador', btrim(p_nombre_comercial),
-      btrim(p_nombre_legal), btrim(p_nombre_comercial), clock_timestamp()
+      v_partida.id, v_empresa_id, 'Jugador', v_comercial_limpio,
+      v_legal_limpio, v_comercial_limpio, clock_timestamp()
     ) returning id into v_participante_id;
   exception when unique_violation then
     return jsonb_build_object(

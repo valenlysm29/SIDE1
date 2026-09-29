@@ -7,7 +7,8 @@
     "world:business": "node world_business_ui.cjs",
     "world:loading": "node world_loading.cjs",
     "lifecycle:db": "node game_lifecycle_db.cjs",
-    "admission:db": "node student_admission_db.cjs",
+    "admission:db": "node student_admission_db.cjs && node student_admission_matrix_db.cjs && node --test student_admission_contract_gaps.test.js",
+    "admission:ui": "node --test student_admission.test.js",
     "lifecycle:ui": "node game_lifecycle_ui.cjs",
     "observations:db": "node game_observations_db.cjs",
     "observations:unit": "node --test game_observations.test.js"
