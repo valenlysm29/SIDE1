@@ -359,6 +359,7 @@ window.SIDE_GAME_BRIDGE={
   activeEvents:()=>activeStudentEvents(),
   productionPlan:()=>productionPlan(),
   financialReport:()=>financialReport(),
+  financialOfficeHtml:()=>window.SIDE_STUDENT_FINANCIAL_VIEW?.officeHtml(financialReport())||'',
   recordOperatingExpense(amount,kind='SIM_GASTOS',storageWrites={}){
     if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
     const key=`${currentRound()}:${['SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES'].includes(kind)?kind:'SIM_GASTOS'}`;
@@ -1288,9 +1289,21 @@ function renderStudentStatus(){
   set('studentIncomeResult',er.utilidad);set('studentCashResult',bc.cajaFinal);set('studentFlowResult',fc.flujoNeto);
   for(const [id,val] of Object.entries({studentERIngresos:er.ingresos,studentERCostos:er.costos,studentEREventos:er.impactoEventos,studentERUtilidad:er.utilidad,studentERDevoluciones:er.devoluciones,studentERActivos:er.resultadoVentaActivos,studentEROtros:er.otros,studentBCInicial:bc.cajaInicial,studentBCPrestamos:bc.prestamos,studentBCEntradas:bc.entradas,studentBCSalidas:bc.salidas,studentBCFinal:bc.cajaFinal,studentFCOperacion:fc.operacion,studentFCFinanciamiento:fc.financiamiento,studentFCEventos:fc.eventos,studentFCInversion:fc.inversion,studentFCNeto:fc.flujoNeto}))set(id,val);
   if($('studentFinancialDetail'))$('studentFinancialDetail').innerHTML=financialDetailsHtml(f);
+  const historyMount=$('studentCycleHistory');
+  if(historyMount&&window.SIDE_STUDENT_FINANCIAL_VIEW){
+    const runtime=readRoundRuntime(),finished=['finished','results'].includes(runtime?.phase)||['finished','simulation-finished'].includes(runtime?.status);
+    const signature=JSON.stringify([f.history,finished]);
+    if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
+  }
   const events=activeStudentEvents();
   if($('studentEventImpactText'))$('studentEventImpactText').textContent=`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
   const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>';
+}
+function renderOfficeFinances(){
+  const mount=$('adminFinancialPanel');
+  if(!mount||$('simAdmin')?.classList.contains('hidden')||!window.SIDE_STUDENT_FINANCIAL_VIEW)return;
+  const report=financialReport(),signature=JSON.stringify(report);
+  if(mount.dataset.signature!==signature){mount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.officeHtml(report);mount.dataset.signature=signature;}
 }
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;
@@ -1298,14 +1311,21 @@ function financialDetailsHtml(f){
   <div class="financial-details"><strong>BALANCE GENERAL · AL CICLO ${f.round}</strong>${row('Efectivo',bg.efectivo)}${row('Equipos, moldes y mejoras',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
 }
 let lastObservedRound=currentRound();
+let lastDeadlineRefresh='';
 function tickStudentGame(){
   if(!studentConnected)return;
   if(!currentStudent.empresaId&&teacherConfig().lifecycleVersion===2)refreshStudentGame();
   const access=studentAccess(),deadline=teacherConfig().gameStartAt;
   if(currentStudent.empresaId&&access.integration&&access.remaining===0&&zeroSyncDeadline!==deadline){zeroSyncDeadline=deadline;refreshStudentGame();}
   const round=currentRound();
+  const runtime=readRoundRuntime();
+  if(currentStudent.empresaId&&teacherConfig().cycleCloseMode==='automatic'&&runtime?.running&&runtime.startedAt&&Number(runtime.duration)>0){
+    const deadline=Date.parse(runtime.startedAt)+Number(runtime.duration)*1000;
+    const key=`${round}:${deadline}`;
+    if(Number.isFinite(deadline)&&studentNow()>=deadline&&lastDeadlineRefresh!==key){lastDeadlineRefresh=key;refreshStudentGame();}
+  }
   if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;currentCategory=round>1?'A':navigationCategories()[0]?.cat;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
-  syncStudentTimer();if(studentConnected)updateIntegrationUI();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();
+  syncStudentTimer();if(studentConnected)updateIntegrationUI();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();renderOfficeFinances();
 }
 
 (async function restoreStudentSession(){

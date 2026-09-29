@@ -34,7 +34,8 @@
         }else p.otros+=amount;
       }
     }
-    period(round);
+    // Include quiet cycles so the student can review every played period.
+    for(let r=1;r<=round;r++)period(r);
     let cash=n(capital),assets=0,debt=0,earnings=0;const history=[];
     for(const p of [...periods.values()].sort((a,b)=>a.r-b.r)){
       const initial=cash,operating=p.ventas-p.devoluciones-p.gastos+p.eventos+p.otros;
