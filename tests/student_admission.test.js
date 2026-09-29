@@ -3,15 +3,17 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
+const {execFileSync}=require('node:child_process');
+const {chromium}=require('playwright');
 
 const root=path.resolve(__dirname,'..');
 const serviceSource=fs.readFileSync(path.join(root,'services/empresa_service.js'),'utf8');
 const decisionsServiceSource=fs.readFileSync(path.join(root,'services/decisiones_service.js'),'utf8');
 const appSource=fs.readFileSync(path.join(root,'app.js'),'utf8');
 
-function loadService(source,rpc,serviceName){
+function loadService(source,rpc,serviceName,logger=console){
  const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};
- vm.runInNewContext(source,{window,console},{filename:serviceName});
+ vm.runInNewContext(source,{window,console:logger},{filename:serviceName});
  return window.SIDE[serviceName];
 }
 
@@ -43,6 +45,120 @@ test('student service does not call the server with any missing identity field',
   {codigo:'SIDE-000',nombreLegal:'Legal',nombreComercial:' '}
  ])assert.equal((await service.ingresar(input)).code,'DATOS_INCOMPLETOS');
  assert.equal(calls,0);
+});
+
+test('student service preserves technical Supabase errors for safe UI classification',async()=>{
+ const logged=[];
+ const service=loadService(serviceSource,async()=>({
+  data:null,
+  error:{code:'PGRST202',message:'Could not find the function',details:'Searched for public.ingresar_empresa',hint:'Reload the schema cache',status:404}
+ }),'EmpresaService',{error:(...args)=>logged.push(args)});
+ const result=await service.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ assert.deepEqual(JSON.parse(JSON.stringify(result)),{
+  success:false,
+  technical:true,
+  code:'PGRST202',
+  error:'Could not find the function',
+  details:'Searched for public.ingresar_empresa',
+  hint:'Reload the schema cache',
+  status:404
+ });
+ assert.equal(logged.length,1);
+ assert.equal(logged[0][0],'SIDE EmpresaService: fallo tecnico en ingresar_empresa');
+ assert.equal(logged[0][1].code,'PGRST202');
+});
+
+test('student service logs permission and network failures without relabeling them as identity rejection',async()=>{
+ const permissionLogs=[];
+ const permissionService=loadService(serviceSource,async()=>({
+  data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}
+ }),'EmpresaService',{error:(...args)=>permissionLogs.push(args)});
+ const permission=await permissionService.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ assert.equal(permission.success,false);
+ assert.equal(permission.technical,true);
+ assert.equal(permission.code,'42501');
+ assert.equal(permission.error,'permission denied for function ingresar_empresa');
+ assert.equal(permissionLogs[0][1].code,'42501');
+
+ const networkLogs=[];
+ const networkError=Object.assign(new Error('Network request failed'),{name:'TypeError'});
+ const networkService=loadService(serviceSource,async()=>{throw networkError;},'EmpresaService',{error:(...args)=>networkLogs.push(args)});
+ const network=await networkService.ingresar({codigo:'SIDE-005',nombreLegal:'demo2',nombreComercial:'demo2'});
+ assert.equal(network.success,false);
+ assert.equal(network.technical,true);
+ assert.equal(network.code,'RPC_INGRESAR_EMPRESA_EXCEPCION');
+ assert.equal(network.error,'Network request failed');
+ assert.equal(networkLogs[0][0],'SIDE EmpresaService: excepcion en ingresar_empresa');
+ assert.equal(networkLogs[0][1],networkError);
+});
+
+test('real student form shows the server message for technical failures and business messages only for safe rejections',async()=>{
+ const python=process.env.PYTHON_BIN||'python';
+ let html=execFileSync(python,['-c',"import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('index.html'))"],{
+  cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}
+ });
+ const bootstrap=`
+ window.__rpcResult={data:null,error:null};
+ window.__rpcThrow=null;
+ window.__consoleErrors=[];
+ const __originalConsoleError=console.error.bind(console);
+ console.error=(...args)=>{
+  window.__consoleErrors.push(args.map(value=>value instanceof Error?{name:value.name,message:value.message,code:value.code}:value));
+  __originalConsoleError(...args);
+ };
+ window.supabase={createClient:()=>({
+  rpc:async()=>{if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
+  auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}
+ })};
+ `;
+ html=html.replace('window.SIDE_CONFIG = {',bootstrap+'window.SIDE_CONFIG = {');
+ const chrome='C:/Program Files/Google/Chrome/Application/chrome.exe';
+ const browser=await chromium.launch({headless:true,...(fs.existsSync(chrome)?{executablePath:chrome}:{})});
+ try{
+  const page=await browser.newPage();
+  await page.setContent(html,{waitUntil:'load'});
+  async function submit({response,throwMessage=null,expected}){
+   await page.evaluate(({response,throwMessage})=>{
+    window.__consoleErrors=[];
+    window.__rpcResult=response;
+    window.__rpcThrow=throwMessage?Object.assign(new TypeError(throwMessage),{code:'FETCH_ERROR'}):null;
+    $('gameCode').value='SIDE-005';
+    $('companyLegalName').value='demo2';
+    $('companyBrandName').value='demo2';
+    $('studentForm').requestSubmit();
+   },{response,throwMessage});
+   await page.waitForFunction(text=>$('studentMessage').textContent===text,expected);
+   return {
+    message:await page.locator('#studentMessage').textContent(),
+    errors:await page.evaluate(()=>window.__consoleErrors)
+   };
+  }
+
+  const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
+  const genericMessage='No se pudo validar el ingreso con los datos proporcionados.';
+  const startedMessage='La partida ya inició. No se permiten nuevos ingresos.';
+  for(const technical of [
+   {data:null,error:{code:'PGRST202',message:'Could not find public.ingresar_empresa',status:404}},
+   {data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}}
+  ]){
+   const result=await submit({response:technical,expected:serverMessage});
+   assert.equal(result.message,serverMessage);
+   assert.notEqual(result.message,genericMessage);
+   assert.ok(result.errors.some(args=>args.some(value=>value&&value.code===technical.error.code)),`console.error debe conservar ${technical.error.code}`);
+  }
+
+  const network=await submit({response:{data:null,error:null},throwMessage:'Network request failed',expected:serverMessage});
+  assert.equal(network.message,serverMessage);
+  assert.notEqual(network.message,genericMessage);
+  assert.ok(network.errors.some(args=>args.some(value=>value&&value.message==='Network request failed')));
+
+  const invalid=await submit({response:{data:{success:false,code:'CREDENCIALES_INVALIDAS',error:'safe'},error:null},expected:genericMessage});
+  assert.equal(invalid.message,genericMessage);
+  assert.equal(invalid.errors.length,0);
+  const started=await submit({response:{data:{success:false,code:'PARTIDA_INICIADA',error:'safe'},error:null},expected:startedMessage});
+  assert.equal(started.message,startedMessage);
+  assert.equal(started.errors.length,0);
+ }finally{await browser.close();}
 });
 
 test('student state service always uses normalized identity and compare-and-swap revision',async()=>{
@@ -78,7 +194,10 @@ test('student decision/report writes use identity wrappers, never empresaId RPCs
 test('frontend maps safe errors, hydrates by identity and recovers stale revisions',()=>{
  assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. No se permiten nuevos ingresos\.'/);
  assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'No se pudo validar el ingreso con los datos proporcionados\.'/);
- assert.match(appSource,/ingreso\.code==='PARTIDA_INICIADA'\?JOIN_STARTED_MESSAGE:JOIN_INVALID_MESSAGE/);
+ assert.match(appSource,/JOIN_SERVER_MESSAGE\s*=\s*'No se pudo conectar con el servidor\. Intenta nuevamente en unos minutos\.'/);
+ assert.match(appSource,/ingreso\?\.code==='PARTIDA_INICIADA'/);
+ assert.match(appSource,/ingreso\?\.code==='CREDENCIALES_INVALIDAS'/);
+ assert.match(appSource,/console\.error\('SIDE: error técnico al validar el ingreso',ingreso\)/);
  assert.match(appSource,/EmpresaService\.obtenerEstado\(identity\)/);
  assert.match(appSource,/EmpresaService\.guardarEstado\(identity,snapshot,expectedRevision\)/);
  assert.match(appSource,/queueStudentSnapshot\(snapshot,newRevision=>S\.DecisionesService\.guardar\(identity,round,decisiones,newRevision\)\)/);

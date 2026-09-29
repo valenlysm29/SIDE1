@@ -9,6 +9,7 @@ const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulac
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const JOIN_STARTED_MESSAGE = 'La partida ya inició. No se permiten nuevos ingresos.';
 const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso con los datos proporcionados.';
+const JOIN_SERVER_MESSAGE = 'No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
 const CREDIT_INITIAL_PERCENT = 70;
@@ -387,13 +388,19 @@ $('studentForm')?.addEventListener('submit',async e=>{
     const localGame={...DEMO_GAME,codigo:code,nombre:localCfg.nombre||DEMO_GAME.nombre,curso:localCfg.curso||DEMO_GAME.curso,estado:'activa'};
     currentStudent={name:'Jugador',company:previous?.empresa||brandName,legalName:previous?.legalName||legalName,participantId:null,game:localGame,returning:Boolean(previous)};
   }else{
-    if(!requireSupabase())return;message('studentMessage','Validando ingreso...');
-    if(!S.EmpresaService?.ingresar){message('studentMessage','No se pudo validar el ingreso. Actualiza la página e inténtalo nuevamente.',true);return}
-    const ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName});
-    if(!ingreso.success){message('studentMessage',ingreso.code==='PARTIDA_INICIADA'?JOIN_STARTED_MESSAGE:JOIN_INVALID_MESSAGE,true);return}
+    if(!requireSupabase()){const error={code:'CLIENTE_SUPABASE_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}message('studentMessage','Validando ingreso...');
+    if(!S.EmpresaService?.ingresar){const error={code:'SERVICIO_EMPRESA_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    let ingreso;
+    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    if(!ingreso?.success){
+      if(ingreso?.code==='PARTIDA_INICIADA'){message('studentMessage',JOIN_STARTED_MESSAGE,true);return}
+      if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
+      console.error('SIDE: error técnico al validar el ingreso',ingreso);
+      message('studentMessage',JOIN_SERVER_MESSAGE,true);return
+    }
     const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
     const empresaId=data.empresa_id||empresa.id||null,participantId=data.participante_id||null,returning=Boolean(data.reingreso);
-    if(!empresaId||!found.id){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
+    if(!empresaId||!found.id){console.error('SIDE: respuesta incompleta de ingresar_empresa',ingreso);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     const canonicalBrand=cleanText(empresa.nombre_comercial||data.nombre_comercial||brandName),canonicalLegal=cleanText(empresa.nombre_legal||data.nombre_legal||legalName);
     const capitalSource=empresa.caja_inicial??data.caja_inicial,currentCapital=Number(capitalSource);
     currentStudent={name:'Jugador',company:canonicalBrand,legalName:canonicalLegal,participantId,empresaId,snapshotRevision:Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0),...(capitalSource!==null&&capitalSource!==undefined&&Number.isFinite(currentCapital)?{initialCapital:currentCapital}:{}),game:{...found,codigo:cleanCode(found.codigo||code)},returning};

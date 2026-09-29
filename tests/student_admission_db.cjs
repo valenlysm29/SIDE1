@@ -4,6 +4,45 @@ const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 const STARTED_MESSAGE='La partida ya inició. No se permiten nuevos ingresos.';
 
 (async()=>{
+ // Ejecuta la migracion real sobre datos que ya existian antes de que fueran
+ // agregadas las columnas de identidad. Reproduce SIDE-005 + demo2/demo2 y
+ // comprueba que el backfill conserva el reingreso estricto tras iniciar.
+ let legacy;
+ const legacyDb=await database({beforeStudentAdmission:async db=>{
+  for(let index=0;index<=5;index++)legacy=await createGame(db,config());
+  assert.equal(legacy.codigo,'SIDE-005');
+  const empresa=(await db.query(`
+   insert into empresas(nombre_legal,nombre_comercial,caja_inicial,caja_actual,ciclo_actual)
+   values('demo2','demo2',100000,87654,1) returning id
+  `)).rows[0];
+  const participante=(await db.query(`
+   insert into participantes(partida_id,empresa_id,nombre,empresa)
+   values($1,$2,'Jugador','demo2') returning id
+  `,[legacy.id,empresa.id])).rows[0];
+  legacy={...legacy,empresa_id:empresa.id,participante_id:participante.id};
+ }});
+ try{
+  const migrated=(await legacyDb.query(`
+   select nombre_legal_ingreso,nombre_comercial_ingreso
+   from participantes where id=$1
+  `,[legacy.participante_id])).rows[0];
+  assert.deepEqual(migrated,{nombre_legal_ingreso:'demo2',nombre_comercial_ingreso:'demo2'});
+  const started=await rpc(legacyDb,'controlar_partida',{
+   p_partida_id:legacy.id,p_accion:'iniciar',p_config:null,p_expected_round:null
+  });
+  assert.equal(started.configuracion.runtime.phase,'decisions');
+  await legacyDb.exec('set role anon');
+  const reentry=await rpc(legacyDb,'ingresar_empresa',{
+   p_codigo:' side-005 ',p_nombre_legal:' DEMO2 ',p_nombre_comercial:'demo2'
+  });
+  assert.equal(reentry.success,true);
+  assert.equal(reentry.reingreso,true);
+  assert.equal(reentry.empresa_id,legacy.empresa_id);
+  assert.equal(reentry.participante_id,legacy.participante_id);
+  await legacyDb.exec('reset role');
+  assert.equal((await legacyDb.query('select count(*)::int total from participantes where partida_id=$1',[legacy.id])).rows[0].total,1);
+ }finally{await legacyDb.close();}
+
  const db=await database();
  try{
   const game=await createGame(db,config({capital:135000}));

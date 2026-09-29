@@ -2,7 +2,7 @@ const {PGlite}=require('@electric-sql/pglite');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const professor='11111111-1111-1111-1111-111111111111';
-async function database(){
+async function database({beforeStudentAdmission}={}){
  const db=new PGlite();
  await db.exec(`
  create role anon; create role authenticated; create schema auth;
@@ -19,10 +19,11 @@ async function database(){
  await db.exec(base);
  const migration=fs.readFileSync(path.join(root,'docs/supabase_game_lifecycle.sql'),'utf8');
  await db.exec(migration);await db.exec(migration); // Repeatable deployment.
- const studentAdmission=fs.readFileSync(path.join(root,'docs/supabase_student_admission.sql'),'utf8');
- await db.exec(studentAdmission);await db.exec(studentAdmission); // Repeatable deployment.
  await db.query(`insert into auth.users(id,raw_user_meta_data,email) values($1,'{}','test@example.invalid')`,[professor]);
  await db.query(`select set_config('test.uid',$1,false)`,[professor]);
+ if(beforeStudentAdmission)await beforeStudentAdmission(db);
+ const studentAdmission=fs.readFileSync(path.join(root,'docs/supabase_student_admission.sql'),'utf8');
+ await db.exec(studentAdmission);await db.exec(studentAdmission); // Repeatable deployment.
  return db;
 }
 const config=(overrides={})=>({lifecycleVersion:2,cycleCloseMode:'manual',integrationDurationMinutes:5,integrationMinutes:0,cycles:3,roundHours:0,roundMinutes:10,enabledEvents:[],...overrides});

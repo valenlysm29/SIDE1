@@ -29,7 +29,29 @@
 
   /** Respuesta estándar cuando no hay conexión. */
   function offline() {
-    return { success: false, offline: true, error: 'Supabase no disponible (modo local).' };
+    return {
+      success: false,
+      offline: true,
+      technical: true,
+      code: 'CLIENTE_SUPABASE_NO_DISPONIBLE',
+      error: 'Supabase no disponible (modo local).'
+    };
+  }
+
+  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA']);
+
+  /** Conserva el diagnostico de PostgREST sin convertirlo en un rechazo de identidad. */
+  function technicalFailure(error, fallbackCode) {
+    const failure = {
+      success: false,
+      technical: true,
+      code: cleanText(error && error.code) || fallbackCode,
+      error: cleanText(error && error.message) || 'Error de comunicacion con Supabase.'
+    };
+    if (error && error.details != null) failure.details = String(error.details);
+    if (error && error.hint != null) failure.hint = String(error.hint);
+    if (error && error.status != null) failure.status = error.status;
+    return failure;
   }
 
   function cleanText(value) {
@@ -62,14 +84,29 @@
         p_nombre_legal: nombreLegal,
         p_nombre_comercial: nombreComercial
       });
-      if (error) return { success: false, error: error.message };
+      if (error) {
+        console.error('SIDE EmpresaService: fallo tecnico en ingresar_empresa', error);
+        return technicalFailure(error, 'RPC_INGRESAR_EMPRESA_ERROR');
+      }
       const data = Array.isArray(response) ? response[0] : response;
-      if (!data || data.success === false || data.error) {
-        return { success: false, code: data && (data.code || data.codigo_error), error: (data && data.error) || 'No se pudo validar el ingreso.' };
+      if (!data || typeof data !== 'object') {
+        const failure = technicalFailure(null, 'RESPUESTA_INGRESO_INVALIDA');
+        console.error('SIDE EmpresaService: respuesta invalida de ingresar_empresa', { response });
+        return failure;
+      }
+      if (data.success === false || data.error) {
+        const code = cleanText(data.code || data.codigo_error);
+        return {
+          success: false,
+          code,
+          error: cleanText(data.error) || 'No se pudo validar el ingreso.',
+          technical: !ADMISSION_REJECTION_CODES.has(code)
+        };
       }
       return { success: true, data };
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      console.error('SIDE EmpresaService: excepcion en ingresar_empresa', err);
+      return technicalFailure(err, 'RPC_INGRESAR_EMPRESA_EXCEPCION');
     }
   }
 
