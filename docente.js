@@ -52,6 +52,7 @@ function publishGameState(){
 let companiesPoll=null,companiesChannel=null,companiesChannelId=null;
 function startLiveCompanies(){
   if(!companiesPoll)companiesPoll=setInterval(()=>{if(!document.hidden)loadReports()},3000);
+  gradeQueue?.flush();
   const sb=window.SIDE?.SupabaseClient?.get();
   if(!sb?.channel||!state.partidaId||companiesChannelId===state.partidaId)return;
   if(companiesChannel)sb.removeChannel(companiesChannel);
@@ -570,7 +571,7 @@ async function supabaseReports(){
   rosterSyncError='';
   const roster=(parts.data||[]).filter(p=>p.empresa_id).map(p=>({id:'sb-'+p.empresa_id,empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,partida:$('gameCode').value,empresa:p.empresas?.nombre_comercial||p.empresa,nombre:p.nombre||'Jugador',ronda:p.empresas?.ciclo_actual||1,caja:p.empresas?.caja_actual||0,fuente:'supabase',estado:'activa'}));
   const known=new Set(state.reports.map(r=>r.empresa));
-  state.reports.push(...roster.filter(r=>!known.has(r.empresa)));renderCompanies();
+  state.reports.push(...roster.filter(r=>!known.has(r.empresa)));
   const cat=await supabaseCatalog();
   const code=$('gameCode').value;
   const localBase=state.reports||[];
@@ -630,45 +631,105 @@ async function loadReports(){
   const names=new Set(state.reports.map(r=>r.empresa));
   if(state.partidaId)state.reports.push(...cached.filter(r=>r.fuente==='supabase'&&!names.has(r.empresa)));
   state.reports=state.reports.filter(r=>r.partida===$('gameCode').value);
-  renderCompanies();
   try{
     const remote=await supabaseReports();
-    if(remote)state.reports=remote;
+    if(remote){
+      state.reports=remote;
+      for(const r of remote)if(r.fuente==='supabase')presenceStates.set(String(r.empresaId||r.id),presenceTracker.observe(String(r.empresaId||r.id),r.lastSeenAt));
+    }
   }catch(error){rosterSyncError=error.message;console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
   renderCompanies();renderResults();renderWinnerSelect();
   }finally{reportsBusy=false;if(reportsAgain){reportsAgain=false;setTimeout(loadReports,100);}}
 }
 function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}">${escapeHtml(k)} ${v.complete?'✓':`${v.done||0}/${v.total||0}`}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
-function companyIsRecent(r){return Boolean(r.conectada)&&teacherNow()-Date.parse(r.lastSeenAt||r.updatedAt||'')<90000;}
-function companyActivity(r){
-  if(companyIsRecent(r))return r.integracion?'CONECTADA · EN SALA DE ESPERA':r.tomandoDecisiones?'CONECTADA · TOMANDO DECISIONES':'CONECTADA · EN PARTIDA';
-  if(r.fuente==='supabase')return r.lastSeenAt?'SIN ACTIVIDAD RECIENTE':'REGISTRADA · PRESENCIA SIN CONFIRMAR';
-  return 'SIN ACTIVIDAD RECIENTE';
+const presenceTracker=window.SIDE.TeacherSync.createPresenceTracker({now:teacherNow});
+const presenceStates=new Map();
+const gradeUiStatus=new Map();
+const gradeFailureNotified=new Set();
+function companyPresence(r){
+  if(r.fuente!=='supabase')return r.conectada?'online':'idle';
+  return presenceStates.get(String(r.empresaId||r.id))||'unconfirmed';
+}
+function companyActivity(r,presence){
+  if(presence==='online')return r.integracion?'CONECTADA · EN SALA DE ESPERA':r.tomandoDecisiones?'CONECTADA · TOMANDO DECISIONES':'CONECTADA · EN PARTIDA';
+  return presence==='idle'?'SIN ACTIVIDAD RECIENTE':'REGISTRADA · PRESENCIA SIN CONFIRMAR';
 }
 function gradeKey(r){return `${$('gameCode').value}:${r.empresaId||r.empresa.trim().toUpperCase()}`;}
 function grades(){try{return JSON.parse(localStorage.getItem('SIDE_TEACHER_GRADES')||'{}')||{}}catch{return {}}}
-function gradeValue(r){const local=grades()[gradeKey(r)];return local?.pending||r.teacherScore==null?(local?.value??r.teacherScore??null):r.teacherScore;}
+function gradeValue(r){const local=grades()[gradeKey(r)];return local?.value??r.teacherScore??null;}
 function gradeLabel(r){const value=gradeValue(r);return value==null?'Sin calificar':`${Number(value).toLocaleString('es-PE')} / 20`;}
-async function saveCompanyGrade(id,value){
+const gradeQueue=window.SIDE.TeacherSync.createGradeQueue({
+  storage:localStorage,
+  save:({partidaId,empresaId,puntaje})=>window.SIDE.PartidaService.guardarPuntaje(partidaId,empresaId,puntaje),
+  onStatus:(key,status)=>{
+    gradeUiStatus.set(key,status);
+    if(status==='saving'||status==='saved')gradeFailureNotified.delete(key);
+    if(status==='saved'){
+      const latest=grades(),entry=latest[key];
+      if(entry){entry.pending=false;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(latest));}
+      const report=state.reports.find(r=>gradeKey(r)===key);
+      if(report&&entry)report.teacherScore=entry.value;
+    }
+    if(status==='failed'&&!gradeFailureNotified.has(key)){
+      gradeFailureNotified.add(key);
+      toast('No se pudo sincronizar la nota. Reintentando…');
+    }
+    const form=[...document.querySelectorAll('[data-grade-form]')].find(f=>{
+      const r=state.reports.find(x=>x.id===f.dataset.gradeForm);return r&&gradeKey(r)===key;
+    });
+    if(form)form.querySelector('[data-grade-status]').textContent=gradeStatus(key);
+    if(status==='saved'){renderResults();renderWinnerSelect();}
+  }
+});
+function gradeStatus(key){
+  const status=gradeUiStatus.get(key);
+  return status==='saving'||status==='retrying'?'Guardando…':status==='saved'?'Guardado ✓':status==='failed'?'Sin conexión · reintentando…':grades()[key]?.pending?'Guardando…':grades()[key]?'Guardado ✓':'Sin calificar';
+}
+function saveCompanyGrade(id,value){
   const report=state.reports.find(r=>r.id===id);if(!report)return;
   if(String(value).trim()===''||!Number.isFinite(Number(value))||Number(value)<0||Number(value)>20){toast('Escribe una nota entre 0 y 20.');return false;}
   const note=Math.round(Number(value)*100)/100,all=grades(),key=gradeKey(report),entry={value:note,pending:Boolean(report.empresaId&&state.partidaId),updatedAt:new Date().toISOString()};
   all[key]=entry;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(all));
   if(entry.pending){
-    const result=await window.SIDE.PartidaService.guardarPuntaje(state.partidaId,report.empresaId,note);
-    if(result.success){report.teacherScore=note;const latest=grades();if(latest[key]?.updatedAt===entry.updatedAt){latest[key].pending=false;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(latest));}toast('Puntaje guardado.');}
-    else toast('Nota guardada en este equipo; sincronización pendiente. '+(result.error||''));
-  }else toast('Puntaje guardado.');
-  renderCompanies(true);renderResults();renderWinnerSelect();return true;
+    gradeQueue.enqueue(key,{partidaId:state.partidaId,empresaId:report.empresaId,puntaje:note});
+  }else gradeUiStatus.set(key,'saved');
+  renderCompanies();renderResults();renderWinnerSelect();return true;
 }
 function renderCompanies(force=false){
   if($('companiesLiveStatus'))$('companiesLiveStatus').textContent=`${state.reports.length} empresa(s) registrada(s) · ${rosterSyncError?'Sincronización pendiente; mostrando los últimos datos. Reintentando…':'actualización automática cada 3 segundos'}`;
   const grid=$('companiesGrid');
-  // Background polling must not erase a grade the teacher is currently typing.
-  if(!force&&grid.contains(document.activeElement)&&document.activeElement.closest('.company-grade'))return;
-  grid.innerHTML=state.reports.map((r,i)=>`<article class="company-card"><div class="company-status-line"><span class="live-dot ${companyIsRecent(r)?'online':'idle'}"></span><b>${companyActivity(r)}</b></div><h3>${escapeHtml(r.empresa)}</h3><small>${escapeHtml(r.nombre||'Jugador')} · ciclo ${r.rondasActivas||r.ronda||0}</small><div class="section-status-row">${sectionBadges(r)}</div><div class="score">${Number(r.progreso||0)}% decisiones obligatorias</div><div class="metric"><span>Caja</span><b>${money(r.caja??r.capital)}</b></div><div class="metric"><span>Utilidad del ciclo</span><b>${money(r.utilidad)}</b></div><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${i}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${i}" data-grade type="number" min="0" max="20" step="0.01" required value="${gradeValue(r)??''}" placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small>${grades()[gradeKey(r)]?.pending?'Guardada en este equipo · pendiente de sincronizar':gradeLabel(r)}</small></form><button class="eliminate" data-eliminate="${i}">${r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad'}</button></article>`).join('')||'<div class="card">Aún no hay empresas reportadas en esta partida.</div>';
-  grid.querySelectorAll('[data-eliminate]').forEach(b=>b.addEventListener('click',()=>toggleElimination(Number(b.dataset.eliminate))));
-  grid.querySelectorAll('[data-grade-form]').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();const button=form.querySelector('button');button.disabled=true;try{await saveCompanyGrade(form.dataset.gradeForm,form.querySelector('input').value);}finally{button.disabled=false;}}));
+  const current=new Map([...grid.querySelectorAll('[data-company-id]')].map(card=>[card.dataset.companyId,card]));
+  if(!state.reports.length){if(grid.textContent!=='Aún no hay empresas reportadas en esta partida.')grid.innerHTML='<div class="card">Aún no hay empresas reportadas en esta partida.</div>';return;}
+  grid.querySelector('.card:not([data-company-id])')?.remove();
+  for(const [i,r] of state.reports.entries()){
+    let card=current.get(String(r.id));
+    if(!card){
+      card=document.createElement('article');card.className='company-card';card.dataset.companyId=String(r.id);
+      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${i}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${i}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
+      card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>x.id===r.id)));
+      card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=r.id;switchTab('resultados');renderResults();});
+      const form=card.querySelector('[data-grade-form]'),input=form.querySelector('input');
+      input.addEventListener('input',()=>{input.dataset.dirty='true';});
+      form.addEventListener('submit',event=>{event.preventDefault();if(saveCompanyGrade(r.id,input.value))input.dataset.dirty='';});
+      grid.appendChild(card);
+    }
+    current.delete(String(r.id));
+    const setText=(field,value)=>{const el=card.querySelector(`[data-field="${field}"]`);if(el.textContent!==value)el.textContent=value;};
+    const presence=companyPresence(r);
+    card.querySelector('.live-dot').classList.toggle('online',presence==='online');
+    card.querySelector('.live-dot').classList.toggle('idle',presence!=='online');
+    setText('presence',companyActivity(r,presence));
+    setText('company',r.empresa);
+    setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
+    setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
+    setText('cash',money(r.caja??r.capital));setText('profit',money(r.utilidad));
+    const sections=sectionBadges(r),sectionEl=card.querySelector('[data-field="sections"]');if(sectionEl.innerHTML!==sections)sectionEl.innerHTML=sections;
+    const input=card.querySelector('[data-grade]'),value=gradeValue(r);
+    if(document.activeElement!==input&&input.dataset.dirty!=='true'&&input.value!==String(value??''))input.value=value??'';
+    const status=gradeStatus(gradeKey(r)),statusEl=card.querySelector('[data-grade-status]');if(statusEl.textContent!==status)statusEl.textContent=status;
+    const eliminate=card.querySelector('[data-eliminate]'),label=r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad';if(eliminate.textContent!==label)eliminate.textContent=label;
+  }
+  for(const card of current.values())card.remove();
 }
 function toggleElimination(i){const r=state.reports[i];if(!r)return;r.estado=r.estado==='eliminada'?'activa':'eliminada';persistReports();renderCompanies();renderResults();renderWinnerSelect();toast(r.empresa+(r.estado==='eliminada'?' fue marcada como eliminada.':' fue reactivada.'))}
 function persistReports(){localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(state.reports))}
