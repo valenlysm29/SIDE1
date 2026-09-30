@@ -60,7 +60,8 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
     },
     actors(id) {
       const room=businessInteriors.rooms.find(room=>room.id===id);
-      const local=room.actors.map(actor=>({role:actor.route.role,id:actor.object.userData.cityNpcId||null,visible:actor.object.visible}));
+      scene.updateMatrixWorld(true);
+      const local=room.actors.map(actor=>{const id=actor.object.userData.cityNpcId||null,manifest=cityApproved?.find(model=>model.id===id),bounds=new THREE.Box3().setFromObject(actor.object,true);return {role:actor.route.role,id,visible:actor.object.visible,height:bounds.max.y-bounds.min.y,approvedHeight:manifest?.altura||null,manifestRoles:manifest?[manifest.rol,...(manifest.roles||[])]:[]};});
       const visibleIds=[];scene.updateMatrixWorld(true);scene.traverse(obj=>{if(!obj.userData.cityNpcId)return;for(let p=obj;p;p=p.parent)if(!p.visible)return;const p=obj.getWorldPosition(new THREE.Vector3());if(Math.hypot(p.x-HUB_OFFSET-room.layout.x,p.z-room.layout.z)<24)visibleIds.push(obj.userData.cityNpcId);});
       return {local,visibleIds,count:room.actors.length};
     },
@@ -107,6 +108,8 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
           await page.evaluate(id=>decisionInteriorQA.door(id,true),id);
           const actors=await page.evaluate(id=>decisionInteriorQA.actors(id),id);
           assert.equal(actors.count,count,`${id} actor count stable`);
+          assert.ok(actors.count>0&&actors.local.every(actor=>actor.id&&actor.manifestRoles.includes(actor.role)),`${tier} ${id} staff approved for each role`);
+          for(const actor of actors.local)assert.ok(Math.abs(actor.height-actor.approvedHeight)<=.1,`${tier} ${id} ${actor.id} height ${actor.height} expected ${actor.approvedHeight}`);
           assert.equal(new Set(actors.visibleIds).size,actors.visibleIds.length,`${tier} ${id} unique active CC0 actors`);
         }
         const measure=await page.evaluate(({id,tier})=>decisionInteriorQA.measure(id,tier),{id,tier});
