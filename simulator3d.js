@@ -1014,12 +1014,15 @@
     return loadCharacter('mona',ASSET_PRIORITY.IMPORTANT);
   }
 
-  function createBusinessNpc(role, room) {
+  function createBusinessNpc(role, room, previous = null) {
     const cityRole=['oficina','banco','cajero','proveedor','almacen','cliente','guardia'].includes(role)?role:role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
     const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
-    const nearby=room?room.actors.map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
-    if(room)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
-    const obj=person({...look,execModel:'city-fallback',cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby});
+    const serviceRoom=room&&['office','bank','suppliers'].includes(room.id);
+    const nearby=serviceRoom?room.actors.filter(actor=>actor.object!==previous).map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
+    if(serviceRoom)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
+    const config={...look,cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby};
+    const obj=serviceRoom?cityNpcFromTemplate(config):person(config);
+    if(!obj)return null;
     obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
   }
 
@@ -1050,7 +1053,8 @@
         for(const room of businessInteriors?.rooms||[]){
           for(const actor of room.actors){
             const previous=actor.object,role=previous.userData.role;
-            const replacement=createBusinessNpc(role,room);
+            const replacement=createBusinessNpc(role,room,previous);
+            if(!replacement)continue;
             replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
             replacement.visible=previous.visible;replacement.name=previous.name;
             room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
@@ -1295,7 +1299,11 @@
     const template=choice&&cityTemplates.get(choice.model.id);
     if(!template)return null;
     const group=new THREE.Group(),avatar=SkeletonUtils.clone(template.scene);
-    avatar.scale.setScalar((cfg.bodyScale||1)*choice.heightScale);
+    if(cfg.excludedCityIds){
+      avatar.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(avatar),height=bounds.max.y-bounds.min.y;
+      const scale=height>0?choice.model.altura/height:1;avatar.scale.multiplyScalar(scale*(cfg.bodyScale||1)*choice.heightScale);
+      avatar.updateMatrixWorld(true);const floor=new THREE.Box3().setFromObject(avatar).min.y;avatar.position.y-=floor;
+    }else avatar.scale.setScalar((cfg.bodyScale||1)*choice.heightScale);
     avatar.traverse(node=>{if(node.isMesh)node.userData.sharedCharacterResource=true});
     if(choice.repeated)avatar.traverse(node=>{
       if(!node.isMesh||!node.material)return;
@@ -2332,7 +2340,7 @@
       pendingUnits:businessState?.pendingSupplierOrder?.units||0,
       productionActive:running&&!gameSession?.shiftEnded&&bridge().canOperate?.()!==false&&accounted<plannedTotal&&display+reserve<capacity,
       producedUnits:inventory?.producedUnits??null,plannedUnits:plan?.producibleUnits??0,productionPlan:plan,
-      cash:decisionCash(),round:currentRoundSafe(),debt:bridge().creditState?.().outstanding??null,loan:bridge().decisions?.PRESTAMO?.amount??null,
+      profit:bridge().financialReport?.().estadoResultados?.utilidad??null,cash:decisionCash(),round:currentRoundSafe(),debt:bridge().creditState?.().outstanding??null,loan:bridge().decisions?.PRESTAMO?.amount??null,
       machines:{cutting:owned('MESA_CORTE'),assembly:owned('ENSAMBLE'),finishing:owned('ACABADOS')},
       workers:{cutting:qty('PERS_CORTE'),assembly:qty('PERS_ENSAMBLE'),finishing:qty('PERS_ACABADO')},
       products:PRODUCTS.map(p=>({id:p.id,color:p.color,display:displayStock(p.id),reserve:reserveStock(p.id)}))};

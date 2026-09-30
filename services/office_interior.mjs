@@ -48,7 +48,7 @@ export function buildOfficeInterior({ room, batch, m, collider, sign, hotspot, o
   b.box(x, 2.02, boardZ - .043, 3.6, 1.43, .018, m.white);
   // Boards face the doorway (negative Z), without changing exterior signs.
   const title = sign(room.detail, 'FINANZAS Y CICLO', 'CAJA · DEUDA · RESUMEN', x, 2.26, boardZ - .065, 3.35, .57, Math.PI);
-  const indicator = sign(room.detail, 'Estado de la empresa', 'Datos del ciclo actual', x, 1.74, boardZ - .07, 3.35, .36, Math.PI);
+  const indicator = sign(room.detail, 'Estado de la empresa', 'Datos del ciclo actual', x, 1.6, boardZ - .07, 3.35, .85, Math.PI);
   room.stateSigns ||= [];
   room.stateSigns.push({ key: 'finance', mesh: indicator, title, fields: ['cash', 'debt', 'round'], zone: 'office' });
   // The decision terminal is against the rear wall, reachable from the spine.

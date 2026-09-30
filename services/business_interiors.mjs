@@ -515,13 +515,13 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   function updateStateSigns(room,value) {
     for(const entry of room.stateSigns||[]){
       const number=(key)=>value[key]==null?'Sin datos':Number(value[key]).toLocaleString('es-PE');
-      const text=room.id==='office'?`Ciclo ${number('round')} · Caja S/ ${number('cash')} · Deuda S/ ${number('debt')}`:
+      const text=room.id==='office'?`Ciclo ${number('round')} · Caja S/ ${number('cash')}\nDeuda S/ ${number('debt')} · Utilidad S/ ${number('profit')}\nProducidas ${number('producedUnits')} · Pendientes ${number('pendingUnits')}`:
         `Caja S/ ${number('cash')} · Deuda S/ ${number('debt')} · Solicitud S/ ${number('loan')}`;
       const mesh=entry.mesh;if(mesh.userData.stateText===text)continue;
       mesh.userData.stateText=text;
       const canvas=mesh.material.map.image,ctx=canvas.getContext('2d');
       ctx.fillStyle='#23393e';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#f1edde';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.font=`500 ${canvas.height*.3}px Arial`;ctx.fillText(text,canvas.width/2,canvas.height/2,canvas.width*.95);mesh.material.map.needsUpdate=true;
+      const lines=text.split('\n');ctx.font=`500 ${canvas.height*(lines.length>1?.21:.3)}px Arial`;lines.forEach((line,index)=>ctx.fillText(line,canvas.width/2,canvas.height*(lines.length>1?.22+index*.29:.5),canvas.width*.95));mesh.material.map.needsUpdate=true;
     }
   }
   const interiorNavigation=createInteriorNavigation({THREE,rooms,colliders,offsetX});
@@ -884,8 +884,9 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     }
   }
   function ensureActors(room) {
-    if (room.actors.length || !createNpc) return;
+    if (!createNpc) return;
     for (const route of room.routes) {
+      if(room.actors.some(actor=>actor.route===route))continue;
       const object = createNpc(route.role, room); if (!object) continue;
       const start = route.points[0]; object.position.set(start.x - offsetX, .025, start.z);
       object.name = `SIDE ${route.zone} ${route.role}`; room.detail.add(object);

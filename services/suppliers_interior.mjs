@@ -33,7 +33,7 @@ export function buildSuppliersInterior({ room, batch: b, m, collider, sign, hots
       }
     }
   }
-  sign(room.detail, 'MUESTRAS', 'EXHIBICIÓN · SIN STOCK PROPIO', x + .3, 2.65, z - 6.5, 4.5, .55);
+  sign(room.detail, 'MUESTRAS', 'CUERO · HILO · ACCESORIOS', x + .3, 2.65, z - 6.5, 4.5, .55);
   // Packing bench is behind the counter, outside the public route.
   solid(x - 5.05, z - 4.7, 1.6, 1.5, .95, m.steel, 'packing-table');
   b.box(x - 5.05, 1.03, z - 4.7, 1.8, .12, 1.7, m.wood);
