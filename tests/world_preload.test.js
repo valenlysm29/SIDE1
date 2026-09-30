@@ -7,7 +7,7 @@ function fixture(engine=async()=>true,details=async()=>true){
       city:async()=>{counts.city++;},guide:async()=>{counts.guide++;},lighting:async()=>{counts.lighting++;},
       details:async()=>{counts.details++;await details();},upgrade:()=>counts.upgrade++},
     localStorage:{getItem:()=>null,setItem(){throw Error('Preloading must not write financial storage');}}};
-  const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  loadThree=window.engine;
+  const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  loadThree=window.engine;
   loadCharacter=window.city;loadStartupEnvironment=window.lighting;ASSET_PRIORITY={CRITICAL:'CRITICAL',IMPORTANT:'IMPORTANT'};
   loadExecModelTemplates=window.details;loadNpcModelTemplate=async()=>false;refreshBusinessCharacters=window.upgrade;ensureHubCharacters=()=>{};
   window.SIDE3D = {`);

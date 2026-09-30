@@ -200,7 +200,7 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
     if (!latestPlayer || !latestCamera || now - lastRender < 100) return;
     lastRender = now;
     const point = mapPoint(latestPlayer.x - offsetX, latestPlayer.z, bounds);
-    // These coordinates match simulator3d.js's existing 7–93% mapping.
+    // These coordinates match js/simulator3d.js's existing 7–93% mapping.
     dot.style.left = `${7 + point.x * .86}%`;
     dot.style.top = `${7 + point.y * .86}%`;
     dot.style.rotate = `${-yaw * 180 / Math.PI}deg`;

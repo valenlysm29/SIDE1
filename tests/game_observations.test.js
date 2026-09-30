@@ -1,5 +1,5 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
-const rules=require('../side_rules.js');
+const rules=require('../js/side_rules.js');
 test('cancellation overrides operating and automatic schedule states, including legacy games',()=>{
  for(const lifecycleVersion of [1,2]){
   const config={lifecycleVersion,cancelledAt:new Date().toISOString(),cycleCloseMode:'automatic',runtime:{phase:'cancelled',round:2},gameStartAt:'2020-01-01T00:00:00Z'};

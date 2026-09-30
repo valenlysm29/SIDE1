@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const url=process.env.SIDE_TEST_URL||'http://127.0.0.1:8772/';
 const label=process.env.SIDE_LOADING_LABEL||'current';
-const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D = {',`  window.loadingQA={
   stages:{}, snapshot(){return {inventory,gameSession,businessState,initialized}},
   move(){const before={x:player.x,z:player.z};keys.KeyW=true;updatePlayer(.04);keys={};return Math.hypot(player.x-before.x,player.z-before.z);}
@@ -21,7 +21,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   for(const warm of [false,true]){
    const context=await browser.newContext({viewport:{width:1280,height:800}}),page=await context.newPage(),errors=[];
    page.setDefaultTimeout(120000);page.on('pageerror',e=>errors.push(e.message));
-   await page.route('**/*',r=>!r.request().url().startsWith(url)?r.abort():/\/simulator3d\.js(?:\?|$)/.test(r.request().url())?r.fulfill({contentType:'application/javascript',body:instrumented}):r.continue());
+   await page.route('**/*',r=>!r.request().url().startsWith(url)?r.abort():/\/js\/simulator3d\.js(?:\?|$)/.test(r.request().url())?r.fulfill({contentType:'application/javascript',body:instrumented}):r.continue());
    const nav=Date.now();await page.goto(url,{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.SIDE3D&&window.loadingQA);
    const navigationMs=Date.now()-nav;
    if(warm&&!await page.evaluate(()=>typeof SIDE3D.preload==='function')){await context.close();continue;}

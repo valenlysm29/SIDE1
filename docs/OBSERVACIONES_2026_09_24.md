@@ -21,7 +21,7 @@ Referencia técnica: [Supabase: presencia](https://supabase.com/docs/guides/real
 
 ## Aplicación en Supabase
 
-**Pendiente en el servidor remoto:** ejecutar el archivo completo `docs/supabase_game_lifecycle.sql` actualizado en el SQL Editor del proyecto configurado. Está preparado para la instalación que ya tiene `docs/supabase_migration.sql`. Es transaccional y repetible; no borra partidas, empresas ni decisiones. Agrega la señal de presencia, el historial de sorteos, la asignación de códigos y las funciones de cancelación/eventos. La creación verifica `side_game_features` para evitar generar partidas con un backend anterior.
+**Pendiente en el servidor remoto:** ejecutar el archivo completo `supabase/migrations/supabase_game_lifecycle.sql` actualizado en el SQL Editor del proyecto configurado. Está preparado para la instalación que ya tiene `supabase/migrations/supabase_migration.sql`. Es transaccional y repetible; no borra partidas, empresas ni decisiones. Agrega la señal de presencia, el historial de sorteos, la asignación de códigos y las funciones de cancelación/eventos. La creación verifica `side_game_features` para evitar generar partidas con un backend anterior.
 
 Después, servir los archivos actualizados y recargar las páginas de docentes y alumnos. Los recursos modificados tienen una versión nueva para evitar caché antigua. No se ejecutó la migración ni se publicó la aplicación en un servidor remoto desde esta tarea.
 

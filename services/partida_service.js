@@ -74,10 +74,10 @@
       if(d.configuracion?.lifecycleVersion===2){
         const {data:features,error:featuresError}=await sb.rpc('side_game_features');
         if(featuresError&&!/PGRST202|42883/.test(featuresError.code||''))return {success:false,error:featuresError.message||'No se pudo comprobar Supabase. Vuelve a intentarlo.'};
-        if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con docs/supabase_game_lifecycle.sql para habilitar códigos de tres dígitos, cancelación y eventos sin repetición.'};
+        if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql para habilitar códigos de tres dígitos, cancelación y eventos sin repetición.'};
         // Read-only readiness check: do not leave an unusable lobby in an old DB.
         const {error:readinessError}=await sb.rpc('controlar_partida',{p_partida_id:null,p_accion:'sincronizar'});
-        if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica docs/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
+        if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica supabase/migrations/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
       }
       const payload = {
         profesor_id: userData.user.id,
@@ -210,7 +210,7 @@
       if(!error&&!data?.error&&accion==='guardar'&&config?.eventRules&&JSON.stringify(config.eventRules)!==JSON.stringify(data?.configuracion?.eventRules||{})){
         // JSONB can reorder keys; compare each rule instead of its serialization.
         const saved=data?.configuracion?.eventRules||{};
-        if(Object.entries(config.eventRules).some(([id,rule])=>saved[id]?.firstRound!==rule.firstRound||saved[id]?.repeat!==rule.repeat))return {success:false,error:'No se guardaron las reglas de eventos. Actualiza docs/supabase_game_lifecycle.sql en Supabase.'};
+        if(Object.entries(config.eventRules).some(([id,rule])=>saved[id]?.firstRound!==rule.firstRound||saved[id]?.repeat!==rule.repeat))return {success:false,error:'No se guardaron las reglas de eventos. Actualiza supabase/migrations/supabase_game_lifecycle.sql en Supabase.'};
       }
       return error||data?.error?{success:false,error:error?.message||data.error}:{success:true,data};
     }catch(error){return {success:false,error:error.message};}

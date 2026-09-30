@@ -1,6 +1,6 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {suggestedScore,suggestedPodium,finalPodium}=require('../teacher_podium.js');
+const {suggestedScore,suggestedPodium,finalPodium}=require('../js/teacher_podium.js');
 
 const reports=[
   {empresa:'Alta SIDE',estadoResultados:{ventasNetas:100,utilidad:30},balanceGeneral:{activos:100,efectivo:40,deuda:0},teacherScore:8},

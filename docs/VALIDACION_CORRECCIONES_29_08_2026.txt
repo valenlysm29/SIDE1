@@ -1,15 +1,15 @@
 VALIDACIÓN ESTÁTICA — CORRECCIONES 29/08/2026
 
-OK — JavaScript: app.js
-OK — JavaScript: config.js
-OK — JavaScript: decision_catalog.js
-OK — JavaScript: docente.js
-OK — JavaScript: events_catalog.js
-OK — JavaScript: icon_bank.js
-OK — JavaScript: simulator3d.js
-OK — JavaScript: tutorial.js
+OK — JavaScript: js/app.js
+OK — JavaScript: js/config.js
+OK — JavaScript: js/decision_catalog.js
+OK — JavaScript: js/docente.js
+OK — JavaScript: js/events_catalog.js
+OK — JavaScript: js/icon_bank.js
+OK — JavaScript: js/simulator3d.js
+OK — JavaScript: js/tutorial.js
 
-OK — 50 eventos explícitos en events_catalog.js
+OK — 50 eventos explícitos en js/events_catalog.js
 OK — 23 eventos grupales
 OK — 27 eventos individuales
 OK — Todos los eventos contienen descripción, alcance, probabilidad, ciclos, implicancia y efecto.
@@ -45,4 +45,4 @@ OK — No se encontraron IDs HTML duplicados.
 OK — No se encontraron referencias $() a IDs inexistentes.
 OK — No quedan flechas finas →/← en las interfaces HTML principales.
 
-NOTA: La validación realizada es de sintaxis, estructura e integración estática. La publicación en Supabase requiere ejecutar la migración incluida en supabase_schema.sql para activar la restricción de una sola partida activa a nivel de base de datos.
+NOTA: La validación realizada es de sintaxis, estructura e integración estática. La publicación en Supabase requiere ejecutar la migración incluida en supabase/schema.sql para activar la restricción de una sola partida activa a nivel de base de datos.

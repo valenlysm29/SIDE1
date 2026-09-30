@@ -236,7 +236,7 @@ async function legacyMatrix(){
    `)).rows[0]
   });
   const before=await readMigrationState();
-  const migration=fs.readFileSync(path.join(root,'docs/supabase_student_admission.sql'),'utf8');
+  const migration=fs.readFileSync(path.join(root,'supabase/migrations/supabase_student_admission.sql'),'utf8');
   await db.exec(migration);
   const after=await readMigrationState();
   assert.deepEqual(after,before);

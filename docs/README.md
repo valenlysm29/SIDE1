@@ -1,5 +1,9 @@
 # SIDE — Simulador empresarial · versión integrada 3D
 
+La distribución actual de carpetas y las instrucciones de inicio están en
+[README.md de SIDE1](../README.md). El código de las páginas está en `js/`,
+los estilos en `css/` y los scripts SQL en `supabase/`.
+
 ## Plaza jugable — 25 de septiembre de 2026
 
 El mundo abre en una plaza 3D explorable con cámara en tercera persona, edificios
@@ -8,7 +12,7 @@ interactivo. Consulta [controles, alcance y pruebas](HUB_JUGABLE.md).
 
 ## Corrección del inicio de partidas — septiembre de 2026
 
-El flujo nuevo separa integración y Ciclo 1, incorpora inicio manual y plazo automático persistido en Supabase, y corrige la selección de eventos. **Antes de usarlo entre dispositivos, ejecutar `supabase_game_lifecycle.sql`.** Consulta [instalación, archivos modificados y pruebas](CORRECCION_INICIO_PARTIDA.md). Las instrucciones de versiones anteriores se conservan debajo como historial.
+El flujo nuevo separa integración y Ciclo 1, incorpora inicio manual y plazo automático persistido en Supabase, y corrige la selección de eventos. **Antes de usarlo entre dispositivos, ejecutar `supabase/migrations/supabase_game_lifecycle.sql`.** Consulta [instalación, archivos modificados y pruebas](CORRECCION_INICIO_PARTIDA.md). Las instrucciones de versiones anteriores se conservan debajo como historial.
 
 ## Mona y carpeta unificada
 

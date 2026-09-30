@@ -3,7 +3,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const config=require('../simulator3d-config');
+const config=require('../js/simulator3d-config');
 
 test('the reformed world has three separated business sectors',()=>{
   const {store,production,warehouse}=config.WORLD;
@@ -40,7 +40,7 @@ test('the local human avatar is a valid GLB with idle and walk clips',()=>{
 });
 
 test('simulator source connects events, production and financial sales',()=>{
-  const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+  const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
   assert.match(source,/activeEvents\?\.\(\)/);
   assert.match(source,/productionPlan\?\.\(\)/);
   assert.match(source,/recordSimulatedSale\?\.\(salePrice,/);

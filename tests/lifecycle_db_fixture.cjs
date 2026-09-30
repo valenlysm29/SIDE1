@@ -15,14 +15,14 @@ async function database({beforeStudentAdmission}={}){
  create table empresas_decisiones(id serial primary key,empresa_id bigint,ciclo integer,decision_id integer,opcion_id integer,cantidad integer,costo_total numeric,enviada boolean,updated_at timestamptz default now());
  `);
  // The installed Supabase project already owns these four business tables.
- const base=fs.readFileSync(path.join(root,'docs/supabase_migration.sql'),'utf8').replace(/create extension if not exists "pgcrypto";/,'');
+ const base=fs.readFileSync(path.join(root,'supabase/migrations/supabase_migration.sql'),'utf8').replace(/create extension if not exists "pgcrypto";/,'');
  await db.exec(base);
- const migration=fs.readFileSync(path.join(root,'docs/supabase_game_lifecycle.sql'),'utf8');
+ const migration=fs.readFileSync(path.join(root,'supabase/migrations/supabase_game_lifecycle.sql'),'utf8');
  await db.exec(migration);await db.exec(migration); // Repeatable deployment.
  await db.query(`insert into auth.users(id,raw_user_meta_data,email) values($1,'{}','test@example.invalid')`,[professor]);
  await db.query(`select set_config('test.uid',$1,false)`,[professor]);
  if(beforeStudentAdmission)await beforeStudentAdmission(db);
- const studentAdmission=fs.readFileSync(path.join(root,'docs/supabase_student_admission.sql'),'utf8');
+ const studentAdmission=fs.readFileSync(path.join(root,'supabase/migrations/supabase_student_admission.sql'),'utf8');
  await db.exec(studentAdmission);await db.exec(studentAdmission); // Repeatable deployment.
  return db;
 }

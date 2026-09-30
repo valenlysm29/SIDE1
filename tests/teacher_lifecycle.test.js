@@ -1,4 +1,4 @@
-const test=require('node:test'),assert=require('node:assert/strict'),R=require('../side_rules.js');
+const test=require('node:test'),assert=require('node:assert/strict'),R=require('../js/side_rules.js');
 const start=Date.parse('2026-09-22T12:00:00Z');
 const config={integrationMinutes:60,cycles:3,roundHours:0,roundMinutes:10,cycleCloseMode:'manual',gameStartedAt:new Date(start).toISOString()};
 test('integration is cycle 1 and counts toward the configured total',()=>{

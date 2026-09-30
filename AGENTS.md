@@ -15,6 +15,12 @@ Ejecutar los comandos de Git desde `SIDE1`, que es la raíz del repositorio.
   padre ni rutas `../` para guardar artefactos del proyecto.
 - Guardar capturas y resultados en `tests/output/`, entregas en `output/`,
   documentación en `docs/` y análisis en `reports/`.
+- Guardar JavaScript de las páginas en `js/`, estilos en `css/`, servicios
+  en `services/`, el esquema SQL en `supabase/schema.sql` y migraciones en
+  `supabase/migrations/`. Actualizar las rutas al mover archivos.
+- Mantener en la raíz las páginas HTML, el lanzador, el servidor y las guías
+  principales. Conservar licencias en `LICENSES/` e históricos en `archive/`,
+  `reports/legacy/` o `tests/output/legacy/`, según su función.
 - Las carpetas auxiliares `outputs/` y `.codex-work/` también pertenecen a
   `SIDE1`. Sus contenidos temporales permanecen locales e ignorados por Git.
 - Antes de terminar, comprobar que el directorio contenedor del proyecto no

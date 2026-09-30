@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const url=process.env.SIDE_TEST_URL||'http://127.0.0.1:8771/';
 const output=path.join(__dirname,'output');fs.mkdirSync(output,{recursive:true});
-const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.startupQA={
+const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.startupQA={
   storeVisit(){cancelAnimationFrame(raf);const e=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++){updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);}keys={};renderInventoryDisplays();updateGameplayCamera(1);renderer.render(scene,camera);}
 };\n  window.SIDE3D = {`);
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};
@@ -18,7 +18,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    page.on('pageerror',error=>errors.push(error.message));
    page.on('requestfailed',request=>{if(request.url().startsWith(url))failedLocal.push({url:request.url(),error:request.failure()?.errorText})});
    // All third-party hosts are unavailable. The 3D engine and its assets must load locally.
-   await context.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
+   await context.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/js\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA',company:'QA MUNDO',game:DEMO_GAME};openDecisionMenu();});
    assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),true,'the world is available before decisions are submitted');

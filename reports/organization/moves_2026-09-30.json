@@ -1,0 +1,594 @@
+{
+  "moved_files": [
+    {
+      "from": "app.js",
+      "to": "js/app.js",
+      "sha256_before": "fa92cdf748ace4f88238a172a2e455036271a07e6c6baa5efe688d6252d0ee74",
+      "sha256_after": "49021ed883da06b7adcb2c4655c76f4bd707423fcc433ecf6284395ffbc97ded",
+      "content_updated": true
+    },
+    {
+      "from": "character-selection.css",
+      "to": "css/character-selection.css",
+      "sha256_before": "7871046c4c7dea881fffdddfa717859bfd200d40f7a32d071345e18ed9789343",
+      "sha256_after": "7871046c4c7dea881fffdddfa717859bfd200d40f7a32d071345e18ed9789343",
+      "content_updated": false
+    },
+    {
+      "from": "company_summary.css",
+      "to": "css/company_summary.css",
+      "sha256_before": "5f96270ae734b2a3db57a018db7e215e0dcbc1b77e50e6fa2aaddd214ad0973c",
+      "sha256_after": "5f96270ae734b2a3db57a018db7e215e0dcbc1b77e50e6fa2aaddd214ad0973c",
+      "content_updated": false
+    },
+    {
+      "from": "company_summary.js",
+      "to": "js/company_summary.js",
+      "sha256_before": "526ea7a38162f807617f2befa8946db2d44419c920ef815d5fb2635a039da374",
+      "sha256_after": "526ea7a38162f807617f2befa8946db2d44419c920ef815d5fb2635a039da374",
+      "content_updated": false
+    },
+    {
+      "from": "config.js",
+      "to": "js/config.js",
+      "sha256_before": "0e128a2bdf9d8d264249abb2ae5951534f7ab56dc1c27f725786e91982671d9f",
+      "sha256_after": "0e128a2bdf9d8d264249abb2ae5951534f7ab56dc1c27f725786e91982671d9f",
+      "content_updated": false
+    },
+    {
+      "from": "correcciones_observaciones.js",
+      "to": "js/correcciones_observaciones.js",
+      "sha256_before": "5d15a0c8f48d6fb19b393701302a5ae8975daf4217fc0e2828db167f70102637",
+      "sha256_after": "5d15a0c8f48d6fb19b393701302a5ae8975daf4217fc0e2828db167f70102637",
+      "content_updated": false
+    },
+    {
+      "from": "decision_catalog.js",
+      "to": "js/decision_catalog.js",
+      "sha256_before": "8109f319a350e4ec2170e37d1bfb28b75ce40a63f45b8a22ad5173ab2a89eea9",
+      "sha256_after": "8109f319a350e4ec2170e37d1bfb28b75ce40a63f45b8a22ad5173ab2a89eea9",
+      "content_updated": false
+    },
+    {
+      "from": "decision_review_model.js",
+      "to": "js/decision_review_model.js",
+      "sha256_before": "d5d5c96c7469a61405f05f40dde4354fb3f8a0076038798877d37f6251f15285",
+      "sha256_after": "d5d5c96c7469a61405f05f40dde4354fb3f8a0076038798877d37f6251f15285",
+      "content_updated": false
+    },
+    {
+      "from": "docente.css",
+      "to": "css/docente.css",
+      "sha256_before": "6598a5dc4e8b3dd07b2e9625ac1a8e2a0a1757eda91e587d485725d0a8cf90c5",
+      "sha256_after": "6598a5dc4e8b3dd07b2e9625ac1a8e2a0a1757eda91e587d485725d0a8cf90c5",
+      "content_updated": false
+    },
+    {
+      "from": "docente.js",
+      "to": "js/docente.js",
+      "sha256_before": "4b2091e905689c5163687f404997cae6450d2dac74987a267d9ba9c9282afe9b",
+      "sha256_after": "aa39f110e51464a9d3c778307b3315aafb68ebdc7fa401e5c5e1d469ab820735",
+      "content_updated": true
+    },
+    {
+      "from": "enterprise_visual_v10.js",
+      "to": "js/enterprise_visual_v10.js",
+      "sha256_before": "aca6e7e7f45e23fa4ac410fe81cde9e0d95648e6a936b52b2f44191d3406abaa",
+      "sha256_after": "aca6e7e7f45e23fa4ac410fe81cde9e0d95648e6a936b52b2f44191d3406abaa",
+      "content_updated": false
+    },
+    {
+      "from": "enterprise_visual_v8.js",
+      "to": "js/enterprise_visual_v8.js",
+      "sha256_before": "899362242a9e1021b885bde522b75af215bcb8bd140a28922bfdd816bde19c2f",
+      "sha256_after": "899362242a9e1021b885bde522b75af215bcb8bd140a28922bfdd816bde19c2f",
+      "content_updated": false
+    },
+    {
+      "from": "enterprise_visual_v9.js",
+      "to": "js/enterprise_visual_v9.js",
+      "sha256_before": "4358a5cb4c46899d0d51d524f331fce2d5a6073087c54034c6a583936fe5c833",
+      "sha256_after": "4358a5cb4c46899d0d51d524f331fce2d5a6073087c54034c6a583936fe5c833",
+      "content_updated": false
+    },
+    {
+      "from": "enterprise_world_v5.js",
+      "to": "js/enterprise_world_v5.js",
+      "sha256_before": "2cf458ad0ba3da0a42570297ad629dc1c2016f64780ceae518ebf7c404a9e428",
+      "sha256_after": "2cf458ad0ba3da0a42570297ad629dc1c2016f64780ceae518ebf7c404a9e428",
+      "content_updated": false
+    },
+    {
+      "from": "enterprise_world_v6.js",
+      "to": "js/enterprise_world_v6.js",
+      "sha256_before": "3fc85c6448823d0febc9ddab805a19e3d0a77b7d44b4897dfaf58bc8e2a82828",
+      "sha256_after": "3fc85c6448823d0febc9ddab805a19e3d0a77b7d44b4897dfaf58bc8e2a82828",
+      "content_updated": false
+    },
+    {
+      "from": "enterprise_world_v7.js",
+      "to": "js/enterprise_world_v7.js",
+      "sha256_before": "ae2f3d2f19f1581ca26ca4e4ec6b53ba3291db1b165abf318096271cd1ed1f6b",
+      "sha256_after": "ae2f3d2f19f1581ca26ca4e4ec6b53ba3291db1b165abf318096271cd1ed1f6b",
+      "content_updated": false
+    },
+    {
+      "from": "events_catalog.js",
+      "to": "js/events_catalog.js",
+      "sha256_before": "62be6cdf51cd65b0d1476c00e92a91b05a1113f2e4d97c07d0c67e2c1d819d2f",
+      "sha256_after": "62be6cdf51cd65b0d1476c00e92a91b05a1113f2e4d97c07d0c67e2c1d819d2f",
+      "content_updated": false
+    },
+    {
+      "from": "financial_model.js",
+      "to": "js/financial_model.js",
+      "sha256_before": "22de4129d3b8cf00967831db3d795ecb74e60ff339b2cf7133448d5d5cfd4aa1",
+      "sha256_after": "22de4129d3b8cf00967831db3d795ecb74e60ff339b2cf7133448d5d5cfd4aa1",
+      "content_updated": false
+    },
+    {
+      "from": "hub-world.css",
+      "to": "css/hub-world.css",
+      "sha256_before": "35d94d18bd7078399c2dcfaf1cf195bf093d355f6ec6377e41bf17088ac6cd0a",
+      "sha256_after": "35d94d18bd7078399c2dcfaf1cf195bf093d355f6ec6377e41bf17088ac6cd0a",
+      "content_updated": false
+    },
+    {
+      "from": "icon_bank.js",
+      "to": "js/icon_bank.js",
+      "sha256_before": "868f6b4193c25d98f36d7b3364b58686d79aa0b5e404bbbbbd9613e1ea4876da",
+      "sha256_after": "868f6b4193c25d98f36d7b3364b58686d79aa0b5e404bbbbbd9613e1ea4876da",
+      "content_updated": false
+    },
+    {
+      "from": "production.css",
+      "to": "css/production.css",
+      "sha256_before": "80c933eb482ddd68630a45da3f74fdfb081981ac35f5a0ab16803549c0a3a0ca",
+      "sha256_after": "80c933eb482ddd68630a45da3f74fdfb081981ac35f5a0ab16803549c0a3a0ca",
+      "content_updated": false
+    },
+    {
+      "from": "production_dop.js",
+      "to": "js/production_dop.js",
+      "sha256_before": "b0969228265937dfe17c20023ad6216ae90fccd91afb20dfd4e9fbc0f4eb31d3",
+      "sha256_after": "b0969228265937dfe17c20023ad6216ae90fccd91afb20dfd4e9fbc0f4eb31d3",
+      "content_updated": false
+    },
+    {
+      "from": "production_model.js",
+      "to": "js/production_model.js",
+      "sha256_before": "59bcd4fd22800b9d43576473f990287227c1c5d71f84fab87e43db93c7525a62",
+      "sha256_after": "59bcd4fd22800b9d43576473f990287227c1c5d71f84fab87e43db93c7525a62",
+      "content_updated": false
+    },
+    {
+      "from": "responsive.css",
+      "to": "css/responsive.css",
+      "sha256_before": "ed20570fed68813b362c6cf7864b84212b8c6e05a455e92323fef8e904b513af",
+      "sha256_after": "ed20570fed68813b362c6cf7864b84212b8c6e05a455e92323fef8e904b513af",
+      "content_updated": false
+    },
+    {
+      "from": "side_rules.js",
+      "to": "js/side_rules.js",
+      "sha256_before": "05a284a60b8b652c08c03bcd8c3799fe1863336fcb8d9117d2134fdd327d6e21",
+      "sha256_after": "05a284a60b8b652c08c03bcd8c3799fe1863336fcb8d9117d2134fdd327d6e21",
+      "content_updated": false
+    },
+    {
+      "from": "simulator3d-config.js",
+      "to": "js/simulator3d-config.js",
+      "sha256_before": "12a62f5a99421592ad5b9e239b056fee103c44e725c400acb75cb36225458e12",
+      "sha256_after": "12a62f5a99421592ad5b9e239b056fee103c44e725c400acb75cb36225458e12",
+      "content_updated": false
+    },
+    {
+      "from": "simulator3d.css",
+      "to": "css/simulator3d.css",
+      "sha256_before": "38e99b20567df3935012bfd041e48f865f4c1fcc81a5540555b4f568ca2fe422",
+      "sha256_after": "38e99b20567df3935012bfd041e48f865f4c1fcc81a5540555b4f568ca2fe422",
+      "content_updated": false
+    },
+    {
+      "from": "simulator3d.js",
+      "to": "js/simulator3d.js",
+      "sha256_before": "7f3dab6da5a466c49816ae1fc52c2e387b5c619a52fb6eac177e52864cefe3d3",
+      "sha256_after": "5b2a405184a82b16c7592d2b7be2a065cda57fe25012a37fe0c69363b2b25fde",
+      "content_updated": true
+    },
+    {
+      "from": "student_financial_view.js",
+      "to": "js/student_financial_view.js",
+      "sha256_before": "2cea666ecb7023e65cc08915c307500397ebb6a332d373385e31c3b8982265e1",
+      "sha256_after": "2cea666ecb7023e65cc08915c307500397ebb6a332d373385e31c3b8982265e1",
+      "content_updated": false
+    },
+    {
+      "from": "styles.css",
+      "to": "css/styles.css",
+      "sha256_before": "686cc428e6034ed9a47212eca23acaf6248364f66952635d067ae4de6a4a9666",
+      "sha256_after": "8d5b921082d386bedad0c67ce6ceb8b33f4f641b1a74dae166ad7d8594d81f6f",
+      "content_updated": true
+    },
+    {
+      "from": "teacher_history.js",
+      "to": "js/teacher_history.js",
+      "sha256_before": "432987da480e18c0135134c8433a16357aafe088d127dffc31c87373f584e183",
+      "sha256_after": "432987da480e18c0135134c8433a16357aafe088d127dffc31c87373f584e183",
+      "content_updated": false
+    },
+    {
+      "from": "teacher_podium.js",
+      "to": "js/teacher_podium.js",
+      "sha256_before": "5581ba5950483685bc2b239b36f53beb238df91711310a3cf33b2b2a1279c388",
+      "sha256_after": "5581ba5950483685bc2b239b36f53beb238df91711310a3cf33b2b2a1279c388",
+      "content_updated": false
+    },
+    {
+      "from": "teacher_report_pdf.js",
+      "to": "js/teacher_report_pdf.js",
+      "sha256_before": "e18fc560f4091f1f356c89ac68a7c66af73ba7e1582e234e509cc45e07d8b4ba",
+      "sha256_after": "e18fc560f4091f1f356c89ac68a7c66af73ba7e1582e234e509cc45e07d8b4ba",
+      "content_updated": false
+    },
+    {
+      "from": "tutorial.js",
+      "to": "js/tutorial.js",
+      "sha256_before": "ef928449350586b8d9bf93951ff5a30935818563d482080b5d11c65d6ef973ec",
+      "sha256_after": "ef928449350586b8d9bf93951ff5a30935818563d482080b5d11c65d6ef973ec",
+      "content_updated": false
+    },
+    {
+      "from": "world_minimap.css",
+      "to": "css/world_minimap.css",
+      "sha256_before": "7e9b7577cdd4bb4023357b6eb92c5ff909d9c89f041bff5daae617a5c28fbe33",
+      "sha256_after": "7e9b7577cdd4bb4023357b6eb92c5ff909d9c89f041bff5daae617a5c28fbe33",
+      "content_updated": false
+    },
+    {
+      "from": "supabase_schema.sql",
+      "to": "supabase/schema.sql",
+      "sha256_before": "5f460b47a38cdb917d663c418dea8c45da7738891986bd044c7ff80232432c48",
+      "sha256_after": "5f460b47a38cdb917d663c418dea8c45da7738891986bd044c7ff80232432c48",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_game_lifecycle.sql",
+      "to": "supabase/migrations/supabase_game_lifecycle.sql",
+      "sha256_before": "e7fda02fe1fe272fef5459a4988d051a25f4e0a82dc209217e7a695f4d044d5f",
+      "sha256_after": "e7fda02fe1fe272fef5459a4988d051a25f4e0a82dc209217e7a695f4d044d5f",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_migration.sql",
+      "to": "supabase/migrations/supabase_migration.sql",
+      "sha256_before": "7a85b24a422cce4062fadaed78fa39243e29e3257ddb3df0f8481f0eb2390441",
+      "sha256_after": "7a85b24a422cce4062fadaed78fa39243e29e3257ddb3df0f8481f0eb2390441",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_student_admission.sql",
+      "to": "supabase/migrations/supabase_student_admission.sql",
+      "sha256_before": "e88a7d32a7c24e6849d932301b8f3931d532c15ebed405bb196f45a44701cdbd",
+      "sha256_after": "e88a7d32a7c24e6849d932301b8f3931d532c15ebed405bb196f45a44701cdbd",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_teacher_grades.sql",
+      "to": "supabase/migrations/supabase_teacher_grades.sql",
+      "sha256_before": "1a41929b0504a8fe48e4a08b4aaf0035df59bad07caa4d953da12655b5ce393e",
+      "sha256_after": "1a41929b0504a8fe48e4a08b4aaf0035df59bad07caa4d953da12655b5ce393e",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_teacher_history.sql",
+      "to": "supabase/migrations/supabase_teacher_history.sql",
+      "sha256_before": "cbef578fcd55ef2d57adb8b1e236915b630c37e39beff000f19aae95d5765af0",
+      "sha256_after": "cbef578fcd55ef2d57adb8b1e236915b630c37e39beff000f19aae95d5765af0",
+      "content_updated": false
+    },
+    {
+      "from": "docs/supabase_teacher_integration.sql",
+      "to": "supabase/migrations/supabase_teacher_integration.sql",
+      "sha256_before": "c6a58d3259802581ca54fd4978bda1c1bb029c1842a29d3aba7bcc542430b34d",
+      "sha256_after": "c6a58d3259802581ca54fd4978bda1c1bb029c1842a29d3aba7bcc542430b34d",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RECAST-NAVIGATION-LICENSE.txt",
+      "to": "LICENSES/RECAST-NAVIGATION-LICENSE.txt",
+      "sha256_before": "4283b37ca4c4c5d32d601823ced7adbb84d0b5868df60bfeaa7feba7f4b32f15",
+      "sha256_after": "4283b37ca4c4c5d32d601823ced7adbb84d0b5868df60bfeaa7feba7f4b32f15",
+      "content_updated": false
+    },
+    {
+      "from": "docs/THREE-VRM-LICENSE.txt",
+      "to": "LICENSES/THREE-VRM-LICENSE.txt",
+      "sha256_before": "af94751b8702d6983e4d2c3a79125eb2c987171efba41243023a81a180a914dd",
+      "sha256_after": "af94751b8702d6983e4d2c3a79125eb2c987171efba41243023a81a180a914dd",
+      "content_updated": false
+    },
+    {
+      "from": "docs/YUKA-LICENSE.txt",
+      "to": "LICENSES/YUKA-LICENSE.txt",
+      "sha256_before": "3fd61a2f84900d97348f5d57bc6b8022e881536722888ed12b9d046bd8b863ae",
+      "sha256_after": "3fd61a2f84900d97348f5d57bc6b8022e881536722888ed12b9d046bd8b863ae",
+      "content_updated": false
+    },
+    {
+      "from": "docs/EJECUCION_EMPRESA_V3.txt",
+      "to": "reports/legacy/EJECUCION_EMPRESA_V3.txt",
+      "sha256_before": "941df81366297cbf6d19d0c1dc2bb5640dfbabba500c078d12837fd9326f7866",
+      "sha256_after": "941df81366297cbf6d19d0c1dc2bb5640dfbabba500c078d12837fd9326f7866",
+      "content_updated": false
+    },
+    {
+      "from": "docs/EJECUCION_REGRESION_V3.txt",
+      "to": "reports/legacy/EJECUCION_REGRESION_V3.txt",
+      "sha256_before": "d418211493251e8817361c74cc8a6f67cf045584fed2b58e139be3df7935f0a9",
+      "sha256_after": "d418211493251e8817361c74cc8a6f67cf045584fed2b58e139be3df7935f0a9",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RESULTADOS_REGLAS.txt",
+      "to": "reports/legacy/RESULTADOS_REGLAS.txt",
+      "sha256_before": "a0e7cd2abeff220b213899c139123f221a79fccfc7070b38dee157bb01f3c0ee",
+      "sha256_after": "a0e7cd2abeff220b213899c139123f221a79fccfc7070b38dee157bb01f3c0ee",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RESULTADOS_REGLAS_FINAL_V2.txt",
+      "to": "reports/legacy/RESULTADOS_REGLAS_FINAL_V2.txt",
+      "sha256_before": "b414c119a7164a7cc902e1b36959c4c7b5ba4dbe8c91e65e45d2772b2435119f",
+      "sha256_after": "b414c119a7164a7cc902e1b36959c4c7b5ba4dbe8c91e65e45d2772b2435119f",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RESULTADOS_SERVIDOR_FINAL_V2.txt",
+      "to": "reports/legacy/RESULTADOS_SERVIDOR_FINAL_V2.txt",
+      "sha256_before": "091db27ba9062bf72c2c05ad1bb45069703071e8b33d717c0f14fd3dc39200cc",
+      "sha256_after": "091db27ba9062bf72c2c05ad1bb45069703071e8b33d717c0f14fd3dc39200cc",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RESULTADOS_SERVIDOR_V3.txt",
+      "to": "reports/legacy/RESULTADOS_SERVIDOR_V3.txt",
+      "sha256_before": "a32a7669fea52589157441ef8b791c809d66d31ecad361d36e5aba9bf7a6b89d",
+      "sha256_after": "a32a7669fea52589157441ef8b791c809d66d31ecad361d36e5aba9bf7a6b89d",
+      "content_updated": false
+    },
+    {
+      "from": "docs/RESULTADOS_UNITARIOS_V3.txt",
+      "to": "reports/legacy/RESULTADOS_UNITARIOS_V3.txt",
+      "sha256_before": "d32d1b26f9c841d1058fa96665af318fc63de54f3821e9b80823bb5f6169f507",
+      "sha256_after": "d32d1b26f9c841d1058fa96665af318fc63de54f3821e9b80823bb5f6169f507",
+      "content_updated": false
+    },
+    {
+      "from": "docs/VERIFICACION_GITHUB.txt",
+      "to": "reports/legacy/VERIFICACION_GITHUB.txt",
+      "sha256_before": "21809afa1b09cf7a27a0481dd94b6e69d7bc850811c63f64db5a0248fa56aa34",
+      "sha256_after": "21809afa1b09cf7a27a0481dd94b6e69d7bc850811c63f64db5a0248fa56aa34",
+      "content_updated": false
+    },
+    {
+      "from": "docs/prueba.txt",
+      "to": "archive/notes/prueba.txt",
+      "sha256_before": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256_after": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content_updated": false
+    },
+    {
+      "from": "SIDE_corregido.zip",
+      "to": "output/entregas/SIDE_corregido.zip",
+      "sha256_before": "1d9d21c814e8b1e43e9ccf6ec6f097df35bee0e115b263e3466e1e6f4745e5ae",
+      "sha256_after": "1d9d21c814e8b1e43e9ccf6ec6f097df35bee0e115b263e3466e1e6f4745e5ae",
+      "content_updated": false
+    },
+    {
+      "from": "SIDE_corregido.sha256",
+      "to": "output/entregas/SIDE_corregido.sha256",
+      "sha256_before": "8d6db75d072061ce7a88f2c837f12789dbbb0532a39006aa18f10956f86ec9fe",
+      "sha256_after": "8d6db75d072061ce7a88f2c837f12789dbbb0532a39006aa18f10956f86ec9fe",
+      "content_updated": false
+    },
+    {
+      "from": "tests/capturas_final_v2/lobby-1366x768.png",
+      "to": "tests/output/legacy/capturas_final_v2/lobby-1366x768.png",
+      "sha256_before": "ed7cbe552939fef2fd1981dcb427b21b0ae8af25d603c6ae59739704785ac514",
+      "sha256_after": "ed7cbe552939fef2fd1981dcb427b21b0ae8af25d603c6ae59739704785ac514",
+      "content_updated": false
+    },
+    {
+      "from": "tests/capturas_final_v2/lobby-390x844.png",
+      "to": "tests/output/legacy/capturas_final_v2/lobby-390x844.png",
+      "sha256_before": "8f9778e2b76b39045a7eb515ec6ac0f24f04f5db169e45a3e6ae5237340f8617",
+      "sha256_after": "8f9778e2b76b39045a7eb515ec6ac0f24f04f5db169e45a3e6ae5237340f8617",
+      "content_updated": false
+    },
+    {
+      "from": "tests/capturas_final_v2/lobby-844x390.png",
+      "to": "tests/output/legacy/capturas_final_v2/lobby-844x390.png",
+      "sha256_before": "d4ee77b135a0821f461c1d25f0b97fce6edfa589136459625901b5de9dff8899",
+      "sha256_after": "d4ee77b135a0821f461c1d25f0b97fce6edfa589136459625901b5de9dff8899",
+      "content_updated": false
+    },
+    {
+      "from": "tests/capturas_final_v2/sales-desktop.png",
+      "to": "tests/output/legacy/capturas_final_v2/sales-desktop.png",
+      "sha256_before": "36325b0904cfd01b3935c0b8fd8eed3bf1ca1e6027f4e8482c4af6320803948e",
+      "sha256_after": "36325b0904cfd01b3935c0b8fd8eed3bf1ca1e6027f4e8482c4af6320803948e",
+      "content_updated": false
+    },
+    {
+      "from": "tests/capturas_final_v2/sales-mobile.png",
+      "to": "tests/output/legacy/capturas_final_v2/sales-mobile.png",
+      "sha256_before": "bcaf2c620630af28346f0be4db519e3db758d94981c64b69fc42f251110eedd8",
+      "sha256_after": "bcaf2c620630af28346f0be4db519e3db758d94981c64b69fc42f251110eedd8",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/MANIFIESTO_V3.json",
+      "to": "tests/output/legacy/evidencias_v3/MANIFIESTO_V3.json",
+      "sha256_before": "c3673bce7020179c635fddb1ddfc0f53ec67a56b02794365f803e248a2b73d10",
+      "sha256_after": "c3673bce7020179c635fddb1ddfc0f53ec67a56b02794365f803e248a2b73d10",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/RESULTADOS_EMPRESA_V3.json",
+      "to": "tests/output/legacy/evidencias_v3/RESULTADOS_EMPRESA_V3.json",
+      "sha256_before": "b66490c6312afa9ef47d32ba2d5322d0feed131478a142989e60beb938788469",
+      "sha256_after": "b66490c6312afa9ef47d32ba2d5322d0feed131478a142989e60beb938788469",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/RESULTADOS_REGRESION_V3.json",
+      "to": "tests/output/legacy/evidencias_v3/RESULTADOS_REGRESION_V3.json",
+      "sha256_before": "e0a17432e58369fd3d03bbc9e892974ec932ffa07aa90b968d805c68447f74cd",
+      "sha256_after": "e0a17432e58369fd3d03bbc9e892974ec932ffa07aa90b968d805c68447f74cd",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/RESULTADOS_SINTAXIS_V3.json",
+      "to": "tests/output/legacy/evidencias_v3/RESULTADOS_SINTAXIS_V3.json",
+      "sha256_before": "cda3bf67a6e36cd3dddbf6432b4929b9236548ec9656838e532fb25c5f34d041",
+      "sha256_after": "cda3bf67a6e36cd3dddbf6432b4929b9236548ec9656838e532fb25c5f34d041",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/empresa-infraestructura.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/empresa-infraestructura.png",
+      "sha256_before": "2cdd4946a28acacd92dd1dfc9eba0db307063d975535702fc6934184857f332f",
+      "sha256_after": "2cdd4946a28acacd92dd1dfc9eba0db307063d975535702fc6934184857f332f",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/empresa-movil.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/empresa-movil.png",
+      "sha256_before": "0b60aeb3df07abedefe8288886fa3a2f8ba1dab844ea8ec0aa1de53bf4a7926c",
+      "sha256_after": "0b60aeb3df07abedefe8288886fa3a2f8ba1dab844ea8ec0aa1de53bf4a7926c",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/empresa-solo-enviadas.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/empresa-solo-enviadas.png",
+      "sha256_before": "67db49ceeb2583892cc5770e31bfed1b5d8e1e2dc4f41ff66754ff9d3ceb6cfb",
+      "sha256_after": "67db49ceeb2583892cc5770e31bfed1b5d8e1e2dc4f41ff66754ff9d3ceb6cfb",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/empresa-tiendas.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/empresa-tiendas.png",
+      "sha256_before": "4ab696fda12ff668db74049cdffc97502f4feed34ce7955621fac205f4679e31",
+      "sha256_after": "4ab696fda12ff668db74049cdffc97502f4feed34ce7955621fac205f4679e31",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/historial-ciclo-1.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/historial-ciclo-1.png",
+      "sha256_before": "12892aa821d411a0fdf7efeaf30d495b94d1526e7efc78f01b7036e32e7e486c",
+      "sha256_after": "12892aa821d411a0fdf7efeaf30d495b94d1526e7efc78f01b7036e32e7e486c",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/revision-final-escritorio.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/revision-final-escritorio.png",
+      "sha256_before": "59018e3da1b39c625703aa3a047575043d48013ae06480c664ca266b8dc80625",
+      "sha256_after": "59018e3da1b39c625703aa3a047575043d48013ae06480c664ca266b8dc80625",
+      "content_updated": false
+    },
+    {
+      "from": "tests/evidencias_v3/capturas/revision-final-movil.png",
+      "to": "tests/output/legacy/evidencias_v3/capturas/revision-final-movil.png",
+      "sha256_before": "10b843e54a810b4dc7e5a6545a3481becdf6c3997adbfdd575a033c7dc92f855",
+      "sha256_after": "10b843e54a810b4dc7e5a6545a3481becdf6c3997adbfdd575a033c7dc92f855",
+      "content_updated": false
+    },
+    {
+      "from": "tests/RESULTADOS_DECISIONES_REVISADAS.txt",
+      "to": "tests/output/legacy/RESULTADOS_DECISIONES_REVISADAS.txt",
+      "sha256_before": "e20c3cfa6de331d4bd1ed62b4315a9b5cca75a2ccf3cc66f17b08b53539e82fe",
+      "sha256_after": "e20c3cfa6de331d4bd1ed62b4315a9b5cca75a2ccf3cc66f17b08b53539e82fe",
+      "content_updated": false
+    },
+    {
+      "from": "tests/RESULTADOS_FINAL_V2.json",
+      "to": "tests/output/legacy/RESULTADOS_FINAL_V2.json",
+      "sha256_before": "a9dba9aab878034ab8911be7390528ee35d6dc19f1577aef004e9fbee579fe5b",
+      "sha256_after": "a9dba9aab878034ab8911be7390528ee35d6dc19f1577aef004e9fbee579fe5b",
+      "content_updated": false
+    },
+    {
+      "from": "tests/RESULTADOS_VALIDACION.json",
+      "to": "tests/output/legacy/RESULTADOS_VALIDACION.json",
+      "sha256_before": "577cd03a68d45e377759e7e0b9828a19843c8114500e913c2c2bfdfc2eb677bf",
+      "sha256_after": "577cd03a68d45e377759e7e0b9828a19843c8114500e913c2c2bfdfc2eb677bf",
+      "content_updated": false
+    }
+  ],
+  "updated_references": [
+    "docente.html",
+    "index.html",
+    "docs/AUDITORIA_FINANZAS_CICLOS.md",
+    "docs/AUDITORIA_SIDE_2026_09_26.md",
+    "docs/CAMBIOS_INTEGRACION_3D.txt",
+    "docs/CORRECCIONES_PRODUCCION_VISUAL.md",
+    "docs/CORRECCION_INICIO_PARTIDA.md",
+    "docs/INTEGRACION_SUPABASE.md",
+    "docs/LEEME_FINAL_V2.txt",
+    "docs/OBSERVACIONES_2026_09_24.md",
+    "docs/OBSERVACIONES_PROFESOR_ALUMNO_2026_09_22.md",
+    "docs/README.md",
+    "docs/VALIDACION_07_09_2026.md",
+    "docs/VALIDACION_CORRECCIONES_29_08_2026.txt",
+    "docs/VALIDACION_FINAL_V2.md",
+    "docs/VALIDACION_FINAL_V3.md",
+    "js/app.js",
+    "js/docente.js",
+    "js/simulator3d.js",
+    "services/business_interiors.mjs",
+    "services/partida_service.js",
+    "services/teacher_history_service.js",
+    "services/world_orientation.mjs",
+    "tests/business_projection_regression.test.js",
+    "tests/business_visual_snapshot.test.js",
+    "tests/character_selection_ui.cjs",
+    "tests/continuous_world.cjs",
+    "tests/credits_ui.test.js",
+    "tests/cycle_productivity.test.js",
+    "tests/decisions_corrections.test.js",
+    "tests/decision_interiors_browser.cjs",
+    "tests/decision_review_model.test.js",
+    "tests/gameplay_hud.cjs",
+    "tests/game_observations.test.js",
+    "tests/lifecycle_db_fixture.cjs",
+    "tests/local_server_test.py",
+    "tests/outdoor_performance.cjs",
+    "tests/playable_hub.cjs",
+    "tests/production_dop.test.js",
+    "tests/production_model.test.js",
+    "tests/production_performance.cjs",
+    "tests/responsive_delivery.test.js",
+    "tests/side_rules.test.js",
+    "tests/simulator3d_config.test.js",
+    "tests/static_delivery.test.js",
+    "tests/student_admission.test.js",
+    "tests/student_admission_matrix_db.cjs",
+    "tests/student_financial_summary.test.js",
+    "tests/supplied_npcs.cjs",
+    "tests/teacher_history.test.js",
+    "tests/teacher_history_db.cjs",
+    "tests/teacher_lifecycle.test.js",
+    "tests/teacher_podium.test.js",
+    "tests/world_business_ui.cjs",
+    "tests/world_cycle_restart.cjs",
+    "tests/world_entry_assets.cjs",
+    "tests/world_finance.test.cjs",
+    "tests/world_loading.cjs",
+    "tests/world_preload.test.js",
+    "tests/world_runtime.test.js",
+    "tests/world_startup.cjs",
+    "tools/mona_preview.html",
+    "tools/npc_preview.html"
+  ]
+}

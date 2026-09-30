@@ -3,7 +3,8 @@ __pycache__/
 node_modules/
 .cache/
 godot4/.godot/
-tests/output/
+tests/output/*
+!tests/output/legacy/
 tests/.python-deps/
 /output/
 
@@ -13,9 +14,7 @@ tests/.python-deps/
 /.codex-work/*
 !/.codex-work/.gitkeep
 
-# Paquete local de entrega
-/SIDE_corregido.zip
-/SIDE_corregido.sha256
+# Paquetes locales de entrega en /output/entregas/ (cubiertos por /output/).
 
 # Mixamo source files and locally derived NPCs are licensed for the game,
 # not for redistribution as standalone assets in this public repository.

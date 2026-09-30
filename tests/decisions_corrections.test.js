@@ -2,7 +2,7 @@
 // Functional checks with a minimal DOM double. These do not measure browser layout.
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const rules=require('../side_rules');
+const rules=require('../js/side_rules');
 const root=path.resolve(__dirname,'..');
 function runtime(){
   const elements=new Map(),inputs=[],storage=new Map(),errors=[];
@@ -15,7 +15,7 @@ function runtime(){
     setInterval(){},clearInterval(){},setTimeout(){},clearTimeout(){},requestAnimationFrame(){},
     ResizeObserver:class{observe(){}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,String(v)),removeItem:k=>storage.delete(k),key:i=>[...storage.keys()][i],get length(){return storage.size}}});
   context.window=context;context.addEventListener=()=>{};context.scrollTo=()=>{};
-  for(const name of ['side_rules.js','decision_catalog.js','production_model.js','decision_review_model.js','production_dop.js','financial_model.js','app.js','company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
+  for(const name of ['js/side_rules.js','js/decision_catalog.js','js/production_model.js','js/decision_review_model.js','js/production_dop.js','js/financial_model.js','js/app.js','js/company_summary.js'])vm.runInContext(fs.readFileSync(path.join(root,name),'utf8'),context,{filename:name});
   const run=code=>vm.runInContext(code,context);
   // Peripheral effects are outside these tests; all selection/save/calculation handlers are real.
   run('updateHud=()=>{};updateSectionCost=()=>{};syncStudentReportPreview=()=>{};animateCash=()=>{};syncStudentTimer=()=>{};');

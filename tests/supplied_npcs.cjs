@@ -6,7 +6,7 @@ const output=path.join(__dirname,'output/npcs');fs.mkdirSync(output,{recursive:t
 const captureScreenshots=process.env.SIDE_SKIP_SCREENSHOTS!=='1';
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};
 // Instrument only the test response, so production does not expose mutation/debug APIs.
-const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     manual(){cancelAnimationFrame(raf)},
     enterStore(){
@@ -106,7 +106,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     await ctx.route('**/*',async route=>{
       const url=route.request().url();
       if(!url.startsWith(base)||(fallback&&/\/npcs\/(chico[123]|mona)\.glb$/.test(url)))return route.abort();
-      if(/\/simulator3d\.js(?:\?|$)/.test(url))return route.fulfill({status:200,contentType:'application/javascript',body:instrumented});
+      if(/\/js\/simulator3d\.js(?:\?|$)/.test(url))return route.fulfill({status:200,contentType:'application/javascript',body:instrumented});
       return route.continue();
     });
     await p.goto(base);

@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const dop=require('../production_dop'),model=require('../production_model');
+const dop=require('../js/production_dop'),model=require('../js/production_model');
 const box=(left,top,width,height)=>({left,top,right:left+width,bottom:top+height});
 function layout(mobile=false){
   if(mobile)return Object.fromEntries(['leather','cut','accessories','classification','preparation','assembly','finish','result'].map((id,i)=>[id,box(32,i*176,220,144)]));
@@ -59,7 +59,7 @@ test('mount redraws after resize and disconnects observers when the category cha
   const graph={isConnected:true,querySelector:()=>svg,querySelectorAll:()=>nodes,getBoundingClientRect:()=>({left:0,top:0,width:720,height:1018})};
   const ctx=vm.createContext({requestAnimationFrame(fn){frame=fn;return 1},cancelAnimationFrame(){frame=null;cancelled=true},getComputedStyle(){return {getPropertyValue:()=> '0'}},
     ResizeObserver:class{constructor(fn){callback=fn}observe(){}disconnect(){disconnected=true}},window:{addEventListener(event,fn){resizeHandler=fn},removeEventListener(event,fn){assert.equal(fn,resizeHandler);resizeHandler=null}},document:{}});
-  vm.runInContext(fs.readFileSync(path.join(__dirname,'../production_dop.js'),'utf8'),ctx);
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/production_dop.js'),'utf8'),ctx);
   const cleanup=ctx.SIDE_PRODUCTION_DOP.mount({querySelector:()=>graph});
   frame();assert.equal((svg.innerHTML.match(/<path /g)||[]).length,7);
   assert.equal(svg.attrs.viewBox,'0 0 720 1018');

@@ -28,5 +28,5 @@ Flechas corregidas:
 
 Validación:
 - Sintaxis de todos los JS comprobada con node --check.
-- Referencias estáticas de IDs de app.js y simulator3d.js verificadas sin faltantes.
+- Referencias estáticas de IDs de js/app.js y js/simulator3d.js verificadas sin faltantes.
 - No quedan glifos finos → ← › ‹ en HTML/JS/CSS.

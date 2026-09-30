@@ -14,7 +14,7 @@
 | Sintaxis JavaScript | 11 archivos correctos | Todos los archivos JavaScript principales de la raíz. |
 
 Las dos suites de navegador finalizaron sin excepciones JavaScript no controladas.
-Los resultados y los registros de ejecución están en `tests/evidencias_v3/`.
+Los resultados y los registros de ejecución están en `tests/output/legacy/evidencias_v3/`.
 
 ## Qué comprueba la integración nueva
 

@@ -4,7 +4,7 @@ const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture
 const root=path.resolve(__dirname,'..'),other='22222222-2222-2222-2222-222222222222';
 
 (async()=>{
-  const db=await database(),sql=fs.readFileSync(path.join(root,'docs/supabase_teacher_history.sql'),'utf8');
+  const db=await database(),sql=fs.readFileSync(path.join(root,'supabase/migrations/supabase_teacher_history.sql'),'utf8');
   const read=()=>rpc(db,'obtener_ultima_partida_docente',{});
   const control=(game,action,extra={})=>rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:action,...extra});
   const identity=(game,name)=>({p_codigo:game.codigo,p_nombre_legal:name+' SAC',p_nombre_comercial:name});

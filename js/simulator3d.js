@@ -728,9 +728,9 @@
       const modules = await Promise.all([
         import('three/addons/loaders/GLTFLoader.js'),
         import('three/addons/utils/SkeletonUtils.js'),
-        import('./services/asset_manager.mjs'),
-        import('./services/character_manager.mjs'),
-        import('./services/character_animation_controller.mjs')
+        import('../services/asset_manager.mjs'),
+        import('../services/character_manager.mjs'),
+        import('../services/character_animation_controller.mjs')
       ]);
       GLTFLoader = modules[0].GLTFLoader;
       SkeletonUtils = modules[1];
@@ -756,10 +756,10 @@
     if(!await loadThree())return false;
     if(!npcMotion||!npcNavigation||!npcNames||!monaModule){
       [npcMotion,npcNavigation,npcNames,monaModule]=await Promise.all([
-        import('./services/npc_motion.js?v=20260927-characters'),
-        import('./services/npc_navigation.mjs'),
-        import('./services/npc_names.js'),
-        import('./services/mona_npc.js?v=20260927-characters')
+        import('../services/npc_motion.js?v=20260927-characters'),
+        import('../services/npc_navigation.mjs'),
+        import('../services/npc_names.js'),
+        import('../services/mona_npc.js?v=20260927-characters')
       ]);
     }
     if(!characterManager){
@@ -819,7 +819,7 @@
 
   async function loadStartupEnvironment() {
     try {
-      const {loadStudioEnvironment}=await import('./services/startup_environment.mjs?v=20260927-entry');
+      const {loadStudioEnvironment}=await import('../services/startup_environment.mjs?v=20260927-entry');
       studioEnvironment=await loadStudioEnvironment();
     } catch(error) {console.warn('Se conserva la iluminación directa del mundo.',error);}
   }
@@ -1029,7 +1029,7 @@
   async function loadCityNpcModels() {
     if(cityLoadPromise)return cityLoadPromise;
     cityLoadPromise=(async()=>{try {
-      [cityRosterModule,cityClipModule]=await Promise.all([import('./services/npc_city_roster.mjs'),import('./services/npc_clip_controller.mjs')]);
+      [cityRosterModule,cityClipModule]=await Promise.all([import('../services/npc_city_roster.mjs'),import('../services/npc_clip_controller.mjs')]);
       if(!cityApproved){
         const publicResponse=await fetch('assets/models/npc/manifest.json');
         const publicRows=publicResponse.ok?await publicResponse.json():[];
@@ -1072,7 +1072,7 @@
     cityNavPromise=(async()=>{
       try{
         const [{buildNpcGridNavmesh},{loadOptionalNpcNavigator}]=await Promise.all([
-          import('./services/npc_navmesh_grid.mjs'),import('./services/npc_optional_navigation.mjs')
+          import('../services/npc_navmesh_grid.mjs'),import('../services/npc_optional_navigation.mjs')
         ]);
         const built=buildNpcGridNavmesh({THREE,bounds:cityMap.bounds,offsetX:HUB_OFFSET,
           obstacles:hubWorld.colliders,cellSize:3,agentRadius:.4});
@@ -3140,14 +3140,14 @@
   }
 
   async function buildPlayableHub() {
-    ({deriveWorldDecisionState}=await import('./services/world_decision_state.mjs'));
-    const {createWorldEventVisuals}=await import('./services/world_event_visuals.mjs');
+    ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs'));
+    const {createWorldEventVisuals}=await import('../services/world_event_visuals.mjs');
     worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
-    const {createHubWorld,CITY_MAP}=await import('./services/hub_world.js?v=20260929-decision-city');
+    const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20260929-decision-city');
     cityMap=CITY_MAP;
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
     const [orientationModule,{createWorldMinimapControl},{createWorldWayfinding}]=await Promise.all([
-      import('./services/world_orientation.mjs'),import('./services/world_minimap_control.mjs'),import('./services/world_wayfinding.mjs')
+      import('../services/world_orientation.mjs'),import('../services/world_minimap_control.mjs'),import('../services/world_wayfinding.mjs')
     ]);
     closestCityZone=orientationModule.closestCityZone;
     worldOrientation=orientationModule.createWorldOrientation({THREE,root:$3(rootId),zones:CITY_MAP.zones,bounds:CITY_MAP.bounds,offsetX:HUB_OFFSET,
@@ -3155,7 +3155,7 @@
     worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
     worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
-    const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
+    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
       createNpc:createBusinessNpc,onCollidersAdded:items=>hubWorld.colliders.push(...items),
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
@@ -3176,10 +3176,10 @@
       {x:HUB_OFFSET+19,z:30.1,type:'news',label:'Leer noticias del ciclo'}
     );
     productInteractables=interactables.filter(point=>point.type==='product');
-    const {deriveObjective}=await import('./services/gameplay_objectives.mjs');
+    const {deriveObjective}=await import('../services/gameplay_objectives.mjs');
     hubWorld.deriveObjective=deriveObjective;
-    playerMotion=await import('./services/player_motion.mjs');
-    const {createHubVehicles}=await import('./services/hub_vehicles.js?v=20260927-continuous-world');
+    playerMotion=await import('../services/player_motion.mjs');
+    const {createHubVehicles}=await import('../services/hub_vehicles.js?v=20260927-continuous-world');
     hubVehicles=createHubVehicles(hubWorld,HUB_OFFSET);
     scene.environment=studioEnvironment;scene.environmentIntensity=.3;
     // A continuous sky gradient, rendered as geometry; no background photograph.

@@ -7,7 +7,7 @@ const url=process.env.SIDE_TEST_URL;
 if(!url)throw new Error('Run with node tests/run_world_regression.cjs continuous_world.cjs');
 const output=path.join(__dirname,'output/continuous');fs.mkdirSync(output,{recursive:true});
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:1}},INV_MARKETING:{optionIds:['mkt_baja']},MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}}};
-let source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+let source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 for(const name of ['buildLegacyWorld','buildRetiredStaticInterior','rebuildRetiredDynamicWorld','renderRetiredInventoryDisplays']){
   source=source.replace(new RegExp(`function ${name}\\(([^)]*)\\) \\{`),`function ${name}($1) { window.continuousCounters.legacy++;`);
 }
@@ -62,7 +62,7 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
       window.requestAnimationFrame=fn=>{const id=request.call(window,time=>{continuousCounters.raf.delete(id);fn(time);});continuousCounters.raf.add(id);return id;};
       window.cancelAnimationFrame=id=>{continuousCounters.raf.delete(id);cancel.call(window,id);};
     });
-    await page.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
+    await page.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/js\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
     await page.goto(url,{waitUntil:'domcontentloaded'});
     assert.equal(await page.evaluate(seed=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA CONTINUO',company:'QA CONTINUO',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seed);return commitReviewedSections(decisionCategories().map(c=>c.cat),true);},seed),true);
     assert.equal(await page.evaluate(()=>startSimulationLoading()),true);

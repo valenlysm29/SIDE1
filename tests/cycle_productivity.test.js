@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const model=require('../production_model'),rules=require('../side_rules');
+const model=require('../js/production_model'),rules=require('../js/side_rules');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 
 test('cycle productivity uses recorded output and does not substitute planned units',()=>{
@@ -34,7 +34,7 @@ test('legacy multiple stores normalize to one, keeping its district and first co
 test('production record is scoped to active company and cycle, never reconstructed from inventory',()=>{
   const data=new Map();let round=1,company='Example';
   const context={window:{SIDE_GAME_BRIDGE:{currentRound:()=>round,companyName:()=>company}},document:{getElementById:()=>({textContent:'CODE'})},localStorage:{getItem:key=>data.get(key)||null}};
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8'),context);
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8'),context);
   const read=context.window.SIDE3D.cycleProductionRecord;
   assert.equal(read(),null);
   data.set('side3d_inventory_CODE_Example_1',JSON.stringify({totalTarget:200,reserve:{esencial:100},sold:{esencial:20}}));
@@ -48,7 +48,7 @@ test('realized cycle output is recorded once on creation and added production, e
   const data=new Map();let target=80;
   const context={window:{SIDE_GAME_BRIDGE:{currentRound:()=>1,companyName:()=> 'Factory',productionPlan:()=>({producibleUnits:target,productLines:[{plannedUnits:target},{plannedUnits:0},{plannedUnits:0}]})}},document:{getElementById:()=>({textContent:'CODE'})},localStorage:{getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)}};
   // Expose only the existing loader in this isolated VM, without starting WebGL.
-  const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('window.SIDE3D = { prepare,','window.SIDE3D = { loadInventory, prepare,');
+  const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('window.SIDE3D = { prepare,','window.SIDE3D = { loadInventory, prepare,');
   vm.runInNewContext(source,context);
   const simulator=context.window.SIDE3D;
   simulator.loadInventory();assert.equal(simulator.cycleProductionRecord().producedUnits,80);

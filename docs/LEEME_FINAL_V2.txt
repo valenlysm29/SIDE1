@@ -43,7 +43,7 @@ puerto u origen puede mostrar un almacenamiento distinto; no significa que se
 hayan borrado las partidas originales. El lanzador conserva localhost:8000.
 
 VALIDACION
-Consulta VALIDACION_FINAL_V2.md y tests/RESULTADOS_FINAL_V2.json.
+Consulta VALIDACION_FINAL_V2.md y tests/output/legacy/RESULTADOS_FINAL_V2.json.
 Las pruebas visuales usan Chromium aislado con los HTML, CSS y JS entregados.
 No se ha validado la conexion a Supabase en produccion ni una partida 3D completa.
 No se modifico el esquema SQL ni la configuracion original de Supabase.

@@ -4,14 +4,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const responsivePath = path.join(root, 'responsive.css');
+const responsivePath = path.join(root, 'css/responsive.css');
 const responsive = fs.readFileSync(responsivePath, 'utf8');
 
 test('student and teacher pages load the final responsive layer', () => {
   for (const file of ['index.html', 'docente.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
     assert.match(html, /<meta\s+name="viewport"[^>]*width=device-width/i);
-    assert.match(html, /href="responsive\.css\?v=20260910-2"/);
+    assert.match(html, /href="css\/responsive\.css\?v=20260910-2"/);
   }
 });
 

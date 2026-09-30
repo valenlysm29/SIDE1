@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const pdf=require('../teacher_report_pdf');
-const financial=require('../financial_model');
+const pdf=require('../js/teacher_report_pdf');
+const financial=require('../js/financial_model');
 
 test('cycle identifies the reported period relative to the configured total',()=>{
   assert.equal(pdf.cycleLabel({ronda:1},{cycles:6}),'1/6');

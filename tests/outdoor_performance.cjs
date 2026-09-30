@@ -53,7 +53,7 @@ async function serve() {
   };
 }
 
-const source = fs.readFileSync(path.join(root, 'simulator3d.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'js/simulator3d.js'), 'utf8');
 assert.ok(source.includes('  window.SIDE3D = {'), 'simulator diagnostics injection point');
 const instrumented = source.replace('  window.SIDE3D = {', `  window.outdoorPerfQA = {
     pause() { cancelAnimationFrame(raf); if (detailsTimer) { clearTimeout(detailsTimer); detailsTimer = 0; } },
@@ -110,7 +110,7 @@ const instrumented = source.replace('  window.SIDE3D = {', `  window.outdoorPerf
     await context.route('**/*', route => {
       const requested = route.request().url();
       if (!requested.startsWith(local.url)) return route.abort();
-      if (/\/simulator3d\.js(?:\?|$)/.test(requested)) return route.fulfill({ contentType: 'application/javascript', body: instrumented });
+      if (/\/js\/simulator3d\.js(?:\?|$)/.test(requested)) return route.fulfill({ contentType: 'application/javascript', body: instrumented });
       return route.continue();
     });
     await page.goto(local.url, { waitUntil: 'domcontentloaded' });

@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const root=path.resolve(__dirname,'..'),output=path.join(__dirname,'output/gameplay');
 const mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.json':'application/json','.wasm':'application/wasm','.glb':'model/gltf-binary','.png':'image/png'};
-const source=fs.readFileSync(path.join(root,'simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.objectiveQA={
+const source=fs.readFileSync(path.join(root,'js/simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.objectiveQA={
   freeze(){cancelAnimationFrame(raf);},
   update(){updateHubObjective();},
   enter(id){const e=hubWorld.entrances.find(e=>e.id===id);positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++)updatePlayer(1/60);keys={};},
@@ -19,7 +19,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     const file=path.resolve(root,'.'+decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname));
     if(!file.startsWith(root+path.sep)||!fs.existsSync(file)||!fs.statSync(file).isFile()){response.writeHead(404).end();return;}
     response.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream'});
-    if(file===path.join(root,'simulator3d.js'))response.end(source);else fs.createReadStream(file).pipe(response);
+    if(file===path.join(root,'js/simulator3d.js'))response.end(source);else fs.createReadStream(file).pipe(response);
   });
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const url=`http://127.0.0.1:${server.address().port}/`;

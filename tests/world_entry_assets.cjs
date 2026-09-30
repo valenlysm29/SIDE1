@@ -2,7 +2,7 @@
 const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const url=process.env.SIDE_TEST_URL;
 if(!url)throw Error('Run with node tests/run_world_regression.cjs world_entry_assets.cjs');
-const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.entryQA={
+const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.entryQA={
   pause(){cancelAnimationFrame(raf);},
   store(){const e=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(e.x,e.z,0);keys={KeyW:true};for(let i=0;i<95;i++){updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);}keys={};updateGameplayCamera(1);return currentInterior;},
   move(){const z=player.z;keys={KeyW:true};updatePlayer(.04);keys={};return Math.abs(player.z-z);},
@@ -18,7 +18,7 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
     await page.route('**/*',async route=>{
       const request=route.request().url();
       if(!request.startsWith(url))return route.abort();
-      if(/\/simulator3d\.js(?:\?|$)/.test(request))return route.fulfill({contentType:'application/javascript',body:source});
+      if(/\/js\/simulator3d\.js(?:\?|$)/.test(request))return route.fulfill({contentType:'application/javascript',body:source});
       if(/npc_realistic_(male|female)\.glb$/.test(request)){held.push(request);await gate;}
       return route.continue();
     });

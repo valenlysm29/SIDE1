@@ -32,12 +32,12 @@ test('credits data contains the required Poly Pizza attribution and traceable CC
 });
 
 test('splash omits credits entry while attribution remains available in the project',()=>{
-  const html=read('index.html'),app=read('app.js');
+  const html=read('index.html'),app=read('js/app.js');
   assert.doesNotMatch(html,/id="openCreditsBtn"/);
   assert.ok(fs.existsSync(path.join(root,'CREDITS.md')));
   assert.match(html,/id="creditsModal"[^>]+role="dialog"[^>]+aria-modal="true"[^>]+aria-labelledby="creditsTitle"/);
   assert.match(html,/services\/credits_data\.js\?v=20260928-production/);
-  assert.ok(html.indexOf('services/credits_data.js')<html.indexOf('app.js'));
+  assert.ok(html.indexOf('services/credits_data.js')<html.indexOf('js/app.js'));
   assert.match(app,/if\(e\.key==='Escape'[^\n]+closeModal\(\)/);
   assert.match(app,/if\(trigger\?\.isConnected\)trigger\.focus\(\)/);
   assert.match(app,/source\.rel='noopener noreferrer'/);

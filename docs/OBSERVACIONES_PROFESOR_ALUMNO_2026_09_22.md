@@ -11,7 +11,7 @@
 
 ## Base de datos
 
-Para una instalación existente con `docs/supabase_migration.sql` aplicado, ejecutar `docs/supabase_teacher_integration.sql` en el SQL Editor de Supabase. Incluye restricciones de ingreso y decisiones, resolución del ciclo automático y publicación Realtime de participantes. No elimina datos. El archivo general de migración contiene las mismas funciones para instalaciones nuevas.
+Para una instalación existente con `supabase/migrations/supabase_migration.sql` aplicado, ejecutar `supabase/migrations/supabase_teacher_integration.sql` en el SQL Editor de Supabase. Incluye restricciones de ingreso y decisiones, resolución del ciclo automático y publicación Realtime de participantes. No elimina datos. El archivo general de migración contiene las mismas funciones para instalaciones nuevas.
 
 La migración no se ejecutó contra una base de datos remota durante esta revisión. El podio conserva el almacenamiento local que ya utilizaba el proyecto.
 

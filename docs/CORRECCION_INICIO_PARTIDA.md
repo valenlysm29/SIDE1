@@ -4,7 +4,7 @@
 
 El proyecto ya está modificado. Para usar el flujo nuevo entre dispositivos:
 
-1. En el proyecto Supabase asociado a `config.js`, ejecutar **todo** `docs/supabase_game_lifecycle.sql` en SQL Editor. Requiere las tablas y RPC de `docs/supabase_migration.sql` ya instaladas. Si se utiliza `supabase_teacher_integration.sql`, ejecutarlo antes de esta nueva migración, nunca después.
+1. En el proyecto Supabase asociado a `config.js`, ejecutar **todo** `supabase/migrations/supabase_game_lifecycle.sql` en SQL Editor. Requiere las tablas y RPC de `supabase/migrations/supabase_migration.sql` ya instaladas. Si se utiliza `supabase/migrations/supabase_teacher_integration.sql`, ejecutarlo antes de esta nueva migración, nunca después.
 2. Publicar los archivos modificados juntos o abrir `INICIAR_JUEGO.bat` para la ejecución local.
 3. Crear una partida nueva. En manual, **Guardar configuración** abre el ingreso; **Iniciar partida** comienza las decisiones. En automático, guardar o iniciar programa el plazo de integración.
 
@@ -50,7 +50,7 @@ Las partidas antiguas sin versión 2 conservan su calendario original, incluida 
 | `docente.html` | Campo de minutos, textos del flujo y versiones de recursos. |
 | `index.html` | Versiones de recursos modificados. |
 | `styles.css` | Contador visible con la tipografía y colores del lobby. |
-| `docs/supabase_game_lifecycle.sql` | Migración, funciones, catálogo y validaciones de base de datos. |
+| `supabase/migrations/supabase_game_lifecycle.sql` | Migración, funciones, catálogo y validaciones de base de datos. |
 | `tests/game_lifecycle_db.cjs`, `tests/lifecycle_db_fixture.cjs` | Pruebas ejecutables con PostgreSQL local PGlite. |
 | `tests/game_lifecycle_ui.cjs` | Pruebas de navegador conectadas a las RPC reales en PostgreSQL local. |
 | `tests/teacher_lifecycle_ui.cjs` | Adapta las expectativas del inicio manual y mantiene la comprobación de compatibilidad antigua. |

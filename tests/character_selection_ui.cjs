@@ -8,7 +8,7 @@ const {chromium}=require('playwright');
 
 const root=path.resolve(__dirname,'..');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const css=fs.readFileSync(path.join(root,'character-selection.css'),'utf8');
+const css=fs.readFileSync(path.join(root,'css/character-selection.css'),'utf8');
 const script=fs.readFileSync(path.join(root,'services/character_selection.js'),'utf8');
 const section=html.match(/<section id="characterSelection"[\s\S]*?<\/section>/)?.[0];
 

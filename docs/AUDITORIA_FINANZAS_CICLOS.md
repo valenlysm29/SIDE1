@@ -6,7 +6,7 @@
 - `decision_catalog.js` aporta opciones/costos; `decision_review_model.js` valida y prepara movimientos; `production_model.js` determina capacidad, materiales y producción; `side_rules.js` conserva calendario y contratos de tiendas. No se han cambiado estas fórmulas.
 - Fuente de caja: capital inicial más `cashLedger`, indexado por ciclo y concepto. `financial_model.js` deriva estado de resultados, flujo y balance del libro registrado y sus desgloses. Préstamos son deuda; moldes/equipos/mejoras son activos. La política académica existente trata insumos como gasto del ciclo; no se ha introducido valoración contable de inventarios ni depreciación.
 - El mundo reutiliza `SIDE_GAME_BRIDGE`: ventas, comisión existente de tienda física, gastos, devoluciones y mejoras. El inventario físico, satisfacción, reputación, precios y mejoras operativas viven en `simulator3d.js` y almacenamiento local por empresa/ciclo. Las tiendas del hub deben llamar las mismas acciones, nunca crear una segunda contabilidad.
-- Supabase/PostgreSQL conserva empresas, participantes, decisiones y reportes mediante servicios/RPC. `supabase_game_lifecycle.sql` administra fases `integration`, `decisions`, `results`, `finished`, `cancelled` y eventos. Polling de alumno consulta cada tres segundos usando tiempo servidor; la transición automática no necesita mantener abierta la pantalla docente.
+- Supabase/PostgreSQL conserva empresas, participantes, decisiones y reportes mediante servicios/RPC. `supabase/migrations/supabase_game_lifecycle.sql` administra fases `integration`, `decisions`, `results`, `finished`, `cancelled` y eventos. Polling de alumno consulta cada tres segundos usando tiempo servidor; la transición automática no necesita mantener abierta la pantalla docente.
 - El guardado local por código/empresa/ciclo no equivale a un snapshot remoto completo del mundo. Reingresar desde otro navegador no reconstruye todo el libro e inventario local.
 
 ## Problemas confirmados y corregidos
@@ -18,7 +18,7 @@
 
 ## Archivos modificados / creados
 
-Modificados: `app.js`, fragmentos económicos de `simulator3d.js`, `docs/supabase_game_lifecycle.sql`, `tests/game_lifecycle_db.cjs`.
+Modificados: `app.js`, fragmentos económicos de `simulator3d.js`, `supabase/migrations/supabase_game_lifecycle.sql`, `tests/game_lifecycle_db.cjs`.
 
 Creados: `tests/world_finance.test.cjs`, este documento.
 

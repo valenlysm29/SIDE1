@@ -1,8 +1,8 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const model=require('../decision_review_model'),rules=require('../side_rules');
-const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../decision_catalog.js'),'utf8'),sandbox);
+const model=require('../js/decision_review_model'),rules=require('../js/side_rules');
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/decision_catalog.js'),'utf8'),sandbox);
 const catalog=JSON.parse(JSON.stringify(sandbox.window.SIDE_DECISION_CATALOG));
 const item=id=>catalog.flatMap(c=>c.items).find(i=>i.id===id);
 function context(patch={}){return {catalog,state:{},drafts:{},round:1,config:{interest:20,cycles:6},rules,capital:100000,ledger:{},...patch};}

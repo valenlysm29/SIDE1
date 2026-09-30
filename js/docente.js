@@ -284,7 +284,7 @@ async function ensureSupabasePartida(config){
   try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
   if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;}
   if(config.lifecycleVersion===2){
-    if(r.data.configuracion?.runtime?.phase!=='integration'){toast('Falta aplicar docs/supabase_game_lifecycle.sql en Supabase.');return false;}
+    if(r.data.configuracion?.runtime?.phase!=='integration'){toast('Falta aplicar supabase/migrations/supabase_game_lifecycle.sql en Supabase.');return false;}
     applyTeacherState(r.data);
   }else saveConfig(true);
   // Partida nueva: el contador local vuelve al ciclo 1 (no hereda el anterior).
@@ -367,7 +367,7 @@ async function controlGame(action){
     if(state.partidaId){
       const result=await window.SIDE.PartidaService.controlar(state.partidaId,action,null,expectedRound);
       if(!result.success){toast(result.error||'No se pudo actualizar la partida.');return false;}
-      if(action==='cancelar'&&!result.data?.configuracion?.cancelledAt){toast('La cancelación no se aplicó. Actualiza Supabase con docs/supabase_game_lifecycle.sql.');return false;}
+      if(action==='cancelar'&&!result.data?.configuracion?.cancelledAt){toast('La cancelación no se aplicó. Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql.');return false;}
       applyTeacherState(result.data);
     }else{
       const c={...state.authoritative},r={...c.runtime},now=new Date().toISOString(),duration=roundSeconds();

@@ -23,7 +23,7 @@ Entrega del 17/09/2026, basada en el último ZIP corregido y las dos capturas ad
 | `tests/production_dop.test.js` — nuevo | Seis pruebas de conexiones, adaptación de coordenadas, ceros, escape de textos y ciclo de vida de los observadores. |
 | `tests/decisions_corrections.test.js` | Incorpora el componente visual al entorno de pruebas; mantiene las comprobaciones de tiendas, guardado y DOP exclusivo de Producción. |
 | `tests/static_delivery.test.js` | Valida la nueva ubicación de la representación y mantiene las comprobaciones de las cinco actividades documentadas. |
-| `tests/RESULTADOS_DECISIONES_REVISADAS.txt` | Salida completa de las 60 pruebas aprobadas. |
+| `tests/output/legacy/RESULTADOS_DECISIONES_REVISADAS.txt` | Salida completa de las 60 pruebas aprobadas. |
 
 El ZIP contiene el código JavaScript y CSS completo, junto con todos los recursos necesarios del proyecto; no es un parche ni requiere React o un proceso de compilación nuevo.
 

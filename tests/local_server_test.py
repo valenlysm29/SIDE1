@@ -18,7 +18,7 @@ class LocalServerTest(unittest.TestCase):
         self.server.server_close()
         self.thread.join(timeout=2)
     def test_entry_and_versioned_resources(self):
-        for path,needle in [('index.html?v=20260917-realismo3','class="lobby-actions"'),('app.js?v=20260917-realismo3','function renderChannelChoices'),('styles.css?v=20260917-realismo3','#studentLobby .lobby-actions'),('production_model.js?v=20260917-realismo3','MOLD_REQUIREMENTS'),('responsive.css?v=20260917-realismo3','CAPA RESPONSIVE GLOBAL'),('simulator3d-config.js?v=20260917-realismo3','NPC_STATES'),('simulator3d.js?v=20260917-realismo3','function buildStaticWorld')]:
+        for path,needle in [('index.html?v=20260917-realismo3','class="lobby-actions"'),('js/app.js?v=20260917-realismo3','function renderChannelChoices'),('css/styles.css?v=20260917-realismo3','#studentLobby .lobby-actions'),('js/production_model.js?v=20260917-realismo3','MOLD_REQUIREMENTS'),('css/responsive.css?v=20260917-realismo3','CAPA RESPONSIVE GLOBAL'),('js/simulator3d-config.js?v=20260917-realismo3','NPC_STATES'),('js/simulator3d.js?v=20260917-realismo3','function buildStaticWorld')]:
             with urlopen(self.base+'/'+path,timeout=5) as response:
                 self.assertEqual(response.status,200)
                 self.assertEqual(response.headers['Cache-Control'],'no-store')

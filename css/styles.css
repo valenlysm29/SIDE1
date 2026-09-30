@@ -12,7 +12,7 @@ button,input{font:inherit}
 /* =========================
    INICIO / SPLASH
    ========================= */
-.landing-screen{background:#031024 url('assets/landing_bg.png') center/cover no-repeat;display:flex;align-items:flex-end;justify-content:center}
+.landing-screen{background:#031024 url('../assets/landing_bg.png') center/cover no-repeat;display:flex;align-items:flex-end;justify-content:center}
 .landing-overlay{display:none}
 .upch-corner{position:absolute;top:24px;left:26px;width:112px;height:112px;padding:12px;object-fit:contain;background:#fff;border-radius:4px;z-index:20;box-shadow:0 8px 24px #0008}
 .landing-content{position:relative;z-index:2;text-align:center;width:min(920px,92vw);padding-bottom:6vh}
@@ -32,7 +32,7 @@ button,input{font:inherit}
    queda como acceso discreto en la esquina inferior derecha.
    ========================= */
 .profile-screen{background:#020716 radial-gradient(circle at 50% 30%,#0b1f3f 0%,#020716 68%);display:flex;align-items:center;justify-content:center}
-.profile-bg{position:absolute;inset:0;background:url('assets/login_bg.png') center/cover no-repeat;opacity:.55}
+.profile-bg{position:absolute;inset:0;background:url('../assets/login_bg.png') center/cover no-repeat;opacity:.55}
 .profile-header{display:none}
 .profile-card{border:0;background:transparent;cursor:pointer;font-family:inherit;color:#fff}
 .profile-card:focus-visible{outline:3px solid #fff;outline-offset:4px}
@@ -83,7 +83,7 @@ button,input{font:inherit}
 /* =========================
    PANEL PROFESOR / LOBBY
    ========================= */
-.dashboard-screen{background:#020817}.dashboard-bg{position:absolute;inset:0;background:url('assets/login_bg.png') center/cover no-repeat}.dashboard-bg:after{content:"";position:absolute;inset:0;background:#02081766}
+.dashboard-screen{background:#020817}.dashboard-bg{position:absolute;inset:0;background:url('../assets/login_bg.png') center/cover no-repeat}.dashboard-bg:after{content:"";position:absolute;inset:0;background:#02081766}
 .dashboard-inner{position:relative;z-index:2;width:min(1100px,92vw);margin:auto;padding:28px 0 50px}
 .dashboard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .dash-logo{width:180px;height:70px;object-fit:contain}.dash-role{display:block;color:#b8c8df;font-size:16px;font-weight:800;letter-spacing:2px}
@@ -100,7 +100,7 @@ button,input{font:inherit}
    MÓVIL
    ========================= */
 @media(max-width:800px){
-  .landing-screen{background-image:url('assets/new/home-mobile.png');background-position:center top;background-size:cover;align-items:flex-end}
+  .landing-screen{background-image:url('../assets/landing_bg.png');background-position:center top;background-size:cover;align-items:flex-end}
   .landing-content{padding-bottom:5vh;width:92vw}
   .upch-corner{top:14px;left:14px;width:88px;height:88px;padding:9px}
   .loading-wrap{width:88vw}.loading-track{height:48px}

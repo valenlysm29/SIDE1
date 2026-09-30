@@ -2,7 +2,7 @@
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const url=process.env.SIDE_TEST_URL||'http://127.0.0.1:8772/';
-const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D = {',`  window.businessQA={
   freeze(){cancelAnimationFrame(raf);},
   resume(){clock.getDelta();raf=requestAnimationFrame(frame);},
@@ -17,7 +17,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
  try{
   const page=await browser.newPage({viewport:{width:1366,height:900}}),errors=[];
   page.setDefaultTimeout(60000);page.on('pageerror',e=>errors.push(e.message));
-  await page.route('**/*',r=>!r.request().url().startsWith(url)?r.abort():/\/simulator3d\.js(?:\?|$)/.test(r.request().url())?r.fulfill({contentType:'application/javascript',body:instrumented}):r.continue());
+  await page.route('**/*',r=>!r.request().url().startsWith(url)?r.abort():/\/js\/simulator3d\.js(?:\?|$)/.test(r.request().url())?r.fulfill({contentType:'application/javascript',body:instrumented}):r.continue());
   await page.goto(url,{waitUntil:'domcontentloaded'});
   await page.evaluate(seed=>{
    localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));

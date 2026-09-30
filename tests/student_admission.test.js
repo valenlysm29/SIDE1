@@ -9,7 +9,7 @@ const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'..');
 const serviceSource=fs.readFileSync(path.join(root,'services/empresa_service.js'),'utf8');
 const decisionsServiceSource=fs.readFileSync(path.join(root,'services/decisiones_service.js'),'utf8');
-const appSource=fs.readFileSync(path.join(root,'app.js'),'utf8');
+const appSource=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
 
 function loadService(source,rpc,serviceName,logger=console){
  const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};

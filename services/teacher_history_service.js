@@ -13,7 +13,7 @@
         /(?:obtener_ultima_partida_docente|side_teacher_history).*(?:schema cache|does not exist)/i.test(message)) {
       return {
         success: false, unavailable: true, code: 'HISTORIAL_NO_CONFIGURADO',
-        error: 'Aplica docs/supabase_teacher_history.sql en Supabase para habilitar el apartado Historial.'
+        error: 'Aplica supabase/migrations/supabase_teacher_history.sql en Supabase para habilitar el apartado Historial.'
       };
     }
     return { success: false, code: code || undefined, error: message };

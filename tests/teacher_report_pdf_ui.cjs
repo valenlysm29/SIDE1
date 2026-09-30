@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 const {execFileSync}=require('node:child_process');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-pdf');
-const model=require('../financial_model');
+const model=require('../js/financial_model');
 const python=process.env.PYTHON_BIN||'C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe';
 async function main(){
   fs.mkdirSync(out,{recursive:true});

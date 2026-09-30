@@ -26,7 +26,7 @@ async function serve() {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   return { url: `http://127.0.0.1:${server.address().port}/`, close: () => new Promise(resolve => server.close(resolve)) };
 }
-const original = fs.readFileSync(path.join(root, 'simulator3d.js'), 'utf8');
+const original = fs.readFileSync(path.join(root, 'js/simulator3d.js'), 'utf8');
 assert.ok(original.includes('  window.SIDE3D = {'));
 const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionInteriorQA = {
     pause() { cancelAnimationFrame(raf); if(detailsTimer){clearTimeout(detailsTimer);detailsTimer=0;} },
@@ -82,7 +82,7 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
     const context=await browser.newContext({viewport:{width:1366,height:900}}),page=await context.newPage();page.setDefaultTimeout(60000);
     page.on('pageerror',error=>errors.push(error.message));
     page.on('response',response=>{if(response.url().startsWith(local.url)&&response.status()>=400)failedLocal.push(response.status()+' '+response.url());});
-    await context.route('**/*',route=>{const url=route.request().url();if(!url.startsWith(local.url))return route.abort();if(/\/simulator3d\.js(?:\?|$)/.test(url))return route.fulfill({contentType:'application/javascript',body:instrumented});return route.continue();});
+    await context.route('**/*',route=>{const url=route.request().url();if(!url.startsWith(local.url))return route.abort();if(/\/js\/simulator3d\.js(?:\?|$)/.test(url))return route.fulfill({contentType:'application/javascript',body:instrumented});return route.continue();});
     await page.goto(local.url,{waitUntil:'domcontentloaded'});
     assert.equal(await page.evaluate(seedValue=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA INTERIORS',company:'QA INTERIORS',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seedValue);return commitReviewedSections(decisionCategories().map(category=>category.cat),true);},seed),true);
     assert.equal(await page.evaluate(()=>startSimulationLoading()),true);

@@ -57,6 +57,6 @@ Para la regresion docente, ejecutar `tests/browser_checks.py` con la variable de
 entorno `SIDE_TEST_GROUP=teacher`. La variable `CHROMIUM_PATH` permite indicar
 la ubicacion del ejecutable y `SIDE_QA_OUTPUT` la carpeta de resultados.
 
-Resultados: `tests/RESULTADOS_FINAL_V2.json`, con huellas SHA-256 de las fuentes.
-Capturas: `tests/capturas_final_v2/`.
+Resultados: `tests/output/legacy/RESULTADOS_FINAL_V2.json`, con huellas SHA-256 de las fuentes.
+Capturas: `tests/output/legacy/capturas_final_v2/`.
 Los informes anteriores que siguen en el proyecto son historicos.

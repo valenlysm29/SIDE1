@@ -2,9 +2,9 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-const history=require('../teacher_history.js');
+const history=require('../js/teacher_history.js');
 const catalogWindow={};
-vm.runInNewContext(fs.readFileSync(path.join(root,'decision_catalog.js'),'utf8'),{window:catalogWindow});
+vm.runInNewContext(fs.readFileSync(path.join(root,'js/decision_catalog.js'),'utf8'),{window:catalogWindow});
 const catalog=catalogWindow.SIDE_DECISION_CATALOG;
 
 function service(client){
@@ -47,7 +47,7 @@ test('missing RPC or table returns actionable configuration feedback without con
       const result=await api.obtenerUltima();
       assert.equal(result.success,false);assert.equal(result.unavailable,true);
       assert.equal(result.code,'HISTORIAL_NO_CONFIGURADO');
-      assert.match(result.error,/docs\/supabase_teacher_history\.sql/);
+      assert.match(result.error,/supabase\/migrations\/supabase_teacher_history\.sql/);
     }
     assert.deepEqual(errors,[]);
   }

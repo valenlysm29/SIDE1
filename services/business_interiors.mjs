@@ -854,7 +854,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   }
   let snapshot = {}, disposed = false, courier = null;
   function sync(value = {}) {
-    // `simulator3d.js` owns the financial model and sends a read-only
+    // `js/simulator3d.js` owns the financial model and sends a read-only
     // projection. Keep the older ratio aliases for callers from earlier
     // builds, but prefer the current snapshot contract (`storeFill`,
     // `warehouseFill`, `pendingUnits`, `producedUnits`, `plannedUnits`).

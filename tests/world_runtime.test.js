@@ -7,7 +7,7 @@ function runtime(){
   const context={window:{SIDE_GAME_BRIDGE:{canOperate:()=>allowed}},performance:{now:()=>1000},
     document:{hidden:false,getElementById:id=>id==='simulator3d'?{classList:{contains:()=>hidden}}:null,exitPointerLock(){}},
     localStorage:{getItem:()=>null},clearTimeout(){},clearInterval(){},requestAnimationFrame(){scheduled++;return scheduled}};
-  const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.runtimeQA={
+  const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('  window.SIDE3D = {',`  window.runtimeQA={
     start(){initialized=true;running=true;sessionContext=storageContext();gameSession={shiftEnded:false};clock={getDelta:()=>.016};renderer={render:()=>window.rendered()};},
     context:syncSessionContext, frame, suspend,
     pauseVisible(){running=false;updateHUD=()=>{};},

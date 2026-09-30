@@ -34,9 +34,9 @@ Reglas:
 
 | Recurso Supabase | Origen | Uso en frontend |
 |---|---|---|
-| `partidas` | `supabase_schema.sql` + migración | Crear partida, leer config |
-| `participantes` | `supabase_schema.sql` + migración | Vínculo estudiante → empresa |
-| `profesores` | `supabase_schema.sql` + migración | Perfil del docente (trigger) |
+| `partidas` | `supabase/schema.sql` + migración | Crear partida, leer config |
+| `participantes` | `supabase/schema.sql` + migración | Vínculo estudiante → empresa |
+| `profesores` | `supabase/schema.sql` + migración | Perfil del docente (trigger) |
 | `empresas` | Existente + migración | Crear empresa al unirse |
 | `decisiones_catalogo` | Existente + migración (poblado) | Catálogo de decisiones |
 | `decisiones_opciones` | Existente + migración (poblado) | Opciones por decisión |
@@ -50,7 +50,7 @@ Reglas:
 | RPC `obtener_reporte_empresa` | Migración | Reporte para el docente |
 | RPC `avanzar_ciclo` | Migración | Profesor avanza el ciclo |
 
-Script SQL: `docs/supabase_migration.sql` (ejecutar en SQL Editor una vez).
+Script SQL: `supabase/migrations/supabase_migration.sql` (ejecutar en SQL Editor una vez).
 
 ## 4. Cambios en archivos existentes
 
@@ -240,7 +240,7 @@ comercial para volver a ingresar").
 **Problema:** ingresos/costos/utilidad/flujo/puntaje salían S/ 0 entre
 dispositivos porque viven en el `localStorage` del estudiante.
 
-**Archivos:** `docs/supabase_migration.sql` (columnas `score`/`progreso` +
+**Archivos:** `supabase/migrations/supabase_migration.sql` (columnas `score`/`progreso` +
 RPC `guardar_reporte` con upsert por empresa+ciclo), `services/`
 (`DecisionesService.guardarReporte()`), `app.js` (`syncStudentReportPreview()`
 ahora retorna el reporte + `syncReportToSupabase()`), `company_summary.js` y
@@ -267,7 +267,7 @@ No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|
-| `guardar_decisiones` falla con error `42P10` | Falta el UNIQUE en `empresas_decisiones(empresa_id, ciclo, decision_id)` | Ejecutar la sección 14 del `supabase_migration.sql` (crea el constraint) |
+| `guardar_decisiones` falla con error `42P10` | Falta el UNIQUE en `empresas_decisiones(empresa_id, ciclo, decision_id)` | Ejecutar la sección 14 del `supabase/migrations/supabase_migration.sql` (crea el constraint) |
 | Join dice "no encontramos partida" | `estado` distinto de `esperando` o código con espacios | `UPDATE partidas SET estado='esperando'`; copiar el código exacto |
 | Registro no redirige | Confirmación por correo activada en Auth | Desactivar "Confirm email" en Authentication → Settings |
 | `profesores` vacío tras registro | El trigger no disparó | Insert manual con el UID de Authentication → Users |

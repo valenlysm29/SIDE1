@@ -1183,7 +1183,7 @@ async function syncSectionToSupabase(cat){
 }
 /**
  * Convierte una decisión del estado local al formato del RPC guardar_decisiones.
- * @param {object} item Definición del catálogo (decision_catalog.js).
+ * @param {object} item Definición del catálogo (js/decision_catalog.js).
  * @param {object} st Estado local de la decisión (ver prepareSectionSave).
  * @param {number} round Ciclo actual (las compras de activos viven por ciclo).
  * @returns {object|Array|null} {decision_id, opcion_id, cantidad, costo_total},

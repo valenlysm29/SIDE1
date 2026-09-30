@@ -116,7 +116,7 @@ segunda contabilidad ni una jerarquía nueva de managers.
 Modificados: `simulator3d.js`, `app.js`, `docente.js`, `company_summary.js`,
 `production_model.js`, `index.html`, `hub-world.css`, `services/hub_vehicles.js`,
 `services/hub_world.js`, `services/vehicle_motion.mjs`,
-`docs/supabase_game_lifecycle.sql` y `.gitignore`.
+`supabase/migrations/supabase_game_lifecycle.sql` y `.gitignore`.
 
 Creados: `services/player_motion.mjs`, `services/gameplay_objectives.mjs`,
 `tests/player_motion.test.mjs`, `tests/gameplay_objectives.test.mjs`,

@@ -24,8 +24,8 @@ const seed = {
     page.on('pageerror', error => errors.push(error.message));
     await context.route('**/*', route => route.request().url().startsWith(url) ? route.continue() : route.abort());
     // Accelerate only the end of a shift; keep the production entry/replay handlers intact.
-    const source = fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
-    await page.route('**/simulator3d.js?*', route => route.fulfill({contentType:'application/javascript',
+    const source = fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
+    await page.route('**/js/simulator3d.js?*', route => route.fulfill({contentType:'application/javascript',
       body:source.replace('  window.SIDE3D = {', `  window.cycleQA = {
         finish(success=false) { if(success) gameSession.revenue=gameSession.targetRevenue; endShift(); },
         openAdmin, openDecisionsFrom3D,

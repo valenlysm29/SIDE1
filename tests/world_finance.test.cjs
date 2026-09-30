@@ -1,8 +1,8 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const path=require('node:path'),financial=require('../financial_model.js');
-const app=fs.readFileSync(path.join(__dirname,'../app.js'),'utf8');
-const simulator=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8');
+const path=require('node:path'),financial=require('../js/financial_model.js');
+const app=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
+const simulator=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 function fixture(){
   const store=new Map();let allowed=true,fail=false,clock=1000;
   const c={window:{},cashLedger:{},decisionState:{},currentRound:()=>1,studentAccess:()=>({canOperate:allowed}),

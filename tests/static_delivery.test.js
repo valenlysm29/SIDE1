@@ -18,18 +18,18 @@ test('all local HTML assets exist',()=>{
 });
 
 test('market-segment decision is absent from the active catalog',()=>{
-  const catalog=fs.readFileSync(path.join(root,'decision_catalog.js'),'utf8');
+  const catalog=fs.readFileSync(path.join(root,'js/decision_catalog.js'),'utf8');
   assert.doesNotMatch(catalog,/id:'SEGMENTO'|name:'Segmento de mercado'/);
 });
 
 test('production model loads before the application and review modules',()=>{
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert.ok(html.indexOf('production_model.js')<html.indexOf('decision_review_model.js'));
-  assert.ok(html.indexOf('production_model.js')<html.indexOf('app.js'));
+  assert.ok(html.indexOf('js/production_model.js')<html.indexOf('js/decision_review_model.js'));
+  assert.ok(html.indexOf('js/production_model.js')<html.indexOf('js/app.js'));
 });
 
 test('productive catalog requires a mold and a sales channel, with calculator first',()=>{
-  const source=fs.readFileSync(path.join(root,'decision_catalog.js'),'utf8'),sandbox={window:{}};
+  const source=fs.readFileSync(path.join(root,'js/decision_catalog.js'),'utf8'),sandbox={window:{}};
   require('node:vm').runInNewContext(source,sandbox);
   const catalog=sandbox.window.SIDE_DECISION_CATALOG,items=catalog.flatMap(category=>category.items||[]),production=catalog.find(category=>category.cat==='C'),logistics=catalog.find(category=>category.cat==='F');
   assert.ok(logistics, 'Logistics category must exist');
@@ -42,15 +42,15 @@ test('productive catalog requires a mold and a sales channel, with calculator fi
 });
 
 test('cycle zero places summary last and later cycles place it first',()=>{
-  const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  const source=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
   assert.match(source,/currentRound\(\)<=1\?\[\.\.\.decisions,\.\.\.\(summary\?\[summary\]:\[\]\)\]/);
   assert.match(source,/round>1\?'A':navigationCategories\(\)\[0\]\?\.cat/);
 });
 
 test('DOP presentation loads before the app and keeps the documented cycle',()=>{
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  const dop=fs.readFileSync(path.join(root,'production_dop.js'),'utf8');
-  assert.ok(html.indexOf('production_dop.js')<html.indexOf('app.js'));
+  const dop=fs.readFileSync(path.join(root,'js/production_dop.js'),'utf8');
+  assert.ok(html.indexOf('js/production_dop.js')<html.indexOf('js/app.js'));
   for(const label of ['MATERIA PRIMA PRINCIPAL','MATERIA PRIMA SECUNDARIA','Corte de piezas','Clasificación','Preparación','Ensamblado y colocación de accesorios','Acabado final','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO','Tabla de resumen'])assert.ok(dop.includes(label),label);
   assert.doesNotMatch(dop,/Inspección final/);
   assert.match(dop,/<td>Operaciones<\/td><td>2<\/td>/);
@@ -60,7 +60,7 @@ test('DOP presentation loads before the app and keeps the documented cycle',()=>
 });
 
 test('infrastructure, production and logistics drafts remain saveable over budget',()=>{
-  const source=fs.readFileSync(path.join(root,'app.js'),'utf8');
+  const source=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
   assert.match(source,/saveDecisionSection'\)\.disabled=locked;/);
   assert.match(source,/const affordable=cashBalance\(\)-old\+plan\.net>=-0\.005;/);
   assert.match(source,/const ledger=affordable\?\{\.\.\.cashLedger,\[key\]:plan\.net\}:\{\.\.\.cashLedger\};/);

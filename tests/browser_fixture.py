@@ -17,7 +17,7 @@ def asset_uri(relative):
     mime=mimetypes.guess_type(str(path))[0] or 'application/octet-stream'
     return 'data:'+mime+';base64,'+base64.b64encode(path.read_bytes()).decode('ascii')
 def embed_assets(text):
-    return re.sub(r'''(['"])(assets/[^'"\s]+\.(?:png|gif|svg|jpg|webp))\1''',lambda m:m[1]+asset_uri(m[2])+m[1],text)
+    return re.sub(r'''(['"])((?:\.\./)?assets/[^'"\s]+\.(?:png|gif|svg|jpg|webp))\1''',lambda m:m[1]+asset_uri(m[2].removeprefix('../'))+m[1],text)
 def document(name, storage=None):
     text=(ROOT/name).read_text(encoding='utf-8')
     text=re.sub(r'<link[^>]*href="https://[^>]+>', '',text)

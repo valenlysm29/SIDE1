@@ -1,8 +1,8 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const model=require('../financial_model.js');
-const view=require('../student_financial_view.js');
+const model=require('../js/financial_model.js');
+const view=require('../js/student_financial_view.js');
 
 test('summary retains every cycle, including quiet cycles, and reports cumulative values',()=>{
   const report=model.calculate({capital:1000,round:3,ledger:{'1:SIM_VENTAS':200,'3:SIM_GASTOS':-50}});

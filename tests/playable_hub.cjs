@@ -26,7 +26,7 @@ async function serve() {
 }
 
 // These helpers exist only in the response served to the test browser.
-const source=fs.readFileSync(path.join(root,'simulator3d.js'),'utf8');
+const source=fs.readFileSync(path.join(root,'js/simulator3d.js'),'utf8');
 assert.ok(source.includes('  window.SIDE3D = {'),'simulator diagnostics injection point');
 const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebGLRenderer({preserveDrawingBuffer:true,').replace('  window.SIDE3D = {',`  window.hubQA={
   place(x,z,heading=0){keys={};Object.assign(player,{x,z,y:player.baseY,vx:0,vz:0,vy:0,speed:0,grounded:true});yaw=targetYaw=heading;pitch=targetPitch=0;cameraSnap=true;},
@@ -65,7 +65,7 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     await context.route('**/*',route=>{
       const requested=route.request().url();
       if(!requested.startsWith(local.url))return route.abort();
-      if(/\/simulator3d\.js(?:\?|$)/.test(requested))return route.fulfill({contentType:'application/javascript',body:instrumented});
+      if(/\/js\/simulator3d\.js(?:\?|$)/.test(requested))return route.fulfill({contentType:'application/javascript',body:instrumented});
       return route.continue();
     });
     await page.goto(local.url,{waitUntil:'domcontentloaded'});

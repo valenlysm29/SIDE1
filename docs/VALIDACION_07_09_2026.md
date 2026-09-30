@@ -25,7 +25,7 @@ Las pruebas de interfaz ejecutaron el HTML, CSS y JavaScript de esta entrega en 
 
 Este método comprueba la lógica local y la interacción visual, pero **no es una prueba de despliegue**. No se probó una conexión a Supabase real, la autenticación remota, la sincronización entre dispositivos, ni una sesión completa del motor 3D con sus CDN. Tampoco se prueba la resistencia de `localStorage` frente a borrado del sitio o fallos de almacenamiento. No se modificaron datos de un servidor externo.
 
-El listado de las 40 comprobaciones está en `tests/RESULTADOS_VALIDACION.json`.
+El listado de las 40 comprobaciones está en `tests/output/legacy/RESULTADOS_VALIDACION.json`.
 
 ## Repetir las pruebas
 
