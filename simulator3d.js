@@ -39,7 +39,8 @@
   let controlsOpenedFromHelp = false, missionCollapsed = false;
   let hubWorld = null, businessWorld = null, businessInteriors = null, hubActors = [], playerAvatar = null;
   let deriveWorldDecisionState = null, worldDecisionState = null, worldEventVisuals = null;
-  let worldOrientation = null, closestCityZone = null, cityMap = null, selectedMapDestination = null;
+  let worldOrientation = null, worldMinimapControl = null, worldWayfinding = null;
+  let closestCityZone = null, cityMap = null, selectedMapDestination = null;
   let lastWorldSnapshot = null;
   const GUIDE_NAME = 'Guía SIDE';
   let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
@@ -3131,10 +3132,14 @@
     const {createHubWorld,CITY_MAP}=await import('./services/hub_world.js?v=20260929-decision-city');
     cityMap=CITY_MAP;
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
-    const orientationModule=await import('./services/world_orientation.mjs');
+    const [orientationModule,{createWorldMinimapControl},{createWorldWayfinding}]=await Promise.all([
+      import('./services/world_orientation.mjs'),import('./services/world_minimap_control.mjs'),import('./services/world_wayfinding.mjs')
+    ]);
     closestCityZone=orientationModule.closestCityZone;
     worldOrientation=orientationModule.createWorldOrientation({THREE,root:$3(rootId),zones:CITY_MAP.zones,bounds:CITY_MAP.bounds,offsetX:HUB_OFFSET,
       onNavigate:(id,zone)=>enterHubInterior(id,zone)});
+    worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
+    worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
@@ -3720,8 +3725,10 @@
           const target=entrance||station||{x:HUB_OFFSET+selected.x,z:selected.z};
           hubWaypoint.position.set(target.x,0,target.z);hubWaypoint.visible=true;
         }
-        worldOrientation?.update({player,camera,yaw,now,activeZone:currentInterior||closestCityZone?.(player.x-HUB_OFFSET,player.z,cityMap.zones,11),
-          targetZone:selectedMapDestination||worldDecisionState?.objective?.zoneId||null});
+        const activeZone=currentInterior||closestCityZone?.(player.x-HUB_OFFSET,player.z,cityMap.zones,11);
+        const targetZone=selectedMapDestination||worldDecisionState?.objective?.zoneId||null;
+        worldOrientation?.update({player,camera,yaw,now,activeZone,targetZone});
+        worldWayfinding?.update({player,camera,targetZone,now});
         if(adminOpen) refreshAdminUI(); lastHudTick = now;
       }
     }

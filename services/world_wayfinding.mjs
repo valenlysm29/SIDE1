@@ -111,7 +111,8 @@ export function createWorldWayfinding({ THREE, root, zones, offsetX = 150 }) {
     const safeStyle = getComputedStyle(safeProbe);
     const safe = { top: parseFloat(safeStyle.paddingTop) || 0, right: parseFloat(safeStyle.paddingRight) || 0,
       bottom: parseFloat(safeStyle.paddingBottom) || 0, left: parseFloat(safeStyle.paddingLeft) || 0 };
-    const obstacles = ['.sim3d-touch-controls', '.sim3d-actionbar', '.sim-city-map', '.sim-world-location', '.sim3d-metrics-drawer', '.sim3d-stats']
+    const obstacles = ['.sim3d-touch-controls', '.sim3d-actionbar', '.sim-city-map', '.sim-world-location',
+      '.sim3d-metrics-drawer', '.sim3d-missions', '.sim3d-stats', '.sim-zone-banner', '.sim-zone-label']
       .flatMap(selector => [...root.querySelectorAll(selector)])
       .filter(node => node !== guide && getComputedStyle(node).display !== 'none' && node.getBoundingClientRect().width > 0)
       .map(node => localRect(node, rect));

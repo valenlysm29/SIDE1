@@ -31,6 +31,9 @@
   #simulator3d .sim-city-map-open .sim-city-map-content{display:grid;width:min(100%,900px);margin:auto;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}
   #simulator3d .sim-city-map-open .mini-map-area{width:min(100%,calc(100dvh - 96px));height:min(100%,calc(100dvh - 96px));max-height:calc(100dvh - 96px);justify-self:center}
 }
+@media(max-height:700px) and (orientation:portrait) and (hover:none){
+  #simulator3d .sim-city-map:not(.sim-city-map-open){bottom:calc(142px + env(safe-area-inset-bottom,0px))}
+}
 
 /* Keep a small, high-contrast set of projected zone labels on narrow screens. */
 @media(max-width:560px){
