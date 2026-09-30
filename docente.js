@@ -569,7 +569,7 @@ async function supabaseReports(){
   const parts=await S.PartidaService.listarParticipantes(state.partidaId);
   if(!parts.success){rosterSyncError=parts.error||'Error de conexión';return null;}
   rosterSyncError='';
-  const roster=(parts.data||[]).filter(p=>p.empresa_id).map(p=>({id:'sb-'+p.empresa_id,empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,partida:$('gameCode').value,empresa:p.empresas?.nombre_comercial||p.empresa,nombre:p.nombre||'Jugador',ronda:p.empresas?.ciclo_actual||1,caja:p.empresas?.caja_actual||0,fuente:'supabase',estado:'activa'}));
+  const roster=(parts.data||[]).filter(p=>p.empresa_id).map(p=>({id:'sb-'+p.empresa_id,empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,partida:$('gameCode').value,empresa:p.empresas?.nombre_comercial||p.empresa,legalName:p.empresas?.nombre_legal||null,nombre:p.nombre||'Jugador',ronda:p.empresas?.ciclo_actual||1,caja:p.empresas?.caja_actual||0,fuente:'supabase',estado:'activa'}));
   const known=new Set(state.reports.map(r=>r.empresa));
   state.reports.push(...roster.filter(r=>!known.has(r.empresa)));
   const cat=await supabaseCatalog();
@@ -597,6 +597,7 @@ async function supabaseReports(){
       id:local?.id||('sb-'+p.empresa_id),empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,
       nombre:p.nombre||local?.nombre||'Jugador',
       empresa:emp.nombre_comercial||p.empresa,
+      legalName:emp.nombre_legal||p.empresas?.nombre_legal||local?.legalName||null,
       partida:code,
       ronda:cicloActual,rondasActivas:cicloActual,
       capital:rep?Number(rep.capital):(emp.caja_inicial??local?.capital??0),
@@ -785,22 +786,42 @@ function loadPublished(){
 }
 setInterval(renderPodium,1000);
 function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished()}
-function makePdf(){
-  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'pt',format:'a4'});let y=45;
-  const line=(text,bold=false)=>{doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(bold?12:10);for(const row of doc.splitTextToSize(text,510)){if(y>770){doc.addPage();y=45;}doc.text(row,40,y);y+=15;}};
-  line('SIDE — Resultados',true);line(`${getConfig().nombre} · ${$('gameCode').value}`);
-  for(const r of state.reports.filter(r=>r.estado!=='eliminada')){
-    y+=12;const er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral;
-    line(`${r.empresa} · Ciclo ${r.ronda} · Nota: ${gradeLabel(r)}`,true);
-    line(`Resultados: ventas netas ${money(er.ventasNetas??er.ingresos)}; gastos ${money(er.costos)}; eventos ${money(er.impactoEventos)}; otros resultados ${money(Number(er.otros||0)+Number(er.resultadoVentaActivos||0))}; utilidad ${money(er.utilidad)}.`);
-    line(`Caja: inicial ${money(bc.cajaInicial)} + entradas ${money(bc.entradas)} - salidas ${money(bc.salidas)} = final ${money(bc.cajaFinal)}.`);
-    line(`Flujo: operación ${money(fc.operacion)}; inversión ${money(fc.inversion)}; financiamiento ${money(fc.financiamiento)}; neto ${money(fc.flujoNeto)}.`);
-    if(bg)line(`Balance: efectivo ${money(bg.efectivo)}; activos fijos ${money(bg.activosFijos)}; activos totales ${money(bg.activos)} = deuda ${money(bg.deuda)} + patrimonio ${money(bg.patrimonio)}.`);
-  }
-  return doc;
+let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
+function pdfLogo(){
+  if(!pdfLogoPromise)pdfLogoPromise=new Promise(resolve=>{
+    const image=new Image();
+    image.onload=()=>{try{const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;canvas.getContext('2d').drawImage(image,0,0);resolve(canvas.toDataURL('image/png'));}catch{resolve(null)}};
+    image.onerror=()=>resolve(null);image.src='assets/side_logo.png';
+  });
+  return pdfLogoPromise;
 }
-function showPdf(){const doc=makePdf(),blob=doc.output('blob'),url=URL.createObjectURL(blob);$('pdfFrame').src=url;$('pdfModal').classList.remove('hidden')}
-function downloadPdf(){makePdf().save(($('gameCode').value||'SIDE')+'-resultados.pdf')}
+async function makePdf(){
+  const reports=state.reports.filter(r=>r.estado!=='eliminada').map(r=>({...r,teacherScore:gradeValue(r)}));
+  if(!reports.length)throw new Error('No hay empresas activas con resultados para descargar.');
+  const config=getConfig(),generatedAt=new Date(),logo=await pdfLogo();
+  return window.SIDE_TEACHER_PDF.create({jsPDF:window.jspdf?.jsPDF,reports,config,logo,generatedAt});
+}
+async function exportPdf(preview){
+  if(pdfBusy)return;pdfBusy=true;
+  ['viewPdf','downloadPdf'].forEach(id=>$(id).disabled=true);
+  try{
+    const filename=($('gameCode').value||'SIDE')+'-resultados.pdf';
+    const doc=await makePdf();
+    if(preview){
+      const url=URL.createObjectURL(doc.output('blob'));
+      if(pdfPreviewUrl)URL.revokeObjectURL(pdfPreviewUrl);
+      pdfPreviewUrl=url;$('pdfFrame').src=url;$('pdfModal').classList.remove('hidden');
+    }else doc.save(filename);
+  }catch(error){console.error('SIDE: PDF export failed',error);toast(error.message||'No se pudo generar el PDF. Inténtalo de nuevo.');}
+  finally{pdfBusy=false;['viewPdf','downloadPdf'].forEach(id=>$(id).disabled=false);}
+}
+function showPdf(){return exportPdf(true)}
+function downloadPdf(){return exportPdf(false)}
+function closePdfPreview(){
+  $('pdfModal').classList.add('hidden');$('pdfFrame').removeAttribute('src');
+  if(pdfPreviewUrl){URL.revokeObjectURL(pdfPreviewUrl);pdfPreviewUrl=null;}
+}
+window.addEventListener('pagehide',()=>{if(pdfPreviewUrl)URL.revokeObjectURL(pdfPreviewUrl);pdfPreviewUrl=null;});
 
 window.addEventListener('storage',e=>{if(e.key==='SIDE_STUDENT_REPORTS'){loadReports()}if(e.key==='SIDE_ROUND_RUNTIME'){const r=runtime();if(r&&gameStatus()?.active){state.round=Number(r.round||state.round);state.seconds=Number(r.remaining??state.seconds);updateTimer();updateRoundDisplay()}}});
 
@@ -834,7 +855,7 @@ $('publishPodium')?.addEventListener('click',publishPodium);
 $('resultCompanySelect')?.addEventListener('change',event=>{state.resultCompanyId=event.target.value;renderResults();});
 $('viewPdf')?.addEventListener('click',showPdf);
 $('downloadPdf')?.addEventListener('click',downloadPdf);
-$('closePdf')?.addEventListener('click',()=>$('pdfModal').classList.add('hidden'));
+$('closePdf')?.addEventListener('click',closePdfPreview);
 async function copyInvitation(link=false){
   if(!gameStatus()?.active){toast('Guarda la configuración para generar una partida.');return;}
   const code=$('gameCode').value;
