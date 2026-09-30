@@ -11,7 +11,9 @@
     "admission:ui": "node --test student_admission.test.js",
     "lifecycle:ui": "node game_lifecycle_ui.cjs",
     "observations:db": "node game_observations_db.cjs",
-    "observations:unit": "node --test game_observations.test.js"
+    "observations:unit": "node --test game_observations.test.js",
+    "history:db": "node teacher_history_db.cjs",
+    "history:ui": "node teacher_history_ui.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
