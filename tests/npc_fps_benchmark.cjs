@@ -1,4 +1,5 @@
 const {chromium}=require('playwright');
+const assert=require('node:assert/strict');
 const http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.json':'application/json','.wasm':'application/wasm','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.glb':'model/gltf-binary','.svg':'image/svg+xml'};
@@ -25,6 +26,8 @@ const server=http.createServer((req,res)=>{
     const tiers={};
     for(const tier of ['low','medium','high']){
       await page.evaluate(mode=>document.querySelector(`[data-quality="${mode}"]`)?.click(),tier);
+      const expected={low:6,medium:10,high:16}[tier];
+      await page.waitForFunction(expected=>SIDE3D.diagnostics().cityNpcModels.active===expected,expected,{timeout:120000});
       if(tier==='high')await page.waitForFunction(()=>SIDE3D.diagnostics().cityNpcModels.loaded>=16,undefined,{timeout:120000});
       await page.waitForTimeout(1800);
       const fps=[];
@@ -35,6 +38,7 @@ const server=http.createServer((req,res)=>{
       }
       fps.sort((a,b)=>a-b);
       tiers[tier]={samples:fps,median:fps[Math.floor(fps.length/2)]||null,cityNpcModels:await page.evaluate(()=>SIDE3D.diagnostics().cityNpcModels)};
+      assert.equal(tiers[tier].cityNpcModels.active,expected,`${tier} active NPC roster follows tier`);
     }
     console.log(JSON.stringify({renderer:'headless Chromium SwiftShader',tiers},null,2));
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}

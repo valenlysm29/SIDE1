@@ -111,21 +111,22 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
     const rect = root.getBoundingClientRect();
     const candidates = zoneList.map(zone => ({ zone, point: project(zone, camera, rect) }))
       .filter(item => item.point && item.point.distance < 145
-        && item.point.y > Math.min(155, rect.height * .2)
-        && !(item.point.x < 265 && item.point.y < 410))
+        && !(item.point.x < 265 && item.point.y > rect.height - 435))
       .sort((a, b) => a.point.distance - b.point.distance);
     const occupied = [];
     labels.forEach(label => { label.hidden = true; });
     for (const { zone, point } of candidates) {
       const label = labels.get(zone.id);
+      const screenX=point.x<265&&point.y<410?280:point.x;
+      const screenY=Math.max(Math.min(165,rect.height*.24),point.y);
       // The CSS minimum size is used before first paint, so collision checks
       // are stable when a label has previously been hidden.
       const width = Math.max(98, label.offsetWidth || 98);
       const height = Math.max(26, label.offsetHeight || 26);
-      const box = { left: point.x - width / 2, right: point.x + width / 2, top: point.y - height / 2, bottom: point.y + height / 2 };
+      const box = { left: screenX - width / 2, right: screenX + width / 2, top: screenY - height / 2, bottom: screenY + height / 2 };
       if (occupied.some(other => box.left < other.right + 7 && box.right > other.left - 7 && box.top < other.bottom + 7 && box.bottom > other.top - 7)) continue;
       occupied.push(box);
-      label.style.left = `${point.x}px`; label.style.top = `${point.y}px`;
+      label.style.left = `${screenX}px`; label.style.top = `${screenY}px`;
       label.style.setProperty('--distance-scale', String(Math.max(.85, Math.min(1.14, 32 / Math.max(28, point.distance)))));
       label.hidden = false;
     }

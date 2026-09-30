@@ -33,6 +33,7 @@
   let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
   let cityRosterModule = null, cityClipModule = null, cityRoster = null;
   let cityApproved = null, cityLoadPromise = null;
+  let cityNavigator = null, cityNavPromise = null, cityNavStats = null;
   const cityTemplates = new Map();
   const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
@@ -943,6 +944,7 @@
       for(const id of CHARACTER_IDS){const template=characterManager?.template(id);if(!template)continue;if(id==='mona')monaTemplate=template;else suppliedTemplates[id]=template;}
       await Promise.all([loadExecModelTemplates(),storeProps,warehouseProps,productionProps,outdoorProps]);
       await loadCityNpcModels();
+      void prepareCityNavigator();
       if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
       refreshBusinessCharacters();ensureHubCharacters({allowFallback:true});detailsComplete=true;return true;
     })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
@@ -1011,44 +1013,70 @@
     return loadCharacter('mona',ASSET_PRIORITY.IMPORTANT);
   }
 
+  function createBusinessNpc(role) {
+    const cityRole=role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
+    const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
+    const obj=person({...look,cityRole,cityScene:'interiors'});
+    obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
+  }
+
   async function loadCityNpcModels() {
     if(cityLoadPromise)return cityLoadPromise;
     cityLoadPromise=(async()=>{try {
       [cityRosterModule,cityClipModule]=await Promise.all([import('./services/npc_city_roster.mjs'),import('./services/npc_clip_controller.mjs')]);
       if(!cityApproved){
-        const [publicResponse,privateResponse]=await Promise.all([
-          fetch('assets/models/npc/manifest.json'),fetch('assets/models/npc/private/manifest.json')
-        ]);
+        const publicResponse=await fetch('assets/models/npc/manifest.json');
         const publicRows=publicResponse.ok?await publicResponse.json():[];
-        const privateRows=privateResponse.ok?await privateResponse.json():[];
-        cityApproved=cityRosterModule.validCityManifest([
-          ...(Array.isArray(publicRows)?publicRows.filter(row=>!row.privado):[]),
-          ...(Array.isArray(privateRows)?privateRows.filter(row=>row.privado===true):[])
-        ]);
+        cityApproved=cityRosterModule.validCityManifest(Array.isArray(publicRows)?publicRows.filter(row=>!row.privado):[]);
       }
       const target=perfMode==='low'?6:perfMode==='high'?16:10;
       const selected=cityApproved.slice(0,target);
       const missing=selected.filter(entry=>!cityTemplates.has(entry.id));
-      if(!missing.length&&cityRoster)return;
+      if(!missing.length&&cityRoster&&cityRoster.models.length===selected.length)return;
       await Promise.all(missing.map(async entry=>{
         try {const gltf=await assetCache.loadGLTF(new GLTFLoader(),entry.archivo,{priority:ASSET_PRIORITY.LAZY});
           if(gltf?.scene)cityTemplates.set(entry.id,{scene:gltf.scene,clips:gltf.animations||[],entry});
         } catch(error){console.warn(`NPC ${entry.id} no disponible; se usará el respaldo procedural.`,error)}
       }));
-      const firstRoster=!cityRoster;
+      const previousRosterIds=cityRoster?.models.map(model=>model.id).join('|')||'';
       cityRoster=cityRosterModule.createCityRoster(selected.filter(entry=>cityTemplates.has(entry.id)));
-      if(firstRoster&&cityRoster.models.length){
+      if(previousRosterIds!==cityRoster.models.map(model=>model.id).join('|')&&cityRoster.models.length){
         // Hub fallback actors may have been created before deferred model loading.
         for(const actor of hubActors){actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal)}
         hubActors.length=0;
         for(const room of businessInteriors?.rooms||[]){
-          for(const actor of room.actors){actor.object.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.object);clearGroup(disposal)}
-          room.actors.length=0;
+          for(const actor of room.actors){
+            const previous=actor.object,role=previous.userData.role;
+            const replacement=createBusinessNpc(role);
+            replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
+            replacement.visible=previous.visible;replacement.name=previous.name;
+            room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
+          }
         }
+        ensureHubCharacters({allowFallback:true});
       }
     } catch(error){console.warn('No se pudo cargar el catálogo NPC; se mantiene el respaldo procedural.',error)}})()
       .finally(()=>{cityLoadPromise=null});
     return cityLoadPromise;
+  }
+
+  async function prepareCityNavigator() {
+    if(perfMode==='low'||cityNavigator||cityNavPromise||!hubWorld||!cityMap)return cityNavigator;
+    cityNavPromise=(async()=>{
+      try{
+        const [{buildNpcGridNavmesh},{loadOptionalNpcNavigator}]=await Promise.all([
+          import('./services/npc_navmesh_grid.mjs'),import('./services/npc_optional_navigation.mjs')
+        ]);
+        const built=buildNpcGridNavmesh({THREE,bounds:cityMap.bounds,offsetX:HUB_OFFSET,
+          obstacles:hubWorld.colliders,cellSize:3,agentRadius:.4});
+        cityNavStats=built.stats;
+        const navigator=await loadOptionalNpcNavigator({THREE,geometry:built.geometry,obstacles:hubWorld.colliders});
+        built.geometry.dispose();
+        cityNavigator=navigator.ready?navigator:null;
+      }catch(error){console.warn('Navegación avanzada no disponible; se conservan rutas seguras.',error)}
+      return cityNavigator;
+    })().finally(()=>{cityNavPromise=null});
+    return cityNavPromise;
   }
 
   async function loadSuppliedNpcs() {
@@ -1735,6 +1763,7 @@
     businessInteriors?.setQuality(mode);
     hubWorld?.setQuality(mode);
     if(detailsComplete)void loadCityNpcModels();
+    if(detailsComplete&&mode!=='low')void prepareCityNavigator();
     ensureHubCharacters({allowFallback:Boolean(cityRoster)});
     resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
@@ -3109,12 +3138,7 @@
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
-      createNpc(role){
-        const cityRole=role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
-        const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
-        const obj=person({...look,cityRole,cityScene:'interiors'});
-        obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
-      },
+      createNpc:createBusinessNpc,
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
     businessInteriors.installStoreProps(storePropTemplates,perfMode);
     businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);
@@ -3133,7 +3157,7 @@
       {x:HUB_OFFSET+19,z:66,type:'decisionZone',category:'B',label:'Gestionar infraestructura en la oficina'},
       {x:HUB_OFFSET+66,z:19,type:'decisionZone',category:'E',label:'Revisar finanzas en el banco'},
       {x:HUB_OFFSET-66,z:-19,type:'decisionZone',category:'F',label:'Gestionar compras con proveedores'},
-      {x:HUB_OFFSET+19,z:29,type:'news',label:'Leer noticias del ciclo'}
+      {x:HUB_OFFSET+19,z:30.1,type:'news',label:'Leer noticias del ciclo'}
     );
     productInteractables=interactables.filter(point=>point.type==='product');
     const {deriveObjective}=await import('./services/gameplay_objectives.mjs');
@@ -3343,11 +3367,13 @@
       const obj=actor.obj;
       if(!obj.visible)continue;
       if(!running||hubDirectoryOpen||actor.pause>0||hubVehicles?.occupied(obj.position.x,obj.position.z,.8)||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
-      if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
+      const navigator=perfMode!=='low'&&cityNavigator?.ready?cityNavigator:null;
+      if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=navigator?navigator.plan(obj.position,{x:goal[0],z:goal[1]}):npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
       const target=actor.route[0];if(!target){actor.index=(actor.index+1)%actor.patrol.length;continue;}
       Object.assign(actor.state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
       const neighbors=hubActors.filter(a=>a!==actor&&a.obj.visible).map(a=>a.obj.position).concat({x:player.x,z:player.z});
-      const moved=npcNavigation.advance(actor.state,{x:target[0],z:target[1]},dt,hubWorld.colliders,neighbors,actor.speed);
+      const moved=navigator?navigator.advance(actor.state,{x:target[0],z:target[1]},dt,neighbors,actor.speed)
+        :npcNavigation.advance(actor.state,{x:target[0],z:target[1]},dt,hubWorld.colliders,neighbors,actor.speed);
       obj.position.set(actor.state.x,.025,actor.state.z);obj.rotation.y=actor.state.yaw;setPersonPose(obj,0,moved.distance>.00001,dt);
       if(moved.arrived){actor.route.shift();if(!actor.route.length){actor.index=(actor.index+1)%actor.patrol.length;actor.pause=.7;}}
     }
@@ -4000,7 +4026,8 @@
     });
     const selected=activeCharacterId(),selectedInstances=characters.filter(character=>character.characterId===selected).length;
     return {initialized, running, session:gameSession?{context:sessionContext,day:gameSession.day,timeLeft:gameSession.timeLeft,shiftEnded:gameSession.shiftEnded}:null,
-      navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:'city-aabb', models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
+      navigationReady:Boolean(npcNavigation&&hubWorld&&businessInteriors),navigationSystem:cityNavigator?.ready&&perfMode!=='low'?'yuka-three-pathfinding+aabb':'city-aabb',navigationGrid:cityNavStats,
+      models:Object.keys(execModelTemplates).filter(key=>execModelTemplates[key]), characters,
       assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',storeProps:{loaded:Object.keys(storePropTemplates),errors:{...storePropErrors}},warehouseProps:{loaded:Object.keys(warehousePropTemplates),errors:{...warehousePropErrors}},productionProps:{loaded:Object.keys(productionPropTemplates),errors:{...productionPropErrors}},outdoorProps:{loaded:Object.keys(outdoorPropTemplates),errors:{...outdoorPropErrors}},cache:assetCache?.diagnostics?.()||null},
       character:{selected,name:CONFIG.NPCS[selected]?.name||'',selectedInstances,playerInstances:characters.filter(character=>character.role==='player').length,manager:characterManager?.diagnostics?.()||null,animation:playerAvatar?.userData.animationController?.getSnapshot?.()||null,controllers:controllers.size,mixers:mixers.size},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},

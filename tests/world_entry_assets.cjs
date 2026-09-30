@@ -43,11 +43,11 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
     const after=await page.evaluate(()=>entryQA.stats());
     assert.equal(after.scene,before.scene);
     assert.equal(after.streamedCharacters-before.streamedCharacters,4,'details stream three city pedestrians and the guide');
-    assert.equal(after.children-before.children,after.streamedCharacters-before.streamedCharacters,'only streamed characters extend the existing scene');
+    assert.equal(after.children-before.children,4,'only streamed characters extend the existing scene');
     assert.equal(after.actors.length,before.actors.length);assert.equal(after.ledger,before.ledger);
     for(const role of ['cashier','salesperson']){
       const a=after.actors.find(a=>a.role===role),b=before.actors.find(a=>a.role===role);assert.equal(a.pending,false);assert.equal(a.x,b.x);assert.equal(a.z,b.z);
-      assert.equal(a.kind,role==='cashier'?'male':'female');
+      assert.ok(a.kind.startsWith('city:'),`${role} upgrades to an approved city NPC`);
     }
     await page.evaluate(()=>entryQA.render());
     await page.screenshot({path:path.join(__dirname,'output/continuous/entry-streaming.png')});

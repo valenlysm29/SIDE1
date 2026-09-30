@@ -436,6 +436,12 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   landmark('suppliers', -76, -19, 14, 17, 8, supplierMaterial);
   // The existing plaza kiosk is the news notice point; its central position is
   // kept for the business directory and objective markers.
+  // A separate notice box keeps the cycle news action visible beside the plaza.
+  box(19, .88, 31.15, 1.5, 1.55, .48, m.darkSteel);
+  box(19, 1.42, 31.47, 1.19, .18, .05, m.yellow);
+  box(19, .91, 31.45, 1.18, .72, .06, m.opaqueGlass);
+  label('NOTICIAS', 'CICLO ACTUAL', 19, 2.04, 31.49, 2.5, .68, '#284657');
+  collider(19, 31.15, 1.5, .48, 'news-box');
 
   // Beyond the walking boundary, instanced facades and a thin second skyline
   // mask the terrain edge. The near band survives on Low; detail is tiered.

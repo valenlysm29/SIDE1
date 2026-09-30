@@ -88,8 +88,8 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
     pass(2,'Entrada física tienda',await enter('store'));
     await page.screenshot({path:path.join(output,'store.png')});
     await interiorPhoto('store',[[131,19]]);
-    const inspectBefore=await page.evaluate(()=>continuousQA.finance());
-    await walkRoute([[126,19.15]]);await page.keyboard.press('KeyE');
+    // A customer may wait in the direct aisle; use the clear route around the queue.
+    await walkRoute([[131,20.5],[126,20.5],[126,19.15]]);const inspectBefore=await page.evaluate(()=>continuousQA.finance());await page.keyboard.press('KeyE');
     assert.equal(await page.locator('#simProductInspect').isVisible(),true);assert.equal(await page.locator('#inspectProductName').innerText(),'Bolso Básico');
     assert.deepEqual(await page.evaluate(()=>continuousQA.finance()),inspectBefore,'product inspection only reads the authoritative model');
     await page.keyboard.press('Escape');

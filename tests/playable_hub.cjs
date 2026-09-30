@@ -40,6 +40,7 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
   screenVersion(){const maps=new Set();hubWorld.group.traverse(n=>{for(const m of n.isMesh?(Array.isArray(n.material)?n.material:[n.material]):[])if(m.map)maps.add(m.map)});return [...maps].reduce((sum,map)=>sum+map.version,0);},
   actors(){return hubActors.map(a=>{const m=a.obj.userData.motion,p=a.obj.userData.parts;return {kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,animated:Boolean(m||p||a.obj.userData.animationController||a.obj.userData.cityClipController),knee:m?.bones.ShinL.rotation.x??p?.legL.rotation.x,bones:m?Object.keys(m.bones).length:0};});},
   state(){return {keys,visibilityPaused,running,hubDirectoryOpen,player:{...player},collision:collision(player.x,player.z-.1),actors:this.actors()};},
+  station(type,category){const point=interactables.find(item=>item.type===type&&item.category===category&&!item.zone);if(!point)return null;this.place(point.x,point.z);const nearest=nearestInteractable();return {type:nearest?.type,category:nearest?.category};},
   pause(){cancelAnimationFrame(raf);},
   draw(){updateGameplayCamera(1/60);updateMinimap();updateHubObjective();renderer.render(scene,camera);},
   stepActors(seconds){for(let i=0;i<Math.round(seconds*60);i++)updateHubActors(1/60);renderer.render(scene,camera);},
@@ -116,6 +117,8 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     // City pedestrians stream after the first controllable frame; wait
     // explicitly before validating their articulated procedural fallback.
     await page.evaluate(()=>SIDE3D.preloadDetails());
+    await page.waitForFunction(()=>SIDE3D.diagnostics().navigationSystem==='yuka-three-pathfinding+aabb',undefined,{timeout:30000});
+    assert.ok((await page.evaluate(()=>SIDE3D.diagnostics().navigationGrid))?.blocked>0,'city navmesh excludes solid parcels');
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
     const activeCharacter=await page.evaluate(()=>SIDE3D.diagnostics().character.selected);
     assert.equal(actorsBefore.length,3,'three distinct NPC positions patrol outdoors');
@@ -261,6 +264,15 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
       await page.evaluate(()=>SIDE3D.rebuild());
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.actors),actorCount,'rebuild does not duplicate pedestrians');
     }
+    for(const category of ['B','E','F']){
+      const station=await page.evaluate(cat=>hubQA.station('decisionZone',cat),category);
+      assert.deepEqual(station,{type:'decisionZone',category},`${category} has an accessible world terminal`);
+    }
+    assert.equal((await page.evaluate(()=>hubQA.station('news',undefined)))?.type,'news','notice box can be used from the plaza');
+    const beforeMapClick=await page.evaluate(()=>SIDE3D.diagnostics().player);
+    await page.locator('.sim-city-zone[data-zone="bank"]').click();
+    assert.equal(await page.locator('.sim-city-zone[data-zone="bank"]').evaluate(el=>el.classList.contains('is-target')),true);
+    assert.deepEqual(await page.evaluate(()=>SIDE3D.diagnostics().player),beforeMapClick,'map click marks a route without teleporting');
     await page.setViewportSize({width:390,height:844});
     await page.evaluate(()=>{const p=hubQA.world().spawn;hubQA.place(p.x,p.z)});
     await page.evaluate(()=>hubQA.draw());
