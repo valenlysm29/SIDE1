@@ -183,6 +183,17 @@ convirtieron o redujeron con el pipeline del proyecto. Ver
 [registro de licencia](LICENSES/Quaternius_Ultimate_Modular_City_CC0.txt)
 y [curación](reports/npc_curation.md).
 
+### Primer lote de NPC (Quaternius, CC0)
+
+| Modelo integrado | Autor | Fuente de descarga | Fuente original y licencia |
+| --- | --- | --- | --- |
+| `city_woman_casual.glb` | Quaternius | [Casual.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Casual.gltf) | [Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html), CC0 |
+| `city_man_casual.glb` | Quaternius | [Casual_2.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Casual_2.gltf) | [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html), CC0 |
+| `city_woman_suit.glb` | Quaternius | [Suit.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Suit.gltf) | [Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html), CC0 |
+| `city_man_suit.glb` | Quaternius | [Suit.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Suit.gltf) | [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html), CC0 |
+| `city_woman_worker.glb` | Quaternius | [Worker.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Worker.gltf) | [Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html), CC0 |
+| `city_man_worker.glb` | Quaternius | [Worker.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Worker.gltf) | [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html), CC0 |
+
 ### Lote adicional de NPC (Quaternius, CC0)
 
 | Modelo integrado | Autor | Fuente de descarga | Fuente original y licencia |

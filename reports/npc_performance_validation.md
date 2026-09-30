@@ -9,21 +9,21 @@ y ausencia de desplazamiento horizontal de raíz.
 
 ## Rendimiento observado
 
-Se ejecutó `tests/npc_fps_benchmark.cjs` en Chrome headless con ANGLE
-SwiftShader a 1280×800. Con los **16 modelos cargados**, el monitor mostró
-aproximadamente **1 FPS**, mientras había otras mediciones y procesos activos.
-SwiftShader es renderizado por software y estaba saturado: esta cifra no es un
-FPS de hardware ni sirve para estimar Baja, Media, Alta o Auto. Tampoco permite
-cuantificar la variación respecto a la línea base, que también rondaba 1 FPS.
+Se repitió `tests/npc_fps_benchmark.cjs` de forma aislada en Chrome headless
+con ANGLE SwiftShader a 1280×800. La mediana de cuatro muestras fue **3 FPS
+en Baja, 1 en Media y 1 en Alta**. SwiftShader renderiza por CPU: estas cifras
+no permiten estimar FPS de GPU real ni cuantificar una mejora respecto a la
+línea base.
 
 El costo de memoria de plantillas aumenta con el catálogo, pero el render
 simultáneo continúa limitado por tier: Baja 5 clientes, Media 8, Alta 10 y
 Auto 8 (`simulator3d-config.js`). Se comparte la geometría de cada plantilla
 entre clones. El runtime reduce la frecuencia de pose para NPC lejanos y
-suspende el mixer cuando salen de la vista. El plan de streaming por tier en
-`services/npc_streaming.mjs` propone mantener 4/8/16/8 plantillas según
-Baja/Media/Alta/Auto y dar prioridad a la zona próxima. El integrador debe
-conectarlo a `simulator3d.js` y evitar expulsar plantillas con clones vivos.
+suspende el mixer cuando salen de la vista. `simulator3d.js` activa 6/10/16/10
+plantillas para Baja/Media/Alta/Auto, respectivamente. Un cambio a un tier
+inferior conserva los GLB ya descargados en caché y limita el catálogo activo;
+el benchmark verifica ese contrato. La prioridad por zona de
+`services/npc_streaming.mjs` sigue disponible como evolución del cargador.
 
 **FPS estimado por tier en GPU real:** sin estimación defendible todavía.
 Se requiere una medición en un equipo modesto, misma cámara y número de NPC,
