@@ -21,15 +21,23 @@ export function validCityManifest(rows){
 
 export function createCityRoster(rows,{random=Math.random}={}){
   const approved=validCityManifest(rows),bags=new Map(),counts=new Map();
-  function draw(scene,role,nearby=[]){
+  function draw(scene,role,nearby=[],{unique=false}={}){
     const pool=approved.filter(row=>npcHasRole(row,role));
     if(!pool.length)return null;
     const key=`${scene}:${role}`;let bag=bags.get(key);
     if(!bag?.length){bag=shuffle(pool,random);bags.set(key,bag)}
     const near=new Set(nearby.map(item=>typeof item==='string'?item:item?.id));
     const different=bag.findIndex(row=>!near.has(row.id));
+    // Interior staff cannot visually repeat a nearby actor, even when the
+    // shuffled bag's remaining outfits are all already in the neighborhood.
+    let uniqueModel=null;
+    if(unique&&different<0){
+      const eligible=pool.filter(row=>!near.has(row.id));
+      if(!eligible.length)return null;
+      uniqueModel=shuffle(eligible,random)[0];
+    }
     const index=different>=0?different:0;
-    const [model]=bag.splice(index,1);
+    const model=uniqueModel||bag.splice(index,1)[0];
     const count=counts.get(key)||0;counts.set(key,count+1);
     // Variation only begins after the first full pass through the pool.
     const repeated=count>=pool.length;
