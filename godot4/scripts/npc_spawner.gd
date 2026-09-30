@@ -16,7 +16,6 @@ const COLORS: Array[Color] = [
 ]
 
 var _shop: Node3D
-var _time_until_spawn := 0.0
 var _spawn_index := 0
 var _rng := RandomNumberGenerator.new()
 
@@ -29,18 +28,19 @@ func _ready() -> void:
 		return
 	for i in range(mini(max_initial_npcs, max_npcs)):
 		_spawn_one()
-	_time_until_spawn = spawn_interval
+	_schedule_spawn()
 
 
-func _process(delta: float) -> void:
+func _on_spawn_timer() -> void:
 	if _shop == null or spawn_positions.is_empty():
 		return
-	_time_until_spawn -= delta
-	if _time_until_spawn > 0.0:
-		return
-	_time_until_spawn = maxf(0.2, spawn_interval)
 	if get_child_count() < max_npcs:
 		_spawn_one()
+	_schedule_spawn()
+
+
+func _schedule_spawn() -> void:
+	get_tree().create_timer(maxf(0.2, spawn_interval)).timeout.connect(_on_spawn_timer)
 
 
 func _spawn_one() -> void:

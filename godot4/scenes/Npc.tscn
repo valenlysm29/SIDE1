@@ -55,3 +55,6 @@ root_node = NodePath("..")
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 anim_player = NodePath("../AnimationPlayer")
+
+[node name="WaitTimer" type="Timer" parent="."]
+one_shot = true

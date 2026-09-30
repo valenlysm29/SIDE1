@@ -14,6 +14,9 @@ signal door_body_exited(body: Node3D)
 
 var _occupants: Array[Node3D] = []
 var _browse_cursor: int = 0
+var _box_batches: Dictionary = {}
+var _torus_batches: Dictionary = {}
+var _grain_cache: Dictionary = {}
 
 
 func _ready() -> void:
@@ -23,7 +26,9 @@ func _ready() -> void:
 
 
 func has_capacity() -> bool:
-	_occupants = _occupants.filter(func(npc: Node3D) -> bool: return is_instance_valid(npc))
+	for i in range(_occupants.size() - 1, -1, -1):
+		if not is_instance_valid(_occupants[i]):
+			_occupants.remove_at(i)
 	return _occupants.size() < max_capacity
 
 
@@ -131,6 +136,7 @@ func _build_shop() -> void:
 			spot.rotation.x = -PI / 2.0
 			spot.shadow_enabled = false
 			_display.add_child(spot)
+	_flush_mesh_batches()
 
 
 func _shelf(at: Vector3, wood: Material, metal: Material) -> void:
@@ -177,25 +183,50 @@ func _bag(at: Vector3, style: int, main: Material, trim: Material, gold: Materia
 
 
 func _box(parent: Node3D, at: Vector3, size: Vector3, surface: Material) -> void:
-	var node := MeshInstance3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	mesh.material = surface
-	node.mesh = mesh
-	node.position = at
-	parent.add_child(node)
+	# Agrupa geometría idéntica en la coordenada local de Display.
+	var by_size: Dictionary = _box_batches.get_or_add(surface, {})
+	var transforms: Array = by_size.get_or_add(size, [])
+	transforms.append(parent.transform * Transform3D(Basis.IDENTITY, at) if parent != _display else Transform3D(Basis.IDENTITY, at))
 
 
 func _torus(parent: Node3D, at: Vector3, radius: float, tube: float, surface: Material) -> void:
-	var node := MeshInstance3D.new()
-	var mesh := TorusMesh.new()
-	mesh.inner_radius = radius - tube
-	mesh.outer_radius = radius + tube
-	mesh.material = surface
-	node.mesh = mesh
-	node.position = at
-	node.rotation.x = PI / 2.0
-	parent.add_child(node)
+	var by_shape: Dictionary = _torus_batches.get_or_add(surface, {})
+	var shape := Vector2(radius, tube)
+	var transforms: Array = by_shape.get_or_add(shape, [])
+	var local := Transform3D(Basis(Vector3.RIGHT, PI / 2.0), at)
+	transforms.append(parent.transform * local if parent != _display else local)
+
+
+func _flush_mesh_batches() -> void:
+	for surface: Material in _box_batches:
+		var by_size: Dictionary = _box_batches[surface]
+		for size: Vector3 in by_size:
+			var mesh := BoxMesh.new()
+			mesh.size = size
+			mesh.material = surface
+			_add_multimesh(mesh, by_size[size])
+	for surface: Material in _torus_batches:
+		var by_shape: Dictionary = _torus_batches[surface]
+		for shape: Vector2 in by_shape:
+			var mesh := TorusMesh.new()
+			mesh.inner_radius = shape.x - shape.y
+			mesh.outer_radius = shape.x + shape.y
+			mesh.material = surface
+			_add_multimesh(mesh, by_shape[shape])
+	_box_batches.clear()
+	_torus_batches.clear()
+
+
+func _add_multimesh(mesh: Mesh, transforms: Array) -> void:
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.mesh = mesh
+	multi.instance_count = transforms.size()
+	for i in transforms.size():
+		multi.set_instance_transform(i, transforms[i])
+	var node := MultiMeshInstance3D.new()
+	node.multimesh = multi
+	_display.add_child(node)
 
 
 func _mat(color: Color, roughness: float, metallic: float = 0.0) -> StandardMaterial3D:
@@ -208,14 +239,21 @@ func _mat(color: Color, roughness: float, metallic: float = 0.0) -> StandardMate
 
 func _textured_mat(color: Color, woven: bool) -> StandardMaterial3D:
 	# Mapas PBR originales generados a partir de ruido determinista; no usan assets externos.
+	var grains: Array = _grain_cache.get(woven, [])
+	if grains.is_empty():
+		grains.resize(128 * 128)
+		for y in range(128):
+			for x in range(128):
+				grains[y * 128 + x] = _grain(x, y, woven)
+		_grain_cache[woven] = grains
 	var albedo := Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	var normal := Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	var rough := Image.create(128, 128, false, Image.FORMAT_RGBA8)
 	for y in range(128):
 		for x in range(128):
-			var grain := _grain(x, y, woven)
-			var dx := _grain((x + 1) % 128, y, woven) - _grain((x + 127) % 128, y, woven)
-			var dy := _grain(x, (y + 1) % 128, woven) - _grain(x, (y + 127) % 128, woven)
+			var grain: float = grains[y * 128 + x]
+			var dx: float = grains[y * 128 + ((x + 1) % 128)] - grains[y * 128 + ((x + 127) % 128)]
+			var dy: float = grains[((y + 1) % 128) * 128 + x] - grains[((y + 127) % 128) * 128 + x]
 			var shade := 0.89 + grain * 0.19
 			albedo.set_pixel(x, y, Color(color.r * shade, color.g * shade, color.b * shade))
 			normal.set_pixel(x, y, Color(clampf(0.5 - dx * 0.45, 0.0, 1.0), clampf(0.5 - dy * 0.45, 0.0, 1.0), 0.98))

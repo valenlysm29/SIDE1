@@ -110,12 +110,26 @@ func _make_environment() -> void:
 func _make_ground_and_roads() -> void:
 	_box("Terrain", Vector3(0, -0.15, 0), Vector3(176, 0.2, 176), _materials.grass)
 	# Tres bucles viales dan acceso al centro desde todos los bordes del mapa.
+	var unit_box := BoxMesh.new()
 	for coordinate in [-76.0, -24.0, 24.0, 76.0]:
 		_box("Road_NS", Vector3(coordinate, -0.035, 0), Vector3(9, 0.04, 176), _materials.road)
 		_box("Road_EW", Vector3(0, -0.032, coordinate), Vector3(176, 0.04, 9), _materials.road)
+		var lane_ns_near: Array[Transform3D] = []
+		var lane_ns_far: Array[Transform3D] = []
+		var lane_ew_near: Array[Transform3D] = []
+		var lane_ew_far: Array[Transform3D] = []
 		for stripe in range(-84, 85, 8):
-			_box("LaneMark", Vector3(coordinate, 0.0, stripe), Vector3(0.13, 0.008, 3.3), _materials.line, _city, false, 95)
-			_box("LaneMark", Vector3(stripe, 0.0, coordinate), Vector3(3.3, 0.008, 0.13), _materials.line, _city, false, 95)
+			if stripe < 0:
+				lane_ns_near.append(_box_transform(Vector3(coordinate, 0.0, stripe), Vector3(0.13, 0.008, 3.3)))
+				lane_ew_near.append(_box_transform(Vector3(stripe, 0.0, coordinate), Vector3(3.3, 0.008, 0.13)))
+			else:
+				lane_ns_far.append(_box_transform(Vector3(coordinate, 0.0, stripe), Vector3(0.13, 0.008, 3.3)))
+				lane_ew_far.append(_box_transform(Vector3(stripe, 0.0, coordinate), Vector3(3.3, 0.008, 0.13)))
+		# Lotes por tramo conservan el descarte por distancia de las marcas.
+		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_near, 95, _city, true)
+		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_far, 95, _city, true)
+		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_near, 95, _city, true)
+		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_far, 95, _city, true)
 	# Los paseos centrales conectan la tienda con ambas plazas.
 	_box("CentralWalk_EW", Vector3(0, -0.017, 0), Vector3(42, 0.05, 15), _materials.paving)
 	_box("CentralWalk_NS", Vector3(0, -0.014, 0), Vector3(15, 0.05, 42), _materials.paving)
@@ -124,12 +138,15 @@ func _make_ground_and_roads() -> void:
 		_box("Sidewalk_EW", Vector3(0, -0.008, coordinate), Vector3(176, 0.05, 3.4), _materials.paving)
 	for x in [-24.0, 24.0]:
 		for z in [-24.0, 24.0]:
+			var crosswalk: Array[Transform3D] = []
 			for offset in range(-4, 5):
-				_box("Crosswalk", Vector3(x + offset * 0.85, 0.006, z), Vector3(0.5, 0.012, 7.4), _materials.line, _city, false, 95)
+				crosswalk.append(_box_transform(Vector3(x + offset * 0.85, 0.006, z), Vector3(0.5, 0.012, 7.4)))
+			_multimesh("Crosswalk", unit_box, _materials.line, crosswalk, 95, _city, true)
 
 
 func _make_buildings() -> void:
 	var palette := [_materials.brick, _materials.sand, _materials.blue]
+	var unit_box := BoxMesh.new()
 	var index := 0
 	for x in BUILDING_CENTERS:
 		for z in BUILDING_CENTERS:
@@ -141,10 +158,13 @@ func _make_buildings() -> void:
 			_box("Facade", Vector3(0, height * 0.5, 0), Vector3(BUILDING_WIDTH, height, BUILDING_DEPTH), palette[index % 3], building, true)
 			_box("Roof", Vector3(0, height + 0.18, 0), Vector3(BUILDING_WIDTH + 0.5, 0.36, BUILDING_DEPTH + 0.5), _materials.roof, building)
 			# Ventanas lejanas se ocultan por distancia; la fachada conserva su volumen.
+			var windows: Array[Transform3D] = []
 			for floor_index in range(1, int(height / 3.0)):
 				for side in [-1.0, 1.0]:
 					for window_x in [-4.5, -1.5, 1.5, 4.5]:
-						_box("Window", Vector3(window_x, floor_index * 3.0, side * (BUILDING_DEPTH * 0.5 + 0.025)), Vector3(1.5, 1.6, 0.05), _materials.glass, building, false, 75)
+						windows.append(_box_transform(Vector3(window_x, floor_index * 3.0, side * (BUILDING_DEPTH * 0.5 + 0.025)), Vector3(1.5, 1.6, 0.05)))
+			# Un lote por edificio mantiene la distancia de visibilidad local.
+			_multimesh("Windows", unit_box, _materials.glass, windows, 75, building, true)
 			index += 1
 
 
@@ -156,7 +176,11 @@ func _make_plazas() -> void:
 		_box("BenchBack", center + Vector3(-4.2, 0.96, 5.1), Vector3(2.2, 0.9, 0.12), _materials.wood, _city, false, 90)
 
 
-func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[Transform3D], view_end: float = 0.0) -> void:
+func _box_transform(position: Vector3, size: Vector3) -> Transform3D:
+	return Transform3D(Basis.IDENTITY.scaled(size), position)
+
+
+func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[Transform3D], view_end: float = 0.0, parent: Node3D = null, shadows: bool = false) -> void:
 	var batch := MultiMesh.new()
 	batch.transform_format = MultiMesh.TRANSFORM_3D
 	batch.mesh = mesh
@@ -167,10 +191,13 @@ func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[
 	instance.name = name
 	instance.multimesh = batch
 	instance.material_override = material
-	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadows else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	if view_end > 0.0:
 		instance.visibility_range_end = view_end
-	_city.add_child(instance)
+	if parent == null:
+		_city.add_child(instance)
+	else:
+		parent.add_child(instance)
 
 
 func _make_street_furniture() -> void:

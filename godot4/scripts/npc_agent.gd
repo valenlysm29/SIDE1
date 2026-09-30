@@ -12,29 +12,33 @@ enum State { IDLE, PATROL, INTERACT, WALK_TO_SHOP, ENTER_SHOP, BROWSE, EXIT_SHOP
 @onready var visual: Node3D = $Visual
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var animation_tree: AnimationTree = $AnimationTree
+@onready var wait_timer: Timer = $WaitTimer
 
 var shop: Node3D
 var state := State.IDLE
-var state_timer := 0.0
 var browse_stops := 0
 var inside_shop := false
 var home_position := Vector3.ZERO
 var color := Color.WHITE
 var _animation_playback: AnimationNodeStateMachinePlayback
 var _rng := RandomNumberGenerator.new()
+static var _color_materials: Dictionary = {}
 
 
 func _ready() -> void:
 	_rng.randomize()
 	home_position = global_position
-	navigation_agent.avoidance_enabled = true
+	# Waiting NPCs need neither physics ticks nor RVO avoidance updates.
+	navigation_agent.avoidance_enabled = false
 	navigation_agent.radius = 0.38
 	navigation_agent.max_speed = walk_speed
 	navigation_agent.velocity_computed.connect(_on_safe_velocity)
+	wait_timer.timeout.connect(_on_wait_complete)
 	_build_animations()
 	if shop != null:
 		_connect_door()
 	set_state(State.IDLE)
+	_begin_wait(0.01)
 
 
 func configure(target_shop: Node3D, model_color: Color) -> void:
@@ -54,7 +58,13 @@ func start_visit() -> void:
 
 
 func set_state(next_state: State) -> void:
+	wait_timer.stop()
 	state = next_state
+	var is_waiting := state == State.IDLE or state == State.INTERACT
+	navigation_agent.avoidance_enabled = not is_waiting
+	set_physics_process(not is_waiting)
+	if is_waiting:
+		velocity = Vector3.ZERO
 	match state:
 		State.IDLE, State.INTERACT, State.BROWSE:
 			_play_animation("interact" if state != State.IDLE else "idle")
@@ -63,12 +73,6 @@ func set_state(next_state: State) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if state == State.IDLE or state == State.INTERACT:
-		state_timer -= delta
-		if state_timer <= 0.0:
-			_on_wait_complete()
-		velocity = Vector3.ZERO
-		return
 	if navigation_agent.is_navigation_finished():
 		_on_destination_reached()
 		velocity = Vector3.ZERO
@@ -88,7 +92,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_safe_velocity(safe_velocity: Vector3) -> void:
-	if state in [State.IDLE, State.INTERACT]:
+	if state == State.IDLE or state == State.INTERACT:
 		return
 	velocity = safe_velocity
 	move_and_slide()
@@ -114,7 +118,7 @@ func _on_destination_reached() -> void:
 			_next_browse_stop()
 		State.BROWSE:
 			set_state(State.INTERACT)
-			state_timer = _rng.randf_range(browse_min_seconds, browse_max_seconds)
+			_begin_wait(_rng.randf_range(browse_min_seconds, browse_max_seconds))
 		State.EXIT_SHOP:
 			if inside_shop and shop != null:
 				shop.exit_shop(self)
@@ -122,7 +126,7 @@ func _on_destination_reached() -> void:
 			_begin_wander()
 		State.WANDER, State.PATROL:
 			set_state(State.IDLE)
-			state_timer = _rng.randf_range(0.6, 2.3)
+			_begin_wait(_rng.randf_range(0.6, 2.3))
 		_:
 			_begin_wander()
 
@@ -138,6 +142,10 @@ func _on_wait_complete() -> void:
 				_set_destination(shop.get_exit_point())
 		State.IDLE:
 			_begin_wander()
+
+
+func _begin_wait(seconds: float) -> void:
+	wait_timer.start(maxf(0.01, seconds))
 
 
 func _next_browse_stop() -> void:
@@ -228,9 +236,12 @@ func _play_animation(name: String) -> void:
 
 
 func _apply_color() -> void:
-	for mesh in [$Visual/Body, $Visual/Head]:
-		var material := StandardMaterial3D.new()
+	var material: StandardMaterial3D = _color_materials.get(color)
+	if material == null:
+		material = StandardMaterial3D.new()
 		material.albedo_color = color
+		_color_materials[color] = material
+	for mesh in [$Visual/Body, $Visual/Head]:
 		mesh.material_override = material
 
 
