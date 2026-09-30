@@ -30,7 +30,12 @@
     "altura": 1.68,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Women",
-    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Suit.gltf"
+    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Suit.gltf",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ]
   },
   {
     "id": "city_man_suit",
@@ -41,7 +46,12 @@
     "altura": 1.76,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Men",
-    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Suit.gltf"
+    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Suit.gltf",
+    "roles": [
+      "oficina",
+      "banco",
+      "guardia"
+    ]
   },
   {
     "id": "city_woman_worker",
@@ -52,7 +62,11 @@
     "altura": 1.68,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Women",
-    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Worker.gltf"
+    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Worker.gltf",
+    "roles": [
+      "almacen",
+      "proveedor"
+    ]
   },
   {
     "id": "city_man_worker",
@@ -63,7 +77,11 @@
     "altura": 1.76,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Men",
-    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Worker.gltf"
+    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Worker.gltf",
+    "roles": [
+      "produccion",
+      "proveedor"
+    ]
   },
   {
     "id": "city_woman_cardigan",
@@ -74,7 +92,10 @@
     "altura": 1.68,
     "licencia": "CC0",
     "fuente": "Quaternius Animated Women Pack",
-    "url": "https://poly.pizza/m/AQsd9ngvKU"
+    "url": "https://poly.pizza/m/AQsd9ngvKU",
+    "roles": [
+      "oficina"
+    ]
   },
   {
     "id": "city_woman_tank",
@@ -118,7 +139,10 @@
     "altura": 1.76,
     "licencia": "CC0",
     "fuente": "Quaternius Animated Men Pack",
-    "url": "https://poly.pizza/m/DLptRuewTn"
+    "url": "https://poly.pizza/m/DLptRuewTn",
+    "roles": [
+      "proveedor"
+    ]
   },
   {
     "id": "city_man_shorts",
@@ -151,7 +175,12 @@
     "altura": 1.76,
     "licencia": "CC0",
     "fuente": "Quaternius Animated Men Pack",
-    "url": "https://poly.pizza/m/mQnGoME1ez"
+    "url": "https://poly.pizza/m/mQnGoME1ez",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ]
   },
   {
     "id": "city_woman_formal",
@@ -162,7 +191,12 @@
     "altura": 1.68,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Women",
-    "url": "https://github.com/agentkaerf/FreeModels"
+    "url": "https://github.com/agentkaerf/FreeModels",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ]
   },
   {
     "id": "city_man_hoodie",
@@ -173,6 +207,9 @@
     "altura": 1.76,
     "licencia": "CC0",
     "fuente": "Quaternius Ultimate Modular Men",
-    "url": "https://github.com/agentkaerf/FreeModels"
+    "url": "https://github.com/agentkaerf/FreeModels",
+    "roles": [
+      "proveedor"
+    ]
   }
 ]

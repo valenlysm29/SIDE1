@@ -1,54 +1,50 @@
-# Fase F: rendimiento y validación de NPC
+# Rendimiento y validación de NPC — 29-09-2026
 
-Fecha: 29-09-2026.
+El manifiesto de producción contiene **16 GLB urbanos** con 14 440 740 bytes
+en conjunto. Son 16 geometrías y atuendos originales distintos; cada GLB
+contiene skin y clips Idle/Walk/Run in-place del mismo rig. Los archivos
+individuales pesan entre 450 848 y 1 460 044 bytes. La suite automatizada
+comprueba IDs únicos, licencia, integridad del GLB, clips ligados al esqueleto
+y ausencia de desplazamiento horizontal de raíz.
 
-Actualización posterior: se integraron seis GLB urbanos en
-`assets/models/npc/manifest.json`, con 7 961 900 bytes en conjunto.
-La comprobación de contrato de los seis modelos pasó: archivos distintos,
-skin y clips Idle/Walk/Run reales. Las cifras de FPS que siguen pertenecen a
-la fase anterior, con cero modelos nuevos; no miden el rendimiento de este lote.
+## Rendimiento observado
 
-## Estado medido
+Se ejecutó `tests/npc_fps_benchmark.cjs` en Chrome headless con ANGLE
+SwiftShader a 1280×800. Con los **16 modelos cargados**, el monitor mostró
+aproximadamente **1 FPS**, mientras había otras mediciones y procesos activos.
+SwiftShader es renderizado por software y estaba saturado: esta cifra no es un
+FPS de hardware ni sirve para estimar Baja, Media, Alta o Auto. Tampoco permite
+cuantificar la variación respecto a la línea base, que también rondaba 1 FPS.
 
-En la medición original no había `assets/models/npc/manifest.json` ni modelos
-NPC nuevos publicados. Por ello esa medición no permite certificar el coste GPU
-de los seis GLB integrados después ni la antigua meta de 16 modelos distintos.
+El costo de memoria de plantillas aumenta con el catálogo, pero el render
+simultáneo continúa limitado por tier: Baja 5 clientes, Media 8, Alta 10 y
+Auto 8 (`simulator3d-config.js`). Se comparte la geometría de cada plantilla
+entre clones. El runtime reduce la frecuencia de pose para NPC lejanos y
+suspende el mixer cuando salen de la vista. El plan de streaming por tier en
+`services/npc_streaming.mjs` propone mantener 4/8/16/8 plantillas según
+Baja/Media/Alta/Auto y dar prioridad a la zona próxima. El integrador debe
+conectarlo a `simulator3d.js` y evitar expulsar plantillas con clones vivos.
 
-Los tiers conservan sus límites de clientes simultáneos: Baja 5, Media 8,
-Alta 10 y Auto 8 (`simulator3d-config.js`). El pool procedural se limita al
-tier y los NPC GLB se liberan al reciclarlos. Las geometrías y materiales
-compartidos del template no se destruyen con cada clon. Las poses de NPC
-distantes se actualizan a menor frecuencia y el mixer de un NPC fuera de la
-vista deja de avanzar; el movimiento y la lógica siguen funcionando.
+**FPS estimado por tier en GPU real:** sin estimación defendible todavía.
+Se requiere una medición en un equipo modesto, misma cámara y número de NPC,
+por tier, después de conectar el streaming. El límite de NPC y la carga
+diferida reducen el riesgo, pero no constituyen una medición.
 
-## FPS en Media
+## Pruebas actuales de esta tanda
 
-El script `tests/npc_fps_benchmark.cjs` se ejecutó en el mismo Chrome
-headless con ANGLE SwiftShader y vista 1280×800 que la medición base del
-proyecto. La base comunicada fue una mediana de **1 FPS**. Tras los cambios,
-las cuatro muestras fueron **1, 1, 1 y 2 FPS** (mediana **1 FPS**), con
-**0 NPC** activos y «RUTA SEGURA». No es una medición capaz de verificar la
-degradación máxima del 10 %: SwiftShader está saturado y el contador redondea
-a FPS enteros; además no se renderizó ningún modelo nuevo. Debe repetirse en
-GPU real, misma cámara, mismo número de NPC y misma tier Media cuando se
-incorporen los 16 GLB.
+- `node --test tests/*.test.js tests/*.test.mjs tests/world_finance.test.cjs`:
+  suite completa en verde al integrar el catálogo.
+- `tests/npc_city_pack.test.mjs`: valida los 16 GLB, skin, clips y movimiento
+  in-place sin contar avatares jugables.
+- `tests/npc_streaming.test.mjs`: prioridad por zona, límites por tier y
+  protección de clones activos.
+- `tests/npc_optional_navigation.test.mjs` y
+  `tests/npc_navmesh_grid.test.mjs`: ruta segura con fallback AABB, avance Yuka
+  sujeto a colisiones y cuadrícula de navmesh fuera de sólidos.
+- Smoke de navegador real: three-pathfinding 1.3.0 construyó una zona de
+  cuadrícula; la ruta entre dos puntos rodeó el obstáculo central.
 
-## Pruebas
-
-- `node --check simulator3d.js` y módulos/contrato nuevos: correctos.
-- Suite `node --test tests/*.test.js tests/*.test.mjs tests/world_finance.test.cjs` desde `SIDE1`:
-  **196 pruebas, 193 aprobadas, 0 fallidas, 3 omitidas**. Las tres omitidas
-  comprueban manifest, clips y hash/archivos al existir modelos aprobados.
-- `tests/npc_city_roster.test.mjs` cubre sorteo sin reemplazo y bolsas
-  independientes por escena.
-- `tests/business_interiors.test.mjs` recorre el ciclo completo del mensajero
-  y comprueba colisiones y continuidad sin modificar la reserva.
-- `tests/npc_manifest_contract.test.mjs` no representa los 16 modelos como
-  entregados: afirma cero cuando falta manifest. Cuando se publique uno,
-  exigirá al menos 16 IDs únicos, archivos GLB reales, clips idle/walk/run
-  presentes en manifest y GLB, y hashes distintos de todos los avatares
-  elegibles y entre NPC.
-
-No se ejecutó `supplied_npcs.cjs` porque escribe resultados e imágenes en
-`tests/output/npcs/`; los artefactos preexistentes de `tests/output/` no se
-modificaron en esta fase.
+La capa Yuka/three-pathfinding es opcional. Necesita construir su geometría
+cuando la ciudad y sus colliders estén listos. Si falta un módulo, no existe
+una ruta completa o ésta cruza un collider dinámico, se usa el planificador
+AABB existente.

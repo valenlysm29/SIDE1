@@ -22,9 +22,9 @@ Criterio de distribución para 16 modelos únicos: ocho presentaciones femeninas
 | Lote | Información publicada por el autor | Decisión de curación |
 | --- | --- | --- |
 | [Universal Base Characters](https://quaternius.com/packs/universalbasecharacters.html) ([itch.io](https://quaternius.itch.io/universal-base-characters)) | La página describe seis bases en proporciones Regular, Teen y Superhero; el ZIP **Standard recibido contiene solamente Superhero Female y Male** y peinados. `License_Standard.txt` confirma CC0. | Ambos cuerpos llevan ropa interior y silueta de superhéroe, según `Preview.png`; ninguno sirve de NPC urbano vestido. Los otros cuatro cuerpos descritos en la página no están en el ZIP Standard. |
-| [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html) y [Women](https://quaternius.com/packs/ultimatemodularwomen.html) | Personajes modulares con 24 animaciones por modelo, CC0; glTF disponibles en [FreeModels](https://github.com/agentkaerf/FreeModels). | Se aprobaron 3 hombres y 3 mujeres con ropa apropiada para sus roles. |
+| [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html) y [Women](https://quaternius.com/packs/ultimatemodularwomen.html) | Personajes modulares con 24 animaciones por modelo, CC0; glTF disponibles en [FreeModels](https://github.com/agentkaerf/FreeModels). | Se aprobaron cuatro hombres y cuatro mujeres con ropa apropiada para sus roles. |
 | [Mixamo](https://www.mixamo.com/) | El usuario descargará personajes vestidos manualmente en `assets/models/incoming/mixamo/`. | Revisar ropa y licencia de cada descarga recibida. No registrar un modelo ausente. |
-| [En3D](https://github.com/menyifang/En3D) | Código del repositorio; la licencia de avatares y pesos requiere confirmación separada. | **Bloqueado** para uso hasta confirmación escrita de ambas licencias; tampoco puede cerrar la meta de 16 aún. |
+| [En3D](https://github.com/menyifang/En3D) | Código del repositorio; la licencia de avatares y pesos requiere confirmación separada. | **Bloqueado** para uso hasta confirmación escrita de ambas licencias. |
 
 ## Inventario aprobado
 
@@ -46,15 +46,13 @@ Criterio de distribución para 16 modelos únicos: ocho presentaciones femeninas
 | `Superhero_Male_FullBody.gltf` / `.fbx` | Presentación masculina; edad aparente adulta; complexión muy musculosa; piel con variantes claras y oscuras; ropa dominante: bóxer negro, torso desnudo. No apto para cliente ni trabajo empresarial. Los dos formatos son el mismo modelo; el glTF tiene skin pero **0 clips**. |
 | Peinados y cejas del mismo ZIP | Accesorios sin cuerpo ni vestimenta; no constituyen modelos NPC distintos. |
 | Universal Animation Library 2 | Es una biblioteca de clips y maniquí, no personajes vestidos. |
-| `Casual_Hoodie` hombre | Sudadera con pantalón corto; se exigió pantalón largo para este lote. |
-| `Formal` mujer | Vestido; no cumple la preferencia de polo/camisa y pantalón del usuario. |
 | `Punk` hombre y mujer | Estilo llamativo y pantalones rotos; no encaja con el reparto cotidiano seleccionado. |
 | Muestra En3D | Pendiente de licencia escrita de avatares y pesos, además de curación visual. |
 | Mixamo recibido después de esta fase | Véase el reporte diferencial Mixamo: 24 FBX With Skin, 11 animaciones Without Skin; falta Idle, Walk compatible y Run compatible In Place. |
 
 La inspección visual original de las bases se basó en `base-characters/Universal Base Characters[Standard]/Preview.png`. La revisión inicial de los seis modelos aprobados se hizo con renders de sus glTF exactos. Los diez modelos adicionales se revisaron mediante las vistas fuente y validación de clips/skin. Son geometrías y atuendos originales distintos, no recolores. No se infiere identidad ni edad exacta del estilo low poly; se observan apariencias adultas, pero la variedad de complexiones y edades sigue limitada por las fuentes.
 
-`assets/models/npc/manifest.json` registra los seis GLB entregados. `manifest.pending.json` sigue siendo una lista separada de candidatos Mixamo sin aprobar.
+`assets/models/npc/manifest.json` registra los 16 GLB entregados. `manifest.pending.json` sigue siendo una lista separada de candidatos Mixamo sin aprobar.
 
 ## Incorporación de septiembre: diez NPC adicionales
 
@@ -70,6 +68,12 @@ La inspección visual original de las bases se basó en `base-characters/Univers
 | `city_man_office` | Animated Men / Man in Suit | Tienda | Traje formal | 0.51 MB |
 | `city_woman_formal` | Ultimate Modular Women / Formal | Tienda | Vestido formal | 1.31 MB |
 | `city_man_hoodie` | Ultimate Modular Men / Casual_Hoodie | Almacén | Sudadera y pantalón corto | 1.31 MB |
+
+`Formal` y `Casual_Hoodie` se reconsideraron tras la revisión visual: el
+vestido verde de `Formal` es vestimenta urbana apropiada para caja y oficina;
+la sudadera con pantalón corto de `Casual_Hoodie` es vestimenta cotidiana
+apropiada para un repartidor. Sus poses Idle, Walk y Run se renderizaron sin
+deformación visible. Ninguno se presenta como operario con equipo de seguridad.
 
 Los cuatro avatares elegibles permanecen fuera de este catálogo. Los 16 GLB
 suman 14.44 MB y cada uno queda bajo 1.5 MB. El controlador del runtime ahora

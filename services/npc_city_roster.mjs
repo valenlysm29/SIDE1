@@ -1,6 +1,8 @@
 // A scene owns its own shuffled bag. No selected player avatar belongs in a bag.
 const PLAYER_IDS=new Set(['chico1','chico2','chico3','mona']);
-const ROLES=new Set(['cliente','tienda','almacen','produccion']);
+export const NPC_ROLES=Object.freeze(['cliente','tienda','almacen','produccion','oficina','banco','cajero','proveedor','guardia']);
+const ROLES=new Set(NPC_ROLES);
+export const npcHasRole=(row,role)=>row?.rol===role||Array.isArray(row?.roles)&&row.roles.includes(role);
 const shuffle=(items,random)=>{const copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy};
 
 export function validCityManifest(rows){
@@ -8,6 +10,7 @@ export function validCityManifest(rows){
   const ids=new Set();
   return rows.filter(row=>{
     if(!row||typeof row.id!=='string'||PLAYER_IDS.has(row.id)||ids.has(row.id)||!ROLES.has(row.rol))return false;
+    if(row.roles!==undefined&&(!Array.isArray(row.roles)||row.roles.some(role=>!ROLES.has(role))||new Set(row.roles).size!==row.roles.length))return false;
     const publicCC0=/^assets\/models\/npc\/[a-z0-9_-]+\.glb$/.test(row.archivo)&&/^CC0(?:-1\.0)?$/i.test(row.licencia||'');
     const privateMixamo=row.privado===true&&/^assets\/models\/npc\/private\/[a-z0-9_-]+\.glb$/i.test(row.archivo)&&row.licencia==='Mixamo';
     if(!publicCC0&&!privateMixamo)return false;
@@ -19,7 +22,7 @@ export function validCityManifest(rows){
 export function createCityRoster(rows,{random=Math.random}={}){
   const approved=validCityManifest(rows),bags=new Map(),counts=new Map();
   function draw(scene,role,nearby=[]){
-    const pool=approved.filter(row=>row.rol===role||role==='cliente'&&row.rol==='cliente');
+    const pool=approved.filter(row=>npcHasRole(row,role));
     if(!pool.length)return null;
     const key=`${scene}:${role}`;let bag=bags.get(key);
     if(!bag?.length){bag=shuffle(pool,random);bags.set(key,bag)}

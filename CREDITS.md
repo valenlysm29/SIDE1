@@ -245,5 +245,9 @@ Fuentes autorizadas y verificadas para una incorporación posterior:
 Yuka ([MIT](https://github.com/Mugen87/yuka/blob/master/LICENSE)) y
 three-pathfinding ([MIT](https://github.com/donmccurdy/three-pathfinding/blob/main/LICENSE))
 son fuentes de código autorizadas para navegación; no aportan modelos NPC.
+La versión 1.3.0 de `three-pathfinding` se conserva en
+`vendor/three-pathfinding.module.js`, con su [licencia MIT](LICENSES/three-pathfinding-MIT.txt).
+Se usa como módulo opcional para rutas sobre la cuadrícula transitable; Yuka
+suaviza el avance y el planificador AABB conserva el control de colisiones.
 El detalle de los intentos de adquisición y sus bloqueos está en
 `assets/models/incoming/licencias.md`.

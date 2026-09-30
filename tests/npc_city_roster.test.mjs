@@ -25,3 +25,17 @@ test('unlicensed entries and unsupported roles cannot enter the roster',()=>{
   assert.equal(validCityManifest([{...model('a'),licencia:'unknown'},{...model('b'),rol:'fantasy'}]).length,0);
   assert.equal(validCityManifest([{...model('local'),licencia:'Mixamo',privado:true,archivo:'assets/models/npc/private/local.glb'}]).length,1);
 });
+
+test('office, bank, cashier, supplier and guard roles select only assigned outfits',()=>{
+  const rows=[
+    {...model('suit'),rol:'tienda',roles:['oficina','banco','guardia']},
+    {...model('formal'),rol:'tienda',roles:['banco','cajero']},
+    {...model('worker'),rol:'almacen',roles:['proveedor']}
+  ];
+  const roster=createCityRoster(rows,{random:()=>.2});
+  assert.equal(roster.draw('bank','guardia').model.id,'suit');
+  assert.equal(roster.draw('bank','cajero').model.id,'formal');
+  assert.equal(roster.draw('depot','proveedor').model.id,'worker');
+  assert.equal(roster.draw('office','oficina').model.id,'suit');
+  assert.equal(validCityManifest([{...model('bad'),roles:['fantasy']}]).length,0);
+});

@@ -84,6 +84,11 @@
     "nombre": "Asesora",
     "genero": "mujer",
     "rol": "tienda",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ],
     "archivo": "assets/models/npc/city_woman_suit.glb",
     "clips": [
       "Death",
@@ -124,6 +129,11 @@
     "nombre": "Asesor",
     "genero": "hombre",
     "rol": "tienda",
+    "roles": [
+      "oficina",
+      "banco",
+      "guardia"
+    ],
     "archivo": "assets/models/npc/city_man_suit.glb",
     "clips": [
       "Death",
@@ -164,6 +174,10 @@
     "nombre": "Operaria",
     "genero": "mujer",
     "rol": "produccion",
+    "roles": [
+      "almacen",
+      "proveedor"
+    ],
     "archivo": "assets/models/npc/city_woman_worker.glb",
     "clips": [
       "Death",
@@ -204,6 +218,10 @@
     "nombre": "Operario",
     "genero": "hombre",
     "rol": "almacen",
+    "roles": [
+      "produccion",
+      "proveedor"
+    ],
     "archivo": "assets/models/npc/city_man_worker.glb",
     "clips": [
       "Death",
@@ -244,6 +262,9 @@
     "nombre": "Vecina con cárdigan",
     "genero": "mujer",
     "rol": "cliente",
+    "roles": [
+      "oficina"
+    ],
     "archivo": "assets/models/npc/city_woman_cardigan.glb",
     "clips": [
       "HumanArmature|Female_Clapping",
@@ -352,6 +373,9 @@
     "nombre": "Vecino de manga larga",
     "genero": "hombre",
     "rol": "cliente",
+    "roles": [
+      "proveedor"
+    ],
     "archivo": "assets/models/npc/city_man_long_sleeves.glb",
     "clips": [
       "HumanArmature|Man_Clapping",
@@ -433,6 +457,11 @@
     "nombre": "Oficinista",
     "genero": "hombre",
     "rol": "tienda",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ],
     "archivo": "assets/models/npc/city_man_office.glb",
     "clips": [
       "HumanArmature|Man_Clapping",
@@ -460,6 +489,11 @@
     "nombre": "Cajera",
     "genero": "mujer",
     "rol": "tienda",
+    "roles": [
+      "oficina",
+      "banco",
+      "cajero"
+    ],
     "archivo": "assets/models/npc/city_woman_formal.glb",
     "clips": [
       "Death",
@@ -500,6 +534,9 @@
     "nombre": "Repartidor",
     "genero": "hombre",
     "rol": "almacen",
+    "roles": [
+      "proveedor"
+    ],
     "archivo": "assets/models/npc/city_man_hoodie.glb",
     "clips": [
       "Death",

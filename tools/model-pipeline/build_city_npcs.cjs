@@ -33,6 +33,8 @@ function checkEntry(entry, ids) {
   if (!/^[a-z0-9][a-z0-9_-]*$/.test(entry.id) || ids.has(entry.id)) throw Error(`id inválido o repetido: ${entry.id}`);
   ids.add(entry.id);
   if (!['cliente', 'tienda', 'almacen', 'produccion'].includes(entry.rol)) throw Error(`${entry.id}: rol inválido`);
+  const allowedRoles=new Set(['cliente','tienda','almacen','produccion','oficina','banco','cajero','proveedor','guardia']);
+  if(entry.roles!==undefined&&(!Array.isArray(entry.roles)||entry.roles.some(role=>!allowedRoles.has(role))||new Set(entry.roles).size!==entry.roles.length))throw Error(`${entry.id}: roles adicionales inválidos`);
   if (!Number.isFinite(entry.altura) || entry.altura < 1 || entry.altura > 2.3) throw Error(`${entry.id}: altura inválida`);
   if (entry.fuente.toLowerCase().includes('en3d')) throw Error(`${entry.id}: En3D bloqueado hasta confirmar licencia de avatares y pesos por escrito`);
   if (privateMixamo) {
@@ -115,6 +117,7 @@ async function main() {
     const bytes = fs.statSync(target).size;
     built.push({
       id: entry.id, nombre: entry.nombre, genero: entry.genero, rol: entry.rol,
+      ...(entry.roles?.length?{roles:entry.roles}:{}),
       archivo: `assets/models/npc/${privateMixamo?'private/':''}${fileName}`, clips, altura: entry.altura,
       triangulos: triangles, licencia: entry.licencia, fuente: entry.fuente, url: entry.url,
       ...(privateMixamo?{privado:true}:{}),
