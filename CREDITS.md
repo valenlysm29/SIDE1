@@ -171,11 +171,16 @@ la Tanda 2: `warehouse_sewing_machine.glb`, `warehouse_cutting_table.glb`,
 como modelos originales de SIDE porque no se encontró una alternativa adecuada,
 ligera y con licencia verificable en las fuentes autorizadas.
 
-## NPC de ciudad (conversión pendiente)
+## NPC de ciudad (Quaternius, CC0)
 
-Actualmente hay **0 modelos nuevos publicados** en `assets/models/npc/` y no
-existe un manifest de personajes aprobados. El sistema de NPC puede leer un
-manifest futuro, pero ahora conserva los NPC procedurales existentes.
+Se integraron seis modelos nuevos en `assets/models/npc/`: mujer y hombre casuales,
+mujer y hombre con traje, y mujer y hombre con ropa de trabajo. Son de
+[Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html)
+y [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html)
+de Quaternius, publicados bajo CC0. Los glTF se obtuvieron del repositorio
+[FreeModels](https://github.com/agentkaerf/FreeModels) y se convirtieron a GLB
+con el pipeline del proyecto. Ver [registro de licencia](LICENSES/Quaternius_Ultimate_Modular_City_CC0.txt)
+y [curación](reports/npc_curation.md).
 
 ### FBX Mixamo privados recibidos: créditos individuales provisionales
 
@@ -214,7 +219,7 @@ Fuentes autorizadas y verificadas para una incorporación posterior:
 | Fuente | URL oficial | Licencia y estado |
 | --- | --- | --- |
 | Quaternius Universal Base Characters | [quaternius.com](https://quaternius.com/packs/universalbasecharacters.html), [itch.io](https://quaternius.itch.io/universal-base-characters) | CC0 1.0; ZIP Standard recibido. Sus dos bases Superhero están descartadas por ropa y no se usan. |
-| Quaternius Ultimate Modular Men | [quaternius.com](https://quaternius.com/packs/ultimatemodularcharacters.html) | CC0 1.0; descarga de Drive bloqueada por cuota. |
+| Quaternius Ultimate Modular Men y Women | [Men](https://quaternius.com/packs/ultimatemodularcharacters.html), [Women](https://quaternius.com/packs/ultimatemodularwomen.html), [GitHub](https://github.com/agentkaerf/FreeModels) | CC0 1.0; seis modelos integrados desde el espejo GitHub. |
 | Quaternius Universal Animation Library 2 | [quaternius.com](https://quaternius.com/packs/universalanimationlibrary2.html) | CC0 1.0; ZIP Standard recibido. Sus clips aún no se incorporan a ningún modelo NPC. |
 | En3D 3DHuman-Syn | [GitHub](https://github.com/menyifang/En3D), [pesos](https://modelscope.cn/models/alibaba_openvision_3dgen/cv_en3d_3d_human_generation) | Licencia de avatares y pesos sin confirmar; no se usan. Apache-2.0 corresponde al código descargado (`render.py`). |
 | Ready Player Me Animation Library | [GitHub y licencia](https://github.com/readyplayerme/animation-library/blob/master/LICENSE.md) | Exige avatares Ready Player Me y limita redistribución; descartada para estos NPC. |

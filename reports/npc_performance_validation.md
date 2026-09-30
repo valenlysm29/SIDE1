@@ -2,12 +2,17 @@
 
 Fecha: 29-09-2026.
 
+Actualización posterior: se integraron seis GLB urbanos en
+`assets/models/npc/manifest.json`, con 7 961 900 bytes en conjunto.
+La comprobación de contrato de los seis modelos pasó: archivos distintos,
+skin y clips Idle/Walk/Run reales. Las cifras de FPS que siguen pertenecen a
+la fase anterior, con cero modelos nuevos; no miden el rendimiento de este lote.
+
 ## Estado medido
 
-No hay `assets/models/npc/manifest.json` ni modelos NPC nuevos publicados.
-El flujo actual usa los NPC procedurales existentes. Por ello no se puede
-certificar el criterio de 16 modelos, su peso, clips, LOD visual ni el coste GPU
-de los GLB futuros.
+En la medición original no había `assets/models/npc/manifest.json` ni modelos
+NPC nuevos publicados. Por ello esa medición no permite certificar el coste GPU
+de los seis GLB integrados después ni la antigua meta de 16 modelos distintos.
 
 Los tiers conservan sus límites de clientes simultáneos: Baja 5, Media 8,
 Alta 10 y Auto 8 (`simulator3d-config.js`). El pool procedural se limita al
