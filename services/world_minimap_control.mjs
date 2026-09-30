@@ -36,7 +36,9 @@ export function createWorldMinimapControl({ root }) {
 
   function onToggle() { setExpanded(!expanded, { restoreFocus: expanded }); }
   function onMapClick(event) {
-    if (expanded && event.target.closest('.sim-city-zone')) setExpanded(false, { restoreFocus: true });
+    const zone = event.target.closest('.sim-city-zone');
+    if (zone && expanded) setExpanded(false, { restoreFocus: true });
+    else if (!zone && !expanded) setExpanded(true);
   }
   function onKeydown(event) {
     if (!expanded) return;
