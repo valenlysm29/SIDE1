@@ -1,0 +1,361 @@
+{
+  "node": {
+    "total": 229,
+    "passed": 229,
+    "failed": 0,
+    "log": "tests/output/decision-interiors-node-final.log"
+  },
+  "browser": {
+    "total": 16,
+    "passed": 16,
+    "batchResults": [
+      {
+        "suite": "playable_hub.cjs",
+        "passed": false,
+        "durationMs": 39442
+      },
+      {
+        "suite": "continuous_world.cjs",
+        "passed": true,
+        "durationMs": 75782
+      },
+      {
+        "suite": "gameplay_hud.cjs",
+        "passed": true,
+        "durationMs": 13803
+      },
+      {
+        "suite": "world_business_ui.cjs",
+        "passed": true,
+        "durationMs": 30221
+      },
+      {
+        "suite": "world_cycle_restart.cjs",
+        "passed": true,
+        "durationMs": 31601
+      },
+      {
+        "suite": "world_startup.cjs",
+        "passed": true,
+        "durationMs": 48268
+      },
+      {
+        "suite": "world_loading.cjs",
+        "passed": true,
+        "durationMs": 21656
+      },
+      {
+        "suite": "world_entry_assets.cjs",
+        "passed": true,
+        "durationMs": 15191
+      },
+      {
+        "suite": "supplied_npcs.cjs",
+        "passed": true,
+        "durationMs": 39816
+      },
+      {
+        "suite": "mona_npc.cjs",
+        "passed": true,
+        "durationMs": 58216
+      },
+      {
+        "suite": "npc_locomotion.cjs",
+        "passed": true,
+        "durationMs": 9335
+      },
+      {
+        "suite": "game_lifecycle_db.cjs",
+        "passed": true,
+        "durationMs": 2724
+      },
+      {
+        "suite": "game_observations_db.cjs",
+        "passed": true,
+        "durationMs": 2671
+      },
+      {
+        "suite": "game_lifecycle_ui.cjs",
+        "passed": true,
+        "durationMs": 32498
+      },
+      {
+        "suite": "decisions_cycle_ui.cjs",
+        "passed": true,
+        "durationMs": 27909
+      },
+      {
+        "suite": "teacher_lifecycle_ui.cjs",
+        "passed": true,
+        "durationMs": 12721
+      }
+    ],
+    "finalResults": [
+      {
+        "suite": "playable_hub.cjs",
+        "passed": true,
+        "durationMs": 39442,
+        "verification": "Separate successful rerun after zone-aware station QA update",
+        "log": "tests/output/decision-interiors-playable-final.log"
+      },
+      {
+        "suite": "continuous_world.cjs",
+        "passed": true,
+        "durationMs": 75782
+      },
+      {
+        "suite": "gameplay_hud.cjs",
+        "passed": true,
+        "durationMs": 13803
+      },
+      {
+        "suite": "world_business_ui.cjs",
+        "passed": true,
+        "durationMs": 30221
+      },
+      {
+        "suite": "world_cycle_restart.cjs",
+        "passed": true,
+        "durationMs": 31601
+      },
+      {
+        "suite": "world_startup.cjs",
+        "passed": true,
+        "durationMs": 48268
+      },
+      {
+        "suite": "world_loading.cjs",
+        "passed": true,
+        "durationMs": 21656
+      },
+      {
+        "suite": "world_entry_assets.cjs",
+        "passed": true,
+        "durationMs": 15191
+      },
+      {
+        "suite": "supplied_npcs.cjs",
+        "passed": true,
+        "durationMs": 39816
+      },
+      {
+        "suite": "mona_npc.cjs",
+        "passed": true,
+        "durationMs": 58216
+      },
+      {
+        "suite": "npc_locomotion.cjs",
+        "passed": true,
+        "durationMs": 9335
+      },
+      {
+        "suite": "game_lifecycle_db.cjs",
+        "passed": true,
+        "durationMs": 2724
+      },
+      {
+        "suite": "game_observations_db.cjs",
+        "passed": true,
+        "durationMs": 2671
+      },
+      {
+        "suite": "game_lifecycle_ui.cjs",
+        "passed": true,
+        "durationMs": 32498
+      },
+      {
+        "suite": "decisions_cycle_ui.cjs",
+        "passed": true,
+        "durationMs": 27909
+      },
+      {
+        "suite": "teacher_lifecycle_ui.cjs",
+        "passed": true,
+        "durationMs": 12721
+      }
+    ]
+  },
+  "interiorCombinations": {
+    "total": 12,
+    "passed": 12,
+    "checks": {
+      "low-office": {
+        "entered": true,
+        "exited": true,
+        "category": "B",
+        "colliders": 11,
+        "navigationReady": false,
+        "actors": 2
+      },
+      "low-bank": {
+        "entered": true,
+        "exited": true,
+        "category": "E",
+        "colliders": 6,
+        "navigationReady": false,
+        "actors": 3
+      },
+      "low-suppliers": {
+        "entered": true,
+        "exited": true,
+        "category": "F",
+        "colliders": 7,
+        "navigationReady": false,
+        "actors": 2
+      },
+      "medium-office": {
+        "entered": true,
+        "exited": true,
+        "category": "B",
+        "colliders": 11,
+        "navigationReady": true,
+        "actors": 2
+      },
+      "medium-bank": {
+        "entered": true,
+        "exited": true,
+        "category": "E",
+        "colliders": 6,
+        "navigationReady": true,
+        "actors": 3
+      },
+      "medium-suppliers": {
+        "entered": true,
+        "exited": true,
+        "category": "F",
+        "colliders": 7,
+        "navigationReady": true,
+        "actors": 2
+      },
+      "high-office": {
+        "entered": true,
+        "exited": true,
+        "category": "B",
+        "colliders": 11,
+        "navigationReady": true,
+        "actors": 2
+      },
+      "high-bank": {
+        "entered": true,
+        "exited": true,
+        "category": "E",
+        "colliders": 6,
+        "navigationReady": true,
+        "actors": 3
+      },
+      "high-suppliers": {
+        "entered": true,
+        "exited": true,
+        "category": "F",
+        "colliders": 7,
+        "navigationReady": true,
+        "actors": 2
+      },
+      "auto-office": {
+        "entered": true,
+        "exited": true,
+        "category": "B",
+        "colliders": 11,
+        "navigationReady": true,
+        "actors": 2
+      },
+      "auto-bank": {
+        "entered": true,
+        "exited": true,
+        "category": "E",
+        "colliders": 6,
+        "navigationReady": true,
+        "actors": 3
+      },
+      "auto-suppliers": {
+        "entered": true,
+        "exited": true,
+        "category": "F",
+        "colliders": 7,
+        "navigationReady": true,
+        "actors": 2
+      }
+    }
+  },
+  "interiorPerformance": {
+    "measurement": "Actual scene, 1366x900, first-person at inner door; SwiftShader CPU renderer, no claim about GPU FPS",
+    "tiers": {
+      "low": {
+        "office": {
+          "calls": 54,
+          "triangles": 15534
+        },
+        "bank": {
+          "calls": 56,
+          "triangles": 17198
+        },
+        "suppliers": {
+          "calls": 66,
+          "triangles": 16756
+        }
+      },
+      "medium": {
+        "office": {
+          "calls": 55,
+          "triangles": 21432
+        },
+        "bank": {
+          "calls": 59,
+          "triangles": 28298
+        },
+        "suppliers": {
+          "calls": 70,
+          "triangles": 28324
+        }
+      },
+      "high": {
+        "office": {
+          "calls": 54,
+          "triangles": 26116
+        },
+        "bank": {
+          "calls": 59,
+          "triangles": 28298
+        },
+        "suppliers": {
+          "calls": 70,
+          "triangles": 28324
+        }
+      },
+      "auto": {
+        "office": {
+          "calls": 55,
+          "triangles": 24166
+        },
+        "bank": {
+          "calls": 55,
+          "triangles": 23660
+        },
+        "suppliers": {
+          "calls": 70,
+          "triangles": 28324
+        }
+      }
+    }
+  },
+  "exteriorPerformance": {
+    "low": {
+      "calls": 135,
+      "triangles": 50920
+    },
+    "medium": {
+      "calls": 145,
+      "triangles": 64100
+    },
+    "high": {
+      "calls": 145,
+      "triangles": 64488
+    }
+  },
+  "limitations": [
+    "SwiftShader does not establish GPU FPS.",
+    "Metrics cover fixed room views, not every position.",
+    "Low resource deferral verified; device latency remains to be measured."
+  ],
+  "push": false
+}

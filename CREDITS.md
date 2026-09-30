@@ -262,3 +262,16 @@ Se usa como módulo opcional para rutas sobre la cuadrícula transitable; Yuka
 suaviza el avance y el planificador AABB conserva el control de colisiones.
 El detalle de los intentos de adquisición y sus bloqueos está en
 `assets/models/incoming/licencias.md`.
+
+
+## Interiores de Oficina, Banco y Proveedores — 30-09-2026
+
+Mobiliario y geometría procedural creados para SIDE en `services/office_interior.mjs`,
+`services/bank_interior.mjs` y `services/suppliers_interior.mjs`: escritorios,
+pantallas, archivo, mesa y sillas de reunión, pizarra, ventanilla, espera, cajero,
+mostrador, catálogo y muestras. No se incorporaron modelos, texturas ni activos
+externos nuevos. Las cajas y cilindros se comparten mediante `InstancedMesh`.
+El personal usa exclusivamente el catálogo de 16 Quaternius CC0 ya acreditado;
+los cuatro avatares elegibles están excluidos. Las dependencias MIT de Yuka y
+three-pathfinding ya acreditadas se reutilizan para la navegación interior y
+solo se inicializan al solicitar rutas en Media, Alta o Auto.
