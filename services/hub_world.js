@@ -9,6 +9,22 @@ const DISTRICTS = [
   { id: 'sjl', label: 'SAN JUAN DE LURIGANCHO' }
 ];
 
+// Local hub coordinates. The three existing business interiors keep their
+// original positions; all callers add offsetX only to the X coordinate.
+export const CITY_MAP = Object.freeze({
+  bounds: Object.freeze({ minX: -88, maxX: 88, minZ: -88, maxZ: 88 }),
+  visualExtent: 180,
+  zones: Object.freeze([
+    Object.freeze({ id: 'store', name: 'Tienda', x: -19, z: 19 }),
+    Object.freeze({ id: 'warehouse', name: 'Almacén', x: -20.5, z: -19 }),
+    Object.freeze({ id: 'production', name: 'Producción', x: 20, z: -19 }),
+    Object.freeze({ id: 'office', name: 'Oficina', x: 19, z: 76 }),
+    Object.freeze({ id: 'bank', name: 'Banco', x: 76, z: 19 }),
+    Object.freeze({ id: 'suppliers', name: 'Proveedores', x: -76, z: -19 }),
+    Object.freeze({ id: 'news', name: 'Buzón de noticias', x: 19, z: 29 })
+  ])
+});
+
 function seededRandom(seed = 4107) {
   return () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
 }
@@ -144,8 +160,32 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     add(sign.mesh, x, y, z, ry); return sign;
   }
 
-  // The central crossing and four parcels preserve the source map's layout.
-  ground(0, 0, 114, 114, m.grass, -.08, 12);
+  // The central crossing remains intact. A larger connected street grid makes
+  // the business district one part of a city instead of an isolated diorama.
+  ground(0, 0, CITY_MAP.visualExtent * 2, CITY_MAP.visualExtent * 2, m.grass, -.08, 16);
+  // Two avenue spurs connect the old crossing to a calmer outer ring.
+  for (const side of [-1, 1]) {
+    ground(side * 71, 0, 38, 10, m.asphalt, .145);
+    ground(0, side * 71, 10, 38, m.asphalt, .145);
+    ground(side * 60, 0, 8, 172, m.asphalt, .146);
+    ground(0, side * 60, 172, 8, m.asphalt, .146);
+    // Footways follow both sides of each avenue. They meet at every junction.
+    for (const verge of [-1, 1]) {
+      ground(side * 71, verge * 7, 36, 3, m.paving, .12, 6);
+      ground(verge * 7, side * 71, 3, 36, m.paving, .12, 6);
+      ground(side * (60 + verge * 5.7), 0, 2.6, 172, m.paving, .12, 6);
+      ground(0, side * (60 + verge * 5.7), 172, 2.6, m.paving, .12, 6);
+    }
+  }
+  // Outer parcels preserve broad walking corridors around the ring.
+  for (const x of [-76, 76]) for (const z of [-76, -19, 19, 76]) {
+    ground(x, z, 23, z === -76 || z === 76 ? 22 : 26, m.paving, .10, 8);
+  }
+  for (const z of [-76, 76]) for (const x of [-19, 19]) ground(x, z, 26, 22, m.paving, .10, 8);
+  for (const at of [-60, 60]) for (let lane = -74; lane <= 74; lane += 8) {
+    box(lane, .176, at, 3.1, .012, .09, m.yellow);
+    box(at, .176, lane, .09, .012, 3.1, m.yellow);
+  }
   ground(0, 0, 102, 10, m.asphalt, .15); ground(0, 0, 10, 102, m.asphalt, .155);
   for (const axis of [-1, 1]) {
     ground(0, axis * 39, 84, 10, m.asphalt, .145); ground(axis * 39, 0, 10, 68, m.asphalt, .146);
@@ -373,32 +413,59 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   vehicle(-21, 32.25, Math.PI / 2, 0xa8afb3); vehicle(31.7, 17, 0, 0xeaebe4); vehicle(13, -30.4, Math.PI / 2, 0x24394f, true);
   for (const z of [13.5, 20.5, 26.5]) box(31.8, .163, z, 4.1, .017, .1, m.white);
 
-  // Low-cost surrounding blocks give the playable streets a coherent skyline.
-  // Windows share one batched material and all geometry remains in true 3D.
+  // Public service landmarks sit on accessible outer parcels. Their footprints
+  // join the same collision graph used by players and NPCs; background blocks
+  // beyond the playable boundary do not burden path searches.
+  const landmarkMaterial = mat(0xb2beb9), supplierMaterial = mat(0xb99f77);
+  function landmark(id, x, z, w, d, h, material) {
+    box(x, h / 2 + .15, z, w, h, d, material);
+    box(x, h + .33, z, w + .7, .36, d + .7, m.darkSteel);
+    const front = z > 50 ? z - d / 2 - .055 : z < -50 ? z + d / 2 + .055 : z;
+    const side = x > 50 ? x - w / 2 - .055 : x < -50 ? x + w / 2 + .055 : x;
+    if (Math.abs(z) > 50) {
+      box(x, 2, front, w * .48, 3.2, .11, m.opaqueGlass);
+      box(x, h - .8, front, w * .7, .18, .15, m.mint);
+    } else {
+      box(side, 2, z, .11, 3.2, d * .48, m.opaqueGlass);
+      box(side, h - .8, z, .15, .18, d * .7, m.mint);
+    }
+    collider(x, z, w, d, id);
+  }
+  landmark('office', 19, 76, 16, 13, 11, landmarkMaterial);
+  landmark('bank', 76, 19, 13, 16, 9, m.concrete);
+  landmark('suppliers', -76, -19, 14, 17, 8, supplierMaterial);
+  // The existing plaza kiosk is the news notice point; its central position is
+  // kept for the business directory and objective markers.
+
+  // Beyond the walking boundary, instanced facades and a thin second skyline
+  // mask the terrain edge. The near band survives on Low; detail is tiered.
   const skylineColors = [m.plaster, m.mint, m.coral, m.concrete];
-  const skyline = [[-47,-25,10,19,12],[-47,-5,10,13,14],[-47,19,10,23,15],[-26,-48,14,15,11],[-7,-48,15,24,11],[15,-48,15,18,11],[34,-48,12,12,11],[48,-22,11,21,17],[48,3,11,13,18],[48,28,11,19,14],[-23,48,17,18,10],[0,48,15,24,10],[25,48,18,14,10]];
-  skyline.forEach(([x,z,w,h,d], i) => {
+  const skyline = [];
+  for (const side of [-1, 1]) for (let p = -78; p <= 78; p += 26) {
+    skyline.push([side * 104, p, 13, 11 + ((p + 78) / 26 * 7 + (side + 1) * 5) % 13, 18]);
+    skyline.push([p, side * 104, 18, 12 + ((p + 78) / 26 * 5 + (side + 1) * 3) % 14, 13]);
+  }
+  skyline.forEach(([x,z,w,h,d], i) => withFallback(`skyline-${Math.abs(x)>90?(x<0?'west':'east'):(z<0?'north':'south')}`, () => {
     const material = skylineColors[i % skylineColors.length]; box(x, h / 2, z, w, h, d, material);
     box(x, h + .2, z, w + .6, .4, d + .6, m.white); box(x, .65, z, w + .15, 1.3, d + .15, m.darkSteel);
-    const front = z < -35 ? z + d / 2 + .03 : z > 35 ? z - d / 2 - .03 : z;
-    if (Math.abs(z) > 35) {
+    const front = z < -90 ? z + d / 2 + .03 : z > 90 ? z - d / 2 - .03 : z;
+    withFallback('skylineDetails', () => { if (Math.abs(z) > 90) {
       for (let wx = x - w / 2 + 1.4; wx < x + w / 2 - .7; wx += 2.7) for (let wy = 2.8; wy < h - .5; wy += 3.1) box(wx, wy, front, 1.32, 1.6, .06, m.opaqueGlass);
     } else {
       const side = x < 0 ? x + w / 2 + .03 : x - w / 2 - .03;
       for (let wz = z - d / 2 + 1.4; wz < z + d / 2 - .7; wz += 2.7) for (let wy = 2.8; wy < h - .5; wy += 3.1) box(side, wy, wz, .06, 1.6, 1.32, m.opaqueGlass);
-    }
-    collider(x, z, w, d, 'building');
-  });
+    } });
+  }));
 
   // SIDE mint and warm brass architectural trim, batched with
   // the city instead of adding expensive shadow-casting lights to each sign.
   const warmTrim=mat(0xdcb854,{emissive:0x8d6427,emissiveIntensity:.32});
   const mintTrim=mat(0x83c4b9,{emissive:0x376e65,emissiveIntensity:.32});
-  for(const [x,z,w,h,d] of skyline) {
+  withFallback('skylineDetails', () => { for(const [x,z,w,h,d] of skyline) {
     box(x,h-.6,z,w+.15,.12,d+.15,x<0?warmTrim:mintTrim);
     box(x,h+.9,z,w*.42,1.4,d*.45,m.darkSteel);
     for(const side of [-1,1])box(x+side*(w/2-.35),h/2,z+d/2+.06,.13,h-1,.12,x<0?warmTrim:mintTrim);
-  }
+  } });
   label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
   label('PASEO COSTA','BARRIO COMERCIAL',-7,20,-42.4,11,2.3,'#294951');
   withFallback('trees', () => { for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2); });
@@ -468,7 +535,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   function templateValue(source,key){return source&&Object.prototype.hasOwnProperty.call(source,key)?source[key]:null;}
   function sameOutdoorTemplates(next){return OUTDOOR_PROP_KEYS.every(key=>(templateValue(installedOutdoorTemplates,key)||null)===(templateValue(next,key)||null));}
   function setFallbackVisibility(installed, rank){
-    const detailCategories=new Set(['bushes','fountain','planters','signage','birds']);
+    const detailCategories=new Set(['bushes','fountain','planters','signage','birds','skylineDetails']);
     fallbackObjects.forEach((objects,category)=>objects.forEach(object=>{
       object.visible=!installed.has(category)&&rank>=(detailCategories.has(category)?2:1);
       if(category==='birds'&&object.isInstancedMesh){
@@ -535,7 +602,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     let drawables=0,triangles=0,shadows=0;
     visible.forEach(batch=>batch.traverse(object=>{if(!object.isMesh)return;drawables++;const count=object.isInstancedMesh?object.count:1;triangles+=(object.geometry?.index?.count||object.geometry?.attributes?.position?.count||0)/3*count;if(object.castShadow)shadows++;}));
     const categories={};for(const batch of visible)categories[batch.userData.category]=(categories[batch.userData.category]||0)+Number(batch.userData.activeInstances??batch.userData.instanceCount??0);
-    return {quality:outdoorQuality,seed:OUTDOOR_SEED,placementSignature,installed:[...new Set(batches.map(batch=>batch.userData.category))].sort(),batches:batches.length,instances:batches.reduce((sum,b)=>sum+Number(b.userData.instanceCount||0),0),visibleBatches:visible.length,visibleInstances:visible.reduce((sum,b)=>sum+Number(b.userData.activeInstances??b.userData.instanceCount??0),0),drawables,triangles:Math.round(triangles),shadows,categories,birds:categories.birds||0,fallbackVisible:[...fallbackObjects].filter(([,objects])=>objects.some(object=>object.visible)).map(([category])=>category).sort()};
+    return {quality:outdoorQuality,seed:OUTDOOR_SEED,placementSignature,installed:[...new Set(batches.map(batch=>batch.userData.category))].sort(),batches:batches.length,instances:batches.reduce((sum,b)=>sum+Number(b.userData.instanceCount||0),0),visibleBatches:visible.length,visibleInstances:visible.reduce((sum,b)=>sum+Number(b.userData.activeInstances??b.userData.instanceCount??0),0),drawables,triangles:Math.round(triangles),shadows,categories,birds:categories.birds||0,fallbackVisible:[...fallbackObjects].filter(([category,objects])=>!category.startsWith('skyline')&&objects.some(object=>object.visible)).map(([category])=>category).sort()};
   }
   const entrances = [
     { id: 'store', name: 'Tienda SIDE', x: offsetX - 19, z: 26, rotation: Math.PI, portal: { x: offsetX - 19, z: 24.75, halfWidth: 1.05 } },
