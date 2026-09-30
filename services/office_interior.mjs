@@ -57,7 +57,7 @@ export function buildOfficeInterior({ room, batch, m, collider, sign, hotspot, o
   solid(x, back, 1.16, .65, 'terminal');
   hotspot(room, 'office-decisions', 'decisionZone', 'Finanzas y resumen del ciclo', x, back - 1.1, 'empresa', { category: 'B' });
   room.officeStations = {
-    finance: { x: offsetX + deskX, z: z - .4 },
+    finance: { x: offsetX + deskX + 1.85, z: z - 1.65 },
     manager: { x: offsetX + meetingX, z: z - .35 },
     patrol: [{ x: offsetX + x, z: z - 2 }, { x: offsetX + x, z: back - 1.25 }]
   };
