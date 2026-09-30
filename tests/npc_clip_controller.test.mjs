@@ -13,6 +13,9 @@ function fakeMixer(){
 test('clip catalogue distinguishes the second idle and optional work actions',()=>{
   assert.equal(classifyNpcClip('Idle_02'),'idle2');
   assert.equal(classifyNpcClip('Picking Up Box'),'pickup');
+  assert.equal(classifyNpcClip('HumanArmature|Female_Idle'),'idle');
+  assert.equal(classifyNpcClip('HumanArmature|Man_Walk'),'walk');
+  assert.equal(classifyNpcClip('HumanArmature|Man_Run'),'run');
   const catalog=indexNpcClips([{name:'Idle'},{name:'Idle_02'},{name:'Walking'},{name:'Carry Box'}]);
   assert.deepEqual(Object.keys(catalog),['idle','idle2','walk','carry']);
 });

@@ -10,7 +10,9 @@ const ALIASES=Object.freeze({
 });
 
 export function classifyNpcClip(name){
-  const value=normal(name);
+  // Some CC0 packs prefix every clip with the armature and character name.
+  // Keep the final action token so a genuine "Man_Walk" still maps to walk.
+  const value=normal(String(name||'').split('|').pop()).replace(/^(female|male|woman|man) /,'');
   // Specific phrases must win over the generic "idle" token.
   for(const state of ['idle2',...NPC_CLIP_STATES.filter(item=>item!=='idle2')])if(ALIASES[state].some(alias=>value===alias||value.startsWith(`${alias} `)))return state;
   return null;

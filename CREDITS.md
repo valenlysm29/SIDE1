@@ -173,14 +173,30 @@ ligera y con licencia verificable en las fuentes autorizadas.
 
 ## NPC de ciudad (Quaternius, CC0)
 
-Se integraron seis modelos nuevos en `assets/models/npc/`: mujer y hombre casuales,
-mujer y hombre con traje, y mujer y hombre con ropa de trabajo. Son de
-[Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html)
-y [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html)
-de Quaternius, publicados bajo CC0. Los glTF se obtuvieron del repositorio
-[FreeModels](https://github.com/agentkaerf/FreeModels) y se convirtieron a GLB
-con el pipeline del proyecto. Ver [registro de licencia](LICENSES/Quaternius_Ultimate_Modular_City_CC0.txt)
+Se integraron 16 NPC distintos en `assets/models/npc/`, todos de Quaternius
+y publicados bajo CC0. Ocho proceden de Ultimate Modular Men/Women y ocho
+de Animated Men/Women. Cada GLB contiene su propia piel y clips Idle, Walk y
+Run en el mismo rig. Los primeros se obtuvieron del espejo
+[FreeModels](https://github.com/agentkaerf/FreeModels); los Animated se
+obtuvieron de [Poly Pizza](https://poly.pizza/u/Quaternius/Lists). Todos se
+convirtieron o redujeron con el pipeline del proyecto. Ver
+[registro de licencia](LICENSES/Quaternius_Ultimate_Modular_City_CC0.txt)
 y [curación](reports/npc_curation.md).
+
+### Lote adicional de NPC (Quaternius, CC0)
+
+| Modelo integrado | Autor | Fuente de descarga | Fuente original y licencia |
+| --- | --- | --- | --- |
+| `city_woman_cardigan.glb` | Quaternius | [Woman](https://poly.pizza/m/AQsd9ngvKU) | [Animated Women](https://quaternius.com/packs/animatedwomen.html), CC0 |
+| `city_woman_tank.glb` | Quaternius | [Woman in Tank Top](https://poly.pizza/m/XqzeZGB7iU) | [Animated Women](https://quaternius.com/packs/animatedwomen.html), CC0 |
+| `city_woman_green.glb` | Quaternius | [Woman Casual](https://poly.pizza/m/jpKRgGDxhk) | [Animated Women](https://quaternius.com/packs/animatedwomen.html), CC0 |
+| `city_woman_dress.glb` | Quaternius | [Woman in Dress](https://poly.pizza/m/zMyPlQXBzq) | [Animated Women](https://quaternius.com/packs/animatedwomen.html), CC0 |
+| `city_man_long_sleeves.glb` | Quaternius | [Man in Long Sleeves](https://poly.pizza/m/DLptRuewTn) | [Animated Men](https://quaternius.com/packs/animatedmen.html), CC0 |
+| `city_man_shorts.glb` | Quaternius | [Man](https://poly.pizza/m/HMnuH5geEG) | [Animated Men](https://quaternius.com/packs/animatedmen.html), CC0 |
+| `city_man_maroon.glb` | Quaternius | [Man](https://poly.pizza/m/fjHyMd5Wxw) | [Animated Men](https://quaternius.com/packs/animatedmen.html), CC0 |
+| `city_man_office.glb` | Quaternius | [Man in Suit](https://poly.pizza/m/mQnGoME1ez) | [Animated Men](https://quaternius.com/packs/animatedmen.html), CC0 |
+| `city_woman_formal.glb` | Quaternius | [Formal.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Women%20-%20April%202022/Individual%20Characters/glTF/Formal.gltf) | [Ultimate Modular Women](https://quaternius.com/packs/ultimatemodularwomen.html), CC0 |
+| `city_man_hoodie.glb` | Quaternius | [Casual_Hoodie.gltf](https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Casual_Hoodie.gltf) | [Ultimate Modular Men](https://quaternius.com/packs/ultimatemodularcharacters.html), CC0 |
 
 ### FBX Mixamo privados recibidos: créditos individuales provisionales
 
@@ -219,7 +235,8 @@ Fuentes autorizadas y verificadas para una incorporación posterior:
 | Fuente | URL oficial | Licencia y estado |
 | --- | --- | --- |
 | Quaternius Universal Base Characters | [quaternius.com](https://quaternius.com/packs/universalbasecharacters.html), [itch.io](https://quaternius.itch.io/universal-base-characters) | CC0 1.0; ZIP Standard recibido. Sus dos bases Superhero están descartadas por ropa y no se usan. |
-| Quaternius Ultimate Modular Men y Women | [Men](https://quaternius.com/packs/ultimatemodularcharacters.html), [Women](https://quaternius.com/packs/ultimatemodularwomen.html), [GitHub](https://github.com/agentkaerf/FreeModels) | CC0 1.0; seis modelos integrados desde el espejo GitHub. |
+| Quaternius Ultimate Modular Men y Women | [Men](https://quaternius.com/packs/ultimatemodularcharacters.html), [Women](https://quaternius.com/packs/ultimatemodularwomen.html), [GitHub](https://github.com/agentkaerf/FreeModels) | CC0 1.0; ocho modelos integrados desde el espejo GitHub. |
+| Quaternius Animated Men y Women | [Men](https://quaternius.com/packs/animatedmen.html), [Women](https://quaternius.com/packs/animatedwomen.html), [Poly Pizza](https://poly.pizza/u/Quaternius/Lists) | CC0 1.0; ocho modelos integrados, cada uno con Idle, Walk y Run en su rig. |
 | Quaternius Universal Animation Library 2 | [quaternius.com](https://quaternius.com/packs/universalanimationlibrary2.html) | CC0 1.0; ZIP Standard recibido. Sus clips aún no se incorporan a ningún modelo NPC. |
 | En3D 3DHuman-Syn | [GitHub](https://github.com/menyifang/En3D), [pesos](https://modelscope.cn/models/alibaba_openvision_3dgen/cv_en3d_3d_human_generation) | Licencia de avatares y pesos sin confirmar; no se usan. Apache-2.0 corresponde al código descargado (`render.py`). |
 | Ready Player Me Animation Library | [GitHub y licencia](https://github.com/readyplayerme/animation-library/blob/master/LICENSE.md) | Exige avatares Ready Player Me y limita redistribución; descartada para estos NPC. |
