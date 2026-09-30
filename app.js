@@ -347,6 +347,11 @@ function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 window.SIDE_GAME_BRIDGE={
   get decisions(){return decisionState},
   get ledger(){return cashLedger},
+  openDecisionCategory(cat){
+    if(!['B','C','D','E','F'].includes(cat))return false;
+    currentCategory=cat;
+    return openDecisionMenu();
+  },
   currentRound:()=>currentRound(),
   cash:()=>cashBalance(),
   decisionProgress:()=>decisionProgressPercent(),

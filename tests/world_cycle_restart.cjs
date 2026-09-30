@@ -126,8 +126,10 @@ const seed = {
       await active();
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().session.day),success?2:1);
     }
-    const names=await page.evaluate(()=>SIDE3D.diagnostics().characters.map(c=>c.name));
-    for(const name of ['Joel','Miguel','Gonzalo','Valeria'])assert.ok(names.includes(name),name);
+    const characters=await page.evaluate(()=>SIDE3D.diagnostics().characters);
+    assert.equal(characters.filter(character=>character.role==='player').length,1,'one playable student avatar');
+    assert.ok(characters.some(character=>character.name==='Miguel'&&character.role==='player'));
+    for(const name of ['Joel','Gonzalo','Valeria'])assert.equal(characters.some(character=>character.name===name&&character.role!=='player'),false,`${name} must not be an NPC`);
     assert.deepEqual(errors,[]);
     console.log('PASS retry day, next day, NPC names, no browser errors');
   } finally { await browser.close(); }

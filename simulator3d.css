@@ -90,6 +90,8 @@
 #simulator3d.in-hub .sim-world-location strong{text-shadow:2px 3px #1f203a80}
 #simulator3d.in-hub .sim3d-prompt{border-color:#82eadc66;background:#13222ce8}
 #simulator3d.in-hub .sim3d-prompt kbd{background:#91eedb;color:#142936}
+.sim-summary-consequences{margin:12px 0;padding:10px 12px 10px 28px;border-radius:10px;background:#0a1b29;color:#b9e6d0;font-size:11px;line-height:1.55}
+.sim-summary-consequences[hidden]{display:none}
 @media(max-width:800px){.sim-drive-hud{right:12px;bottom:220px;width:180px;padding:10px 14px}.sim-drive-hud b{font-size:44px}.sim-drive-hud p{display:none}.sim-drive-hud>span{font-size:7px}}
 
 /* Mapa de la ciudad y orientación de las siete zonas. */
@@ -101,6 +103,9 @@
 #simulator3d .sim-city-map .mini-map-area:after{content:'';position:absolute;inset:7%;border:1px dashed #b9d7c151;border-radius:8px;pointer-events:none}
 #simulator3d .sim-city-map .mini-player{z-index:6;width:10px;height:10px;background:#fff;box-shadow:0 0 0 3px #2988ef,0 0 12px 5px #248df08a;pointer-events:none}
 #simulator3d .sim-city-zone{position:absolute;z-index:4;display:flex;align-items:center;gap:3px;min-height:23px;padding:3px 5px;transform:translate(-50%,-50%);border:1px solid #e7f4e2a1;border-radius:6px;background:#102332e8;color:#fff;box-shadow:0 2px 9px #0009;font:800 8px Montserrat,system-ui,sans-serif;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#simulator3d .sim-city-zone{width:27px;height:27px;min-height:0;justify-content:center;padding:3px}
+#simulator3d .sim-city-zone span{position:absolute;left:50%;bottom:calc(100% + 5px);display:none;transform:translateX(-50%);padding:4px 6px;border-radius:4px;background:#071622;color:#fff;font-size:9px}
+#simulator3d .sim-city-zone:hover span,#simulator3d .sim-city-zone:focus-visible span{display:block}
 #simulator3d .sim-city-zone img{width:13px;height:13px;object-fit:contain}
 #simulator3d .sim-city-zone:hover,#simulator3d .sim-city-zone:focus-visible{background:#294d60;outline:2px solid #9cf5e8;outline-offset:1px}
 #simulator3d .sim-city-zone.is-current{border-color:#80e8dd;background:#185a62}

@@ -110,7 +110,9 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
   function renderLabels(camera) {
     const rect = root.getBoundingClientRect();
     const candidates = zoneList.map(zone => ({ zone, point: project(zone, camera, rect) }))
-      .filter(item => item.point && item.point.distance < 145)
+      .filter(item => item.point && item.point.distance < 145
+        && item.point.y > Math.min(155, rect.height * .2)
+        && !(item.point.x < 265 && item.point.y < 410))
       .sort((a, b) => a.point.distance - b.point.distance);
     const occupied = [];
     labels.forEach(label => { label.hidden = true; });

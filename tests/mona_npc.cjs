@@ -42,13 +42,14 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     await p.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
     await p.evaluate(()=>SIDE3D.preloadDetails());
     let diag=await p.evaluate(()=>SIDE3D.diagnostics());
-   assert.equal(diag.mona.loaded,!fallback);assert.equal(diag.mona.instances,1);assert.equal(diag.running,true);
+   assert.equal(diag.mona.loaded,!fallback);assert.equal(diag.mona.instances,0);assert.equal(diag.running,true);
    assert.equal(diag.world.id,'side-city');assert.equal(diag.world.legacyActive,false);
-   const guide=diag.characters.find(c=>c.kind===(fallback?'mona-fallback':'mona'));
+   const guide=diag.characters.find(c=>c.role==='guide');
    assert.ok(guide&&guide.x>100,'guide belongs to the new world');
-   assert.equal(guide.name,'Valeria');
+   assert.equal(guide.name,'Guía SIDE');
+   assert.equal(diag.characters.some(c=>c.name==='Valeria'&&c.role!=='player'),false,'playable identity is not an NPC');
    assert.ok(diag.player.x>guide.x&&Math.abs(diag.player.z-guide.z)<2,'spawn is on the connected city sidewalk near the guide');
-   for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());assert.equal((await p.evaluate(()=>SIDE3D.diagnostics())).mona.instances,1);}
+   for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());assert.equal((await p.evaluate(()=>SIDE3D.diagnostics())).mona.instances,0);}
    await p.keyboard.down('KeyA');
    try{await p.waitForFunction(x=>SIDE3D.diagnostics().player.x<x+1.4,guide.x,{timeout:90000,polling:100});}
    catch(error){fs.writeFileSync(path.join(output,fallback?'fallback-approach-failure.json':'approach-failure.json'),JSON.stringify(await p.evaluate(()=>({diag:SIDE3D.diagnostics(),prompt:document.querySelector('#sim3dPrompt').textContent,message:document.querySelector('#sim3dMessage').textContent})),null,2));throw error;}
@@ -56,9 +57,9 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    const approached=await p.evaluate(()=>SIDE3D.diagnostics().player);
    assert.ok(approached.x>guide.x-.8&&approached.x>100,'real walking approaches the guide without legacy coordinates');
    assert.ok(approached.x<diag.player.x-.4&&Math.hypot(approached.x-guide.x,approached.z-guide.z)<1.8,'player actually walks into conversation range');
-   await p.waitForFunction(()=>document.querySelector('#sim3dPrompt').textContent.includes('Valeria'));
+   await p.waitForFunction(()=>document.querySelector('#sim3dPrompt').textContent.includes('Guía SIDE'));
    await p.keyboard.press('KeyE');
-   await p.waitForFunction(()=>document.querySelector('#sim3dMessage').textContent.startsWith('Valeria:'));
+   await p.waitForFunction(()=>document.querySelector('#sim3dMessage').textContent.startsWith('Guía SIDE:'));
    await p.locator('#side3dCanvas').click({position:{x:600,y:400}});
    await p.waitForFunction(()=>document.pointerLockElement?.id==='side3dCanvas');
    await p.mouse.move(80,560);

@@ -32,10 +32,15 @@
   let monaModule = null, monaTemplate = null, monaLoadError = '';
   let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
   let cityRosterModule = null, cityClipModule = null, cityRoster = null;
+  let cityApproved = null, cityLoadPromise = null;
   const cityTemplates = new Map();
   const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
   let hubWorld = null, businessWorld = null, businessInteriors = null, hubActors = [], playerAvatar = null;
+  let deriveWorldDecisionState = null, worldDecisionState = null, worldEventVisuals = null;
+  let worldOrientation = null, closestCityZone = null, cityMap = null, selectedMapDestination = null;
+  let lastWorldSnapshot = null;
+  const GUIDE_NAME = 'Guía SIDE';
   let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
   let currentInterior = null, hubReturnPoint = null, cameraSnap = true;
   let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
@@ -73,7 +78,7 @@
   let characterManager = null, selectedCharacterId = 'chico2';
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
-  const hubBounds = {minX:HUB_OFFSET-49,maxX:HUB_OFFSET+49,minZ:-47,maxZ:47};
+  const hubBounds = {minX:HUB_OFFSET-88,maxX:HUB_OFFSET+88,minZ:-88,maxZ:88};
 
   const PRODUCTS = [
     { id: 'esencial', name: 'Bolso Básico', price: 75, color: 0xc46b59, accent: '#ff9b89' },
@@ -603,6 +608,7 @@
     const changed = sessionContext !== storageContext();
     const closed = (bridge().canExplore?.() ?? bridge().canOperate?.()) === false;
     if (!changed && !closed) return;
+    if (lastWorldSnapshot) cacheWorldHistory(lastWorldSnapshot);
     // Stop the old shift before it can record activity under the new cycle's keys.
     running = false;
     clearCustomerFlow(!changed);
@@ -635,6 +641,14 @@
     if($3('summaryProfit')) $3('summaryProfit').textContent=fmt(bridge().financialReport?.().estadoResultados.utilidad ?? gameSession.revenue-Number(businessState?.expenses||0));
     if($3('summaryReputation')) $3('summaryReputation').textContent=`${Math.round(businessState?.reputation||80)}%`;
     if($3('summaryReturns')) $3('summaryReturns').textContent=String(businessState?.returns||0);
+    const consequences=$3('summaryConsequences');
+    if(consequences){
+      consequences.replaceChildren();
+      for(const item of worldDecisionState?.consequences||[]){
+        const row=document.createElement('li');row.textContent=item.text;consequences.append(row);
+      }
+      consequences.hidden=!consequences.childElementCount;
+    }
     const replay = $3('sim3dReplayBtn'); if (replay) replay.textContent = met ? 'JUGAR SIGUIENTE DÍA' : 'REINTENTAR DÍA';
     wrap.classList.remove('hidden');
   }
@@ -648,6 +662,8 @@
     const success=gameSession.revenue >= gameSession.targetRevenue;
     updateReputation(success ? 3 : -2, success ? 'Jornada exitosa' : 'Meta no alcanzada');
     addBusinessLog(`Cierre Día ${gameSession.day}: ingresos ${fmt(gameSession.revenue)}, utilidad ${fmt(gameSession.revenue-businessState.expenses)}.`);
+    syncWorldDecisions();
+    if(lastWorldSnapshot)cacheWorldHistory(lastWorldSnapshot);
     showSummaryOverlay();
     playSfx(success ? 'endWin' : 'endLose');
     message(gameSession.revenue >= gameSession.targetRevenue ? 'Se cerró la tienda: alcanzaste la meta del día.' : 'Se cerró la tienda: no llegaste a la meta.');
@@ -996,25 +1012,32 @@
   }
 
   async function loadCityNpcModels() {
-    if(cityRoster)return;
-    try {
+    if(cityLoadPromise)return cityLoadPromise;
+    cityLoadPromise=(async()=>{try {
       [cityRosterModule,cityClipModule]=await Promise.all([import('./services/npc_city_roster.mjs'),import('./services/npc_clip_controller.mjs')]);
-      const [publicResponse,privateResponse]=await Promise.all([
-        fetch('assets/models/npc/manifest.json'),fetch('assets/models/npc/private/manifest.json')
-      ]);
-      const publicRows=publicResponse.ok?await publicResponse.json():[];
-      const privateRows=privateResponse.ok?await privateResponse.json():[];
-      const approved=cityRosterModule.validCityManifest([
-        ...(Array.isArray(publicRows)?publicRows.filter(row=>!row.privado):[]),
-        ...(Array.isArray(privateRows)?privateRows.filter(row=>row.privado===true):[])
-      ]);
-      await Promise.all(approved.map(async entry=>{
+      if(!cityApproved){
+        const [publicResponse,privateResponse]=await Promise.all([
+          fetch('assets/models/npc/manifest.json'),fetch('assets/models/npc/private/manifest.json')
+        ]);
+        const publicRows=publicResponse.ok?await publicResponse.json():[];
+        const privateRows=privateResponse.ok?await privateResponse.json():[];
+        cityApproved=cityRosterModule.validCityManifest([
+          ...(Array.isArray(publicRows)?publicRows.filter(row=>!row.privado):[]),
+          ...(Array.isArray(privateRows)?privateRows.filter(row=>row.privado===true):[])
+        ]);
+      }
+      const target=perfMode==='low'?6:perfMode==='high'?16:10;
+      const selected=cityApproved.slice(0,target);
+      const missing=selected.filter(entry=>!cityTemplates.has(entry.id));
+      if(!missing.length&&cityRoster)return;
+      await Promise.all(missing.map(async entry=>{
         try {const gltf=await assetCache.loadGLTF(new GLTFLoader(),entry.archivo,{priority:ASSET_PRIORITY.LAZY});
           if(gltf?.scene)cityTemplates.set(entry.id,{scene:gltf.scene,clips:gltf.animations||[],entry});
         } catch(error){console.warn(`NPC ${entry.id} no disponible; se usará el respaldo procedural.`,error)}
       }));
-      cityRoster=cityRosterModule.createCityRoster(approved.filter(entry=>cityTemplates.has(entry.id)));
-      if(cityRoster.models.length){
+      const firstRoster=!cityRoster;
+      cityRoster=cityRosterModule.createCityRoster(selected.filter(entry=>cityTemplates.has(entry.id)));
+      if(firstRoster&&cityRoster.models.length){
         // Hub fallback actors may have been created before deferred model loading.
         for(const actor of hubActors){actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal)}
         hubActors.length=0;
@@ -1023,7 +1046,9 @@
           room.actors.length=0;
         }
       }
-    } catch(error){console.warn('No se pudo cargar el catálogo NPC; se mantiene el respaldo procedural.',error)}
+    } catch(error){console.warn('No se pudo cargar el catálogo NPC; se mantiene el respaldo procedural.',error)}})()
+      .finally(()=>{cityLoadPromise=null});
+    return cityLoadPromise;
   }
 
   async function loadSuppliedNpcs() {
@@ -1709,6 +1734,8 @@
     if(renderer&&sunLight){renderer.shadowMap.enabled=mode!=='low';sunLight.castShadow=mode!=='low';renderer.shadowMap.needsUpdate=true;}
     businessInteriors?.setQuality(mode);
     hubWorld?.setQuality(mode);
+    if(detailsComplete)void loadCityNpcModels();
+    ensureHubCharacters({allowFallback:Boolean(cityRoster)});
     resize(); refreshAdminUI(); message(`Calidad gráfica: ${mode.toUpperCase()}`);
   }
 
@@ -2277,7 +2304,33 @@
       products:PRODUCTS.map(p=>({id:p.id,color:p.color,display:displayStock(p.id),reserve:reserveStock(p.id)}))};
   }
 
-  function renderInventoryDisplays() { businessInteriors?.sync(businessVisualSnapshot()); }
+  function syncWorldDecisions(snapshot = businessVisualSnapshot()) {
+    if (!deriveWorldDecisionState) return null;
+    const round=currentRoundSafe();
+    let previous=null;
+    try{previous=JSON.parse(localStorage.getItem(worldHistoryKey(round-1))||'null');}catch{}
+    worldDecisionState = deriveWorldDecisionState({
+      round, decisions: bridge().decisions || {}, visual: snapshot, previous,
+      events: activeCycleEvents(), cycleClosed: Boolean(gameSession?.shiftEnded),
+      decisionProgress: bridge().decisionProgress?.() || 0
+    });
+    worldEventVisuals?.update(worldDecisionState.events, perfMode);
+    lastWorldSnapshot={round,cash:worldDecisionState.cues.cash,displayStock:worldDecisionState.cues.displayStock,
+      reserveStock:worldDecisionState.cues.reserveStock,producedUnits:worldDecisionState.cues.producedUnits};
+    return worldDecisionState;
+  }
+
+  function worldHistoryKey(round){return `side3d_world_history_${companyStorageContext()}_${round}`;}
+  function cacheWorldHistory(snapshot){
+    if(!snapshot||snapshot.round<1)return;
+    try{localStorage.setItem(worldHistoryKey(snapshot.round),JSON.stringify(snapshot));}catch{}
+  }
+
+  function renderInventoryDisplays() {
+    const snapshot = businessVisualSnapshot();
+    businessInteriors?.sync(snapshot);
+    syncWorldDecisions(snapshot);
+  }
 
   function rebuildDynamicWorld() {
     if(!businessInteriors)return;
@@ -2352,7 +2405,7 @@
         : totalDisplayStock() + totalReserveStock() === 0
           ? 'No quedan bolsos. Revisa tu producción y el abastecimiento en Administración.'
           : 'Bienvenido. Revisa los bolsos en los exhibidores y atiende a los clientes en caja.';
-    message(`${CONFIG.NPCS.mona.name}: ${advice}`, 6500);
+    message(`${GUIDE_NAME}: ${advice}`, 6500);
   }
 
   function rebuildRetiredDynamicWorld() {
@@ -3001,20 +3054,26 @@
   }
 
   // One scene, one coordinate system. Crossing a door changes only the HUD zone.
-  const HUB_CHARACTER_ROUTES=[[[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],[[7,-9],[29,-9],[29,-7],[7,-7]]];
+  const HUB_CHARACTER_ROUTES=[
+    [[8,9],[30,9],[30,29],[8,29]],[[8,29],[8,9],[30,9],[30,29]],
+    [[7,-9],[29,-9],[29,-7],[7,-7]],
+    [[34,13],[57,13],[57,26],[34,26]],
+    [[-42,-26],[-65,-26],[-65,-11],[-42,-11]]
+  ];
+  const hubNpcLimit=()=>perfMode==='low'?2:perfMode==='high'?5:3;
 
   function ensureHubCharacters({allowFallback=false}={}) {
     if(!scene||!hubWorld||!npcNames)return;
-    const selected=activeCharacterId();
     let guide=animatedActors.find(actor=>actor.type==='guide');
-    if(selected!=='mona'&&!guide&&allowFallback){
-      const object=person({gender:'female',cityRole:'cliente',cityScene:'hub',forceProcedural:true,bodyScale:.96});
-      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
+    if(!guide&&allowFallback){
+      const object=person({gender:'female',cityRole:'tienda',cityScene:'hub',forceProcedural:true,bodyScale:.96});
+      object.name=GUIDE_NAME;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,GUIDE_NAME,1.7);
       object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
       animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
-      interactables.push({mesh:object,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
+      interactables.push({mesh:object,type:'guide',label:`Hablar con ${GUIDE_NAME}`,x:HUB_OFFSET+14,z:26});
     }
-    [0,1,2].forEach(index=>{
+    hubActors.forEach(actor=>{actor.obj.visible=Number(actor.obj.userData.cityHubIndex)<hubNpcLimit();});
+    Array.from({length:hubNpcLimit()},(_,index)=>index).forEach(index=>{
       if(hubActors.some(actor=>actor.obj.userData.cityHubIndex===index)||!allowFallback)return;
       const object=person({cityRole:'cliente',cityScene:'hub',gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62][index]});
       object.getObjectByName('NpcNameLabel')?.removeFromParent();
@@ -3037,8 +3096,16 @@
   }
 
   async function buildPlayableHub() {
-    const {createHubWorld}=await import('./services/hub_world.js?v=20260928-outdoor-props-3');
+    ({deriveWorldDecisionState}=await import('./services/world_decision_state.mjs'));
+    const {createWorldEventVisuals}=await import('./services/world_event_visuals.mjs');
+    worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
+    const {createHubWorld,CITY_MAP}=await import('./services/hub_world.js?v=20260929-decision-city');
+    cityMap=CITY_MAP;
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
+    const orientationModule=await import('./services/world_orientation.mjs');
+    closestCityZone=orientationModule.closestCityZone;
+    worldOrientation=orientationModule.createWorldOrientation({THREE,root:$3(rootId),zones:CITY_MAP.zones,bounds:CITY_MAP.bounds,offsetX:HUB_OFFSET,
+      onNavigate:(id,zone)=>enterHubInterior(id,zone)});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
@@ -3062,6 +3129,12 @@
       ...point,type:({finance:'register',inventory:'restock',supplier:'admin',production:'admin'})[point.type]||point.type,
       adminPage:point.type==='supplier'||point.type==='inventory'?'stock':point.type==='production'?'dashboard':undefined
     }));
+    interactables.push(
+      {x:HUB_OFFSET+19,z:66,type:'decisionZone',category:'B',label:'Gestionar infraestructura en la oficina'},
+      {x:HUB_OFFSET+66,z:19,type:'decisionZone',category:'E',label:'Revisar finanzas en el banco'},
+      {x:HUB_OFFSET-66,z:-19,type:'decisionZone',category:'F',label:'Gestionar compras con proveedores'},
+      {x:HUB_OFFSET+19,z:29,type:'news',label:'Leer noticias del ciclo'}
+    );
     productInteractables=interactables.filter(point=>point.type==='product');
     const {deriveObjective}=await import('./services/gameplay_objectives.mjs');
     hubWorld.deriveObjective=deriveObjective;
@@ -3103,20 +3176,22 @@
 
   function updateHubObjective() {
     if(!hubWorld?.deriveObjective)return;
-    const objective=hubWorld.deriveObjective({
+    const retailObjective=hubWorld.deriveObjective({
       visited:businessState?.exploredHub||[],shiftEnded:gameSession?.shiftEnded,
       queue:checkoutQueue.length,stockKnown:Boolean(inventory),display:totalDisplayStock(),
       reserve:totalReserveStock(),deliveryPending:Boolean(businessState?.pendingSupplierOrder)
     });
+    const cycleObjective=worldDecisionState?.objective;
+    const objective=cycleObjective?{...retailObjective,region:cycleObjective.zoneId,title:cycleObjective.title}:retailObjective;
     const entrance=hubWorld.entrances.find(e=>e.id===objective.region);
     const station=interactables.find(p=>p.zone===objective.region&&p.type===objective.interaction);
-    const destination=station||entrance;
+    const targetZone=worldDecisionState?.zones?.find(zone=>zone.id===objective.region);
+    const destination=station||entrance||(targetZone?{x:HUB_OFFSET+targetZone.x,z:targetZone.z,name:targetZone.label}:null);
     const distance=destination?Math.round(Math.hypot(destination.x-player.x,destination.z-player.z)):0;
     const title=$3('simHubObjective');
     if(title&&title.textContent!==objective.title)title.textContent=objective.title;
     const preparing=bridge().canOperate?.()===false;
-    if(preparing&&title)title.textContent='PREPARA TU EMPRESA';
-    const detail=preparing?'Camina hasta la tienda · Usa su terminal de decisiones':currentInterior===objective.region&&station?`${station.label} · ${distance} m · E para interactuar`:entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:objective.instruction;
+    const detail=preparing&&cycleObjective?`${destination?.name||targetZone?.label||'Destino'} · ${distance} m · Revisa las decisiones`:currentInterior===objective.region&&station?`${station.label} · ${distance} m · E para interactuar`:entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:destination?`${destination.name||targetZone?.label||'Destino'} · ${distance} m`:objective.instruction;
     if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
     const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
     const contextual=$3('simBusinessContext');
@@ -3171,10 +3246,17 @@
   }
 
   // Compatibility API now selects a walking destination; it never moves a player.
-  function enterHubInterior(id) {
-    const entrance=hubWorld?.entrances.find(e=>e.id===id);if(!entrance)return;
-    closeHubDirectory();message(entrance.name+' · Sigue el camino y cruza su puerta a pie.');
-    if(hubWaypoint){hubWaypoint.visible=true;hubWaypoint.position.set(entrance.x,0,entrance.z);}
+  function enterHubInterior(id, suppliedZone) {
+    const entrance=hubWorld?.entrances.find(e=>e.id===id);
+    const zone=suppliedZone||cityMap?.zones.find(item=>item.id===id);
+    if(!entrance&&!zone)return;
+    const station=interactables.find(point=>point.type==='decisionZone'&&point.category===({office:'B',bank:'E',suppliers:'F'}[id]))
+      ||(id==='news'?interactables.find(point=>point.type==='news'&&!point.zone):null);
+    const destination=entrance||station||{x:HUB_OFFSET+zone.x,z:zone.z};
+    selectedMapDestination=id;
+    closeHubDirectory();message(`${zone?.name||entrance.name} · Sigue la ruta marcada en el mapa.`);
+    if(hubWaypoint){hubWaypoint.visible=true;hubWaypoint.position.set(destination.x,0,destination.z);}
+    targetYaw=Math.atan2(destination.x-player.x,player.z-destination.z);
   }
 
   function setCameraMode(mode) {
@@ -3244,7 +3326,7 @@
     }
     const blocked=paused||Boolean(vehicleTransition);
     const input={throttle:blocked?0:(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer:blocked?0:(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0),brake:blocked||Boolean(keys.Space)};
-    hubVehicles.update(dt,{active:driving,input,player,people:hubActors.map(a=>a.obj.position),bounds:hubBounds});
+    hubVehicles.update(dt,{active:driving,input,player,people:hubActors.filter(a=>a.obj.visible).map(a=>a.obj.position),bounds:hubBounds});
     if(driving){
       player.x=driving.x;player.z=driving.z;player.speed=0;
       if(Math.abs(driving.speed)>1&&performance.now()-lastCameraInputAt>1500){
@@ -3259,11 +3341,12 @@
     if(!inHub)return;
     for(const actor of hubActors) {
       const obj=actor.obj;
+      if(!obj.visible)continue;
       if(!running||hubDirectoryOpen||actor.pause>0||hubVehicles?.occupied(obj.position.x,obj.position.z,.8)||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
       if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
       const target=actor.route[0];if(!target){actor.index=(actor.index+1)%actor.patrol.length;continue;}
       Object.assign(actor.state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
-      const neighbors=hubActors.filter(a=>a!==actor).map(a=>a.obj.position).concat({x:player.x,z:player.z});
+      const neighbors=hubActors.filter(a=>a!==actor&&a.obj.visible).map(a=>a.obj.position).concat({x:player.x,z:player.z});
       const moved=npcNavigation.advance(actor.state,{x:target[0],z:target[1]},dt,hubWorld.colliders,neighbors,actor.speed);
       obj.position.set(actor.state.x,.025,actor.state.z);obj.rotation.y=actor.state.yaw;setPersonPose(obj,0,moved.distance>.00001,dt);
       if(moved.arrived){actor.route.shift();if(!actor.route.length){actor.index=(actor.index+1)%actor.patrol.length;actor.pause=.7;}}
@@ -3447,8 +3530,8 @@
     if(driving||vehicle){p.replaceChildren();const key=document.createElement('kbd');key.textContent='F';p.append(key,driving?' Bajar del auto · detente primero':' Conducir SIDE Cruiser');p.classList.add('show');return;}
     if(hubDirectoryOpen){p.classList.remove('show');return;}
     if(it?.type.startsWith('hub')){p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` ${it.label}`);p.classList.add('show');return;}
-    if (it?.type === 'mona') {
-      p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` Hablar con ${CONFIG.NPCS.mona.name}`);
+    if (it?.type === 'guide') {
+      p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` Hablar con ${GUIDE_NAME}`);
       p.classList.add('show');
       return;
     }
@@ -3456,6 +3539,10 @@
       p.innerHTML = '<kbd>E</kbd> Abrir terminal de decisiones';
       p.classList.add('show');
       return;
+    }
+    if (it?.type === 'decisionZone') {
+      p.replaceChildren();const key=document.createElement('kbd');key.textContent='E';p.append(key,` ${it.label}`);
+      p.classList.add('show');return;
     }
     if (it?.type === 'register') {
       const next = checkoutQueue[0];
@@ -3495,20 +3582,22 @@
     if (!it) return;
     if(it.type==='hubDirectory')openHubDirectory();
     else if (it.type === 'decisions') openDecisionsFrom3D();
+    else if (it.type === 'decisionZone') openDecisionsFrom3D(it.category);
     else if (it.type === 'register') openCheckout();
     else if (it.type === 'restock') restockDisplays(true);
     else if (it.type === 'product') openProductInspect(it.productId);
     else if (it.type === 'admin') openAdmin(it.adminPage);
     else if (it.type === 'news') openNewsPanel();
-    else if (it.type === 'mona') talkToMona();
+    else if (it.type === 'guide') talkToMona();
   }
 
-  function openDecisionsFrom3D() {
+  function openDecisionsFrom3D(category) {
     running = false;
     document.exitPointerLock?.();
     stopAmbient();
     window.__SIDE_RETURN_TO_3D = true;
-    if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
+    if (category && bridge().openDecisionCategory) bridge().openDecisionCategory(category);
+    else if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
   }
 
   function resize() {
@@ -3594,7 +3683,21 @@
       for(const npc of npcs)npc.obj.visible=currentInterior==='store'||Math.hypot(npc.obj.position.x-player.x,npc.obj.position.z-player.z)<18;
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
-      if (now - lastHudTick > 220) { renderInventoryDisplays();updateHUD(); updateMinimap();updateHubObjective(); if(adminOpen) refreshAdminUI(); lastHudTick = now; }
+      if (now - lastHudTick > 220) {
+        renderInventoryDisplays();updateHUD();updateMinimap();updateHubObjective();
+        const selected=cityMap?.zones.find(zone=>zone.id===selectedMapDestination);
+        if(selected&&Math.hypot(HUB_OFFSET+selected.x-player.x,selected.z-player.z)<11)selectedMapDestination=null;
+        if(selectedMapDestination&&selected&&hubWaypoint){
+          const station=interactables.find(point=>point.type==='decisionZone'&&point.category===({office:'B',bank:'E',suppliers:'F'}[selectedMapDestination]))
+            ||(selectedMapDestination==='news'?interactables.find(point=>point.type==='news'&&!point.zone):null);
+          const entrance=hubWorld?.entrances.find(item=>item.id===selectedMapDestination);
+          const target=entrance||station||{x:HUB_OFFSET+selected.x,z:selected.z};
+          hubWaypoint.position.set(target.x,0,target.z);hubWaypoint.visible=true;
+        }
+        worldOrientation?.update({player,camera,yaw,now,activeZone:currentInterior||closestCityZone?.(player.x-HUB_OFFSET,player.z,cityMap.zones,11),
+          targetZone:selectedMapDestination||worldDecisionState?.objective?.zoneId||null});
+        if(adminOpen) refreshAdminUI(); lastHudTick = now;
+      }
     }
     updateAdaptiveQuality(elapsed, now);
     renderer.render(scene, camera);
@@ -3901,6 +4004,7 @@
       assets:{detailsLoading:Boolean(detailsPromise&&!detailsComplete),detailsReady:detailsComplete,lighting:studioEnvironment?'baked-studio':'direct',storeProps:{loaded:Object.keys(storePropTemplates),errors:{...storePropErrors}},warehouseProps:{loaded:Object.keys(warehousePropTemplates),errors:{...warehousePropErrors}},productionProps:{loaded:Object.keys(productionPropTemplates),errors:{...productionPropErrors}},outdoorProps:{loaded:Object.keys(outdoorPropTemplates),errors:{...outdoorPropErrors}},cache:assetCache?.diagnostics?.()||null},
       character:{selected,name:CONFIG.NPCS[selected]?.name||'',selectedInstances,playerInstances:characters.filter(character=>character.role==='player').length,manager:characterManager?.diagnostics?.()||null,animation:playerAvatar?.userData.animationController?.getSnapshot?.()||null,controllers:controllers.size,mixers:mixers.size},
       suppliedNpcs:{loaded:Object.keys(suppliedTemplates),errors:{...suppliedErrors},customers:npcs.map(n=>({kind:n.obj.userData.modelKind,state:n.state,x:n.obj.position.x,z:n.obj.position.z,speed:n.obj.userData.motion?.speed||0,distance:n.obj.userData.motion?.distance||0,routeRemaining:n.route.length-n.routeIndex})),actors:animatedActors.filter(a=>['guide','visitor'].includes(a.type)).map(a=>({kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:a.obj.userData.motion?.phase||0,distance:a.obj.userData.motion?.distance||0,rigged:Boolean(a.obj.userData.motion)}))},
+      cityNpcModels:{approved:cityApproved?.length||0,loaded:cityTemplates.size,active:cityRoster?.models.length||0,visibleHub:hubActors.filter(actor=>actor.obj.visible).length},
       mona:{loaded:Boolean(monaTemplate), error:monaLoadError, instances:characters.filter(c=>c.characterId==='mona'||c.kind==='mona'||c.kind==='mona-fallback').length},
       hub:{active:inHub,district:selectedDistrict,mode:cameraMode,interior:currentInterior,actors:hubActors.length,visited:[...(businessState?.exploredHub||[])],drawCalls:renderer?.info.render.calls||0,triangles:renderer?.info.render.triangles||0,meshes:hubWorld?.group.children.length||0,outdoorProps:hubWorld?.outdoorProps?.()||null},
       world:{id:'side-city',continuous:true,legacyActive:Boolean(businessWorld&&businessWorld!==businessInteriors?.group&&businessWorld.visible),interiors:businessInteriors?.stats()||null,queueCapacity:queueSlots.length},

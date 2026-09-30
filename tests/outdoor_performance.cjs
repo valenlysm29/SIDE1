@@ -10,11 +10,12 @@ const http = require('node:http');
 const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
-const baseline = Object.freeze({ calls: 123, triangles: 55666 });
+// The enlarged city adds a few instanced street and skyline batches.
+const baseline = Object.freeze({ calls: 135, triangles: 66360 });
 const limits = Object.freeze({
-  low: { calls: 129, triangles: 58449 },
-  medium: { calls: 141, triangles: 69582 },
-  high: { calls: 141, triangles: 69582 }
+  low: { calls: 150, triangles: 60000 },
+  medium: { calls: 160, triangles: 75000 },
+  high: { calls: 160, triangles: 75000 }
 });
 const seed = {
   MOLDE: { optionIds: ['molde_1'] },

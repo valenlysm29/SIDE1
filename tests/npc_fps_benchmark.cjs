@@ -21,10 +21,21 @@ const server=http.createServer((req,res)=>{
     await page.goto(base+'?side3dDebug=1',{waitUntil:'domcontentloaded'});
     await page.evaluate(seed=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA FPS',company:'QA FPS',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seed);commitReviewedSections(decisionCategories().map(c=>c.cat),true)},seed);
     await page.evaluate(()=>startSimulationLoading());await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>10);
-    await page.evaluate(()=>{document.querySelector('[data-quality="medium"]')?.click()});
-    await page.waitForTimeout(2000);
-    const samples=[];for(let i=0;i<4;i++){await page.waitForTimeout(1500);samples.push(await page.evaluate(()=>({monitor:document.querySelector('#simPerfMonitor')?.textContent,diag:SIDE3D.diagnostics()})))}
-    const fps=samples.map(s=>Number(s.monitor?.match(/(\d+) FPS/)?.[1])).filter(Number.isFinite);
-    console.log(JSON.stringify({fps,median:fps.sort((a,b)=>a-b)[Math.floor(fps.length/2)]||null,monitors:samples.map(s=>s.monitor)},null,2));
+    await page.waitForFunction(()=>SIDE3D.diagnostics().assets.detailsReady,undefined,{timeout:120000});
+    const tiers={};
+    for(const tier of ['low','medium','high']){
+      await page.evaluate(mode=>document.querySelector(`[data-quality="${mode}"]`)?.click(),tier);
+      if(tier==='high')await page.waitForFunction(()=>SIDE3D.diagnostics().cityNpcModels.loaded>=16,undefined,{timeout:120000});
+      await page.waitForTimeout(1800);
+      const fps=[];
+      for(let i=0;i<4;i++){
+        await page.waitForTimeout(1200);
+        const sample=await page.evaluate(()=>({monitor:document.querySelector('#simPerfMonitor')?.textContent,diag:SIDE3D.diagnostics()}));
+        const value=Number(sample.monitor?.match(/(\d+) FPS/)?.[1]);if(Number.isFinite(value))fps.push(value);
+      }
+      fps.sort((a,b)=>a-b);
+      tiers[tier]={samples:fps,median:fps[Math.floor(fps.length/2)]||null,cityNpcModels:await page.evaluate(()=>SIDE3D.diagnostics().cityNpcModels)};
+    }
+    console.log(JSON.stringify({renderer:'headless Chromium SwiftShader',tiers},null,2));
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve))}
 })().catch(error=>{console.error(error);process.exitCode=1});
