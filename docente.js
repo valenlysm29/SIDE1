@@ -785,7 +785,8 @@ function loadPublished(){
   renderPodium();
 }
 setInterval(renderPodium,1000);
-function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished()}
+const historyController=window.SIDE_TEACHER_HISTORY?.createController({mount:$('historyContent'),status:$('historyStatus'),refresh:$('refreshHistory'),service:window.SIDE?.TeacherHistoryService,catalog:window.SIDE_DECISION_CATALOG||[]});
+function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',decisiones:'Decisiones · partida anterior',podio:'Ganador y podio'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='decisiones')historyController?.load()}
 let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
 function pdfLogo(){
   if(!pdfLogoPromise)pdfLogoPromise=new Promise(resolve=>{
