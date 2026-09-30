@@ -231,6 +231,14 @@ test('student decision/report writes use identity wrappers, never empresaId RPCs
  ]);
 });
 
+test('state reads and writes preserve technical error codes instead of rejecting the saved identity',async()=>{
+ const service=loadService(serviceSource,async()=>({data:null,error:{code:'FETCH_ERROR',message:'Failed to fetch',details:'network interrupted'}}),'EmpresaService');
+ const identity={codigo:'SIDE-418',nombreLegal:'Legal A',nombreComercial:'Marca A'};
+ for(const result of [await service.obtenerEstado(identity),await service.guardarEstado(identity,{},0)]){
+  assert.equal(result.success,false);assert.equal(result.technical,true);assert.equal(result.code,'FETCH_ERROR');assert.equal(result.details,'network interrupted');
+ }
+});
+
 test('frontend maps safe errors, hydrates by identity and recovers stale revisions',()=>{
  assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados\.'/);
  assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'No se pudo validar el ingreso con los datos proporcionados\.'/);
@@ -240,12 +248,12 @@ test('frontend maps safe errors, hydrates by identity and recovers stale revisio
  assert.match(appSource,/console\.error\('SIDE: error técnico al validar el ingreso',ingreso\)/);
  assert.match(appSource,/EmpresaService\.obtenerEstado\(identity\)/);
  assert.match(appSource,/EmpresaService\.guardarEstado\(identity,snapshot,expectedRevision\)/);
- assert.match(appSource,/queueStudentSnapshot\(snapshot,newRevision=>S\.DecisionesService\.guardar\(identity,round,decisiones,newRevision\)\)/);
- assert.match(appSource,/queueStudentSnapshot\(snapshot,S\.DecisionesService\?\(newRevision=>S\.DecisionesService\.guardarReporte\(identity,round,payload,newRevision\)\):null\)/);
- assert.match(appSource,/const operation=await afterSnapshot\(newRevision\)/);
- assert.match(appSource,/result\.code==='ESTADO_DESACTUALIZADO'/);
+ assert.match(appSource,/S\.DecisionesService\.guardar\(identity,round,operation\.payload,newRevision\)/);
+ assert.match(appSource,/S\.DecisionesService\.guardarReporte\(identity,round,operation\.payload,newRevision\)/);
+ assert.match(appSource,/StudentSync\.createQueue/);
+ assert.match(appSource,/onConflict:recoverStaleStudentState/);
  assert.match(appSource,/refreshStudentGame\(\{forceHydrate:true\}\)/);
- assert.match(appSource,/snapshotRevision:serverRevision/);
+ assert.match(appSource,/snapshotRevision:.*serverRevision/);
  assert.doesNotMatch(appSource,/EmpresaService\.obtenerEstado\([^)]*empresaId/);
  assert.doesNotMatch(appSource,/EmpresaService\.guardarEstado\([^)]*empresaId/);
  assert.doesNotMatch(appSource,/DecisionesService\.guardar(?:Reporte)?\([^)]*empresaId/);

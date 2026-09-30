@@ -78,6 +78,11 @@ la documentación histórica del proyecto y de las entregas anteriores.
 Esta versión transforma el módulo de decisiones en una experiencia tipo juego con navegación por pestañas y caja visible.
 
 ## Acceso demo
+
+Estas credenciales abren el modo de demostración cuando Supabase no está
+configurado. Con Supabase configurado, el profesor debe ingresar con una cuenta
+registrada y su contraseña real; el panel solo se abre tras autenticar la cuenta.
+
 - Profesor: `profesor@upch.pe`
 - Contraseña: `Heredia`
 - Código estudiante: `SIDE-000`

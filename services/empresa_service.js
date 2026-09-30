@@ -130,11 +130,11 @@
         p_nombre_legal: nombreLegal,
         p_nombre_comercial: nombreComercial
       });
-      if (error) return { success: false, error: error.message };
+      if (error) return technicalFailure(error, 'RPC_ESTUDIANTE_ERROR');
       if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
       return { success: true, data };
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      return technicalFailure(err, 'RPC_ESTUDIANTE_EXCEPCION');
     }
   }
 
@@ -157,11 +157,11 @@
         p_snapshot: snapshot,
         p_expected_revision: revision
       });
-      if (error) return { success: false, error: error.message };
+      if (error) return technicalFailure(error, 'RPC_ESTUDIANTE_ERROR');
       if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
       return { success: true, data };
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      return technicalFailure(err, 'RPC_ESTUDIANTE_EXCEPCION');
     }
   }
 

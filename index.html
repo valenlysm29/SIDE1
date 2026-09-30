@@ -120,7 +120,8 @@
         <p class="join-name-warning">Si ya participaste, usa el mismo código, nombre de empresa y nombre comercial para recuperar tu progreso, incluso en otro dispositivo.</p>
         <button class="primary-gold join-submit" type="submit">ENTRAR A LA PARTIDA</button>
       </form>
-      <div id="studentMessage" class="form-message"></div>
+      <div id="studentMessage" class="form-message" role="status"></div>
+      <button id="studentReconnectBtn" class="primary-gold hidden" type="button">REINTENTAR CONEXIÓN</button>
     </section>
 
     <section id="creditsModal" class="modal credits-modal hidden" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" aria-describedby="creditsIntro">
@@ -173,6 +174,7 @@
           <h2 id="lobbyGameName">Esperando...</h2>
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
+          <p data-student-sync-status class="student-sync-status hidden" role="status"></p>
           <button id="cancelledBackToProfiles" class="ghost-btn hidden" type="button">VOLVER AL INICIO</button>
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>
@@ -539,6 +541,7 @@
 
     <main class="decision-game-stage tabbed-stage">
       <section class="decision-window" aria-label="Ventana de decisiones">
+        <p data-student-sync-status class="student-sync-status hidden" role="status"></p>
         <nav id="decisionTabs" class="decision-tabs" aria-label="Secciones de decisión"></nav>
         <div id="decisionDetail" class="decision-detail">
           <div id="decisionStickyHead" class="decision-detail-head sticky-section-head">
@@ -580,8 +583,9 @@
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
 <script src="services/partida_service.js?v=20260924-observations"></script>
-<script src="services/empresa_service.js?v=20260928-secure-cas"></script>
+<script src="services/empresa_service.js?v=20260930-sync-retry"></script>
 <script src="services/decisiones_service.js?v=20260928-secure-cas"></script>
+<script src="services/student_sync.js?v=20260930-sync-retry"></script>
 <script src="js/side_rules.js?v=20260924-observations"></script>
 <script src="js/icon_bank.js?v=20260910-2"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
@@ -607,7 +611,7 @@
 <script src="js/production_dop.js?v=20260917-visual"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20260928-secure-cas"></script>
+<script src="js/app.js?v=20260930-sync-retry"></script>
 <script src="js/company_summary.js?v=20260922-teacher-final"></script>
 </body>
 </html>
