@@ -31,6 +31,51 @@ export function closestCityZone(x, z, zones, radius = 11) {
 
 const labelHeight = zone => zone.id === 'news' ? 3.3 : 8;
 
+const SHORT_ZONE_NAMES = Object.freeze({ suppliers: 'Proveed.', news: 'Noticias' });
+const intersects = (a, b, gap = 5) => a.left < b.right + gap && a.right > b.left - gap && a.top < b.bottom + gap && a.bottom > b.top - gap;
+
+/** Select label positions without touching the DOM, so mobile layouts can be tested. */
+export function layoutZoneLabels({ candidates, width, height, obstacles = [], targetZone = null, currentZone = null, maxLabels = width <= 560 ? 3 : width <= 800 ? 5 : 7 }) {
+  const margin = 12;
+  const cap = Math.max(1, maxLabels);
+  const occupied = [];
+  const placements = [];
+  const ordered = [...candidates].filter(item => item.point || item.zone.id === targetZone)
+    .sort((a, b) => (b.zone.id === targetZone) - (a.zone.id === targetZone)
+      || (b.zone.id === currentZone) - (a.zone.id === currentZone)
+      || (a.point?.distance ?? Infinity) - (b.point?.distance ?? Infinity));
+  const makeBox = (x, y, w, h) => ({ left: x - w / 2, right: x + w / 2, top: y - h / 2, bottom: y + h / 2 });
+  const fits = box => box.left >= margin && box.right <= width - margin && box.top >= margin && box.bottom <= height - margin
+    && ![...obstacles, ...occupied].some(other => intersects(box, other));
+  for (const { zone, point } of ordered) {
+    if (placements.length >= cap) break;
+    const full = zone.name;
+    const short = SHORT_ZONE_NAMES[zone.id] || full;
+    const names = full === short ? [full] : [full, short];
+    const anchorX = point?.x ?? width / 2;
+    const anchorY = point?.y ?? height * .32;
+    const shifts = [[0, 0], [0, -36], [0, 36], [-64, 0], [64, 0], [-64, -36], [64, -36], [-64, 36], [64, 36]];
+    let chosen = null;
+    for (const name of names) {
+      const boxWidth = Math.max(width <= 560 ? 88 : 98, 39 + name.length * (width <= 560 ? 7.4 : 7.8));
+      const boxHeight = width <= 560 ? 34 : 30;
+      const centers = shifts.map(([dx, dy]) => [Math.max(margin + boxWidth / 2, Math.min(width - margin - boxWidth / 2, anchorX + dx)), Math.max(margin + boxHeight / 2, Math.min(height - margin - boxHeight / 2, anchorY + dy))]);
+      if (zone.id === targetZone) {
+        for (let y = 110; y < height - 24; y += 38) for (let x = margin + boxWidth / 2; x <= width - margin - boxWidth / 2; x += 34) centers.push([x, y]);
+      }
+      for (const [x, y] of centers) {
+        const box = makeBox(x, y, boxWidth, boxHeight);
+        if (!fits(box)) continue;
+        chosen = { id: zone.id, x, y, text: name, abbreviated: name !== full, box, distance: point?.distance ?? Infinity };
+        break;
+      }
+      if (chosen) break;
+    }
+    if (chosen) { occupied.push(chosen.box); placements.push(chosen); }
+  }
+  return placements;
+}
+
 /**
  * Coordinates in `zones` and `bounds` are local to the city; player/camera
  * coordinates are absolute world coordinates. `onNavigate(id, zone)` is called
@@ -110,24 +155,21 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
   function renderLabels(camera) {
     const rect = root.getBoundingClientRect();
     const candidates = zoneList.map(zone => ({ zone, point: project(zone, camera, rect) }))
-      .filter(item => item.point && item.point.distance < 145
-        && !(item.point.x < 265 && item.point.y > rect.height - 435))
-      .sort((a, b) => a.point.distance - b.point.distance);
-    const occupied = [];
+      .filter(item => item.zone.id === targetZone || item.zone.id === currentZone || (item.point && item.point.distance < 145));
+    const obstacles = [];
+    for (const element of root.querySelectorAll('.sim3d-stats,.sim3d-brand,.sim3d-actionbar,.sim3d-objective,.sim3d-controls,.sim3d-missions,.sim-world-location,.sim-city-map,.sim3d-touch-pad,.sim3d-touch-actions,.sim-drive-hud,.sim-zone-banner,.sim3d-message.show')) {
+      if (element.hidden || !element.getClientRects().length) continue;
+      const box = element.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) continue;
+      obstacles.push({ left: box.left - rect.left, right: box.right - rect.left, top: box.top - rect.top, bottom: box.bottom - rect.top });
+    }
+    const selected = layoutZoneLabels({ candidates, width: rect.width, height: rect.height, obstacles, targetZone, currentZone });
     labels.forEach(label => { label.hidden = true; });
-    for (const { zone, point } of candidates) {
-      const label = labels.get(zone.id);
-      const screenX=point.x<265&&point.y<410?280:point.x;
-      const screenY=Math.max(Math.min(165,rect.height*.24),point.y);
-      // The CSS minimum size is used before first paint, so collision checks
-      // are stable when a label has previously been hidden.
-      const width = Math.max(98, label.offsetWidth || 98);
-      const height = Math.max(26, label.offsetHeight || 26);
-      const box = { left: screenX - width / 2, right: screenX + width / 2, top: screenY - height / 2, bottom: screenY + height / 2 };
-      if (occupied.some(other => box.left < other.right + 7 && box.right > other.left - 7 && box.top < other.bottom + 7 && box.bottom > other.top - 7)) continue;
-      occupied.push(box);
-      label.style.left = `${screenX}px`; label.style.top = `${screenY}px`;
-      label.style.setProperty('--distance-scale', String(Math.max(.85, Math.min(1.14, 32 / Math.max(28, point.distance)))));
+    for (const item of selected) {
+      const label = labels.get(item.id);
+      label.querySelector('span').textContent = item.text;
+      label.style.left = `${item.x}px`; label.style.top = `${item.y}px`;
+      label.style.setProperty('--distance-scale', String(rect.width <= 800 ? 1 : Math.max(.85, Math.min(1.14, 32 / Math.max(28, item.distance)))));
       label.hidden = false;
     }
   }
