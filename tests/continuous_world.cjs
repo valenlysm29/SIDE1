@@ -68,7 +68,7 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
     assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
     await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);await page.evaluate(()=>continuousQA.pause());
     const initial=await page.evaluate(()=>({diagnostic:SIDE3D.diagnostics(),world:continuousQA.inspect(),legacy:continuousCounters.legacy,listeners:continuousCounters.listeners}));
-    assert.equal(initial.legacy,0);assert.equal(initial.diagnostic.hub.active,true);assert.equal(initial.diagnostic.hub.interior,null);assert.ok(initial.diagnostic.player.x>100);assert.equal(initial.world.stats.rooms,3);
+    assert.equal(initial.legacy,0);assert.equal(initial.diagnostic.hub.active,true);assert.equal(initial.diagnostic.hub.interior,null);assert.ok(initial.diagnostic.player.x>100);assert.equal(initial.world.stats.rooms,6);
     pass(1,'Nuevo mapa único',initial);
     const doors=await page.evaluate(()=>continuousQA.doors());
     async function enter(id){

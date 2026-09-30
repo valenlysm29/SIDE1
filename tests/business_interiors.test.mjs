@@ -53,7 +53,7 @@ test('all three businesses belong to one world group with same-coordinate door c
   const f = fixture();
   assert.equal(f.scene.children.length, 1);
   assert.equal(f.world.group.userData.connectedWorld, true);
-  for (const door of f.world.entrances) {
+  for (const door of f.world.entrances.filter(door=>BUSINESS_LAYOUTS.some(layout=>layout.id===door.id))) {
     const from = { x: door.portal.x, z: door.portal.z + 1.5 };
     const to = { x: door.portal.x, z: door.portal.z - 1.5 };
     assertClearSegment(f.world, from, to, `${door.id} doorway`);
@@ -66,7 +66,7 @@ test('all three businesses belong to one world group with same-coordinate door c
 
 test('player can physically walk in and out of each real doorway', () => {
   const f = fixture();
-  for (const door of f.world.entrances) {
+  for (const door of f.world.entrances.filter(door=>BUSINESS_LAYOUTS.some(layout=>layout.id===door.id))) {
     const player = { x: door.portal.x, z: door.portal.z + 1.5, vx: 0, vz: 0, grounded: true };
     for (let i = 0; i < 30; i++) stepPlayerMotion(player, { forward: 1, yaw: 0 }, .05, (x, z) => blocked(f.world, x, z));
     assert.equal(f.world.zoneAt(player), door.id);
@@ -112,7 +112,7 @@ test('current financial snapshot changes visible display and reserve tiers indep
   const f = fixture();
   const projection = { storeFill: .5, warehouseFill: .75, producedUnits: 20, plannedUnits: 80, pendingUnits: 0 };
   f.world.sync(projection);
-  assert.deepEqual(f.world.stats().stockLevels, { store: 2, warehouse: 3, production: 1 });
+  assert.deepEqual(Object.fromEntries(Object.entries(f.world.stats().stockLevels).filter(([id])=>BUSINESS_LAYOUTS.some(layout=>layout.id===id))), { store: 2, warehouse: 3, production: 1 });
   for (const room of f.world.rooms) for (const tier of room.stock) assert.equal(tier.group.visible, tier.tier <= room.stockLevel);
   assert.deepEqual(projection, { storeFill: .5, warehouseFill: .75, producedUnits: 20, plannedUnits: 80, pendingUnits: 0 });
   f.world.sync({ storeFill: 0, warehouseFill: 0, producedUnits: 0, plannedUnits: 80 });
@@ -162,7 +162,7 @@ test('shared instancing batches stock per room/tier; furniture has metre-scale c
   });
   assert.equal(geometry.size, 2);
   assert.ok(instances > 500);
-  for (const room of f.world.rooms) {
+  for (const room of f.world.rooms.filter(room=>BUSINESS_LAYOUTS.some(layout=>layout.id===room.id))) {
     assert.equal(room.stock.length, 4);
     assert.ok(room.stock.every(s => s.group.children.length <= 5));
   }

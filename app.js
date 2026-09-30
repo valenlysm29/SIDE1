@@ -354,6 +354,7 @@ window.SIDE_GAME_BRIDGE={
   },
   currentRound:()=>currentRound(),
   cash:()=>cashBalance(),
+  creditState:()=>({outstanding:creditOutstanding(),approved:creditApprovedLine(),available:creditAvailable()}),
   decisionProgress:()=>decisionProgressPercent(),
   canStartSimulation:()=>canStartSimulation(),
   canExplore:()=>canExploreWorld(),

@@ -418,18 +418,31 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   // beyond the playable boundary do not burden path searches.
   const landmarkMaterial = mat(0xb2beb9), supplierMaterial = mat(0xb99f77);
   function landmark(id, x, z, w, d, h, material) {
-    box(x, h / 2 + .15, z, w, h, d, material);
+    // Ground floor shares the original landmark footprint and facade palette.
+    const axis = id === 'office' ? 'z' : 'x';
+    const direction = id === 'suppliers' ? -1 : 1;
+    const edge = axis === 'z' ? z-d/2 : x-direction*w/2;
+    const wall = (cx,cz,ww,dd) => { box(cx,h/2+.15,cz,ww,h,dd,material); collider(cx,cz,ww,dd,id); };
+    if(axis==='z') {
+      wall(x-w/2,z,.24,d);wall(x+w/2,z,.24,d);wall(x,z+d/2,w,.24);
+      for(const side of [-1,1])wall(x+side*(w/4+.75),edge,w/2-1.5,.24);
+      box(x,(h+3.1)/2+.15,edge,3,h-3.1,.24,material);
+    } else {
+      wall(x,z-d/2,w,.24);wall(x,z+d/2,w,.24);wall(x+direction*w/2,z,.24,d);
+      for(const side of [-1,1])wall(edge,z+side*(d/4+.75),.24,d/2-1.5);
+      box(edge,(h+3.1)/2+.15,z,.24,h-3.1,3,material);
+    }
     box(x, h + .33, z, w + .7, .36, d + .7, m.darkSteel);
     const front = z > 50 ? z - d / 2 - .055 : z < -50 ? z + d / 2 + .055 : z;
     const side = x > 50 ? x - w / 2 - .055 : x < -50 ? x + w / 2 + .055 : x;
     if (Math.abs(z) > 50) {
-      box(x, 2, front, w * .48, 3.2, .11, m.opaqueGlass);
+      for (const side of [-1,1]) box(x+side*(1.65+w*.12),2,front,w*.24,3.2,.11,m.opaqueGlass);
       box(x, h - .8, front, w * .7, .18, .15, m.mint);
     } else {
-      box(side, 2, z, .11, 3.2, d * .48, m.opaqueGlass);
+      for (const sign of [-1,1]) box(side,2,z+sign*(1.65+d*.12),.11,3.2,d*.24,m.opaqueGlass);
       box(side, h - .8, z, .15, .18, d * .7, m.mint);
     }
-    collider(x, z, w, d, id);
+
   }
   landmark('office', 19, 76, 16, 13, 11, landmarkMaterial);
   landmark('bank', 76, 19, 13, 16, 9, m.concrete);

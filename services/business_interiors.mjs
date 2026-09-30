@@ -1,5 +1,9 @@
 import * as THREE from '../vendor/three/build/three.module.js';
 import * as npcNavigation from './npc_navigation.mjs';
+import { buildOfficeInterior } from './office_interior.mjs';
+import { buildBankInterior } from './bank_interior.mjs';
+import { buildSuppliersInterior } from './suppliers_interior.mjs';
+import { createInteriorNavigation } from './interior_navigation.mjs';
 
 // Metres, on the same street grid as the city. No interior scene or spawn map.
 export const BUSINESS_LAYOUTS = Object.freeze([
@@ -34,8 +38,14 @@ export function stockVisualLevel(ratio) {
   return Number.isFinite(value) ? Math.min(4, Math.max(0, Math.ceil(value * 4))) : 0;
 }
 
+export const DECISION_INTERIOR_LAYOUTS = Object.freeze([
+  {id:'office',name:'Oficina',x:19,z:76,width:16,depth:13,height:3.1,doorX:19,doorZ:69.5,doorWidth:3,axis:'z',direction:1},
+  {id:'bank',name:'Banco',x:76,z:19,width:13,depth:16,height:3.1,doorX:69.5,doorZ:19,doorWidth:3,axis:'x',direction:1},
+  {id:'suppliers',name:'Proveedores',x:-76,z:-19,width:14,depth:17,height:3.1,doorX:-69,doorZ:-19,doorWidth:3,axis:'x',direction:-1}
+].map(Object.freeze));
+
 /** Presentation only: snapshot comes from the existing SIDE business model. */
-export function createBusinessInteriors({ scene, offsetX = 150, createNpc, animateNpc } = {}) {
+export function createBusinessInteriors({ scene, offsetX = 150, createNpc, animateNpc, onCollidersAdded } = {}) {
   const group = new THREE.Group(); group.name = 'SIDE connected businesses'; group.position.x = offsetX;
   scene?.add(group);
   const resources = new Set(), colliders = [], hotspots = [], rooms = [], animated = [];
@@ -473,6 +483,48 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     room.stock.forEach(stock => stock.batch.finish());
   }
 
+  const builders = {office:buildOfficeInterior,bank:buildBankInterior,suppliers:buildSuppliersInterior};
+  for (const layout of DECISION_INTERIOR_LAYOUTS) {
+    const detail = new THREE.Group(); detail.name = `${layout.id} deferred interior`; detail.visible=false; group.add(detail);
+    const room = {id:layout.id,layout,detail,stock:[],actors:[],routes:[],lights:[],stockLevel:0,realLightLimit:0,deferred:true};
+    rooms.push(room);
+    zones.push({id:layout.id,name:layout.name,minX:offsetX+layout.x-layout.width/2,maxX:offsetX+layout.x+layout.width/2,minZ:layout.z-layout.depth/2,maxZ:layout.z+layout.depth/2,ceilingY:3.1});
+    const axis=layout.axis, direction=layout.direction;
+    entrances.push({id:layout.id,name:layout.name,x:offsetX+layout.doorX-(axis==='x'?direction*1.6:0),z:layout.doorZ-(axis==='z'?direction*1.6:0),
+      portal:{x:offsetX+layout.doorX,z:layout.doorZ,axis,direction,halfWidth:1.35}});
+  }
+  function ensureRoom(room) {
+    if(!room.deferred)return;
+    room.deferred=false;
+    const before=colliders.length;
+    const b=batchBuilder(room.detail),l=room.layout;
+    b.box(l.x,.0075,l.z,l.width-.24,.035,l.depth-.24,m.floor);
+    builders[room.id]({room,batch:b,m,collider,sign,hotspot,offsetX});
+    for(const point of hotspots.filter(point=>point.zone===room.id&&point.type==='decisionZone'))point.category ||= point.cat;
+    if(room.officeStations){
+      const stations=room.officeStations;
+      room.routes.push({zone:room.id,role:'oficina',stationary:true,points:[stations.finance]},
+        {zone:room.id,role:'oficina',points:stations.patrol});
+    }
+    if(room.id==='bank')room.stateSigns=[{mesh:sign(room.detail,'ESTADO FINANCIERO','Consulta del ciclo',l.x+1,2.4,l.z-7.8,4,.65),fields:['cash','debt','loan']}];
+    npcRoutes.push(...room.routes);
+    setQuality(storePropQuality);
+    onCollidersAdded?.(colliders.slice(before));
+    sync(snapshot);
+  }
+  function updateStateSigns(room,value) {
+    for(const entry of room.stateSigns||[]){
+      const number=(key)=>value[key]==null?'Sin datos':Number(value[key]).toLocaleString('es-PE');
+      const text=room.id==='office'?`Ciclo ${number('round')} · Caja S/ ${number('cash')} · Deuda S/ ${number('debt')}`:
+        `Caja S/ ${number('cash')} · Deuda S/ ${number('debt')} · Solicitud S/ ${number('loan')}`;
+      const mesh=entry.mesh;if(mesh.userData.stateText===text)continue;
+      mesh.userData.stateText=text;
+      const canvas=mesh.material.map.image,ctx=canvas.getContext('2d');
+      ctx.fillStyle='#23393e';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#f1edde';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.font=`500 ${canvas.height*.3}px Arial`;ctx.fillText(text,canvas.width/2,canvas.height/2,canvas.width*.95);mesh.material.map.needsUpdate=true;
+    }
+  }
+  const interiorNavigation=createInteriorNavigation({THREE,rooms,colliders,offsetX});
   const npcRoutes = rooms.flatMap(room => room.routes);
   const zoneAt = position => zones.find(zone => position && position.x > zone.minX + .12 && position.x < zone.maxX - .12 && position.z > zone.minZ + .12 && position.z < zone.maxZ)?.id || null;
   const storeRoom = rooms.find(room => room.id === 'store');
@@ -506,6 +558,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         object.castShadow = cast; object.receiveShadow = rank > 1;
       });
     });
+    for(const room of rooms.filter(room=>builders[room.id]))room.detail.traverse(object=>{if(object.isMesh){object.castShadow=rank>1;object.receiveShadow=rank>1;}});
     setWarehouseQuality(storePropQuality);
     setProductionQuality(storePropQuality);
     for (const room of rooms) room.realLightLimit = Math.max(0, rank - 1);
@@ -819,6 +872,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     };
     const pendingUnits = Math.max(0, Number(next.pendingUnits ?? next.warehousePendingUnits ?? 0) || 0);
     for (const room of rooms) {
+      room.syncState?.(next); updateStateSigns(room,next);
       const level = stockVisualLevel(ratios[room.id]); room.stockLevel = level;
       for (const tier of room.stock) tier.group.visible = tier.tier <= level;
       // A pending order is shown in the receiving area only. It never adds
@@ -832,7 +886,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   function ensureActors(room) {
     if (room.actors.length || !createNpc) return;
     for (const route of room.routes) {
-      const object = createNpc(route.role); if (!object) continue;
+      const object = createNpc(route.role, room); if (!object) continue;
       const start = route.points[0]; object.position.set(start.x - offsetX, .025, start.z);
       object.name = `SIDE ${route.zone} ${route.role}`; room.detail.add(object);
       room.actors.push({ object, route, target: route.stationary ? 0 : 1, wait: 0 });
@@ -888,6 +942,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     dt = Math.max(0, Math.min(.05, Number(dt) || 0)); const active = zoneAt(position);
     for (const room of rooms) {
       const b = room.layout, distance = position ? Math.hypot(position.x - offsetX - b.x, position.z - b.z) : Infinity;
+      if(distance<24)ensureRoom(room);
       room.detail.visible = distance < 24; // preload geometry is allocated once, render only near its parcel
       const inside = active === room.id; room.lights.forEach((light, index) => { light.visible = inside && index < Number(room.realLightLimit || 0); });
       for (const actor of room.actors) actor.object.visible = inside;
@@ -898,20 +953,21 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
         const target = route.points[actor.target];
         const playerDistance = Math.hypot(position.x - offsetX - object.position.x, position.z - object.position.z);
         let moving = false;
+        if(actor.wait>0){actor.wait=Math.max(0,actor.wait-dt);animateNpc?.(object,dt,false);continue;}
         if (!route.stationary && playerDistance > 1.05) {
           const blocks=colliders.filter(item=>item.zone===room.id);
           const world={x:object.position.x+offsetX,z:object.position.z};
-          if(!actor.path?.length)actor.path=npcNavigation.planPath(world,target,blocks);
+          if(!actor.path?.length)actor.path=interiorNavigation.plan(room,world,target,storePropQuality);
           const waypoint=actor.path?.[0];
           if(waypoint){
             const motion=actor.motion||(actor.motion={speed:0,yaw:object.rotation.y});
             Object.assign(motion,{x:world.x,z:world.z});
             const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z}));
             neighbors.push({x:position.x,z:position.z});
-            const step=npcNavigation.advance(motion,{x:waypoint[0],z:waypoint[1]},dt,blocks,neighbors,.65);
+            const step=interiorNavigation.advance(room,motion,{x:waypoint[0],z:waypoint[1]},dt,neighbors,.65,storePropQuality,actor.path.length===1);
             object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
             moving=step.distance>.0001;
-            if(step.arrived){actor.path.shift();if(!actor.path.length)actor.target=(actor.target+1)%route.points.length}
+            if(step.arrived){actor.path.shift();if(!actor.path.length){actor.target=(actor.target+1)%route.points.length;actor.wait=route.role==='cliente'?2: .7;}}
           }
         }
         animateNpc?.(object, dt, moving);
@@ -926,14 +982,14 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   return {
     group, colliders, entrances, zones, hotspots, interactionPoints: hotspots, npcRoutes, rooms,
     queueSlots, checkoutQueueSlots: queueSlots, browsePoints, salesAssistantPoint,
-    zoneAt, sync, update: sync, tick, installStoreProps, installWarehouseProps, installProductionProps, setQuality,
+    zoneAt, sync, update: sync, tick, ensureRoom, interiorNavigation, installStoreProps, installWarehouseProps, installProductionProps, setQuality,
     stats() {
       let instancedBatches = 0, geometryInstances = 0, visibleBatches = 0;
       group.traverse(object => {
         if (object.isInstancedMesh) { instancedBatches++; geometryInstances += object.count; }
       });
       group.traverseVisible(object => { if (object.isMesh) visibleBatches++; });
-      return { rooms: rooms.length, colliders: colliders.length,
+      return { rooms: rooms.length, deferredRooms: rooms.filter(room=>room.deferred).length, navigation:interiorNavigation.stats(), colliders: colliders.length,
         stockLevels: Object.fromEntries(rooms.map(room => [room.id, room.stockLevel])),
         activeNpcs: rooms.filter(r => r.id === group.userData.activeZone).reduce((n, r) => n + r.actors.length, 0),
         activeLights: rooms.reduce((n, r) => n + r.lights.filter(l => l.visible && r.detail.visible).length, 0),
@@ -943,7 +999,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       };
     },
     dispose() {
-      if (disposed) return; disposed = true; group.removeFromParent();
+      if (disposed) return; disposed = true; interiorNavigation.dispose(); group.removeFromParent();
       group.traverse(object => object.userData?.ownedPropGeometries?.forEach(geometry => geometry.dispose()));
       group.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
       resources.forEach(resource => resource.dispose()); rooms.forEach(room => { room.actors.length = 0; }); courier=null; group.clear();

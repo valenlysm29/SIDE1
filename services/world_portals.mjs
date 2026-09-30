@@ -3,12 +3,14 @@
 export function crossedPortal(previous, next, portal) {
   if (!previous || !next || !portal) return false;
   const direction = portal.direction ?? -1;
-  const before = (previous.z - portal.z) * direction;
-  const after = (next.z - portal.z) * direction;
+  const axis = portal.axis || 'z';
+  const across = axis === 'x' ? 'z' : 'x';
+  const before = (previous[axis] - portal[axis]) * direction;
+  const after = (next[axis] - portal[axis]) * direction;
   if (!(before < 0 && after >= 0)) return false;
   const t = -before / (after - before);
-  const x = previous.x + (next.x - previous.x) * t;
-  return Math.abs(x - portal.x) <= (portal.halfWidth ?? 1.05);
+  const x = previous[across] + (next[across] - previous[across]) * t;
+  return Math.abs(x - portal[across]) <= (portal.halfWidth ?? 1.05);
 }
 
 export function crossedEntrance(previous, next, entrances) {

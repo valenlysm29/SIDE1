@@ -1014,10 +1014,12 @@
     return loadCharacter('mona',ASSET_PRIORITY.IMPORTANT);
   }
 
-  function createBusinessNpc(role) {
-    const cityRole=role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
+  function createBusinessNpc(role, room) {
+    const cityRole=['oficina','banco','cajero','proveedor','almacen','cliente','guardia'].includes(role)?role:role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
     const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
-    const obj=person({...look,cityRole,cityScene:'interiors'});
+    const nearby=room?room.actors.map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
+    if(room)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
+    const obj=person({...look,execModel:'city-fallback',cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby});
     obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
   }
 
@@ -1048,7 +1050,7 @@
         for(const room of businessInteriors?.rooms||[]){
           for(const actor of room.actors){
             const previous=actor.object,role=previous.userData.role;
-            const replacement=createBusinessNpc(role);
+            const replacement=createBusinessNpc(role,room);
             replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
             replacement.visible=previous.visible;replacement.name=previous.name;
             room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
@@ -1287,7 +1289,9 @@
     const nearby=[];
     for(const actor of [...animatedActors,...hubActors])if(actor.obj?.userData?.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
     for(const customer of npcs)if(customer.obj?.userData?.cityNpcId)nearby.push(customer.obj.userData.cityNpcId);
-    const choice=cityRoster.draw(cfg.cityScene||'business',cfg.cityRole,nearby);
+    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors)if(actor.object.userData.cityNpcId)nearby.push(actor.object.userData.cityNpcId);
+    if(cfg.excludedCityIds){nearby.splice(0,nearby.length,...cfg.excludedCityIds);if(!cityRoster.models.some(row=>cityRosterModule.npcHasRole(row,cfg.cityRole)&&!nearby.includes(row.id)))return null;}
+    const choice=cityRoster.draw(cfg.cityScene||'business',cfg.cityRole,nearby,{unique:Boolean(cfg.excludedCityIds)});
     const template=choice&&cityTemplates.get(choice.model.id);
     if(!template)return null;
     const group=new THREE.Group(),avatar=SkeletonUtils.clone(template.scene);
@@ -2328,7 +2332,7 @@
       pendingUnits:businessState?.pendingSupplierOrder?.units||0,
       productionActive:running&&!gameSession?.shiftEnded&&bridge().canOperate?.()!==false&&accounted<plannedTotal&&display+reserve<capacity,
       producedUnits:inventory?.producedUnits??null,plannedUnits:plan?.producibleUnits??0,productionPlan:plan,
-      cash:decisionCash(),round:currentRoundSafe(),
+      cash:decisionCash(),round:currentRoundSafe(),debt:bridge().creditState?.().outstanding??null,loan:bridge().decisions?.PRESTAMO?.amount??null,
       machines:{cutting:owned('MESA_CORTE'),assembly:owned('ENSAMBLE'),finishing:owned('ACABADOS')},
       workers:{cutting:qty('PERS_CORTE'),assembly:qty('PERS_ENSAMBLE'),finishing:qty('PERS_ACABADO')},
       products:PRODUCTS.map(p=>({id:p.id,color:p.color,display:displayStock(p.id),reserve:reserveStock(p.id)}))};
@@ -2606,7 +2610,8 @@
     if(npcNavigation&&npc.route.length) {
       const safe=[];let from={x:npc.obj.position.x,z:npc.obj.position.z};
       for(const point of npc.route) {
-        const segment=npcNavigation.planPath(from,{x:point[0],z:point[1]},npcObstacles());
+        const room=businessInteriors?.rooms.find(room=>room.id===businessInteriors.zoneAt(from)&&room.id===businessInteriors.zoneAt({x:point[0],z:point[1]}));
+        const segment=room?businessInteriors.interiorNavigation.plan(room,from,{x:point[0],z:point[1]},perfMode):npcNavigation.planPath(from,{x:point[0],z:point[1]},npcObstacles());
         if(!segment.length){safe.length=0;break}
         safe.push(...segment);const last=segment[segment.length-1];from={x:last[0],z:last[1]};
       }
@@ -2928,7 +2933,8 @@
     const state=n.locomotion || (n.locomotion={speed:0});
     Object.assign(state,{x:n.obj.position.x,z:n.obj.position.z,yaw:n.obj.rotation.y});
     const neighbors=npcNeighbors(n.obj);
-    const result=npcNavigation.advance(state,{x:target[0],z:target[1]},dt,npcObstacles(),neighbors,n.speed,n.routeIndex===n.route.length-1);
+    const interiorRoom=businessInteriors?.rooms.find(room=>room.id===businessInteriors.zoneAt(state));
+    const result=interiorRoom?businessInteriors.interiorNavigation.advance(interiorRoom,state,{x:target[0],z:target[1]},dt,neighbors,n.speed,perfMode,n.routeIndex===n.route.length-1):npcNavigation.advance(state,{x:target[0],z:target[1]},dt,npcObstacles(),neighbors,n.speed,n.routeIndex===n.route.length-1);
     n.obj.position.set(state.x,.025,state.z);n.obj.rotation.y=state.yaw;
     n.walkCycle+=result.distance*6.5;
     setPersonPose(n.obj,n.walkCycle,result.distance>.00001,dt);
@@ -3143,7 +3149,7 @@
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
-      createNpc:createBusinessNpc,
+      createNpc:createBusinessNpc,onCollidersAdded:items=>hubWorld.colliders.push(...items),
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
     businessInteriors.installStoreProps(storePropTemplates,perfMode);
     businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);
@@ -3159,9 +3165,6 @@
       adminPage:point.type==='supplier'||point.type==='inventory'?'stock':point.type==='production'?'dashboard':undefined
     }));
     interactables.push(
-      {x:HUB_OFFSET+19,z:66,type:'decisionZone',category:'B',label:'Gestionar infraestructura en la oficina'},
-      {x:HUB_OFFSET+66,z:19,type:'decisionZone',category:'E',label:'Revisar finanzas en el banco'},
-      {x:HUB_OFFSET-66,z:-19,type:'decisionZone',category:'F',label:'Gestionar compras con proveedores'},
       {x:HUB_OFFSET+19,z:30.1,type:'news',label:'Leer noticias del ciclo'}
     );
     productInteractables=interactables.filter(point=>point.type==='product');
@@ -3423,7 +3426,7 @@
       const distance=cameraZoom+Math.max(0,player.speed-2.65)*.18;
       const desired=new THREE.Vector3(player.x+Math.sin(yaw)*distance,Math.max(.55,focus.y+1.15-Math.sin(orbitPitch)*distance),player.z+Math.cos(yaw)*distance);
       const room=businessInteriors?.zones.find(zone=>zone.id===currentInterior);
-      const nearDoor=hubWorld?.entrances.some(entrance=>Math.abs(player.x-entrance.portal.x)<entrance.portal.halfWidth+1&&Math.abs(player.z-entrance.portal.z)<3);
+      const nearDoor=hubWorld?.entrances.some(entrance=>entrance.portal.axis==='x'?Math.abs(player.z-entrance.portal.z)<entrance.portal.halfWidth+1&&Math.abs(player.x-entrance.portal.x)<3:Math.abs(player.x-entrance.portal.x)<entrance.portal.halfWidth+1&&Math.abs(player.z-entrance.portal.z)<3);
       // Keep the third-person orbit below the 3.1m lintel while crossing a
       // doorway. Tall industrial roofs do not imply an overhead camera.
       const ceilingLimit=room||nearDoor?Math.min(2.8,room?.ceilingY-.25||2.8):Infinity;
@@ -3702,6 +3705,7 @@
       updateHubActors(dt);
       hubWorld?.tickOutdoorProps(dt,player,time);
       businessInteriors?.tick(dt,player,time);
+      for(const point of businessInteriors?.hotspots||[])if(point.type==='decisionZone'&&!interactables.some(existing=>existing.id===point.id))interactables.push(point);
       if (operating && !gameSession?.shiftEnded) {
         spawnNpc(now);
         triggerRandomEvent(now);
