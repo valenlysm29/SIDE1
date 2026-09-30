@@ -3204,7 +3204,7 @@
   function refreshHubUI() {
     const root=$3(rootId);root?.classList.toggle('in-hub',inHub);root?.classList.toggle('third-person',cameraMode==='third');
     $3('simMinimap')?.classList.toggle('hub-map',inHub);
-    const label={store:'TIENDA',warehouse:'ALMACÉN',production:'PRODUCCIÓN'}[currentInterior]||'PLAZA SIDE';
+    const label={store:'TIENDA',warehouse:'ALMACÉN',production:'PRODUCCIÓN',office:'OFICINA',bank:'BANCO',suppliers:'PROVEEDORES'}[currentInterior]||'PLAZA SIDE';
     root?.setAttribute('data-world-zone',currentInterior||'city');
     if($3('simWorldLocation'))$3('simWorldLocation').textContent=`${label} · ${DISTRICTS[selectedDistrict]}`;
     if($3('sim3dCameraBtn')){$3('sim3dCameraBtn').textContent=cameraMode==='third'?'CÁMARA · 3.ª':'CÁMARA · 1.ª';$3('sim3dCameraBtn').setAttribute('aria-pressed',String(cameraMode==='third'));}
@@ -3235,7 +3235,7 @@
     if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
     const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
     const contextual=$3('simBusinessContext');
-    if(contextual){contextual.hidden=!currentInterior;contextual.textContent=currentInterior==='warehouse'?`Inventario ${totalReserveStock()}/${warehouseCapacity()} · ${businessState?.pendingSupplierOrder?'Pedido pendiente':'Recepción disponible'}`:currentInterior==='production'?`Producción ${inventory?.producedUnits||0}/${productionSnapshot()?.producibleUnits||0} · Capacidad y productividad en terminal`:`Exhibición ${totalDisplayStock()} · Clientes ${checkoutQueue.length} · Ventas ${fmt(salesLedger())}`;}
+    if(contextual){contextual.hidden=!currentInterior;contextual.textContent=currentInterior==='office'?`Ciclo ${currentRoundSafe()} · Caja ${fmt(decisionCash())} · Resumen en la pizarra`:currentInterior==='bank'?`Deuda ${bridge().creditState?fmt(bridge().creditState().outstanding):'Sin datos'} · Préstamos en ventanilla`:currentInterior==='suppliers'?`Pedidos ${businessVisualSnapshot().pendingUnits} uds · Compras en el mostrador`:currentInterior==='warehouse'?`Inventario ${totalReserveStock()}/${warehouseCapacity()} · ${businessState?.pendingSupplierOrder?'Pedido pendiente':'Recepción disponible'}`:currentInterior==='production'?`Producción ${inventory?.producedUnits||0}/${productionSnapshot()?.producibleUnits||0} · Capacidad y productividad en terminal`:`Exhibición ${totalDisplayStock()} · Clientes ${checkoutQueue.length} · Ventas ${fmt(salesLedger())}`;}
     const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
     if(orderStatus){
       orderStatus.hidden=!order;
