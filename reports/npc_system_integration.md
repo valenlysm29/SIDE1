@@ -1,0 +1,7 @@
+# Fase E: integración del sistema NPC
+
+El runtime acepta modelos GLB solo de `assets/models/npc/manifest.json` (CC0) y, si existe localmente, de `assets/models/npc/private/manifest.json` (Mixamo con `privado: true`). La carpeta privada está ignorada por Git. En ausencia de archivos, usa el NPC procedural. La conversión privada de FBX Mixamo a GLB aún requiere Blender y los archivos que descargará el usuario; el pipeline público no los empaqueta.
+
+El sorteo por escena y rol usa una bolsa sin reemplazo. Las repeticiones reciben escala entre 96 % y 104 %, tinte leve y offset de animación. `npc_clip_controller.mjs` usa solo clips presentes en cada GLB. Las rutas de interiores ahora avanzan con `npc_navigation.mjs` sobre los AABB de su zona; los clientes conservan su flujo existente de stock y cola.
+
+Se añadió un mensajero visual de logística que, cuando la producción está activa y existe reserva, recorre físicamente almacén → recogida → calle → producción → operación → inspección → entrega → regreso. Usa `planPath` y `advance` sobre los colliders existentes; si una ruta no es alcanzable, se detiene. Solo aparece desde Media y no modifica stock, ventas ni decisiones. Una prueba recorre el ciclo completo y comprueba que no cruza obstáculos ni se teletransporta. Los demás trabajadores mantienen sus rutas por zona. Todavía no se puede comprobar visualmente la ropa, el patinaje o la diversidad de modelos hasta que haya archivos aprobados.

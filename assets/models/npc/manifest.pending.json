@@ -1,0 +1,23 @@
+{
+  "status": "pendiente_de_archivos_mixamo_y_curacion",
+  "purpose": "Plan de 16 plazas; no es el manifiesto que carga SIDE",
+  "requiredClips": ["idle", "walk", "run"],
+  "slots": [
+    {"slot": 1, "rol": "cliente", "genero": "mujer", "archivo": null},
+    {"slot": 2, "rol": "cliente", "genero": "hombre", "archivo": null},
+    {"slot": 3, "rol": "cliente", "genero": "mujer", "archivo": null},
+    {"slot": 4, "rol": "cliente", "genero": "hombre", "archivo": null},
+    {"slot": 5, "rol": "cliente", "genero": "mujer", "archivo": null},
+    {"slot": 6, "rol": "cliente", "genero": "hombre", "archivo": null},
+    {"slot": 7, "rol": "tienda", "genero": "mujer", "archivo": null},
+    {"slot": 8, "rol": "tienda", "genero": "hombre", "archivo": null},
+    {"slot": 9, "rol": "tienda", "genero": "mujer", "archivo": null},
+    {"slot": 10, "rol": "tienda", "genero": "hombre", "archivo": null},
+    {"slot": 11, "rol": "almacen", "genero": "mujer", "archivo": null},
+    {"slot": 12, "rol": "almacen", "genero": "hombre", "archivo": null},
+    {"slot": 13, "rol": "almacen", "genero": "hombre", "archivo": null},
+    {"slot": 14, "rol": "produccion", "genero": "mujer", "archivo": null},
+    {"slot": 15, "rol": "produccion", "genero": "hombre", "archivo": null},
+    {"slot": 16, "rol": "produccion", "genero": "mujer", "archivo": null}
+  ]
+}

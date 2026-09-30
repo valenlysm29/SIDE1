@@ -170,3 +170,58 @@ la Tanda 2: `warehouse_sewing_machine.glb`, `warehouse_cutting_table.glb`,
 `warehouse_pendant_light.glb`. La overlock y la estación de planchado se generan
 como modelos originales de SIDE porque no se encontró una alternativa adecuada,
 ligera y con licencia verificable en las fuentes autorizadas.
+
+## NPC de ciudad (conversión pendiente)
+
+Actualmente hay **0 modelos nuevos publicados** en `assets/models/npc/` y no
+existe un manifest de personajes aprobados. El sistema de NPC puede leer un
+manifest futuro, pero ahora conserva los NPC procedurales existentes.
+
+### FBX Mixamo privados recibidos: créditos individuales provisionales
+
+Estos son **candidatos visuales**, no modelos utilizados todavía. Fueron
+aportados por el usuario como descargas de [Mixamo](https://www.mixamo.com/),
+servicio de Adobe. Los nombres originales del personaje y sus autores
+individuales no figuran de forma verificable en los FBX recibidos, cuyos
+nombres describen la acción. La procedencia declarada de rig y movimiento
+es Mixamo/Adobe; los [términos de Mixamo](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html)
+requieren mantener estos archivos fuera del repositorio público. No se ha
+realizado aún unión de clips, normalización ni exportación GLB.
+
+| FBX fuente privado | Material identificador en FBX | Modelo/autor original | Estado |
+| --- | --- | --- | --- |
+| `Dwarf Walk (1).fbx` | `Ch27_body`, `Ch27_hair` | No consta | Candidato; faltan clips válidos |
+| `Dwarf Walk (2).fbx` | `Ch41_body`, `Ch41_hair` | No consta | Candidato; faltan clips válidos |
+| `Dwarf Walk (3).fbx` | `Ch08_Body`, `Ch08_Hoodie` | No consta | Candidato casual; faltan clips válidos |
+| `Dwarf Walk.fbx` | `Ch23_body`, `Ch23_hair` | No consta | Candidato; faltan clips válidos |
+| `Walk (2).fbx` | `Ch26_body`, `Ch26_hair` | No consta | Candidato; faltan clips válidos |
+| `Walk (4).fbx` | `Ch02_Body`, `Ch02_Hair` | No consta | Candidata casual; faltan clips válidos |
+| `Walk (5).fbx` | `Ch37_Shirt`, `Ch37_Pants` | No consta | Candidata casual; faltan clips válidos |
+| `Walk (6).fbx` | `Ch07_body`, `Ch07_hair` | No consta | Candidato; faltan clips válidos |
+| `Walking (1).fbx` | `Ch42_Shirt`, `Ch42_Shorts` | No consta | Candidato casual; faltan clips válidos |
+| `Walking (2).fbx` | `Ch01_body`, `Ch01_hair` | No consta | Candidato; faltan clips válidos |
+| `Walking (3).fbx` | `Ch06` | No consta | Candidato casual; faltan clips válidos |
+| `Walking (4).fbx` | `Ch22_Body`, `Ch22_Hair` | No consta | Candidata casual; faltan clips válidos |
+| `Walking (6).fbx` | `Ch31_Body`, `Ch31_Sweater` | No consta | Candidato; faltan clips válidos |
+| `Walking 1).fbx` | `Bottoms`, `Body`, `Hair` | No consta | Candidato casual; faltan clips válidos |
+
+La lista completa de descartes y el motivo de cada uno está en
+`reports/mixamo_delta_2026-09-29.md`. No se atribuye ninguno como asset
+efectivamente usado en SIDE hasta superar la validación técnica.
+
+Fuentes autorizadas y verificadas para una incorporación posterior:
+
+| Fuente | URL oficial | Licencia y estado |
+| --- | --- | --- |
+| Quaternius Universal Base Characters | [quaternius.com](https://quaternius.com/packs/universalbasecharacters.html), [itch.io](https://quaternius.itch.io/universal-base-characters) | CC0 1.0; ZIP Standard recibido. Sus dos bases Superhero están descartadas por ropa y no se usan. |
+| Quaternius Ultimate Modular Men | [quaternius.com](https://quaternius.com/packs/ultimatemodularcharacters.html) | CC0 1.0; descarga de Drive bloqueada por cuota. |
+| Quaternius Universal Animation Library 2 | [quaternius.com](https://quaternius.com/packs/universalanimationlibrary2.html) | CC0 1.0; ZIP Standard recibido. Sus clips aún no se incorporan a ningún modelo NPC. |
+| En3D 3DHuman-Syn | [GitHub](https://github.com/menyifang/En3D), [pesos](https://modelscope.cn/models/alibaba_openvision_3dgen/cv_en3d_3d_human_generation) | Licencia de avatares y pesos sin confirmar; no se usan. Apache-2.0 corresponde al código descargado (`render.py`). |
+| Ready Player Me Animation Library | [GitHub y licencia](https://github.com/readyplayerme/animation-library/blob/master/LICENSE.md) | Exige avatares Ready Player Me y limita redistribución; descartada para estos NPC. |
+| Mixamo | [mixamo.com](https://www.mixamo.com), [FAQ de Adobe](https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html) | 35 FBX privados recibidos (24 With Skin, 11 animaciones Without Skin); faltan Idle y Run In Place compatibles. El repositorio SIDE1 es público; no agregar FBX/GLB originales sueltos. |
+
+Yuka ([MIT](https://github.com/Mugen87/yuka/blob/master/LICENSE)) y
+three-pathfinding ([MIT](https://github.com/donmccurdy/three-pathfinding/blob/main/LICENSE))
+son fuentes de código autorizadas para navegación; no aportan modelos NPC.
+El detalle de los intentos de adquisición y sus bloqueos está en
+`assets/models/incoming/licencias.md`.

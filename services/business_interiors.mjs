@@ -1,10 +1,26 @@
 import * as THREE from '../vendor/three/build/three.module.js';
+import * as npcNavigation from './npc_navigation.mjs';
 
 // Metres, on the same street grid as the city. No interior scene or spawn map.
 export const BUSINESS_LAYOUTS = Object.freeze([
   { id: 'store', name: 'Tienda SIDE', x: -19, z: 19, width: 16, depth: 10, height: 4.6, doorX: -19, doorZ: 24, doorWidth: 2.8 },
   { id: 'warehouse', name: 'Almacén SIDE', x: -20.5, z: -19, width: 15, depth: 14, height: 6.6, doorX: -20, doorZ: -12, doorWidth: 3.6 },
   { id: 'production', name: 'Producción SIDE', x: 20, z: -19, width: 16, depth: 14, height: 6.4, doorX: 20, doorZ: -12, doorWidth: 2.8 }
+].map(Object.freeze));
+
+// Visual logistics route in shared world coordinates. Financial and inventory
+// state remains owned by the existing simulation snapshot.
+export const WORKER_CYCLE = Object.freeze([
+  {state:'recoger',x:-24.1,z:-16.0,wait:.7,action:'pickup'},
+  {state:'salir del almacén',x:-20,z:-10.4},
+  {state:'transportar',x:20,z:-10.4,action:'carry'},
+  {state:'entrar en producción',x:20,z:-13.2,action:'carry'},
+  {state:'operar',x:15.2,z:-21.55,wait:1.8,action:'inspect'},
+  {state:'inspeccionar',x:24,z:-21.4,wait:.8,action:'inspect'},
+  {state:'entregar',x:24.7,z:-19.6,wait:.7,action:'carry'},
+  {state:'salir de producción',x:20,z:-10.4},
+  {state:'volver',x:-20,z:-10.4},
+  {state:'entrar en almacén',x:-20,z:-13.2}
 ].map(Object.freeze));
 
 export function getBusinessZones(offsetX = 150) {
@@ -783,7 +799,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       realLights: productionRoom?.realLightLimit || 0
     };
   }
-  let snapshot = {}, disposed = false;
+  let snapshot = {}, disposed = false, courier = null;
   function sync(value = {}) {
     // `simulator3d.js` owns the financial model and sends a read-only
     // projection. Keep the older ratio aliases for callers from earlier
@@ -822,6 +838,51 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       room.actors.push({ object, route, target: route.stationary ? 0 : 1, wait: 0 });
     }
   }
+  function tickCourier(dt, position) {
+    // A single courier is enough to show the complete physical workflow. It
+    // operates only while the authoritative snapshot says production can run.
+    const active=Boolean(snapshot.productionActive&&Number(snapshot.reserve||0)>0);
+    if(!active||qualityRank(storePropQuality)<2){
+      if(courier)courier.object.visible=false;
+      return;
+    }
+    if(!courier){
+      const object=createNpc?.('warehouse-worker');
+      if(!object)return;
+      object.name='SIDE logistics courier';object.position.set(-22,.025,-16.1);
+      group.add(object);
+      courier={object,index:0,path:[],motion:{speed:0,yaw:0},wait:0};
+    }
+    const {object}=courier;
+    const world={x:object.position.x+offsetX,z:object.position.z};
+    const distanceToPlayer=position?Math.hypot(world.x-position.x,world.z-position.z):Infinity;
+    object.visible=distanceToPlayer<30;
+    const stage=WORKER_CYCLE[courier.index];
+    if(courier.wait>0){
+      courier.wait=Math.max(0,courier.wait-dt);
+      courier.motion.speed=0;
+      object.userData.cityRequestedAction=courier.pauseAction||null;
+      animateNpc?.(object,dt,false);
+      return;
+    }
+    object.userData.cityRequestedAction=stage.action==='carry'?'carry':null;
+    if(!courier.path.length){
+      const target={x:stage.x+offsetX,z:stage.z};
+      courier.path=npcNavigation.planPath(world,target,colliders);
+      if(!courier.path.length){animateNpc?.(object,dt,false);return}
+    }
+    const target=courier.path[0],motion=courier.motion;
+    Object.assign(motion,{x:world.x,z:world.z});
+    const neighbors=rooms.flatMap(room=>room.actors.map(actor=>({x:actor.object.position.x+offsetX,z:actor.object.position.z})));
+    if(position)neighbors.push({x:position.x,z:position.z});
+    const result=npcNavigation.advance(motion,{x:target[0],z:target[1]},dt,colliders,neighbors,.85,courier.path.length===1);
+    object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
+    animateNpc?.(object,dt,result.distance>.0001);
+    if(result.arrived){
+      courier.path.shift();
+      if(!courier.path.length){courier.wait=stage.wait||0;courier.pauseAction=stage.action||null;courier.index=(courier.index+1)%WORKER_CYCLE.length}
+    }
+  }
   function tick(dt, position, time = 0) {
     if (disposed) return;
     dt = Math.max(0, Math.min(.05, Number(dt) || 0)); const active = zoneAt(position);
@@ -834,16 +895,29 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       ensureActors(room);
       for (const actor of room.actors) {
         const { object, route } = actor;
-        const target = route.points[actor.target], dx = target.x - offsetX - object.position.x, dz = target.z - object.position.z, length = Math.hypot(dx, dz);
+        const target = route.points[actor.target];
         const playerDistance = Math.hypot(position.x - offsetX - object.position.x, position.z - object.position.z);
         let moving = false;
-        if (!route.stationary && length > .08 && playerDistance > 1.05) {
-          const step = Math.min(length, dt * .65); object.position.x += dx / length * step; object.position.z += dz / length * step;
-          object.rotation.y = Math.atan2(dx, dz); moving = true;
-        } else if (!route.stationary && length <= .08) actor.target = (actor.target + 1) % route.points.length;
+        if (!route.stationary && playerDistance > 1.05) {
+          const blocks=colliders.filter(item=>item.zone===room.id);
+          const world={x:object.position.x+offsetX,z:object.position.z};
+          if(!actor.path?.length)actor.path=npcNavigation.planPath(world,target,blocks);
+          const waypoint=actor.path?.[0];
+          if(waypoint){
+            const motion=actor.motion||(actor.motion={speed:0,yaw:object.rotation.y});
+            Object.assign(motion,{x:world.x,z:world.z});
+            const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z}));
+            neighbors.push({x:position.x,z:position.z});
+            const step=npcNavigation.advance(motion,{x:waypoint[0],z:waypoint[1]},dt,blocks,neighbors,.65);
+            object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
+            moving=step.distance>.0001;
+            if(step.arrived){actor.path.shift();if(!actor.path.length)actor.target=(actor.target+1)%route.points.length}
+          }
+        }
         animateNpc?.(object, dt, moving);
       }
     }
+    tickCourier(dt,position);
     for (const animation of animated) if (active === animation.zone) animation.object.position.y = animation.y + (snapshot.productionActive ? Math.sin(time * 20 + animation.phase) * .045 : 0);
     group.userData.activeZone = active;
   }
@@ -872,7 +946,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       if (disposed) return; disposed = true; group.removeFromParent();
       group.traverse(object => object.userData?.ownedPropGeometries?.forEach(geometry => geometry.dispose()));
       group.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
-      resources.forEach(resource => resource.dispose()); rooms.forEach(room => { room.actors.length = 0; }); group.clear();
+      resources.forEach(resource => resource.dispose()); rooms.forEach(room => { room.actors.length = 0; }); courier=null; group.clear();
     }
   };
 }

@@ -1,0 +1,1104 @@
+{
+  "previous": 17,
+  "current": 35,
+  "new": 18,
+  "modified": 3,
+  "unchanged": [
+    "Dwarf Walk (1).fbx",
+    "Dwarf Walk (2).fbx",
+    "Dwarf Walk (3).fbx",
+    "Dwarf Walk.fbx",
+    "Reloading.fbx",
+    "Walk (1).fbx",
+    "Walk (2).fbx",
+    "Walk (3).fbx",
+    "Walk (4).fbx",
+    "Walk (5).fbx",
+    "Walk (6).fbx",
+    "Walk.fbx",
+    "Walking (1).fbx",
+    "Walking (2).fbx"
+  ],
+  "changed": [
+    {
+      "file": "Slow Run (1).fbx",
+      "change": "new",
+      "sha256": "2842ce5c35ca15d1909fa550e387dadda6881b18a314e7aaec704666cf7eac1b",
+      "type": "Run Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "5f88ae054fd498c8c170a5849a3a2ca3be7cb04d488fb450a647fc57d8f40ea7",
+        "hierarchy": "431b8781c4fed55e1155766b9e7686823c27d0208d4691bbcf5b02af7310e366",
+        "restPose": "4a77fc452f43b4ea5f20ab34c37a73521399500a869ea305df9a6e69aacd32aa"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig7:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0",
+          "frameRange": [
+            1.0,
+            44.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Strut Walking (3).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": false,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Slow Run.fbx",
+      "change": "new",
+      "sha256": "5ae12b214eae2e2f800467752c2e74df19cdb4d4dccaf67acff9274c34a62dfe",
+      "type": "Run Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "16ff09daecc3253096e4415c6906d14e9837e7fb941c9363c1c610174d4bcc4c",
+        "hierarchy": "ff44ad9fe30ab5d57171a77af858a62b813ad6c08dfa9cf0db87a6e9d4fdf431",
+        "restPose": "df0629700cf31cd9c61b2c9b05450df0b8d235a5cd60a8b91195af85e07be4e5"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig9:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.001",
+          "frameRange": [
+            1.0,
+            43.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": false,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (1).fbx",
+      "change": "modified",
+      "sha256": "14e0382540219a9184c005bc76b947ec5048aef7fb1a4245c1e91b9a66f76f79",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "de4887b1911c7258c09eea834131f97d521bdd008d91b1c5b706a2d73afec7a3",
+        "hierarchy": "e635f31acaa6b1e022e263a3ab94163bcdb34360fa139b0f3a511654c6cdb58c",
+        "restPose": "f2d26b7370821d05cca0753e87406b7499c3694120c7e29c03d1a43f65601044"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig12:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.002",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (2).fbx",
+      "change": "new",
+      "sha256": "f71ce6c111c3d0d620a02750078dbd3c30e651e669857fbf94a2b34e10c09b80",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "96079a9c29dff5a067d5614122085a35dbb6567cd99cda970712602413dc8aa0"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.003",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (3).fbx",
+      "change": "new",
+      "sha256": "aa088564549d864a3df9a0e0f8777004d1f8c985a41a514093e6bd85c3c962e3",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "5f88ae054fd498c8c170a5849a3a2ca3be7cb04d488fb450a647fc57d8f40ea7",
+        "hierarchy": "431b8781c4fed55e1155766b9e7686823c27d0208d4691bbcf5b02af7310e366",
+        "restPose": "4a77fc452f43b4ea5f20ab34c37a73521399500a869ea305df9a6e69aacd32aa"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig7:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.004",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Slow Run (1).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (4).fbx",
+      "change": "new",
+      "sha256": "e4aefb73052c1b4c9ee275297ab45ee84bbbca1e051361eb09e46a7cfb7b6b9d",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "b3271363f68c9bbd11363fd93ddf4f72c4888373e034cbae7528eb8f2dcf6a26"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.005",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (5).fbx",
+      "change": "new",
+      "sha256": "51f029452a1249ca3ffde310615826760a3dcc3a116b83227a9b3d946058f06b",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "89dc73bd27f9a0b063ea165a34acbf4f85a0107cf1cda0b479ea8d8a2d422542",
+        "hierarchy": "8b64728b5a54107fb2aee91461a76ca22a1dfcee8af51d71be2743fbb25b238a",
+        "restPose": "e95967cbac9a8fe0bc4d5e38d169d3032731c0aca16d4c222d7a2b7e2adb7af9"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig6:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.006",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (6).fbx",
+      "change": "new",
+      "sha256": "bb860be299830d158397f0c42afdc86329573f9a7f30307a6385d103395e1474",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "ba2824c6244154f1ad11bec1b99c4d52eab96b88dc11a9f1cdecddfcacedfa05",
+        "hierarchy": "1b892b9343969d1860bf8a4c0ba82d354268bbbfd7b5e8d0b4033316b317dd2c",
+        "restPose": "0e97e0e115d5f22c364c83e53372d393438faf10bcf0e403dc54966595bfceea"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig11:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.007",
+          "frameRange": [
+            1.0,
+            86.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking (7).fbx",
+      "change": "new",
+      "sha256": "fdcb66e99bb5ef47a2871282e58042528b6dab671dc624e401e389b4ab6976c7",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "ad2296b606b6775e278a0f0da0228f015044f35f3480e2154cce34144c93d830"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.008",
+          "frameRange": [
+            1.0,
+            86.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Strut Walking.fbx",
+      "change": "modified",
+      "sha256": "ad0de12ca24ee54dd073ea19a50aa3b7ee082b8f2b8a4c70fa804ec143470f21",
+      "type": "other clip Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "a27fe321f0f0132f0352cbd4801995b5a935a452d0beef085b6989817d3b73eb"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.009",
+          "frameRange": [
+            1.0,
+            87.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (3).fbx",
+      "change": "new",
+      "sha256": "83465f984becac3c4b1851d24733d00bda2adcd6e6ae94f370e9d9869ad8d9ff",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 1,
+      "skinnedMeshes": 1,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "16ff09daecc3253096e4415c6906d14e9837e7fb941c9363c1c610174d4bcc4c",
+        "hierarchy": "ff44ad9fe30ab5d57171a77af858a62b813ad6c08dfa9cf0db87a6e9d4fdf431",
+        "restPose": "a5e6f5c3d849e3997773583254d31ba397686bf0b4a9c0588ddc01160c8dae3e"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig9:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.005",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (4).fbx",
+      "change": "new",
+      "sha256": "aa3d91560079ac6d264542156e99f93293dab7992df873c3c84e6042853a7da0",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 6,
+      "skinnedMeshes": 6,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f5cfa636a51878958dcf83608de8fa5a4607a98bf95f86a40c5c8f54d1789e36",
+        "hierarchy": "719e5bbd199218214b58d0892572ec37c4646d33bc2c47f89a6b6bf2eaa3d09e",
+        "restPose": "6b4a670d11108de83f53051eebf1fa13eb745f76a63cfd6e1973a97662bee39d"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig2:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.006",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Walking (5).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (5).fbx",
+      "change": "new",
+      "sha256": "4cec02d40dc00836a480f0f4130abad9f445392204c16eaf79bb9e663a44fec4",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 6,
+      "skinnedMeshes": 6,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f5cfa636a51878958dcf83608de8fa5a4607a98bf95f86a40c5c8f54d1789e36",
+        "hierarchy": "719e5bbd199218214b58d0892572ec37c4646d33bc2c47f89a6b6bf2eaa3d09e",
+        "restPose": "6b4a670d11108de83f53051eebf1fa13eb745f76a63cfd6e1973a97662bee39d"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig2:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.007",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Walking (4).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (6).fbx",
+      "change": "new",
+      "sha256": "92c6d9acad33c4e727af8b764f7abc3c0c1796c2fc0a213687fa2f2e0b76f436",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 7,
+      "skinnedMeshes": 7,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "16ff09daecc3253096e4415c6906d14e9837e7fb941c9363c1c610174d4bcc4c",
+        "hierarchy": "ff44ad9fe30ab5d57171a77af858a62b813ad6c08dfa9cf0db87a6e9d4fdf431",
+        "restPose": "2759eccad7c7ed605d120c0da1f5d5ba99e5aae5ed65e16cd86f2d331234ff35"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig9:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.008",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (7).fbx",
+      "change": "new",
+      "sha256": "7ebb66a2fbc786430bbbe06c927eee5aee86b607fa0a8137427eba156d92f209",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 7,
+      "skinnedMeshes": 7,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "5f88ae054fd498c8c170a5849a3a2ca3be7cb04d488fb450a647fc57d8f40ea7",
+        "hierarchy": "431b8781c4fed55e1155766b9e7686823c27d0208d4691bbcf5b02af7310e366",
+        "restPose": "c46d15c8951b6bdc6a673d1252c008fa73a5d3d2c9cff8b980480d0801b3db70"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig7:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.009",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Dwarf Walk (3).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking (8).fbx",
+      "change": "new",
+      "sha256": "e99fe567dfbd8ae6da1e670ce984d2b1167a2dc7d8f782a4c99580cde3fb2877",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 1,
+      "skinnedMeshes": 1,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "535ca6e12ce6b16010a31bedae49c42c707f7577451c0f4f81efbf6cee7669dd"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.010",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Walk (1).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking 1).fbx",
+      "change": "new",
+      "sha256": "b43a453300c48128a4bec38e3ac494742eeff2a68f9e89b01e2878c8113efa51",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 7,
+      "skinnedMeshes": 7,
+      "bones": 67,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "142da45fd839cb6789f98526cce7c6d8f8786d53e2cca14565e5273ad98ab28b",
+        "hierarchy": "c982f2db804d274e2496a65de2bde961bf2a25fa68db9a1b3885d65aab205e4e",
+        "restPose": "b0c0bc2c0ac62fc148d604b8907d97c4e94a1cdc0bba32bd258faf8e9e25a6ed"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.011",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking 2).fbx",
+      "change": "new",
+      "sha256": "359659530ba229e3539b58998be5827a444d3bc890fdc7fb473ba370c9213f30",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 7,
+      "skinnedMeshes": 7,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "16bae63259e152bcedd842f43b4ec2450a933f827e50ed8c25796f408b2123d7",
+        "hierarchy": "1444f35a123ed6e79f321e623a6338414590ae8f798b0e4b4770fe343ba790ea",
+        "restPose": "2256c8355623ff8039656923c8566d62bcc3110edbbf707fbd1cf52f04ebc23b"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig8:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.012",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Walk (6).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking.fbx",
+      "change": "modified",
+      "sha256": "e6b91b223363c1b5c2818e885162bf84653079fff217c1fa222ace0e194ba43b",
+      "type": "Walk Without Skin",
+      "armatures": 1,
+      "meshes": 0,
+      "skinnedMeshes": 0,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "d2e121c1bb5eda55c73d04e783ce73c48e4b762dd39478bd0774ea24a2b3368e",
+        "hierarchy": "2b2cd8b9251f001ed30df55da07ddc7031b1934f69dbeee8093449f24848a49e",
+        "restPose": "694f37aa0a2d1ff6eef6a6acd9cbae217fe90f3157504dd95984bd90b20bff2a"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig4:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.005",
+          "frameRange": [
+            1.0,
+            42.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 30,
+      "sameRestAndVertexCountAs": [],
+      "separateClipType": null,
+      "inPlace": true,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "Walking1.fbx",
+      "change": "new",
+      "sha256": "ae1a73e72973ac744511fc7fc79e470583ed57f5de0aca8e8d9c3d91bba15a7d",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 7,
+      "skinnedMeshes": 7,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "2dd74f5e51bd53f85a25e2ec7af1ef09437a8196d4af5f957383d5e8d60e6acc",
+        "hierarchy": "6e149c6c6c6f5c596b56818c2213f6430b72c4df2e40b1fd0d1e0951c177ec08",
+        "restPose": "1f2b631f192b28a5713359b614526aa0bf938649cf5612971fcf466a045fb9d2"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig5:Hips"
+      ],
+      "actions": [
+        {
+          "name": "Armature|mixamo.com|Layer0.014",
+          "frameRange": [
+            1.0,
+            58.0
+          ],
+          "slots": 1
+        }
+      ],
+      "fps": 60,
+      "sameRestAndVertexCountAs": [
+        "Walk.fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    },
+    {
+      "file": "character.fbx",
+      "change": "new",
+      "sha256": "f9efdd615b8de657d0e088577d18618ae5a35ef7178d370ec404b18c3590b0c1",
+      "type": "character With Skin",
+      "armatures": 1,
+      "meshes": 6,
+      "skinnedMeshes": 6,
+      "bones": 65,
+      "armatureName": "Armature",
+      "rigFingerprint": {
+        "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+        "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+        "restPose": "008b2266eed7945fee89af928faec0ef8b2a483d176f0d5b258867bb839a3be3"
+      },
+      "armatureTransform": {
+        "location": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          0.009999999776482582,
+          0.009999999776482582
+        ],
+        "rotationEuler": [
+          1.570796251296997,
+          -0.0,
+          0.0
+        ]
+      },
+      "rootBones": [
+        "mixamorig:Hips"
+      ],
+      "actions": [],
+      "fps": 25,
+      "sameRestAndVertexCountAs": [
+        "Walking (1).fbx"
+      ],
+      "separateClipType": null,
+      "inPlace": null,
+      "result": "no separate Idle/Walk/Run animation; cannot complete NPC"
+    }
+  ]
+}

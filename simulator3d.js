@@ -31,6 +31,8 @@
   const characterTextures = new Map();
   let monaModule = null, monaTemplate = null, monaLoadError = '';
   let npcMotion = null, npcNavigation = null, npcNames = null, customerModelIndex = 0;
+  let cityRosterModule = null, cityClipModule = null, cityRoster = null;
+  const cityTemplates = new Map();
   const suppliedTemplates = {}, suppliedErrors = {};
   let controlsOpenedFromHelp = false, missionCollapsed = false;
   let hubWorld = null, businessWorld = null, businessInteriors = null, hubActors = [], playerAvatar = null;
@@ -400,9 +402,8 @@
     const casual = [0x20242a,0x394d69,0x6a4f78,0x5b765f,0xa26059,0xc38b5c,0xd7d7d2];
     const premium = [0x1d2736,0x283047,0x473c50,0x846d5c];
     const palette = archetype?.id === 'premium' ? premium : casual;
-    const available=['chico1','chico2','chico3'].filter(id=>id!==activeCharacterId());
     return {
-      execModel: available[customerModelIndex++ % available.length],
+      cityRole:'cliente',cityScene:'store',
       gender: Math.random() < 0.5 ? 'female' : 'male',
       shirt: palette[Math.floor(Math.random()*palette.length)],
       pants: [0x202a36,0x2c3440,0x40506b,0x61574d][Math.floor(Math.random()*4)],
@@ -925,6 +926,7 @@
       await characterManager?.preloadRemaining({priority:ASSET_PRIORITY.IMPORTANT});
       for(const id of CHARACTER_IDS){const template=characterManager?.template(id);if(!template)continue;if(id==='mona')monaTemplate=template;else suppliedTemplates[id]=template;}
       await Promise.all([loadExecModelTemplates(),storeProps,warehouseProps,productionProps,outdoorProps]);
+      await loadCityNpcModels();
       if(['chico1','chico2','chico3'].some(id=>!suppliedTemplates[id])&&!execModelTemplates.casual)await loadNpcModelTemplate();
       refreshBusinessCharacters();ensureHubCharacters({allowFallback:true});detailsComplete=true;return true;
     })().catch(error=>{console.warn('SIDE: personajes interiores conservan su respaldo.',error);return false;})
@@ -991,6 +993,37 @@
   async function loadMonaModel() {
     if (monaTemplate) return true;
     return loadCharacter('mona',ASSET_PRIORITY.IMPORTANT);
+  }
+
+  async function loadCityNpcModels() {
+    if(cityRoster)return;
+    try {
+      [cityRosterModule,cityClipModule]=await Promise.all([import('./services/npc_city_roster.mjs'),import('./services/npc_clip_controller.mjs')]);
+      const [publicResponse,privateResponse]=await Promise.all([
+        fetch('assets/models/npc/manifest.json'),fetch('assets/models/npc/private/manifest.json')
+      ]);
+      const publicRows=publicResponse.ok?await publicResponse.json():[];
+      const privateRows=privateResponse.ok?await privateResponse.json():[];
+      const approved=cityRosterModule.validCityManifest([
+        ...(Array.isArray(publicRows)?publicRows.filter(row=>!row.privado):[]),
+        ...(Array.isArray(privateRows)?privateRows.filter(row=>row.privado===true):[])
+      ]);
+      await Promise.all(approved.map(async entry=>{
+        try {const gltf=await assetCache.loadGLTF(new GLTFLoader(),entry.archivo,{priority:ASSET_PRIORITY.LAZY});
+          if(gltf?.scene)cityTemplates.set(entry.id,{scene:gltf.scene,clips:gltf.animations||[],entry});
+        } catch(error){console.warn(`NPC ${entry.id} no disponible; se usará el respaldo procedural.`,error)}
+      }));
+      cityRoster=cityRosterModule.createCityRoster(approved.filter(entry=>cityTemplates.has(entry.id)));
+      if(cityRoster.models.length){
+        // Hub fallback actors may have been created before deferred model loading.
+        for(const actor of hubActors){actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal)}
+        hubActors.length=0;
+        for(const room of businessInteriors?.rooms||[]){
+          for(const actor of room.actors){actor.object.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.object);clearGroup(disposal)}
+          room.actors.length=0;
+        }
+      }
+    } catch(error){console.warn('No se pudo cargar el catálogo NPC; se mantiene el respaldo procedural.',error)}
   }
 
   async function loadSuppliedNpcs() {
@@ -1195,12 +1228,38 @@
     return group;
   }
 
+  function cityNpcFromTemplate(cfg) {
+    if(!cityRoster||!SkeletonUtils?.clone)return null;
+    const nearby=[];
+    for(const actor of [...animatedActors,...hubActors])if(actor.obj?.userData?.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
+    for(const customer of npcs)if(customer.obj?.userData?.cityNpcId)nearby.push(customer.obj.userData.cityNpcId);
+    const choice=cityRoster.draw(cfg.cityScene||'business',cfg.cityRole,nearby);
+    const template=choice&&cityTemplates.get(choice.model.id);
+    if(!template)return null;
+    const group=new THREE.Group(),avatar=SkeletonUtils.clone(template.scene);
+    avatar.scale.setScalar((cfg.bodyScale||1)*choice.heightScale);
+    avatar.traverse(node=>{if(node.isMesh)node.userData.sharedCharacterResource=true});
+    if(choice.repeated)avatar.traverse(node=>{
+      if(!node.isMesh||!node.material)return;
+      node.userData.cityTintedMaterial=true;
+      node.material=Array.isArray(node.material)?node.material.map(material=>material.clone()):node.material.clone();
+      const materials=Array.isArray(node.material)?node.material:[node.material];
+      for(const material of materials)if(material.color)material.color.lerp(new THREE.Color(choice.tint),.12);
+    });
+    group.add(avatar);
+    const mixer=new THREE.AnimationMixer(avatar);
+    const controller=cityClipModule.createNpcClipController({mixer,clips:template.clips,idleVariant:Math.floor(choice.animationOffset)});
+    group.userData={cityNpcId:choice.model.id,modelKind:`city:${choice.model.id}`,cityClipController:controller,
+      cityAvatar:avatar,cityMixer:mixer,cityPosePosition:new THREE.Vector3(),cityPoseReady:false};
+    npcNames?.setNpcName(group,choice.model.nombre,choice.model.altura*choice.heightScale);
+    return group;
+  }
+
   function person(style = 0x5aa9ff, characterRole = 'npc') {
     const cfg = typeof style === 'object' ? style : { shirt: style };
+    if(characterRole!=='player'&&cfg.cityRole){const city=cityNpcFromTemplate(cfg);if(city)return city;cfg.forceProcedural=true;}
     let modelKind = cfg.execModel || (cfg.gender === 'female' ? 'female' : cfg.formal ? 'male' : 'casual');
-    if(characterRole!=='player'&&validCharacterId(modelKind)&&modelKind===activeCharacterId()){
-      modelKind=CHARACTER_IDS.find(id=>id!=='mona'&&id!==activeCharacterId()&&suppliedTemplates[id])||(cfg.gender === 'female'?'female':'casual');
-    }
+    if(characterRole!=='player'&&validCharacterId(modelKind)){modelKind='city-fallback';cfg.forceProcedural=true;}
     if (suppliedTemplates[modelKind]) {
       const group=npcMotion.createNpc(suppliedTemplates[modelKind],modelKind);
       npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);return attachProceduralController(group);
@@ -1342,6 +1401,20 @@
     } else if(g.userData.poseElapsed) {
       frameDt=(frameDt||.016)+g.userData.poseElapsed;g.userData.poseElapsed=0;
     }
+    if(g.userData.cityClipController){
+      const now=g.getWorldPosition(g.userData.cityPosePosition||new THREE.Vector3());
+      const previous=g.userData.cityPreviousPosition||(g.userData.cityPreviousPosition=now.clone());
+      const distance=g.userData.cityPoseReady?previous.distanceTo(now):0;
+      previous.copy(now);g.userData.cityPoseReady=true;
+      let onScreen=!camera||playerDistance<55;
+      if(onScreen&&camera){
+        const dx=now.x-camera.position.x,dy=now.y-camera.position.y,dz=now.z-camera.position.z;
+        const basis=camera.matrixWorld.elements;
+        const facing=-(dx*basis[8]+dy*basis[9]+dz*basis[10]);
+        onScreen=facing>-.2*Math.hypot(dx,dy,dz);
+      }
+      g.userData.cityClipController.update(frameDt||.016,{distance,requested:g.userData.cityRequestedAction||null,visible:onScreen});return;
+    }
     if(g.userData.animationController){
       const now=performance.now()/1000;
       const dt=frameDt ?? Math.min(.08,Math.max(.001,now-Number(g.userData.lastAnimAt||now-.016)));
@@ -1378,6 +1451,7 @@
   }
 
   function acquireNpcPerson(style) {
+    if(style.cityRole){const created=person(style);created.userData.cityRole=style.cityRole;return created;}
     const index=npcPool.findIndex(p=>p.userData.modelKind===style.execModel);
     const pooled=index>=0?npcPool.splice(index,1)[0]:null;
     if(!pooled)return person(style);
@@ -1393,7 +1467,8 @@
     if(npc.obj.userData.orderLabel){npc.obj.remove(npc.obj.userData.orderLabel);npc.obj.userData.orderLabel=null;}
     npcGroup?.remove(npc.obj);npc.obj.visible=false;
     const limit=Number((PERF[perfMode]||PERF.auto||{maxCustomers:8}).maxCustomers||8);
-    if(npcPool.length<limit)npcPool.push(npc.obj);
+    if(npc.obj.userData.cityNpcId||npc.obj.userData.cityRole){const disposal=new THREE.Group();disposal.add(npc.obj);clearGroup(disposal)}
+    else if(npcPool.length<limit)npcPool.push(npc.obj);
     else {const disposal=new THREE.Group();disposal.add(npc.obj);clearGroup(disposal)}
   }
 
@@ -2140,10 +2215,11 @@
       const child = group.children[0];
       group.remove(child);
       child.traverse?.((c) => {
+        if(c.userData?.cityClipController){c.userData.cityClipController.dispose();c.userData.cityMixer?.uncacheRoot?.(c.userData.cityAvatar)}
         if(c.userData?.animationController)c.userData.animationController.dispose();
         else if (c.userData?.mixer) { c.userData.mixer.stopAllAction(); c.userData.mixer.uncacheRoot(c.userData.modelAvatar); }
         if (c.isSkinnedMesh) c.skeleton?.dispose?.();
-        if (c.userData?.sharedCharacterResource) return;
+        if (c.userData?.sharedCharacterResource){if(c.userData.cityTintedMaterial){const materials=Array.isArray(c.material)?c.material:[c.material];materials.forEach(material=>material?.dispose?.())}return;}
         c.userData?.ownedTexture?.dispose?.();
         c.geometry?.dispose?.();
         if (c.material) Array.isArray(c.material) ? c.material.forEach(m => m.dispose?.()) : c.material.dispose?.();
@@ -2175,7 +2251,7 @@
 
   function addWorkers(count, color, startX, startZ, role = 'worker') {
     for (let i = 0; i < Math.min(count, 8); i++) {
-      const p = person({shirt:color,pants:0x2b3440,formal:false,gender:i%3===0?'female':'male'});
+      const p = person({cityRole:startX<0?'almacen':'produccion',cityScene:'business',shirt:color,pants:0x2b3440,formal:false,gender:i%3===0?'female':'male'});
       p.position.set(startX + (i % 4) * 1.28, 0, startZ + Math.floor(i / 4) * 1.56);
       p.rotation.y = Math.PI;
       dynamicGroup.add(p);
@@ -2244,7 +2320,7 @@
     const staff = Math.min(perfMode==='low'?3:6, salesStaff());
     for (let i=0;i<staff;i++) {
       const look = STAFF_LOOKS[i % STAFF_LOOKS.length];
-      const p = person(look);
+      const p = person({...look,cityRole:'tienda',cityScene:'business'});
       p.position.set(3.8 + (i%3) * 2.2, 0, 4.75 - Math.floor(i/3)*1.1);
       dynamicGroup.add(p);
       registerAnimatedActor({ type: 'salesperson', obj: p, baseY: 0, baseX: p.position.x, baseZ: p.position.z, phase: Math.random()*6.28, speed: 1.7 + i*0.15, state:'disponible' });
@@ -2254,14 +2330,11 @@
   function buildMonaNpc() {
     const config = CONFIG.NPCS?.mona;
     if (!config) return;
-    const mona = monaTemplate
-      ? monaModule.createMonaNpc(THREE, monaTemplate, config)
-      : person({gender:'female', execModel:'female', bodyScale:.96});
+    const mona = person({gender:'female',cityRole:'tienda',cityScene:'business',forceProcedural:true,bodyScale:.96});
     mona.position.set(config.position.x, 0, config.position.z);
     mona.name = config.name;
     mona.userData.npcId = 'mona';
     mona.userData.role = 'guide';
-    if (!monaTemplate) mona.userData.modelKind = 'mona-fallback';
     dynamicGroup.add(mona);
     npcNames.setNpcName(mona,config.name,config.height);
     const collider={npcId:'mona',minX:config.position.x-.28,maxX:config.position.x+.28,minZ:config.position.z-.24,maxZ:config.position.z+.24};
@@ -2832,10 +2905,10 @@
       [[4.2,11.0],[7,11.0],[7,12.6],[4.2,12.6]],
       [[10.5,12.5],[12.2,12.5],[12.2,10.9],[9,10.9],[9,12.5]]
     ];
-    ['chico1','chico2','chico3'].forEach((id,i)=>{
-      const obj=person({execModel:id});obj.userData.role='pedestrian';
-      obj.position.set(routes[i][0][0],.025,routes[i][0][1]);scene.add(obj);
-      registerAnimatedActor({type:'visitor',obj,patrol:routes[i],patrolIndex:1,pause:i*.6,speed:.82+i*.06});
+    routes.forEach((route,i)=>{
+      const obj=person({cityRole:'cliente',cityScene:'outdoor',gender:i%2?'female':'male'});obj.userData.role='pedestrian';
+      obj.position.set(route[0][0],.025,route[0][1]);scene.add(obj);
+      registerAnimatedActor({type:'visitor',obj,patrol:route,patrolIndex:1,pause:i*.6,speed:.82+i*.06});
     });
   }
 
@@ -2933,41 +3006,19 @@
   function ensureHubCharacters({allowFallback=false}={}) {
     if(!scene||!hubWorld||!npcNames)return;
     const selected=activeCharacterId();
-    for(let i=hubActors.length-1;i>=0;i--){
-      const actor=hubActors[i],id=actor.obj.userData.characterId;
-      if(id!==selected)continue;
-      actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal);hubActors.splice(i,1);
-    }
     let guide=animatedActors.find(actor=>actor.type==='guide');
-    if(guide?.obj.userData.characterId===selected){
-      interactables=interactables.filter(item=>item.mesh!==guide.obj);guide.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(guide.obj);clearGroup(disposal);
-      animatedActors=animatedActors.filter(actor=>actor!==guide);
-      guide=null;
-    }
-    if(guide?.obj.userData.modelKind==='mona-fallback'&&monaTemplate){
-      interactables=interactables.filter(item=>item.mesh!==guide.obj);guide.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(guide.obj);clearGroup(disposal);
-      animatedActors=animatedActors.filter(actor=>actor!==guide);guide=null;
-    }
-    if(selected!=='mona'&&!guide&&(monaTemplate||allowFallback)){
-      const object=monaTemplate
-        ? attachProceduralController(monaModule.createMonaNpc(THREE,monaTemplate,CONFIG.NPCS.mona))
-        : person({gender:'female',forceProcedural:true,bodyScale:.96});
-      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide',characterId:'mona',modelKind:monaTemplate?'mona':'mona-fallback'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
+    if(selected!=='mona'&&!guide&&allowFallback){
+      const object=person({gender:'female',cityRole:'cliente',cityScene:'hub',forceProcedural:true,bodyScale:.96});
+      object.name=CONFIG.NPCS.mona.name;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,CONFIG.NPCS.mona.name,CONFIG.NPCS.mona.height);
       object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
       animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
       interactables.push({mesh:object,type:'mona',label:`Hablar con ${CONFIG.NPCS.mona.name}`,x:HUB_OFFSET+14,z:26});
     }
-    ['chico1','chico2','chico3'].forEach((id,index)=>{
-      if(id===selected)return;
-      const current=hubActors.find(actor=>actor.obj.userData.characterId===id);
-      if(current&&current.obj.userData.modelKind===`${id}-fallback`&&suppliedTemplates[id]){
-        current.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(current.obj);clearGroup(disposal);hubActors.splice(hubActors.indexOf(current),1);
-      }else if(current)return;
-      if(!suppliedTemplates[id]&&!allowFallback)return;
-      const object=suppliedTemplates[id]
-        ? person({execModel:id})
-        : person({forceProcedural:true,gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62][index]});
-      object.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(object.userData,{role:'hub-pedestrian',characterId:id,modelKind:suppliedTemplates[id]?id:`${id}-fallback`});
+    [0,1,2].forEach(index=>{
+      if(hubActors.some(actor=>actor.obj.userData.cityHubIndex===index)||!allowFallback)return;
+      const object=person({cityRole:'cliente',cityScene:'hub',gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62][index]});
+      object.getObjectByName('NpcNameLabel')?.removeFromParent();
+      Object.assign(object.userData,{role:'hub-pedestrian',cityHubIndex:index});
       const source=hubWorld.patrolRoutes?.[index]||HUB_CHARACTER_ROUTES[index].map(([x,z])=>[x+HUB_OFFSET,z]);
       const patrol=source.map(point=>Array.isArray(point)?point:[point.x,point.z]);object.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(object);
       hubActors.push({obj:object,patrol,index:1,route:[],pause:index*.8,speed:.9+index*.07,state:{speed:0}});
@@ -2991,7 +3042,12 @@
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
     const {createBusinessInteriors}=await import('./services/business_interiors.mjs?v=20260928-production-props-4');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
-      createNpc(role){const obj=person(role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{execModel:role==='supervisor'?'chico2':'chico3'});obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;},
+      createNpc(role){
+        const cityRole=role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
+        const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
+        const obj=person({...look,cityRole,cityScene:'interiors'});
+        obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
+      },
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
     businessInteriors.installStoreProps(storePropTemplates,perfMode);
     businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);

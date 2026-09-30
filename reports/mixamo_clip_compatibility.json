@@ -1,0 +1,2376 @@
+[
+  {
+    "clipFile": "Slow Run (1).fbx",
+    "rigFingerprint": {
+      "boneNames": "5f88ae054fd498c8c170a5849a3a2ca3be7cb04d488fb450a647fc57d8f40ea7",
+      "hierarchy": "431b8781c4fed55e1155766b9e7686823c27d0208d4691bbcf5b02af7310e366",
+      "rest": "4a77fc452f43b4ea5f20ab34c37a73521399500a869ea305df9a6e69aacd32aa"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0",
+      "frameRange": [
+        1,
+        44
+      ],
+      "fps": 60,
+      "durationSeconds": 0.7166666666666667,
+      "horizontalDeltaMeters": 2.191190000022819,
+      "horizontalRangeMeters": [
+        0.02721,
+        2.19119
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00123,
+            -0.00989,
+            0.84313
+          ],
+          "leftFoot": [
+            0.10944,
+            0.09509,
+            0.26117
+          ],
+          "rightFoot": [
+            0.0178,
+            0.15765,
+            0.11593
+          ]
+        },
+        {
+          "frame": 6,
+          "hips": [
+            -0.00731,
+            -0.2385,
+            0.90774
+          ],
+          "leftFoot": [
+            0.08803,
+            -0.33858,
+            0.18188
+          ],
+          "rightFoot": [
+            0.01275,
+            0.11406,
+            0.14625
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.01831,
+            -0.54089,
+            0.94401
+          ],
+          "leftFoot": [
+            0.03806,
+            -0.81683,
+            0.13739
+          ],
+          "rightFoot": [
+            -0.03776,
+            -0.08507,
+            0.21098
+          ]
+        },
+        {
+          "frame": 17,
+          "hips": [
+            -0.02391,
+            -0.77643,
+            0.89753
+          ],
+          "leftFoot": [
+            -0.0111,
+            -0.86074,
+            0.11005
+          ],
+          "rightFoot": [
+            -0.06434,
+            -0.39623,
+            0.28474
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            -0.02645,
+            -1.00345,
+            0.84543
+          ],
+          "leftFoot": [
+            -0.01302,
+            -0.86206,
+            0.11593
+          ],
+          "rightFoot": [
+            -0.07867,
+            -0.82629,
+            0.27233
+          ]
+        },
+        {
+          "frame": 28,
+          "hips": [
+            -0.01888,
+            -1.34452,
+            0.87526
+          ],
+          "leftFoot": [
+            -0.00232,
+            -0.92431,
+            0.16679
+          ],
+          "rightFoot": [
+            -0.04087,
+            -1.41644,
+            0.16267
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            -0.01641,
+            -1.6285,
+            0.9037
+          ],
+          "leftFoot": [
+            0.04978,
+            -1.11771,
+            0.236
+          ],
+          "rightFoot": [
+            0.00901,
+            -1.90773,
+            0.13411
+          ]
+        },
+        {
+          "frame": 39,
+          "hips": [
+            0.00076,
+            -1.9425,
+            0.82173
+          ],
+          "leftFoot": [
+            0.08788,
+            -1.56504,
+            0.3231
+          ],
+          "rightFoot": [
+            0.01654,
+            -2.0309,
+            0.11593
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            -0.00122,
+            -2.20108,
+            0.84313
+          ],
+          "leftFoot": [
+            0.10945,
+            -2.09611,
+            0.26117
+          ],
+          "rightFoot": [
+            0.01781,
+            -2.03354,
+            0.11593
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk (3).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.125852,
+        "hipsRestDelta": 2.048547,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (7).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.125852,
+        "hipsRestDelta": 2.048547,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Slow Run.fbx",
+    "rigFingerprint": {
+      "boneNames": "16ff09daecc3253096e4415c6906d14e9837e7fb941c9363c1c610174d4bcc4c",
+      "hierarchy": "ff44ad9fe30ab5d57171a77af858a62b813ad6c08dfa9cf0db87a6e9d4fdf431",
+      "rest": "df0629700cf31cd9c61b2c9b05450df0b8d235a5cd60a8b91195af85e07be4e5"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.003",
+      "frameRange": [
+        1,
+        43
+      ],
+      "fps": 60,
+      "durationSeconds": 0.7,
+      "horizontalDeltaMeters": 2.0526510538569385,
+      "horizontalRangeMeters": [
+        0.02461,
+        2.05265
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00209,
+            -0.00786,
+            0.82629
+          ],
+          "leftFoot": [
+            0.11021,
+            0.08782,
+            0.25317
+          ],
+          "rightFoot": [
+            0.01177,
+            0.15211,
+            0.11541
+          ]
+        },
+        {
+          "frame": 6,
+          "hips": [
+            -0.00803,
+            -0.22465,
+            0.88302
+          ],
+          "leftFoot": [
+            0.09005,
+            -0.32617,
+            0.17852
+          ],
+          "rightFoot": [
+            0.00679,
+            0.10994,
+            0.14563
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.01746,
+            -0.51577,
+            0.9113
+          ],
+          "leftFoot": [
+            0.04201,
+            -0.78477,
+            0.13699
+          ],
+          "rightFoot": [
+            -0.04249,
+            -0.08347,
+            0.20494
+          ]
+        },
+        {
+          "frame": 17,
+          "hips": [
+            -0.02275,
+            -0.7437,
+            0.87285
+          ],
+          "leftFoot": [
+            -0.00574,
+            -0.82739,
+            0.11123
+          ],
+          "rightFoot": [
+            -0.068,
+            -0.38069,
+            0.28024
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            -0.02462,
+            -0.96688,
+            0.83119
+          ],
+          "leftFoot": [
+            -0.00731,
+            -0.8293,
+            0.1108
+          ],
+          "rightFoot": [
+            -0.07811,
+            -0.79853,
+            0.26224
+          ]
+        },
+        {
+          "frame": 27,
+          "hips": [
+            -0.01822,
+            -1.23599,
+            0.84723
+          ],
+          "leftFoot": [
+            0.00062,
+            -0.86631,
+            0.15039
+          ],
+          "rightFoot": [
+            -0.05176,
+            -1.26306,
+            0.18232
+          ]
+        },
+        {
+          "frame": 32,
+          "hips": [
+            -0.01657,
+            -1.50711,
+            0.8747
+          ],
+          "leftFoot": [
+            0.04988,
+            -1.03697,
+            0.20579
+          ],
+          "rightFoot": [
+            -0.00296,
+            -1.75778,
+            0.13158
+          ]
+        },
+        {
+          "frame": 38,
+          "hips": [
+            -0.0014,
+            -1.82272,
+            0.81344
+          ],
+          "leftFoot": [
+            0.08491,
+            -1.41371,
+            0.30903
+          ],
+          "rightFoot": [
+            0.01005,
+            -1.95167,
+            0.11541
+          ]
+        },
+        {
+          "frame": 43,
+          "hips": [
+            -1e-05,
+            -2.06051,
+            0.81219
+          ],
+          "leftFoot": [
+            0.11017,
+            -1.91511,
+            0.27113
+          ],
+          "rightFoot": [
+            0.01135,
+            -1.95469,
+            0.11541
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Walking (3).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.73288,
+        "hipsRestDelta": 0.786247,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (6).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 5.899545,
+        "hipsRestDelta": 2.120663,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (1).fbx",
+    "rigFingerprint": {
+      "boneNames": "de4887b1911c7258c09eea834131f97d521bdd008d91b1c5b706a2d73afec7a3",
+      "hierarchy": "e635f31acaa6b1e022e263a3ab94163bcdb34360fa139b0f3a511654c6cdb58c",
+      "rest": "f2d26b7370821d05cca0753e87406b7499c3694120c7e29c03d1a43f65601044"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.006",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 6.999999999999975e-05,
+      "horizontalRangeMeters": [
+        0.11624,
+        0.05418
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00205,
+            -0.0017,
+            0.97113
+          ],
+          "leftFoot": [
+            0.11355,
+            8e-05,
+            0.18739
+          ],
+          "rightFoot": [
+            -0.03876,
+            0.02143,
+            0.13326
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00609,
+            0.01679,
+            0.9704
+          ],
+          "leftFoot": [
+            0.12933,
+            -0.29445,
+            0.15302
+          ],
+          "rightFoot": [
+            -0.04013,
+            0.19003,
+            0.14333
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.02067,
+            -0.00732,
+            0.951
+          ],
+          "leftFoot": [
+            0.13851,
+            -0.29389,
+            0.13915
+          ],
+          "rightFoot": [
+            -0.04344,
+            0.31449,
+            0.16829
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08858,
+            -0.03739,
+            0.95158
+          ],
+          "leftFoot": [
+            0.14242,
+            -0.16108,
+            0.131
+          ],
+          "rightFoot": [
+            -0.04467,
+            0.26517,
+            0.25427
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.11015,
+            -0.00976,
+            0.96647
+          ],
+          "leftFoot": [
+            0.14255,
+            0.00904,
+            0.13052
+          ],
+          "rightFoot": [
+            -0.0058,
+            0.03525,
+            0.21335
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.1084,
+            0.01185,
+            0.95909
+          ],
+          "leftFoot": [
+            0.14353,
+            0.18311,
+            0.12712
+          ],
+          "rightFoot": [
+            -0.02791,
+            -0.22095,
+            0.14203
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.07591,
+            -0.00112,
+            0.94834
+          ],
+          "leftFoot": [
+            0.1459,
+            0.31698,
+            0.15914
+          ],
+          "rightFoot": [
+            -0.0348,
+            -0.27031,
+            0.13802
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01816,
+            -0.02607,
+            0.94168
+          ],
+          "leftFoot": [
+            0.14634,
+            0.25054,
+            0.24492
+          ],
+          "rightFoot": [
+            -0.03844,
+            -0.15013,
+            0.13073
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.00212,
+            -0.0017,
+            0.97113
+          ],
+          "leftFoot": [
+            0.11348,
+            8e-05,
+            0.18739
+          ],
+          "rightFoot": [
+            -0.03876,
+            0.02143,
+            0.13326
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Walking (2).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 5.786401,
+        "hipsRestDelta": 2.667073,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (2).fbx",
+    "rigFingerprint": {
+      "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+      "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+      "rest": "96079a9c29dff5a067d5614122085a35dbb6567cd99cda970712602413dc8aa0"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.008",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 6.000000000000016e-05,
+      "horizontalRangeMeters": [
+        0.11307,
+        0.05695
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00227,
+            -0.00842,
+            0.93941
+          ],
+          "leftFoot": [
+            0.1036,
+            -0.00684,
+            0.19302
+          ],
+          "rightFoot": [
+            -0.03351,
+            0.01929,
+            0.14293
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00668,
+            0.01197,
+            0.94405
+          ],
+          "leftFoot": [
+            0.11791,
+            -0.26954,
+            0.15979
+          ],
+          "rightFoot": [
+            -0.03526,
+            0.1774,
+            0.15252
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.01929,
+            -0.01404,
+            0.92569
+          ],
+          "leftFoot": [
+            0.12626,
+            -0.27287,
+            0.14816
+          ],
+          "rightFoot": [
+            -0.03939,
+            0.29117,
+            0.17536
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08389,
+            -0.04498,
+            0.92293
+          ],
+          "leftFoot": [
+            0.13113,
+            -0.15246,
+            0.14104
+          ],
+          "rightFoot": [
+            -0.04195,
+            0.23402,
+            0.24791
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.10412,
+            -0.01639,
+            0.93782
+          ],
+          "leftFoot": [
+            0.13133,
+            0.0077,
+            0.14041
+          ],
+          "rightFoot": [
+            -0.00311,
+            0.02489,
+            0.21592
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.10639,
+            0.01077,
+            0.93709
+          ],
+          "leftFoot": [
+            0.13156,
+            0.17155,
+            0.13945
+          ],
+          "rightFoot": [
+            -0.02426,
+            -0.22622,
+            0.15292
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.07204,
+            -0.00781,
+            0.92292
+          ],
+          "leftFoot": [
+            0.13299,
+            0.29657,
+            0.16642
+          ],
+          "rightFoot": [
+            -0.02896,
+            -0.25239,
+            0.14775
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01683,
+            -0.03107,
+            0.91032
+          ],
+          "leftFoot": [
+            0.136,
+            0.22038,
+            0.23909
+          ],
+          "rightFoot": [
+            -0.0331,
+            -0.14229,
+            0.1406
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.00233,
+            -0.00842,
+            0.93941
+          ],
+          "leftFoot": [
+            0.10354,
+            -0.00684,
+            0.19302
+          ],
+          "rightFoot": [
+            -0.03351,
+            0.01929,
+            0.14293
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.113209,
+        "hipsRestDelta": 4.976851,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 20.730881,
+        "hipsRestDelta": 6.046366,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (4).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 9.22641,
+        "hipsRestDelta": 1.695147,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 5.998013,
+        "hipsRestDelta": 2.326051,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (8).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 20.730881,
+        "hipsRestDelta": 6.046366,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "character.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 5.998013,
+        "hipsRestDelta": 2.326051,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (3).fbx",
+    "rigFingerprint": {
+      "boneNames": "5f88ae054fd498c8c170a5849a3a2ca3be7cb04d488fb450a647fc57d8f40ea7",
+      "hierarchy": "431b8781c4fed55e1155766b9e7686823c27d0208d4691bbcf5b02af7310e366",
+      "rest": "4a77fc452f43b4ea5f20ab34c37a73521399500a869ea305df9a6e69aacd32aa"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.014",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 6.999999999999975e-05,
+      "horizontalRangeMeters": [
+        0.11986,
+        0.05904
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00234,
+            -0.00356,
+            0.97065
+          ],
+          "leftFoot": [
+            0.10286,
+            -0.0026,
+            0.1851
+          ],
+          "rightFoot": [
+            -0.02894,
+            0.01891,
+            0.13157
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00727,
+            0.01693,
+            0.97571
+          ],
+          "leftFoot": [
+            0.11856,
+            -0.29303,
+            0.15189
+          ],
+          "rightFoot": [
+            -0.03036,
+            0.18496,
+            0.14161
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.01976,
+            -0.00946,
+            0.95645
+          ],
+          "leftFoot": [
+            0.12735,
+            -0.29206,
+            0.13787
+          ],
+          "rightFoot": [
+            -0.03367,
+            0.30758,
+            0.16611
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08839,
+            -0.04211,
+            0.95497
+          ],
+          "leftFoot": [
+            0.1312,
+            -0.16113,
+            0.12964
+          ],
+          "rightFoot": [
+            -0.03512,
+            0.25855,
+            0.25089
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.10951,
+            -0.01204,
+            0.96887
+          ],
+          "leftFoot": [
+            0.13135,
+            0.00653,
+            0.12913
+          ],
+          "rightFoot": [
+            0.00327,
+            0.03172,
+            0.21068
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.11259,
+            0.01674,
+            0.97343
+          ],
+          "leftFoot": [
+            0.13169,
+            0.17764,
+            0.12856
+          ],
+          "rightFoot": [
+            -0.02246,
+            -0.25555,
+            0.14446
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.0759,
+            -0.00263,
+            0.95342
+          ],
+          "leftFoot": [
+            0.13312,
+            0.3123,
+            0.15675
+          ],
+          "rightFoot": [
+            -0.02535,
+            -0.26969,
+            0.13721
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01768,
+            -0.027,
+            0.94153
+          ],
+          "leftFoot": [
+            0.13503,
+            0.24529,
+            0.24168
+          ],
+          "rightFoot": [
+            -0.0286,
+            -0.15019,
+            0.12916
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.00241,
+            -0.00356,
+            0.97065
+          ],
+          "leftFoot": [
+            0.10279,
+            -0.0026,
+            0.1851
+          ],
+          "rightFoot": [
+            -0.02894,
+            0.01891,
+            0.13157
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk (3).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.125852,
+        "hipsRestDelta": 2.048547,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (7).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.125852,
+        "hipsRestDelta": 2.048547,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (4).fbx",
+    "rigFingerprint": {
+      "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+      "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+      "rest": "b3271363f68c9bbd11363fd93ddf4f72c4888373e034cbae7528eb8f2dcf6a26"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.017",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 5.9999999999999724e-05,
+      "horizontalRangeMeters": [
+        0.11974,
+        0.060969999999999996
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00269,
+            -0.00297,
+            0.98417
+          ],
+          "leftFoot": [
+            0.10144,
+            -0.00342,
+            0.18719
+          ],
+          "rightFoot": [
+            -0.02678,
+            0.0185,
+            0.13315
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00784,
+            0.01828,
+            0.9892
+          ],
+          "leftFoot": [
+            0.11732,
+            -0.29638,
+            0.15382
+          ],
+          "rightFoot": [
+            -0.02823,
+            0.18608,
+            0.14325
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.01983,
+            -0.00897,
+            0.9699
+          ],
+          "leftFoot": [
+            0.12588,
+            -0.2951,
+            0.13889
+          ],
+          "rightFoot": [
+            -0.03173,
+            0.30904,
+            0.16805
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08939,
+            -0.04269,
+            0.96884
+          ],
+          "leftFoot": [
+            0.12982,
+            -0.16331,
+            0.13106
+          ],
+          "rightFoot": [
+            -0.03283,
+            0.25956,
+            0.25246
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.11108,
+            -0.01183,
+            0.98213
+          ],
+          "leftFoot": [
+            0.13024,
+            0.0058,
+            0.12992
+          ],
+          "rightFoot": [
+            0.00384,
+            0.03181,
+            0.20935
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.1119,
+            0.01529,
+            0.98057
+          ],
+          "leftFoot": [
+            0.13064,
+            0.17923,
+            0.12912
+          ],
+          "rightFoot": [
+            -0.01791,
+            -0.23943,
+            0.14393
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.07695,
+            -0.00189,
+            0.96676
+          ],
+          "leftFoot": [
+            0.13323,
+            0.31395,
+            0.1585
+          ],
+          "rightFoot": [
+            -0.02315,
+            -0.27283,
+            0.13881
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01757,
+            -0.02718,
+            0.955
+          ],
+          "leftFoot": [
+            0.13389,
+            0.24693,
+            0.24414
+          ],
+          "rightFoot": [
+            -0.02643,
+            -0.15218,
+            0.13072
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.00275,
+            -0.00297,
+            0.98417
+          ],
+          "leftFoot": [
+            0.10137,
+            -0.00342,
+            0.18719
+          ],
+          "rightFoot": [
+            -0.02678,
+            0.0185,
+            0.13315
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.487221,
+        "hipsRestDelta": 2.528613,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 19.849991,
+        "hipsRestDelta": 1.568583,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (4).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 9.600411,
+        "hipsRestDelta": 2.868018,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.786634,
+        "hipsRestDelta": 5.306612,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (8).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 19.849991,
+        "hipsRestDelta": 1.568583,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "character.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.786634,
+        "hipsRestDelta": 5.306612,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (5).fbx",
+    "rigFingerprint": {
+      "boneNames": "89dc73bd27f9a0b063ea165a34acbf4f85a0107cf1cda0b479ea8d8a2d422542",
+      "hierarchy": "8b64728b5a54107fb2aee91461a76ca22a1dfcee8af51d71be2743fbb25b238a",
+      "rest": "e95967cbac9a8fe0bc4d5e38d169d3032731c0aca16d4c222d7a2b7e2adb7af9"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.023",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 5.999999999999994e-05,
+      "horizontalRangeMeters": [
+        0.11224,
+        0.05055
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00124,
+            -0.00016,
+            0.91809
+          ],
+          "leftFoot": [
+            0.11619,
+            0.00055,
+            0.18359
+          ],
+          "rightFoot": [
+            -0.04512,
+            0.02234,
+            0.1322
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00472,
+            0.016,
+            0.91817
+          ],
+          "leftFoot": [
+            0.13082,
+            -0.27281,
+            0.14959
+          ],
+          "rightFoot": [
+            -0.04662,
+            0.1831,
+            0.14233
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.02023,
+            -0.0055,
+            0.89807
+          ],
+          "leftFoot": [
+            0.13985,
+            -0.27672,
+            0.13773
+          ],
+          "rightFoot": [
+            -0.04995,
+            0.30089,
+            0.16554
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08405,
+            -0.03335,
+            0.90017
+          ],
+          "leftFoot": [
+            0.14397,
+            -0.15158,
+            0.1302
+          ],
+          "rightFoot": [
+            -0.05132,
+            0.25086,
+            0.24498
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.10479,
+            -0.00751,
+            0.91578
+          ],
+          "leftFoot": [
+            0.1441,
+            0.0107,
+            0.12985
+          ],
+          "rightFoot": [
+            -0.01348,
+            0.03402,
+            0.20819
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.10752,
+            0.0172,
+            0.91441
+          ],
+          "leftFoot": [
+            0.14417,
+            0.17645,
+            0.12989
+          ],
+          "rightFoot": [
+            -0.04151,
+            -0.24354,
+            0.14225
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.07259,
+            0.00108,
+            0.8953
+          ],
+          "leftFoot": [
+            0.15161,
+            0.30245,
+            0.15623
+          ],
+          "rightFoot": [
+            -0.04124,
+            -0.25536,
+            0.13726
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01829,
+            -0.02066,
+            0.88927
+          ],
+          "leftFoot": [
+            0.1481,
+            0.23579,
+            0.23606
+          ],
+          "rightFoot": [
+            -0.0448,
+            -0.14137,
+            0.12979
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.0013,
+            -0.00016,
+            0.91809
+          ],
+          "leftFoot": [
+            0.11612,
+            0.00055,
+            0.18359
+          ],
+          "rightFoot": [
+            -0.04512,
+            0.02234,
+            0.1322
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Walk (5).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 4.819865,
+        "hipsRestDelta": 1.587678,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (6).fbx",
+    "rigFingerprint": {
+      "boneNames": "ba2824c6244154f1ad11bec1b99c4d52eab96b88dc11a9f1cdecddfcacedfa05",
+      "hierarchy": "1b892b9343969d1860bf8a4c0ba82d354268bbbfd7b5e8d0b4033316b317dd2c",
+      "rest": "0e97e0e115d5f22c364c83e53372d393438faf10bcf0e403dc54966595bfceea"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.025",
+      "frameRange": [
+        1,
+        86
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4166666666666667,
+      "horizontalDeltaMeters": 0.00317855312996338,
+      "horizontalRangeMeters": [
+        0.11460999999999999,
+        0.06002
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00311,
+            -0.00407,
+            0.94959
+          ],
+          "leftFoot": [
+            0.11084,
+            -0.01689,
+            0.2262
+          ],
+          "rightFoot": [
+            -0.04191,
+            0.02091,
+            0.17833
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00903,
+            0.01976,
+            0.95614
+          ],
+          "leftFoot": [
+            0.12373,
+            -0.25522,
+            0.19009
+          ],
+          "rightFoot": [
+            -0.04436,
+            0.17875,
+            0.18815
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.01803,
+            -0.00863,
+            0.93892
+          ],
+          "leftFoot": [
+            0.1316,
+            -0.26004,
+            0.1812
+          ],
+          "rightFoot": [
+            -0.05077,
+            0.28322,
+            0.20949
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08409,
+            -0.04026,
+            0.92951
+          ],
+          "leftFoot": [
+            0.1392,
+            -0.15004,
+            0.17639
+          ],
+          "rightFoot": [
+            -0.05571,
+            0.20561,
+            0.26447
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.10558,
+            -0.01264,
+            0.9475
+          ],
+          "leftFoot": [
+            0.13946,
+            0.00982,
+            0.176
+          ],
+          "rightFoot": [
+            -0.01101,
+            0.01263,
+            0.24909
+          ]
+        },
+        {
+          "frame": 54,
+          "hips": [
+            0.10412,
+            0.00974,
+            0.94548
+          ],
+          "leftFoot": [
+            0.14064,
+            0.15919,
+            0.17196
+          ],
+          "rightFoot": [
+            -0.03056,
+            -0.16274,
+            0.17839
+          ]
+        },
+        {
+          "frame": 65,
+          "hips": [
+            0.07902,
+            0.00231,
+            0.93561
+          ],
+          "leftFoot": [
+            0.15193,
+            0.28391,
+            0.19509
+          ],
+          "rightFoot": [
+            -0.03309,
+            -0.2445,
+            0.18188
+          ]
+        },
+        {
+          "frame": 75,
+          "hips": [
+            0.02081,
+            -0.02651,
+            0.91897
+          ],
+          "leftFoot": [
+            0.14864,
+            0.20547,
+            0.24855
+          ],
+          "rightFoot": [
+            -0.04131,
+            -0.15515,
+            0.17598
+          ]
+        },
+        {
+          "frame": 86,
+          "hips": [
+            -0.00225,
+            -0.00713,
+            0.94518
+          ],
+          "leftFoot": [
+            0.11307,
+            0.00547,
+            0.23491
+          ],
+          "rightFoot": [
+            -0.04153,
+            0.00646,
+            0.17739
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 4.920923,
+        "hipsRestDelta": 1.371182,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking (7).fbx",
+    "rigFingerprint": {
+      "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+      "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+      "rest": "ad2296b606b6775e278a0f0da0228f015044f35f3480e2154cce34144c93d830"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.027",
+      "frameRange": [
+        1,
+        86
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4166666666666667,
+      "horizontalDeltaMeters": 0.0030536044275577016,
+      "horizontalRangeMeters": [
+        0.12159,
+        0.05744
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00231,
+            -0.00069,
+            0.97081
+          ],
+          "leftFoot": [
+            0.11367,
+            -0.00167,
+            0.19204
+          ],
+          "rightFoot": [
+            -0.03922,
+            0.02145,
+            0.13827
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00712,
+            0.01802,
+            0.96871
+          ],
+          "leftFoot": [
+            0.12964,
+            -0.29855,
+            0.15916
+          ],
+          "rightFoot": [
+            -0.04064,
+            0.19055,
+            0.14848
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.0202,
+            -0.00647,
+            0.94975
+          ],
+          "leftFoot": [
+            0.13831,
+            -0.29145,
+            0.144
+          ],
+          "rightFoot": [
+            -0.04434,
+            0.31251,
+            0.1729
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08947,
+            -0.03942,
+            0.9534
+          ],
+          "leftFoot": [
+            0.14259,
+            -0.16046,
+            0.13622
+          ],
+          "rightFoot": [
+            -0.04598,
+            0.25991,
+            0.25618
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.1111,
+            -0.00937,
+            0.96941
+          ],
+          "leftFoot": [
+            0.14275,
+            0.00914,
+            0.1359
+          ],
+          "rightFoot": [
+            -0.00638,
+            0.03303,
+            0.21776
+          ]
+        },
+        {
+          "frame": 54,
+          "hips": [
+            0.11447,
+            0.01732,
+            0.96855
+          ],
+          "leftFoot": [
+            0.14288,
+            0.16681,
+            0.13516
+          ],
+          "rightFoot": [
+            -0.03361,
+            -0.23322,
+            0.14519
+          ]
+        },
+        {
+          "frame": 65,
+          "hips": [
+            0.0824,
+            0.00484,
+            0.94643
+          ],
+          "leftFoot": [
+            0.15008,
+            0.30946,
+            0.15719
+          ],
+          "rightFoot": [
+            -0.03405,
+            -0.27509,
+            0.14422
+          ]
+        },
+        {
+          "frame": 75,
+          "hips": [
+            0.02202,
+            -0.02478,
+            0.94174
+          ],
+          "leftFoot": [
+            0.1481,
+            0.2603,
+            0.23829
+          ],
+          "rightFoot": [
+            -0.03887,
+            -0.16525,
+            0.13574
+          ]
+        },
+        {
+          "frame": 86,
+          "hips": [
+            -0.00145,
+            -0.00362,
+            0.96711
+          ],
+          "leftFoot": [
+            0.11641,
+            0.02622,
+            0.203
+          ],
+          "rightFoot": [
+            -0.039,
+            0.00603,
+            0.13727
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.834212,
+        "hipsRestDelta": 3.060834,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 17.504868,
+        "hipsRestDelta": 3.511678,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (4).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 8.364904,
+        "hipsRestDelta": 0.890399,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 7.337143,
+        "hipsRestDelta": 3.618872,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (8).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 17.504868,
+        "hipsRestDelta": 3.511678,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "character.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 7.337143,
+        "hipsRestDelta": 3.618872,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Strut Walking.fbx",
+    "rigFingerprint": {
+      "boneNames": "f8aad95dcee2761368a43bdc649f5fe53c5c25c6189f2212c7945f2ec97178c1",
+      "hierarchy": "cc07f9c41a37367c97ea6d4e57e3df6980957bbbae96d5ed3a1f8d1669270846",
+      "rest": "a27fe321f0f0132f0352cbd4801995b5a935a452d0beef085b6989817d3b73eb"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.033",
+      "frameRange": [
+        1,
+        87
+      ],
+      "fps": 60,
+      "durationSeconds": 1.4333333333333333,
+      "horizontalDeltaMeters": 6.999999999999975e-05,
+      "horizontalRangeMeters": [
+        0.11757000000000001,
+        0.05784
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.0025,
+            0.00427,
+            0.96913
+          ],
+          "leftFoot": [
+            0.11758,
+            -0.00311,
+            0.19838
+          ],
+          "rightFoot": [
+            -0.04392,
+            0.02241,
+            0.14546
+          ]
+        },
+        {
+          "frame": 12,
+          "hips": [
+            -0.00669,
+            0.0226,
+            0.9656
+          ],
+          "leftFoot": [
+            0.13277,
+            -0.28436,
+            0.16372
+          ],
+          "rightFoot": [
+            -0.04558,
+            0.18928,
+            0.15553
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.0208,
+            -0.00195,
+            0.94696
+          ],
+          "leftFoot": [
+            0.14164,
+            -0.28527,
+            0.14856
+          ],
+          "rightFoot": [
+            -0.05009,
+            0.30668,
+            0.17989
+          ]
+        },
+        {
+          "frame": 33,
+          "hips": [
+            0.08918,
+            -0.03524,
+            0.95207
+          ],
+          "leftFoot": [
+            0.14656,
+            -0.15816,
+            0.14341
+          ],
+          "rightFoot": [
+            -0.05175,
+            0.25269,
+            0.25835
+          ]
+        },
+        {
+          "frame": 44,
+          "hips": [
+            0.11081,
+            -0.00474,
+            0.96659
+          ],
+          "leftFoot": [
+            0.1468,
+            0.01022,
+            0.14163
+          ],
+          "rightFoot": [
+            -0.01483,
+            0.03158,
+            0.21607
+          ]
+        },
+        {
+          "frame": 55,
+          "hips": [
+            0.11088,
+            0.02081,
+            0.95916
+          ],
+          "leftFoot": [
+            0.14717,
+            0.18292,
+            0.14163
+          ],
+          "rightFoot": [
+            -0.03651,
+            -0.22956,
+            0.15165
+          ]
+        },
+        {
+          "frame": 66,
+          "hips": [
+            0.07653,
+            0.00542,
+            0.94384
+          ],
+          "leftFoot": [
+            0.15733,
+            0.31066,
+            0.16959
+          ],
+          "rightFoot": [
+            -0.0394,
+            -0.26431,
+            0.15024
+          ]
+        },
+        {
+          "frame": 76,
+          "hips": [
+            0.01796,
+            -0.02069,
+            0.94029
+          ],
+          "leftFoot": [
+            0.15139,
+            0.23731,
+            0.24908
+          ],
+          "rightFoot": [
+            -0.04353,
+            -0.14759,
+            0.14296
+          ]
+        },
+        {
+          "frame": 87,
+          "hips": [
+            -0.00257,
+            0.00427,
+            0.96913
+          ],
+          "leftFoot": [
+            0.11751,
+            -0.00311,
+            0.19838
+          ],
+          "rightFoot": [
+            -0.04392,
+            0.02241,
+            0.14546
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 7.48645,
+        "hipsRestDelta": 3.358117,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 18.081467,
+        "hipsRestDelta": 3.988045,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walk (4).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 7.871508,
+        "hipsRestDelta": 0.43517,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (1).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.877901,
+        "hipsRestDelta": 3.263609,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "Walking (8).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 18.081467,
+        "hipsRestDelta": 3.988045,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      },
+      {
+        "character": "character.fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.877901,
+        "hipsRestDelta": 3.263609,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  },
+  {
+    "clipFile": "Walking.fbx",
+    "rigFingerprint": {
+      "boneNames": "d2e121c1bb5eda55c73d04e783ce73c48e4b762dd39478bd0774ea24a2b3368e",
+      "hierarchy": "2b2cd8b9251f001ed30df55da07ddc7031b1934f69dbeee8093449f24848a49e",
+      "rest": "694f37aa0a2d1ff6eef6a6acd9cbae217fe90f3157504dd95984bd90b20bff2a"
+    },
+    "motion": {
+      "name": "Armature|mixamo.com|Layer0.039",
+      "frameRange": [
+        1,
+        42
+      ],
+      "fps": 30,
+      "durationSeconds": 1.3666666666666667,
+      "horizontalDeltaMeters": 6.324555320336693e-05,
+      "horizontalRangeMeters": [
+        0.01388,
+        0.04796
+      ],
+      "samples": [
+        {
+          "frame": 1,
+          "hips": [
+            -0.00626,
+            -0.01016,
+            0.98317
+          ],
+          "leftFoot": [
+            0.07234,
+            0.01663,
+            0.22637
+          ],
+          "rightFoot": [
+            -0.01112,
+            0.0216,
+            0.15444
+          ]
+        },
+        {
+          "frame": 6,
+          "hips": [
+            0.00198,
+            0.01203,
+            0.98564
+          ],
+          "leftFoot": [
+            0.04567,
+            -0.22387,
+            0.17435
+          ],
+          "rightFoot": [
+            -0.00943,
+            0.18563,
+            0.15827
+          ]
+        },
+        {
+          "frame": 11,
+          "hips": [
+            0.0076,
+            0.00241,
+            0.95772
+          ],
+          "leftFoot": [
+            0.03102,
+            -0.26145,
+            0.16174
+          ],
+          "rightFoot": [
+            -0.00811,
+            0.34241,
+            0.17253
+          ]
+        },
+        {
+          "frame": 16,
+          "hips": [
+            0.0026,
+            -0.00477,
+            0.95787
+          ],
+          "leftFoot": [
+            0.03101,
+            -0.10806,
+            0.1574
+          ],
+          "rightFoot": [
+            -0.02089,
+            0.27372,
+            0.23431
+          ]
+        },
+        {
+          "frame": 22,
+          "hips": [
+            0.00575,
+            0.01624,
+            0.99393
+          ],
+          "leftFoot": [
+            0.02492,
+            0.08433,
+            0.15862
+          ],
+          "rightFoot": [
+            -0.06007,
+            -0.01588,
+            0.24601
+          ]
+        },
+        {
+          "frame": 27,
+          "hips": [
+            -0.00265,
+            0.02886,
+            0.98586
+          ],
+          "leftFoot": [
+            0.03489,
+            0.25209,
+            0.16247
+          ],
+          "rightFoot": [
+            -0.02983,
+            -0.27389,
+            0.18209
+          ]
+        },
+        {
+          "frame": 32,
+          "hips": [
+            -0.00564,
+            0.00519,
+            0.95817
+          ],
+          "leftFoot": [
+            0.03913,
+            0.36661,
+            0.1796
+          ],
+          "rightFoot": [
+            -0.00871,
+            -0.27119,
+            0.15756
+          ]
+        },
+        {
+          "frame": 37,
+          "hips": [
+            -0.00257,
+            -0.0191,
+            0.95035
+          ],
+          "leftFoot": [
+            0.04589,
+            0.26242,
+            0.21239
+          ],
+          "rightFoot": [
+            -0.01047,
+            -0.14191,
+            0.15535
+          ]
+        },
+        {
+          "frame": 42,
+          "hips": [
+            -0.00628,
+            -0.01022,
+            0.98306
+          ],
+          "leftFoot": [
+            0.07234,
+            0.01663,
+            0.22637
+          ],
+          "rightFoot": [
+            -0.01192,
+            0.022,
+            0.15405
+          ]
+        }
+      ]
+    },
+    "matches": [
+      {
+        "character": "Dwarf Walk (2).fbx",
+        "boneCount": 65,
+        "namesAndParents": "MATCH",
+        "maxRestMatrixDelta": 6.03278,
+        "hipsRestDelta": 1.792832,
+        "armatureWorldMatrixDelta": 0.0,
+        "status": "INCOMPATIBLE"
+      }
+    ]
+  }
+]

@@ -1,0 +1,431 @@
+{
+  "name": "Walking (5).fbx",
+  "bytes": 59502096,
+  "sha256": "4cec02d40dc00836a480f0f4130abad9f445392204c16eaf79bb9e663a44fec4",
+  "armatures": 1,
+  "meshes": 6,
+  "skinnedMeshes": 6,
+  "vertices": 31440,
+  "actions": [
+    {
+      "name": "Armature|mixamo.com|Layer0.007",
+      "frameRange": [
+        1.0,
+        58.0
+      ],
+      "slots": 1
+    }
+  ],
+  "errors": [],
+  "fps": 60,
+  "fpsBase": 1.0,
+  "meshDetails": [
+    {
+      "name": "Ch22_Shirt",
+      "vertices": 4347,
+      "vertexGroups": 12,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    },
+    {
+      "name": "Ch22_Body",
+      "vertices": 9692,
+      "vertexGroups": 47,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    },
+    {
+      "name": "Ch22_Hair",
+      "vertices": 8792,
+      "vertexGroups": 5,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    },
+    {
+      "name": "Ch22_Pants",
+      "vertices": 4001,
+      "vertexGroups": 11,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    },
+    {
+      "name": "Ch22_Eyelashes",
+      "vertices": 550,
+      "vertexGroups": 1,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    },
+    {
+      "name": "Ch22_Sneakers",
+      "vertices": 4058,
+      "vertexGroups": 6,
+      "armatureModifiers": [
+        "Armature"
+      ]
+    }
+  ],
+  "bones": 65,
+  "boneNames": [
+    "mixamorig2:Head",
+    "mixamorig2:HeadTop_End",
+    "mixamorig2:Hips",
+    "mixamorig2:LeftArm",
+    "mixamorig2:LeftFoot",
+    "mixamorig2:LeftForeArm",
+    "mixamorig2:LeftHand",
+    "mixamorig2:LeftHandIndex1",
+    "mixamorig2:LeftHandIndex2",
+    "mixamorig2:LeftHandIndex3",
+    "mixamorig2:LeftHandIndex4",
+    "mixamorig2:LeftHandMiddle1",
+    "mixamorig2:LeftHandMiddle2",
+    "mixamorig2:LeftHandMiddle3",
+    "mixamorig2:LeftHandMiddle4",
+    "mixamorig2:LeftHandPinky1",
+    "mixamorig2:LeftHandPinky2",
+    "mixamorig2:LeftHandPinky3",
+    "mixamorig2:LeftHandPinky4",
+    "mixamorig2:LeftHandRing1",
+    "mixamorig2:LeftHandRing2",
+    "mixamorig2:LeftHandRing3",
+    "mixamorig2:LeftHandRing4",
+    "mixamorig2:LeftHandThumb1",
+    "mixamorig2:LeftHandThumb2",
+    "mixamorig2:LeftHandThumb3",
+    "mixamorig2:LeftHandThumb4",
+    "mixamorig2:LeftLeg",
+    "mixamorig2:LeftShoulder",
+    "mixamorig2:LeftToeBase",
+    "mixamorig2:LeftToe_End",
+    "mixamorig2:LeftUpLeg",
+    "mixamorig2:Neck",
+    "mixamorig2:RightArm",
+    "mixamorig2:RightFoot",
+    "mixamorig2:RightForeArm",
+    "mixamorig2:RightHand",
+    "mixamorig2:RightHandIndex1",
+    "mixamorig2:RightHandIndex2",
+    "mixamorig2:RightHandIndex3",
+    "mixamorig2:RightHandIndex4",
+    "mixamorig2:RightHandMiddle1",
+    "mixamorig2:RightHandMiddle2",
+    "mixamorig2:RightHandMiddle3",
+    "mixamorig2:RightHandMiddle4",
+    "mixamorig2:RightHandPinky1",
+    "mixamorig2:RightHandPinky2",
+    "mixamorig2:RightHandPinky3",
+    "mixamorig2:RightHandPinky4",
+    "mixamorig2:RightHandRing1",
+    "mixamorig2:RightHandRing2",
+    "mixamorig2:RightHandRing3",
+    "mixamorig2:RightHandRing4",
+    "mixamorig2:RightHandThumb1",
+    "mixamorig2:RightHandThumb2",
+    "mixamorig2:RightHandThumb3",
+    "mixamorig2:RightHandThumb4",
+    "mixamorig2:RightLeg",
+    "mixamorig2:RightShoulder",
+    "mixamorig2:RightToeBase",
+    "mixamorig2:RightToe_End",
+    "mixamorig2:RightUpLeg",
+    "mixamorig2:Spine",
+    "mixamorig2:Spine1",
+    "mixamorig2:Spine2"
+  ],
+  "boneNamesHash": "f5cfa636a51878958dcf83608de8fa5a4607a98bf95f86a40c5c8f54d1789e36",
+  "hierarchyHash": "719e5bbd199218214b58d0892572ec37c4646d33bc2c47f89a6b6bf2eaa3d09e",
+  "restHash": "6b4a670d11108de83f53051eebf1fa13eb745f76a63cfd6e1973a97662bee39d",
+  "armatureName": "Armature",
+  "boneParents": [
+    [
+      "mixamorig2:Head",
+      "mixamorig2:Neck"
+    ],
+    [
+      "mixamorig2:HeadTop_End",
+      "mixamorig2:Head"
+    ],
+    [
+      "mixamorig2:Hips",
+      null
+    ],
+    [
+      "mixamorig2:LeftArm",
+      "mixamorig2:LeftShoulder"
+    ],
+    [
+      "mixamorig2:LeftFoot",
+      "mixamorig2:LeftLeg"
+    ],
+    [
+      "mixamorig2:LeftForeArm",
+      "mixamorig2:LeftArm"
+    ],
+    [
+      "mixamorig2:LeftHand",
+      "mixamorig2:LeftForeArm"
+    ],
+    [
+      "mixamorig2:LeftHandIndex1",
+      "mixamorig2:LeftHand"
+    ],
+    [
+      "mixamorig2:LeftHandIndex2",
+      "mixamorig2:LeftHandIndex1"
+    ],
+    [
+      "mixamorig2:LeftHandIndex3",
+      "mixamorig2:LeftHandIndex2"
+    ],
+    [
+      "mixamorig2:LeftHandIndex4",
+      "mixamorig2:LeftHandIndex3"
+    ],
+    [
+      "mixamorig2:LeftHandMiddle1",
+      "mixamorig2:LeftHand"
+    ],
+    [
+      "mixamorig2:LeftHandMiddle2",
+      "mixamorig2:LeftHandMiddle1"
+    ],
+    [
+      "mixamorig2:LeftHandMiddle3",
+      "mixamorig2:LeftHandMiddle2"
+    ],
+    [
+      "mixamorig2:LeftHandMiddle4",
+      "mixamorig2:LeftHandMiddle3"
+    ],
+    [
+      "mixamorig2:LeftHandPinky1",
+      "mixamorig2:LeftHand"
+    ],
+    [
+      "mixamorig2:LeftHandPinky2",
+      "mixamorig2:LeftHandPinky1"
+    ],
+    [
+      "mixamorig2:LeftHandPinky3",
+      "mixamorig2:LeftHandPinky2"
+    ],
+    [
+      "mixamorig2:LeftHandPinky4",
+      "mixamorig2:LeftHandPinky3"
+    ],
+    [
+      "mixamorig2:LeftHandRing1",
+      "mixamorig2:LeftHand"
+    ],
+    [
+      "mixamorig2:LeftHandRing2",
+      "mixamorig2:LeftHandRing1"
+    ],
+    [
+      "mixamorig2:LeftHandRing3",
+      "mixamorig2:LeftHandRing2"
+    ],
+    [
+      "mixamorig2:LeftHandRing4",
+      "mixamorig2:LeftHandRing3"
+    ],
+    [
+      "mixamorig2:LeftHandThumb1",
+      "mixamorig2:LeftHand"
+    ],
+    [
+      "mixamorig2:LeftHandThumb2",
+      "mixamorig2:LeftHandThumb1"
+    ],
+    [
+      "mixamorig2:LeftHandThumb3",
+      "mixamorig2:LeftHandThumb2"
+    ],
+    [
+      "mixamorig2:LeftHandThumb4",
+      "mixamorig2:LeftHandThumb3"
+    ],
+    [
+      "mixamorig2:LeftLeg",
+      "mixamorig2:LeftUpLeg"
+    ],
+    [
+      "mixamorig2:LeftShoulder",
+      "mixamorig2:Spine2"
+    ],
+    [
+      "mixamorig2:LeftToeBase",
+      "mixamorig2:LeftFoot"
+    ],
+    [
+      "mixamorig2:LeftToe_End",
+      "mixamorig2:LeftToeBase"
+    ],
+    [
+      "mixamorig2:LeftUpLeg",
+      "mixamorig2:Hips"
+    ],
+    [
+      "mixamorig2:Neck",
+      "mixamorig2:Spine2"
+    ],
+    [
+      "mixamorig2:RightArm",
+      "mixamorig2:RightShoulder"
+    ],
+    [
+      "mixamorig2:RightFoot",
+      "mixamorig2:RightLeg"
+    ],
+    [
+      "mixamorig2:RightForeArm",
+      "mixamorig2:RightArm"
+    ],
+    [
+      "mixamorig2:RightHand",
+      "mixamorig2:RightForeArm"
+    ],
+    [
+      "mixamorig2:RightHandIndex1",
+      "mixamorig2:RightHand"
+    ],
+    [
+      "mixamorig2:RightHandIndex2",
+      "mixamorig2:RightHandIndex1"
+    ],
+    [
+      "mixamorig2:RightHandIndex3",
+      "mixamorig2:RightHandIndex2"
+    ],
+    [
+      "mixamorig2:RightHandIndex4",
+      "mixamorig2:RightHandIndex3"
+    ],
+    [
+      "mixamorig2:RightHandMiddle1",
+      "mixamorig2:RightHand"
+    ],
+    [
+      "mixamorig2:RightHandMiddle2",
+      "mixamorig2:RightHandMiddle1"
+    ],
+    [
+      "mixamorig2:RightHandMiddle3",
+      "mixamorig2:RightHandMiddle2"
+    ],
+    [
+      "mixamorig2:RightHandMiddle4",
+      "mixamorig2:RightHandMiddle3"
+    ],
+    [
+      "mixamorig2:RightHandPinky1",
+      "mixamorig2:RightHand"
+    ],
+    [
+      "mixamorig2:RightHandPinky2",
+      "mixamorig2:RightHandPinky1"
+    ],
+    [
+      "mixamorig2:RightHandPinky3",
+      "mixamorig2:RightHandPinky2"
+    ],
+    [
+      "mixamorig2:RightHandPinky4",
+      "mixamorig2:RightHandPinky3"
+    ],
+    [
+      "mixamorig2:RightHandRing1",
+      "mixamorig2:RightHand"
+    ],
+    [
+      "mixamorig2:RightHandRing2",
+      "mixamorig2:RightHandRing1"
+    ],
+    [
+      "mixamorig2:RightHandRing3",
+      "mixamorig2:RightHandRing2"
+    ],
+    [
+      "mixamorig2:RightHandRing4",
+      "mixamorig2:RightHandRing3"
+    ],
+    [
+      "mixamorig2:RightHandThumb1",
+      "mixamorig2:RightHand"
+    ],
+    [
+      "mixamorig2:RightHandThumb2",
+      "mixamorig2:RightHandThumb1"
+    ],
+    [
+      "mixamorig2:RightHandThumb3",
+      "mixamorig2:RightHandThumb2"
+    ],
+    [
+      "mixamorig2:RightHandThumb4",
+      "mixamorig2:RightHandThumb3"
+    ],
+    [
+      "mixamorig2:RightLeg",
+      "mixamorig2:RightUpLeg"
+    ],
+    [
+      "mixamorig2:RightShoulder",
+      "mixamorig2:Spine2"
+    ],
+    [
+      "mixamorig2:RightToeBase",
+      "mixamorig2:RightFoot"
+    ],
+    [
+      "mixamorig2:RightToe_End",
+      "mixamorig2:RightToeBase"
+    ],
+    [
+      "mixamorig2:RightUpLeg",
+      "mixamorig2:Hips"
+    ],
+    [
+      "mixamorig2:Spine",
+      "mixamorig2:Hips"
+    ],
+    [
+      "mixamorig2:Spine1",
+      "mixamorig2:Spine"
+    ],
+    [
+      "mixamorig2:Spine2",
+      "mixamorig2:Spine1"
+    ]
+  ],
+  "rootBones": [
+    "mixamorig2:Hips"
+  ],
+  "hips": [
+    "mixamorig2:Hips"
+  ],
+  "armatureTransform": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "scale": [
+      0.009999999776482582,
+      0.009999999776482582,
+      0.009999999776482582
+    ],
+    "rotationEuler": [
+      1.570796251296997,
+      -0.0,
+      0.0
+    ]
+  },
+  "weightedVertices": 31440,
+  "durationSeconds": 0.95
+}

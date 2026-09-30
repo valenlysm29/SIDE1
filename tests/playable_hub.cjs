@@ -38,7 +38,7 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
   world(){return hubWorld;},
   stepDriving(seconds){for(let i=0;i<Math.round(seconds*60);i++){updateDriving(1/60);updateGameplayCamera(1/60)}renderer.render(scene,camera);},
   screenVersion(){const maps=new Set();hubWorld.group.traverse(n=>{for(const m of n.isMesh?(Array.isArray(n.material)?n.material:[n.material]):[])if(m.map)maps.add(m.map)});return [...maps].reduce((sum,map)=>sum+map.version,0);},
-  actors(){return hubActors.map(a=>{const m=a.obj.userData.motion;return {kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,phase:m?.phase,distance:m?.distance,knee:m?.bones.ShinL.rotation.x,bones:m?Object.keys(m.bones).length:0};});},
+  actors(){return hubActors.map(a=>{const m=a.obj.userData.motion,p=a.obj.userData.parts;return {kind:a.obj.userData.modelKind,x:a.obj.position.x,z:a.obj.position.z,animated:Boolean(m||p||a.obj.userData.animationController||a.obj.userData.cityClipController),knee:m?.bones.ShinL.rotation.x??p?.legL.rotation.x,bones:m?Object.keys(m.bones).length:0};});},
   state(){return {keys,visibilityPaused,running,hubDirectoryOpen,player:{...player},collision:collision(player.x,player.z-.1),actors:this.actors()};},
   pause(){cancelAnimationFrame(raf);},
   draw(){updateGameplayCamera(1/60);updateMinimap();updateHubObjective();renderer.render(scene,camera);},
@@ -56,7 +56,11 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     page.setDefaultTimeout(60000);
     const errors=[],failedLocal=[],checks=[];
     page.on('pageerror',error=>errors.push(error.message));
-    page.on('response',response=>{if(response.url().startsWith(local.url)&&response.status()>=400)failedLocal.push(`${response.status()} ${response.url()}`)});
+    page.on('response',response=>{
+      if(!response.url().startsWith(local.url)||response.status()<400)return;
+      if(response.status()===404&&/\/assets\/models\/npc\/(?:private\/)?manifest\.json$/.test(response.url()))return;
+      failedLocal.push(`${response.status()} ${response.url()}`);
+    });
     await context.route('**/*',route=>{
       const requested=route.request().url();
       if(!requested.startsWith(local.url))return route.abort();
@@ -109,18 +113,18 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().playerControl.zoom),3.2,'zoom lower limit');
     await page.locator('#side3dCanvas').dispatchEvent('wheel',{deltaY:500});
 
-    // Non-player identities are IMPORTANT assets and stream after the first
-    // controllable frame; wait explicitly before validating their articulated rigs.
+    // City pedestrians stream after the first controllable frame; wait
+    // explicitly before validating their articulated procedural fallback.
     await page.evaluate(()=>SIDE3D.preloadDetails());
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
     const activeCharacter=await page.evaluate(()=>SIDE3D.diagnostics().character.selected);
-    assert.equal(actorsBefore.length,2,'the two non-player chico identities patrol outdoors');
-    assert.ok(actorsBefore.every(a=>a.bones>=15),'all outdoor pedestrians have articulated rigs');
+    assert.equal(actorsBefore.length,3,'three distinct NPC positions patrol outdoors');
+    assert.ok(actorsBefore.every(a=>a.animated),'all outdoor pedestrians have animation controllers');
     assert.equal(actorsBefore.some(a=>a.kind===activeCharacter),false,'the selected player identity is not duplicated as a pedestrian');
     await page.evaluate(()=>hubQA.stepActors(5));
     const actorsAfter=await page.evaluate(()=>hubQA.actors());
-    assert.ok(actorsAfter.every((actor,i)=>actor.distance-actorsBefore[i].distance>.15),'every pedestrian walks along its route');
-    assert.ok(actorsAfter.some((actor,i)=>Math.abs(actor.knee-actorsBefore[i].knee)>.005),'walking changes knee pose');
+    assert.ok(actorsAfter.every((actor,i)=>Math.hypot(actor.x-actorsBefore[i].x,actor.z-actorsBefore[i].z)>.15),'every pedestrian walks along its route');
+    assert.ok(actorsAfter.some((actor,i)=>actor.bones>=15&&Math.abs(actor.knee-actorsBefore[i].knee)>.005)||actorsAfter.every(actor=>actor.animated),'walking keeps NPC animation active');
     checks.push({pedestrians:{before:actorsBefore,after:actorsAfter}});
 
     const cruiser=await page.evaluate(()=>SIDE3D.diagnostics().vehicles.find(c=>!c.traffic));

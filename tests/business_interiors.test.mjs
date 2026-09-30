@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../vendor/three/build/three.module.js';
-import { BUSINESS_LAYOUTS, createBusinessInteriors, stockVisualLevel } from '../services/business_interiors.mjs';
+import { BUSINESS_LAYOUTS, WORKER_CYCLE, createBusinessInteriors, stockVisualLevel } from '../services/business_interiors.mjs';
 import { crossedEntrance } from '../services/world_portals.mjs';
 import { stepPlayerMotion, constrainCamera } from '../services/player_motion.mjs';
 
@@ -28,6 +28,26 @@ function assertClearSegment(world, from, to, label) {
     assert.equal(blocked(world, from.x + (to.x - from.x) * t, from.z + (to.z - from.z) * t), false, label);
   }
 }
+
+test('visual courier crosses warehouse and production on a clear route without changing stock', () => {
+  const f=fixture({createNpc:()=>new THREE.Group(),animateNpc:()=>{}});
+  const snapshot={productionActive:true,reserve:5};f.world.sync(snapshot);
+  const observer={x:150,z:0};let enteredProduction=false,returnedWarehouse=false,previous=null;
+  assert.deepEqual(WORKER_CYCLE.map(step=>step.state),['recoger','salir del almacén','transportar','entrar en producción','operar','inspeccionar','entregar','salir de producción','volver','entrar en almacén']);
+  for(let i=0;i<50000&&!returnedWarehouse;i++){
+    f.world.tick(1/60,observer,i/60);
+    const object=f.world.group.getObjectByName('SIDE logistics courier');
+    assert.ok(object);
+    const current={x:object.position.x+150,z:object.position.z};
+    if(i%30===0){assert.equal(blocked(f.world,current.x,current.z,.29),false,`courier collision at frame ${i}`);if(previous)assert.ok(Math.hypot(current.x-previous.x,current.z-previous.z)<.6,'courier never teleports');previous=current}
+    if(object.position.x>15&&object.position.z< -14)enteredProduction=true;
+    if(enteredProduction&&object.position.x< -15)returnedWarehouse=true;
+  }
+  assert.equal(enteredProduction,true);
+  assert.equal(returnedWarehouse,true);
+  assert.equal(snapshot.reserve,5);
+  f.close();
+});
 
 test('all three businesses belong to one world group with same-coordinate door crossings', () => {
   const f = fixture();

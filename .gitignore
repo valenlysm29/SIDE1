@@ -15,3 +15,9 @@ tests/.python-deps/
 # Paquete local de entrega
 /SIDE_corregido.zip
 /SIDE_corregido.sha256
+
+# Mixamo source files and locally derived NPCs are licensed for the game,
+# not for redistribution as standalone assets in this public repository.
+/assets/models/incoming/mixamo/
+/assets/models/npc/private/
+/tools/model-pipeline/.tmp/

@@ -18,7 +18,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
       businessInteriors.tick(1/60,player,0);return currentInterior;
     },
     spawn(){lastSpawn=-1e9;spawnNpc(performance.now());return npcs.length},
-    actors(){return [...hubActors,...animatedActors.filter(a=>a.type==='guide')].map(a=>({kind:a.obj.userData.modelKind,role:a.obj.userData.role,rigged:Boolean(a.obj.userData.motion),distance:a.obj.userData.motion?.distance||0,x:a.obj.position.x,z:a.obj.position.z}))},
+    actors(){return [...hubActors,...animatedActors.filter(a=>a.type==='guide')].map(a=>({kind:a.obj.userData.modelKind,role:a.obj.userData.role,animated:Boolean(a.obj.userData.motion||a.obj.userData.parts||a.obj.userData.animationController||a.obj.userData.cityClipController),x:a.obj.position.x,z:a.obj.position.z}))},
     queueScenario(){
       clearCustomerFlow(true);
       const point=businessInteriors.browsePoints[0];
@@ -118,14 +118,14 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     const initial=await p.evaluate(()=>SIDE3D.diagnostics());
     assert.equal(initial.suppliedNpcs.loaded.length,fallback?0:3);assert.equal(initial.mona.loaded,!fallback);
     const actors=await p.evaluate(()=>__npcTest.actors());
-    assert.equal(actors.length,3);assert.equal(initial.mona.instances,1);
-    assert.equal(actors.filter(a=>a.role==='hub-pedestrian').length,2);
-    if(!fallback)for(const model of ['chico1','chico3'])assert.ok(actors.some(c=>c.kind===model),`city pedestrian: ${model}`);
-    if(fallback)for(const model of ['chico1-fallback','chico3-fallback'])assert.ok(actors.some(c=>c.kind===model),`procedural city pedestrian: ${model}`);
+    assert.equal(actors.length,4);assert.equal(initial.mona.instances,0);
+    assert.equal(actors.filter(a=>a.role==='hub-pedestrian').length,3);
+    assert.ok(actors.filter(a=>a.role==='hub-pedestrian').every(a=>!['chico1','chico2','chico3','mona'].includes(a.kind)),
+      'city pedestrians do not reuse a selectable avatar');
     assert.equal(actors.some(c=>c.kind===initial.character.selected||c.kind===`${initial.character.selected}-fallback`),false,'the selected player identity is excluded from the pedestrian pool');
-    if(!fallback)assert.ok(actors.every(a=>a.rigged));
+    assert.ok(actors.every(a=>a.animated),'all NPCs have animation controllers');
     assert.equal(initial.world.id,'side-city');assert.equal(initial.world.legacyActive,false);
-    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,3);assert.equal(d.mona.instances,1)}
+    for(let i=0;i<3;i++){await p.evaluate(()=>SIDE3D.rebuild());const d=await p.evaluate(()=>SIDE3D.diagnostics());assert.equal((await p.evaluate(()=>__npcTest.actors())).length,4);assert.equal(d.mona.instances,0)}
     assert.equal(await p.evaluate(()=>__npcTest.enterStore()),'store');
     assert.equal(await p.evaluate(()=>__npcTest.spawn()),1,'a normal customer spawn uses the physical city store');
     const travel=await p.evaluate(()=>__npcTest.step(100));
@@ -134,9 +134,9 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     assert.ok(travel.states.includes('ENTER_STORE'),'customers enter through the door');
     assert.ok(travel.states.includes('BROWSE'),'customers reach products');
     assert.ok(travel.states.includes('LEAVE_STORE')||travel.states.includes('QUEUE'),'customers complete a decision');
-    if(!fallback)assert.ok((await p.evaluate(()=>__npcTest.actors())).filter(a=>a.role==='hub-pedestrian').every(a=>a.distance>1),'the two non-player city identities patrol while Mona remains at her guidance point');
+    if(!fallback)assert.ok((await p.evaluate(()=>__npcTest.actors())).filter(a=>a.role==='hub-pedestrian').every((a,i)=>Math.hypot(a.x-actors[i].x,a.z-actors[i].z)>1),'the three city pedestrians patrol while the guide remains at her point');
     const basket=await p.evaluate(()=>__npcTest.queueScenario());
-    assert.equal(basket.boneAttached,!fallback);
+    assert.equal(basket.boneAttached,false,'procedural customers carry bags without reusing a selectable avatar rig');
     assert.equal(await p.evaluate(()=>__npcTest.charge()),basket.revenue,'no charge while the customer is still walking to the till');
     const queue=await p.evaluate(()=>__npcTest.step(35));
     fs.writeFileSync(path.join(output,fallback?'queue-fallback.json':'queue.json'),JSON.stringify({queue,details:await p.evaluate(()=>__npcTest.inspect())},null,2));
@@ -144,7 +144,7 @@ const instrumented=source.replace('  window.SIDE3D =',`  window.__npcTest={
     const revenue=await p.evaluate(()=>__npcTest.charge());assert.equal(revenue,basket.revenue+75,'the existing checkout still records the sale');
     await p.evaluate(()=>__npcTest.view());if(captureScreenshots)await p.screenshot({path:path.join(output,fallback?'game-fallback.png':'game-npcs.png')});
     await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-    assert.deepEqual(pageErrors,[]);results.push({fallback,initial,travel,queue:queue.states,basket,status:'passed'});console.log('PASS NPC world',fallback?'fallback':'four GLB');await ctx.close();
+    assert.deepEqual(pageErrors,[]);results.push({fallback,initial,travel,queue:queue.states,basket,status:'passed'});console.log('PASS NPC world',fallback?'fallback':'supplied player assets with procedural city NPCs');await ctx.close();
   }
   assert.deepEqual(errors,[]);
  } finally {await browser.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(results,null,2));}

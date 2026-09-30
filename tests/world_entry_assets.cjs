@@ -42,7 +42,7 @@ const source=fs.readFileSync(path.join(__dirname,'../simulator3d.js'),'utf8').re
     release();await page.evaluate(()=>Promise.all([detailsA,detailsB]));
     const after=await page.evaluate(()=>entryQA.stats());
     assert.equal(after.scene,before.scene);
-    assert.equal(after.streamedCharacters-before.streamedCharacters,3,'details stream two pedestrians and the guide');
+    assert.equal(after.streamedCharacters-before.streamedCharacters,4,'details stream three city pedestrians and the guide');
     assert.equal(after.children-before.children,after.streamedCharacters-before.streamedCharacters,'only streamed characters extend the existing scene');
     assert.equal(after.actors.length,before.actors.length);assert.equal(after.ledger,before.ledger);
     for(const role of ['cashier','salesperson']){
