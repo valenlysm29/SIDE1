@@ -4,6 +4,8 @@ La distribución actual de carpetas y las instrucciones de inicio están en
 [README.md de SIDE1](../README.md). El código de las páginas está en `js/`,
 los estilos en `css/` y los scripts SQL en `supabase/`.
 
+Consulta el [formato alfanumérico de códigos de partida y su migración](CODIGOS_PARTIDA.md).
+
 ## Plaza jugable — 25 de septiembre de 2026
 
 El mundo abre en una plaza 3D explorable con cámara en tercera persona, edificios

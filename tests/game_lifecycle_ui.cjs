@@ -39,12 +39,25 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  }
  try{
   const t=await teacher();
+  assert.match(await t.locator('#gameCode').inputValue(),/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  // An old unsaved numeric draft upgrades; an existing active game's code stays valid.
+  await t.evaluate(()=>{
+   localStorage.setItem('SIDE_ASSIGNED_GAME_CODE','SIDE-025');
+   localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({codigo:'SIDE-025'}));
+   loadConfig();
+  });
+  const draftCode=await t.locator('#gameCode').inputValue();
+  assert.match(draftCode,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  await t.evaluate(()=>loadConfig());assert.equal(await t.locator('#gameCode').inputValue(),draftCode);
+  await t.evaluate(()=>{localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true}));loadConfig();});
+  assert.equal(await t.locator('#gameCode').inputValue(),'SIDE-025');
+  await t.evaluate(()=>{localStorage.removeItem('SIDE_GAME_STATUS');localStorage.removeItem('SIDE_TEACHER_CONFIG');localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');loadConfig();});
   assert.equal(await t.locator('#integrationDurationMinutes').isVisible(),true);
   assert.equal(await t.locator('#copyGameCode').isDisabled(),true);
   await t.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.copiedText=value;}}}));
   await t.locator('#saveAll').click();await t.waitForFunction(()=>runtime()?.phase==='integration');
   const game=await t.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'Prueba'}));
-  assert.match(game.codigo,/^SIDE-\d{3}$/);
+  assert.match(game.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
   await t.locator('#copyGameCode').click();assert.equal(await t.evaluate(()=>window.copiedText),game.codigo);
   await t.locator('#copyGameLink').click();assert.equal(await t.evaluate(()=>window.copiedText),'http://side.test/index.html?partida='+game.codigo);
   const invitation=await page(studentHTML);await invitation.goto('http://side.test/index.html?partida='+game.codigo);

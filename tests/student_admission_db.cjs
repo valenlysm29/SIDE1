@@ -9,7 +9,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
  // comprueba que el backfill conserva el reingreso estricto tras iniciar.
  let legacy;
  const legacyDb=await database({beforeStudentAdmission:async db=>{
-  for(let index=0;index<=5;index++)legacy=await createGame(db,config());
+  legacy=(await db.query("insert into partidas(profesor_id,nombre,codigo,configuracion) values(auth.uid(),'Histórica','SIDE-005',$1) returning *",[config()])).rows[0];
   assert.equal(legacy.codigo,'SIDE-005');
   const empresa=(await db.query(`
    insert into empresas(nombre_legal,nombre_comercial,caja_inicial,caja_actual,ciclo_actual)
@@ -46,7 +46,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
  const db=await database();
  try{
   const game=await createGame(db,config({capital:135000}));
-  assert.equal(game.codigo,'SIDE-000','the demo code remains available for the first game');
+  assert.match(game.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
   const join=(codigo,nombreLegal,nombreComercial)=>rpc(db,'ingresar_empresa',{
    p_codigo:codigo,p_nombre_legal:nombreLegal,p_nombre_comercial:nombreComercial
   });
@@ -187,8 +187,8 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
    assert.equal((await db.query('select count(*)::int as total from participantes where partida_id=$1',[racing.id])).rows[0].total,0);
   }
 
-  // Compatibilidad: SIDE-000 ya cubrio alta/reingreso seguro y el profesor conservo sus controles.
-  assert.equal((await join(' side-000 ','COMPANIA AGIL S.A.','CAFE DEL NORTE')).empresa_id,first.empresa_id);
+  // Reingreso con el código generado: ignora espacios y mayúsculas.
+  assert.equal((await join(' '+game.codigo.toLowerCase()+' ','COMPANIA AGIL S.A.','CAFE DEL NORTE')).empresa_id,first.empresa_id);
 
   // Las RPC seguras por terna siguen disponibles a anon. Las variantes
   // historicas por empresaId y las escrituras REST quedan cerradas.
@@ -209,7 +209,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   assert.equal(anonymousReentry.empresa_id,first.empresa_id);
 
   const anonymousState=await rpc(db,'obtener_estado_estudiante',{
-   p_codigo:' side-000 ',p_nombre_legal:'COMPANIA AGIL S.A.',p_nombre_comercial:'CAFE DEL NORTE'
+   p_codigo:' '+game.codigo.toLowerCase()+' ',p_nombre_legal:'COMPANIA AGIL S.A.',p_nombre_comercial:'CAFE DEL NORTE'
   });
   assert.equal(anonymousState.success,true);
   assert.equal(Number(anonymousState.snapshot_revision),1);

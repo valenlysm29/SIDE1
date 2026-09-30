@@ -27,3 +27,19 @@ test('game creation distinguishes missing migration from transient network failu
  result=await window.SIDE.PartidaService.crear({nombre:'Prueba',configuracion:{lifecycleVersion:2}});
  assert.equal(result.error,'Failed to fetch');assert.equal(inserted,false);
 });
+test('game creation requires the alphanumeric migration before inserting a remote lobby',async()=>{
+ let features={observationsVersion:1},inserted=false;
+ const client={
+  auth:{getUser:async()=>({data:{user:{id:'teacher'}}})},
+  rpc:async name=>({data:name==='side_game_features'?features:{}}),
+  from(){inserted=true;return {insert:()=>({select:()=>({single:async()=>({data:{codigo:'SIDE-WG2'}})})})};}
+ };
+ const window={SIDE:{SupabaseClient:{get:()=>client}}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),{window});
+ const input={nombre:'Prueba',configuracion:{lifecycleVersion:2}};
+ let result=await window.SIDE.PartidaService.crear(input);
+ assert.equal(result.success,false);assert.match(result.error,/supabase_game_codes\.sql/);assert.equal(inserted,false);
+ features={observationsVersion:1,gameCodeVersion:2};
+ result=await window.SIDE.PartidaService.crear(input);
+ assert.equal(result.success,true);assert.equal(result.data.codigo,'SIDE-WG2');assert.equal(inserted,true);
+});

@@ -8,8 +8,15 @@ const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture
  const read=(game,name)=>rpc(db,'obtener_estado_estudiante',identity(game,name));
  try{
   const first=await createGame(db),second=await createGame(db);
-  assert.equal(first.codigo,'SIDE-000');assert.equal(second.codigo,'SIDE-001');
+  assert.match(first.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);assert.match(second.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);assert.notEqual(first.codigo,second.codigo);
   await assert.rejects(()=>db.query('insert into partidas(profesor_id,nombre,codigo) values($1,$2,$3)',[professor,'Duplicada',first.codigo]));
+  // Deploy the focused migration twice over historical games without renaming them.
+  await db.query("insert into partidas(profesor_id,nombre,codigo,estado) values($1,'Histórica','SIDE-025','finalizada')",[professor]);
+  const before=(await db.query('select id,codigo from partidas order by id')).rows;
+  const migration=require('node:fs').readFileSync(require('node:path').join(__dirname,'../supabase/migrations/supabase_game_codes.sql'),'utf8');
+  await db.exec(migration);await db.exec(migration);
+  assert.deepEqual((await db.query('select id,codigo from partidas order by id')).rows,before);
+  assert.equal((await rpc(db,'side_game_features',{})).gameCodeVersion,2);
   const student=await join(first,'Presencia');
   await read(first,'Presencia');
   const seen=()=>db.query('select last_seen_at from participantes where empresa_id=$1',[student.empresa_id]);
@@ -17,7 +24,7 @@ const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture
   await read(first,'Presencia');assert.ok((await seen()).rows[0].last_seen_at>=seenAt);
   await db.query("update participantes set last_seen_at=now()-interval '2 minutes' where empresa_id=$1",[student.empresa_id]);
   await read(first,'Presencia');assert.ok(Date.now()-Date.parse((await seen()).rows[0].last_seen_at)<5000);
-  console.log('PASS unique three-digit codes, collision rejection and server presence heartbeat');
+  console.log('PASS unique alphanumeric codes, collision rejection and server presence heartbeat');
 
   for(const game of [first,await createGame(db,config({cycleCloseMode:'automatic'}))]){
    const s=await join(game,'Cancelación');
@@ -62,8 +69,14 @@ const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture
   console.log('PASS manual event rules: first cycle, single occurrence, repeat, immutable past draws, cancellation preserves history, server validation');
 
   // Exhaustion is explicit; finalizing a game never reuses its code and history.
-  await db.query("insert into partidas(profesor_id,nombre,codigo,estado) select $1,'Ocupada','SIDE-'||lpad(n::text,3,'0'),'finalizada' from generate_series(0,999) n where not exists(select 1 from partidas where codigo='SIDE-'||lpad(n::text,3,'0'))",[professor]);
+  await db.query(`insert into partidas(profesor_id,nombre,codigo,estado)
+    select $1,'Ocupada',candidate,'finalizada' from (
+      select 'SIDE-'||substr('ABCDEFGHJKLMNPQRSTUVWXYZ',a,1)||substr('ABCDEFGHJKLMNPQRSTUVWXYZ',b,1)||d::text candidate
+      from generate_series(1,24) a cross join generate_series(1,24) b cross join generate_series(2,9) d
+    ) codes where not exists(select 1 from partidas where codigo=codes.candidate)`,[professor]);
+  await db.query("delete from partidas where codigo='SIDE-WG2'");
+  assert.equal((await createGame(db)).codigo,'SIDE-WG2','find the last free code even when the rest are occupied');
   await assert.rejects(()=>createGame(db),/agotaron/);
-  console.log('PASS 1000-code exhaustion reports an error instead of duplicating a code');
+  console.log('PASS 4608-code exhaustion reports an error instead of duplicating a code');
  }finally{await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

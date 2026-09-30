@@ -35,7 +35,7 @@
   }
 
   /**
-   * Busca una partida en estado 'esperando' por su código (ej. SIDE-4821).
+   * Busca una partida en estado 'esperando' por su código (ej. SIDE-WG2).
    * @param {string} codigo Código de partida.
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
    *   data = { id, codigo, nombre, curso, estado, segmento } o null si no existe.
@@ -59,7 +59,7 @@
    * Crea una partida nueva para el profesor autenticado.
    * @param {object} datos { nombre, curso, segmento?, configuracion?, eventos_habilitados? }
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
-   *   data = fila creada (incluye id y codigo generado SIDE-XXXX).
+   *   data = fila creada (incluye id y codigo generado SIDE-WG2).
    */
   async function crear(datos) {
     const sb = client();
@@ -74,7 +74,8 @@
       if(d.configuracion?.lifecycleVersion===2){
         const {data:features,error:featuresError}=await sb.rpc('side_game_features');
         if(featuresError&&!/PGRST202|42883/.test(featuresError.code||''))return {success:false,error:featuresError.message||'No se pudo comprobar Supabase. Vuelve a intentarlo.'};
-        if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql para habilitar códigos de tres dígitos, cancelación y eventos sin repetición.'};
+        if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql para habilitar cancelación y eventos sin repetición.'};
+        if(features?.gameCodeVersion!==2)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_codes.sql para habilitar códigos como SIDE-WG2.'};
         // Read-only readiness check: do not leave an unusable lobby in an old DB.
         const {error:readinessError}=await sb.rpc('controlar_partida',{p_partida_id:null,p_accion:'sincronizar'});
         if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica supabase/migrations/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
