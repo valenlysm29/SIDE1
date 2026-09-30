@@ -123,7 +123,7 @@
         const result=service?.obtenerUltima?await service.obtenerUltima():{success:false,unavailable:true};
         if(request!==generation)return;
         if(!result.success){
-          status.textContent=result.unavailable?'El historial de Decisiones aún no está habilitado. Aplica el SQL de historial en Supabase y pulsa Actualizar.':result.offline?'Conecta Supabase para consultar la partida anterior.':'No se pudo consultar el historial. Revisa tu conexión o sesión y pulsa Actualizar.';
+          status.textContent=result.unavailable?'El apartado Historial aún no está habilitado. Aplica el SQL de historial en Supabase y pulsa Actualizar.':result.offline?'Conecta Supabase para consultar la partida anterior.':'No se pudo consultar el historial. Revisa tu conexión o sesión y pulsa Actualizar.';
           return;
         }
         snapshot=result.data;status.textContent=snapshot?'Última partida finalizada · consulta de solo lectura.':' ';render();

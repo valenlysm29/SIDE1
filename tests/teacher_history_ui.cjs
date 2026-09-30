@@ -29,7 +29,11 @@ const snapshot={partida:{id:'game-one',codigo:'SIDE-777',nombre:'Historial empre
         window.historyReply={data:null,error:null};window.historyCalls=[];
         SIDE.SupabaseClient.get=()=>({rpc:async(...args)=>{historyCalls.push(args);return historyReply}});
       });
-      await page.locator('[data-tab="decisiones"]').click();
+      assert.deepEqual(await page.locator('.sidebar nav .nav-btn').evaluateAll(buttons=>buttons.slice(-2).map(button=>button.textContent.trim())),['Ganador y podio','Historial']);
+      await page.locator('[data-tab="historial"]').click();
+      assert.equal(await page.locator('#tab-historial').isVisible(),true);
+      assert.equal(await page.locator('#historyHeading').innerText(),'Historial');
+      assert.equal(await page.locator('#pageTitle').innerText(),'Historial · partida anterior');
       await page.waitForFunction(()=>document.querySelector('#historyContent').getAttribute('aria-busy')==='false');
       assert.match(await page.locator('#historyContent').innerText(),/Aún no hay una partida anterior registrada/);
       assert.equal(await page.locator('#refreshHistory').isEnabled(),true);
