@@ -91,3 +91,30 @@
 #simulator3d.in-hub .sim3d-prompt{border-color:#82eadc66;background:#13222ce8}
 #simulator3d.in-hub .sim3d-prompt kbd{background:#91eedb;color:#142936}
 @media(max-width:800px){.sim-drive-hud{right:12px;bottom:220px;width:180px;padding:10px 14px}.sim-drive-hud b{font-size:44px}.sim-drive-hud p{display:none}.sim-drive-hud>span{font-size:7px}}
+
+/* Mapa de la ciudad y orientación de las siete zonas. */
+#simulator3d .sim-city-map{width:240px;bottom:150px;padding:11px;pointer-events:auto;background:rgba(5,13,22,.92)}
+#simulator3d .sim-city-map .mini-title{display:flex;justify-content:space-between;align-items:center;font-size:10px;margin-bottom:8px}
+#simulator3d .sim-city-map .mini-title small{color:#a9c4d6;font-size:8px;letter-spacing:0;text-transform:none}
+#simulator3d .sim-city-map .mini-map-area{height:210px;overflow:visible;background:linear-gradient(90deg,transparent 47%,#697781 47%,#697781 53%,transparent 53%),linear-gradient(transparent 47%,#697781 47%,#697781 53%,transparent 53%),linear-gradient(135deg,#375448,#294139);border:1px solid #82a0a344}
+#simulator3d .sim-city-map .mini-map-area:before{content:'';position:absolute;inset:15%;border:7px solid #6a7778;border-radius:13px;pointer-events:none}
+#simulator3d .sim-city-map .mini-map-area:after{content:'';position:absolute;inset:7%;border:1px dashed #b9d7c151;border-radius:8px;pointer-events:none}
+#simulator3d .sim-city-map .mini-player{z-index:6;width:10px;height:10px;background:#fff;box-shadow:0 0 0 3px #2988ef,0 0 12px 5px #248df08a;pointer-events:none}
+#simulator3d .sim-city-zone{position:absolute;z-index:4;display:flex;align-items:center;gap:3px;min-height:23px;padding:3px 5px;transform:translate(-50%,-50%);border:1px solid #e7f4e2a1;border-radius:6px;background:#102332e8;color:#fff;box-shadow:0 2px 9px #0009;font:800 8px Montserrat,system-ui,sans-serif;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#simulator3d .sim-city-zone img{width:13px;height:13px;object-fit:contain}
+#simulator3d .sim-city-zone:hover,#simulator3d .sim-city-zone:focus-visible{background:#294d60;outline:2px solid #9cf5e8;outline-offset:1px}
+#simulator3d .sim-city-zone.is-current{border-color:#80e8dd;background:#185a62}
+#simulator3d .sim-city-zone.is-target{border-color:#ffd329;background:#5b4618;box-shadow:0 0 0 2px #ffd3296b,0 2px 9px #0009}
+#simulator3d .mini-cruiser{z-index:5}
+#simulator3d .sim-zone-labels{position:absolute;inset:0;z-index:9;overflow:hidden;pointer-events:none}
+#simulator3d .sim-zone-label{position:absolute;display:flex;align-items:center;gap:6px;min-width:98px;min-height:26px;padding:5px 10px;transform:translate(-50%,-50%) scale(var(--distance-scale,1));transform-origin:center;border:1px solid #c8ece3ad;border-radius:7px;background:#0a202ee8;color:#fff;box-shadow:0 6px 18px #0009;font:900 11px Montserrat,system-ui,sans-serif;text-shadow:0 1px 4px #000;text-align:center;white-space:nowrap;letter-spacing:.2px}
+#simulator3d .sim-zone-label[hidden]{display:none}
+#simulator3d .sim-zone-label img{width:17px;height:17px;object-fit:contain}
+#simulator3d .sim-zone-label.is-current{border-color:#8af1df;background:#154d55ed}
+#simulator3d .sim-zone-label.is-target{border-color:#ffd329;background:#51411cef}
+#simulator3d .sim-zone-banner{position:absolute;z-index:19;top:23%;left:50%;transform:translateX(-50%);min-width:190px;padding:10px 20px;border:1px solid #85eee1a8;border-radius:8px;background:#092330ec;box-shadow:0 12px 30px #0009;color:#fff;text-align:center;font:900 19px Montserrat,system-ui,sans-serif;letter-spacing:.5px;pointer-events:none}
+#simulator3d .sim-zone-banner[hidden],#simulator3d .sim-route-marker[hidden]{display:none}
+#simulator3d .sim-route-marker{position:absolute;z-index:15;display:flex;align-items:center;gap:7px;transform:translate(-50%,-50%);padding:7px 10px;border:1px solid #ffd329;border-radius:100px;background:#2b2411ee;color:#ffdf62;box-shadow:0 5px 20px #0009;font:900 10px Montserrat,system-ui,sans-serif;pointer-events:none;white-space:nowrap}
+#simulator3d .sim-route-marker span{font:900 18px system-ui}
+@media(max-width:800px){#simulator3d .sim-city-map{display:block;right:10px;bottom:113px;width:174px;padding:7px}#simulator3d .sim-city-map .mini-map-area{height:150px}#simulator3d .sim-city-map .mini-title{font-size:8px}#simulator3d .sim-city-map .mini-title small{display:none}#simulator3d .sim-city-zone{width:22px;height:22px;min-height:0;justify-content:center;padding:2px;border-radius:50%}#simulator3d .sim-city-zone span{display:none}#simulator3d .sim-city-zone img{width:14px;height:14px}#simulator3d .sim-zone-label{font-size:9px;min-width:78px;padding:4px 7px}#simulator3d .sim-zone-label img{width:14px;height:14px}}
+@media(max-width:560px){#simulator3d .sim-city-map{right:8px;bottom:202px;width:136px}#simulator3d .sim-city-map .mini-map-area{height:114px}#simulator3d .sim-city-zone{width:20px;height:20px}#simulator3d .sim-city-map .mini-player{width:8px;height:8px}#simulator3d .sim-zone-label{display:none}#simulator3d .sim-route-marker{font-size:9px;max-width:145px}#simulator3d .sim-zone-banner{top:27%;font-size:15px}}

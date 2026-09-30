@@ -411,16 +411,15 @@
     </div>
 
 
-    <div id="simMinimap" class="sim-minimap" aria-label="Minimapa">
-      <span class="mini-title">TU EMPRESA</span>
-      <div class="mini-map-area">
-        <i class="mini-zone city"></i><i class="mini-zone sales"></i><i class="mini-zone production"></i><i class="mini-zone warehouse"></i>
-        <b id="miniPlayer" class="mini-player"></b>
-        <span class="mini-point entry" title="Entrada"></span>
-        <span class="mini-point cash" title="Caja"></span>
-        <span class="mini-point admin" title="Administración"></span>
+    <div id="simMinimap" class="sim-minimap sim-city-map" aria-label="Mapa de la ciudad">
+      <span class="mini-title">MAPA DE SIDE <small>Elige una zona</small></span>
+      <div class="mini-map-area" id="simCityMapArea" role="group" aria-label="Zonas de la ciudad">
+        <b id="miniPlayer" class="mini-player" title="Tu posición" aria-label="Tu posición"></b>
       </div>
     </div>
+    <div id="simZoneLabels" class="sim-zone-labels" aria-hidden="true"></div>
+    <div id="simZoneBanner" class="sim-zone-banner" role="status" aria-live="polite" hidden></div>
+    <div id="simRouteMarker" class="sim-route-marker" aria-hidden="true" hidden><span>↗</span><b id="simRouteMarkerName">Objetivo</b></div>
 
     <div id="simTutorial3d" class="sim-tutorial3d hidden">
       <span id="tutorialStepLabel">TUTORIAL 1/6</span>
