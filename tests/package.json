@@ -2,11 +2,12 @@
   "private": true,
   "description": "Pruebas de integración del flujo de partidas SIDE con PostgreSQL local y Chromium",
   "scripts": {
-    "test": "node --test *.test.js *.test.mjs world_finance.test.cjs",
+    "test": "node --test *.test.js *.test.mjs world_finance.test.cjs && node decision_options_db.cjs",
     "world:ui": "node playable_hub.cjs && node gameplay_hud.cjs",
     "world:business": "node world_business_ui.cjs",
     "world:loading": "node world_loading.cjs",
     "lifecycle:db": "node game_lifecycle_db.cjs",
+    "decisions:db": "node decision_options_db.cjs",
     "admission:db": "node student_admission_db.cjs && node student_admission_matrix_db.cjs && node --test student_admission_contract_gaps.test.js",
     "admission:ui": "node --test student_admission.test.js",
     "lifecycle:ui": "node game_lifecycle_ui.cjs",

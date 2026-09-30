@@ -2,7 +2,7 @@ const {PGlite}=require('@electric-sql/pglite');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const professor='11111111-1111-1111-1111-111111111111';
-async function database({beforeStudentAdmission}={}){
+async function database({beforeStudentAdmission,beforeDecisionOptions}={}){
  const db=new PGlite();
  await db.exec(`
  create role anon; create role authenticated; create schema auth;
@@ -24,6 +24,9 @@ async function database({beforeStudentAdmission}={}){
  if(beforeStudentAdmission)await beforeStudentAdmission(db);
  const studentAdmission=fs.readFileSync(path.join(root,'supabase/migrations/supabase_student_admission.sql'),'utf8');
  await db.exec(studentAdmission);await db.exec(studentAdmission); // Repeatable deployment.
+ if(beforeDecisionOptions)await beforeDecisionOptions(db);
+ const decisionOptions=fs.readFileSync(path.join(root,'supabase/migrations/20260930_preservar_opciones_decisiones.sql'),'utf8');
+ await db.exec(decisionOptions);await db.exec(decisionOptions);
  return db;
 }
 const config=(overrides={})=>({lifecycleVersion:2,cycleCloseMode:'manual',integrationDurationMinutes:5,integrationMinutes:0,cycles:3,roundHours:0,roundMinutes:10,enabledEvents:[],...overrides});

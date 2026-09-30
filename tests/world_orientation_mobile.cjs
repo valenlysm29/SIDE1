@@ -55,11 +55,18 @@ const overlap=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;
         await page.locator('.sim-city-zone[data-zone="bank"]').click();
         assert.equal(await page.locator('.sim-city-zone[data-zone="bank"]').evaluate(el=>el.classList.contains('is-target')),true);
         assert.equal(await page.locator('#simMinimap').evaluate(el=>el.classList.contains('sim-city-map-open')),false,'map closes after choosing a zone');
-        await page.waitForTimeout(500);
+        // The HUD updates on rendered frames; asset loading can exceed 500 ms.
+        await page.locator('.sim-edge-guide').waitFor({state:'visible',timeout:15000});
         assert.equal(await page.locator('.sim-edge-guide').isVisible(),true,'edge arrow points toward offscreen bank');
-        const arrowBox=await box(page.locator('.sim-edge-guide'));
-        const blockers=page.locator('.sim3d-touch-controls:visible, .sim3d-actionbar:visible, .sim-city-map:visible, .sim3d-missions:visible, .sim3d-stats:visible, .sim-zone-label:visible');
-        for(let i=0;i<await blockers.count();i++)assert.equal(overlap(arrowBox,await box(blockers.nth(i))),false,'edge arrow avoids visible controls, HUD and labels');
+        // Read all animated overlay rectangles in the same browser task.
+        const arrowLayout=await page.evaluate(()=>{
+          const rect=el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
+          const selectors='.sim3d-touch-controls, .sim3d-actionbar, .sim-city-map, .sim3d-missions, .sim3d-stats, .sim-zone-label';
+          return {arrow:rect(document.querySelector('.sim-edge-guide')),blockers:[...document.querySelectorAll(selectors)]
+            .filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=='hidden';})
+            .map(el=>({name:el.className,box:rect(el)}))};
+        });
+        for(const blocker of arrowLayout.blockers)assert.equal(overlap(arrowLayout.arrow,blocker.box),false,`edge arrow avoids ${blocker.name}: ${JSON.stringify(arrowLayout)}`);
         await page.screenshot({path:path.join(out,`target-${width}x${height}.png`)});
       }
       assert.deepEqual(errors,[]);

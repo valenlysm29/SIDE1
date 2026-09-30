@@ -38,7 +38,15 @@ Pruebas automatizadas, desde esta carpeta:
 ```powershell
 node --test tests/*.test.js tests/*.test.mjs tests/world_finance.test.cjs
 python tests/local_server_test.py
+node tests/decision_options_db.cjs
 ```
+
+La migración `supabase/migrations/20260930_preservar_opciones_decisiones.sql`
+debe aplicarse después de las migraciones existentes. Conserva todas las
+opciones de una decisión en filas distintas y reemplaza las selecciones
+anteriores de las decisiones enviadas. No reconstruye opciones que ya hayan
+sido sobrescritas en la base de datos. Su aplicación en Supabase es un paso
+separado de las pruebas locales.
 
 El registro de archivos trasladados está en
 [reports/organization/moves_2026-09-30.json](reports/organization/moves_2026-09-30.json).

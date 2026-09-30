@@ -267,7 +267,7 @@ No agregar acceso directo a `supabaseClient` fuera de `services/`.
 
 | Síntoma | Causa probable | Fix |
 |---|---|---|
-| `guardar_decisiones` falla con error `42P10` | Falta el UNIQUE en `empresas_decisiones(empresa_id, ciclo, decision_id)` | Ejecutar la sección 14 del `supabase/migrations/supabase_migration.sql` (crea el constraint) |
+| El guardado pierde opciones de una decisión o falla con `42P10` | La clave o la función de guardado son de una versión anterior | Aplicar al final `supabase/migrations/20260930_preservar_opciones_decisiones.sql` |
 | Join dice "no encontramos partida" | `estado` distinto de `esperando` o código con espacios | `UPDATE partidas SET estado='esperando'`; copiar el código exacto |
 | Registro no redirige | Confirmación por correo activada en Auth | Desactivar "Confirm email" en Authentication → Settings |
 | `profesores` vacío tras registro | El trigger no disparó | Insert manual con el UID de Authentication → Users |
