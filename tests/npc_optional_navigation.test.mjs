@@ -29,7 +29,11 @@ test('three-pathfinding route is accepted only when complete and clear',()=>{
 test('Yuka steering remains behind AABB and neighbor collision guard',()=>{
   const open=createOptionalNpcNavigator({YUKA});
   const walker={x:0,z:0,yaw:Math.PI/2,speed:0};
-  for(let i=0;i<120;i++)open.advance(walker,{x:4,z:0},.05,[],1.1);
+  for(let i=0;i<120;i++){
+    const result=open.advance(walker,{x:4,z:0},.05,[],1.1);
+    assert.equal(result.arrived,Math.hypot(4-walker.x,walker.z)<.10,
+      'arrival must refer to the real waypoint, not the steering lookahead');
+  }
   assert.ok(walker.x>3.8&&walker.x<=4,'Yuka did not move along a clear path');
   const nav=createOptionalNpcNavigator({YUKA,obstacles:[obstacle]});
   assert.equal(nav.ready,false);

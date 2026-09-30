@@ -50,7 +50,7 @@ Criterio de distribución para 16 modelos únicos: ocho presentaciones femeninas
 | Muestra En3D | Pendiente de licencia escrita de avatares y pesos, además de curación visual. |
 | Mixamo recibido después de esta fase | Véase el reporte diferencial Mixamo: 24 FBX With Skin, 11 animaciones Without Skin; falta Idle, Walk compatible y Run compatible In Place. |
 
-La inspección visual original de las bases se basó en `base-characters/Universal Base Characters[Standard]/Preview.png`. La revisión inicial de los seis modelos aprobados se hizo con renders de sus glTF exactos. Los diez modelos adicionales se revisaron mediante las vistas fuente y validación de clips/skin. Son geometrías y atuendos originales distintos, no recolores. No se infiere identidad ni edad exacta del estilo low poly; se observan apariencias adultas, pero la variedad de complexiones y edades sigue limitada por las fuentes.
+La inspección visual original de las bases se basó en `base-characters/Universal Base Characters[Standard]/Preview.png`. Los primeros seis modelos se revisaron con renders de sus glTF exactos; los diez incorporados después se revisaron mediante vistas fuente y validación de clips/skin. El catálogo final contiene 16 geometrías y atuendos originales distintos, sin contar recolores. No se infiere identidad ni edad exacta del estilo low poly; se observan apariencias adultas, pero la variedad de complexiones y edades sigue limitada por las fuentes.
 
 `assets/models/npc/manifest.json` registra los 16 GLB entregados. `manifest.pending.json` sigue siendo una lista separada de candidatos Mixamo sin aprobar.
 
@@ -84,12 +84,14 @@ archivos: los clips son in-place.
 
 **Límites visuales y de navegación:** Los modelos Animated de 2019 son más
 angulosos que los Modular de 2022. La variedad de edad y complexión es menor
-que la variedad de vestuario, peinado y género aparente. Los roles de banco,
-guardia y proveedor no tienen una categoría propia en `npc_city_roster.mjs`;
-por ahora se asignan a `cliente` o `tienda` según su escena. La navegación
-estable sigue usando el planificador AABB existente, con evitación de
-colisiones; Yuka y three-pathfinding requieren un navmesh y ajuste de rutas
-del mapa ampliado antes de integrarse sin comprometer el flujo actual.
+que la variedad de vestuario, peinado y género aparente. El catálogo ahora
+admite los roles `oficina`, `banco`, `cajero`, `proveedor` y `guardia` como
+etiquetas secundarias; el guardia usa traje formal, no uniforme especializado.
+La capa opcional de Yuka y three-pathfinding usa un navmesh de cuadrícula
+construido desde los límites de ciudad y sus colliders. Si no existe ruta
+válida, el planificador AABB mantiene la navegación y las colisiones. El
+integrador debe activar esta capa en los actores del hub; los clientes e
+interiores conservan su FSM actual.
 
 Candidatos descartados en esta fase: En3D (licencia de avatares y pesos sin
 confirmar); Mixamo recibido (Idle/Walk/Run no compatibles en un mismo rig);

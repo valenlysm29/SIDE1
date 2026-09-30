@@ -51,7 +51,8 @@ export function createOptionalNpcNavigator({THREE,Pathfinding,YUKA,geometry,obst
       steered.z=state.z+dz/length*lookahead;
     }else return safeAdvance(state,target,dt,currentObstacles,neighbors,maxSpeed,final);
     // AABB movement and neighbor separation still guard the final step.
-    return safeAdvance(state,steered,dt,currentObstacles,neighbors,maxSpeed,final);
+    const result=safeAdvance(state,steered,dt,currentObstacles,neighbors,maxSpeed,final);
+    return {...result,arrived:Math.hypot(target.x-state.x,target.z-state.z)<.10};
   }
   return {ready:!!pathfinder,plan,advance,setObstacles(next){currentObstacles=Array.isArray(next)?next:[]}};
 }
