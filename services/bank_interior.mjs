@@ -28,9 +28,9 @@ export function buildBankInterior({ room, batch: b, m, collider, sign, hotspot, 
   sign(room.detail, 'PRÉSTAMOS', 'Consulta y decide en ventanilla', tellerX, 2.35, back + .18, 5.2, .78);
   hotspot(room, 'bank-loans', 'decisionZone', 'Préstamos · Banco', tellerX, counterZ + 1.3, 'E');
 
-  // Waiting seats occupy the west side; the central arrival aisle stays clear.
+  // Waiting seats occupy the southwest corner; the west door at z stays clear.
   const waitingX = x - width / 2 + 1.2;
-  for (const seatZ of [z - .2, z + 1.25, z + 2.7]) {
+  for (const seatZ of [z + 3.3, z + 4.75, z + 6.2]) {
     solid(waitingX, .43, seatZ, .85, .16, .78, m.mint, 'bank-waiting-seat');
     b.box(waitingX - .36, .8, seatZ, .12, .65, .8, m.mint);
     for (const side of [-1, 1]) {
@@ -38,7 +38,7 @@ export function buildBankInterior({ room, batch: b, m, collider, sign, hotspot, 
       b.box(waitingX + side * .29, .2, seatZ + .25, .07, .4, .07, m.steel);
     }
   }
-  sign(room.detail, 'SALA DE ESPERA', 'Mantén libre el acceso', waitingX + .55, 2.3, z - 1.45, 2.5, .45);
+  sign(room.detail, 'SALA DE ESPERA', 'Mantén libre el acceso', waitingX + .55, 2.3, z + 2.4, 2.5, .45);
   // Queue marks are flush to the floor and impose no invisible barriers.
   const queue = [counterZ + 1.3, counterZ + 2.65, counterZ + 4];
   queue.forEach((pz, index) => {
