@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="responsive.css?v=20260910-2">
   <link rel="stylesheet" href="production.css?v=20260922-fixedbar">
   <link rel="stylesheet" href="character-selection.css?v=20260927-selector">
+  <link rel="stylesheet" href="world_minimap.css?v=20260930-touch-map">
 </head>
 <body>
 <main id="app">
@@ -411,10 +412,16 @@
     </div>
 
 
-    <div id="simMinimap" class="sim-minimap sim-city-map" aria-label="Mapa de la ciudad">
-      <span class="mini-title">MAPA DE SIDE <small>Elige una zona</small></span>
-      <div class="mini-map-area" id="simCityMapArea" role="group" aria-label="Zonas de la ciudad">
-        <b id="miniPlayer" class="mini-player" title="Tu posición" aria-label="Tu posición"></b>
+    <div id="simMinimap" class="sim-minimap sim-city-map" role="region" aria-label="Mapa de la ciudad">
+      <div class="sim-city-map-head">
+        <span class="mini-title">Mapa de SIDE <small>Elige una zona</small></span>
+        <button id="simCityMapToggle" class="sim-city-map-toggle" type="button" aria-label="Ampliar mapa" aria-controls="simMinimap" aria-expanded="false" title="Ampliar mapa">⛶</button>
+      </div>
+      <div class="sim-city-map-content">
+        <div class="mini-map-area" id="simCityMapArea" role="group" aria-label="Zonas de la ciudad">
+          <b id="miniPlayer" class="mini-player" title="Tu posición" aria-label="Tu posición"></b>
+        </div>
+        <div id="simCityZoneList" class="sim-city-zone-list" role="group" aria-label="Elegir zona"></div>
       </div>
     </div>
     <div id="simZoneLabels" class="sim-zone-labels" aria-hidden="true"></div>
