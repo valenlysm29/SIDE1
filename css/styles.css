@@ -3,7 +3,7 @@
 .financial-details>span{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-bottom:1px solid #ffffff0b}
 .financial-details>span>b{white-space:nowrap;color:#ffe080}
 .financial-details summary{cursor:pointer;font-weight:800;line-height:1.5}
-html,body{margin:0;min-height:100%;font-family:Montserrat,Arial,sans-serif;background:#020716;color:#fff}
+html,body{margin:0;min-height:100%;font-family:var(--side-font,Montserrat,Arial,sans-serif);background:var(--side-canvas,#020716);color:var(--side-text-bright,#fff)}
 body{overflow-x:hidden}
 button,input{font:inherit}
 .hidden{display:none!important}
@@ -70,7 +70,7 @@ button,input{font:inherit}
 .modal input{width:100%;padding:15px 17px;border-radius:12px;border:1px solid #365d8b;background:#021a37;color:#fff;outline:none}
 .modal input:focus{border-color:#ffd333;box-shadow:0 0 0 3px #ffd33322}
 .two-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.primary-gold{width:100%;border:0;border-radius:12px;padding:16px;margin-top:20px;background:linear-gradient(#ffe985,#e7a800);color:#501800;font-weight:900;letter-spacing:1.5px;cursor:pointer;box-shadow:0 4px 0 #8c5100}
+.primary-gold{width:100%;min-height:var(--side-touch-target,44px);border:0;border-radius:var(--side-radius-control,12px);padding:var(--side-space-4,16px);margin-top:var(--side-space-5,20px);background:linear-gradient(var(--side-gold-light,#ffe985),var(--side-gold-deep,#e7a800));color:var(--side-gold-ink,#501800);font-weight:900;letter-spacing:1.5px;cursor:pointer;box-shadow:var(--side-shadow-action,0 4px 0 #8c5100)}
 .switch-line{text-align:center;color:#d9e7f5;margin:22px 0 0}.switch-line button{background:none;border:0;color:#ffd329;font-weight:900;cursor:pointer}
 .form-message{min-height:22px;text-align:center;margin-top:12px;color:#ffdf72}
 .field-hint{display:block;color:#8da4c2;font-size:13px;line-height:1.5;margin-top:6px}

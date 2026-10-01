@@ -1,18 +1,18 @@
 /* SIDE · Decisions shell and production presentation. Business rules live in the models. */
 #decisionMenu {
-  --ui-canvas: #061321;
-  --ui-panel: #091c2f;
-  --ui-raised: #0d263d;
-  --ui-inset: #071726;
-  --ui-line: #294358;
-  --ui-text: #eef5fa;
-  --ui-muted: #a3b8c9;
-  --ui-yellow: #ffd34f;
-  --ui-green: #8be6b2;
-  --ui-blue: #84cfff;
-  --ui-radius: 14px;
-  --ui-space: clamp(16px, 2vw, 24px);
-  --ui-shadow: 0 8px 24px #00000020;
+  --ui-canvas: var(--side-decision-canvas, #061321);
+  --ui-panel: var(--side-decision-panel, #091c2f);
+  --ui-raised: var(--side-decision-raised, #0d263d);
+  --ui-inset: var(--side-panel-inset, #071726);
+  --ui-line: var(--side-line, #294358);
+  --ui-text: var(--side-text, #eef5fa);
+  --ui-muted: var(--side-text-muted, #a3b8c9);
+  --ui-yellow: var(--side-gold, #ffd329);
+  --ui-green: var(--side-success, #8be6b2);
+  --ui-blue: var(--side-blue, #84cfff);
+  --ui-radius: var(--side-radius-production, 14px);
+  --ui-space: var(--side-space-panel, clamp(16px, 2vw, 24px));
+  --ui-shadow: var(--side-shadow-soft, 0 8px 24px #00000020);
   height: auto;
   min-height: 100dvh;
   max-height: none;
