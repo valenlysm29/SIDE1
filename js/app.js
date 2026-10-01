@@ -776,10 +776,23 @@ function renderDecisionRow(item){
     let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
-  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
+  const sent=sectionSubmitted(currentCategory)||decisionsSubmitted();
+  const draftAction=item.type==='info'?'':`<footer class="item-draft-bar"><button type="button" class="item-draft-save" data-save-item-draft="${item.id}" aria-label="Guardar borrador: ${escapeHtml(item.name)}" ${locked?'disabled':''}>Guardar borrador</button><p class="item-draft-feedback" role="status" aria-live="polite">${sent?'Decisión enviada; edición bloqueada en este ciclo.':locked?'Edición bloqueada por las reglas de esta decisión.':'Copia local de la sección. El envío se confirma por separado.'}</p></footer>`;
+  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${sent?'ENVIADA · BLOQUEADA':locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}${draftAction}</article>`;
 }
 document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty], [data-mold-target]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 function bindDecisionControls(){
+  document.querySelectorAll('[data-save-item-draft]').forEach(button=>button.addEventListener('click',()=>{
+    const item=findDecisionItem(button.dataset.saveItemDraft);
+    const feedback=button.closest('.decision-row')?.querySelector('.item-draft-feedback');
+    try{
+      if(!item||!studentAccess().canOperate||cycleDecisionsLocked()||decisionEditingBlocked()||isLocked(item))return;
+      if(!persistCurrentDraftOnly())throw new Error('Draft unavailable');
+      if(feedback){feedback.textContent='Borrador local guardado; pendiente de envío. Incluye los cambios de esta sección.';feedback.dataset.state='saved';}
+    }catch{
+      if(feedback){feedback.textContent='No se pudo guardar el borrador local. Revisa el almacenamiento del navegador y vuelve a intentarlo antes de salir.';feedback.dataset.state='error';}
+    }
+  }));
   document.querySelectorAll('[data-choice]').forEach(input=>{
     input.addEventListener('click',event=>{
       const item=findDecisionItem(input.dataset.choice);

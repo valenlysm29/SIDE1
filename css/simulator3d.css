@@ -134,3 +134,39 @@
 #simulator3d .sim-zone-label,#simulator3d .sim-route-marker,#simulator3d .sim-edge-guide{display:none}
 @media (hover:none) and (pointer:coarse){#simulator3d .sim3d-touch-controls{left:calc(12px + env(safe-area-inset-left,0px));right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(62px + env(safe-area-inset-bottom,0px))}#simulator3d .sim3d-actionbar{right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}#simulator3d .sim-zone-banner{top:max(27%,calc(env(safe-area-inset-top,0px) + 106px))}#simulator3d .sim-route-marker{display:none}}
 @media(max-height:480px) and (hover:none) and (pointer:coarse){#simulator3d .sim-zone-banner{top:calc(env(safe-area-inset-top,0px) + 66px);font-size:13px;padding:6px 12px;min-width:0}#simulator3d .sim-edge-guide{font-size:10px}}
+
+/* SIDE HUD: an opaque instrument strip keeps the numbers readable in every zone. */
+#simulator3d .sim3d-brand,
+#simulator3d .sim3d-stats,
+#simulator3d .sim3d-missions,
+#simulator3d .sim3d-objective { background: var(--side-panel, #06172e); color: var(--side-text, #eef5fa); border-color: var(--side-line, #294358); backdrop-filter: none; box-shadow: none; }
+#simulator3d .sim3d-stats { border-radius: var(--side-radius-control, 12px); }
+#simulator3d .sim3d-stat { min-width: 0; padding: 10px 12px; }
+#simulator3d .sim3d-stat span { color: var(--side-text-muted, #a3b8c9); font-size: 11px; line-height: 1.4; letter-spacing: 0; overflow-wrap: anywhere; }
+#simulator3d .sim3d-stat strong { color: var(--side-text, #eef5fa); font-size: 16px; line-height: 1.5; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#simulator3d .sim3d-stat.cash strong,
+#simulator3d .sim3d-stat.revenue strong { color: var(--side-gold, #ffd329); }
+#simulator3d .sim3d-stat.stock strong,
+#simulator3d .sim3d-stat.time strong { color: var(--side-blue, #84cfff); }
+#simulator3d .sim3d-stat.rating strong { color: var(--side-success, #8be6b2); }
+#simulator3d .sim3d-stat.lost strong { color: var(--side-danger, #ff8b9a); }
+#simulator3d .sim3d-brand span { color: var(--side-text-muted, #a3b8c9); font-size: 11px; letter-spacing: 0; }
+#simulator3d .sim3d-brand strong { color: var(--side-text, #eef5fa); font-size: 14px; }
+#simulator3d .sim3d-missions-head { gap: 8px; align-items: center; }
+#simulator3d .sim3d-missions-head span { color: var(--side-gold, #ffd329); font-size: 12px; letter-spacing: 0; }
+#simulator3d .sim3d-missions-head strong { color: var(--side-text, #eef5fa); font-size: 12px; line-height: 1.5; }
+#simulator3d .sim3d-missions-head button { width: 44px; height: 44px; border-color: var(--side-line-control, #5c7890); color: var(--side-text, #eef5fa); background: var(--side-panel-raised, #0b1d36); font-size: 18px; }
+#simulator3d .sim3d-mission-list { gap: 8px; }
+#simulator3d .sim3d-mission-list > div { padding: 8px; background: var(--side-panel-inset, #071726); }
+#simulator3d .sim3d-mission-list > div > span { flex: 0 0 24px; width: 24px; height: 24px; font-size: 12px; color: var(--side-text, #eef5fa); }
+#simulator3d .sim3d-mission-list p { align-items: flex-start; flex-wrap: wrap; gap: 3px 8px; }
+#simulator3d .sim3d-mission-list b { color: var(--side-text, #eef5fa); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+#simulator3d .sim3d-mission-list small { color: var(--side-text-muted, #a3b8c9); font-size: 11px; line-height: 1.5; white-space: normal; }
+#simulator3d .sim3d-mission-list > div.done > span { background: var(--side-success, #8be6b2); color: var(--side-panel-inset, #071726); }
+#simulator3d .sim3d-mission-list > div.done b,
+#simulator3d .sim3d-mission-list > div.done small { color: var(--side-success, #8be6b2); }
+#simulator3d .sim3d-btn { min-width: 44px; min-height: 44px; height: auto; border-color: var(--side-line-control, #5c7890); background: var(--side-panel, #06172e); color: var(--side-text, #eef5fa); font-size: 11px; line-height: 1.4; letter-spacing: 0; }
+#simulator3d .sim3d-btn.primary { border-color: var(--side-gold, #ffd329); background: var(--side-gold, #ffd329); color: var(--side-gold-ink, #501800); }
+#simulator3d .sim3d-btn:hover { border-color: var(--side-gold, #ffd329); }
+#simulator3d .sim3d-btn:focus-visible,
+#simulator3d .sim3d-missions-head button:focus-visible { outline: 3px solid var(--side-gold, #ffd329); outline-offset: 3px; }
