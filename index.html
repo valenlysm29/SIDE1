@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/styles.css?v=20260924-observations">
+  <link rel="stylesheet" href="css/student-interface.css?v=20261001">
   <link rel="stylesheet" href="css/simulator3d.css?v=20260925-playable-hub">
   <link rel="stylesheet" href="css/hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="css/company_summary.css?v=20260917-realismo3">
@@ -33,7 +34,7 @@
           <div id="loadingBar" class="loading-bar"></div>
           <span id="loadingPercent">0%</span>
         </div>
-        <button id="startBtn" class="start-link" disabled>HAZ CLIC PARA EMPEZAR</button>
+        <button id="startBtn" class="start-link" disabled>Empezar</button>
       </div>
     </div>
   </section>
@@ -44,12 +45,14 @@
 
     <div class="profile-main">
       <img class="profile-side-logo" src="assets/side_logo.png" alt="SIDE">
+      <h1 class="profile-title">Elige cómo entrar</h1>
 
       <button class="profile-card student-hero" data-profile="student" aria-label="Iniciar sesión como estudiante">
         <img class="student-hero-img" src="assets/estudiante.png" alt="">
         <span class="student-hero-copy">
-          <span class="hero-eyebrow">ESTUDIANTE</span>
-          <span class="hero-cta">INICIAR SESIÓN <i class="hero-arrow"><img src="assets/icons/ui/arrow-right-thick.svg" alt=""></i></span>
+          <span class="hero-eyebrow">Estudiante</span>
+          <span class="profile-description">Dirige tu empresa y decide en cada ciclo.</span>
+          <span class="hero-cta">Entrar a una partida <i class="hero-arrow" aria-hidden="true"><img src="assets/icons/ui/arrow-right-thick.svg" alt=""></i></span>
         </span>
       </button>
     </div>
@@ -57,7 +60,7 @@
     <button class="profile-card teacher-mini" data-profile="teacher" aria-label="Iniciar sesión como profesor">
       <img class="teacher-mini-img" src="assets/profesor.png" alt="">
       <span class="teacher-mini-copy">
-        <span class="mini-eyebrow">PROFESOR</span>
+        <span class="mini-eyebrow">Profesor</span>
         <span class="mini-cta">Iniciar sesión</span>
       </span>
     </button>
@@ -66,26 +69,26 @@
   <div id="modalRoot" class="modal-root hidden">
     <div class="modal-backdrop"></div>
 
-    <section id="teacherLoginModal" class="modal hidden" role="dialog" aria-modal="true">
+    <section id="teacherLoginModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherLoginTitle">
       <button class="close-btn" data-close aria-label="Cerrar">×</button>
       <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
-      <h2>Acceso del profesor</h2>
+      <h2 id="teacherLoginTitle">Acceso del profesor</h2>
       <p class="modal-lead">Ingresa a tu cuenta para administrar una partida.</p>
       <form id="loginForm">
         <label for="loginEmail">Correo institucional</label>
         <input id="loginEmail" type="email" placeholder="profesor@upch.pe" autocomplete="email" required>
         <label for="loginPassword">Contraseña</label>
         <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" required>
-        <button class="primary-gold" type="submit">INICIAR SESIÓN</button>
+        <button class="primary-gold" type="submit">Iniciar sesión</button>
       </form>
-      <p class="switch-line">¿No tienes cuenta? <button type="button" data-switch="register">REGÍSTRATE AQUÍ</button></p>
-      <div id="loginMessage" class="form-message"></div>
+      <p class="switch-line">¿No tienes cuenta? <button type="button" data-switch="register">Crear cuenta</button></p>
+      <div id="loginMessage" class="form-message" role="status"></div>
     </section>
 
-    <section id="teacherRegisterModal" class="modal hidden" role="dialog" aria-modal="true">
+    <section id="teacherRegisterModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherRegisterTitle">
       <button class="close-btn" data-close aria-label="Cerrar">×</button>
       <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
-      <h2>Registro del profesor</h2>
+      <h2 id="teacherRegisterTitle">Registro del profesor</h2>
       <p class="modal-lead">Crea tu cuenta para administrar partidas de SIDE.</p>
       <form id="registerForm">
         <div class="two-cols">
@@ -95,18 +98,18 @@
         <label for="registerCourse">Curso</label><input id="registerCourse" placeholder="Finanzas Corporativas" autocomplete="off" required>
         <label for="registerEmail">Correo institucional</label><input id="registerEmail" type="email" placeholder="profesor@upch.pe" required>
         <label for="registerPassword">Contraseña</label><input id="registerPassword" type="password" minlength="6" placeholder="••••••••" required>
-        <button class="primary-gold" type="submit">CREAR CUENTA</button>
+        <button class="primary-gold" type="submit">Crear cuenta</button>
       </form>
-      <p class="switch-line">¿Ya tienes cuenta? <button type="button" data-switch="login">INICIA SESIÓN</button></p>
-      <div id="registerMessage" class="form-message"></div>
+      <p class="switch-line">¿Ya tienes cuenta? <button type="button" data-switch="login">Iniciar sesión</button></p>
+      <div id="registerMessage" class="form-message" role="status"></div>
     </section>
 
-    <section id="studentModal" class="modal student-join-modal hidden" role="dialog" aria-modal="true">
+    <section id="studentModal" class="modal student-join-modal hidden" role="dialog" aria-modal="true" aria-labelledby="studentJoinTitle" aria-describedby="studentJoinIntro">
       <button class="close-btn" data-close aria-label="Cerrar">×</button>
       <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
-      <h2>Entrar a una partida</h2>
-      <p class="modal-lead">Introduce el código que te entregó tu profesor.</p>
-      <form id="studentForm" class="student-join-form">
+      <h2 id="studentJoinTitle">Entrar a una partida</h2>
+      <p id="studentJoinIntro" class="modal-lead">Introduce el código que te entregó tu profesor.</p>
+      <form id="studentForm" class="student-join-form" aria-describedby="studentRejoinHelp">
         <div class="join-field join-code-field">
           <label for="gameCode">Código de partida</label>
           <input id="gameCode" placeholder="Ej. SIDE-WG2" maxlength="12" autocomplete="off" required>
@@ -119,11 +122,11 @@
           <label for="companyBrandName">Nombre comercial</label>
           <input id="companyBrandName" placeholder="Ej. BOSS BAGS" maxlength="40" autocomplete="off" required>
         </div>
-        <p class="join-name-warning">Si ya participaste, usa el mismo código, nombre de empresa y nombre comercial para recuperar tu progreso, incluso en otro dispositivo.</p>
-        <button class="primary-gold join-submit" type="submit">ENTRAR A LA PARTIDA</button>
+        <p id="studentRejoinHelp" class="join-name-warning">Si ya participaste, usa el mismo código, nombre de empresa y nombre comercial para recuperar tu progreso, incluso en otro dispositivo.</p>
+        <button class="primary-gold join-submit" type="submit">Entrar a la partida</button>
       </form>
       <div id="studentMessage" class="form-message" role="status"></div>
-      <button id="studentReconnectBtn" class="primary-gold hidden" type="button">REINTENTAR CONEXIÓN</button>
+      <button id="studentReconnectBtn" class="primary-gold hidden" type="button">Reintentar conexión</button>
     </section>
 
     <section id="creditsModal" class="modal credits-modal hidden" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" aria-describedby="creditsIntro">
@@ -136,15 +139,15 @@
     </section>
   </div>
 
-  <section id="studentLoading" class="screen game-loading-screen hidden">
-    <div class="game-loading-bg"></div>
+  <section id="studentLoading" class="screen game-loading-screen hidden" aria-label="Preparando tu empresa">
+    <div class="game-loading-bg" aria-hidden="true"></div>
     <div class="game-loading-content">
       <img src="assets/side_logo.png" class="game-loading-logo" alt="SIDE">
-      <div class="loading-orbit"><span></span><span></span><span></span></div>
-      <p class="eyebrow">CONECTANDO CON LA SIMULACIÓN</p>
-      <h1>PREPARANDO TU EMPRESA...</h1>
+      <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p class="eyebrow">Conectando con la simulación</p>
+      <h1>Preparando tu empresa…</h1>
       <div class="game-progress"><div id="joinProgress"></div></div>
-      <p id="joinLoadingText">Sincronizando partida</p>
+      <p id="joinLoadingText" role="status">Sincronizando partida</p>
     </div>
   </section>
 
@@ -159,12 +162,12 @@
       <div class="game-loading-content student-waiting-content">
         <img src="assets/side_logo.png" class="game-loading-logo" alt="SIDE">
         <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-        <p class="eyebrow">SALA DE ESPERA</p>
-        <h1>PREPARANDO LA PARTIDA...</h1>
+        <p class="eyebrow">Sala de espera</p>
+        <h1>Preparando la partida…</h1>
         <p id="waitingGameName"></p>
         <p id="waitingCompanies" class="waiting-companies" role="status" aria-live="polite">Contando empresas conectadas…</p>
         <p id="studentIntegrationNotice" class="hint" role="status" aria-live="polite"></p>
-        <button id="waitingBackToProfiles" class="ghost-btn" type="button">VOLVER AL INICIO</button>
+        <button id="waitingBackToProfiles" class="ghost-btn" type="button">Volver al inicio</button>
       </div>
     </div>
     <div class="dashboard-inner lobby">
