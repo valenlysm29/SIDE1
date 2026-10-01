@@ -1,0 +1,324 @@
+{
+  "sourceRef": "working-tree",
+  "randomSeed": 4107,
+  "reportOnly": true,
+  "baselines": {
+    "store": {
+      "low": {
+        "calls": 186,
+        "triangles": 72132
+      },
+      "medium": {
+        "calls": 190,
+        "triangles": 72516
+      },
+      "high": {
+        "calls": 190,
+        "triangles": 72516
+      }
+    },
+    "production": {
+      "low": {
+        "calls": 141,
+        "triangles": 62140
+      },
+      "medium": {
+        "calls": 145,
+        "triangles": 62692
+      },
+      "high": {
+        "calls": 145,
+        "triangles": 62692
+      }
+    },
+    "exterior": {
+      "low": {
+        "calls": 101,
+        "triangles": 53546
+      },
+      "medium": {
+        "calls": 107,
+        "triangles": 55158
+      },
+      "high": {
+        "calls": 107,
+        "triangles": 55546
+      }
+    }
+  },
+  "limits": {
+    "store": {
+      "low": {
+        "calls": 195,
+        "triangles": 75738
+      },
+      "medium": {
+        "calls": 218,
+        "triangles": 90645
+      },
+      "high": {
+        "calls": 218,
+        "triangles": 90645
+      }
+    },
+    "production": {
+      "low": {
+        "calls": 148,
+        "triangles": 65247
+      },
+      "medium": {
+        "calls": 166,
+        "triangles": 78365
+      },
+      "high": {
+        "calls": 166,
+        "triangles": 78365
+      }
+    },
+    "exterior": {
+      "low": {
+        "calls": 106,
+        "triangles": 56223
+      },
+      "medium": {
+        "calls": 123,
+        "triangles": 68947
+      },
+      "high": {
+        "calls": 123,
+        "triangles": 69432
+      }
+    }
+  },
+  "loaded": {
+    "newFiles": [
+      "shop_entry_door.glb",
+      "shop_window_panel.glb",
+      "shop_ceiling_light.glb",
+      "shop_atm.glb",
+      "production_overlock_machine.glb",
+      "production_ironing_station.glb",
+      "production_mannequin.glb",
+      "production_garment_rack.glb"
+    ],
+    "sharedFiles": [
+      "warehouse_cutting_table.glb",
+      "warehouse_sewing_machine.glb",
+      "warehouse_fabric_rolls.glb",
+      "warehouse_rack_tall.glb",
+      "warehouse_pendant_light.glb"
+    ],
+    "store": [
+      "atm",
+      "ceilingLight",
+      "counter",
+      "counterEnd",
+      "entryDoor",
+      "mirror",
+      "register",
+      "shelfLow",
+      "shelfTall",
+      "table",
+      "windowPanel"
+    ],
+    "production": [
+      "cuttingTable",
+      "fabricRolls",
+      "garmentRack",
+      "ironingStation",
+      "mannequin",
+      "overlockMachine",
+      "pendantLight",
+      "rackTall",
+      "sewingMachine"
+    ]
+  },
+  "tiers": {
+    "store": {
+      "low": {
+        "zone": "store",
+        "mode": "low",
+        "calls": 221,
+        "triangles": 69290,
+        "visibleMeshes": 320,
+        "geometries": 168,
+        "activeRealLights": 0,
+        "props": {
+          "batches": 9,
+          "drawables": 20,
+          "instances": 19,
+          "triangles": 6294,
+          "realLights": 0
+        },
+        "deltaCalls": 35,
+        "deltaTriangles": -2842,
+        "callBudgetRemaining": -26,
+        "triangleBudgetRemaining": 6448
+      },
+      "medium": {
+        "zone": "store",
+        "mode": "medium",
+        "calls": 237,
+        "triangles": 81858,
+        "visibleMeshes": 344,
+        "geometries": 179,
+        "activeRealLights": 1,
+        "props": {
+          "batches": 12,
+          "drawables": 31,
+          "instances": 24,
+          "triangles": 6982,
+          "realLights": 1
+        },
+        "deltaCalls": 47,
+        "deltaTriangles": 9342,
+        "callBudgetRemaining": -19,
+        "triangleBudgetRemaining": 8787
+      },
+      "high": {
+        "zone": "store",
+        "mode": "high",
+        "calls": 237,
+        "triangles": 81858,
+        "visibleMeshes": 344,
+        "geometries": 179,
+        "activeRealLights": 2,
+        "props": {
+          "batches": 12,
+          "drawables": 31,
+          "instances": 24,
+          "triangles": 6982,
+          "realLights": 2
+        },
+        "deltaCalls": 47,
+        "deltaTriangles": 9342,
+        "callBudgetRemaining": -19,
+        "triangleBudgetRemaining": 8787
+      }
+    },
+    "production": {
+      "low": {
+        "zone": "production",
+        "mode": "low",
+        "calls": 173,
+        "triangles": 59978,
+        "visibleMeshes": 289,
+        "geometries": 252,
+        "activeRealLights": 0,
+        "props": {
+          "batches": 2,
+          "drawables": 8,
+          "instances": 6,
+          "triangles": 1356,
+          "realLights": 0
+        },
+        "deltaCalls": 32,
+        "deltaTriangles": -2162,
+        "callBudgetRemaining": -25,
+        "triangleBudgetRemaining": 5269
+      },
+      "medium": {
+        "zone": "production",
+        "mode": "medium",
+        "calls": 193,
+        "triangles": 77638,
+        "visibleMeshes": 314,
+        "geometries": 277,
+        "activeRealLights": 1,
+        "props": {
+          "batches": 11,
+          "drawables": 33,
+          "instances": 23,
+          "triangles": 8156,
+          "realLights": 1
+        },
+        "deltaCalls": 48,
+        "deltaTriangles": 14946,
+        "callBudgetRemaining": -27,
+        "triangleBudgetRemaining": 727
+      },
+      "high": {
+        "zone": "production",
+        "mode": "high",
+        "calls": 193,
+        "triangles": 77638,
+        "visibleMeshes": 314,
+        "geometries": 277,
+        "activeRealLights": 2,
+        "props": {
+          "batches": 11,
+          "drawables": 33,
+          "instances": 23,
+          "triangles": 8156,
+          "realLights": 2
+        },
+        "deltaCalls": 48,
+        "deltaTriangles": 14946,
+        "callBudgetRemaining": -27,
+        "triangleBudgetRemaining": 727
+      }
+    },
+    "exterior": {
+      "low": {
+        "zone": "exterior",
+        "mode": "low",
+        "calls": 133,
+        "triangles": 50432,
+        "visibleMeshes": 204,
+        "geometries": 288,
+        "activeRealLights": 0,
+        "props": {
+          "batches": 7,
+          "drawables": 11,
+          "instances": 37,
+          "triangles": 4510,
+          "realLights": 0
+        },
+        "deltaCalls": 32,
+        "deltaTriangles": -3114,
+        "callBudgetRemaining": -27,
+        "triangleBudgetRemaining": 5791
+      },
+      "medium": {
+        "zone": "exterior",
+        "mode": "medium",
+        "calls": 143,
+        "triangles": 63612,
+        "visibleMeshes": 217,
+        "geometries": 290,
+        "activeRealLights": 0,
+        "props": {
+          "batches": 12,
+          "drawables": 20,
+          "instances": 68,
+          "triangles": 7768,
+          "realLights": 0
+        },
+        "deltaCalls": 36,
+        "deltaTriangles": 8454,
+        "callBudgetRemaining": -20,
+        "triangleBudgetRemaining": 5335
+      },
+      "high": {
+        "zone": "exterior",
+        "mode": "high",
+        "calls": 143,
+        "triangles": 64000,
+        "visibleMeshes": 217,
+        "geometries": 290,
+        "activeRealLights": 0,
+        "props": {
+          "batches": 12,
+          "drawables": 20,
+          "instances": 70,
+          "triangles": 8156,
+          "realLights": 0
+        },
+        "deltaCalls": 36,
+        "deltaTriangles": 8454,
+        "callBudgetRemaining": -20,
+        "triangleBudgetRemaining": 5432
+      }
+    }
+  }
+}

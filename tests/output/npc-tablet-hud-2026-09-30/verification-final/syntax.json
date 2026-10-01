@@ -1,0 +1,33 @@
+{
+  "files": [
+    "js/app.js",
+    "js/simulator3d.js",
+    "services/business_interiors.mjs",
+    "services/character_geometry.mjs",
+    "services/hub_vehicles.js",
+    "services/hub_world.js",
+    "services/npc_navigation.mjs",
+    "services/npc_optional_navigation.mjs",
+    "services/npc_patrol.mjs",
+    "services/player_motion.mjs",
+    "services/vehicle_motion.mjs",
+    "services/world_orientation.mjs",
+    "services/world_wayfinding.mjs",
+    "tests/browser_git_baseline.cjs",
+    "tests/character_geometry.test.mjs",
+    "tests/clean_world_hud.test.mjs",
+    "tests/interior_ground.test.mjs",
+    "tests/npc_collision.test.mjs",
+    "tests/npc_fps_benchmark.cjs",
+    "tests/npc_optional_navigation.test.mjs",
+    "tests/npc_patrol.test.mjs",
+    "tests/production_performance_compare.cjs",
+    "tests/run_world_regression.cjs",
+    "tests/tablet_return.test.js",
+    "tests/tablet_return_browser.cjs",
+    "tests/tablet_visual_capture.cjs",
+    "tests/world_orientation_mobile.cjs",
+    "tests/npc_world_fixes_browser.cjs"
+  ],
+  "failures": []
+}

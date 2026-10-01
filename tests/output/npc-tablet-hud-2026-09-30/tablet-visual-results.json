@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "url": "http://127.0.0.1:55378/",
+  "title": "SIDE — Simulador de Decisiones Financieras",
+  "viewport": {
+    "width": 1366,
+    "height": 900
+  },
+  "focus": "side3dCanvas",
+  "decisionsAndCyclePreserved": true,
+  "errors": [],
+  "captures": [
+    "tablet-open.png",
+    "tablet-closed.png"
+  ]
+}

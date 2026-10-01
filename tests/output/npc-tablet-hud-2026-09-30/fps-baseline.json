@@ -1,0 +1,110 @@
+{
+  "renderer": "headless Chromium SwiftShader",
+  "sourceRef": "1746be4",
+  "randomSeed": 4107,
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "tiers": {
+    "low": {
+      "samples": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "median": 2,
+      "graphics": [
+        {
+          "drawCalls": 166,
+          "triangles": 69606
+        },
+        {
+          "drawCalls": 166,
+          "triangles": 69606
+        },
+        {
+          "drawCalls": 166,
+          "triangles": 69606
+        },
+        {
+          "drawCalls": 166,
+          "triangles": 69606
+        }
+      ],
+      "cityNpcModels": {
+        "approved": 16,
+        "loaded": 10,
+        "active": 6,
+        "visibleHub": 2
+      }
+    },
+    "medium": {
+      "samples": [
+        1,
+        2,
+        2,
+        2
+      ],
+      "median": 2,
+      "graphics": [
+        {
+          "drawCalls": 184,
+          "triangles": 85562
+        },
+        {
+          "drawCalls": 184,
+          "triangles": 85562
+        },
+        {
+          "drawCalls": 184,
+          "triangles": 85562
+        },
+        {
+          "drawCalls": 184,
+          "triangles": 85562
+        }
+      ],
+      "cityNpcModels": {
+        "approved": 16,
+        "loaded": 10,
+        "active": 10,
+        "visibleHub": 3
+      }
+    },
+    "high": {
+      "samples": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "median": 1,
+      "graphics": [
+        {
+          "drawCalls": 188,
+          "triangles": 86048
+        },
+        {
+          "drawCalls": 188,
+          "triangles": 86048
+        },
+        {
+          "drawCalls": 188,
+          "triangles": 86048
+        },
+        {
+          "drawCalls": 188,
+          "triangles": 86048
+        }
+      ],
+      "cityNpcModels": {
+        "approved": 16,
+        "loaded": 16,
+        "active": 16,
+        "visibleHub": 5
+      }
+    }
+  }
+}

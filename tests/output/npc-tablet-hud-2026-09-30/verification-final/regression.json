@@ -1,0 +1,162 @@
+[
+  {
+    "suite": "playable_hub.cjs",
+    "passed": true,
+    "durationMs": 30427
+  },
+  {
+    "suite": "continuous_world.cjs",
+    "passed": true,
+    "durationMs": 61261
+  },
+  {
+    "suite": "gameplay_hud.cjs",
+    "passed": true,
+    "durationMs": 15565
+  },
+  {
+    "suite": "world_business_ui.cjs",
+    "passed": true,
+    "durationMs": 22276
+  },
+  {
+    "suite": "world_cycle_restart.cjs",
+    "passed": true,
+    "durationMs": 43636
+  },
+  {
+    "suite": "world_startup.cjs",
+    "passed": true,
+    "durationMs": 38996
+  },
+  {
+    "suite": "world_loading.cjs",
+    "passed": true,
+    "durationMs": 17587
+  },
+  {
+    "suite": "world_entry_assets.cjs",
+    "passed": true,
+    "durationMs": 14143
+  },
+  {
+    "suite": "supplied_npcs.cjs",
+    "passed": true,
+    "durationMs": 41737
+  },
+  {
+    "suite": "mona_npc.cjs",
+    "passed": true,
+    "durationMs": 60281
+  },
+  {
+    "suite": "npc_locomotion.cjs",
+    "passed": true,
+    "durationMs": 8476
+  },
+  {
+    "suite": "game_lifecycle_db.cjs",
+    "passed": true,
+    "durationMs": 2431
+  },
+  {
+    "suite": "game_observations_db.cjs",
+    "passed": true,
+    "durationMs": 2314
+  },
+  {
+    "suite": "game_lifecycle_ui.cjs",
+    "passed": true,
+    "durationMs": 33390
+  },
+  {
+    "suite": "decisions_cycle_ui.cjs",
+    "passed": true,
+    "durationMs": 30289
+  },
+  {
+    "suite": "teacher_lifecycle_ui.cjs",
+    "passed": true,
+    "durationMs": 17172
+  },
+  {
+    "suite": "tablet_return_browser.cjs",
+    "passed": true,
+    "durationMs": 32626
+  },
+  {
+    "suite": "npc_world_fixes_browser.cjs",
+    "passed": true,
+    "durationMs": 47483
+  },
+  {
+    "suite": "world_orientation_mobile.cjs",
+    "passed": true,
+    "durationMs": 126535
+  },
+  {
+    "suite": "character_selection_ui.cjs",
+    "passed": true,
+    "durationMs": 1986
+  },
+  {
+    "suite": "decision_interiors_browser.cjs",
+    "passed": true,
+    "durationMs": 111941
+  },
+  {
+    "suite": "npc_navmesh_browser.cjs",
+    "passed": true,
+    "durationMs": 1934
+  },
+  {
+    "suite": "teacher_history_ui.cjs",
+    "passed": true,
+    "durationMs": 10268
+  },
+  {
+    "suite": "teacher_report_pdf_ui.cjs",
+    "passed": true,
+    "durationMs": 9772
+  },
+  {
+    "suite": "decision_options_db.cjs",
+    "passed": true,
+    "durationMs": 2155
+  },
+  {
+    "suite": "student_admission_db.cjs",
+    "passed": true,
+    "durationMs": 3433
+  },
+  {
+    "suite": "student_admission_matrix_db.cjs",
+    "passed": true,
+    "durationMs": 4977
+  },
+  {
+    "suite": "teacher_history_db.cjs",
+    "passed": true,
+    "durationMs": 2078
+  },
+  {
+    "suite": "character_preview.cjs",
+    "passed": true,
+    "durationMs": 11874
+  },
+  {
+    "suite": "production_performance.cjs",
+    "passed": false,
+    "durationMs": 11813
+  },
+  {
+    "suite": "outdoor_performance.cjs",
+    "passed": true,
+    "durationMs": 19577
+  },
+  {
+    "suite": "npc_fps_benchmark.cjs",
+    "passed": true,
+    "durationMs": 47407
+  }
+]
