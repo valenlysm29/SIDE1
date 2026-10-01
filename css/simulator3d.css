@@ -111,7 +111,7 @@
 #simulator3d .sim-city-zone.is-current{border-color:#80e8dd;background:#185a62}
 #simulator3d .sim-city-zone.is-target{border-color:#ffd329;background:#5b4618;box-shadow:0 0 0 2px #ffd3296b,0 2px 9px #0009}
 #simulator3d .mini-cruiser{z-index:5}
-#simulator3d .sim-zone-labels{position:absolute;inset:0;z-index:9;overflow:hidden;pointer-events:none}
+#simulator3d .sim-zone-labels{display:none}
 #simulator3d .sim-zone-label{position:absolute;display:flex;align-items:center;gap:6px;min-width:98px;min-height:26px;padding:5px 10px;transform:translate(-50%,-50%) scale(var(--distance-scale,1));transform-origin:center;border:1px solid #c8ece3ad;border-radius:7px;background:#0a202ee8;color:#fff;box-shadow:0 6px 18px #0009;font:900 11px Montserrat,system-ui,sans-serif;text-shadow:0 1px 4px #000;text-align:center;white-space:nowrap;letter-spacing:.2px}
 #simulator3d .sim-zone-label[hidden]{display:none}
 #simulator3d .sim-zone-label img{width:17px;height:17px;object-fit:contain}
@@ -130,5 +130,7 @@
 #simulator3d .sim-edge-guide[hidden]{display:none}
 #simulator3d .sim-edge-guide-arrow{flex:none;display:inline-block;color:#ffd329;font:900 18px/1 system-ui;transform-origin:center}
 #simulator3d .sim-edge-guide b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Legacy containers stay unobtrusive while the map controller initializes. */
+#simulator3d .sim-zone-label,#simulator3d .sim-route-marker,#simulator3d .sim-edge-guide{display:none}
 @media (hover:none) and (pointer:coarse){#simulator3d .sim3d-touch-controls{left:calc(12px + env(safe-area-inset-left,0px));right:calc(12px + env(safe-area-inset-right,0px));bottom:calc(62px + env(safe-area-inset-bottom,0px))}#simulator3d .sim3d-actionbar{right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}#simulator3d .sim-zone-banner{top:max(27%,calc(env(safe-area-inset-top,0px) + 106px))}#simulator3d .sim-route-marker{display:none}}
 @media(max-height:480px) and (hover:none) and (pointer:coarse){#simulator3d .sim-zone-banner{top:calc(env(safe-area-inset-top,0px) + 66px);font-size:13px;padding:6px 12px;min-width:0}#simulator3d .sim-edge-guide{font-size:10px}}

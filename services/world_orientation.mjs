@@ -1,4 +1,4 @@
-// SIDE city orientation is a DOM overlay. It owns no Three.js scene objects.
+// SIDE city orientation lives on the minimap, without labels over the playfield.
 export const CITY_ZONE_ICONS = Object.freeze({
   store: 'assets/icons/categories/canales_ventas.svg',
   warehouse: 'assets/icons/categories/insumos.svg',
@@ -28,8 +28,6 @@ export function closestCityZone(x, z, zones, radius = 11) {
   }
   return nearest;
 }
-
-const labelHeight = zone => zone.id === 'news' ? 3.3 : 8;
 
 const SHORT_ZONE_NAMES = Object.freeze({ suppliers: 'Proveed.', news: 'Noticias' });
 const intersects = (a, b, gap = 5) => a.left < b.right + gap && a.right > b.left - gap && a.top < b.bottom + gap && a.bottom > b.top - gap;
@@ -91,13 +89,15 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
   const labelsRoot = root.querySelector('#simZoneLabels');
   const banner = root.querySelector('#simZoneBanner');
   const routeMarker = root.querySelector('#simRouteMarker');
-  const routeName = root.querySelector('#simRouteMarkerName');
-  if (!map || !dot || !labelsRoot || !banner || !routeMarker || !routeName) throw new Error('Faltan elementos de orientación del mundo');
+  if (!map || !dot || !banner) throw new Error('Faltan elementos de orientación del mundo');
+  // Remove legacy overlay containers as well as their children. Destination
+  // guidance belongs to the existing objective button and the map icons.
+  labelsRoot?.remove();
+  routeMarker?.remove();
 
-  const buttons = new Map(), labels = new Map();
+  const buttons = new Map();
   let currentZone = null, targetZone = null, bannerTimer = 0, lastRender = -Infinity;
-  let latestPlayer = null, latestCamera = null;
-  const projected = new THREE.Vector3();
+  let latestPlayer = null;
 
   for (const zone of zoneList) {
     const point = mapPoint(zone.x, zone.z, bounds);
@@ -115,20 +115,11 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
     button.addEventListener('click', () => { setTarget(zone.id); onNavigate(zone.id, zone); });
     map.append(button); buttons.set(zone.id, button);
 
-    const label = document.createElement('div');
-    label.className = 'sim-zone-label'; label.dataset.zone = zone.id;
-    const labelIcon = icon.cloneNode();
-    const labelText = document.createElement('span'); labelText.textContent = zone.name;
-    label.append(labelIcon, labelText);
-    labelsRoot.append(label); labels.set(zone.id, label);
   }
 
   function setTarget(id) {
     targetZone = byId.has(id) ? id : null;
     buttons.forEach((button, key) => button.classList.toggle('is-target', key === targetZone));
-    labels.forEach((label, key) => label.classList.toggle('is-target', key === targetZone));
-    routeMarker.hidden = !targetZone;
-    if (targetZone) routeName.textContent = byId.get(targetZone).name;
   }
 
   function setActiveZone(id, announce = true) {
@@ -136,7 +127,6 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
     if (next === currentZone) return;
     currentZone = next;
     buttons.forEach((button, key) => button.classList.toggle('is-current', key === currentZone));
-    labels.forEach((label, key) => label.classList.toggle('is-current', key === currentZone));
     if (!next || !announce) return;
     banner.textContent = byId.get(next).name;
     banner.hidden = false;
@@ -144,74 +134,22 @@ export function createWorldOrientation({ THREE, root, zones, bounds = DEFAULT_CI
     bannerTimer = setTimeout(() => { banner.hidden = true; }, 2600);
   }
 
-  function project(zone, camera, rect) {
-    projected.set(zone.x + offsetX, labelHeight(zone), zone.z);
-    const distance = projected.distanceTo(camera.position);
-    projected.project(camera);
-    if (projected.z < -1 || projected.z > 1 || Math.abs(projected.x) > 1.12 || Math.abs(projected.y) > 1.12) return null;
-    return { x: (projected.x + 1) * rect.width / 2, y: (1 - projected.y) * rect.height / 2, distance };
-  }
-
-  function renderLabels(camera) {
-    const rect = root.getBoundingClientRect();
-    const candidates = zoneList.map(zone => ({ zone, point: project(zone, camera, rect) }))
-      .filter(item => item.zone.id === targetZone || item.zone.id === currentZone || (item.point && item.point.distance < 145));
-    const obstacles = [];
-    for (const element of root.querySelectorAll('.sim3d-stats,.sim3d-brand,.sim3d-actionbar,.sim3d-objective,.sim3d-controls,.sim3d-missions,.sim-world-location,.sim-city-map,.sim3d-touch-pad,.sim3d-touch-actions,.sim-drive-hud,.sim-zone-banner,.sim3d-message.show')) {
-      if (element.hidden || !element.getClientRects().length) continue;
-      const box = element.getBoundingClientRect();
-      if (box.width < 1 || box.height < 1) continue;
-      obstacles.push({ left: box.left - rect.left, right: box.right - rect.left, top: box.top - rect.top, bottom: box.bottom - rect.top });
-    }
-    const selected = layoutZoneLabels({ candidates, width: rect.width, height: rect.height, obstacles, targetZone, currentZone });
-    labels.forEach(label => { label.hidden = true; });
-    for (const item of selected) {
-      const label = labels.get(item.id);
-      label.querySelector('span').textContent = item.text;
-      label.style.left = `${item.x}px`; label.style.top = `${item.y}px`;
-      label.style.setProperty('--distance-scale', String(rect.width <= 800 ? 1 : Math.max(.85, Math.min(1.14, 32 / Math.max(28, item.distance)))));
-      label.hidden = false;
-    }
-  }
-
-  function renderRoute(player, camera) {
-    if (!targetZone || !player || !camera) { routeMarker.hidden = true; return; }
-    const zone = byId.get(targetZone);
-    const rect = root.getBoundingClientRect();
-    const point = project(zone, camera, rect);
-    const localX = player.x - offsetX;
-    const distance = Math.round(Math.hypot(zone.x - localX, zone.z - player.z));
-    if (distance < 5) { routeMarker.hidden = true; return; }
-    const centerX = rect.width / 2, centerY = rect.height / 2;
-    const dx = point ? point.x - centerX : zone.x - localX;
-    const dy = point ? point.y - centerY : zone.z - player.z;
-    routeMarker.hidden = false;
-    routeMarker.style.left = `${Math.max(85, Math.min(rect.width - 85, point ? point.x : centerX + Math.sign(dx) * rect.width * .38))}px`;
-    routeMarker.style.top = `${Math.max(100, Math.min(rect.height - 95, point ? point.y : centerY + Math.sign(dy) * rect.height * .35))}px`;
-    routeMarker.querySelector('span').style.rotate = `${Math.atan2(dy, dx) * 180 / Math.PI + 45}deg`;
-    routeName.textContent = `${zone.name} · ${distance} m`;
-  }
-
-  function update({ player, camera, activeZone, targetZone: target, yaw = 0, now = performance.now() } = {}) {
+  function update({ player, activeZone, targetZone: target, yaw = 0, now = performance.now() } = {}) {
     if (target !== undefined && target !== targetZone) setTarget(target);
     if (activeZone !== undefined) setActiveZone(activeZone);
     if (player) latestPlayer = player;
-    if (camera) latestCamera = camera;
-    if (!latestPlayer || !latestCamera || now - lastRender < 100) return;
+    if (!latestPlayer || now - lastRender < 100) return;
     lastRender = now;
     const point = mapPoint(latestPlayer.x - offsetX, latestPlayer.z, bounds);
     // These coordinates match js/simulator3d.js's existing 7–93% mapping.
     dot.style.left = `${7 + point.x * .86}%`;
     dot.style.top = `${7 + point.y * .86}%`;
     dot.style.rotate = `${-yaw * 180 / Math.PI}deg`;
-    renderLabels(latestCamera);
-    renderRoute(latestPlayer, latestCamera);
   }
 
   function destroy() {
     clearTimeout(bannerTimer);
-    buttons.forEach(button => button.remove()); labels.forEach(label => label.remove());
-    routeMarker.hidden = true; banner.hidden = true;
+    buttons.forEach(button => button.remove()); banner.hidden = true;
   }
 
   return { update, setTarget, setActiveZone, destroy, get activeZone() { return currentZone; }, get targetZone() { return targetZone; } };

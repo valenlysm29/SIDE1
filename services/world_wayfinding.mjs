@@ -82,25 +82,9 @@ function localRect(element, rootRect) {
     top: rect.top - rootRect.top, bottom: rect.bottom - rootRect.top };
 }
 
-/** Adds one reusable edge arrow. Existing zone banners remain owned by world_orientation. */
-export function createWorldWayfinding({ THREE, root, zones, offsetX = 150 }) {
+/** Keep transient zone notices clear of touch controls; guidance stays on the map. */
+export function createWorldWayfinding({ THREE, root }) {
   if (!THREE || !root) throw new TypeError('THREE and root are required');
-  const byId = new Map((zones || []).map(zone => [zone.id, zone]));
-  const guide = document.createElement('div');
-  guide.className = 'sim-edge-guide';
-  guide.hidden = true;
-  guide.setAttribute('role', 'status');
-  guide.setAttribute('aria-live', 'off');
-  const arrow = document.createElement('span');
-  arrow.className = 'sim-edge-guide-arrow';
-  arrow.textContent = '➜';
-  arrow.setAttribute('aria-hidden', 'true');
-  const label = document.createElement('b');
-  guide.append(arrow, label);
-  root.append(guide);
-  const vector = new THREE.Vector3();
-  const cameraLocal = new THREE.Vector3();
-  const inverseCameraRotation = new THREE.Quaternion();
   const safeProbe = document.createElement('div');
   safeProbe.className = 'sim-safe-probe';
   root.append(safeProbe);
@@ -112,14 +96,16 @@ export function createWorldWayfinding({ THREE, root, zones, offsetX = 150 }) {
     const safe = { top: parseFloat(safeStyle.paddingTop) || 0, right: parseFloat(safeStyle.paddingRight) || 0,
       bottom: parseFloat(safeStyle.paddingBottom) || 0, left: parseFloat(safeStyle.paddingLeft) || 0 };
     const obstacles = ['.sim3d-touch-controls', '.sim3d-actionbar', '.sim-city-map', '.sim-world-location',
-      '.sim3d-metrics-drawer', '.sim3d-missions', '.sim3d-stats', '.sim-zone-banner', '.sim-zone-label']
+      '.sim3d-metrics-drawer', '.sim3d-missions', '.sim3d-stats']
       .flatMap(selector => [...root.querySelectorAll(selector)])
-      .filter(node => node !== guide && getComputedStyle(node).display !== 'none' && node.getBoundingClientRect().width > 0)
+      .filter(node => getComputedStyle(node).display !== 'none' && node.getBoundingClientRect().width > 0)
       .map(node => localRect(node, rect));
     return { safe, obstacles };
   }
 
-  function update({ player, camera, targetZone, now = performance.now() } = {}) {
+  function update({ now = performance.now() } = {}) {
+    if (now - lastRender < 120) return;
+    lastRender = now;
     const rect = root.getBoundingClientRect();
     const coarse = matchMedia('(pointer: coarse)').matches;
     const mobile = coarse || rect.width <= 560;
@@ -130,37 +116,11 @@ export function createWorldWayfinding({ THREE, root, zones, offsetX = 150 }) {
         bannerWidth: size.width, bannerHeight: size.height, safe, obstacles });
       if (position) { banner.style.left = `${position.x}px`; banner.style.top = `${position.y - size.height / 2}px`; }
     } else if (banner) { banner.style.removeProperty('left'); banner.style.removeProperty('top'); }
-    if (!player || !camera || !byId.has(targetZone)) { guide.hidden = true; return; }
-    if (now - lastRender < 120) return;
-    lastRender = now;
-    if (!mobile || root.querySelector('.sim-city-map-open')) { guide.hidden = true; return; }
-    const zone = byId.get(targetZone);
-    const distance = Math.round(Math.hypot(zone.x + offsetX - player.x, zone.z - player.z));
-    if (distance < 7) { guide.hidden = true; return; }
-    vector.set(zone.x + offsetX, 5, zone.z);
-    camera.updateMatrixWorld();
-    inverseCameraRotation.copy(camera.quaternion).invert();
-    cameraLocal.copy(vector).sub(camera.position).applyQuaternion(inverseCameraRotation);
-    vector.project(camera);
-    const inView = cameraLocal.z < 0 && vector.z >= -1 && vector.z <= 1
-      && Math.abs(vector.x) <= .86 && Math.abs(vector.y) <= .82;
-    if (inView) { guide.hidden = true; return; }
-    const dx = cameraLocal.z < 0 ? vector.x : cameraLocal.x;
-    const dy = cameraLocal.z < 0 ? -vector.y : -cameraLocal.y;
-    const { safe, obstacles } = environment(rect);
-    const placement = computeEdgeArrow({ width: rect.width, height: rect.height, dx, dy, safe, obstacles });
-    if (!placement) { guide.hidden = true; return; }
-    guide.hidden = false;
-    guide.style.left = `${placement.x}px`;
-    guide.style.top = `${placement.y}px`;
-    arrow.style.transform = `rotate(${placement.angle}deg)`;
-    label.textContent = `${zone.name} · ${distance} m`;
-    guide.setAttribute('aria-label', `Objetivo fuera de vista: ${zone.name}, a ${distance} metros`);
   }
 
   function destroy() {
-    guide.remove(); safeProbe.remove();
+    safeProbe.remove();
     banner?.style.removeProperty('left'); banner?.style.removeProperty('top');
   }
-  return { update, destroy, element: guide };
+  return { update, destroy };
 }

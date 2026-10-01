@@ -72,6 +72,9 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   const group = new THREE.Group(); group.name = 'SIDE explorable urban hub'; group.position.set(offsetX, -.125, 0);
   scene?.add(group);
   const colliders = [], resources = new Set(), batches = new Map();
+  // Only walkable geometry belongs here: props, roofs and vegetation must not
+  // lift a pedestrian. Cache their local bounds once, without per-frame rays.
+  const groundSurfaces = [];
   const outdoorPropRoot = new THREE.Group(); outdoorPropRoot.name = 'SIDE streamed outdoor props'; group.add(outdoorPropRoot);
   const fallbackObjects = new Map();
   const OUTDOOR_PROP_KEYS = Object.freeze(['treeDefault', 'treeOak', 'treeTall', 'bush', 'bench', 'fountain', 'trafficLight', 'streetLight', 'planter', 'trashcan', 'stopSign', 'birdBrown']);
@@ -140,7 +143,26 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     const geo = new THREE.PlaneGeometry(w, d);
     const uv = geo.attributes.uv;
     for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w / tile, uv.getY(i) * d / tile);
-    resources.add(geo); return add(new THREE.Mesh(geo, material), x, y, z, 0, -Math.PI / 2);
+    resources.add(geo);
+    const mesh = add(new THREE.Mesh(geo, material), x, y, z, 0, -Math.PI / 2);
+    geo.computeBoundingBox();
+    groundSurfaces.push(geo.boundingBox.clone().applyMatrix4(mesh.matrix));
+    mesh.userData.walkableGround = true;
+    return mesh;
+  }
+  function groundHeightAt(x, z) {
+    const localX = x - group.position.x, localZ = z - group.position.z;
+    let height = -Infinity;
+    for (const surface of groundSurfaces) {
+      if (localX >= surface.min.x && localX <= surface.max.x && localZ >= surface.min.z && localZ <= surface.max.z) {
+        height = Math.max(height, surface.max.y);
+      }
+    }
+    return Number.isFinite(height) ? height + group.position.y : null;
+  }
+  function walkablePlatform(x, y, z, w, h, d, material) {
+    box(x, y, z, w, h, d, material);
+    groundSurfaces.push(new THREE.Box3(new THREE.Vector3(x - w / 2, y - h / 2, z - d / 2), new THREE.Vector3(x + w / 2, y + h / 2, z + d / 2)));
   }
   function canvasSign(w, h, draw) {
     const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = Math.round(1024 * h / w);
@@ -230,8 +252,8 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
     box(x, .169, 19, .16, .035, 22, m.darkSteel);
     for (let z = 11; z < 28; z += 4) box(x, .18, z, .2, .015, 1.4, m.light);
   }
-  box(19, .18, 19, 5.4, .09, 5.4, m.white);
-  box(19, .237, 19, 4.95, .025, 4.95, m.darkSteel);
+  walkablePlatform(19, .18, 19, 5.4, .09, 5.4, m.white);
+  walkablePlatform(19, .237, 19, 4.95, .025, 4.95, m.darkSteel);
 
   function bench(x, z, yaw = 0) {
     framed(x, z, yaw, () => {
@@ -632,7 +654,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   return {
     group, colliders, entrances, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
     crossedEntrance: (previous, next) => crossedEntrance(previous, next, entrances),
-    spawn: { x: offsetX + 16, z: 27 }, groundY: .025,
+    spawn: { x: offsetX + 16, z: 27 }, groundY: .025, groundHeightAt,
     patrolRoutes: [
       [[13.5, 13.5], [24.5, 13.5], [24.5, 24.5], [13.5, 24.5]],
       [[7, 12.5], [7, 25], [12.5, 25], [12.5, 12.5]],

@@ -35,16 +35,11 @@ const overlap=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;
       await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>4);
       await page.screenshot({path:path.join(out,`${before?'before':'after'}-${width}x${height}.png`)});
       if(!before){
-        const labels=page.locator('.sim-zone-label:visible');
-        const count=await labels.count(),limit=width<=560?3:width<=800?5:7;
-        assert.ok(count>0&&count<=limit,`visible labels ${count}/${limit}`);
-        const labelBoxes=[];for(let i=0;i<count;i++)labelBoxes.push(await box(labels.nth(i)));
-        for(let i=0;i<count;i++)for(let j=i+1;j<count;j++)assert.equal(overlap(labelBoxes[i],labelBoxes[j]),false,'zone labels do not overlap');
+        assert.equal(await page.locator('.sim-zone-label,.sim-edge-guide,#simRouteMarker,#simZoneLabels').count(),0,'destination overlays do not exist outside the map');
         const target=await page.locator('.sim-city-zone.is-target').getAttribute('data-zone');
         assert.ok(target,'an active objective is marked on the minimap');
-        assert.equal(await page.locator(`.sim-zone-label[data-zone="${target}"]`).isVisible(),true,'active objective label remains visible');
-        const controls=page.locator('.sim3d-touch-pad:visible, .sim3d-touch-actions:visible, .sim-city-map:visible, .sim3d-stats:visible, .sim3d-actionbar:visible');
-        for(let i=0;i<await controls.count();i++){const control=await box(controls.nth(i));for(const label of labelBoxes)assert.equal(overlap(label,control),false,'labels avoid touch controls and minimap')}
+        assert.equal(await page.locator(`.sim-city-zone[data-zone="${target}"]`).isVisible(),true,'active objective icon remains on the minimap');
+        assert.match(await page.locator('#simHubDestination').innerText(),/\d+\s*m\b/,'the current objective button keeps its distance');
         const mapBox=await box(page.locator('#simMinimap'));
         const movement=page.locator('.sim3d-touch-pad:visible, .sim3d-touch-actions:visible, .sim3d-actionbar:visible, .sim3d-missions:visible');
         for(let i=0;i<await movement.count();i++)assert.equal(overlap(mapBox,await box(movement.nth(i))),false,'compact map avoids gameplay controls and mission panel');
@@ -55,18 +50,7 @@ const overlap=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;
         await page.locator('.sim-city-zone[data-zone="bank"]').click();
         assert.equal(await page.locator('.sim-city-zone[data-zone="bank"]').evaluate(el=>el.classList.contains('is-target')),true);
         assert.equal(await page.locator('#simMinimap').evaluate(el=>el.classList.contains('sim-city-map-open')),false,'map closes after choosing a zone');
-        // The HUD updates on rendered frames; asset loading can exceed 500 ms.
-        await page.locator('.sim-edge-guide').waitFor({state:'visible',timeout:15000});
-        assert.equal(await page.locator('.sim-edge-guide').isVisible(),true,'edge arrow points toward offscreen bank');
-        // Read all animated overlay rectangles in the same browser task.
-        const arrowLayout=await page.evaluate(()=>{
-          const rect=el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
-          const selectors='.sim3d-touch-controls, .sim3d-actionbar, .sim-city-map, .sim3d-missions, .sim3d-stats, .sim-zone-label';
-          return {arrow:rect(document.querySelector('.sim-edge-guide')),blockers:[...document.querySelectorAll(selectors)]
-            .filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=='hidden';})
-            .map(el=>({name:el.className,box:rect(el)}))};
-        });
-        for(const blocker of arrowLayout.blockers)assert.equal(overlap(arrowLayout.arrow,blocker.box),false,`edge arrow avoids ${blocker.name}: ${JSON.stringify(arrowLayout)}`);
+        assert.equal(await page.locator('.sim-zone-label,.sim-edge-guide,#simRouteMarker,#simZoneLabels').count(),0,'choosing an offscreen destination does not create screen markers');
         await page.screenshot({path:path.join(out,`target-${width}x${height}.png`)});
       }
       assert.deepEqual(errors,[]);
