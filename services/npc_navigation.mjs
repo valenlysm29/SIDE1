@@ -3,6 +3,49 @@ export const NPC_RADIUS=.29;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const inside=(p,r)=>p.x>r.minX&&p.x<r.maxX&&p.z>r.minZ&&p.z<r.maxZ;
+
+// Circle contacts in XZ. The caller retains the static wall/bounds guard.
+// Existing overlaps recover by a bounded step; contacts never move a neighbor.
+export function resolveCircleMotion(start,desired,{radius=NPC_RADIUS,neighbors=[],blocked=()=>false,maxCorrection=.01}={}) {
+  let next={x:desired.x,z:desired.z};
+  const safe=p=>!blocked(p.x,p.z);
+  for(let pass=0;pass<3;pass++)for(const other of neighbors) {
+    const minimum=radius+(Number(other.radius)||NPC_RADIUS),ox=start.x-other.x,oz=start.z-other.z;
+    const oldDistance=Math.hypot(ox,oz),dx=next.x-start.x,dz=next.z-start.z;
+    const newDistance=Math.hypot(next.x-other.x,next.z-other.z);
+    if(oldDistance<minimum-1e-7) {
+      const nx=oldDistance>1e-8?ox/oldDistance:1,nz=oldDistance>1e-8?oz/oldDistance:0;
+      const correction=Math.min(Math.max(0,maxCorrection),minimum-oldDistance+1e-7);
+      const budget=Math.max(correction,Math.hypot(dx,dz));
+      const base=newDistance>oldDistance?next:start;
+      for(const angle of [0,Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2]) {
+        const x=nx*Math.cos(angle)-nz*Math.sin(angle),z=nx*Math.sin(angle)+nz*Math.cos(angle);
+        const candidate={x:base.x+x*correction,z:base.z+z*correction};
+        const length=Math.hypot(candidate.x-start.x,candidate.z-start.z);
+        if(length>budget&&length>1e-9){candidate.x=start.x+(candidate.x-start.x)*budget/length;candidate.z=start.z+(candidate.z-start.z)*budget/length;}
+        if(safe(candidate)&&Math.hypot(candidate.x-other.x,candidate.z-other.z)>oldDistance+1e-8){next=candidate;break}
+      }
+      continue;
+    }
+    // Swept intersection also catches a fast step whose endpoint clears the body.
+    const a=dx*dx+dz*dz,b=2*(ox*dx+oz*dz),c=oldDistance*oldDistance-minimum*minimum;
+    const discriminant=b*b-4*a*c;
+    const hit=a>1e-12&&discriminant>=0?(-b-Math.sqrt(discriminant))/(2*a):Infinity;
+    if(newDistance>=minimum&&!(hit>=0&&hit<1))continue;
+    const t=clamp(Number.isFinite(hit)?hit:0,0,1);
+    const contact={x:start.x+dx*t,z:start.z+dz*t};
+    const cx=contact.x-other.x,cz=contact.z-other.z,length=Math.hypot(cx,cz)||1,nx=cx/length,nz=cz/length;
+    const remainingX=dx*(1-t),remainingZ=dz*(1-t),inward=Math.min(0,remainingX*nx+remainingZ*nz);
+    next={x:contact.x+remainingX-inward*nx,z:contact.z+remainingZ-inward*nz};
+    if(!safe(next))next=safe(contact)?contact:{x:start.x,z:start.z};
+  }
+  // Every accepted candidate is subject to the original static collision guard.
+  // Crowded contacts can undo an earlier tangent. Reject that last displacement
+  // rather than penetrating a previously clear body or worsening an overlap.
+  if(neighbors.some(other=>Math.hypot(next.x-other.x,next.z-other.z)<
+    Math.min(radius+(Number(other.radius)||NPC_RADIUS),Math.hypot(start.x-other.x,start.z-other.z))-1e-7))return {x:start.x,z:start.z};
+  return safe(next)?next:{x:start.x,z:start.z};
+}
 export function expanded(obstacles,radius=NPC_RADIUS) {
   return obstacles.map(r=>({minX:r.minX-radius,maxX:r.maxX+radius,minZ:r.minZ-radius,maxZ:r.maxZ+radius}));
 }
@@ -65,25 +108,27 @@ export function advance(state,target,dt,obstacles,neighbors=[],maxSpeed=1.1,fina
   let avoidance=0;
   for(const other of neighbors) {
     const ox=other.x-state.x,oz=other.z-state.z,d=Math.hypot(ox,oz);
-    if(d<1.2&&d>.001) {
+    const minimum=(Number(state.radius)||NPC_RADIUS)+(Number(other.radius)||NPC_RADIUS),range=minimum+.8;
+    if(d<range&&d>.001) {
       const ahead=(ox*Math.sin(state.yaw)+oz*Math.cos(state.yaw))/d;
       if(ahead>.25) {
-        goalSpeed*=clamp((d-.58)/.55,0,1);
+        goalSpeed*=clamp((d-minimum)/.6,.22,1);
         // Consistent right-hand passing avoids reciprocal left/right oscillation.
-        if(d>.57)avoidance=Math.max(avoidance,.38*(1-d/1.2));
+        avoidance=Math.max(avoidance,1.15*(1-d/range));
       }
     }
   }
   const speed=state.speed||0;state.speed=speed+clamp(goalSpeed-speed,-3.5*dt,1.8*dt);
   let step=Math.min(distance,state.speed*dt), yaw=state.yaw+avoidance;
   let next={x:state.x+Math.sin(yaw)*step,z:state.z+Math.cos(yaw)*step};
-  const blocks=expanded(obstacles);
-  if(!segmentClear(state,next,blocks)||neighbors.some(o=>{
-    const distance=Math.hypot(next.x-o.x,next.z-o.z);
-    return distance<.56&&distance<=Math.hypot(state.x-o.x,state.z-o.z);
-  })) {
+  const blocks=expanded(obstacles,Number(state.radius)||NPC_RADIUS);
+  const blocked=(x,z)=>!segmentClear(state,{x,z},blocks)||blocks.some(r=>inside({x,z},r));
+  next=resolveCircleMotion(state,next,{radius:Number(state.radius)||NPC_RADIUS,neighbors,blocked,maxCorrection:maxSpeed*dt});
+  const length=Math.hypot(next.x-state.x,next.z-state.z),budget=maxSpeed*dt;
+  if(length>budget&&length>1e-9)next={x:state.x+(next.x-state.x)*budget/length,z:state.z+(next.z-state.z)*budget/length};
+  if(blocked(next.x,next.z)) {
     next={x:state.x,z:state.z};state.speed=0;
   }
-  const moved=Math.hypot(next.x-state.x,next.z-state.z);state.x=next.x;state.z=next.z;
+  const moved=Math.hypot(next.x-state.x,next.z-state.z);state.x=next.x;state.z=next.z;state.speed=dt?moved/dt:0;
   return {distance:moved,arrived:distance<.10,turnRate:wrap(state.yaw-oldYaw)/Math.max(.001,dt)};
 }

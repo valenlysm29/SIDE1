@@ -32,6 +32,15 @@ export function vehicleHits(x,z,yaw,obstacles,bounds) {
   return false;
 }
 
+export function vehicleCircles(x,z,yaw) {
+  return [-1.35,0,1.35].map(along=>({x:x+Math.sin(yaw)*along,z:z+Math.cos(yaw)*along,radius:.94}));
+}
+
+export function vehicleHitsPeople(x,z,yaw,people) {
+  return vehicleCircles(x,z,yaw).some(circle=>people.some(person=>
+    Math.hypot(circle.x-person.x,circle.z-person.z)<circle.radius+(Number(person.radius)||.29)));
+}
+
 // Use the same rotated chassis for both participants, including bumpers.
 export function vehiclesOverlap(a,b,margin=0) {
   for(const alongA of [-1.35,0,1.35])for(const alongB of [-1.35,0,1.35]) {

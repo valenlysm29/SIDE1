@@ -1,8 +1,9 @@
+import {resolveCircleMotion} from './npc_navigation.mjs';
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const PLAYER_STATE=Object.freeze({ON_FOOT:'PLAYER_ON_FOOT',ENTERING:'ENTERING_VEHICLE',DRIVING:'DRIVING',EXITING:'EXITING_VEHICLE'});
 
 // Input is camera-relative; integrate in short steps to preserve thin collisions.
-export function stepPlayerMotion(player,input,dt,blocked=()=>false) {
+export function stepPlayerMotion(player,input,dt,blocked=()=>false,options={}) {
   dt=clamp(dt,0,.05);
   const length=Math.hypot(input.forward||0,input.side||0),sprint=Boolean(input.sprint&&length);
   const speed=sprint?5.2:2.65,rate=player.grounded?(length?(sprint?8:12):15):(length?2.4:1.2);
@@ -18,6 +19,14 @@ export function stepPlayerMotion(player,input,dt,blocked=()=>false) {
     const x=player.x,z=player.z,nx=x+player.vx*h,nz=z+player.vz*h;
     if(!blocked(nx,z))player.x=nx;else player.vx=0;
     if(!blocked(player.x,nz))player.z=nz;else player.vz=0;
+    if(options.neighbors?.length){
+      const next=resolveCircleMotion({x,z},player,{radius:options.radius||player.radius||.36,
+        neighbors:options.neighbors,blocked,maxCorrection:1.2*h});
+      player.x=next.x;player.z=next.z;
+      // Only retain the displacement actually allowed by contact. This prevents
+      // accumulated inward velocity from vibrating against a stationary body.
+      if(h&&Math.hypot(nx-player.x,nz-player.z)>1e-7){player.vx=(player.x-x)/h;player.vz=(player.z-z)/h;}
+    }
     travelled+=Math.hypot(player.x-x,player.z-z);
   }
   player.speed=dt?travelled/dt:0;

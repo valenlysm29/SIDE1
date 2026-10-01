@@ -928,8 +928,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     }
     const target=courier.path[0],motion=courier.motion;
     Object.assign(motion,{x:world.x,z:world.z});
-    const neighbors=rooms.flatMap(room=>room.actors.map(actor=>({x:actor.object.position.x+offsetX,z:actor.object.position.z})));
-    if(position)neighbors.push({x:position.x,z:position.z});
+    const neighbors=rooms.flatMap(room=>room.actors.map(actor=>({x:actor.object.position.x+offsetX,z:actor.object.position.z,radius:npcNavigation.NPC_RADIUS})));
+    if(position)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
     const result=npcNavigation.advance(motion,{x:target[0],z:target[1]},dt,colliders,neighbors,.85,courier.path.length===1);
     object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
     animateNpc?.(object,dt,result.distance>.0001);
@@ -952,10 +952,9 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       for (const actor of room.actors) {
         const { object, route } = actor;
         const target = route.points[actor.target];
-        const playerDistance = Math.hypot(position.x - offsetX - object.position.x, position.z - object.position.z);
         let moving = false;
         if(actor.wait>0){actor.wait=Math.max(0,actor.wait-dt);animateNpc?.(object,dt,false);continue;}
-        if (!route.stationary && playerDistance > 1.05) {
+        if (!route.stationary) {
           const blocks=colliders.filter(item=>item.zone===room.id);
           const world={x:object.position.x+offsetX,z:object.position.z};
           if(!actor.path?.length)actor.path=interiorNavigation.plan(room,world,target,storePropQuality);
@@ -963,8 +962,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
           if(waypoint){
             const motion=actor.motion||(actor.motion={speed:0,yaw:object.rotation.y});
             Object.assign(motion,{x:world.x,z:world.z});
-            const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z}));
-            neighbors.push({x:position.x,z:position.z});
+            const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z,radius:npcNavigation.NPC_RADIUS}));
+            neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
             const step=interiorNavigation.advance(room,motion,{x:waypoint[0],z:waypoint[1]},dt,neighbors,.65,storePropQuality,actor.path.length===1);
             object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
             moving=step.distance>.0001;

@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three/build/three.module.js';
-import {stepVehicle,vehicleHits,vehiclesOverlap} from './vehicle_motion.mjs';
+import {stepVehicle,vehicleHits,vehiclesOverlap,vehicleHitsPeople,vehicleCircles} from './vehicle_motion.mjs';
 
 export function createHubVehicles(world,offsetX) {
   const resources=new Set(),cars=[];
@@ -73,8 +73,9 @@ export function createHubVehicles(world,offsetX) {
   cars.forEach(c=>sync(c,1));
   return {
     cars,cruiser,
+    navigationNeighbors(){return cars.flatMap(car=>vehicleCircles(car.x,car.z,car.yaw));},
     nearest(x,z){return Math.hypot(cruiser.x-x,cruiser.z-z)<3.5?cruiser:null;},
-    occupied(x,z,r=.4){return cars.some(c=>vehicleHits(c.x,c.z,c.yaw,[{minX:x-r,maxX:x+r,minZ:z-r,maxZ:z+r}]));},
+    occupied(x,z,r=.4){return cars.some(c=>vehicleHitsPeople(c.x,c.z,c.yaw,[{x,z,radius:r}]));},
     update(dt,{active,input,player,people,bounds}) {
       for(const c of cars) {
         if(c.traffic){
@@ -84,13 +85,13 @@ export function createHubVehicles(world,offsetX) {
           const old={x:c.x,z:c.z,yaw:c.yaw,distance:c.distance};
           c.rear.emissiveIntensity=stop?3:.7;c.distance+=c.speed*dt;placeTraffic(c);
           const pedestrians=[...people,...(active?[]:[player])];
-          if(cars.some(other=>other!==c&&vehiclesOverlap(c,other,.12))||pedestrians.some(p=>vehicleHits(c.x,c.z,c.yaw,[{minX:p.x-.42,maxX:p.x+.42,minZ:p.z-.42,maxZ:p.z+.42}]))){Object.assign(c,old);c.speed=0;c.rear.emissiveIntensity=3;}
+          if(vehicleHits(c.x,c.z,c.yaw,world.colliders,bounds)||cars.some(other=>other!==c&&vehiclesOverlap(c,other,.12))||vehicleHitsPeople(c.x,c.z,c.yaw,pedestrians)){Object.assign(c,old);c.speed=0;c.rear.emissiveIntensity=3;}
           c.wheelAngle+=c.speed*dt/.36;
           c.steer=Math.atan2(Math.sin(c.yaw-old.yaw),Math.cos(c.yaw-old.yaw))*2.65/Math.max(.001,c.speed*dt);
           c.body.rotation.x=(previous-c.speed)*.015;
         }else{
-          const blockers=[...world.colliders,...people.map(p=>({minX:p.x-.4,maxX:p.x+.4,minZ:p.z-.4,maxZ:p.z+.4}))];
-          stepVehicle(c,active===c?input:{brake:true},dt,(x,z,yaw)=>vehicleHits(x,z,yaw,blockers,bounds)||cars.some(other=>other!==c&&vehiclesOverlap({x,z,yaw},other)));
+          const pedestrians=[...people,...(active?[]:[player])];
+          stepVehicle(c,active===c?input:{brake:true},dt,(x,z,yaw)=>vehicleHits(x,z,yaw,world.colliders,bounds)||vehicleHitsPeople(x,z,yaw,pedestrians)||cars.some(other=>other!==c&&vehiclesOverlap({x,z,yaw},other)));
           c.rear.emissiveIntensity=active===c&&(input.brake||input.throttle<0)?3:.7;
         }
         sync(c,dt);
