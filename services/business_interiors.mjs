@@ -51,6 +51,9 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   const resources = new Set(), colliders = [], hotspots = [], rooms = [], animated = [];
   const zones = getBusinessZones(offsetX);
   const geometry = new THREE.BoxGeometry(1, 1, 1); resources.add(geometry);
+  geometry.computeBoundingBox();
+  const floors = [], floorMatrix = new THREE.Matrix4(), floorInverse = new THREE.Matrix4();
+  const floorBounds = new THREE.Box3(), floorRay = new THREE.Ray(), floorHit = new THREE.Vector3();
   const cylinder = new THREE.CylinderGeometry(1, 1, 1, 12); resources.add(cylinder);
   const scratch = new THREE.Object3D();
   const STORE_PROP_KEYS = Object.freeze([
@@ -93,7 +96,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       scratch.position.set(x, y, z); scratch.rotation.set(rx, ry, rz); scratch.scale.set(sx, sy, sz); scratch.updateMatrix();
       const key = `${geo.uuid}:${mat.uuid}`;
       if (!batches.has(key)) batches.set(key, { geo, mat, matrices: [] });
-      batches.get(key).matrices.push(scratch.matrix.clone());
+      const placement=scratch.matrix.clone();batches.get(key).matrices.push(placement);
+      return placement;
     }
     return {
       box: (x, y, z, w, h, d, mat, yaw = 0) => shape(geometry, mat, x, y, z, w, h, d, 0, yaw),
@@ -221,7 +225,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   function buildShell(b) {
     const { x, z, width: w, depth: d, height: h, doorX: dx, doorZ: dz, doorWidth: dw } = b;
     // Floor finishes are flush with sidewalk; no artificial raised loading step.
-    shell.box(x, .0075, z, w, .035, d, b.id === 'store' ? m.floor : m.concrete);
+    floors.push({parent:group,matrix:shell.box(x, .0075, z, w, .035, d, b.id === 'store' ? m.floor : m.concrete)});
     for (const side of [-1, 1]) {
       shell.box(x + side * w / 2, h / 2, z, .24, h, d, m.plaster);
       collider(x + side * w / 2, z, .24, d, 'wall', b.id);
@@ -498,7 +502,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     room.deferred=false;
     const before=colliders.length;
     const b=batchBuilder(room.detail),l=room.layout;
-    b.box(l.x,.0075,l.z,l.width-.24,.035,l.depth-.24,m.floor);
+    floors.push({parent:room.detail,matrix:b.box(l.x,.0075,l.z,l.width-.24,.035,l.depth-.24,m.floor)});
     builders[room.id]({room,batch:b,m,collider,sign,hotspot,offsetX});
     for(const point of hotspots.filter(point=>point.zone===room.id&&point.type==='decisionZone'))point.category ||= point.cat;
     if(room.officeStations){
@@ -527,6 +531,25 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   const interiorNavigation=createInteriorNavigation({THREE,rooms,colliders,offsetX});
   const npcRoutes = rooms.flatMap(room => room.routes);
   const zoneAt = position => zones.find(zone => position && position.x > zone.minX + .12 && position.x < zone.maxX - .12 && position.z > zone.minZ + .12 && position.z < zone.maxZ)?.id || null;
+  // Query only the rendered floor instances, never props, roofs or flat navmesh.
+  // Their placement is shared with the batch, and matrixWorld includes every
+  // enclosing group's transform. Thus .025 is a local top, not a world height.
+  function groundHeightAt(x,z) {
+    if(disposed||!Number.isFinite(x)||!Number.isFinite(z))return null;
+    let height=null;
+    for(const floor of floors){
+      floor.parent.updateWorldMatrix(true,false);
+      floorMatrix.multiplyMatrices(floor.parent.matrixWorld,floor.matrix);
+      floorBounds.copy(geometry.boundingBox).applyMatrix4(floorMatrix);
+      if(x<floorBounds.min.x||x>floorBounds.max.x||z<floorBounds.min.z||z>floorBounds.max.z)continue;
+      floorRay.origin.set(x,floorBounds.max.y+1,z);floorRay.direction.set(0,-1,0);
+      floorInverse.copy(floorMatrix).invert();floorRay.applyMatrix4(floorInverse);
+      if(!floorRay.intersectBox(geometry.boundingBox,floorHit))continue;
+      const y=floorHit.applyMatrix4(floorMatrix).y;
+      if(Number.isFinite(y)&&(height===null||y>height))height=y;
+    }
+    return height;
+  }
   const storeRoom = rooms.find(room => room.id === 'store');
   const warehouseRoom = rooms.find(room => room.id === 'warehouse');
   const productionRoom = rooms.find(room => room.id === 'production');
@@ -982,7 +1005,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   return {
     group, colliders, entrances, zones, hotspots, interactionPoints: hotspots, npcRoutes, rooms,
     queueSlots, checkoutQueueSlots: queueSlots, browsePoints, salesAssistantPoint,
-    zoneAt, sync, update: sync, tick, ensureRoom, interiorNavigation, installStoreProps, installWarehouseProps, installProductionProps, setQuality,
+    zoneAt, groundHeightAt, sync, update: sync, tick, ensureRoom, interiorNavigation, installStoreProps, installWarehouseProps, installProductionProps, setQuality,
     stats() {
       let instancedBatches = 0, geometryInstances = 0, visibleBatches = 0;
       group.traverse(object => {
