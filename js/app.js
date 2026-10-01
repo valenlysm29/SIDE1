@@ -405,7 +405,14 @@ document.querySelector('.modal-backdrop')?.addEventListener('click',closeModal);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden'))closeModal()});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!$('modalRoot')?.classList.contains('hidden')){closeModal();return;}
+  if($('decisionMenu')?.classList.contains('hidden'))return;
+  // The review dialog keeps its native Escape behavior; a second Escape exits the tablet.
+  if($('companyReviewDialog')?.open)return;
+  e.preventDefault();e.stopImmediatePropagation();closeDecisionMenu();
+});
 function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260910-2'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(!hasConfig&&email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}$('registerForm')?.reset();if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
@@ -477,7 +484,23 @@ $('resumeWorldBtn')?.addEventListener('click',requestWorldEntry);
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
 $('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;studentSessionRecovering=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;studentJoinedCompanies=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
 $('waitingBackToProfiles')?.addEventListener('click',()=>$('backToProfiles')?.click());
-$('exitDecisions')?.addEventListener('click',()=>{playerIsDeciding=false;syncStudentReportPreview();if(window.__SIDE_RETURN_TO_3D){window.__SIDE_RETURN_TO_3D=false;window.SIDE3D?.returnFromDecisions?.();}else showScreen('studentLobby')});
+function updateDecisionReturnButton(){
+  const button=$('exitDecisions');if(!button)return;
+  const returning=Boolean(window.__SIDE_RETURN_TO_3D),label=returning?'Volver al mundo':'Volver a la sala';
+  button.setAttribute('aria-label',label);button.title=`${label} (Esc)`;
+  button.classList.toggle('returns-to-world',returning);
+  const text=$('decisionReturnLabel');if(text)text.textContent=label;
+}
+function closeDecisionMenu(){
+  if(!$('decisionMenu')||$('decisionMenu').classList.contains('hidden'))return false;
+  document.activeElement?.blur?.();
+  if(typeof closeCompanyReview==='function')closeCompanyReview();
+  playerIsDeciding=false;syncStudentReportPreview();
+  if(window.__SIDE_RETURN_TO_3D){window.__SIDE_RETURN_TO_3D=false;window.SIDE3D?.returnFromDecisions?.();}
+  else showScreen('studentLobby');
+  return true;
+}
+$('exitDecisions')?.addEventListener('click',closeDecisionMenu);
 $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').classList.add('hidden');renderDecisionCategory()});
 
 function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
@@ -648,6 +671,7 @@ function openDecisionMenu(){
   const access=studentAccess();if(!access.canOperate){showScreen('studentLobby');updateIntegrationUI();toast(access.reason);return false;}
 
   loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
+  updateDecisionReturnButton();
   renderTabs(); renderDecisionCategory(); updateHud(); syncStudentReportPreview();
   updateDecisionLayout();
 }
