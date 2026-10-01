@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
-  <link rel="stylesheet" href="css/docente.css?v=20260930-history">
+  <link rel="stylesheet" href="css/docente.css?v=20261001-paneles">
   <link rel="stylesheet" href="css/responsive.css?v=20260910-2">
 </head>
 <body>
@@ -17,13 +17,13 @@
   <div class="docente-bg" aria-hidden="true"></div>
   <aside class="sidebar">
     <div class="brand"><img src="assets/side_logo.png" alt="SIDE"><span>PANEL DOCENTE</span></div>
-    <nav>
+    <nav aria-label="Secciones del panel docente">
       <button class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/icons/teacher/configuracion.svg" alt=""></span><span>Configuración</span></button>
       <button class="nav-btn hidden" data-tab="rondas"><span class="nav-icon"><img src="assets/icons/teacher/rondas.svg" alt=""></span><span>Rondas y eventos</span></button>
       <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/icons/teacher/empresas.svg" alt=""></span><span>Empresas</span></button>
       <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/icons/teacher/resultados.svg" alt=""></span><span>Resultados</span></button>
       <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/icons/teacher/podio.svg" alt=""></span><span>Ganador y podio</span></button>
-      <button class="nav-btn" data-tab="historial"><span class="nav-icon"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><span>Historial</span></button>
+      <button class="nav-btn" data-tab="historial"><span class="nav-icon"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><span>Decisiones</span></button>
     </nav>
     <div class="sidebar-bottom">
       <button id="backHome" class="sidebar-link"><img class="button-arrow-icon left" src="assets/icons/ui/arrow-left-thick.svg" alt=""> Volver a inicio</button>
@@ -123,15 +123,15 @@
       <div class="event-log card"><div class="card-title"><h3>Registro de eventos</h3><button id="clearEvents" class="mini">Limpiar</button></div><div id="eventLog"></div></div>
     </section>
 
-    <section id="tab-empresas" class="tab-panel">
-      <div class="section-head"><div><span class="eyebrow">SEGUIMIENTO</span><h2>Empresas participantes</h2></div><button id="refreshReports" class="secondary">↻ Actualizar información</button></div>
-      <div class="info-banner">Las empresas aparecen automáticamente al ingresar. La lista se actualiza sin recargar la página.</div>
+    <section id="tab-empresas" class="tab-panel teacher-workspace" aria-labelledby="companiesHeading">
+      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/empresas.svg" alt=""></span><div><h2 id="companiesHeading">Empresas participantes</h2><p>Presencia, avance y evaluación de cada empresa.</p></div></div><button id="refreshReports" class="secondary" type="button"><span aria-hidden="true">↻</span> Actualizar información</button></div>
+      <div class="info-banner teacher-guide">Las empresas aparecen al ingresar. La presencia y el avance se actualizan automáticamente; puedes guardar una nota o abrir sus resultados desde cada tarjeta.</div>
       <p id="companiesLiveStatus" role="status" aria-live="polite">Esperando empresas.</p>
       <div id="companiesGrid" class="company-grid"></div>
     </section>
 
-    <section id="tab-resultados" class="tab-panel">
-      <div class="section-head"><div><span class="eyebrow">RESULTADOS</span><h2>Resultados de estudiantes</h2></div><div class="top-actions"><button id="viewPdf" class="secondary">Ver PDF</button><button id="downloadPdf" class="primary">Descargar PDF</button></div></div>
+    <section id="tab-resultados" class="tab-panel teacher-workspace" aria-labelledby="resultsHeading">
+      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/resultados.svg" alt=""></span><div><h2 id="resultsHeading">Resultados por empresa</h2><p>Consulta el cierre del ciclo y sus estados financieros.</p></div></div><div class="top-actions"><button id="viewPdf" class="secondary" type="button">Ver PDF</button><button id="downloadPdf" class="primary" type="button">Descargar PDF</button></div></div>
       <p class="hint">El PDF incluye todas las empresas activas y el ciclo reportado de cada una.</p>
       <div class="stats-grid" id="resultStats"></div>
       <article class="card result-company-card"><div class="card-title"><h3>Detalle por empresa</h3><label>Empresa<select id="resultCompanySelect" aria-label="Empresa para ver resultados"></select></label></div><div id="detailReports"></div></article>
@@ -145,9 +145,9 @@
       </div>
       <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Califica a todas las empresas activas en Empresas para publicar. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
     </section>
-    <section id="tab-historial" class="tab-panel" aria-labelledby="historyHeading">
-      <div class="section-head"><div><span class="eyebrow">PARTIDA ANTERIOR</span><h2 id="historyHeading">Historial</h2></div><button id="refreshHistory" class="secondary" type="button">Actualizar</button></div>
-      <div class="info-banner">Consulta las decisiones y los resultados de todas las empresas de tu última partida finalizada. Al finalizar una nueva partida, este historial se reemplaza.</div>
+    <section id="tab-historial" class="tab-panel teacher-workspace" aria-labelledby="historyHeading">
+      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Decisiones</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
+      <div class="info-banner teacher-guide">Selecciona una empresa y despliega sus ciclos para revisar las decisiones y los resultados registrados. Esta consulta es de solo lectura y se reemplaza al finalizar una nueva partida.</div>
       <p id="historyStatus" class="history-status" role="status" aria-live="polite"></p>
       <div id="historyContent" aria-busy="false"></div>
     </section>
