@@ -42,3 +42,27 @@ test('Yuka steering remains behind AABB and neighbor collision guard',()=>{
   assert.ok(Number.isFinite(state.x)&&Number.isFinite(state.z));
   assert.ok(state.x<.71,'steering crossed a solid obstacle');
 });
+
+test('navmesh spawn samples real triangles and exposes their interpolated height',()=>{
+  const vertices=[0,.1,0, 3,.4,0, 0,.1,3, 5,.2,0, 8,.2,0, 5,.2,3];
+  const attribute={count:6,getX:i=>vertices[i*3],getY:i=>vertices[i*3+1],getZ:i=>vertices[i*3+2]};
+  const geometry={getAttribute:()=>attribute};
+  const nav=createOptionalNpcNavigator({geometry,obstacles:[{minX:.5,maxX:1.5,minZ:.5,maxZ:1.5}]});
+  const spawn=nav.sampleSpawn({x:0,z:0});
+  assert.ok(spawn.x>5,'spawn used a blocked triangle');
+  assert.ok(Math.abs(nav.groundAt(1,1)-.2)<1e-8);
+  assert.equal(nav.groundAt(-3,-3),null);
+  assert.equal(createOptionalNpcNavigator().sampleSpawn({x:0,z:0}),null);
+});
+
+test('Yuka separation steers around a stationary neighbor without overriding collision guards',()=>{
+  const nav=createOptionalNpcNavigator({YUKA});
+  const state={x:0,z:0,yaw:Math.PI/2,speed:0},neighbor={x:1,z:.15};
+  let minimum=Infinity;
+  for(let i=0;i<500;i++){
+    nav.advance(state,{x:5,z:0},.05,[neighbor],1.1);
+    minimum=Math.min(minimum,Math.hypot(state.x-neighbor.x,state.z-neighbor.z));
+  }
+  assert.ok(minimum>=.56-1e-6,'Yuka steering crossed the stationary neighbor');
+  assert.ok(Number.isFinite(state.x)&&Number.isFinite(state.z));
+});
