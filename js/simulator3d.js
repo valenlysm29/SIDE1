@@ -78,6 +78,7 @@
     ['planter','outdoor_planter'],['trashcan','outdoor_trashcan'],['stopSign','outdoor_stop_sign'],['birdBrown','outdoor_bird_brown']
   ]);
   let characterManager = null, selectedCharacterId = 'chico2';
+  let characterGeometry = null;
   const HUB_OFFSET = 150;
   const DISTRICTS = {miraflores:'Miraflores',olivos:'Los Olivos',sjl:'San Juan de Lurigancho'};
   const hubBounds = {minX:HUB_OFFSET-88,maxX:HUB_OFFSET+88,minZ:-88,maxZ:88};
@@ -722,7 +723,7 @@
   }
 
   async function loadThree() {
-    if (THREE && GLTFLoader && SkeletonUtils && assetCache && CharacterManager && CharacterAnimationController) return true;
+    if (THREE && GLTFLoader && SkeletonUtils && assetCache && CharacterManager && CharacterAnimationController && characterGeometry) return true;
     try {
       THREE = await import('three');
       const modules = await Promise.all([
@@ -730,7 +731,8 @@
         import('three/addons/utils/SkeletonUtils.js'),
         import('../services/asset_manager.mjs'),
         import('../services/character_manager.mjs'),
-        import('../services/character_animation_controller.mjs')
+        import('../services/character_animation_controller.mjs'),
+        import('../services/character_geometry.mjs')
       ]);
       GLTFLoader = modules[0].GLTFLoader;
       SkeletonUtils = modules[1];
@@ -739,6 +741,7 @@
       ASSET_PRIORITY = modules[3].ASSET_PRIORITY;
       CharacterAnimationController = modules[4].CharacterAnimationController;
       createNpcMotionAdapter = modules[4].createNpcMotionAdapter;
+      characterGeometry = modules[5];
       return true;
     } catch (err) {
       console.error(err);
@@ -1023,7 +1026,7 @@
     const config={...look,cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby};
     const obj=serviceRoom?cityNpcFromTemplate(config):person(config);
     if(!obj)return null;
-    obj.getObjectByName('NpcNameLabel')?.removeFromParent();obj.userData.role=role;return obj;
+    obj.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(obj.userData,{role,groundY:.025});return obj;
   }
 
   async function loadCityNpcModels() {
@@ -1288,6 +1291,17 @@
     return group;
   }
 
+  function normalizePerson(group, role='npc', variation=.975) {
+    return characterGeometry.normalizeCharacterGeometry(THREE,group,characterGeometry.characterTargetHeight(role,variation));
+  }
+
+  function groundPerson(group, worldPosition=null) {
+    const position=worldPosition||group.getWorldPosition(group.userData.groundWorldPosition||(group.userData.groundWorldPosition=new THREE.Vector3()));
+    const floor=group.userData.groundY??hubWorld?.groundHeightAt?.(position.x,position.z)??hubWorld?.groundY??.025;
+    const parentY=group.parent?group.parent.getWorldPosition(group.userData.groundParentPosition||(group.userData.groundParentPosition=new THREE.Vector3())).y:0;
+    characterGeometry.anchorCharacterToGround(group,floor,parentY,group===playerAvatar?player.y-player.baseY:0);
+  }
+
   function cityNpcFromTemplate(cfg) {
     if(!cityRoster||!SkeletonUtils?.clone)return null;
     const nearby=[];
@@ -1299,11 +1313,6 @@
     const template=choice&&cityTemplates.get(choice.model.id);
     if(!template)return null;
     const group=new THREE.Group(),avatar=SkeletonUtils.clone(template.scene);
-    if(cfg.excludedCityIds){
-      avatar.updateMatrixWorld(true);const bounds=new THREE.Box3().setFromObject(avatar),height=bounds.max.y-bounds.min.y;
-      const scale=height>0?choice.model.altura/height:1;avatar.scale.multiplyScalar(scale*(cfg.bodyScale||1)*choice.heightScale);
-      avatar.updateMatrixWorld(true);const floor=new THREE.Box3().setFromObject(avatar).min.y;avatar.position.y-=floor;
-    }else avatar.scale.setScalar((cfg.bodyScale||1)*choice.heightScale);
     avatar.traverse(node=>{if(node.isMesh)node.userData.sharedCharacterResource=true});
     if(choice.repeated)avatar.traverse(node=>{
       if(!node.isMesh||!node.material)return;
@@ -1314,10 +1323,11 @@
     });
     group.add(avatar);
     const mixer=new THREE.AnimationMixer(avatar);
-    const controller=cityClipModule.createNpcClipController({mixer,clips:template.clips,idleVariant:Math.floor(choice.animationOffset)});
+    const controller=cityClipModule.createNpcClipController({mixer,clips:characterGeometry.clipsWithoutRootMotion(template.clips,avatar.name),idleVariant:Math.floor(choice.animationOffset)});
     group.userData={cityNpcId:choice.model.id,modelKind:`city:${choice.model.id}`,cityClipController:controller,
       cityAvatar:avatar,cityMixer:mixer,cityPosePosition:new THREE.Vector3(),cityPoseReady:false};
-    npcNames?.setNpcName(group,choice.model.nombre,choice.model.altura*choice.heightScale);
+    normalizePerson(group,'npc',(cfg.bodyScale||.975)*choice.heightScale);
+    npcNames?.setNpcName(group,choice.model.nombre,group.userData.characterGeometry.height/group.scale.y);
     return group;
   }
 
@@ -1328,7 +1338,8 @@
     if(characterRole!=='player'&&validCharacterId(modelKind)){modelKind='city-fallback';cfg.forceProcedural=true;}
     if (suppliedTemplates[modelKind]) {
       const group=npcMotion.createNpc(suppliedTemplates[modelKind],modelKind);
-      npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);return attachProceduralController(group);
+      normalizePerson(group,characterRole,cfg.bodyScale);
+      npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,group.userData.characterGeometry.height/group.scale.y);return attachProceduralController(group);
     }
     const template = execModelTemplates[modelKind] || (modelKind.startsWith('chico') ? execModelTemplates.casual : null);
     if (template && SkeletonUtils?.clone) {
@@ -1340,12 +1351,13 @@
       avatar.scale.setScalar(cfg.bodyScale ?? 1);
       group.add(avatar);
       const mixer = new THREE.AnimationMixer(avatar);
-      const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(clip)]));
+      const actions = Object.fromEntries(Object.entries(template.animations).filter(([,clip])=>clip).map(([name,clip])=>[name,mixer.clipAction(characterGeometry.clipsWithoutRootMotion([clip],avatar.name)[0])]));
       actions.idle.play();mixer.update(0);
       const animationController=new CharacterAnimationController({mixer,actions:{IDLE:actions.idle,WALK:actions.walk,TALK:actions.gesture},metadata:{rig:'embedded',retargeted:false}});
       animationController.playIdle();
       group.userData = {modelAvatar:avatar, modelKind, mixer, actions, animationController, currentAction:'idle', lastAnimAt:performance.now()/1000};
-      if(CONFIG.NPCS[modelKind])npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,CONFIG.NPCS[modelKind].height);
+      normalizePerson(group,characterRole,cfg.bodyScale);
+      if(CONFIG.NPCS[modelKind])npcNames.setNpcName(group,CONFIG.NPCS[modelKind].name,group.userData.characterGeometry.height/group.scale.y);
       return group;
     }
     if(!cfg.forceProcedural&&npcModelTemplate&&SkeletonUtils?.clone){
@@ -1357,12 +1369,13 @@
         });
         const bodyScale=cfg.bodyScale??(.86+Math.random()*.12);avatar.scale.setScalar(.82*bodyScale);g.add(avatar);
         if(cfg.formal){const badge=box(.11,.16,.025,cfg.tie??0x315f9c,.16,1.18,.15,.3,.15);g.add(badge);}
-        const mixer=new THREE.AnimationMixer(avatar),idle=npcModelTemplate.animations.idle,walk=npcModelTemplate.animations.walk;
+        const cleanClips=characterGeometry.clipsWithoutRootMotion(Object.values(npcModelTemplate.animations),avatar.name);
+        const mixer=new THREE.AnimationMixer(avatar),idle=cleanClips[0],walk=cleanClips[1];
         const idleAction=idle?mixer.clipAction(idle):null,walkAction=walk?mixer.clipAction(walk):null;
         const actions={idle:idleAction,walk:walkAction};
         const animationController=new CharacterAnimationController({mixer,actions:{IDLE:idleAction,WALK:walkAction},metadata:{rig:'embedded-fallback',retargeted:false}});animationController.playIdle();
         g.userData.modelAvatar=avatar;g.userData.mixer=mixer;g.userData.actions=actions;g.userData.animationController=animationController;g.userData.currentAction='idle';g.userData.lastAnimAt=performance.now()/1000;
-        return g;
+        return normalizePerson(g,characterRole,bodyScale);
       }catch(error){console.warn('No se pudo clonar el avatar; se usa el fallback procedural.',error);}
     }
     const g = new THREE.Group();
@@ -1445,13 +1458,14 @@
     g.userData.parts = { torso, hips, head, armL, armR, foreL, foreR, handL, handR, legL, legR, shoeL, shoeR };
     g.userData.gender = female ? 'female' : 'male';
     if(['male','female'].includes(cfg.execModel))g.userData.pendingCharacterStyle={...cfg};
-    return g;
+    return normalizePerson(g,characterRole,bodyScale);
   }
 
   function setPersonPose(g, cycle = 0, moving = false, frameDt = null, movementSpeed = null) {
     // Keep navigation/customer decisions at full rate; only distant rig posing
     // is reduced. Accumulated time preserves gait speed when it is updated.
     const worldPosition=camera?g.getWorldPosition(g.userData.poseWorldPosition||(g.userData.poseWorldPosition=new THREE.Vector3())):g.position;
+    groundPerson(g,worldPosition);
     const playerDistance=camera?Math.hypot(worldPosition.x-player.x,worldPosition.z-player.z):0;
     const shadowed=g===playerAvatar||playerDistance<18;
     if(g.userData.characterShadowed!==shadowed){g.userData.characterShadowed=shadowed;g.traverse?.(node=>{if(node.isMesh)node.castShadow=shadowed;});}
@@ -3048,7 +3062,7 @@
       if(a.type==='guide'||a.type==='visitor') {
         animatePatrol(a,dt);
       } else if (a.type === 'worker' || a.type === 'cashier' || a.type === 'manager' || a.type === 'analyst' || a.type === 'salesperson') {
-        a.obj.position.y = a.baseY + Math.sin(time * a.speed + a.phase) * 0.012;
+        groundPerson(a.obj);
         if (a.type === 'salesperson') {
           a.obj.rotation.y = Math.PI + Math.sin(time * .4 + a.phase) * .08;
           setPersonPose(a.obj, time + a.phase, false,dt);
@@ -3111,7 +3125,7 @@
     let guide=animatedActors.find(actor=>actor.type==='guide');
     if(!guide&&allowFallback){
       const object=person({gender:'female',cityRole:'tienda',cityScene:'hub',forceProcedural:true,bodyScale:.96});
-      object.name=GUIDE_NAME;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,GUIDE_NAME,1.7);
+      object.name=GUIDE_NAME;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,GUIDE_NAME,object.userData.characterGeometry.height/object.scale.y);
       object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
       animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
       interactables.push({mesh:object,type:'guide',label:`Hablar con ${GUIDE_NAME}`,x:HUB_OFFSET+14,z:26});
@@ -3134,6 +3148,7 @@
       ? monaModule.createMonaNpc(THREE,template,CONFIG.NPCS.mona)
       : npcMotion.createNpc(template,kind)});
     if(!object)object=person({execModel:id,bodyScale:1},'player');
+    normalizePerson(object,'player');
     attachProceduralController(object);
     object.name='PlayerAvatar';Object.assign(object.userData,{modelKind:'player',characterId:id,characterRole:'player',displayName:CONFIG.NPCS[id]?.name||id});
     object.getObjectByName('NpcNameLabel')?.removeFromParent();return object;
@@ -4040,7 +4055,7 @@
       if(node.userData?.mixer)mixers.add(node.userData.mixer);
       if (node.userData?.modelKind) {
         const position=node.getWorldPosition(new THREE.Vector3());
-        characters.push({kind:node.userData.modelKind, characterId:node.userData.characterId||null, role:node.userData.characterRole||node.userData.role||'', name:node.userData.displayName||'', x:position.x, z:position.z});
+        characters.push({kind:node.userData.modelKind, characterId:node.userData.characterId||null, role:node.userData.characterRole||node.userData.role||'', name:node.userData.displayName||'', x:position.x, y:position.y, z:position.z, height:node.userData.characterGeometry?.height||null, groundY:node.userData.groundHeight??null});
       }
     });
     const selected=activeCharacterId(),selectedInstances=characters.filter(character=>character.characterId===selected).length;
