@@ -5,9 +5,9 @@ const url=process.env.SIDE_TEST_URL||'http://127.0.0.1:8772/';
 const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 const instrumented=source.replace('  window.SIDE3D = {',`  window.tabletQA={
   freeze(){cancelAnimationFrame(raf);},
-  open(origin){keys.KeyW=true;if(origin==='news')openNewsPanel();if(origin==='office'){enterHubInterior('office');openAdmin('finance');}if(origin==='office')openDecisionsFrom3D('B');else $3('sim3dDecisionsBtn').click();},
+  open(origin){keys.KeyW=true;if(origin==='news'){positionPlayer(HUB_OFFSET+19,30.1);openNewsPanel();}if(origin==='office'){const room=businessInteriors.rooms.find(room=>room.id==='office');businessInteriors.ensureRoom(room);positionPlayer(HUB_OFFSET+room.layout.x,room.layout.z-2);updateBusinessZone();openAdmin('finance');}if(origin==='office')openDecisionsFrom3D('B');else $3('sim3dDecisionsBtn').click();},
   motion(){const before={x:player.x,z:player.z};keys.KeyW=true;for(let i=0;i<15;i++)updatePlayer(1/60);keys={};return Math.hypot(player.x-before.x,player.z-before.z);},
-  snapshot(){return {running,keys:{...keys},adminOpen,newsOpen,checkoutOpen,productInspectOpen,hubDirectoryOpen,cameraMode,focus:document.activeElement?.id,cycle:currentRoundSafe(),time:gameSession.timeLeft};}
+  snapshot(){return {running,keys:{...keys},adminOpen,newsOpen,checkoutOpen,productInspectOpen,hubDirectoryOpen,cameraMode,interior:currentInterior,focus:document.activeElement?.id,cycle:currentRoundSafe(),time:gameSession.timeLeft};}
 };\n  window.SIDE3D = {`);
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['miraflores'],quantities:{miraflores:1}},INV_MARKETING:{optionIds:['mkt_baja']}};
 (async()=>{
@@ -45,6 +45,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
         await page.evaluate(()=>tabletQA.freeze());
         const state=await page.evaluate(()=>tabletQA.snapshot());
         assert.equal(state.running,true);assert.equal(state.focus,'side3dCanvas');
+        if(origin==='office')assert.equal(state.interior,'office','tablet returns to the physical office');
         assert.ok(Object.values(state.keys).every(value=>!value),'no held key leaks from the tablet');
         for(const key of ['adminOpen','newsOpen','checkoutOpen','productInspectOpen','hubDirectoryOpen'])assert.equal(state[key],false,key);
         assert.equal(await page.evaluate(()=>tabletReturns),++exits,'one return callback per exit');assert.deepEqual(await stable(),before);

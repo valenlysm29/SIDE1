@@ -45,7 +45,7 @@
   const GUIDE_NAME = 'Guía SIDE';
   let inHub = true, cameraMode = 'third', hubDirectoryOpen = false, selectedDistrict = 'miraflores';
   let currentInterior = null, hubReturnPoint = null, cameraSnap = true;
-  let hubWaypoint = null, footstepDistance = 0, footstepBuffer = null;
+  let createNpcPatrol = null, footstepDistance = 0, footstepBuffer = null;
   let hubVehicles = null, driving = null;
   let playerMotion = null, playerMode = 'PLAYER_ON_FOOT', vehicleTransition = null;
   let cameraZoom = 5.2, lastCameraInputAt = 0;
@@ -1026,7 +1026,7 @@
     const config={...look,cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby};
     const obj=serviceRoom?cityNpcFromTemplate(config):person(config);
     if(!obj)return null;
-    obj.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(obj.userData,{role,groundY:.025});return obj;
+    obj.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(obj.userData,{role});return obj;
   }
 
   async function loadCityNpcModels() {
@@ -1297,7 +1297,7 @@
 
   function groundPerson(group, worldPosition=null) {
     const position=worldPosition||group.getWorldPosition(group.userData.groundWorldPosition||(group.userData.groundWorldPosition=new THREE.Vector3()));
-    const floor=group.userData.groundY??hubWorld?.groundHeightAt?.(position.x,position.z)??hubWorld?.groundY??.025;
+    const floor=businessInteriors?.groundHeightAt?.(position.x,position.z)??hubWorld?.groundHeightAt?.(position.x,position.z)??hubWorld?.groundY??.025;
     const parentY=group.parent?group.parent.getWorldPosition(group.userData.groundParentPosition||(group.userData.groundParentPosition=new THREE.Vector3())).y:0;
     characterGeometry.anchorCharacterToGround(group,floor,parentY,group===playerAvatar?player.y-player.baseY:0);
   }
@@ -1323,7 +1323,8 @@
     });
     group.add(avatar);
     const mixer=new THREE.AnimationMixer(avatar);
-    const controller=cityClipModule.createNpcClipController({mixer,clips:characterGeometry.clipsWithoutRootMotion(template.clips,avatar.name),idleVariant:Math.floor(choice.animationOffset)});
+    const clipSpeeds=Object.fromEntries(Object.entries(cityClipModule.indexNpcClips(template.clips)).map(([state,clip])=>[state,cityClipModule.rootMotionSpeed(clip)]));
+    const controller=cityClipModule.createNpcClipController({mixer,clips:characterGeometry.clipsWithoutRootMotion(template.clips,avatar.name),clipSpeeds,idleVariant:Math.floor(choice.animationOffset)});
     group.userData={cityNpcId:choice.model.id,modelKind:`city:${choice.model.id}`,cityClipController:controller,
       cityAvatar:avatar,cityMixer:mixer,cityPosePosition:new THREE.Vector3(),cityPoseReady:false};
     normalizePerson(group,'npc',(cfg.bodyScale||.975)*choice.heightScale);
@@ -3024,10 +3025,9 @@
   }
 
   function npcNeighbors(obj) {
-    const neighbors=[{x:player.x,z:player.z}];
-    for(const other of npcs)if(other.obj!==obj&&!other.dead)neighbors.push({x:other.obj.position.x,z:other.obj.position.z});
-    for(const actor of animatedActors)if(actor.obj&&actor.obj!==obj&&['visitor','guide','salesperson'].includes(actor.type))neighbors.push({x:actor.obj.position.x,z:actor.obj.position.z});
-    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors||[])if(actor.object!==obj)neighbors.push({x:actor.object.position.x+HUB_OFFSET,z:actor.object.position.z});
+    const neighbors=worldPeople(obj);
+    if(!driving)neighbors.push({x:player.x,z:player.z,radius:player.radius});
+    neighbors.push(...(hubVehicles?.navigationNeighbors?.()||[]));
     return neighbors;
   }
 
@@ -3035,6 +3035,7 @@
 
   function animatePatrol(actor,dt) {
     const obj=actor.obj;
+    if(obj.userData.role==='guide'&&inHub)return;
     const nearPlayer=Math.hypot(player.x-obj.position.x,player.z-obj.position.z)<(actor.type==='guide'?2.05:.85);
     if(!running||nearPlayer||actor.pause>0) {
       if(actor.pause>0)actor.pause=Math.max(0,actor.pause-dt);
@@ -3126,9 +3127,15 @@
     if(!guide&&allowFallback){
       const object=person({gender:'female',cityRole:'tienda',cityScene:'hub',forceProcedural:true,bodyScale:.96});
       object.name=GUIDE_NAME;Object.assign(object.userData,{role:'guide'});npcNames.setNpcName(object,GUIDE_NAME,object.userData.characterGeometry.height/object.scale.y);
-      object.position.set(HUB_OFFSET+14,.025,26);scene.add(object);
-      animatedActors.push({type:'guide',obj:object,phase:0,patrol:[[HUB_OFFSET+14,26]],pause:Infinity});
-      interactables.push({mesh:object,type:'guide',label:`Hablar con ${GUIDE_NAME}`,x:HUB_OFFSET+14,z:26});
+      const patrol=[[14,26],[24.5,26],[24.5,13.5],[14,13.5]].map(([x,z])=>[HUB_OFFSET+x,z]);
+      const actor={type:'guide',obj:object,phase:0,patrol,pause:0,speed:.85,state:{speed:0}};
+      actor.patrolController=createNpcPatrol({points:patrol,navigator:cityNavigator,obstacles:hubWorld.colliders,bounds:hubBounds,maxSpeed:actor.speed});
+      const spawn=actor.patrolController.spawn(patrol[0]);
+      if(spawn){
+        object.position.set(spawn.x,.025,spawn.z);scene.add(object);groundPerson(object);
+        animatedActors.push(actor);
+        interactables.push({mesh:object,type:'guide',label:`Hablar con ${GUIDE_NAME}`,x:spawn.x,z:spawn.z});
+      }else clearGroup(object);
     }
     hubActors.forEach(actor=>{actor.obj.visible=Number(actor.obj.userData.cityHubIndex)<hubNpcLimit();});
     Array.from({length:hubNpcLimit()},(_,index)=>index).forEach(index=>{
@@ -3137,8 +3144,13 @@
       object.getObjectByName('NpcNameLabel')?.removeFromParent();
       Object.assign(object.userData,{role:'hub-pedestrian',cityHubIndex:index});
       const source=hubWorld.patrolRoutes?.[index]||HUB_CHARACTER_ROUTES[index].map(([x,z])=>[x+HUB_OFFSET,z]);
-      const patrol=source.map(point=>Array.isArray(point)?point:[point.x,point.z]);object.position.set(patrol[0][0],.025,patrol[0][1]);scene.add(object);
-      hubActors.push({obj:object,patrol,index:1,route:[],pause:index*.8,speed:.9+index*.07,state:{speed:0}});
+      const patrol=source.map(point=>Array.isArray(point)?point:[point.x,point.z]);
+      const actor={obj:object,patrol,speed:.9+index*.07,state:{speed:0}};
+      actor.patrolController=createNpcPatrol({points:patrol,navigator:cityNavigator,obstacles:hubWorld.colliders,bounds:hubBounds,maxSpeed:actor.speed});
+      const spawn=actor.patrolController.spawn(patrol[0]);
+      if(!spawn){clearGroup(object);return;}
+      object.position.set(spawn.x,.025,spawn.z);scene.add(object);groundPerson(object);
+      hubActors.push(actor);
     });
   }
 
@@ -3155,6 +3167,7 @@
   }
 
   async function buildPlayableHub() {
+    ({createNpcPatrol}=await import('../services/npc_patrol.mjs'));
     ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs'));
     const {createWorldEventVisuals}=await import('../services/world_event_visuals.mjs');
     worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
@@ -3208,11 +3221,6 @@
     hubWorld.sky=sky;
     ensureHubCharacters();
     playerAvatar=createPlayableCharacter(activeCharacterId());scene.add(playerAvatar);
-    hubWaypoint=new THREE.Group();hubWaypoint.name='Next destination';
-    const waypointMaterial=new THREE.MeshBasicMaterial({color:0xf4cd78,transparent:true,opacity:.8,depthWrite:false});
-    const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.045,6,40),waypointMaterial);ring.rotation.x=-Math.PI/2;ring.position.y=.07;
-    const arrow=new THREE.Mesh(new THREE.ConeGeometry(.2,.4,4),waypointMaterial);arrow.rotation.z=Math.PI;arrow.position.y=1.8;
-    hubWaypoint.add(ring,arrow);scene.add(hubWaypoint);
     enterHub(false);
   }
 
@@ -3255,11 +3263,6 @@
     if(orderStatus){
       orderStatus.hidden=!order;
       if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-Date.now())/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
-    }
-    if(hubWaypoint){
-      hubWaypoint.visible=Boolean(destination)&&distance>2&&!gameSession?.shiftEnded;
-      if(destination)hubWaypoint.position.set(destination.x,0,destination.z);
-      hubWaypoint.children[1].position.y=1.8+Math.sin(performance.now()*.003)*.12;
     }
     const direction=$3('simHubDirection');
     if(direction){direction.hidden=!destination;if(destination)direction.style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}
@@ -3310,7 +3313,6 @@
     const destination=entrance||station||{x:HUB_OFFSET+zone.x,z:zone.z};
     selectedMapDestination=id;
     closeHubDirectory();message(`${zone?.name||entrance.name} · Sigue la ruta marcada en el mapa.`);
-    if(hubWaypoint){hubWaypoint.visible=true;hubWaypoint.position.set(destination.x,0,destination.z);}
     targetYaw=Math.atan2(destination.x-player.x,player.z-destination.z);
   }
 
@@ -3381,7 +3383,7 @@
     }
     const blocked=paused||Boolean(vehicleTransition);
     const input={throttle:blocked?0:(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),steer:blocked?0:(keys.KeyA||keys.ArrowLeft?1:0)-(keys.KeyD||keys.ArrowRight?1:0),brake:blocked||Boolean(keys.Space)};
-    hubVehicles.update(dt,{active:driving,input,player,people:hubActors.filter(a=>a.obj.visible).map(a=>a.obj.position),bounds:hubBounds});
+    hubVehicles.update(dt,{active:driving,input,player,people:worldPeople(),bounds:hubBounds});
     if(driving){
       player.x=driving.x;player.z=driving.z;player.speed=0;
       if(Math.abs(driving.speed)>1&&performance.now()-lastCameraInputAt>1500){
@@ -3392,22 +3394,49 @@
     const hud=$3('simDriveHud');if(hud){hud.hidden=!driving;if(driving){$3('simDriveSpeed').textContent=String(Math.round(Math.abs(driving.speed)*3.6)).padStart(2,'0');$3('simDriveGear').textContent=driving.speed<-.2?'R':Math.abs(driving.speed)<.2?'N':'D';}}
   }
 
+  function worldPeople(except=null) {
+    const people=[],seen=new Set();
+    const add=obj=>{
+      if(!obj||obj===except||seen.has(obj))return;
+      for(let node=obj;node;node=node.parent)if(!node.visible)return;
+      seen.add(obj);
+      const p=obj.getWorldPosition(obj.userData.collisionPosition||(obj.userData.collisionPosition=new THREE.Vector3()));
+      people.push({x:p.x,z:p.z,radius:npcNavigation?.NPC_RADIUS??.29});
+    };
+    hubActors.forEach(actor=>add(actor.obj));
+    animatedActors.forEach(actor=>add(actor.obj));
+    npcs.filter(npc=>!npc.dead).forEach(npc=>add(npc.obj));
+    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors||[])add(actor.object);
+    return people;
+  }
+
+  function updateHubPatrol(actor,dt) {
+    const obj=actor.obj;
+    if(!obj.visible)return;
+    const state=actor.state||(actor.state={speed:0});
+    if(!running||hubDirectoryOpen){state.speed=0;setPersonPose(obj,0,false,dt,0);return;}
+    const navigator=perfMode!=='low'&&cityNavigator?.ready?cityNavigator:null;
+    if(!actor.patrolController||actor.patrolNavigator!==navigator){
+      actor.patrolController=createNpcPatrol({points:actor.patrol,navigator,obstacles:hubWorld.colliders,bounds:hubBounds,maxSpeed:actor.speed});
+      actor.patrolNavigator=navigator;
+    }
+    Object.assign(state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
+    const neighbors=worldPeople(obj);
+    if(!driving)neighbors.push({x:player.x,z:player.z,radius:player.radius});
+    neighbors.push(...(hubVehicles?.navigationNeighbors?.()||[]));
+    const moved=actor.patrolController.update(state,dt,{neighbors});
+    obj.position.x=state.x;obj.position.z=state.z;obj.rotation.y=state.yaw;
+    setPersonPose(obj,0,moved.distance>.00001,dt,dt?moved.distance/dt:0);
+    if(obj.userData.role==='guide'){
+      const station=interactables.find(point=>point.mesh===obj);
+      if(station){station.x=state.x;station.z=state.z;}
+    }
+  }
+
   function updateHubActors(dt) {
     if(!inHub)return;
-    for(const actor of hubActors) {
-      const obj=actor.obj;
-      if(!obj.visible)continue;
-      if(!running||hubDirectoryOpen||actor.pause>0||hubVehicles?.occupied(obj.position.x,obj.position.z,.8)||Math.hypot(obj.position.x-player.x,obj.position.z-player.z)<.95){actor.pause=Math.max(0,actor.pause-dt);actor.state.speed=0;setPersonPose(obj,0,false,dt);continue;}
-      const navigator=perfMode!=='low'&&cityNavigator?.ready?cityNavigator:null;
-      if(!actor.route.length){const goal=actor.patrol[actor.index];actor.route=navigator?navigator.plan(obj.position,{x:goal[0],z:goal[1]}):npcNavigation.planPath(obj.position,{x:goal[0],z:goal[1]},hubWorld.colliders);}
-      const target=actor.route[0];if(!target){actor.index=(actor.index+1)%actor.patrol.length;continue;}
-      Object.assign(actor.state,{x:obj.position.x,z:obj.position.z,yaw:obj.rotation.y});
-      const neighbors=hubActors.filter(a=>a!==actor&&a.obj.visible).map(a=>a.obj.position).concat({x:player.x,z:player.z});
-      const moved=navigator?navigator.advance(actor.state,{x:target[0],z:target[1]},dt,neighbors,actor.speed)
-        :npcNavigation.advance(actor.state,{x:target[0],z:target[1]},dt,hubWorld.colliders,neighbors,actor.speed);
-      obj.position.set(actor.state.x,.025,actor.state.z);obj.rotation.y=actor.state.yaw;setPersonPose(obj,0,moved.distance>.00001,dt);
-      if(moved.arrived){actor.route.shift();if(!actor.route.length){actor.index=(actor.index+1)%actor.patrol.length;actor.pause=.7;}}
-    }
+    hubActors.forEach(actor=>updateHubPatrol(actor,dt));
+    animatedActors.filter(actor=>actor.obj?.userData.role==='guide').forEach(actor=>updateHubPatrol(actor,dt));
   }
 
   function updateGameplayCamera(dt) {
@@ -3484,14 +3513,12 @@
     if (hemiLight) hemiLight.intensity = 1.05 - dusk * 0.3;
   }
 
-  function collision(x, z) {
+  function collision(x, z, includePeople=true) {
     if(hubWorld){
       if(x<hubBounds.minX||x>hubBounds.maxX||z<hubBounds.minZ||z>hubBounds.maxZ)return true;
       if(hubWorld.colliders.some(c=>x>c.minX-player.radius&&x<c.maxX+player.radius&&z>c.minZ-player.radius&&z<c.maxZ+player.radius))return true;
       if(hubVehicles?.occupied(x,z,player.radius))return true;
-      if(npcs.some(n=>!n.dead&&Math.hypot(x-n.obj.position.x,z-n.obj.position.z)<player.radius+.27))return true;
-      if((businessInteriors?.rooms||[]).some(room=>(room.actors||[]).some(actor=>Math.hypot(x-(actor.object.position.x+HUB_OFFSET),z-actor.object.position.z)<player.radius+.27)))return true;
-      return hubActors.some(a=>Math.hypot(x-a.obj.position.x,z-a.obj.position.z)<player.radius+.27);
+      return includePeople&&worldPeople().some(person=>Math.hypot(x-person.x,z-person.z)<player.radius+person.radius);
     }
     // Until the city is ready, movement stays blocked. Historical colliders
     // can never become a fallback gameplay world.
@@ -3503,7 +3530,8 @@
     if(driving||vehicleTransition){jumpQueued=false;return;}
     const forward = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
     const side = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
-    const {travelled,sprinting}=playerMotion.stepPlayerMotion(player,{forward,side,sprint:keys.ShiftLeft||keys.ShiftRight,yaw},dt,collision);
+    const people=worldPeople();
+    const {travelled,sprinting}=playerMotion.stepPlayerMotion(player,{forward,side,sprint:keys.ShiftLeft||keys.ShiftRight,yaw},dt,(x,z)=>collision(x,z,false),{neighbors:people,radius:player.radius});
     if(running&&hubWorld)updateBusinessZone();
     if(player.grounded){footstepDistance+=travelled;if(footstepDistance>(sprinting ? .95 : .7)){footstepDistance=0;playFootstep();}}
 
@@ -3650,10 +3678,14 @@
 
   function openDecisionsFrom3D(category) {
     running = false;
+    document.activeElement?.blur?.();
+    clearSessionOverlays();
+    player.vx=player.vz=player.speed=0;
+    locked=false;
     document.exitPointerLock?.();
     stopAmbient();
     window.__SIDE_RETURN_TO_3D = true;
-    if (category && bridge().openDecisionCategory) bridge().openDecisionCategory(category);
+    if (typeof category==='string' && bridge().openDecisionCategory) bridge().openDecisionCategory(category);
     else if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
   }
 
@@ -3745,13 +3777,6 @@
         renderInventoryDisplays();updateHUD();updateMinimap();updateHubObjective();
         const selected=cityMap?.zones.find(zone=>zone.id===selectedMapDestination);
         if(selected&&Math.hypot(HUB_OFFSET+selected.x-player.x,selected.z-player.z)<11)selectedMapDestination=null;
-        if(selectedMapDestination&&selected&&hubWaypoint){
-          const station=interactables.find(point=>point.type==='decisionZone'&&point.category===({office:'B',bank:'E',suppliers:'F'}[selectedMapDestination]))
-            ||(selectedMapDestination==='news'?interactables.find(point=>point.type==='news'&&!point.zone):null);
-          const entrance=hubWorld?.entrances.find(item=>item.id===selectedMapDestination);
-          const target=entrance||station||{x:HUB_OFFSET+selected.x,z:selected.z};
-          hubWaypoint.position.set(target.x,0,target.z);hubWaypoint.visible=true;
-        }
         const activeZone=currentInterior||closestCityZone?.(player.x-HUB_OFFSET,player.z,cityMap.zones,11);
         const targetZone=selectedMapDestination||worldDecisionState?.objective?.zoneId||null;
         worldOrientation?.update({player,camera,yaw,now,activeZone,targetZone});
@@ -3907,7 +3932,7 @@
     $3('upgradeWarehouseBtn')?.addEventListener('click',()=>buyUpgrade('warehouse',1500,2));
     document.querySelectorAll('[data-quality]').forEach(btn=>btn.addEventListener('click',()=>setGraphicsQuality(btn.dataset.quality)));
     $3('tutorialNextBtn')?.addEventListener('click',nextTutorial);
-    $3('sim3dDecisionsBtn')?.addEventListener('click', openDecisionsFrom3D);
+    $3('sim3dDecisionsBtn')?.addEventListener('click', () => openDecisionsFrom3D());
     $3('sim3dLobbyBtn')?.addEventListener('click', () => {
       running = false;
       document.exitPointerLock?.();
@@ -4028,6 +4053,8 @@
   }
 
   function returnFromDecisions() {
+    window.__SIDE_RETURN_TO_3D=false;
+    document.activeElement?.blur?.();
     if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
     if (!initialized || !gameSession || gameSession.shiftEnded || sessionContext !== storageContext() ||
         (bridge().canStartSimulation && !bridge().canStartSimulation())) {
@@ -4040,10 +4067,17 @@
     syncSalesFromLedger();
     if (!gameSession) resetGameSession(false);
     running = true;
+    visibilityPaused=document.hidden;
+    pausedFrameDrawn=false;
+    player.vx=player.vz=player.speed=0;
     startAmbient();
     clock?.getDelta();
     message('Cambios aplicados: la boutique, el taller y la atención en caja fueron actualizados con tus decisiones.');
-    setTimeout(() => { resize(); $3('side3dCanvas')?.focus?.(); }, 40);
+    const canvas=$3('side3dCanvas');
+    resize();canvas?.focus?.();
+    if(!matchMedia('(pointer: coarse)').matches){
+      try{canvas?.requestPointerLock?.()?.catch?.(()=>{});}catch{/* a subsequent canvas click retries when a gesture is required */}
+    }
     return true;
   }
 

@@ -406,8 +406,8 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden')){closeModal();return;}
   if(e.key!=='Escape')return;
-  if(!$('modalRoot')?.classList.contains('hidden')){closeModal();return;}
   if($('decisionMenu')?.classList.contains('hidden'))return;
   // The review dialog keeps its native Escape behavior; a second Escape exits the tablet.
   if($('companyReviewDialog')?.open)return;
