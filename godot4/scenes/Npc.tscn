@@ -8,7 +8,7 @@ height = 1.8
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_npc"]
 radius = 0.31
-height = 1.35
+height = 1.65
 radial_segments = 16
 rings = 8
 
@@ -23,7 +23,7 @@ size = Vector3(0.16, 0.62, 0.37)
 
 [node name="Npc" type="CharacterBody3D"]
 collision_layer = 2
-collision_mask = 1
+collision_mask = 7
 script = ExtResource("1_npc")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -36,6 +36,8 @@ height = 1.8
 path_desired_distance = 0.35
 target_desired_distance = 0.45
 avoidance_enabled = true
+avoidance_layers = 1
+avoidance_mask = 3
 neighbor_distance = 2.0
 max_neighbors = 8
 time_horizon_agents = 1.5
@@ -43,7 +45,7 @@ time_horizon_agents = 1.5
 [node name="Visual" type="Node3D" parent="."]
 
 [node name="Body" type="MeshInstance3D" parent="Visual"]
-position = Vector3(0, 0.83, 0)
+position = Vector3(0, 0.825, 0)
 mesh = SubResource("CapsuleMesh_npc")
 
 [node name="Head" type="MeshInstance3D" parent="Visual"]

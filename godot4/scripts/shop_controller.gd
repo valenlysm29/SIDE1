@@ -14,6 +14,7 @@ signal door_body_exited(body: Node3D)
 
 var _occupants: Array[Node3D] = []
 var _browse_cursor: int = 0
+var _browse_reservations: Dictionary = {}
 var _box_batches: Dictionary = {}
 var _torus_batches: Dictionary = {}
 var _grain_cache: Dictionary = {}
@@ -45,6 +46,7 @@ func try_enter(npc: Node3D) -> bool:
 
 
 func exit_shop(npc: Node3D) -> void:
+	release_browse_point(npc)
 	if _occupants.has(npc):
 		_occupants.erase(npc)
 		capacity_changed.emit(_occupants.size(), max_capacity)
@@ -62,13 +64,32 @@ func get_exit_point() -> Vector3:
 	return _exit.global_position
 
 
-func get_browse_point() -> Vector3:
+func get_browse_point(visitor: Node3D = null) -> Vector3:
 	var count := _browse_points.get_child_count()
 	if count == 0:
 		return _entry.global_position
-	var point := _browse_points.get_child(_browse_cursor % count) as Marker3D
-	_browse_cursor += 1
-	return point.global_position
+	if visitor != null:
+		release_browse_point(visitor)
+	# Reservar también mientras se camina: nadie espera sobre el destino de otro.
+	for offset: int in range(count):
+		var slot: int = (_browse_cursor + offset) % count
+		var point := _browse_points.get_child(slot) as Marker3D
+		if _browse_reservations.has(point):
+			var occupant: Node3D = _browse_reservations[point] as Node3D
+			if is_instance_valid(occupant):
+				continue
+			_browse_reservations.erase(point)
+		_browse_cursor = slot + 1
+		if visitor != null:
+			_browse_reservations[point] = visitor
+		return point.global_position
+	return Vector3(INF, INF, INF)
+
+
+func release_browse_point(visitor: Node3D) -> void:
+	for point: Variant in _browse_reservations.keys():
+		if not is_instance_valid(_browse_reservations[point]) or _browse_reservations[point] == visitor:
+			_browse_reservations.erase(point)
 
 
 func _build_shop() -> void:
@@ -90,7 +111,7 @@ func _build_shop() -> void:
 		_box(_display, Vector3(side * 1.08, 2.45, 4.94), Vector3(0.14, 4.9, 0.18), metal, true)
 		_box(_display, Vector3(side * 3.55, 4.83, 4.97), Vector3(4.9, 0.14, 0.2), metal)
 		_box(_display, Vector3(side * 5.45, 0.12, 0), Vector3(0.68, 0.24, 10), dark_wood)
-	_box(_display, Vector3(0, 3.9, 4.94), Vector3(2.25, 1.95, 0.14), wall)
+	_box(_display, Vector3(0, 3.9, 4.94), Vector3(2.25, 1.95, 0.14), wall, true)
 	# Cornisa abierta: la cámara elevada debe ver la exhibición desde arriba.
 	for side in [-1.0, 1.0]:
 		_box(_display, Vector3(side * 5.9, 4.86, 0), Vector3(0.2, 0.13, 10), wall)
@@ -112,11 +133,12 @@ func _build_shop() -> void:
 	var index := 0
 	for x in [-4.75, 4.75]:
 		for z in [-2.65, 2.1]:
-			for y in [0.82, 1.65, 2.48]:
+			# La base del producto coincide con la cara superior de cada estante.
+			for y in [0.56, 1.39, 2.22]:
 				_bag(Vector3(x, y, z), index % 3, palette[index % 3], trim, gold, zipper)
 				index += 1
 	for x in [-0.72, 0.72]:
-		_bag(Vector3(x, 0.93, -1.55), (index + 1) % 3, palette[(index + 1) % 3], trim, gold, zipper)
+		_bag(Vector3(x, 0.82, -1.55), (index + 1) % 3, palette[(index + 1) % 3], trim, gold, zipper)
 		index += 1
 	for x in [-3.6, -1.8, 0.0, 1.8, 3.6]:
 		var lamp := OmniLight3D.new()
@@ -187,10 +209,11 @@ func _bag(at: Vector3, style: int, main: Material, trim: Material, gold: Materia
 
 
 func _box(parent: Node3D, at: Vector3, size: Vector3, surface: Material, collision: bool = false) -> void:
-	# Agrupa geometría idéntica en la coordenada local de Display.
-	var by_size: Dictionary = _box_batches.get_or_add(surface, {})
-	var transforms: Array = by_size.get_or_add(size, [])
-	transforms.append(parent.transform * Transform3D(Basis.IDENTITY, at) if parent != _display else Transform3D(Basis.IDENTITY, at))
+	# Una caja unidad por material conserva forma y UV; el tamaño vive en cada instancia.
+	# No fragmentar por medidas evita una llamada de dibujo por cada pieza diferente.
+	var transforms: Array = _box_batches.get_or_add(surface, [])
+	var local := Transform3D(Basis.IDENTITY.scaled(size), at)
+	transforms.append(parent.transform * local if parent != _display else local)
 	if collision:
 		_solid(parent, at, size)
 
@@ -199,7 +222,7 @@ func _solid(parent: Node3D, at: Vector3, size: Vector3) -> void:
 	var body := StaticBody3D.new()
 	body.name = "Solid"
 	body.collision_layer = 1
-	body.collision_mask = 3
+	body.collision_mask = 6
 	body.position = at
 	var shape := BoxShape3D.new()
 	shape.size = size
@@ -219,12 +242,10 @@ func _torus(parent: Node3D, at: Vector3, radius: float, tube: float, surface: Ma
 
 func _flush_mesh_batches() -> void:
 	for surface: Material in _box_batches:
-		var by_size: Dictionary = _box_batches[surface]
-		for size: Vector3 in by_size:
-			var mesh := BoxMesh.new()
-			mesh.size = size
-			mesh.material = surface
-			_add_multimesh(mesh, by_size[size])
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3.ONE
+		mesh.material = surface
+		_add_multimesh(mesh, _box_batches[surface])
 	for surface: Material in _torus_batches:
 		var by_shape: Dictionary = _torus_batches[surface]
 		for shape: Vector2 in by_shape:
@@ -279,7 +300,12 @@ func _textured_mat(color: Color, woven: bool) -> StandardMaterial3D:
 			normal.set_pixel(x, y, Color(clampf(0.5 - dx * 0.45, 0.0, 1.0), clampf(0.5 - dy * 0.45, 0.0, 1.0), 0.98))
 			var rv := (0.78 if woven else 0.54) + grain * 0.12
 			rough.set_pixel(x, y, Color(rv, rv, rv))
+	# Filtrar a distancia evita que la trama fina de tela/cuero parpadee al caminar.
+	albedo.generate_mipmaps()
+	normal.generate_mipmaps(true)
+	rough.generate_mipmaps()
 	var result := StandardMaterial3D.new()
+	result.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	result.albedo_texture = ImageTexture.create_from_image(albedo)
 	result.normal_enabled = true
 	result.normal_texture = ImageTexture.create_from_image(normal)

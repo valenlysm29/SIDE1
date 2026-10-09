@@ -62,6 +62,7 @@ func _run() -> void:
 func _place(point: Vector3) -> void:
 	_player.global_position = point
 	_player.velocity = Vector3.ZERO
+	_player.reset_physics_interpolation()
 	for frame in range(12):
 		await physics_frame
 

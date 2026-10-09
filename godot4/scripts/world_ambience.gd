@@ -85,23 +85,39 @@ static func _build_plaza_details(parent: Node3D, materials: Dictionary) -> void:
 
 
 static func _build_boundary(parent: Node3D, materials: Dictionary) -> void:
-	# El borde visible coincide con map_limit del jugador, sin muro invisible.
+	# Valla visible y sólida: contiene a los actores incluso durante un salto.
 	var fence: Array[Transform3D] = []
 	for side in [-1.0, 1.0]:
-		for height in [0.45, 1.0]:
+		for height in [0.45, 1.0, 1.65, 2.2]:
 			fence.append(_box_transform(Vector3(side * 87.92, height, 0), Vector3(0.12, 0.12, 176)))
 			fence.append(_box_transform(Vector3(0, height, side * 87.92), Vector3(176, 0.12, 0.12)))
 		for coordinate in range(-88, 89, 4):
-			fence.append(_box_transform(Vector3(side * 87.92, 0.6, coordinate), Vector3(0.16, 1.2, 0.16)))
-			fence.append(_box_transform(Vector3(coordinate, 0.6, side * 87.92), Vector3(0.16, 1.2, 0.16)))
-	_batch(parent, "LimiteVisibleDelBarrio", materials["wood"], fence, 0.0)
+			fence.append(_box_transform(Vector3(side * 87.92, 1.2, coordinate), Vector3(0.16, 2.4, 0.16)))
+			fence.append(_box_transform(Vector3(coordinate, 1.2, side * 87.92), Vector3(0.16, 2.4, 0.16)))
+		_boundary_solid(parent, Vector3(side * 87.92, 1.2, 0), Vector3(0.16, 2.4, 176))
+		_boundary_solid(parent, Vector3(0, 1.2, side * 87.92), Vector3(176, 2.4, 0.16))
+	_batch(parent, "LimiteVisibleDelBarrio", materials["wood"], fence)
+
+
+static func _boundary_solid(parent: Node3D, at: Vector3, size: Vector3) -> void:
+	var body := StaticBody3D.new()
+	body.name = "BoundaryCollision"
+	body.position = at
+	body.collision_layer = 1
+	body.collision_mask = 6
+	var box := BoxShape3D.new()
+	box.size = size
+	var collider := CollisionShape3D.new()
+	collider.shape = box
+	body.add_child(collider)
+	parent.add_child(body)
 
 
 static func _box_transform(at: Vector3, size: Vector3) -> Transform3D:
 	return Transform3D(Basis.IDENTITY.scaled(size), at)
 
 
-static func _batch(parent: Node3D, node_name: String, surface: Material, transforms: Array[Transform3D], view_end: float = 0.0) -> void:
+static func _batch(parent: Node3D, node_name: String, surface: Material, transforms: Array[Transform3D]) -> void:
 	var multi := MultiMesh.new()
 	multi.transform_format = MultiMesh.TRANSFORM_3D
 	multi.mesh = BoxMesh.new()
@@ -113,7 +129,6 @@ static func _batch(parent: Node3D, node_name: String, surface: Material, transfo
 	instance.multimesh = multi
 	instance.material_override = surface
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	instance.visibility_range_end = view_end
 	parent.add_child(instance)
 
 
@@ -131,5 +146,5 @@ static func _sign(parent: Node3D, text: String, at: Vector3, heading: float, fon
 	label.shaded = false
 	label.double_sided = true
 	label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	label.visibility_range_end = 65.0
+	# También los carteles conservan continuidad visual al recorrer el barrio.
 	parent.add_child(label)

@@ -1,5 +1,11 @@
 # Mundo continuo de Godot
 
+**Documento histórico.** La validación vigente a 1080p y 24 NPC, con
+contactos entre personajes, props sólidos y geometría sin cortes de distancia,
+está en [GODOT_VALIDACION_1080_2026_10_09.md](GODOT_VALIDACION_1080_2026_10_09.md).
+Las cifras a 720p y el comportamiento LOD descritos aquí corresponden
+a la intervención anterior.
+
 Proyecto: `godot4/project.godot`. Rama de trabajo:
 `codex/godot-world-continuity`. Esta entrega corresponde al proyecto Godot,
 independiente del simulador web de SIDE1. Se conserva el estilo urbano y se

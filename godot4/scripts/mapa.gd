@@ -57,7 +57,7 @@ func _make_materials() -> void:
 	}
 
 
-func _box(name: String, position: Vector3, size: Vector3, material: Material, parent: Node3D = _city, collision: bool = false, view_end: float = 0.0) -> MeshInstance3D:
+func _box(name: String, position: Vector3, size: Vector3, material: Material, parent: Node3D = _city, collision: bool = false) -> MeshInstance3D:
 	var mesh := MeshInstance3D.new()
 	mesh.name = name
 	var box := BoxMesh.new()
@@ -66,20 +66,26 @@ func _box(name: String, position: Vector3, size: Vector3, material: Material, pa
 	mesh.material_override = material
 	mesh.position = position
 	mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	if view_end > 0.0:
-		mesh.visibility_range_end = view_end
+	# El barrio completo conserva su geometría; ningún sólido se oculta por distancia.
 	parent.add_child(mesh)
 	if collision:
-		var body := StaticBody3D.new()
-		body.name = name + "Collision"
-		body.position = position
-		var shape := CollisionShape3D.new()
-		var collision_box := BoxShape3D.new()
-		collision_box.size = size
-		shape.shape = collision_box
-		body.add_child(shape)
-		parent.add_child(body)
+		_solid_box(name + "Collision", position, size, parent)
 	return mesh
+
+
+func _solid_box(node_name: String, at: Vector3, size: Vector3, parent: Node3D = _city) -> void:
+	# El tamaño vive en Shape3D: no escalar nodos físicos ni la cápsula del actor.
+	var body := StaticBody3D.new()
+	body.name = node_name
+	body.position = at
+	body.collision_layer = 1
+	body.collision_mask = 6
+	var collider := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = size
+	collider.shape = box
+	body.add_child(collider)
+	parent.add_child(body)
 
 
 func _make_environment() -> void:
@@ -131,11 +137,11 @@ func _make_ground_and_roads() -> void:
 			else:
 				lane_ns_far.append(_box_transform(Vector3(coordinate, 0.003, stripe), Vector3(0.13, 0.002, 3.3)))
 				lane_ew_far.append(_box_transform(Vector3(stripe, 0.003, coordinate), Vector3(3.3, 0.002, 0.13)))
-		# Lotes por tramo conservan el descarte por distancia de las marcas.
-		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_near, 95, _city, true)
-		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_far, 95, _city, true)
-		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_near, 95, _city, true)
-		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_far, 95, _city, true)
+		# Lotes por tramo conservan el descarte por encuadre, sin cortes de distancia.
+		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_near, _city, true)
+		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_far, _city, true)
+		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_near, _city, true)
+		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_far, _city, true)
 	# Los paseos centrales conectan la tienda con ambas plazas.
 	_box("CentralWalk_EW", Vector3(0, -0.022, 0), Vector3(42, 0.05, 15), _materials.paving)
 	_box("CentralWalk_NS", Vector3(0, -0.021, 0), Vector3(15, 0.05, 42), _materials.paving)
@@ -147,7 +153,7 @@ func _make_ground_and_roads() -> void:
 			var crosswalk: Array[Transform3D] = []
 			for offset in range(-4, 5):
 				crosswalk.append(_box_transform(Vector3(x + offset * 0.85, 0.005, z), Vector3(0.5, 0.002, 7.4)))
-			_multimesh("Crosswalk", unit_box, _materials.line, crosswalk, 95, _city, true)
+			_multimesh("Crosswalk", unit_box, _materials.line, crosswalk, _city, true)
 
 
 func _make_buildings() -> void:
@@ -163,30 +169,30 @@ func _make_buildings() -> void:
 			_city.add_child(building)
 			_box("Facade", Vector3(0, height * 0.5, 0), Vector3(BUILDING_WIDTH, height, BUILDING_DEPTH), palette[index % 3], building, true)
 			_box("Roof", Vector3(0, height + 0.18, 0), Vector3(BUILDING_WIDTH + 0.5, 0.36, BUILDING_DEPTH + 0.5), _materials.roof, building)
-			# Ventanas lejanas se ocultan por distancia; la fachada conserva su volumen.
+			# Las ventanas permanecen presentes en toda la extensión del barrio.
 			var windows: Array[Transform3D] = []
 			for floor_index in range(1, int(height / 3.0)):
 				for side in [-1.0, 1.0]:
 					for window_x in [-4.5, -1.5, 1.5, 4.5]:
 						windows.append(_box_transform(Vector3(window_x, floor_index * 3.0, side * (BUILDING_DEPTH * 0.5 + 0.025)), Vector3(1.5, 1.6, 0.05)))
-			# Un lote por edificio mantiene la distancia de visibilidad local.
-			_multimesh("Windows", unit_box, _materials.glass, windows, 75, building, true)
+			# Un lote por edificio mantiene el descarte local por encuadre.
+			_multimesh("Windows", unit_box, _materials.glass, windows, building, true)
 			index += 1
 
 
 func _make_plazas() -> void:
 	for center in [Vector3(-36, 0, 0), Vector3(36, 0, 0), Vector3(0, 0, -36), Vector3(0, 0, 36)]:
 		_box("Plaza", center + Vector3(0, -0.021, 0), Vector3(15, 0.05, 15), _materials.paving)
-		_box("Planter", center + Vector3(5.3, 0.28, 5.3), Vector3(2.1, 0.55, 2.1), _materials.brick, _city, true, 90)
-		_box("BenchSeat", center + Vector3(-4.2, 0.57, 4.8), Vector3(2.2, 0.14, 0.65), _materials.wood, _city, false, 90)
-		_box("BenchBack", center + Vector3(-4.2, 0.96, 5.1), Vector3(2.2, 0.9, 0.12), _materials.wood, _city, false, 90)
+		_box("Planter", center + Vector3(5.3, 0.28, 5.3), Vector3(2.1, 0.55, 2.1), _materials.brick, _city, true)
+		_box("BenchSeat", center + Vector3(-4.2, 0.57, 4.8), Vector3(2.2, 0.14, 0.65), _materials.wood, _city, true)
+		_box("BenchBack", center + Vector3(-4.2, 0.96, 5.1), Vector3(2.2, 0.9, 0.12), _materials.wood, _city, true)
 
 
 func _box_transform(position: Vector3, size: Vector3) -> Transform3D:
 	return Transform3D(Basis.IDENTITY.scaled(size), position)
 
 
-func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[Transform3D], view_end: float = 0.0, parent: Node3D = null, shadows: bool = false) -> void:
+func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[Transform3D], parent: Node3D = null, shadows: bool = false) -> void:
 	var batch := MultiMesh.new()
 	batch.transform_format = MultiMesh.TRANSFORM_3D
 	batch.mesh = mesh
@@ -198,8 +204,6 @@ func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[
 	instance.multimesh = batch
 	instance.material_override = material
 	instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadows else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	if view_end > 0.0:
-		instance.visibility_range_end = view_end
 	if parent == null:
 		_city.add_child(instance)
 	else:
@@ -209,13 +213,15 @@ func _multimesh(name: String, mesh: Mesh, material: Material, transforms: Array[
 func _make_street_furniture() -> void:
 	var posts: Array[Transform3D] = []
 	var heads: Array[Transform3D] = []
-	for x in [-72.0, -28.0, 28.0, 72.0]:
+	# Alinear las farolas con las calles, fuera del volumen de los edificios.
+	for x in [-70.0, -18.0, 18.0, 70.0]:
 		for z in range(-64, 65, 16):
-			posts.append(Transform3D(Basis.IDENTITY.scaled(Vector3(0.13, 5.8, 0.13)), Vector3(x + 7.0, 2.9, z)))
-			heads.append(Transform3D(Basis.IDENTITY.scaled(Vector3(1.1, 0.2, 0.55)), Vector3(x + 7.0, 5.8, z)))
+			posts.append(Transform3D(Basis.IDENTITY.scaled(Vector3(0.13, 5.8, 0.13)), Vector3(x, 2.9, z)))
+			heads.append(Transform3D(Basis.IDENTITY.scaled(Vector3(1.1, 0.2, 0.55)), Vector3(x, 5.8, z)))
+			_solid_box("StreetLampCollision", Vector3(x, 2.9, z), Vector3(0.13, 5.8, 0.13))
 	var unit_box := BoxMesh.new()
-	_multimesh("StreetLampPosts", unit_box, _materials.metal, posts, 110)
-	_multimesh("StreetLampHeads", unit_box, _materials.line, heads, 110)
+	_multimesh("StreetLampPosts", unit_box, _materials.metal, posts)
+	_multimesh("StreetLampHeads", unit_box, _materials.line, heads)
 
 
 func _make_vegetation() -> void:
@@ -228,10 +234,12 @@ func _make_vegetation() -> void:
 				continue
 			trunks.append(Transform3D(Basis.IDENTITY.scaled(Vector3(0.35, 4.2, 0.35)), Vector3(x, 2.1, z)))
 			crowns.append(Transform3D(Basis.IDENTITY.scaled(Vector3(3.0, 3.2, 3.0)), Vector3(x, 5.1, z)))
+			# Envolvente conservadora del tronco cilíndrico; también alimenta el navmesh.
+			_solid_box("TreeTrunkCollision", Vector3(x, 2.1, z), Vector3(0.35, 4.2, 0.35))
 	var trunk_mesh := CylinderMesh.new()
 	var crown_mesh := SphereMesh.new()
-	_multimesh("TreeTrunks", trunk_mesh, _materials.wood, trunks, 105)
-	_multimesh("TreeCrowns", crown_mesh, _materials.leaves, crowns, 105)
+	_multimesh("TreeTrunks", trunk_mesh, _materials.wood, trunks)
+	_multimesh("TreeCrowns", crown_mesh, _materials.leaves, crowns)
 
 
 func _make_navigation_mesh() -> void:

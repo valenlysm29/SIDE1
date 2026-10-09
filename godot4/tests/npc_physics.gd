@@ -27,8 +27,8 @@ func _run() -> void:
 		return
 	first.set_full_detail(false)
 	first._on_safe_velocity(Vector3(2.0, 0.0, 0.0))
-	if first.global_position != before or first._has_safe_velocity:
-		_fail("Un callback pendiente siguió activo después del cambio de LOD")
+	if first.global_position != before or not first.navigation_agent.avoidance_enabled:
+		_fail("El cambio LOD movió el cuerpo o quitó su presencia de evitación")
 		return
 	var minimum_y: float = 100.0
 	for frame in range(1200):
@@ -39,6 +39,11 @@ func _run() -> void:
 		await physics_frame
 		for npc: ShopNpc in npcs:
 			minimum_y = minf(minimum_y, npc.global_position.y)
+			var body: MeshInstance3D = npc.get_node("Visual/Body") as MeshInstance3D
+			var capsule: CapsuleMesh = body.mesh as CapsuleMesh
+			if absf(npc.visual.position.y) > 0.0001 or absf(body.position.y - capsule.height * 0.5) > 0.0001:
+				_fail("La animación o malla levantó los pies del NPC")
+				return
 			if npc.global_position.y < -0.05:
 				_fail("Caída con alternancia LOD: %s position=%s state=%d" % [npc.name, npc.global_position, npc.state])
 				return
@@ -51,7 +56,7 @@ func _run() -> void:
 	if first.global_position.y > 0.04 or first.global_position.y < -0.05 or not first.is_on_floor():
 		_fail("IDLE suspendió la gravedad o perdió el suelo: position=%s floor=%s" % [first.global_position, first.is_on_floor()])
 		return
-	print("NPC_PHYSICS_OK: 24 arranques en y=0, callback sin movimiento, 100 cambios LOD y gravedad IDLE; minimum_y=%.5f" % minimum_y)
+	print("NPC_PHYSICS_OK: 24 arranques en y=0, callback sin movimiento, 100 cambios LOD, pies visuales apoyados y gravedad IDLE; minimum_y=%.5f" % minimum_y)
 	quit(0)
 
 

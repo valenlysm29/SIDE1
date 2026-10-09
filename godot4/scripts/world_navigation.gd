@@ -10,7 +10,8 @@ const CELL_SIZE: float = 0.01
 
 static func build(region: NavigationRegion3D, source_root: Node3D) -> void:
 	# Los polígonos manuales no aplican agent_radius: el margen se calcula aquí.
-	var extent: float = HALF_MAP - AGENT_RADIUS
+	# Reservar también el grosor interior de la valla perimetral.
+	var extent: float = HALF_MAP - AGENT_RADIUS - 0.2
 	var obstacles: Array[Rect2] = _collect_obstacles(source_root)
 	var cuts_x: Array[float] = [-extent, extent]
 	var cuts_z: Array[float] = [-extent, extent]

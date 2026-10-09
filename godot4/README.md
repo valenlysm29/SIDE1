@@ -1,7 +1,7 @@
 # SIDE Ciudad de Bolsos — Godot 4
 
 Proyecto Godot 4 independiente del simulador web que permanece en la raíz de
-`SIDE1`. Abre `godot4/project.godot` con Godot 4 y ejecuta la escena principal.
+`SIDE1`. Abre `godot4/project.godot` con Godot 4.4 o posterior y ejecuta la escena principal.
 El barrio tiene suelo físico continuo, jugador controlable y 24 NPC
 persistentes distribuidos entre calles, plazas y tienda.
 
@@ -23,8 +23,14 @@ derecho para girar la cámara y Tab para alternar el panorama del barrio.
 ## Comprobación
 
 Ejecuta los comandos desde la raíz **SIDE1**. La
-[guía de entrega](../docs/GODOT_MUNDO_CONTINUO.md) incluye configuración,
+[guía de entrega a 1080p](../docs/GODOT_VALIDACION_1080_2026_10_09.md) incluye configuración,
 lista de archivos, pruebas manuales y comandos PowerShell con logs locales.
 Las pruebas cubren soporte físico, cruces con teclado real, rutas libres de
 obstáculos, población persistente, aforo y visitas completas. La navegación
 se genera al iniciar; sus polígonos no se guardan como recurso binario.
+
+Para ejecutar la regresión desde SIDE1:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File tests/run_godot_qa.ps1
+```

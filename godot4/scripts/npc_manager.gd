@@ -69,26 +69,36 @@ func _spawn_one(initial: bool) -> void:
 	if spawn_positions.is_empty() or get_population().size() >= max_npcs:
 		return
 	var slot: int = _spawn_index % spawn_positions.size()
-	if not initial:
-		# Las reposiciones solamente ocurren lejos y fuera del encuadre.
-		var camera: Camera3D = get_viewport().get_camera_3d()
-		var found: bool = false
-		for offset in range(spawn_positions.size()):
-			var candidate_slot: int = (_spawn_index + offset) % spawn_positions.size()
-			var candidate: Vector3 = to_global(spawn_positions[candidate_slot])
+	var camera: Camera3D = get_viewport().get_camera_3d()
+	var found: bool = false
+	var spawn: Vector3 = Vector3.ZERO
+	var population: Array[ShopNpc] = get_population()
+	for offset in range(spawn_positions.size()):
+		var candidate_slot: int = (_spawn_index + offset) % spawn_positions.size()
+		var candidate: Vector3 = to_global(spawn_positions[candidate_slot])
+		var occupied: bool = false
+		for other: ShopNpc in population:
+			if other.global_position.distance_to(candidate) < 1.1:
+				occupied = true
+				break
+		if occupied:
+			continue
+		if not initial:
+			# Buscar todos los puntos libres; nunca reponer dentro del encuadre.
 			if camera != null and camera.is_position_in_frustum(candidate + Vector3.UP):
 				continue
 			if candidate.distance_to(_observer_position()) < detail_distance + detail_hysteresis:
 				continue
-			slot = candidate_slot
-			found = true
-			break
-		if not found:
-			return
-	var spawn: Vector3 = spawn_positions[slot]
-	for other: ShopNpc in get_population():
-		if other.global_position.distance_to(to_global(spawn)) < 1.1:
-			return
+			var supported: Vector3 = _supported_spawn(candidate)
+			if not supported.is_finite():
+				continue
+			candidate = supported
+		slot = candidate_slot
+		spawn = to_local(candidate)
+		found = true
+		break
+	if not found:
+		return
 	var npc: ShopNpc = NPC_SCENE.instantiate() as ShopNpc
 	npc.name = "Vecino_%02d" % _spawn_index
 	# Separación inicial para que la cápsula se asiente desde arriba de la losa.
@@ -100,6 +110,33 @@ func _spawn_one(initial: bool) -> void:
 	add_child(npc)
 	_spawn_index += 1
 	npc.call_deferred("start_persistent_life", slot == 0, slot == 2 or slot == 3)
+
+
+func _supported_spawn(candidate: Vector3) -> Vector3:
+	# Sólo reposiciones: al arrancar Main todavía está construyendo sus sólidos.
+	var invalid: Vector3 = Vector3(INF, INF, INF)
+	var map_rid: RID = get_world_3d().navigation_map
+	if NavigationServer3D.map_get_iteration_id(map_rid) == 0:
+		return invalid
+	var projected: Vector3 = NavigationServer3D.map_get_closest_point(map_rid, candidate)
+	if projected.distance_to(candidate) > 0.30:
+		return invalid
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var ray := PhysicsRayQueryParameters3D.create(projected + Vector3.UP * 0.5, projected - Vector3.UP, 1)
+	var ground: Dictionary = space.intersect_ray(ray)
+	if ground.is_empty() or (ground.normal as Vector3).dot(Vector3.UP) < cos(deg_to_rad(45.0)):
+		return invalid
+	var supported: Vector3 = ground.position as Vector3
+	if absf(supported.y - projected.y) > 0.25:
+		return invalid
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = 0.34
+	capsule.height = 1.8
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = capsule
+	query.collision_mask = 7
+	query.transform = Transform3D(Basis.IDENTITY, supported + Vector3.UP * 0.95)
+	return supported if space.intersect_shape(query, 1).is_empty() else invalid
 
 
 func _observer_position() -> Vector3:

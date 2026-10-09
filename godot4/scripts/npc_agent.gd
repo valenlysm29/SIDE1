@@ -28,6 +28,12 @@ var _next_path_point: Vector3 = Vector3.ZERO
 var _gravity: float = 9.8
 var _safe_horizontal_velocity: Vector3 = Vector3.ZERO
 var _has_safe_velocity: bool = false
+var _progress_elapsed: float = 0.0
+var _progress_origin: Vector3 = Vector3.ZERO
+var _blocked_samples: int = 0
+var _resume_destination: Vector3 = Vector3.ZERO
+var _taking_detour: bool = false
+var _waiting_for_browse: bool = false
 var _animation_playback: AnimationNodeStateMachinePlayback
 var _rng := RandomNumberGenerator.new()
 static var _color_materials: Dictionary = {}
@@ -42,8 +48,10 @@ func _ready() -> void:
 	up_direction = Vector3.UP
 	floor_max_angle = deg_to_rad(45.0)
 	_gravity = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
-	# Las pausas conservan Timer y FSM, sin gastar actualizaciones RVO.
-	navigation_agent.avoidance_enabled = false
+	# Un peatón quieto o lejano sigue siendo un obstáculo para sus vecinos.
+	navigation_agent.avoidance_enabled = true
+	navigation_agent.avoidance_layers = 1
+	navigation_agent.avoidance_mask = 3
 	navigation_agent.radius = 0.38
 	navigation_agent.max_speed = walk_speed
 	navigation_agent.velocity_computed.connect(_on_safe_velocity)
@@ -75,7 +83,6 @@ func set_full_detail(enabled: bool) -> void:
 	full_detail = enabled
 	# Las personas lejanas siguen moviéndose y colisionando, sin desaparecer.
 	animation_tree.active = enabled
-	navigation_agent.avoidance_enabled = enabled and state != State.IDLE and state != State.INTERACT
 	_has_safe_velocity = false
 	_path_refresh_remaining = 0.0
 
@@ -99,9 +106,14 @@ func start_visit() -> void:
 func set_state(next_state: State) -> void:
 	wait_timer.stop()
 	state = next_state
+	if state != State.IDLE:
+		_waiting_for_browse = false
 	var is_waiting := state == State.IDLE or state == State.INTERACT
-	navigation_agent.avoidance_enabled = full_detail and not is_waiting
 	_has_safe_velocity = false
+	_progress_elapsed = 0.0
+	_progress_origin = global_position
+	_blocked_samples = 0
+	_taking_detour = false
 	if is_waiting:
 		velocity = Vector3.ZERO
 	match state:
@@ -140,10 +152,11 @@ func _physics_process(delta: float) -> void:
 	velocity.x = horizontal_velocity.x
 	velocity.z = horizontal_velocity.z
 	move_and_slide()
+	_update_progress(delta, desired_velocity)
 
 
 func _on_safe_velocity(safe_velocity: Vector3) -> void:
-	if not navigation_agent.avoidance_enabled or state == State.IDLE or state == State.INTERACT:
+	if not navigation_agent.avoidance_enabled:
 		return
 	_safe_horizontal_velocity = Vector3(safe_velocity.x, 0.0, safe_velocity.z)
 	_has_safe_velocity = true
@@ -153,9 +166,72 @@ func _set_destination(point: Vector3) -> void:
 	var map_rid: RID = get_world_3d().navigation_map
 	navigation_agent.target_position = NavigationServer3D.map_get_closest_point(map_rid, point) if _navigation_ready else point
 	_path_refresh_remaining = 0.0
+	_progress_elapsed = 0.0
+	_progress_origin = global_position
+	_blocked_samples = 0
+	_taking_detour = false
+
+
+func _update_progress(delta: float, desired_velocity: Vector3) -> void:
+	# Recuperar rutas bloqueadas sin mover cuerpos por teletransporte ni cambiar FSM.
+	if desired_velocity.length_squared() < 0.01:
+		_progress_elapsed = 0.0
+		_progress_origin = global_position
+		return
+	_progress_elapsed += delta
+	if _progress_elapsed < 1.5:
+		return
+	var travelled: Vector3 = global_position - _progress_origin
+	travelled.y = 0.0
+	_progress_elapsed = 0.0
+	_progress_origin = global_position
+	if travelled.length() >= 0.15:
+		_blocked_samples = 0
+		return
+	_blocked_samples += 1
+	_path_refresh_remaining = 0.0
+	_has_safe_velocity = false
+	# Volver a consultar el corredor permite resolver pequeños bloqueos transitorios.
+	navigation_agent.target_position = navigation_agent.target_position
+	if _blocked_samples < 2:
+		return
+	_try_local_detour()
+
+
+func _try_local_detour() -> void:
+	var original: Vector3 = _resume_destination if _taking_detour else navigation_agent.target_position
+	var forward: Vector3 = original - global_position
+	forward.y = 0.0
+	forward = forward.normalized() if forward.length_squared() > 0.01 else Vector3.FORWARD
+	var map_rid: RID = get_world_3d().navigation_map
+	var space: PhysicsDirectSpaceState3D = get_world_3d().direct_space_state
+	var capsule: Shape3D = ($CollisionShape3D as CollisionShape3D).shape
+	for angle: float in [PI * 0.5, -PI * 0.5, PI * 0.75, -PI * 0.75]:
+		var desired: Vector3 = global_position + forward.rotated(Vector3.UP, angle) * 1.8
+		var candidate: Vector3 = NavigationServer3D.map_get_closest_point(map_rid, desired)
+		if candidate.distance_to(desired) > 0.3 or candidate.distance_to(global_position) < 0.8:
+			continue
+		var path: PackedVector3Array = NavigationServer3D.map_get_path(map_rid, global_position, candidate, true)
+		if path.size() < 2 or path[-1].distance_to(candidate) > 0.15:
+			continue
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = capsule
+		query.collision_mask = 7
+		query.exclude = [get_rid()]
+		query.transform = Transform3D(Basis.IDENTITY, candidate + Vector3.UP * 0.92)
+		if not space.intersect_shape(query, 1).is_empty():
+			continue
+		_set_destination(candidate)
+		_resume_destination = original
+		_taking_detour = true
+		return
 
 
 func _on_destination_reached() -> void:
+	if _taking_detour:
+		var destination: Vector3 = _resume_destination
+		_set_destination(destination)
+		return
 	match state:
 		State.WALK_TO_SHOP:
 			if shop == null or not shop.has_capacity():
@@ -185,12 +261,16 @@ func _on_destination_reached() -> void:
 
 
 func _on_wait_complete() -> void:
+	if _waiting_for_browse:
+		_next_browse_stop()
+		return
 	match state:
 		State.INTERACT:
 			browse_stops -= 1
 			if browse_stops > 0:
 				_next_browse_stop()
 			else:
+				shop.release_browse_point(self)
 				set_state(State.EXIT_SHOP)
 				_set_destination(shop.get_exit_point())
 		State.IDLE:
@@ -208,8 +288,15 @@ func _next_browse_stop() -> void:
 	if shop == null:
 		_begin_wander()
 		return
+	var point: Vector3 = shop.get_browse_point(self)
+	_waiting_for_browse = not point.is_finite()
+	if _waiting_for_browse:
+		# Una espera por aforo de exhibición no consume las paradas de la visita.
+		set_state(State.IDLE)
+		_begin_wait(0.5)
+		return
 	set_state(State.BROWSE)
-	_set_destination(shop.get_browse_point())
+	_set_destination(point)
 
 
 func _begin_wander() -> void:
@@ -271,9 +358,10 @@ func _build_animations() -> void:
 		animation.length = 1.0
 		animation.loop_mode = Animation.LOOP_LINEAR
 		var track := animation.add_track(Animation.TYPE_VALUE)
-		animation.track_set_path(track, NodePath("Visual:position"))
+		# El gesto anima la cabeza; los pies permanecen apoyados durante la marcha.
+		animation.track_set_path(track, NodePath("Visual/Head:rotation"))
 		animation.track_insert_key(track, 0.0, Vector3.ZERO)
-		animation.track_insert_key(track, 0.5, Vector3(0.0, 0.09 if name == "walk" else 0.025, 0.0))
+		animation.track_insert_key(track, 0.5, Vector3(0.0, 0.0, 0.04 if name == "walk" else 0.025))
 		animation.track_insert_key(track, 1.0, Vector3.ZERO)
 		library.add_animation(name, animation)
 	animation_player.add_animation_library("", library)
