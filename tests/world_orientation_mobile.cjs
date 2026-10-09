@@ -41,8 +41,15 @@ const overlap=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;
         assert.equal(await page.locator(`.sim-city-zone[data-zone="${target}"]`).isVisible(),true,'active objective icon remains on the minimap');
         assert.match(await page.locator('#simHubDestination').innerText(),/\d+\s*m\b/,'the current objective button keeps its distance');
         const mapBox=await box(page.locator('#simMinimap'));
+        assert.ok(mapBox.x>=0&&mapBox.y>=0&&mapBox.right<=width&&mapBox.bottom<=height,'compact map remains fully inside viewport');
         const movement=page.locator('.sim3d-touch-pad:visible, .sim3d-touch-actions:visible, .sim3d-actionbar:visible, .sim3d-missions:visible');
-        for(let i=0;i<await movement.count();i++)assert.equal(overlap(mapBox,await box(movement.nth(i))),false,'compact map avoids gameplay controls and mission panel');
+        const controls=[];
+        for(let i=0;i<await movement.count();i++)controls.push(await box(movement.nth(i)));
+        fs.writeFileSync(path.join(out,`layout-${width}x${height}.json`),JSON.stringify({map:mapBox,controls},null,2));
+        for(const controlBox of controls){
+          assert.ok(controlBox.x>=0&&controlBox.y>=0&&controlBox.right<=width&&controlBox.bottom<=height,'gameplay controls and mission panel remain inside viewport');
+          assert.equal(overlap(mapBox,controlBox),false,'compact map avoids gameplay controls and mission panel');
+        }
         const expand=page.locator('#simCityMapToggle');await expand.click();
         assert.equal(await page.locator('#simMinimap').evaluate(el=>el.classList.contains('sim-city-map-open')),true);
         await page.screenshot({path:path.join(out,`expanded-${width}x${height}.png`)});

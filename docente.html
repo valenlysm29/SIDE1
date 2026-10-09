@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/docente.css?v=20261001-paneles">
-  <link rel="stylesheet" href="css/responsive.css?v=20260910-2">
+  <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
 </head>
 <body>
 <div class="app-shell">
@@ -23,7 +23,7 @@
       <button class="nav-btn" data-tab="empresas"><span class="nav-icon"><img src="assets/icons/teacher/empresas.svg" alt=""></span><span>Empresas</span></button>
       <button class="nav-btn" data-tab="resultados"><span class="nav-icon"><img src="assets/icons/teacher/resultados.svg" alt=""></span><span>Resultados</span></button>
       <button class="nav-btn" data-tab="podio"><span class="nav-icon"><img src="assets/icons/teacher/podio.svg" alt=""></span><span>Ganador y podio</span></button>
-      <button class="nav-btn" data-tab="historial"><span class="nav-icon"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><span>Decisiones</span></button>
+      <button class="nav-btn" data-tab="historial"><span class="nav-icon"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><span>Historial</span></button>
     </nav>
     <div class="sidebar-bottom">
       <button id="backHome" class="sidebar-link"><img class="button-arrow-icon left" src="assets/icons/ui/arrow-left-thick.svg" alt=""> Volver a inicio</button>
@@ -146,7 +146,7 @@
       <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Califica a todas las empresas activas en Empresas para publicar. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
     </section>
     <section id="tab-historial" class="tab-panel teacher-workspace" aria-labelledby="historyHeading">
-      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Decisiones</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
+      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Historial</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
       <div class="info-banner teacher-guide">Selecciona una empresa y despliega sus ciclos para revisar las decisiones y los resultados registrados. Esta consulta es de solo lectura y se reemplaza al finalizar una nueva partida.</div>
       <p id="historyStatus" class="history-status" role="status" aria-live="polite"></p>
       <div id="historyContent" aria-busy="false"></div>
@@ -192,17 +192,17 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20260924-observations"></script>
-<script src="services/empresa_service.js?v=20260920-2"></script>
+<script src="services/partida_service.js?v=20261009-waiting"></script>
+<script src="services/empresa_service.js?v=20261009-waiting"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
 <script src="js/decision_catalog.js?v=20260930-history"></script>
 <script src="js/teacher_history.js?v=20260930-2"></script>
-<script src="js/side_rules.js?v=20260924-observations"></script>
+<script src="js/side_rules.js?v=20261009-waiting"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
 <script src="js/teacher_podium.js?v=20260929-1"></script>
 <script src="services/teacher_sync.js?v=20260929-1"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20260930-history-2"></script>
+<script src="js/docente.js?v=20261009-waiting-history"></script>
 </body>
 </html>
