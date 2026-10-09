@@ -1,5 +1,9 @@
 # Curación de NPC urbanos para SIDE
 
+Actualización local del 09-10-2026: **17 modelos incorporados** (8 mujeres y 9 hombres). Se conserva íntegro el catálogo previo descrito abajo y se añade únicamente `city_man_farmer` para almacén/proveedor, con camisa, overol y botas de trabajo. Los candidatos Punk permanecen excluidos. La validación y sus límites se detallan en [quaternius_validation_2026-10-09.md](quaternius_validation_2026-10-09.md).
+
+## Estado anterior conservado
+
 Estado: **16 modelos urbanos aprobados e integrados** (8 mujeres y 8 hombres). Se descargaron del espejo GitHub [FreeModels](https://github.com/agentkaerf/FreeModels), se contrastó la licencia CC0 con las páginas oficiales de [Women](https://quaternius.com/packs/ultimatemodularwomen.html) y [Men](https://quaternius.com/packs/ultimatemodularcharacters.html), se renderizó cada candidato para revisar la ropa y se conservaron ocho atuendos apropiados. Se añadieron ocho modelos civiles de los paquetes Animated Men/Women publicados por el autor bajo CC0 y distribuidos en Poly Pizza. Cada GLB tiene skin y clips Idle, Walk y Run del mismo rig. El inventario Mixamo previo sigue descrito en [mixamo_delta_2026-09-29.md](mixamo_delta_2026-09-29.md).
 
 ## Modelos elegibles que quedan excluidos

@@ -211,5 +211,19 @@
     "roles": [
       "proveedor"
     ]
+  },
+  {
+    "id": "city_man_farmer",
+    "nombre": "Proveedor de overol",
+    "genero": "hombre",
+    "rol": "almacen",
+    "roles": [
+      "proveedor"
+    ],
+    "archivo": "assets/models/incoming/quaternius-city/man_farmer.gltf",
+    "altura": 1.76,
+    "licencia": "CC0",
+    "fuente": "Quaternius Ultimate Modular Men",
+    "url": "https://github.com/agentkaerf/FreeModels/blob/main/Ultimate%20Modular%20Men-%20Feb%202022/Individual%20Characters/glTF/Farmer.gltf"
   }
 ]
