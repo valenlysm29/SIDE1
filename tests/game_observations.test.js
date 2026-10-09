@@ -22,16 +22,16 @@ test('game creation distinguishes missing migration from transient network failu
  const window={SIDE:{SupabaseClient:{get:()=>client}}};
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),{window});
  let result=await window.SIDE.PartidaService.crear({nombre:'Prueba',configuracion:{lifecycleVersion:2}});
- assert.match(result.error,/Actualiza Supabase/);assert.equal(inserted,false);
+ assert.match(result.error,/Falta aplicar la migración/);assert.equal(inserted,false);
  failure={code:'',message:'Failed to fetch'};
  result=await window.SIDE.PartidaService.crear({nombre:'Prueba',configuracion:{lifecycleVersion:2}});
- assert.equal(result.error,'Failed to fetch');assert.equal(inserted,false);
+ assert.match(result.error,/conexión con Supabase/);assert.equal(inserted,false);
 });
 test('game creation requires the alphanumeric migration before inserting a remote lobby',async()=>{
  let features={observationsVersion:1},inserted=false;
  const client={
   auth:{getUser:async()=>({data:{user:{id:'teacher'}}})},
-  rpc:async name=>({data:name==='side_game_features'?features:{}}),
+  rpc:async name=>({data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:name==='side_game_features'?features:{codigo:'SIDE-WG2',serverTime:'2026-10-09T00:00:00Z'}}),
   from(){inserted=true;return {insert:()=>({select:()=>({single:async()=>({data:{codigo:'SIDE-WG2'}})})})};}
  };
  const window={SIDE:{SupabaseClient:{get:()=>client}}};
@@ -42,4 +42,17 @@ test('game creation requires the alphanumeric migration before inserting a remot
  features={observationsVersion:1,gameCodeVersion:2};
  result=await window.SIDE.PartidaService.crear(input);
  assert.equal(result.success,true);assert.equal(result.data.codigo,'SIDE-WG2');assert.equal(inserted,true);
+});
+
+
+test('game creation returns the RPC server clock instead of a plain inserted row',async()=>{
+ const created={id:'game',codigo:'SIDE-WG2',configuracion:{lifecycleVersion:2}};
+ const calls=[];
+ const client={auth:{getUser:async()=>({data:{user:{id:'teacher'}}})},
+ rpc:async(name,args)=>{calls.push({name,args});return {data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:name==='side_game_features'?{observationsVersion:1,gameCodeVersion:2}:args?.p_partida_id?{...created,serverTime:'2026-10-09T05:00:00Z'}:{error:'No tienes permiso'}};},
+ from:()=>({insert:()=>({select:()=>({single:async()=>({data:created})})})})};
+ const window={SIDE:{SupabaseClient:{get:()=>client}}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),{window});
+ const result=await window.SIDE.PartidaService.crear({nombre:'Prueba',configuracion:{lifecycleVersion:2}});
+ assert.equal(result.success,true);assert.equal(result.data.serverTime,'2026-10-09T05:00:00Z');
+ assert.equal(calls.at(-1).args.p_accion,'sincronizar');assert.equal(calls.at(-1).args.p_partida_id,'game');
 });

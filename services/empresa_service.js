@@ -54,6 +54,15 @@
     return failure;
   }
 
+  async function admissionReady(sb) {
+    try {
+      const {data,error}=await sb.rpc('side_admission_features');
+      if(error&&!/PGRST202|42883/.test(error.code||''))return technicalFailure(error,'RPC_CAPABILITY_ERROR');
+      if(error||data?.waitingRoomVersion!==3||data?.exactIdentityVersion!==2)return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.'};
+      return null;
+    }catch(error){return technicalFailure(error,'RPC_CAPABILITY_ERROR');}
+  }
+
   function cleanText(value) {
     return String(value || '').normalize('NFC').trim().replace(/\s+/g, ' ');
   }
@@ -79,6 +88,7 @@
       return { success: false, code: 'DATOS_INCOMPLETOS', error: 'Faltan datos de ingreso.' };
     }
     try {
+      const readiness=await admissionReady(sb);if(readiness)return readiness;
       const { data: response, error } = await sb.rpc('ingresar_empresa', {
         p_codigo: codigo,
         p_nombre_legal: nombreLegal,
@@ -103,6 +113,7 @@
           technical: !ADMISSION_REJECTION_CODES.has(code)
         };
       }
+      if(!Number.isFinite(Date.parse(data?.partida?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).'};
       return { success: true, data };
     } catch (err) {
       console.error('SIDE EmpresaService: excepcion en ingresar_empresa', err);
@@ -125,6 +136,7 @@
     const nombreComercial = cleanText(d.nombreComercial);
     if (!codigo || !nombreLegal || !nombreComercial) return { success: false, code: 'CREDENCIALES_INVALIDAS', error: 'No se pudo validar el ingreso.' };
     try {
+      const readiness=await admissionReady(sb);if(readiness)return readiness;
       const { data, error } = await sb.rpc('obtener_estado_estudiante', {
         p_codigo: codigo,
         p_nombre_legal: nombreLegal,
@@ -132,6 +144,7 @@
       });
       if (error) return technicalFailure(error, 'RPC_ESTUDIANTE_ERROR');
       if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
+      if(!Number.isFinite(Date.parse(data?.partida?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).'};
       return { success: true, data };
     } catch (err) {
       return technicalFailure(err, 'RPC_ESTUDIANTE_EXCEPCION');

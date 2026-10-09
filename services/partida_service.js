@@ -72,6 +72,10 @@
         return { success: false, error: 'Debes iniciar sesión como profesor.' };
       }
       if(d.configuracion?.lifecycleVersion===2){
+      const {data:admissionFeatures,error:admissionFeatureError}=await sb.rpc('side_admission_features');
+      if(admissionFeatureError&&!/PGRST202|42883/.test(admissionFeatureError.code||''))return {success:false,error:'No se pudo comprobar la conexión con Supabase. Intenta nuevamente.',code:admissionFeatureError.code};
+      if(admissionFeatureError||admissionFeatures?.waitingRoomVersion!==3||admissionFeatures?.exactIdentityVersion!==2)return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.'};
+
         const {data:features,error:featuresError}=await sb.rpc('side_game_features');
         if(featuresError&&!/PGRST202|42883/.test(featuresError.code||''))return {success:false,error:featuresError.message||'No se pudo comprobar Supabase. Vuelve a intentarlo.'};
         if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql para habilitar cancelación y eventos sin repetición.'};
@@ -90,6 +94,12 @@
       };
       const { data, error } = await sb.from('partidas').insert(payload).select().single();
       if (error) return { success: false, error: error.message };
+      if(d.configuracion?.lifecycleVersion===2){
+        const synced=await controlar(data.id,'sincronizar');
+        if(!synced.success)return {success:false,error:'La partida fue creada, pero no se pudo consultar su reloj del servidor: '+(synced.error||'error de conexión'),data};
+        if(!Number.isFinite(Date.parse(synced.data?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).',data};
+        return synced;
+      }
       return { success: true, data };
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };

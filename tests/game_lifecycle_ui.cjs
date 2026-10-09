@@ -14,7 +14,10 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  async function page(html){const p=await browser.newPage({viewport:{width:1366,height:900}});p.on('pageerror',e=>errors.push(e.message));await p.route('**/*',r=>r.abort());await p.route('http://side.test/**',r=>r.fulfill({contentType:'text/html',body:html}));await p.goto('http://side.test/');return p;}
  async function teacher(){
   const p=await page(teacherHTML);
-  await p.exposeFunction('dbCreate',c=>createGame(db,c));
+  await p.exposeFunction('dbCreate',async c=>{
+    const created=await createGame(db,c);
+    return rpc(db,'controlar_partida',{p_partida_id:created.id,p_accion:'sincronizar',p_config:null,p_expected_round:null});
+  });
   await p.exposeFunction('dbControl',(id,action,c,round)=>rpc(db,'controlar_partida',{p_partida_id:id,p_accion:action,p_config:c,p_expected_round:round}));
   await p.evaluate(()=>{
    SIDE.SupabaseClient.isReady=()=>true;
@@ -55,9 +58,15 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.locator('#integrationDurationMinutes').isVisible(),true);
   assert.equal(await t.locator('#copyGameCode').isDisabled(),true);
   await t.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.copiedText=value;}}}));
-  await t.locator('#saveAll').click();await t.waitForFunction(()=>runtime()?.phase==='integration');
+  await t.locator('#integrationDurationMinutes').fill('3');
+  await t.locator('#startGame').click();
+  await t.waitForFunction(()=>runtime()?.phase==='integration').catch(async error=>{console.error('waiting start diagnostic',await t.evaluate(()=>({toast:$('toast')?.textContent,partidaId:state.partidaId,authoritative:state.authoritative,status:gameStatus()})));throw error;});
   const game=await t.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'Prueba'}));
   assert.match(game.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  const initialWaiting=await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'sincronizar',p_config:{},p_expected_round:null});
+  assert.equal(initialWaiting.configuracion.runtime.phase,'integration');
+  const waitingDeadline=initialWaiting.configuracion.gameStartAt;
+  assert.ok(waitingDeadline,'first start click persists the waiting deadline');
   await t.locator('#copyGameCode').click();assert.equal(await t.evaluate(()=>window.copiedText),game.codigo);
   await t.locator('#copyGameLink').click();assert.equal(await t.evaluate(()=>window.copiedText),'http://side.test/index.html?partida='+game.codigo);
   const invitation=await page(studentHTML);await invitation.goto('http://side.test/index.html?partida='+game.codigo);
@@ -67,6 +76,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await s1.locator('#studentWaiting').isVisible(),true);
   assert.match(await s1.locator('#waitingCompanies').innerText(),/2 empresas unidas/);
   assert.match(await s1.locator('#studentIntegrationNotice').innerText(),/Sala de espera/);
+  for(const p of [s1,s2])assert.match(await p.locator('#integrationCountdown').innerText(),/0[23]:/);
   assert.equal(await s1.locator('#enterDecisionsBtn').isDisabled(),true);
   assert.equal(await s1.evaluate(()=>{showScreen('decisionMenu');return openDecisionMenu()}),false);
   assert.equal(await s1.locator('#decisionMenu').isVisible(),false);
@@ -75,9 +85,12 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await s1.evaluate(()=>{localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({lifecycleVersion:2,phase:'decisions'}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,phase:'decisions'}));showScreen('simulator3d');});
   assert.equal(await s1.locator('#simulator3d').isVisible(),false,'cached state cannot bypass authoritative waiting');
   await s1.evaluate(()=>refreshStudentGame());
-  assert.equal(await t.locator('#startGame').isEnabled(),true);
-  assert.equal(await t.locator('#startGame').innerText(),'Iniciar ciclo 1');
-  await t.locator('#startGame').click();
+  assert.equal(await t.locator('#startGame').isDisabled(),true);
+  const earlyStart=await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'iniciar',p_config:{},p_expected_round:null});
+  assert.equal(earlyStart.configuracion.runtime.phase,'integration','server rejects skipping the configured waiting time');
+  assert.equal(earlyStart.configuracion.gameStartAt,waitingDeadline);
+  await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1`,[game.id]);
+  await Promise.all([s1,s2].map(p=>p.evaluate(()=>refreshStudentGame())));
   await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
   assert.equal(await s1.locator('#studentWaiting').isVisible(),false);
   assert.equal(await s1.evaluate(()=>worldCalls.enter),0,'waiting room must open decisions before the 3D world');
@@ -188,9 +201,23 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   for(const p of [auto,late,reload])await p.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
   const after=await rpc(db,'ingresar_empresa',{p_codigo:autoGame.codigo,p_nombre_legal:'After UI',p_nombre_comercial:'After UI'});
   assert.equal(after.code,'PARTIDA_INICIADA');
+  // A fresh browser context models another device after the waiting deadline.
+  const original=await rpc(db,'ingresar_empresa',{p_codigo:autoGame.codigo,p_nombre_legal:'Late UI',p_nombre_comercial:'Late UI'});
+  const otherDevice=await student(autoGame,'Late UI');
+  assert.equal(String(await otherDevice.evaluate(()=>currentStudent.empresaId)),String(original.empresa_id));
+  assert.equal(await otherDevice.locator('#studentWaiting').isVisible(),false);
+  for(const identity of [
+    {p_codigo:autoGame.codigo,p_nombre_legal:'late UI',p_nombre_comercial:'Late UI'},
+    {p_codigo:autoGame.codigo,p_nombre_legal:'Late UI',p_nombre_comercial:'late UI'}
+  ]){
+    const mismatch=await rpc(db,'ingresar_empresa',identity);
+    assert.equal(mismatch.code,'PARTIDA_INICIADA');
+    assert.match(mismatch.error,/exactamente los registrados/);
+  }
+  await otherDevice.close();
   await late.evaluate(()=>$('backToProfiles').click());
   assert.equal(await late.evaluate(()=>studentPoll===null&&studentTick===null&&!studentConnected),true);
-  console.log('PASS UI automatic: 2-minute configuration/countdown, teacher closed, pre-start joins, real browser reload, clock skew, multiple clients, post-start rejection');
+  console.log('PASS UI automatic: server countdown, reload, clock skew, multiple clients, late rejection and exact reentry on another device');
   assert.deepEqual(errors,[]);console.log('PASS no browser JavaScript errors');
  }finally{await browser.close();await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

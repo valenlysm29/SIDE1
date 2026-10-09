@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
+const {database,config,createGame,rpcAfterWaiting:rpc}=require('./lifecycle_db_fixture.cjs');
 (async()=>{
  const db=await database();
  try{
@@ -14,8 +14,8 @@ const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
   const action=(game,name,extra={})=>rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:name,...extra});
   assert.equal((await status(manual,'A')).partida.configuracion.phase,'integration');
   assert.ok((await save(manual,'A',1)).error);
-  await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 hour')) where id=$1`,[manual.id]);
-  assert.equal((await status(manual,'A')).partida.configuracion.phase,'integration','manual never starts without teacher, even after deadline');
+  await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1`,[manual.id]);
+  assert.equal((await status(manual,'A')).partida.configuracion.phase,'decisions','manual cycle control still starts waiting room at server deadline');
   const started=await action(manual,'iniciar');assert.equal(started.configuracion.phase,'decisions');
   assert.equal(started.estado,'activa');
   assert.equal(started.configuracion.runtime.round,1);

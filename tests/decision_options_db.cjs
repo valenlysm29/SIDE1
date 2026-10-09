@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {database,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
+const {database,createGame,rpcAfterWaiting:rpc}=require('./lifecycle_db_fixture.cjs');
 (async()=>{
  const db=await database({beforeDecisionOptions:async db=>{
   await db.exec(`alter table empresas_decisiones add constraint old_installation_key unique(empresa_id,ciclo,decision_id);

@@ -1750,7 +1750,7 @@
     if(bridge().canOperate?.()===false)return;
     if(businessState.pendingSupplierOrder) { message('Ya existe un pedido en camino.'); return; }
     if(operationalCash()<360) { message('No hay caja suficiente para este pedido.'); return; }
-    const orderedAt=Date.now(),sequence=Number(businessState.supplierOrderSequence||0)+1;
+    const orderedAt=bridge().serverNow?.()??Date.now(),sequence=Number(businessState.supplierOrderSequence||0)+1;
     const pendingSupplierOrder={id:`${storageContext()}:${sequence}`,orderedAt,
       dueAt:orderedAt+(businessState.supplierDelay?24000:12000),units:12};
     if(!applyExpense(360,'Pedido a proveedor','SIM_GASTOS',{pendingSupplierOrder,supplierOrderSequence:sequence}))return;
@@ -1760,7 +1760,7 @@
 
   function tickSupplier(now) {
     const order=businessState?.pendingSupplierOrder;
-    if(!order||Date.now()<order.dueAt||bridge().canOperate?.()===false)return;
+    if(!order||(bridge().serverNow?.()??Date.now())<order.dueAt||bridge().canOperate?.()===false)return;
     // Persist the receipt with stock before clearing the order. If interrupted,
     // replay sees the receipt and cannot deliver the same goods twice.
     if(inventory.lastSupplierOrderId!==order.id){
@@ -3262,7 +3262,7 @@
     const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
     if(orderStatus){
       orderStatus.hidden=!order;
-      if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-Date.now())/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
+      if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-(bridge().serverNow?.()??Date.now()))/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
     }
     const direction=$3('simHubDirection');
     if(direction){direction.hidden=!destination;if(destination)direction.style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}

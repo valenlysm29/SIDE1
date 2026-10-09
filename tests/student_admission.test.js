@@ -12,7 +12,7 @@ const decisionsServiceSource=fs.readFileSync(path.join(root,'services/decisiones
 const appSource=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
 
 function loadService(source,rpc,serviceName,logger=console){
- const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};
+ const window={SIDE:{SupabaseClient:{get:()=>({rpc:(name,args)=>name==='side_admission_features'?Promise.resolve({data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null}):rpc(name,args)})}}};
  vm.runInNewContext(source,{window,console:logger},{filename:serviceName});
  return window.SIDE[serviceName];
 }
@@ -107,7 +107,7 @@ test('real student form shows the server message for technical failures and busi
   __originalConsoleError(...args);
  };
  window.supabase={createClient:()=>({
-  rpc:async()=>{if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
+  rpc:async(name)=>{if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null};if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
   auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}
  })};
  `;
@@ -135,7 +135,7 @@ test('real student form shows the server message for technical failures and busi
   }
 
   const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
-  const genericMessage='No se pudo validar el ingreso con los datos proporcionados.';
+  const genericMessage='Los datos no coinciden con el registro. Usa el código y los nombres registrados, respetando mayúsculas y tildes.';
   const startedMessage='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
   for(const technical of [
    {data:null,error:{code:'PGRST202',message:'Could not find public.ingresar_empresa',status:404}},
@@ -205,7 +205,7 @@ test('student state service always uses normalized identity and compare-and-swap
  const calls=[];
  const service=loadService(serviceSource,async(name,args)=>{
   calls.push({name,args});
-  if(name==='obtener_estado_estudiante')return {data:{success:true,snapshot_revision:7},error:null};
+  if(name==='obtener_estado_estudiante')return {data:{success:true,snapshot_revision:7,partida:{serverTime:'2026-10-09T00:00:00Z'}},error:null};
   return {data:{success:true,snapshot_revision:8},error:null};
  },'EmpresaService');
  const identity={codigo:' síde-000 ',nombreLegal:' Compañía   Ágil ',nombreComercial:' Café   Norte '};
@@ -241,7 +241,7 @@ test('state reads and writes preserve technical error codes instead of rejecting
 
 test('frontend maps safe errors, hydrates by identity and recovers stale revisions',()=>{
  assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados\.'/);
- assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'No se pudo validar el ingreso con los datos proporcionados\.'/);
+ assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'Los datos no coinciden con el registro\./);
  assert.match(appSource,/JOIN_SERVER_MESSAGE\s*=\s*'No se pudo conectar con el servidor\. Intenta nuevamente en unos minutos\.'/);
  assert.match(appSource,/ingreso\?\.code==='PARTIDA_INICIADA'/);
  assert.match(appSource,/ingreso\?\.code==='CREDENCIALES_INVALIDAS'/);
@@ -261,4 +261,18 @@ test('frontend maps safe errors, hydrates by identity and recovers stale revisio
  assert.doesNotMatch(decisionsServiceSource,/rpc\(['"]guardar_(?:decisiones|reporte)['"]/);
  assert.match(serviceSource,/p_expected_revision:\s*revision/);
  assert.doesNotMatch(serviceSource,/session[_A-Z-]*token|token[_A-Z-]*session|p_token/i);
+});
+
+
+test('missing capability and missing server time require explicit migration, network remains technical',async()=>{
+ const make=rpc=>{const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};vm.runInNewContext(serviceSource,{window,console});return window.SIDE.EmpresaService;};
+ const identity={codigo:'SIDE-SD7',nombreLegal:'demo1',nombreComercial:'demo1'};
+ const missing=make(async()=>({data:null,error:{code:'PGRST202',message:'missing function'}}));
+ assert.equal((await missing.ingresar(identity)).code,'MIGRACION_PENDIENTE');
+ assert.equal((await missing.obtenerEstado(identity)).code,'MIGRACION_PENDIENTE');
+ const noClock=make(async(name)=>({data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:{success:true,partida:{configuracion:{lifecycleVersion:2}}},error:null}));
+ assert.equal((await noClock.ingresar(identity)).code,'MIGRACION_PENDIENTE');
+ assert.equal((await noClock.obtenerEstado(identity)).code,'MIGRACION_PENDIENTE');
+ const network=make(async()=>({data:null,error:{code:'NETWORK',message:'Failed to fetch'}}));
+ assert.equal((await network.ingresar(identity)).code,'NETWORK');
 });

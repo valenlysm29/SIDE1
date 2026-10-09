@@ -13,7 +13,7 @@ function fixture(){
     writeDecisionBatch(writes){if(fail)return false;for(const [k,v] of Object.entries(writes))store.set(k,v);return true;},
     console:{error(){}},readRoundRuntime:()=>({status:'running'}),businessState:{expenses:0,upgrades:{}},inventory:{reserve:{a:0,b:0,c:0},sold:{}},
     PRODUCTS:[{id:'a'},{id:'b'},{id:'c'}],storageContext:()=> 'QA_1',businessKey:()=> 'business',
-    Date:{now:()=>clock},Number,Math,JSON,loadBusinessState(){},
+    Date:{now:()=>clock},studentNow:()=>clock,Number,Math,JSON,loadBusinessState(){},
     saveBusinessState(){store.set('business',JSON.stringify(c.businessState));},
     saveInventory(){store.set('inventory',JSON.stringify(c.inventory));},
     showCashFx(){},addBusinessLog(){},updateHUD(){},message(){},fmt:String,
@@ -80,4 +80,17 @@ test('failed local commit and closed cycle do not create unpaid orders or upgrad
   const f=fixture(),c=f.c;f.fail(true);c.orderSupplierStock();c.buyUpgrade('warehouse',1500,2);
   assert.equal(c.cashBalance(),100000);assert.equal(c.businessState.pendingSupplierOrder,undefined);assert.equal(c.businessState.upgrades.warehouse,undefined);
   f.fail(false);f.allow(false);c.orderSupplierStock();assert.equal(c.businessState.pendingSupplierOrder,undefined);
+});
+test('supplier delivery follows the server clock despite a shifted device clock',()=>{
+  const f=fixture(),c=f.c;let serverTime=500000;
+  c.bridge().serverNow=()=>serverTime;
+  f.time(999999999);c.orderSupplierStock();
+  assert.equal(c.businessState.pendingSupplierOrder.orderedAt,500000);
+  assert.equal(c.businessState.pendingSupplierOrder.dueAt,512000);
+  c.tickSupplier(0);assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),0);
+  f.time(-999999999);serverTime=511999;c.tickSupplier(0);
+  assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),0);
+  serverTime=512000;c.tickSupplier(0);
+  assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),12);
+  c.tickSupplier(0);assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),12);
 });

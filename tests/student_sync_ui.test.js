@@ -11,7 +11,7 @@ window.calls=[];
 const empty={decision_state:{},cash_ledger:{},financial_sections:{},section_submissions:{},decisions_submitted:false,selected_character:null};
 window.server=JSON.parse(localStorage.getItem('TEST_SERVER')||'null')||{revision:0,snapshot:empty};
 const storeServer=()=>localStorage.setItem('TEST_SERVER',JSON.stringify(server));
-const state=()=>({partida:{id:'test-game',codigo:'SIDE-418',nombre:'Prueba',estado:'activa',configuracion:{capital:100000,round:1,cycles:6}},empresa:{id:1,nombre_legal:'Legal A',nombre_comercial:'Marca A',caja_actual:100000,ciclo_actual:1},empresa_id:1,ciclo_partida:1,snapshot_revision:server.revision,snapshot:server.snapshot});
+const state=()=>({partida:{serverTime:new Date().toISOString(),id:'test-game',codigo:'SIDE-418',nombre:'Prueba',estado:'activa',configuracion:{capital:100000,round:1,cycles:6}},empresa:{id:1,nombre_legal:'Legal A',nombre_comercial:'Marca A',caja_actual:100000,ciclo_actual:1},empresa_id:1,ciclo_partida:1,snapshot_revision:server.revision,snapshot:server.snapshot});
 SIDE.EmpresaService.obtenerEstado=async()=>{
   calls.push({type:'read'});
   if(sessionStorage.TEST_READ_ERROR==='network')return {success:false,technical:true,code:'FETCH_ERROR',error:'Failed to fetch'};
@@ -136,7 +136,7 @@ test('student synchronization and session recovery through the delivered UI',asy
       await p.waitForFunction(()=>!studentConnected&&studentSessionRecoveryTask===null);
       assert.equal(await p.evaluate(()=>Boolean(sessionStorage.SIDE_STUDENT_SESSION)),false);
       assert.equal(await p.locator('#studentReconnectBtn').isVisible(),false);
-      assert.match(await p.locator('#studentMessage').innerText(),/validar el ingreso/);
+      assert.match(await p.locator('#studentMessage').innerText(),/datos no coinciden.*mayúsculas y tildes/i);
       await p.context().close();
     });
     await t.test('online automatically restores a session retained after a network failure',async()=>{

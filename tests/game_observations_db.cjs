@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture.cjs');
+const {database,config,createGame,rpcAfterWaiting:rpc,professor}=require('./lifecycle_db_fixture.cjs');
 (async()=>{
  const db=await database();
  const action=(game,name,extra={})=>rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:name,...extra});

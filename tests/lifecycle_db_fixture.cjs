@@ -27,6 +27,8 @@ async function database({beforeStudentAdmission,beforeDecisionOptions}={}){
  if(beforeDecisionOptions)await beforeDecisionOptions(db);
  const decisionOptions=fs.readFileSync(path.join(root,'supabase/migrations/20260930_preservar_opciones_decisiones.sql'),'utf8');
  await db.exec(decisionOptions);await db.exec(decisionOptions);
+ const waiting=fs.readFileSync(path.join(root,'supabase/migrations/20261009_sala_espera_identidad_exacta.sql'),'utf8');
+ await db.exec(waiting);await db.exec(waiting);
  return db;
 }
 const config=(overrides={})=>({lifecycleVersion:2,cycleCloseMode:'manual',integrationDurationMinutes:5,integrationMinutes:0,cycles:3,roundHours:0,roundMinutes:10,enabledEvents:[],...overrides});
@@ -38,4 +40,12 @@ async function rpc(db,name,args){
  const result=await db.query(`select public.${name}(${entries.map(([key],i)=>`${key} => $${i+1}`).join(',')}) as result`,entries.map(([,v])=>v));
  return result.rows[0].result;
 }
-module.exports={database,config,createGame,rpc,professor};
+// Test-only clock setup: business tests explicitly finish the configured wait.
+// Dedicated waiting_room_db.cjs uses raw rpc to verify early starts are ignored.
+async function rpcAfterWaiting(db,name,args){
+ if(name==='controlar_partida'&&args.p_accion==='iniciar'){
+  await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1 and configuracion->>'cycleCloseMode'='manual' and configuracion#>>'{runtime,phase}'='integration'`,[args.p_partida_id]);
+ }
+ return rpc(db,name,args);
+}
+module.exports={database,config,createGame,rpc,rpcAfterWaiting,professor};

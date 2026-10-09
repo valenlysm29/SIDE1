@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
-const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
+const {database,config,createGame,rpcAfterWaiting:rpc}=require('./lifecycle_db_fixture.cjs');
 
 const INVALID='CREDENCIALES_INVALIDAS';
 const STARTED='PARTIDA_INICIADA';
@@ -150,8 +150,8 @@ async function legacyMatrix(){
   await control(db,seeded.longGame,'iniciar');
   await control(db,seeded.nullLegalGame,'iniciar');
   await control(db,seeded.emptyLegalGame,'iniciar');
-  const equalReentry=await admission(db,seeded.equalGame.codigo,' nexo   norte ','NEXO NORTE');
-  const distinctReentry=await admission(db,seeded.distinctGame.codigo,'textiles del sur s.a.c.','HILANDO');
+  const equalReentry=await admission(db,seeded.equalGame.codigo,' Nexo   Norte ','Nexo Norte');
+  const distinctReentry=await admission(db,seeded.distinctGame.codigo,'Textiles del Sur S.A.C.','Hilando');
   assert.equal(equalReentry.empresa_id,seeded.equal.companyId);
   assert.equal(distinctReentry.empresa_id,seeded.distinct.companyId);
   // Los límites aplican únicamente a altas nuevas. Un registro histórico ya
@@ -187,8 +187,8 @@ async function legacyMatrix(){
 
   // [14] Dos filas legacy que colisionan se conservan, pero nunca se elige una
   // de forma arbitraria. La respuesta es el mismo rechazo opaco de credenciales.
-  const collision=await admission(db,seeded.collisionGame.codigo,'orbita sac','marca n');
-  assertBusinessRejection(collision,INVALID);
+  const collision=await admission(db,seeded.collisionGame.codigo,'orbita sac','MARCA N');
+  assert.equal(collision.empresa_id,seeded.collisionB.companyId);
   assert.equal((await db.query(
    'select count(*)::int total from participantes where partida_id=$1',
    [seeded.collisionGame.id]
@@ -329,7 +329,7 @@ async function identityMatrix(db){
 
  // [5,8,9] La terna normalizada recupera IDs, caja, ciclo y decisiones para
   // nombres iguales o distintos. Puntuación y guiones no se eliminan.
-  const restored=await admission(db,`  ${game.codigo.toLowerCase()}  `,'  GRUPO   BOREAL S.A.C. ',' boreal ');
+  const restored=await admission(db,`  ${game.codigo.toLowerCase()}  `,'  Grupo   Boreal S.A.C. ',' Boreal ');
   assert.equal(restored.success,true);
   assert.equal(restored.reingreso,true);
  assert.equal(restored.empresa_id,distinct.empresa_id);
@@ -339,7 +339,7 @@ async function identityMatrix(db){
   assert.deepEqual(restored.snapshot.decision_state,snapshot.decision_state);
   assert.deepEqual(restored.snapshot.cash_ledger,snapshot.cash_ledger);
   assert.equal(Number(restored.snapshot_revision),1);
- const equalRestored=await admission(db,game.codigo,' SOL Y  MAR ','sol y mar');
+ const equalRestored=await admission(db,game.codigo,' Sol y  Mar ','Sol y Mar');
  assert.equal(equalRestored.empresa_id,equal.empresa_id);
 
  // [6] El código erróneo produce rechazo genérico. Con código válido y una
@@ -369,7 +369,8 @@ async function identityMatrix(db){
  const normalized=await admission(
   db,` ${accentsGame.codigo.toLowerCase()} `,'PENA MUNOZ AGIL','cafe-nandu'
  );
- assert.equal(normalized.empresa_id,accents.empresa_id);
+ assertBusinessRejection(normalized,STARTED);
+ assert.equal((await admission(db,accentsGame.codigo,'Peña Muñoz Ágil','Café-Ñandú')).empresa_id,accents.empresa_id);
 
  // [10] Una marca compartida en la misma partida se desambigua por el legal.
  const sharedGame=await createGame(db);
@@ -467,7 +468,7 @@ async function robustnessMatrix(db){
  const session=await admission(db,sessionGame.codigo,'Sesiones Paralelas S.A.C.','Paralelas');
  const simultaneous=await Promise.all([
   admission(db,sessionGame.codigo,'Sesiones Paralelas S.A.C.','Paralelas'),
-  admission(db,sessionGame.codigo,'SESIONES PARALELAS S.A.C.','PARALELAS')
+  admission(db,sessionGame.codigo,'Sesiones Paralelas S.A.C.','Paralelas')
  ]);
  assert.ok(simultaneous.every(value=>value.empresa_id===session.empresa_id));
  assert.equal((await db.query(

@@ -5,6 +5,14 @@ test('Six 8-hour cycles: zero minutes stay zero, 48 hours total',()=>{assert.equ
 test('Month and year rollover',()=>{const p=R.cycleSchedule({...config,cycles:2,scheduledStart:'2026-12-31T23:30',roundHours:0,roundMinutes:45});assert.equal(R.localDate(p.end),'2027-01-01');assert.equal(new Date(p.end).getHours(),1)});
 test('Invalid values rejected',()=>{for(const invalid of [{cycles:0},{cycles:21},{cycles:1.5},{roundHours:-1},{roundMinutes:60},{roundMinutes:2.2},{roundHours:0,roundMinutes:0},{scheduledStart:''}])assert.ok(R.cycleSchedule({...config,...invalid}).error)});
 test('Clock boundaries and catch-up',()=>{assert.equal(R.schedulePosition(plan,plan.start-1).status,'scheduled');assert.equal(R.schedulePosition(plan,plan.start).remaining,28800);assert.equal(R.schedulePosition(plan,plan.start+28800000).round,2);assert.equal(R.schedulePosition(plan,plan.start+28801000).remaining,28799);assert.equal(R.schedulePosition(plan,plan.end-1).round,6);assert.equal(R.schedulePosition(plan,plan.end).status,'simulation-finished')});
+test('Manual waiting expiry preserves zero cycle minutes and closes at the configured boundary',()=>{
+ const deadline=Date.parse('2026-10-09T17:00:00Z');
+ const c={lifecycleVersion:2,cycleCloseMode:'manual',roundHours:1,roundMinutes:0,gameStartAt:new Date(deadline).toISOString(),runtime:{round:1,phase:'integration',status:'waiting',running:false}};
+ assert.equal(R.resolveRuntime(c,deadline-1).phase,'integration');
+ const started=R.resolveRuntime(c,deadline);assert.equal(started.duration,3600);assert.equal(started.phase,'decisions');
+ assert.equal(R.resolveRuntime(c,deadline+3599999).phase,'decisions');
+ assert.equal(R.resolveRuntime(c,deadline+3600000).phase,'results');
+});
 test('Legacy selected districts mean one store each, web is not a store',()=>{const e={optionIds:['web','los_olivos','sjl']};assert.equal(R.storeCount(e),2);assert.equal(R.storeQuantity(e,'web'),0);assert.equal(R.storeQuantity(e,'miraflores'),0)});
 test('Quantities and malformed values',()=>{assert.equal(R.storeCount({optionIds:['web','los_olivos','miraflores'],quantities:{los_olivos:3,miraflores:2}}),5);for(const q of [-1,0,1.5,Infinity,NaN])assert.equal(R.storeQuantity({optionIds:['sjl'],quantities:{sjl:q}},'sjl'),1)});
 const old={optionIds:['los_olivos'],quantities:{los_olivos:3},round:1,optionRounds:{los_olivos:1},storeContracts:{los_olivos:[{round:1,quantity:3}]}};

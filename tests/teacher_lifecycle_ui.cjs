@@ -18,6 +18,7 @@ function fixture(name){
  assert.equal(await page.locator('#startGame').innerText(),'Iniciar partida');
  assert.equal(await page.locator('[data-tab="rondas"]').isVisible(),false);
  await page.locator('#cycles').fill('3');
+ await page.locator('#integrationDurationMinutes').fill('3');
  assert.equal(await page.locator('#configCycleCount').innerText(),'1 / 3');
  assert.equal(await page.locator('#roundDisplay').innerText(),'1 / 3');
  assert.equal(await page.evaluate(()=>runtime()?.running||false),false);
@@ -35,8 +36,19 @@ function fixture(name){
  await page.locator('#startGame').click();
  assert.equal(await page.locator('[data-tab="rondas"]').isVisible(),true);
  assert.equal(await page.evaluate(()=>runtime().duration),600);
+ assert.equal(await page.evaluate(()=>runtime().phase),'integration');
+ assert.equal(await page.locator('#advanceRound').isDisabled(),true);
+ assert.equal(await page.locator('#startGame').isDisabled(),true);
+ const wait=await page.evaluate(()=>({duration:Date.parse(state.authoritative.gameStartAt)-Date.parse(state.authoritative.integrationStartTime),seconds:state.seconds,deadline:state.authoritative.gameStartAt}));
+ assert.equal(wait.duration,180000);
+ assert.equal(wait.seconds,180);
+ assert.match(await page.locator('#gameStatusBanner').innerText(),/00:03:00/);
+ await page.clock.fastForward(180000);
+ await page.evaluate(()=>refreshTeacherGame());
  assert.equal(await page.evaluate(()=>runtime().phase),'decisions');
+ assert.equal(await page.evaluate(()=>state.authoritative.gameStartAt),wait.deadline);
  assert.equal(await page.locator('#advanceRound').isDisabled(),false);
+
  await page.evaluate(()=>{const reports=[{partida:$('gameCode').value,empresa:'Empresa A',nombre:'Ana',score:50,conectada:true,updatedAt:new Date().toISOString()}];localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));window.dispatchEvent(new StorageEvent('storage',{key:'SIDE_STUDENT_REPORTS'}));});
  await page.waitForFunction(()=>document.querySelector('#companiesGrid').textContent.includes('Empresa A'));
  await page.clock.fastForward(600000);

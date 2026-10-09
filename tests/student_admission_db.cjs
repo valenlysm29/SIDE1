@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
+const {database,config,createGame,rpcAfterWaiting:rpc}=require('./lifecycle_db_fixture.cjs');
 
 const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
 
@@ -33,7 +33,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   assert.equal(started.configuracion.runtime.phase,'decisions');
   await legacyDb.exec('set role anon');
   const reentry=await rpc(legacyDb,'ingresar_empresa',{
-   p_codigo:' side-005 ',p_nombre_legal:' DEMO2 ',p_nombre_comercial:'demo2'
+   p_codigo:' side-005 ',p_nombre_legal:' demo2 ',p_nombre_comercial:'demo2'
   });
   assert.equal(reentry.success,true);
   assert.equal(reentry.reingreso,true);
@@ -86,8 +86,8 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   };
   const saved=await rpc(db,'guardar_estado_estudiante',{
    p_codigo:game.codigo,
-   p_nombre_legal:'COMPAÑÍA ÁGIL S.A.',
-   p_nombre_comercial:'CAFÉ DEL NORTE',
+   p_nombre_legal:'Compañía Ágil S.A.',
+   p_nombre_comercial:'Café del Norte',
    p_snapshot:snapshot,
    p_expected_revision:0
   });
@@ -109,8 +109,8 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
 
   const safeRead=await rpc(db,'obtener_estado_estudiante',{
    p_codigo:`  ${game.codigo.toLowerCase()}  `,
-   p_nombre_legal:'  COMPANIA   AGIL S.A. ',
-   p_nombre_comercial:' cafe   del norte '
+   p_nombre_legal:'  Compañía   Ágil S.A. ',
+   p_nombre_comercial:' Café   del Norte '
   });
   assert.equal(safeRead.success,true);
   assert.equal(Number(safeRead.snapshot_revision),1);
@@ -129,7 +129,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
 
   // 3 y 5. Reingreso con la terna normalizada: mismos IDs y estado existente.
   const normalizedCode=`  ${game.codigo.toLowerCase()}  `;
-  const reentry=await join(normalizedCode,'  COMPANIA   AGIL S.A.  ',' cafe   del norte ');
+  const reentry=await join(normalizedCode,'  Compañía   Ágil S.A.  ',' Café   del Norte ');
   assert.equal(reentry.success,true);
   assert.equal(reentry.reingreso,true);
   assert.equal(reentry.empresa_id,first.empresa_id);
@@ -160,7 +160,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   // 6. Dos sesiones/reingresos simultaneos recuperan la misma fila, sin duplicados.
   const sessions=await Promise.all([
    join(game.codigo,'Compañía Ágil S.A.','Café del Norte'),
-   join(game.codigo,'COMPANIA AGIL S.A.','CAFE DEL NORTE')
+   join(game.codigo,'Compañía Ágil S.A.','Café del Norte')
   ]);
   assert.ok(sessions.every(row=>row.success&&row.reingreso));
   assert.ok(sessions.every(row=>row.empresa_id===first.empresa_id&&row.participante_id===first.participante_id));
@@ -188,7 +188,7 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   }
 
   // Reingreso con el código generado: ignora espacios y mayúsculas.
-  assert.equal((await join(' '+game.codigo.toLowerCase()+' ','COMPANIA AGIL S.A.','CAFE DEL NORTE')).empresa_id,first.empresa_id);
+  assert.equal((await join(' '+game.codigo.toLowerCase()+' ','Compañía Ágil S.A.','Café del Norte')).empresa_id,first.empresa_id);
 
   // Las RPC seguras por terna siguen disponibles a anon. Las variantes
   // historicas por empresaId y las escrituras REST quedan cerradas.
@@ -205,11 +205,11 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
   const anonymousFirst=await join(anonymousGame.codigo,'Anonima Legal S.A.','Anonima Comercial');
   assert.equal(anonymousFirst.success,true);
   assert.equal(anonymousFirst.reingreso,false);
-  const anonymousReentry=await join(game.codigo,'Compania Agil S.A.','Cafe del Norte');
+  const anonymousReentry=await join(game.codigo,'Compañía Ágil S.A.','Café del Norte');
   assert.equal(anonymousReentry.empresa_id,first.empresa_id);
 
   const anonymousState=await rpc(db,'obtener_estado_estudiante',{
-   p_codigo:' '+game.codigo.toLowerCase()+' ',p_nombre_legal:'COMPANIA AGIL S.A.',p_nombre_comercial:'CAFE DEL NORTE'
+   p_codigo:' '+game.codigo.toLowerCase()+' ',p_nombre_legal:'Compañía Ágil S.A.',p_nombre_comercial:'Café del Norte'
   });
   assert.equal(anonymousState.success,true);
   assert.equal(Number(anonymousState.snapshot_revision),1);
@@ -217,19 +217,19 @@ const STARTED_MESSAGE='La partida ya inició. Solo pueden reingresar quienes ya 
 
   const anonymousSnapshot={...snapshot,decision_state:{PRECIO:{round:1,value:43,cost:1234}}};
   const anonymousSave=await rpc(db,'guardar_estado_estudiante',{
-   p_codigo:game.codigo,p_nombre_legal:'Compania Agil S.A.',p_nombre_comercial:'Cafe del Norte',
+   p_codigo:game.codigo,p_nombre_legal:'Compañía Ágil S.A.',p_nombre_comercial:'Café del Norte',
    p_snapshot:anonymousSnapshot,p_expected_revision:1
   });
   assert.equal(anonymousSave.success,true);
   assert.equal(Number(anonymousSave.snapshot_revision),2);
   const anonymousStale=await rpc(db,'guardar_estado_estudiante',{
-   p_codigo:game.codigo,p_nombre_legal:'Compania Agil S.A.',p_nombre_comercial:'Cafe del Norte',
+   p_codigo:game.codigo,p_nombre_legal:'Compañía Ágil S.A.',p_nombre_comercial:'Café del Norte',
    p_snapshot:staleSnapshot,p_expected_revision:1
   });
   assert.equal(anonymousStale.code,'ESTADO_DESACTUALIZADO');
   assert.equal(Number(anonymousStale.snapshot_revision),2);
   const stateAfterStale=await rpc(db,'obtener_estado_estudiante',{
-   p_codigo:game.codigo,p_nombre_legal:'Compania Agil S.A.',p_nombre_comercial:'Cafe del Norte'
+   p_codigo:game.codigo,p_nombre_legal:'Compañía Ágil S.A.',p_nombre_comercial:'Café del Norte'
   });
   assert.deepEqual(stateAfterStale.snapshot.decision_state,anonymousSnapshot.decision_state);
 

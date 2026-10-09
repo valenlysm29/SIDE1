@@ -8,7 +8,7 @@ const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const JOIN_STARTED_MESSAGE = 'La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
-const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso con los datos proporcionados.';
+const JOIN_INVALID_MESSAGE = 'Los datos no coinciden con el registro. Usa el código y los nombres registrados, respetando mayúsculas y tildes.';
 const JOIN_SERVER_MESSAGE = 'No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
@@ -178,7 +178,7 @@ function updateIntegrationUI(){
 }
 let cancellationShown=false,authoritativeStudentState=null;
 let studentConnected=false,remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
-function studentNow(){return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
+function studentNow(){if(currentStudent.empresaId&&!studentClock)return NaN;return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
 function studentIdentityKey(student=currentStudent){return JSON.stringify(studentIdentity(student))}
 let studentOutbox=null,studentStateFailure=null,studentSessionRecovering=false,studentSessionRecoveryTask=null;
@@ -191,6 +191,7 @@ function stopStudentSync(){clearInterval(studentPoll);clearInterval(studentTick)
 function applyStudentGameState(partida,round=1){
   const config=partida.configuracion;
   if(!config||typeof config!=='object')return;
+  if(currentStudent.empresaId&&!Number.isFinite(Date.parse(partida.serverTime||'')))throw new Error('Falta hora del servidor. Aplica la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.');
   if(partida.serverTime)studentClock={time:Date.parse(partida.serverTime),at:performance.now()};
   localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));
   localStorage.setItem('SIDE_EVENT_SCHEDULE',JSON.stringify(config.eventSchedule||{}));
@@ -361,6 +362,7 @@ window.SIDE_GAME_BRIDGE={
     currentCategory=cat;
     return openDecisionMenu();
   },
+  serverNow:()=>studentNow(),
   currentRound:()=>currentRound(),
   cash:()=>cashBalance(),
   creditState:()=>({outstanding:creditOutstanding(),approved:creditApprovedLine(),available:creditAvailable()}),
@@ -437,6 +439,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     let ingreso;
     try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     if(!ingreso?.success){
+      if(ingreso?.code==='MIGRACION_PENDIENTE'){message('studentMessage',ingreso.error,true);return}
       if(ingreso?.code==='PARTIDA_INICIADA'){message('studentMessage',JOIN_STARTED_MESSAGE,true);return}
       if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
       console.error('SIDE: error técnico al validar el ingreso',ingreso);
@@ -449,7 +452,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     const capitalSource=empresa.caja_inicial??data.caja_inicial,currentCapital=Number(capitalSource);
     currentStudent={name:'Jugador',company:canonicalBrand,legalName:canonicalLegal,participantId,empresaId,snapshotRevision:Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0),...(capitalSource!==null&&capitalSource!==undefined&&Number.isFinite(currentCapital)?{initialCapital:currentCapital}:{}),game:{...found,codigo:cleanCode(found.codigo||code)},returning};
     const round=Number(data.ciclo_partida||empresa.ciclo_actual||data.ciclo_inicial||1);
-    try{applyStudentGameState(currentStudent.game,round);if(!studentSyncPending())hydrateRemoteProgress(data);}catch(error){console.error('SIDE: no se pudo restaurar por completo el estado remoto',error)}
+    try{applyStudentGameState(currentStudent.game,round);if(!studentSyncPending())hydrateRemoteProgress(data);}catch(error){console.error('SIDE: no se pudo restaurar por completo el estado remoto',error);message('studentMessage',error.message||JOIN_SERVER_MESSAGE,true);return}
     if(returning)toast('Bienvenido de vuelta. Tu progreso fue restaurado.');
     localStorage.setItem('SIDE_REMOTE_GAME_'+code,'1');
   }
@@ -1333,11 +1336,11 @@ function syncStudentTimer(){
     remain=Math.max(0,duration-Math.floor((studentNow()-new Date(r.startedAt).getTime())/1000));
     note=remain>0?(Number(conf.integrationMinutes)===60&&currentRound()===1?'Período de integración · solo ingreso y espera':'Ciclo en curso'):'Tiempo finalizado';
   }else if(r?.status==='scheduled'){
-    const wait=Math.max(0,Math.floor((new Date(r.scheduledStart).getTime()-Date.now())/1000));
+    const wait=Math.max(0,Math.floor((new Date(r.scheduledStart).getTime()-studentNow())/1000));
     note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente';
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
-  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note=conf.cycleCloseMode==='automatic'?'Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado':'Sala de espera · esperando que el profesor inicie la partida';}
+  if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note='Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado';}
   if(conf.cancelledAt||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
   if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;
@@ -1401,7 +1404,7 @@ function resumeStudentSession(){
       if(studentStateFailure?.code==='CREDENCIALES_INVALIDAS'&&!studentStateFailure.technical){rejectStudentSession();return false;}
       studentSessionRecovering=true;showScreen('profiles');showModal('studentModal');
       $('gameCode').value=currentStudent.game.codigo;$('companyLegalName').value=currentStudent.legalName||'';$('companyBrandName').value=currentStudent.company;
-      $('studentReconnectBtn')?.classList.remove('hidden');message('studentMessage',JOIN_SERVER_MESSAGE+' Tu sesión se conserva; volveremos a intentar la conexión.',true);
+      $('studentReconnectBtn')?.classList.remove('hidden');message('studentMessage',studentStateFailure?.code==='MIGRACION_PENDIENTE'?studentStateFailure.error:JOIN_SERVER_MESSAGE+' Tu sesión se conserva; volveremos a intentar la conexión.',true);
       return false;
     }
     studentSessionRecovering=false;studentStateFailure=null;$('studentReconnectBtn')?.classList.add('hidden');message('studentMessage','');closeModal();

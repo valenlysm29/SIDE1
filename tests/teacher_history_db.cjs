@@ -1,6 +1,6 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture.cjs');
+const {database,config,createGame,rpcAfterWaiting:rpc,professor}=require('./lifecycle_db_fixture.cjs');
 const root=path.resolve(__dirname,'..'),other='22222222-2222-2222-2222-222222222222';
 
 (async()=>{
