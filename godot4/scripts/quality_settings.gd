@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-## Presets de calidad. Alto conserva exactamente los ajustes visuales iniciales.
+## Presets de calidad compartidos por el barrio; Alto usa la resolución completa.
 const CONFIG_PATH := "user://quality.cfg"
 const QUALITY_LOW := 0
 const QUALITY_MEDIUM := 1

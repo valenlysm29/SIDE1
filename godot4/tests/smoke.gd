@@ -21,7 +21,9 @@ func _run() -> void:
 		_fail("No hay ruta desde la calle hasta la tienda")
 		return
 	var visitors: Array[Node3D] = []
-	for i in range(shop.max_capacity):
+	# La población persistente ya ocupa plazas; completar sólo las libres.
+	var available_capacity: int = shop.max_capacity - shop._occupants.size()
+	for i in range(available_capacity):
 		var visitor := Node3D.new()
 		visitors.append(visitor)
 		if not shop.try_enter(visitor):

@@ -81,12 +81,13 @@ func _build_shop() -> void:
 	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	glass.shading_mode = BaseMaterial3D.SHADING_MODE_PER_PIXEL
 	# La planta conserva un pasillo central libre desde la puerta sur.
-	_box(_display, Vector3(0, -0.055, 0), Vector3(12, 0.10, 10), floor_mat)
-	_box(_display, Vector3(0, 2.45, -4.94), Vector3(12, 4.9, 0.12), wall)
+	# El piso comparte la losa física del mundo; solo se añade su acabado visual.
+	_box(_display, Vector3(0, -0.044, 0), Vector3(12, 0.10, 10), floor_mat)
+	_box(_display, Vector3(0, 2.45, -4.94), Vector3(12, 4.9, 0.12), wall, true)
 	for side in [-1.0, 1.0]:
-		_box(_display, Vector3(side * 5.94, 2.45, 0), Vector3(0.12, 4.9, 10), wall)
-		_box(_display, Vector3(side * 3.55, 2.45, 4.94), Vector3(4.9, 4.9, 0.12), glass)
-		_box(_display, Vector3(side * 1.08, 2.45, 4.94), Vector3(0.14, 4.9, 0.18), metal)
+		_box(_display, Vector3(side * 5.94, 2.45, 0), Vector3(0.12, 4.9, 10), wall, true)
+		_box(_display, Vector3(side * 3.55, 2.45, 4.94), Vector3(4.9, 4.9, 0.12), glass, true)
+		_box(_display, Vector3(side * 1.08, 2.45, 4.94), Vector3(0.14, 4.9, 0.18), metal, true)
 		_box(_display, Vector3(side * 3.55, 4.83, 4.97), Vector3(4.9, 0.14, 0.2), metal)
 		_box(_display, Vector3(side * 5.45, 0.12, 0), Vector3(0.68, 0.24, 10), dark_wood)
 	_box(_display, Vector3(0, 3.9, 4.94), Vector3(2.25, 1.95, 0.14), wall)
@@ -99,7 +100,7 @@ func _build_shop() -> void:
 		for z in [-2.65, 2.1]:
 			_shelf(Vector3(x, 0, z), wood, metal)
 	_table(Vector3(0, 0, -1.55), dark_wood, metal)
-	_box(_display, Vector3(4.7, 0.58, -4.05), Vector3(2.1, 1.16, 0.65), dark_wood)
+	_box(_display, Vector3(4.7, 0.58, -4.05), Vector3(2.1, 1.16, 0.65), dark_wood, true)
 	_box(_display, Vector3(4.7, 1.19, -4.05), Vector3(2.2, 0.08, 0.72), wood)
 	var leather := _textured_mat(Color("#a65f38"), false)
 	var navy := _textured_mat(Color("#314d70"), false)
@@ -140,6 +141,8 @@ func _build_shop() -> void:
 
 
 func _shelf(at: Vector3, wood: Material, metal: Material) -> void:
+	# Una envolvente por vitrina conserva los lotes visuales y despeja su navegación.
+	_solid(_display, at + Vector3(0, 1.45, 0), Vector3(0.63, 2.9, 2.0))
 	for side in [-0.9, 0.9]:
 		_box(_display, at + Vector3(0, 1.45, side), Vector3(0.38, 2.9, 0.07), metal)
 	for y in [0.52, 1.35, 2.18]:
@@ -148,6 +151,7 @@ func _shelf(at: Vector3, wood: Material, metal: Material) -> void:
 
 
 func _table(at: Vector3, wood: Material, metal: Material) -> void:
+	_solid(_display, at + Vector3(0, 0.41, 0), Vector3(2.75, 0.82, 1.35))
 	_box(_display, at + Vector3(0, 0.76, 0), Vector3(2.75, 0.12, 1.35), wood)
 	for x in [-1.18, 1.18]:
 		for z in [-0.53, 0.53]:
@@ -182,11 +186,27 @@ func _bag(at: Vector3, style: int, main: Material, trim: Material, gold: Materia
 		_box(bag, Vector3(sx, height * 0.16, 0.133), Vector3(0.013, 0.008, 0.008), trim)
 
 
-func _box(parent: Node3D, at: Vector3, size: Vector3, surface: Material) -> void:
+func _box(parent: Node3D, at: Vector3, size: Vector3, surface: Material, collision: bool = false) -> void:
 	# Agrupa geometría idéntica en la coordenada local de Display.
 	var by_size: Dictionary = _box_batches.get_or_add(surface, {})
 	var transforms: Array = by_size.get_or_add(size, [])
 	transforms.append(parent.transform * Transform3D(Basis.IDENTITY, at) if parent != _display else Transform3D(Basis.IDENTITY, at))
+	if collision:
+		_solid(parent, at, size)
+
+
+func _solid(parent: Node3D, at: Vector3, size: Vector3) -> void:
+	var body := StaticBody3D.new()
+	body.name = "Solid"
+	body.collision_layer = 1
+	body.collision_mask = 3
+	body.position = at
+	var shape := BoxShape3D.new()
+	shape.size = size
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	body.add_child(collider)
+	parent.add_child(body)
 
 
 func _torus(parent: Node3D, at: Vector3, radius: float, tube: float, surface: Material) -> void:

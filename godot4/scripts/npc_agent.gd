@@ -3,10 +3,11 @@ class_name ShopNpc
 
 enum State { IDLE, PATROL, INTERACT, WALK_TO_SHOP, ENTER_SHOP, BROWSE, EXIT_SHOP, WANDER }
 
-@export var walk_speed := 2.15
-@export var browse_min_seconds := 3.0
-@export var browse_max_seconds := 7.0
-@export var wander_radius := 24.0
+@export var walk_speed: float = 2.15
+@export var browse_min_seconds: float = 3.0
+@export var browse_max_seconds: float = 7.0
+@export var wander_radius: float = 24.0
+@export_range(0.0, 1.0, 0.05) var shop_visit_chance: float = 0.20
 
 @onready var navigation_agent: NavigationAgent3D = $NavigationAgent3D
 @onready var visual: Node3D = $Visual
@@ -15,11 +16,18 @@ enum State { IDLE, PATROL, INTERACT, WALK_TO_SHOP, ENTER_SHOP, BROWSE, EXIT_SHOP
 @onready var wait_timer: Timer = $WaitTimer
 
 var shop: Node3D
-var state := State.IDLE
-var browse_stops := 0
-var inside_shop := false
-var home_position := Vector3.ZERO
-var color := Color.WHITE
+var state: State = State.IDLE
+var browse_stops: int = 0
+var inside_shop: bool = false
+var home_position: Vector3 = Vector3.ZERO
+var color: Color = Color.WHITE
+var full_detail: bool = true
+var _navigation_ready: bool = false
+var _path_refresh_remaining: float = 0.0
+var _next_path_point: Vector3 = Vector3.ZERO
+var _gravity: float = 9.8
+var _safe_horizontal_velocity: Vector3 = Vector3.ZERO
+var _has_safe_velocity: bool = false
 var _animation_playback: AnimationNodeStateMachinePlayback
 var _rng := RandomNumberGenerator.new()
 static var _color_materials: Dictionary = {}
@@ -28,7 +36,13 @@ static var _color_materials: Dictionary = {}
 func _ready() -> void:
 	_rng.randomize()
 	home_position = global_position
-	# Waiting NPCs need neither physics ticks nor RVO avoidance updates.
+	add_to_group("world_npcs")
+	floor_snap_length = 0.25
+	safe_margin = 0.02
+	up_direction = Vector3.UP
+	floor_max_angle = deg_to_rad(45.0)
+	_gravity = float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+	# Las pausas conservan Timer y FSM, sin gastar actualizaciones RVO.
 	navigation_agent.avoidance_enabled = false
 	navigation_agent.radius = 0.38
 	navigation_agent.max_speed = walk_speed
@@ -38,7 +52,32 @@ func _ready() -> void:
 	if shop != null:
 		_connect_door()
 	set_state(State.IDLE)
-	_begin_wait(0.01)
+
+
+func start_persistent_life(visit_first: bool = false, start_inside: bool = false) -> void:
+	# Los hijos existen antes de que Main construya y sincronice la navegación.
+	var map_rid: RID = get_world_3d().navigation_map
+	while NavigationServer3D.map_get_iteration_id(map_rid) == 0:
+		await get_tree().physics_frame
+	# Dejar también un tick para registrar los cuerpos estáticos del mapa.
+	await get_tree().physics_frame
+	_navigation_ready = true
+	if start_inside and _enter_shop():
+		browse_stops = _rng.randi_range(1, 3)
+		_next_browse_stop()
+	elif visit_first:
+		start_visit()
+	else:
+		_begin_wander()
+
+
+func set_full_detail(enabled: bool) -> void:
+	full_detail = enabled
+	# Las personas lejanas siguen moviéndose y colisionando, sin desaparecer.
+	animation_tree.active = enabled
+	navigation_agent.avoidance_enabled = enabled and state != State.IDLE and state != State.INTERACT
+	_has_safe_velocity = false
+	_path_refresh_remaining = 0.0
 
 
 func configure(target_shop: Node3D, model_color: Color) -> void:
@@ -61,8 +100,8 @@ func set_state(next_state: State) -> void:
 	wait_timer.stop()
 	state = next_state
 	var is_waiting := state == State.IDLE or state == State.INTERACT
-	navigation_agent.avoidance_enabled = not is_waiting
-	set_physics_process(not is_waiting)
+	navigation_agent.avoidance_enabled = full_detail and not is_waiting
+	_has_safe_velocity = false
 	if is_waiting:
 		velocity = Vector3.ZERO
 	match state:
@@ -73,33 +112,47 @@ func set_state(next_state: State) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if navigation_agent.is_navigation_finished():
-		_on_destination_reached()
-		velocity = Vector3.ZERO
+	if not _navigation_ready:
 		return
-	var next := navigation_agent.get_next_path_position()
-	var direction := next - global_position
-	direction.y = 0.0
-	if direction.length_squared() < 0.0001:
-		velocity = Vector3.ZERO
-		return
-	direction = direction.normalized()
-	var desired_velocity := direction * walk_speed
-	# NavigationAgent3D supplies a collision-safe velocity among moving NPCs.
-	navigation_agent.set_velocity(desired_velocity)
-	if desired_velocity.length_squared() > 0.01:
-		visual.rotation.y = lerp_angle(visual.rotation.y, atan2(direction.x, direction.z), minf(1.0, delta * 8.0))
-
-
-func _on_safe_velocity(safe_velocity: Vector3) -> void:
-	if state == State.IDLE or state == State.INTERACT:
-		return
-	velocity = safe_velocity
+	var desired_velocity: Vector3 = Vector3.ZERO
+	var is_waiting: bool = state == State.IDLE or state == State.INTERACT
+	if not is_waiting:
+		if navigation_agent.is_navigation_finished():
+			_on_destination_reached()
+		else:
+			_path_refresh_remaining -= delta
+			if full_detail or _path_refresh_remaining <= 0.0 or global_position.distance_to(_next_path_point) < 0.45:
+				_next_path_point = navigation_agent.get_next_path_position()
+				_path_refresh_remaining = 0.20
+			var direction: Vector3 = _next_path_point - global_position
+			direction.y = 0.0
+			if direction.length_squared() >= 0.0001:
+				desired_velocity = direction.normalized() * walk_speed
+				visual.rotation.y = lerp_angle(visual.rotation.y, atan2(direction.x, direction.z), minf(1.0, delta * 8.0))
+	# Un solo paso físico por tick, también al esperar o cambiar de nivel de detalle.
+	# El callback RVO sólo entrega velocidad: no puede duplicar move_and_slide.
+	velocity.y = -0.1 if is_on_floor() else velocity.y - _gravity * delta
+	var horizontal_velocity: Vector3 = desired_velocity
+	if navigation_agent.avoidance_enabled:
+		navigation_agent.set_velocity(desired_velocity)
+		if _has_safe_velocity and desired_velocity.length_squared() > 0.0001:
+			horizontal_velocity = _safe_horizontal_velocity
+	velocity.x = horizontal_velocity.x
+	velocity.z = horizontal_velocity.z
 	move_and_slide()
 
 
+func _on_safe_velocity(safe_velocity: Vector3) -> void:
+	if not navigation_agent.avoidance_enabled or state == State.IDLE or state == State.INTERACT:
+		return
+	_safe_horizontal_velocity = Vector3(safe_velocity.x, 0.0, safe_velocity.z)
+	_has_safe_velocity = true
+
+
 func _set_destination(point: Vector3) -> void:
-	navigation_agent.target_position = point
+	var map_rid: RID = get_world_3d().navigation_map
+	navigation_agent.target_position = NavigationServer3D.map_get_closest_point(map_rid, point) if _navigation_ready else point
+	_path_refresh_remaining = 0.0
 
 
 func _on_destination_reached() -> void:
@@ -141,7 +194,10 @@ func _on_wait_complete() -> void:
 				set_state(State.EXIT_SHOP)
 				_set_destination(shop.get_exit_point())
 		State.IDLE:
-			_begin_wander()
+			if shop != null and shop_visit_chance > 0.0 and _rng.randf() < shop_visit_chance:
+				start_visit()
+			else:
+				_begin_wander()
 
 
 func _begin_wait(seconds: float) -> void:
@@ -157,13 +213,22 @@ func _next_browse_stop() -> void:
 
 
 func _begin_wander() -> void:
-	set_state(State.WANDER)
-	var angle := _rng.randf_range(-PI, PI)
-	var radius := _rng.randf_range(5.0, wander_radius)
-	var destination := home_position + Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
-	if shop != null and destination.distance_to(shop.global_position) < 8.0:
-		destination = home_position
-	_set_destination(destination)
+	set_state(State.PATROL)
+	var map_rid: RID = get_world_3d().navigation_map
+	# Sólo aceptar destinos conectados y evitar que un peatón cruce paredes de tienda.
+	for attempt in range(10):
+		var angle: float = _rng.randf_range(-PI, PI)
+		var radius: float = _rng.randf_range(5.0, wander_radius)
+		var desired: Vector3 = home_position + Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
+		if shop != null and desired.distance_to(shop.global_position) < 8.0:
+			continue
+		var destination: Vector3 = NavigationServer3D.map_get_closest_point(map_rid, desired)
+		var path: PackedVector3Array = NavigationServer3D.map_get_path(map_rid, global_position, destination, true)
+		if path.size() >= 2 and destination.distance_to(global_position) > 2.0:
+			_set_destination(destination)
+			return
+	set_state(State.IDLE)
+	_begin_wait(1.0)
 
 
 func _enter_shop() -> bool:

@@ -1,29 +1,30 @@
 # SIDE Ciudad de Bolsos — Godot 4
 
 Proyecto Godot 4 independiente del simulador web que permanece en la raíz de
-`SIDE1`. Abre `project.godot` con Godot 4.7.2 y ejecuta la escena principal.
-La cámara muestra el barrio y la tienda central; los NPC aparecen y realizan
-visitas automáticamente.
+`SIDE1`. Abre `godot4/project.godot` con Godot 4 y ejecuta la escena principal.
+El barrio tiene suelo físico continuo, jugador controlable y 24 NPC
+persistentes distribuidos entre calles, plazas y tienda.
+
+WASD/flechas para caminar, Mayús para correr, espacio para saltar, botón
+derecho para girar la cámara y Tab para alternar el panorama del barrio.
 
 ## Estructura
 
-- `scenes/Main.tscn` y `scripts/mapa.gd`: ciudad, luz, niebla, mobiliario en
-  MultiMesh y malla de navegación continua con interior de la tienda.
+- `scenes/Main.tscn` y `scripts/mapa.gd`: ciudad, suelo sólido y mobiliario.
+- `scripts/world_navigation.gd`: navegación desde las colisiones reales.
+- `scripts/world_ambience.gd`: iluminación, materiales y señalización urbana.
+- `scenes/Player.tscn` y `scripts/player_controller.gd`: jugador y cámaras.
 - `scenes/Shop.tscn` y `scripts/shop_controller.gd`: puerta con Area3D, aforo,
   vitrinas y tres variantes de bolso con materiales PBR originales.
-- `scenes/Npc.tscn`, `scenes/NpcSpawner.tscn` y `scripts/npc_*.gd`: FSM,
-  navegación, evitación y animaciones idle/walk/interact.
+- `scenes/Npc.tscn`, `scenes/NpcSpawner.tscn` y `scripts/npc_*.gd`: gestor
+  persistente, FSM, navegación y detalle por distancia sin eliminar NPC.
 - `CREDITS.md`: procedencia y licencias de los recursos usados.
 
 ## Comprobación
 
-Desde esta carpeta:
-
-```text
-godot --headless --path . --editor --quit
-godot --headless --path . --script res://tests/smoke.gd
-```
-
-La prueba comprueba la ruta desde la calle a la tienda, el aforo y la visita
-completa de un NPC. La malla se genera al iniciar la escena a partir del mapa;
-sus polígonos no se almacenan como recurso binario.
+Ejecuta los comandos desde la raíz **SIDE1**. La
+[guía de entrega](../docs/GODOT_MUNDO_CONTINUO.md) incluye configuración,
+lista de archivos, pruebas manuales y comandos PowerShell con logs locales.
+Las pruebas cubren soporte físico, cruces con teclado real, rutas libres de
+obstáculos, población persistente, aforo y visitas completas. La navegación
+se genera al iniciar; sus polígonos no se guardan como recurso binario.

@@ -1,5 +1,8 @@
 extends Node3D
 
+const WorldNavigation = preload("res://scripts/world_navigation.gd")
+const WorldAmbience = preload("res://scripts/world_ambience.gd")
+
 ## Ciudad transitable. La tienda está en el origen y su puerta sur en z=5.
 const HALF_MAP := 88.0
 const NAV_STEP := 4.0
@@ -24,6 +27,7 @@ func _ready() -> void:
 	_make_plazas()
 	_make_street_furniture()
 	_make_vegetation()
+	WorldAmbience.configure(self, _city, _materials)
 	_make_navigation_mesh()
 
 
@@ -108,39 +112,41 @@ func _make_environment() -> void:
 
 
 func _make_ground_and_roads() -> void:
-	_box("Terrain", Vector3(0, -0.15, 0), Vector3(176, 0.2, 176), _materials.grass)
+	# Una sola losa sólida evita juntas físicas entre terreno, calle y acera.
+	# Las capas decorativas se separan milímetros para evitar parpadeo de profundidad.
+	_box("Terrain", Vector3(0, -0.2, 0), Vector3(176, 0.4, 176), _materials.grass, _city, true)
 	# Tres bucles viales dan acceso al centro desde todos los bordes del mapa.
 	var unit_box := BoxMesh.new()
 	for coordinate in [-76.0, -24.0, 24.0, 76.0]:
-		_box("Road_NS", Vector3(coordinate, -0.035, 0), Vector3(9, 0.04, 176), _materials.road)
-		_box("Road_EW", Vector3(0, -0.032, coordinate), Vector3(176, 0.04, 9), _materials.road)
+		_box("Road_NS", Vector3(coordinate, -0.019, 0), Vector3(9, 0.04, 176), _materials.road)
+		_box("Road_EW", Vector3(0, -0.018, coordinate), Vector3(176, 0.04, 9), _materials.road)
 		var lane_ns_near: Array[Transform3D] = []
 		var lane_ns_far: Array[Transform3D] = []
 		var lane_ew_near: Array[Transform3D] = []
 		var lane_ew_far: Array[Transform3D] = []
 		for stripe in range(-84, 85, 8):
 			if stripe < 0:
-				lane_ns_near.append(_box_transform(Vector3(coordinate, 0.0, stripe), Vector3(0.13, 0.008, 3.3)))
-				lane_ew_near.append(_box_transform(Vector3(stripe, 0.0, coordinate), Vector3(3.3, 0.008, 0.13)))
+				lane_ns_near.append(_box_transform(Vector3(coordinate, 0.003, stripe), Vector3(0.13, 0.002, 3.3)))
+				lane_ew_near.append(_box_transform(Vector3(stripe, 0.003, coordinate), Vector3(3.3, 0.002, 0.13)))
 			else:
-				lane_ns_far.append(_box_transform(Vector3(coordinate, 0.0, stripe), Vector3(0.13, 0.008, 3.3)))
-				lane_ew_far.append(_box_transform(Vector3(stripe, 0.0, coordinate), Vector3(3.3, 0.008, 0.13)))
+				lane_ns_far.append(_box_transform(Vector3(coordinate, 0.003, stripe), Vector3(0.13, 0.002, 3.3)))
+				lane_ew_far.append(_box_transform(Vector3(stripe, 0.003, coordinate), Vector3(3.3, 0.002, 0.13)))
 		# Lotes por tramo conservan el descarte por distancia de las marcas.
 		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_near, 95, _city, true)
 		_multimesh("LaneMarks_NS", unit_box, _materials.line, lane_ns_far, 95, _city, true)
 		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_near, 95, _city, true)
 		_multimesh("LaneMarks_EW", unit_box, _materials.line, lane_ew_far, 95, _city, true)
 	# Los paseos centrales conectan la tienda con ambas plazas.
-	_box("CentralWalk_EW", Vector3(0, -0.017, 0), Vector3(42, 0.05, 15), _materials.paving)
-	_box("CentralWalk_NS", Vector3(0, -0.014, 0), Vector3(15, 0.05, 42), _materials.paving)
+	_box("CentralWalk_EW", Vector3(0, -0.022, 0), Vector3(42, 0.05, 15), _materials.paving)
+	_box("CentralWalk_NS", Vector3(0, -0.021, 0), Vector3(15, 0.05, 42), _materials.paving)
 	for coordinate in [-50.0, 0.0, 50.0]:
-		_box("Sidewalk_NS", Vector3(coordinate, -0.01, 0), Vector3(3.4, 0.05, 176), _materials.paving)
-		_box("Sidewalk_EW", Vector3(0, -0.008, coordinate), Vector3(176, 0.05, 3.4), _materials.paving)
+		_box("Sidewalk_NS", Vector3(coordinate, -0.022, 0), Vector3(3.4, 0.05, 176), _materials.paving)
+		_box("Sidewalk_EW", Vector3(0, -0.021, coordinate), Vector3(176, 0.05, 3.4), _materials.paving)
 	for x in [-24.0, 24.0]:
 		for z in [-24.0, 24.0]:
 			var crosswalk: Array[Transform3D] = []
 			for offset in range(-4, 5):
-				crosswalk.append(_box_transform(Vector3(x + offset * 0.85, 0.006, z), Vector3(0.5, 0.012, 7.4)))
+				crosswalk.append(_box_transform(Vector3(x + offset * 0.85, 0.005, z), Vector3(0.5, 0.002, 7.4)))
 			_multimesh("Crosswalk", unit_box, _materials.line, crosswalk, 95, _city, true)
 
 
@@ -170,7 +176,7 @@ func _make_buildings() -> void:
 
 func _make_plazas() -> void:
 	for center in [Vector3(-36, 0, 0), Vector3(36, 0, 0), Vector3(0, 0, -36), Vector3(0, 0, 36)]:
-		_box("Plaza", center + Vector3(0, -0.008, 0), Vector3(15, 0.05, 15), _materials.paving)
+		_box("Plaza", center + Vector3(0, -0.021, 0), Vector3(15, 0.05, 15), _materials.paving)
 		_box("Planter", center + Vector3(5.3, 0.28, 5.3), Vector3(2.1, 0.55, 2.1), _materials.brick, _city, true, 90)
 		_box("BenchSeat", center + Vector3(-4.2, 0.57, 4.8), Vector3(2.2, 0.14, 0.65), _materials.wood, _city, false, 90)
 		_box("BenchBack", center + Vector3(-4.2, 0.96, 5.1), Vector3(2.2, 0.9, 0.12), _materials.wood, _city, false, 90)
@@ -229,28 +235,8 @@ func _make_vegetation() -> void:
 
 
 func _make_navigation_mesh() -> void:
-	# Malla continua con celdas compartidas: exterior, umbral e interior.
-	var navmesh := NavigationMesh.new()
-	navmesh.cell_size = 0.25
-	navmesh.agent_radius = 0.45
-	var vertices := PackedVector3Array()
-	var side := int(HALF_MAP * 2.0 / NAV_STEP)
-	for z in range(side + 1):
-		for x in range(side + 1):
-			vertices.append(Vector3(-HALF_MAP + float(x) * NAV_STEP, 0.035, -HALF_MAP + float(z) * NAV_STEP))
-	navmesh.vertices = vertices
-	for z in range(side):
-		for x in range(side):
-			var center_x := -HALF_MAP + (float(x) + 0.5) * NAV_STEP
-			var center_z := -HALF_MAP + (float(z) + 0.5) * NAV_STEP
-			if _inside_building(center_x, center_z) or _inside_shop_wall(center_x, center_z):
-				continue
-			var a := z * (side + 1) + x
-			var b := a + 1
-			var c := a + side + 1
-			var d := c + 1
-			navmesh.add_polygon(PackedInt32Array([a, c, d, b]))
-	navigation_region.navigation_mesh = navmesh
+	# La navegación usa las mismas cajas físicas que detienen al jugador.
+	WorldNavigation.build(navigation_region, self)
 
 
 func _inside_building(x: float, z: float) -> bool:
