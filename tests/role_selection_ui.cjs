@@ -37,6 +37,9 @@ const python=process.env.PYTHON_BIN||'C:/Users/Asus/.cache/codex-runtimes/codex-
       assert(geometry.scrollWidth<=width+1,`${width}x${height}: horizontal scroll`);
       for(const item of geometry.items)assert(item.width>0&&item.height>0&&item.left>=0&&item.top>=0&&item.right<=width+1&&item.bottom<=height+1,`${width}x${height}: clipped ${JSON.stringify(item)}`);
       const card=geometry.items.find(item=>item.selector==='.student-hero');
+      const teacher=geometry.items.find(item=>item.selector==='.teacher-mini');
+      assert(width-teacher.right<=32&&height-teacher.bottom<=32,`${width}x${height}: professor access stays in bottom-right corner`);
+      assert(teacher.top>=card.bottom||teacher.left>=card.right,`${width}x${height}: professor access overlaps student card`);
       for(const item of geometry.items.filter(item=>['.student-hero-img','.student-hero-copy','.hero-eyebrow','.hero-cta'].includes(item.selector)))assert(item.left>=card.left&&item.top>=card.top&&item.right<=card.right+1&&item.bottom<=card.bottom+1,`${width}x${height}: content escapes student card ${item.selector}`);
       for(const [role,modal] of [['student','#studentModal'],['teacher','#teacherLoginModal']]){
         await page.locator(`[data-profile="${role}"]`).click();
