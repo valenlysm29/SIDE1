@@ -210,8 +210,17 @@
   global.SIDE = global.SIDE || {};
   async function guardarPuntaje(partidaId,empresaId,puntaje){
     const sb=client();if(!sb)return offline();
+    if(!partidaId||!empresaId)return {success:false,error:'Falta identificar la partida o la empresa para guardar la nota.'};
     if(!Number.isFinite(puntaje)||puntaje<0||puntaje>20)return {success:false,error:'La nota debe estar entre 0 y 20.'};
-    try{const {data,error}=await sb.rpc('guardar_puntaje_docente',{p_partida_id:partidaId,p_empresa_id:empresaId,p_puntaje:puntaje});return error||data?.error?{success:false,error:error?.message||data.error}:{success:true};}
+    try{
+      const {data,error}=await sb.rpc('guardar_puntaje_docente',{p_partida_id:partidaId,p_empresa_id:empresaId,p_puntaje:puntaje});
+      if(error||data?.error){
+        const missing=/^(PGRST202|PGRST204|42703|42883)$/.test(String(error?.code||''));
+        return {success:false,error:missing?'Falta configurar las notas en Supabase. Aplica supabase/migrations/20260929_guardar_puntaje_docente.sql.':error?.message||data.error};
+      }
+      if(data?.success!==true||data.puntaje==null||Number(data.puntaje)!==Math.round(puntaje*100)/100)return {success:false,error:'Supabase no confirmó el guardado de la nota. Vuelve a intentarlo.'};
+      return {success:true,puntaje:Number(data.puntaje)};
+    }
     catch(error){return {success:false,error:error.message};}
   }
   async function controlar(partidaId,accion,config=null,expectedRound=null){

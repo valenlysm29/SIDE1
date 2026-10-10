@@ -86,7 +86,7 @@
             if (jobs[key]?.revision !== snapshot.revision) continue;
             const attempts = ++jobs[key].attempts;
             persist();
-            onStatus(key, attempts >= retryMs.length ? 'failed' : 'retrying');
+            onStatus(key, attempts >= retryMs.length ? 'failed' : 'retrying', error.message);
             const wait = retryMs[Math.min(attempts - 1, retryMs.length - 1)];
             retryDelay = retryDelay === null ? wait : Math.min(retryDelay, wait);
           }

@@ -61,7 +61,7 @@ function fixture(name){
  await page.locator('#publishPodium').click();
  assert.match(await page.locator('#podiumState').innerText(),/24 horas/i);
  await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400000).toISOString();p.expiresAt=new Date(Date.now()-1000).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));loadPublished();});
- assert.equal(await page.locator('#podiumPreview .podium-place').count(),0);
+ assert.equal(await page.locator('#podiumPreview .podium-place').count(),1,'expiry hides the publication, not the teacher grade preview');
  assert.match(await page.locator('#podiumState').innerText(),/vencida/i);
  await page.evaluate(async()=>{
    state.partidaId='test-game-id';

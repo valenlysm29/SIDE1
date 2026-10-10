@@ -141,9 +141,9 @@
       <div class="hero-card winner-hero"><div><span class="eyebrow">PODIO</span><h2>Resultados y calificaciones</h2><p>SIDE muestra una sugerencia financiera. El podio final publicado se ordena exclusivamente por las notas del profesor y se muestra durante 24 horas.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
       <div class="grid two">
         <article class="card"><div class="card-title"><h3>Sugerencia de SIDE</h3><span>Solo informativa</span></div><p class="hint">Puntaje de 0 a 100: margen de utilidad 35 (20% alcanza el máximo), rentabilidad sobre activos 25 (15%), efectivo/activos 25 (30%) y baja deuda/activos 15. Los indicadores sin datos valen cero.</p><div id="sidePodium" class="suggested-podium"></div></article>
-        <article class="card"><div class="card-title"><h3>Podio · publicación de 24 horas</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium"></div></article>
+        <article class="card"><div class="card-title"><h3>Podio según las notas actuales</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium" aria-live="polite"></div></article>
       </div>
-      <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Califica a todas las empresas activas en Empresas para publicar. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status"></p></article>
+      <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Guarda las notas en Empresas, también después de terminar todos los ciclos. Al finalizar se evalúan todas las empresas participantes, aunque estén desconectadas o inactivas. La vista previa se actualiza con cada nota; pulsa PUBLICAR PODIO para publicar los cambios. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status" role="status"></p></article>
     </section>
     <section id="tab-historial" class="tab-panel teacher-workspace" aria-labelledby="historyHeading">
       <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Historial</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
@@ -192,7 +192,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261009-waiting"></script>
+<script src="services/partida_service.js?v=20261009-grades"></script>
 <script src="services/empresa_service.js?v=20261009-waiting"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
@@ -200,9 +200,9 @@
 <script src="js/teacher_history.js?v=20260930-2"></script>
 <script src="js/side_rules.js?v=20261009-waiting"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
-<script src="js/teacher_podium.js?v=20260929-1"></script>
-<script src="services/teacher_sync.js?v=20260929-1"></script>
+<script src="js/teacher_podium.js?v=20261009-grades"></script>
+<script src="services/teacher_sync.js?v=20261009-grades"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20261009-waiting-history"></script>
+<script src="js/docente.js?v=20261009-grades"></script>
 </body>
 </html>

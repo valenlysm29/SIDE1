@@ -660,12 +660,14 @@ function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map((
 const presenceTracker=window.SIDE.TeacherSync.createPresenceTracker({now:teacherNow});
 const presenceStates=new Map();
 const gradeUiStatus=new Map();
+const gradeUiErrors=new Map();
 const gradeFailureNotified=new Set();
 function companyPresence(r){
   if(r.fuente!=='supabase')return r.conectada?'online':'idle';
   return presenceStates.get(String(r.empresaId||r.id))||'unconfirmed';
 }
 function companyActivity(r,presence){
+  if(podiumOptions().finished)return 'PARTICIPACIÓN FINALIZADA';
   if(presence==='online')return r.integracion?'CONECTADA · EN SALA DE ESPERA':r.tomandoDecisiones?'CONECTADA · TOMANDO DECISIONES':'CONECTADA · EN PARTIDA';
   return presence==='idle'?'SIN ACTIVIDAD RECIENTE':'REGISTRADA · PRESENCIA SIN CONFIRMAR';
 }
@@ -676,8 +678,9 @@ function gradeLabel(r){const value=gradeValue(r);return value==null?'Sin calific
 const gradeQueue=window.SIDE.TeacherSync.createGradeQueue({
   storage:localStorage,
   save:({partidaId,empresaId,puntaje})=>window.SIDE.PartidaService.guardarPuntaje(partidaId,empresaId,puntaje),
-  onStatus:(key,status)=>{
+  onStatus:(key,status,error)=>{
     gradeUiStatus.set(key,status);
+    if(error)gradeUiErrors.set(key,error);else gradeUiErrors.delete(key);
     if(status==='saving'||status==='saved')gradeFailureNotified.delete(key);
     if(status==='saved'){
       const latest=grades(),entry=latest[key];
@@ -698,10 +701,15 @@ const gradeQueue=window.SIDE.TeacherSync.createGradeQueue({
 });
 function gradeStatus(key){
   const status=gradeUiStatus.get(key);
-  return status==='saving'||status==='retrying'?'Guardando…':status==='saved'?'Guardado ✓':status==='failed'?'Sin conexión · reintentando…':grades()[key]?.pending?'Guardando…':grades()[key]?'Guardado ✓':'Sin calificar';
+  if(status==='retrying'||status==='failed')return (gradeUiErrors.get(key)||'No se pudo sincronizar la nota.')+' · Pendiente de guardar; reintentando…';
+  const local=grades()[key],report=state.reports.find(r=>gradeKey(r)===key);
+  if(status==='saving'||local?.pending)return 'Guardando…';
+  if(status==='saved'||local||report?.teacherScore!=null)return 'Guardado ✓'+(report?.empresaId?' · Supabase':' · en este navegador');
+  return 'Sin calificar';
 }
 function saveCompanyGrade(id,value){
   const report=state.reports.find(r=>r.id===id);if(!report)return;
+  if(report.fuente==='supabase'&&(!report.empresaId||!state.partidaId)){toast('No se pudo identificar la partida de esta empresa. Recarga antes de guardar la nota.');return false;}
   if(String(value).trim()===''||!Number.isFinite(Number(value))||Number(value)<0||Number(value)>20){toast('Escribe una nota entre 0 y 20.');return false;}
   const note=Math.round(Number(value)*100)/100,all=grades(),key=gradeKey(report),entry={value:note,pending:Boolean(report.empresaId&&state.partidaId),updatedAt:new Date().toISOString()};
   all[key]=entry;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(all));
@@ -743,6 +751,7 @@ function renderCompanies(force=false){
     if(document.activeElement!==input&&input.dataset.dirty!=='true'&&input.value!==String(value??''))input.value=value??'';
     const status=gradeStatus(gradeKey(r)),statusEl=card.querySelector('[data-grade-status]');if(statusEl.textContent!==status)statusEl.textContent=status;
     const eliminate=card.querySelector('[data-eliminate]'),label=r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad';if(eliminate.textContent!==label)eliminate.textContent=label;
+    eliminate.classList.toggle('hidden',podiumOptions().finished);
   }
   for(const card of current.values())card.remove();
 }
@@ -771,24 +780,33 @@ function renderResults(){
 function renderWinnerSelect(){renderPodium();
 }
 function publishedPodium(){try{return JSON.parse(localStorage.getItem('SIDE_PUBLISHED_PODIUM')||'null')}catch{return null}}
+function podiumOptions(){return {finished:Boolean(gameStatus()?.finishedAt&&!gameStatus()?.cancelledAt)};}
+function gradingReports(){return window.SIDE_TEACHER_PODIUM.eligibleReports(state.reports,podiumOptions());}
+function gradeSignature(){return JSON.stringify(gradingReports().map(r=>[String(r.empresaId||r.id||r.empresa),gradeValue(r)==null?null:Number(gradeValue(r))]).sort((a,b)=>a[0].localeCompare(b[0])));}
 function podiumCandidates(){
-  return window.SIDE_TEACHER_PODIUM.finalPodium(state.reports,gradeValue);
+  return window.SIDE_TEACHER_PODIUM.finalPodium(state.reports,gradeValue,podiumOptions());
 }
 function renderPodium(){
   const publication=publishedPodium(),sameGame=publication&&(!publication.code||publication.code===$('gameCode').value);
   const visible=RULES.podiumVisible(publication,$('gameCode').value);
-  const list=visible?publication.podium:sameGame?[]:podiumCandidates();
+  // La vista del profesor refleja siempre las notas actuales, incluso al vencer
+  // una publicación. El snapshot publicado sólo cambia al volver a publicar.
+  const list=podiumCandidates();
+  const changed=Boolean(sameGame&&(publication.gradeSignature?publication.gradeSignature!==gradeSignature():JSON.stringify((publication.podium||[]).map(r=>[r.empresa,Number(r.grade)]))!==JSON.stringify(list.map(r=>[r.empresa,Number(r.grade)]))));
+  const pending=gradingReports().some(r=>grades()[gradeKey(r)]?.pending||gradeQueue.has(gradeKey(r)));
   const names=['🥇','🥈','🥉'],classes=['first','second','third'];
-  $('podiumState').textContent=visible?'Publicado · 24 horas':sameGame?'Publicación vencida':'Vista previa';
-  $('publishStatus').textContent=visible?'Disponible hasta: '+new Date(RULES.podiumExpiry(publication)).toLocaleString('es-PE'):sameGame?'El podio dejó de mostrarse al cumplirse 24 horas.':'El podio será visible durante 24 horas desde su publicación.';
-  $('podiumPreview').innerHTML=list.map((r,i)=>`<div class="podium-place ${classes[i]}"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><small>${r.grade!=null?Number(r.grade).toLocaleString('es-PE')+' / 20':visible?'Sin calificar':gradeLabel(r)}</small></div>`).join('')||`<p>${sameGame?'La publicación del podio ha finalizado.':'Sin empresas activas.'}</p>`;
-  $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Sin empresas activas.</p>';
+  $('podiumState').textContent=visible?(changed?'Notas actualizadas · vista previa':'Publicado · 24 horas'):sameGame?'Publicación vencida · vista previa':'Vista previa';
+  $('publishStatus').textContent=pending?'Hay notas pendientes de sincronizar. Espera a que aparezcan como guardadas antes de publicar.':changed?'Las notas cambiaron. Pulsa PUBLICAR PODIO para publicar las calificaciones actuales.':visible?'Disponible hasta: '+new Date(RULES.podiumExpiry(publication)).toLocaleString('es-PE'):sameGame?'La publicación venció a las 24 horas. Las notas se conservan; puedes volver a publicar.':'El podio será visible durante 24 horas desde su publicación.';
+  $('podiumPreview').innerHTML=list.map((r,i)=>`<div class="podium-place ${classes[i]}"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><small>${Number(r.grade).toLocaleString('es-PE')} / 20</small></div>`).join('')||`<p>${gradingReports().length?'Aún no hay notas. Guarda las calificaciones en Empresas para ver el podio.':'Aún no hay empresas participantes.'}</p>`;
+  $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports,podiumOptions()).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Aún no hay empresas participantes.</p>';
 }
 function publishPodium(){
-  const active=state.reports.filter(r=>r.estado!=='eliminada');
-  if(!active.length||active.some(r=>gradeValue(r)==null)){toast('Califica a todas las empresas activas antes de publicar.');return;}
+  const participants=gradingReports();
+  if(!participants.length||participants.some(r=>gradeValue(r)==null)){toast('Califica a todas las empresas participantes antes de publicar.');return;}
+  if(participants.some(r=>grades()[gradeKey(r)]?.pending||gradeQueue.has(gradeKey(r)))){toast('Espera a que todas las notas se sincronicen antes de publicar el podio.');return;}
   const podium=podiumCandidates();
-  const publication={code:$('gameCode').value,publishedAt:new Date().toISOString(),winner:podium[0].empresa,reason:$('winnerReason').value,podium:podium.map(r=>({empresa:r.empresa,grade:r.grade}))};
+  if(!podium.length){toast('No hay calificaciones válidas para publicar.');return;}
+  const publication={code:$('gameCode').value,publishedAt:new Date().toISOString(),winner:podium[0].empresa,reason:$('winnerReason').value,gradeSignature:gradeSignature(),podium:podium.map(r=>({empresa:r.empresa,grade:r.grade}))};
   publication.expiresAt=new Date(RULES.podiumExpiry(publication)).toISOString();
   localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(publication));
   renderPodium();toast('Podio publicado por 24 horas.');
