@@ -1,0 +1,10 @@
+{
+  "file": "C:\\Users\\Asus\\OneDrive\\Documentos\\side_side_va\\assets\\models\\npc\\city_man_hoodie.glb",
+  "status": "FAIL",
+  "errors": [
+    "[Errno 2] No such file or directory: 'C:\\\\Users\\\\Asus\\\\OneDrive\\\\Documentos\\\\side_side_va\\\\assets\\\\models\\\\npc\\\\city_man_hoodie.glb'"
+  ],
+  "renders": {},
+  "clips": {},
+  "visualReview": "PENDING"
+}
