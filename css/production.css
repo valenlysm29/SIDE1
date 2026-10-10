@@ -347,7 +347,7 @@ body:has(#decisionMenu:not(.hidden)) { overflow-x: clip; }
   #decisionMenu .mission-label { font-size: 9px; margin-bottom: 3px; }
 }
 
-/* Tablet SIDE: each item keeps its cost, rule and local draft action together. */
+/* Tablet SIDE: each item keeps its cost and rule together; drafts are saved per section. */
 #decisionMenu { font-family: var(--side-font, Montserrat, Arial, sans-serif); }
 #decisionMenu .cash-hud { border-color: var(--side-gold-edge); box-shadow: none; }
 #decisionMenu .cash-hud::before { display: none; }
@@ -401,13 +401,6 @@ body:has(#decisionMenu:not(.hidden)) { overflow-x: clip; }
 #decisionMenu .decision-action-pair button small { color: var(--ui-muted); font-size: 13px; }
 #decisionMenu .decision-action-pair button strong { font-size: 14px; }
 #decisionMenu .decision-action-pair .submit-decisions-btn small { color: var(--side-gold-ink); opacity: 1; }
-#decisionMenu .item-draft-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--ui-line); }
-#decisionMenu .item-draft-save { flex: 0 0 auto; min-height: 44px; padding: 10px 16px; border: 1px solid var(--side-line-control); border-radius: var(--side-radius-control); background: var(--ui-raised); color: var(--ui-text); font: 700 14px/1.5 var(--side-font, Montserrat, Arial, sans-serif); cursor: pointer; }
-#decisionMenu .item-draft-save:hover:enabled { border-color: var(--ui-yellow); color: var(--ui-yellow); }
-#decisionMenu .item-draft-save:disabled { color: var(--ui-muted); background: var(--ui-inset); cursor: not-allowed; }
-#decisionMenu .item-draft-feedback { flex: 1 1 240px; min-width: 0; max-width: 72ch; margin: 0; color: var(--ui-muted); font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
-#decisionMenu .item-draft-feedback[data-state=saved] { color: var(--ui-green); }
-#decisionMenu .item-draft-feedback[data-state=error] { color: var(--side-danger); }
 #decisionMenu button:focus-visible,
 #decisionMenu input:focus-visible { outline: 3px solid var(--ui-yellow); outline-offset: 3px; }
 #decisionMenu button:disabled { cursor: not-allowed; }

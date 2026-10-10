@@ -1,5 +1,5 @@
 'use strict';
-// Run sequentially with other Chromium/SwiftShader runners. Local demo only.
+// Section draft regression; filename retained for the integral test runner. Local demo only.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const root=path.resolve(__dirname,'..'),output=path.join(__dirname,'output/mejora-tablet-hud-2026-10-01');
@@ -23,27 +23,37 @@ const server=http.createServer((request,response)=>{
       await page.goto(base,{waitUntil:'domcontentloaded'});
       await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA BORRADOR',company:'QA BORRADOR',game:DEMO_GAME};currentCategory='B';openDecisionMenu();decisionDrafts.MOLDE={optionIds:['molde_1']};renderDecisionCategory();});
       const finance=()=>page.evaluate(()=>JSON.stringify({state:decisionState,ledger:cashLedger,round:currentRound(),submitted:decisionsSubmitted()}));
-      const before=await finance(),button=page.locator('[data-save-item-draft="MOLDE"]'),feedback=page.locator('[data-item="MOLDE"] .item-draft-feedback');
-      await button.click();await assert.equal(await feedback.getAttribute('data-state'),'saved');assert.match(await feedback.textContent(),/Borrador local guardado; pendiente de envío/);
-      assert.equal(await finance(),before);
-      assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem(`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`)).B.MOLDE.optionIds),['molde_1']);
+      const button=page.locator('#saveDecisionSection');
+      for(const cat of ['B','C','F','D','E','A']){
+        await page.locator(`[data-cat="${cat}"]`).click();
+        assert.equal(await page.getByRole('button',{name:/guardar borrador/i}).count(),cat==='A'?0:1);
+        assert.equal(await page.locator('#decisionCards button').filter({hasText:/guardar borrador/i}).count(),0);
+      }
+      await page.locator('[data-cat="B"]').click();
+      await button.click();
+      assert.deepEqual(await page.evaluate(()=>decisionState.MOLDE.optionIds),['molde_1']);
+      assert.equal(await page.evaluate(()=>sectionSubmitted('B')),false);
+      const before=await finance();
+      await button.click();assert.equal(await finance(),before);
+      await page.evaluate(()=>{loadDecisionState();restoreDraftsForRound();renderDecisionCategory();});
+      assert.deepEqual(await page.evaluate(()=>initDraft(findDecisionItem('MOLDE')).optionIds),['molde_1']);
       const bounds=await button.boundingBox();assert.ok(bounds.height>=44,'44px draft target');
       await page.screenshot({path:path.join(output,`tablet-draft-${viewport.width}x${viewport.height}-viewport.png`)});
       await page.evaluate(()=>window.scrollTo(0,0));
       await page.screenshot({path:path.join(output,`tablet-draft-${viewport.width}x${viewport.height}.png`),fullPage:true});
-      await page.evaluate(()=>{window.__draftOriginalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.startsWith('SIDE_DECISION_DRAFTS_'))throw new DOMException('Quota exceeded','QuotaExceededError');return window.__draftOriginalSet.call(this,key,value);};});
-      await button.click();assert.equal(await feedback.getAttribute('data-state'),'error');assert.equal(await finance(),before);
+      await page.evaluate(()=>{window.__draftOriginalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key.startsWith('SIDE_DECISIONS_')||key.startsWith('SIDE_DECISION_DRAFTS_'))throw new DOMException('Quota exceeded','QuotaExceededError');return window.__draftOriginalSet.call(this,key,value);};});
+      await button.click();assert.equal(await finance(),before);
       const storedDraft=await page.evaluate(()=>localStorage.getItem(`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`));
       await page.evaluate(()=>{Storage.prototype.setItem=window.__draftOriginalSet;delete window.__draftOriginalSet;const config=teacherConfig();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({...config,lifecycleVersion:2,phase:'results'}));decisionDrafts.MOLDE.optionIds=['molde_2'];});
       assert.equal(await page.evaluate(()=>studentAccess().canOperate),false);
       await button.click();assert.equal(await finance(),before);assert.equal(await page.evaluate(()=>localStorage.getItem(`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`)),storedDraft);
       await page.evaluate(()=>{localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({...teacherConfig(),phase:'decisions'}));localStorage.setItem(sectionSubmissionKey(currentCategory),'1');renderDecisionCategory();});
-      assert.equal(await page.locator('[data-save-item-draft="MOLDE"]').isDisabled(),true);
-      assert.match(await page.locator('[data-item="MOLDE"] .item-draft-feedback').textContent(),/enviada; edición bloqueada/);
+      assert.equal(await button.isDisabled(),true);
+      assert.match(await page.locator('#sectionSaveHint').textContent(),/enviadas: edición bloqueada/);
       const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert.equal(overflow,false,`no overflow ${viewport.width}`);
       assert.deepEqual(errors,[]);assert.deepEqual(localFailures,[]);
-      results.push({viewport,passed:true,financialStatePreserved:true,localStorageFailureHandled:true,closedCyclePreventsDraftWrite:true,submittedSectionLocked:true,errors,localFailures,overflow});await page.close();
+      results.push({viewport,passed:true,repeatedSavePreservesFinancialState:true,localStorageFailureHandled:true,closedCyclePreventsDraftWrite:true,submittedSectionLocked:true,errors,localFailures,overflow});await page.close();
     }
-    fs.writeFileSync(path.join(output,'tablet-item-draft-results.json'),JSON.stringify(results,null,2));console.log('PASS Tablet: local draft, quota errors, submission lock and five viewports');
+    fs.writeFileSync(path.join(output,'tablet-item-draft-results.json'),JSON.stringify(results,null,2));console.log('PASS Tablet: one draft button per section, persistence, quota errors, submission lock and five viewports');
   }finally{await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

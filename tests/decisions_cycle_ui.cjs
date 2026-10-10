@@ -21,6 +21,9 @@ for(const [width,height] of [[1366,768],[1024,768],[768,1024],[390,844],[320,568
   const layout=await page.evaluate(()=>({wide:document.documentElement.scrollWidth>innerWidth,scroll:([...document.querySelectorAll('#decisionMenu,#decisionTabs,.decision-window,.decision-detail,.decision-cards')]).filter(e=>e.scrollHeight>e.clientHeight+2&&['auto','scroll','hidden'].includes(getComputedStyle(e).overflowY)).map(e=>e.id||e.className)}));
   assert.equal(layout.wide,false,`horizontal overflow ${width}/${cat}`);assert.deepEqual(layout.scroll,[],`nested vertical scroll ${width}/${cat}`);
   assert.equal(await page.locator('.production-dop').count(),cat==='C'?1:0,`DOP exclusivity ${width}/${cat}`);
+  assert.equal(await page.locator('#decisionCards button').filter({hasText:/guardar borrador/i}).count(),0,`no item draft buttons ${width}/${cat}`);
+  assert.equal(await page.getByRole('button',{name:/guardar borrador/i}).count(),cat==='A'?0:1,`one draft action per section ${width}/${cat}`);
+  assert.equal(await page.evaluate(()=>document.querySelector('#decisionCards').nextElementSibling.classList.contains('section-save-bar')),true);
   if(cat==='C'){
    for(const id of await page.evaluate(()=>productionPlan().processes.map(process=>process.id)))assert.equal(await page.locator(`[data-pd-node="${id}"]`).count(),1);
    assert.equal(await page.locator('[data-pd-connectors] path').count(),7);
