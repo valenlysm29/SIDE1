@@ -41,6 +41,7 @@ async function ejecutar(numero=3){
       d.lotes.forEach((l,i)=>{for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])dispatch(`[data-lote="${i}"][data-campo="${campo}"]`,l[campo]??'');});
     },d);
     await p.locator('[data-excel-enviar]').click();assert.match(await p.locator('[data-excel-status]').innerText(),/confirmado/);
+    await p.evaluate(()=>updateHud());assert.equal(await p.evaluate(()=>decisionProgressPercent()),100,'Confirmar lotes completa progreso');assert.match(await p.locator('#decisionProgressText').innerText(),/1\/1.*100%/);assert.equal(await p.locator('#topSubmitAllDecisions').isDisabled(),true,'Plan confirmado no reabre revisión antigua');
     assert.equal(await p.evaluate(()=>JSON.stringify(cashLedger)),ledgerAntes,'Confirmar Excel no vuelve a descontar el ledger anterior');
     const report=await p.evaluate(()=>syncStudentReportPreview());const enviadas=report.excelDecisionState?.decisiones;assert.ok(enviadas,'Reporte conserva plan confirmado');assert.equal(enviadas.montoPrestamo,d.montoPrestamo||0,'Préstamo UI igual al escenario');if(d.reputacionLiteral!==undefined)assert.equal(enviadas.reputacionLiteral,d.reputacionLiteral,'Reputación literal igual al escenario');assert.equal(enviadas.lotes.length,d.lotes.length,'Lotes completos');
     for(const [i,lote] of d.lotes.entries())for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])assert.equal(enviadas.lotes[i][campo]??'',lote[campo]??'',`Lote ${i} ${campo}: UI conserva entrada`);

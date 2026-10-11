@@ -21,10 +21,16 @@ const {cerrarCiclo}=require('../js/engine/ciclo.js'),{adjuntarCaja}=require('../
   const guardar=(c,out)=>rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:c.token,p_cierre:out});
   await db.exec('reset role');await db.query('update side_student_state set revision=revision+1 where empresa_id=$1',[id]);await db.exec('set role authenticated');
   assert.equal((await guardar(ctx,fabricar(ctx))).code,'ESTADO_DESACTUALIZADO');
-  const actual=await contexto(),out=fabricar(actual),saved=await guardar(actual,out);assert.ok(saved.cierre);assert.equal(saved.reused,false);
+  const actual=await contexto(),out=fabricar(actual);let saved;
+  // La transacción termina pero la red pierde el acuse: el reintento debe
+  // mantener la misma identidad (partida,ciclo) y recuperar el cierre guardado.
+  await assert.rejects(async()=>{saved=await guardar(actual,out);throw new Error('NETWORK_ACK_LOST');},/NETWORK_ACK_LOST/);
+  assert.ok(saved.cierre);assert.equal(saved.reused,false);
+  const recuperado=await guardar(actual,out);assert.equal(recuperado.reused,true);assert.deepEqual(recuperado.cierre,saved.cierre);
   const again=await guardar(actual,{...out,resultadosPorEmpresa:{}});assert.equal(again.reused,true);assert.deepEqual(again.cierre,saved.cierre);
   await db.exec('reset role');
   const report=(await db.query('select * from reportes_ciclo where empresa_id=$1 and ciclo=1',[id])).rows[0];
+  assert.equal(Number((await db.query('select count(*) total from side_excel_cierres where partida_id=$1 and ciclo=1',[game.id])).rows[0].total),1,'Acuse perdido no duplica cierre');
   assert.equal(Number(report.caja_final),out.resultadosPorEmpresa[id].financial.balanceCaja.cajaFinal);
   assert.equal(Number(report.utilidad),out.resultadosPorEmpresa[id].financial.estadoResultados.utilidad);
   await db.query(`update reportes_ciclo set caja_final=1,utilidad=1,estado_resultados='{}' where empresa_id=$1 and ciclo=1`,[id]);
