@@ -1,0 +1,18 @@
+[
+  {
+    "etiqueta": "antes",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "supplied_npcs.cjs",
+    "exitCode": 1,
+    "duracionMs": 2476,
+    "log": "reports\\sim\\atribucion-supplied-npcs\\antes.log"
+  },
+  {
+    "etiqueta": "actual",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "supplied_npcs.cjs",
+    "exitCode": null,
+    "duracionMs": 240301,
+    "log": "reports\\sim\\atribucion-supplied-npcs\\actual.log"
+  }
+]

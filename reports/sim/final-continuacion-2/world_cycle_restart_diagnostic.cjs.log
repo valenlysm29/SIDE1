@@ -1,0 +1,79 @@
+BROWSER error Failed to load resource: net::ERR_FAILED
+BROWSER error Failed to load resource: net::ERR_FAILED
+BROWSER warning SIDE: SDK de Supabase no cargado. Modo local activo.
+BROWSER verbose [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o
+BEFORE ACTIVE {
+  excel: undefined,
+  canExplore: true,
+  loading: true,
+  access: { canJoin: true, canOperate: true, integration: false, round: 1 },
+  diagnostics: {
+    initialized: false,
+    running: false,
+    session: null,
+    navigationReady: false,
+    navigationSystem: 'city-aabb',
+    navigationGrid: null,
+    models: [],
+    characters: [],
+    assets: {
+      detailsLoading: false,
+      detailsReady: false,
+      lighting: 'baked-studio',
+      storeProps: [Object],
+      warehouseProps: [Object],
+      productionProps: [Object],
+      outdoorProps: [Object],
+      cache: [Object]
+    },
+    character: {
+      selected: 'chico2',
+      name: 'Miguel',
+      selectedInstances: 0,
+      playerInstances: 0,
+      manager: [Object],
+      animation: null,
+      controllers: 0,
+      mixers: 0
+    },
+    suppliedNpcs: { loaded: [Array], errors: {}, customers: [], actors: [] },
+    cityNpcModels: { approved: 0, loaded: 0, active: 0, visibleHub: 0 },
+    mona: { loaded: false, error: '', instances: 0 },
+    hub: {
+      active: true,
+      district: 'miraflores',
+      mode: 'third',
+      interior: null,
+      actors: 0,
+      visited: [],
+      drawCalls: 0,
+      triangles: 0,
+      meshes: 0,
+      outdoorProps: null
+    },
+    world: {
+      id: 'side-city',
+      continuous: true,
+      legacyActive: false,
+      interiors: null,
+      queueCapacity: 0
+    },
+    driving: null,
+    vehicles: [],
+    playerControl: {
+      mode: 'PLAYER_ON_FOOT',
+      locomotion: 'IDLE',
+      zoom: 5.2,
+      transition: null
+    },
+    player: { x: 166, z: 27 },
+    renderedFrames: 0,
+    lastError: ''
+  }
+}
+page.waitForFunction: Timeout 30000ms exceeded.
+    at active (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\world_cycle_restart_diagnostic.cjs:53:18)
+    at async C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\world_cycle_restart_diagnostic.cjs:68:5 {
+  log: [],
+  name: 'TimeoutError'
+}

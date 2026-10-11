@@ -1,0 +1,10 @@
+[
+  {
+    "etiqueta": "antes",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "supplied_npcs.cjs",
+    "exitCode": null,
+    "duracionMs": 240070,
+    "log": "reports\\sim\\atribucion-supplied-npcs\\antes.log"
+  }
+]

@@ -1,0 +1,376 @@
+{
+  "phase": "excel-cont2-final",
+  "runId": "2026-10-11T20-03-46-552Z",
+  "startedAt": "2026-10-11T20:03:46.552Z",
+  "selection": [
+    "local_server_test.py",
+    "decision_options_db.cjs",
+    "student_admission_db.cjs",
+    "student_admission_matrix_db.cjs",
+    "teacher_history_db.cjs",
+    "game_lifecycle_db.cjs",
+    "game_observations_db.cjs",
+    "waiting_room_db.cjs",
+    "playable_hub.cjs",
+    "continuous_world.cjs",
+    "gameplay_hud.cjs",
+    "world_business_ui.cjs",
+    "world_cycle_restart.cjs",
+    "world_startup.cjs",
+    "world_loading.cjs",
+    "world_entry_assets.cjs",
+    "supplied_npcs.cjs",
+    "mona_npc.cjs",
+    "npc_locomotion.cjs",
+    "game_lifecycle_ui.cjs",
+    "decisions_cycle_ui.cjs",
+    "teacher_lifecycle_ui.cjs",
+    "tablet_return_browser.cjs",
+    "npc_world_fixes_browser.cjs",
+    "world_orientation_mobile.cjs",
+    "teacher_history_ui.cjs",
+    "teacher_report_pdf_ui.cjs",
+    "character_selection_ui.cjs",
+    "decision_interiors_browser.cjs",
+    "npc_navmesh_browser.cjs",
+    "tablet_item_draft_ui.cjs",
+    "mobile_integral_ui.cjs",
+    "side_full_flow.cjs"
+  ],
+  "renderer": "Chromium / SwiftShader (secuencial)",
+  "nodeFiles": 61,
+  "preservation": {
+    "backedUp": true,
+    "restored": true,
+    "backup": ".codex-work\\mejora-side-2026-10-01\\backups\\excel-cont2-final\\2026-10-11T20-03-46-552Z"
+  },
+  "results": [
+    {
+      "suite": "local_server_test.py",
+      "kind": "server",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2850,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\local_server_test.py.log"
+    },
+    {
+      "suite": "decision_options_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2605,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\decision_options_db.cjs.log"
+    },
+    {
+      "suite": "student_admission_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 4700,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\student_admission_db.cjs.log"
+    },
+    {
+      "suite": "student_admission_matrix_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 7623,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\student_admission_matrix_db.cjs.log"
+    },
+    {
+      "suite": "teacher_history_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 7011,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\teacher_history_db.cjs.log"
+    },
+    {
+      "suite": "game_lifecycle_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2684,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\game_lifecycle_db.cjs.log"
+    },
+    {
+      "suite": "game_observations_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 3080,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\game_observations_db.cjs.log"
+    },
+    {
+      "suite": "waiting_room_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2764,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\waiting_room_db.cjs.log"
+    },
+    {
+      "suite": "playable_hub.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 169234,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\playable_hub.cjs.log"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "kind": "browser",
+      "status": "failed",
+      "passed": false,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationMs": 67096,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\continuous_world.cjs.log"
+    },
+    {
+      "suite": "gameplay_hud.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 52881,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\gameplay_hud.cjs.log"
+    },
+    {
+      "suite": "world_business_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 201102,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_business_ui.cjs.log"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "kind": "browser",
+      "status": "failed",
+      "passed": false,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationMs": 51546,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_cycle_restart.cjs.log"
+    },
+    {
+      "suite": "world_startup.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 131792,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_startup.cjs.log"
+    },
+    {
+      "suite": "world_loading.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 31787,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_loading.cjs.log"
+    },
+    {
+      "suite": "world_entry_assets.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 26675,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_entry_assets.cjs.log"
+    },
+    {
+      "suite": "supplied_npcs.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 74019,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\supplied_npcs.cjs.log"
+    },
+    {
+      "suite": "mona_npc.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 287080,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\mona_npc.cjs.log"
+    },
+    {
+      "suite": "npc_locomotion.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 59676,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\npc_locomotion.cjs.log"
+    },
+    {
+      "suite": "game_lifecycle_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 53646,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\game_lifecycle_ui.cjs.log"
+    },
+    {
+      "suite": "decisions_cycle_ui.cjs",
+      "kind": "browser",
+      "status": "failed",
+      "passed": false,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationMs": 23055,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\decisions_cycle_ui.cjs.log"
+    },
+    {
+      "suite": "teacher_lifecycle_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 17074,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\teacher_lifecycle_ui.cjs.log"
+    },
+    {
+      "suite": "tablet_return_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 37248,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\tablet_return_browser.cjs.log"
+    },
+    {
+      "suite": "npc_world_fixes_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 58949,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\npc_world_fixes_browser.cjs.log"
+    },
+    {
+      "suite": "world_orientation_mobile.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 183342,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\world_orientation_mobile.cjs.log"
+    },
+    {
+      "suite": "teacher_history_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 7353,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\teacher_history_ui.cjs.log"
+    },
+    {
+      "suite": "teacher_report_pdf_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 13201,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\teacher_report_pdf_ui.cjs.log"
+    },
+    {
+      "suite": "character_selection_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2005,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\character_selection_ui.cjs.log"
+    },
+    {
+      "suite": "decision_interiors_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 141122,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\decision_interiors_browser.cjs.log"
+    },
+    {
+      "suite": "npc_navmesh_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2096,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\npc_navmesh_browser.cjs.log"
+    },
+    {
+      "suite": "tablet_item_draft_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 27863,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\tablet_item_draft_ui.cjs.log"
+    },
+    {
+      "suite": "mobile_integral_ui.cjs",
+      "kind": "browser",
+      "status": "failed",
+      "passed": false,
+      "exitCode": 1,
+      "timedOut": false,
+      "durationMs": 61814,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont2-final\\runs\\2026-10-11T20-03-46-552Z\\mobile_integral_ui.cjs.log"
+    },
+    {
+      "suite": "side_full_flow.cjs",
+      "kind": "browser",
+      "status": "skipped",
+      "passed": false,
+      "reason": "Runner opcional aún no creado"
+    }
+  ]
+}

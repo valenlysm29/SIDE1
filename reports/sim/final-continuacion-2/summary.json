@@ -1,0 +1,86 @@
+{
+  "startedAt": "2026-10-11T20:00:06.305Z",
+  "nodeFiles": 74,
+  "results": [
+    {
+      "name": "node-todos",
+      "exitCode": 1,
+      "durationMs": 201058
+    },
+    {
+      "name": "excel-sql",
+      "exitCode": 0,
+      "durationMs": 7528
+    },
+    {
+      "name": "excel-sql-activacion",
+      "exitCode": 0,
+      "durationMs": 9439
+    },
+    {
+      "name": "regresion-db-navegador",
+      "exitCode": 1,
+      "durationMs": 1842890
+    },
+    {
+      "name": "sim-1",
+      "exitCode": 0,
+      "durationMs": 40710
+    },
+    {
+      "name": "sim-2",
+      "exitCode": 0,
+      "durationMs": 22663
+    },
+    {
+      "name": "sim-3",
+      "exitCode": 0,
+      "durationMs": 62004
+    },
+    {
+      "name": "transicion",
+      "exitCode": 0,
+      "durationMs": 11849
+    },
+    {
+      "name": "base",
+      "exitCode": 0,
+      "durationMs": 285
+    },
+    {
+      "name": "consecuencias",
+      "exitCode": 0,
+      "durationMs": 266
+    },
+    {
+      "name": "oracle-sim1",
+      "exitCode": 0,
+      "durationMs": 265
+    },
+    {
+      "name": "oracle-sim2",
+      "exitCode": 0,
+      "durationMs": 146
+    },
+    {
+      "name": "oracle-sim3",
+      "exitCode": 0,
+      "durationMs": 245
+    },
+    {
+      "name": "banca",
+      "exitCode": 0,
+      "durationMs": 261
+    },
+    {
+      "name": "banca-mezcla",
+      "exitCode": 0,
+      "durationMs": 258
+    }
+  ],
+  "syntax": {
+    "files": 49,
+    "failures": []
+  },
+  "finishedAt": "2026-10-11T20:36:52.524Z"
+}

@@ -1,0 +1,203 @@
+RUN continuous_diagnostic.cjs
+BROWSER error Failed to load resource: net::ERR_FAILED
+BROWSER error Failed to load resource: net::ERR_FAILED
+BROWSER warning SIDE: SDK de Supabase no cargado. Modo local activo.
+BROWSER verbose [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o
+BEFORE ENTRY {
+  excel: undefined,
+  canExplore: true,
+  active: false,
+  access: { canJoin: true, canOperate: true, integration: false, round: 1 }
+}
+BROWSER warning THREE.WebGLRenderer: KHR_parallel_shader_compile extension not supported.
+AFTER ENTRY true {
+  excel: undefined,
+  canExplore: true,
+  diagnostics: {
+    initialized: true,
+    running: true,
+    session: {
+      context: 'SIDE-000_QA_CONTINUO_1',
+      day: 1,
+      timeLeft: 299.96,
+      shiftEnded: false
+    },
+    navigationReady: true,
+    navigationSystem: 'city-aabb',
+    navigationGrid: null,
+    models: [],
+    characters: [ [Object] ],
+    assets: {
+      detailsLoading: false,
+      detailsReady: false,
+      lighting: 'baked-studio',
+      storeProps: [Object],
+      warehouseProps: [Object],
+      productionProps: [Object],
+      outdoorProps: [Object],
+      cache: [Object]
+    },
+    character: {
+      selected: 'chico2',
+      name: 'Miguel',
+      selectedInstances: 1,
+      playerInstances: 1,
+      manager: [Object],
+      animation: [Object],
+      controllers: 1,
+      mixers: 0
+    },
+    suppliedNpcs: { loaded: [Array], errors: {}, customers: [], actors: [] },
+    cityNpcModels: { approved: 0, loaded: 0, active: 0, visibleHub: 0 },
+    mona: { loaded: false, error: '', instances: 0 },
+    hub: {
+      active: true,
+      district: 'miraflores',
+      mode: 'third',
+      interior: null,
+      actors: 0,
+      visited: [],
+      drawCalls: 176,
+      triangles: 66004,
+      meshes: 283,
+      outdoorProps: [Object]
+    },
+    world: {
+      id: 'side-city',
+      continuous: true,
+      legacyActive: false,
+      interiors: [Object],
+      queueCapacity: 3
+    },
+    driving: null,
+    vehicles: [ [Object], [Object], [Object], [Object], [Object] ],
+    playerControl: {
+      mode: 'PLAYER_ON_FOOT',
+      locomotion: 'IDLE',
+      zoom: 5.2,
+      transition: null
+    },
+    player: { x: 166, z: 27 },
+    renderedFrames: 1,
+    lastError: ''
+  }
+}
+PASS 1 Nuevo mapa único
+PASS 2 Entrada física tienda
+PAGEERROR A user gesture is required to request Pointer Lock.
+PASS 3 Salida física tienda
+PASS 4 Almacén equipado
+PASS 5 Producción equipada
+PASS 6 Paredes, estantes, máquinas y caja sólidos
+PASS 7 Vehículo conserva estacionamiento
+PASS 8 Inventario autoritativo y entrega única
+BEFORE ENTRY {
+  excel: undefined,
+  canExplore: true,
+  active: false,
+  access: { canJoin: true, canOperate: true, integration: false, round: 2 }
+}
+AFTER ENTRY true {
+  excel: undefined,
+  canExplore: true,
+  diagnostics: {
+    initialized: true,
+    running: true,
+    session: {
+      context: 'SIDE-000_QA_CONTINUO_2',
+      day: 1,
+      timeLeft: 299.96,
+      shiftEnded: false
+    },
+    navigationReady: true,
+    navigationSystem: 'yuka-three-pathfinding+aabb',
+    navigationGrid: { cells: 3481, walkable: 3180, blocked: 301, triangles: 6360 },
+    models: [ 'male', 'female' ],
+    characters: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ],
+    assets: {
+      detailsLoading: false,
+      detailsReady: true,
+      lighting: 'baked-studio',
+      storeProps: [Object],
+      warehouseProps: [Object],
+      productionProps: [Object],
+      outdoorProps: [Object],
+      cache: [Object]
+    },
+    character: {
+      selected: 'chico2',
+      name: 'Miguel',
+      selectedInstances: 1,
+      playerInstances: 1,
+      manager: [Object],
+      animation: [Object],
+      controllers: 1,
+      mixers: 0
+    },
+    suppliedNpcs: { loaded: [Array], errors: {}, customers: [], actors: [Array] },
+    cityNpcModels: { approved: 17, loaded: 10, active: 10, visibleHub: 3 },
+    mona: { loaded: true, error: '', instances: 0 },
+    hub: {
+      active: true,
+      district: 'miraflores',
+      mode: 'third',
+      interior: null,
+      actors: 3,
+      visited: [],
+      drawCalls: 180,
+      triangles: 81667,
+      meshes: 283,
+      outdoorProps: [Object]
+    },
+    world: {
+      id: 'side-city',
+      continuous: true,
+      legacyActive: false,
+      interiors: [Object],
+      queueCapacity: 3
+    },
+    driving: null,
+    vehicles: [ [Object], [Object], [Object], [Object], [Object] ],
+    playerControl: {
+      mode: 'PLAYER_ON_FOOT',
+      locomotion: 'IDLE',
+      zoom: 5.2,
+      transition: null
+    },
+    player: { x: 166, z: 27 },
+    renderedFrames: 55,
+    lastError: ''
+  }
+}
+PASS 9 Ciclo sin escenas, NPCs, listeners o RAF duplicados
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'A user gesture is required to request Pointer Lock.'
++ ]
+- []
+
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\continuous_diagnostic.cjs:136:12 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+[
+  {
+    "suite": "continuous_diagnostic.cjs",
+    "passed": false,
+    "durationMs": 276268
+  }
+]

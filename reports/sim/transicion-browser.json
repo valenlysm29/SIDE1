@@ -1,0 +1,130 @@
+{
+  "preparada": {
+    "cash": 1001500,
+    "transicion": {
+      "cajaFinal": 1001500,
+      "maquinariaActivos": {
+        "INF-02": 1
+      },
+      "activosCosto": 3500,
+      "depreciacionAcumulada": 0,
+      "inventarioMP": {
+        "INS-01": 12
+      },
+      "deudaPrincipal": 5000,
+      "teaVigente": 20,
+      "tasaMensualVigente": 0.015309470499731193
+    },
+    "ledger": "{\"1:B\":-3500,\"1:F\":5000}",
+    "costo": 3500
+  },
+  "activa": {
+    "envelope": {
+      "habilitado": true,
+      "version": 1,
+      "round": 2,
+      "decisiones": {
+        "seleccion": [],
+        "lotes": [
+          {
+            "segmento": "",
+            "cantidad": 0,
+            "cuero": "",
+            "accesorios": "",
+            "hilo": "",
+            "molde": "",
+            "precio": 0
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {
+          "INF-02": 1
+        },
+        "tiendasPorZona": {
+          "alta": 0,
+          "media": 0,
+          "baja": 0
+        },
+        "porcentajeVentasCredito": 0
+      },
+      "enviado": false,
+      "transicion": {
+        "cajaFinal": 1001500,
+        "maquinariaActivos": {
+          "INF-02": 1
+        },
+        "activosCosto": 3500,
+        "depreciacionAcumulada": 0,
+        "inventarioMP": {
+          "INS-01": 12
+        },
+        "deudaPrincipal": 5000,
+        "teaVigente": 20,
+        "tasaMensualVigente": 0.015309470499731193
+      },
+      "cicloActivacion": 2,
+      "cajaTransicion": 1001500
+    },
+    "caja": 1001500,
+    "ledger": "{\"1:B\":-3500,\"1:F\":5000}",
+    "maquina": 1
+  },
+  "errores": []
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "etiqueta": "antes",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "continuous_world.cjs",
+    "exitCode": 0,
+    "duracionMs": 129845,
+    "log": "reports\\sim\\atribucion-continuous-world\\antes.log"
+  }
+]

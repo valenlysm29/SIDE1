@@ -1,0 +1,18 @@
+[
+  {
+    "etiqueta": "antes",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "world_startup.cjs",
+    "exitCode": 0,
+    "duracionMs": 94277,
+    "log": "reports\\sim\\atribucion-startup\\antes.log"
+  },
+  {
+    "etiqueta": "actual",
+    "commitBaseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "world_startup.cjs",
+    "exitCode": 0,
+    "duracionMs": 82253,
+    "log": "reports\\sim\\atribucion-startup\\actual.log"
+  }
+]

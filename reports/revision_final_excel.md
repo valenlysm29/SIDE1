@@ -32,3 +32,6 @@ La evidencia UI previa A8 acredita registro real local, tres simulaciones, caja/
 La atribución `reports/atribucion_regresion_excel.md` demuestra fallos de baseline NPC, objetivos táctiles y scroll. El coordinador informó además timeout de `world_startup` en línea67 todavía sin atribución final. No se declara regresión integral verde ni autorización de publicación mientras ese resultado y la corrida final sigan abiertos. La instrucción original exige todos los tests y las tres simulaciones verdes antes del push; el revisor no puede dispensarla.
 
 Pendientes de definición de producto: efectos por tiendas, calendario de cobros a crédito y parámetros marcados PENDIENTE_DEFINIR. La UI explica esa falta de fórmulas; no se presentan como funciones financieras implementadas. No se identificaron nuevos errores reproducibles abiertos en el código Excel revisado al emitir este informe.
+
+## Cierre del coordinador tras la revisión
+La única verificación final terminó con tres simulacionesPASS,3104comparaciones sin diferencias, SQLPASS y49archivos sin errores sintácticos. La regresión general conserva dos fallos3D sin atribuir ni resolver (continuous_world y world_cycle_restart); no se declara aceptación global y no se publica. Esta anotación informa resultados posteriores; no sustituye el dictamen independiente anterior.

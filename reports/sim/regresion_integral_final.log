@@ -1,0 +1,1701 @@
+RUN local_server_test.py
+test_busy_port_does_not_bind_another_server (__main__.LocalServerTest.test_busy_port_does_not_bind_another_server) ... ok
+test_entry_and_versioned_resources (__main__.LocalServerTest.test_entry_and_versioned_resources) ... 127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /index.html?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /js/app.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /css/styles.css?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /js/production_model.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /css/responsive.css?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /js/simulator3d-config.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /js/simulator3d.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 11:28:52] "GET /assets/models/yuka.glb HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.410s
+
+OK
+DONE local_server_test.py: PASS
+RUN node-completa
+✔ AssetManager comparte cargas concurrentes y permite reintentar un fallo (3.8069ms)
+✔ CharacterManager persiste selección, deduplica template y evita NPC del jugador (0.7384ms)
+✔ CharacterManager rechaza identidades inventadas y recupera una selección válida (0.2162ms)
+✔ visual courier crosses warehouse and production on a clear route without changing stock (181.2519ms)
+✔ all three businesses belong to one world group with same-coordinate door crossings (5.8015ms)
+✔ player can physically walk in and out of each real doorway (8.2266ms)
+✔ every worker route and customer browse/checkout route avoids solid furniture (7.855ms)
+✔ walls, racks, sewing machines and cash counter stop moving player (5.6891ms)
+✔ current financial snapshot changes visible display and reserve tiers independently (6.9698ms)
+✔ pending supplier delivery is a marker and never available reserve inventory (4.9513ms)
+✔ stock levels clamp valid ratios and malformed values safely (0.3245ms)
+✔ only current room lights and NPCs run; revisiting never duplicates actors (6.9598ms)
+✔ shared instancing batches stock per room/tier; furniture has metre-scale ceilings (5.0516ms)
+✔ streamed store props preserve routes while quality tiers limit mirrors and shadows (11.2975ms)
+✔ prop installation is idempotent, falls back per category and never disposes cached resources (5.524ms)
+✔ warehouse streamed props keep physical contracts and tier complete supported stock safely (5.7907ms)
+✔ warehouse installation is idempotent with partial fallback and cached resources survive disposal (5.4598ms)
+✔ repeat business model updates retain one scene and disposal is idempotent (4.337ms)
+✔ physical restocking projects the authoritative transfer without creating stock or money (4.0194ms)
+✔ repeated restocking at shelf capacity does not repeat financial or inventory writes (3.0461ms)
+✔ customer reservation immediately reduces visual shelves while preserving production and cash (4.6253ms)
+✔ historical inventory with unknown output does not animate an already allocated production plan (2.7663ms)
+✔ production presentation stops when the existing total inventory capacity is reached (2.7078ms)
+✔ interior projection derives shelf levels, order and capacity from existing business state (3.4173ms)
+✔ repeated visual reads and detached product summaries never mutate inventory or orders (4.6368ms)
+✔ received supplier stock changes warehouse view without fabricating produced output (1.2424ms)
+✔ machine animation respects pause, shift end and completed production plan (1.6941ms)
+✔ visual capacity saturates while stock and unknown historical output remain accurate (2.1714ms)
+✔ central states use smooth mixer crossfades without restarting the active state (6.8416ms)
+✔ walk and run playback rates follow real speed within safe bounds (1.3704ms)
+✔ update owns locomotion, talk, interaction and airborne decisions and advances one mixer (0.6762ms)
+✔ an explicit player locomotion state keeps WALK and RUN synchronized with movement physics (0.2846ms)
+✔ npc_motion adapter is a non-blocking procedural fallback and creates no loop (0.6531ms)
+✔ a missing animation keeps the prior valid action when there is no fallback (0.2513ms)
+✔ dispose releases mixer bindings once and exposes asset provenance metadata (0.2764ms)
+✔ all NPC geometries including unusual GLB units are at most the player height (19.6295ms)
+✔ floor pivot survives repeated animation writes to the GLB root for 60 seconds (29.3734ms)
+✔ pelvis clip keeps its vertical gait bounce without travel or vertical drift (0.4234ms)
+✔ normalizing again is idempotent and grounding retains player jumps (1.0762ms)
+✔ the shipped public NPC GLBs normalize using their actual skinned mesh bounds (873.7197ms)
+✔ the city grid expands without moving existing business entrances (89.109ms)
+✔ outer destinations have collision-free approaches on the connected streets (98.874ms)
+✔ HUD 390px conserva destinos solo en minimapa y mapa expandido (3.327ms)
+✔ HUD 1366px conserva destinos solo en minimapa y mapa expandido (0.6085ms)
+✔ altura de suelo usa geometría caminable mundial de plaza, pedestal y avenidas (65.3927ms)
+✔ five city cars reuse geometry and batch body panels without losing wheel transforms (20.906ms)
+✔ credits data contains the required Poly Pizza attribution and traceable CC0 furniture (4.7047ms)
+✔ splash omits credits entry while attribution remains available in the project (3.9254ms)
+✔ cycle productivity uses recorded output and does not substitute planned units (2.135ms)
+✔ changing the target updates percentage and signed difference without capping at 100 (0.4267ms)
+✔ zero or absent target, absent output and output from another cycle are safe (0.5491ms)
+✔ legacy multiple stores normalize to one, keeping its district and first contract (5.1664ms)
+✔ production record is scoped to active company and cycle, never reconstructed from inventory (12.0082ms)
+✔ realized cycle output is recorded once on creation and added production, excluding supplied stock (18.7737ms)
+✔ decision interiors allocate furniture once and preserve directed physical entry and exit (83.8374ms)
+✔ B E F interaction stations and queues are reachable while furniture blocks the player (57.6499ms)
+✔ financial and order boards read immutable simulation state without creating stock (54.8525ms)
+✔ repeated interior visits reuse distinct actors with clear unique positions (39.9919ms)
+✔ empty scenario includes mandatory local and cleaning only (6.3867ms)
+✔ all three districts retain their quantities and cost (1.5075ms)
+✔ asset acquisitions and disposals have separate gross flows (0.7694ms)
+✔ same-round submitted mold still costs money; later cycles do not charge again (0.8551ms)
+✔ staff severance survives repeated saves in the same round (0.745ms)
+✔ analyst discount affects material prices, not wages (0.732ms)
+✔ loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved (0.4099ms)
+✔ saved ledger is reconciled instead of charged twice (0.6859ms)
+✔ additional drafts apply only the difference (0.4836ms)
+✔ contract calculation excludes current cycle and shows obligations beyond game (2.2555ms)
+✔ contract batches preserve different opening cycles (0.3981ms)
+✔ pure model never mutates its context (26.6447ms)
+✔ all catalog items, including zero-cost guarantees and automatic rules, appear (0.4734ms)
+✔ production review lists the desired quantity for every planned mold (0.3543ms)
+✔ strict staff draw reuses a safe outfit when remaining bag only contains nearby actors (1.9119ms)
+✖ approved city manifest has 16 CC0 actors and strict roles exclude eligible avatars (7.1775ms)
+✔ untouched zero production stays pending and a changed target becomes a draft (44.7177ms)
+✔ current store selection normalizes duplicates without mutating legacy data (1.0665ms)
+✔ store checkboxes accumulate districts, keep web, and update prices independently (12.1702ms)
+✔ single-store draft saves and reloads with one charge and one basic seller (11.4818ms)
+✔ multiple stores survive draft restoration and repeated saves with correct charges and sellers (9.5051ms)
+✔ existing contracts prevent closure but allow adding districts in later cycles (11.866ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (4.7502ms)
+✔ DOP renders once in Production and nowhere in the other categories or summary (13.3959ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (9.5743ms)
+✔ cancellation overrides operating and automatic schedule states, including legacy games (2.8113ms)
+✔ Supabase client retries a delayed SDK and all services share one instance (1.4239ms)
+✔ game creation distinguishes missing migration from transient network failures without inserting (3.181ms)
+✔ game creation requires the alphanumeric migration before inserting a remote lobby (2.0515ms)
+✔ game creation returns the RPC server clock instead of a plain inserted row (1.7794ms)
+✔ operational tasks supersede the tour without changing financial state (0.9577ms)
+✔ stockout distinguishes delivery from procurement and never invents transactions (0.1807ms)
+✔ tour only counts supported unique destinations and continues to operation (0.1525ms)
+✔ shift closure always supersedes live tasks and removes navigation (0.8135ms)
+✔ unloaded inventory is not mistaken for a stockout (0.1812ms)
+✔ outdoor GLBs are instanced by category and quality tiers cap detail without changing physics (66.3495ms)
+✔ partial outdoor loading preserves category fallbacks and installation is idempotent (30.4953ms)
+✔ outdoor placement is deterministic across worlds and birds use transform animation only (69.4515ms)
+✔ interior ground queries use the floor geometry world matrix, including translated parents (34.4111ms)
+✔ rotated scaled floors match a rendered floor raycast instead of a constant local height (12.8192ms)
+✔ normalized NPC feet stay within one centimetre of all six transformed interior floors for sixty seconds (507.4436ms)
+✔ low interior navigation stays on AABB without building geometry (1.6478ms)
+✔ room navmesh initializes lazily and routes around furniture (30.8193ms)
+✔ chico1: intact source, self-contained GLB, valid articulated weights (96.3837ms)
+✔ chico2: intact source, self-contained GLB, valid articulated weights (92.7938ms)
+✔ chico3: intact source, self-contained GLB, valid articulated weights (98.7725ms)
+✔ mona: intact source, self-contained GLB, valid articulated weights (106.6925ms)
+✔ 16 licensed city NPCs have same-file skinned idle, walk and in-place run (80.6073ms)
+✔ city roster draws without replacement until its role pool is exhausted (2.5415ms)
+✔ scene pools are independent and player avatars are rejected (1.4108ms)
+✔ unlicensed entries and unsupported roles cannot enter the roster (0.6639ms)
+✔ office, bank, cashier, supplier and guard roles select only assigned outfits (2.1525ms)
+✔ clip catalogue distinguishes the second idle and optional work actions (2.7176ms)
+✔ actual post-collision distance controls walk clip timing with a 0.2-second fade (1.0793ms)
+✔ root translation yields reference speed; in-place clip remains unknown (0.5978ms)
+✔ a player already overlapping a person separates gradually and can escape (5.7454ms)
+✔ player slides around a person without penetrating and releases contact on reverse (1.4892ms)
+✔ sliding between three people preserves every contact instead of reintroducing overlap (0.5294ms)
+✔ separation against an obstacle corner never pushes a player through a wall or bounds (2.7914ms)
+✔ NPC respects a player radius and walks past without a teleport (6.1509ms)
+✔ vehicle chassis checks pedestrian circles and stops before contact in either heading (2.7222ms)
+✔ an interior walker near the player keeps moving while workers retain their station (31.1337ms)
+✔ the city manifest can be absent or contain no released models (0.7862ms)
+✔ released NPC manifest contains only unique IDs and existing files (3.9409ms)
+✔ released NPCs contain idle, walk and run clips (41.7528ms)
+✔ released NPC GLBs differ from playable avatars and each other (23.7325ms)
+✔ NPC path goes around furniture with body clearance (1.3721ms)
+✔ NPC cannot take an unreachable route through a wall (1.6582ms)
+✔ NPC completes a furniture detour without collision or teleportation (4.1001ms)
+✔ NPC stops before another person and resumes when the path clears (1.5437ms)
+✔ NPC turns before moving backwards and brakes at destination (0.7761ms)
+✔ NPC can detour from a stop beside a person blocking the entrance (2.4272ms)
+✔ city navmesh grid excludes solid colliders and applies the hub offset (1.125ms)
+✔ grid rejects excessive density before allocating geometry (0.4478ms)
+✔ three-pathfinding route is accepted only when complete and clear (2.5727ms)
+✔ Yuka steering remains behind AABB and neighbor collision guard (5.2348ms)
+✔ navmesh spawn samples real triangles and exposes their interpolated height (0.6374ms)
+✔ Yuka separation steers around a stationary neighbor without overriding collision guards (4.3452ms)
+✔ patrols move for sixty seconds, bound pauses and never cross a solid collider (26.0002ms)
+✔ spawn uses a valid navmesh node and never spawns inside a solid (1.5619ms)
+✔ null and partial navmesh paths recover through the authoritative safe planner (4.743ms)
+✔ an obstructing player causes a new destination without teleports or overlap (3.3188ms)
+✔ motion distance follows real movement, including zero distance during stops (0.9127ms)
+✔ low tier loads four nearby-role models and protects active clones from eviction (28.7219ms)
+✔ high tier retains all approved models; invalid licenses never enter a load plan (0.6315ms)
+✔ camera-relative walking and normalized diagonal keep matching speed (5.4278ms)
+✔ idle walk run and reverse transitions accelerate and settle without drift (1.6547ms)
+✔ locomotion is stable at 30/120 Hz and cannot cross a thin wall (3.1779ms)
+✔ camera clamps exact wall intersection, including smoothed endpoint behind wall (3.0875ms)
+✔ vehicle transition approaches door over time and completes once (0.7888ms)
+✔ desktop wires touch the intended borders and cross no cards (8.0572ms)
+✔ mobile wires touch the intended borders and cross no cards (0.8838ms)
+✔ connector coordinates follow changed card widths and heights instead of fixed viewport positions (0.6821ms)
+✔ rendering an empty plan preserves inputs and shows zero output, percent and mold detail (35.6109ms)
+✔ material labels are escaped and percentages are supplied by the existing app calculation (1.4997ms)
+✔ mount redraws after resize and disconnects observers when the category changes (6.5775ms)
+✔ workbook conversions turn purchases into usable raw material (3.3313ms)
+✔ a raw-material shortage limits all three production processes (1.1892ms)
+✔ workers and machines are paired and the slowest process is the bottleneck (0.6091ms)
+✔ level-three staff and production leadership reproduce the efficiency bonuses (0.3957ms)
+✔ equipment acquired in a previous cycle remains available (0.437ms)
+✔ calculator keeps one target and material requirement for every mold (1.1395ms)
+✔ industrial DOP separates operations, inspection and combined activity (0.4908ms)
+✔ DOP data includes purchased material qualities and cycle yield by mold (0.3063ms)
+✔ store facade, emissive lights and ATM preserve the physical doorway contract (25.447ms)
+✔ production props respect tier density, instancing and real-light limits (12.6257ms)
+✔ production installation is idempotent with category fallback and cached resources survive disposal (6.0248ms)
+✔ production placement matrices are deterministic between independent worlds (11.0965ms)
+✔ student and teacher pages load the final responsive layer (5.6882ms)
+✔ responsive layer covers target widths, orientation and accessibility preferences (0.477ms)
+✔ responsive layer addresses every primary product surface (0.3308ms)
+✔ responsive CSS has balanced blocks and no remote asset references (0.7062ms)
+✔ Six 8-hour cycles: zero minutes stay zero, 48 hours total (1.4696ms)
+✔ Month and year rollover (0.3456ms)
+✔ Invalid values rejected (0.3947ms)
+✔ Clock boundaries and catch-up (0.2994ms)
+✔ Manual waiting expiry preserves zero cycle minutes and closes at the configured boundary (2.0362ms)
+✔ Legacy selected districts mean one store each, web is not a store (0.9184ms)
+✔ Quantities and malformed values (0.8509ms)
+✔ Same-cycle drafts editable, prior contracts enforced (2.5083ms)
+✔ Openings expire independently after 12 cycles (0.4319ms)
+✔ Repeated saves do not duplicate openings (0.3147ms)
+✔ the reformed world has three separated business sectors (2.2568ms)
+✔ the city contains a crosswalk between the store and customer spawn (0.4199ms)
+✔ the complete customer state machine is declared (0.4075ms)
+✔ every quality level sets finite simulation limits (0.3255ms)
+✔ the local human avatar is a valid GLB with idle and walk clips (11.4871ms)
+✔ simulator source connects events, production and financial sales (2.747ms)
+✔ baked studio is a valid HDR CubeUV atlas without runtime convolution (30.4209ms)
+✔ invalid or truncated environment data is rejected before texture allocation (0.5479ms)
+✔ all local HTML assets exist (35.5718ms)
+✔ market-segment decision is absent from the active catalog (0.8127ms)
+✔ production model loads before the application and review modules (0.8385ms)
+✔ productive catalog requires a mold and a sales channel, with calculator first (3.4145ms)
+✔ cycle zero places summary last and later cycles place it first (1.0522ms)
+✔ DOP presentation loads before the app and keeps the documented cycle (1.297ms)
+✔ infrastructure, production and logistics drafts remain saveable over budget (1.9427ms)
+✔ student service normalizes the three admission fields and preserves server codes (4.1139ms)
+✔ student service does not call the server with any missing identity field (1.1933ms)
+✔ student service preserves technical Supabase errors for any game and company (2.5921ms)
+✔ student service logs permission and network failures without relabeling them as identity rejection (1.7416ms)
+✔ real student form shows the server message for technical failures and business messages only for safe rejections (13608.7565ms)
+✔ student state service always uses normalized identity and compare-and-swap revision (3.4977ms)
+✔ student decision/report writes use identity wrappers, never empresaId RPCs (4.243ms)
+✔ state reads and writes preserve technical error codes instead of rejecting the saved identity (2.2739ms)
+✔ frontend maps safe errors, hydrates by identity and recovers stale revisions (3.7072ms)
+✔ missing capability and missing server time require explicit migration, network remains technical (5.7527ms)
+✔ validación [16]: integration rechaza whitespace-only y altas sobre 60/40 (2541.832ms)
+✔ seguridad [16]: puntuación y texto SQL se permiten literalmente sin ejecutar código (3614.4612ms)
+✔ summary retains every cycle, including quiet cycles, and reports cumulative values (26.8668ms)
+✔ office view uses financial model statements, including debt and assets (2.2297ms)
+✔ failed snapshot survives reload and retries its decisions/report with the original CAS revision (1.8907ms)
+✔ operation retry after an acknowledged snapshot never repeats the snapshot or the completed report (1.9755ms)
+✔ offline edits coalesce by cycle and category without losing other categories (0.4854ms)
+✔ a newer edit made during a failed request survives and merges the unfinished operations (0.3875ms)
+✔ successful writes advance later jobs of the same company across cycles (0.3755ms)
+✔ CAS conflicts stop retries, preserve a local copy and never overwrite the other session (0.3578ms)
+✔ logout or identity change during a request prevents operations and revision changes in the next session (0.2768ms)
+✔ explicit identity rejection clears the outbox; technical failures with the same code keep it (0.3507ms)
+✔ lost snapshot acknowledgment is verified before retrying decisions and never writes the snapshot twice (0.629ms)
+✔ an unavailable conflict check retains the job and does not adopt an unknown server revision (0.3572ms)
+▶ student synchronization and session recovery through the delivered UI
+  ✔ saving a draft sends snapshot, report and normalized decisions with the acknowledged revision (2919.3044ms)
+  ✔ online retries failed writes before reading and does not erase the local draft (3042.2939ms)
+  ✔ pending decisions/report survive a reload and recover the latest offline draft (8379.7239ms)
+  ✔ a stale offline write preserves another session and hydrates the newer server state (3650.7757ms)
+  ✔ a lost save response still recovers normalized decisions without repeating the committed snapshot (3735.7633ms)
+  ✔ network failure retains the session and retry button restores access without retyping identity (8146.2207ms)
+  ✔ an explicit identity rejection clears the session instead of retrying indefinitely (4422.7323ms)
+  ✔ online automatically restores a session retained after a network failure (7142.4159ms)
+  ✔ configured teacher demo credentials use Supabase Auth and stay on login if rejected (3063.7027ms)
+✔ student synchronization and session recovery through the delivered UI (48090.7807ms)
+✔ el borrador conserva juntas todas las decisiones del segmento (3.3061ms)
+✔ el borrador de otro segmento se conserva (1.3333ms)
+✔ un error de almacenamiento conserva las decisiones editables (1.5002ms)
+✔ sin segmento no se afirma un guardado correcto (1.8999ms)
+✔ twenty tablet exits blur the editor and return once without modifying decisions or the cycle (3.9342ms)
+✔ Escape respects review and login dialogs and ignores a hidden tablet (1.0178ms)
+✔ return label distinguishes the world from the lobby and lobby exit keeps its destination (2.7566ms)
+✔ grade service acknowledges only a confirmed matching grade, including zero (15.8341ms)
+✔ grade service explains missing Supabase migration and validates before RPC (2.8238ms)
+✔ history service distinguishes no previous game and preserves every company, cycle and zero grade (4.7584ms)
+✔ history service re-reads the last game rather than accumulating older games (2.2418ms)
+✔ missing RPC or table returns actionable configuration feedback without console spam (5.7216ms)
+✔ history service reports unavailable connection, rejected permission and RPC exceptions (6.266ms)
+✔ history presentation uses catalog categories, labels and every recorded cycle (24.9088ms)
+✔ history presentation handles empty games, company selection and escaped student values (1.3815ms)
+✔ history controller discards obsolete responses and clears previous data on unavailable schema (0.7709ms)
+✔ integration is cycle 1 and counts toward the configured total (1.3678ms)
+✔ admission only during the first hour; returning companies may rejoin (0.5841ms)
+✔ automatic schedule cannot start before activation and closes after its last cycle (0.3058ms)
+✔ podium expires exactly 24 hours after publication and belongs to its game (0.2308ms)
+✔ SIDE suggestion uses financial statements and remains separate from grades (1.0613ms)
+✔ completed games grade all participants regardless of activity or presence (0.9608ms)
+✔ podium rejects out-of-range grades and breaks ties by company name (14.518ms)
+✔ published podium candidates depend only on teacher grades (0.634ms)
+✔ cycle identifies the reported period relative to the configured total (1.196ms)
+✔ PDF preserves cents, accounting signs, zero grades and absent data (21.2732ms)
+✔ report mapping keeps the model balances and presents outflows as deductions (0.9517ms)
+✔ academic status uses mandatory counts and never invents completion (1.5903ms)
+✔ empty and eliminated rosters cannot download a misleading blank report (1.84ms)
+✔ presence needs two readings and a wider timeout before going idle (3.2871ms)
+✔ grade queue retries, persists, and only acknowledges the latest edit (3.6413ms)
+✔ grade queue shows failure only after repeated retries and keeps job locally (1.4894ms)
+✔ grade migration persists only for the owner and a company in that game (2534.6752ms)
+✔ acceleration and steering are stable across frame rates (6.5445ms)
+✔ brake stops without reversing; reverse is limited (1.4396ms)
+✔ swept substeps stop the bumper at a thin wall (1.7074ms)
+✔ rotated chassis and world bounds are respected (0.322ms)
+✔ vehicle pairs include bumpers and rotation for both chassis (2.2898ms)
+✔ all five decision categories have a destination on the agreed city map (4.1161ms)
+✔ missions follow the current cycle and stock urgency without modifying decisions (1.2146ms)
+✔ visible stock, delivery, machinery and clients use only authoritative inputs (1.4026ms)
+✔ festival events are unique and changing visuals never generate cash or inventory (0.5081ms)
+✔ unknown production and financial values stay unknown (0.1955ms)
+✔ world cash uses one ledger, reconciles sale commission, expense, investment and refund (8.6066ms)
+✔ teacher pause blocks world transactions while academic decisions stay available (2.9263ms)
+✔ checkout commit failure keeps customer and stock; successful retry records sale and sold atomically (4.4134ms)
+✔ closed phases and invalid amounts cannot mutate financial state (3.1165ms)
+✔ supplier debit persists its order; reload delivers once without charging twice (3.3083ms)
+✔ failed local commit and closed cycle do not create unpaid orders or upgrades (1.2253ms)
+✔ supplier delivery follows the server clock despite a shifted device clock (1.1332ms)
+✔ minimapa mantiene escala y orientación para la ciudad completa (3.9945ms)
+✔ todas las zonas poseen nombre, posición, ícono integrado y destino distinto (0.9347ms)
+✔ el escenario contiene controles accesibles para mapa, avisos y objetivo (0.5825ms)
+✔ rótulos móviles priorizan objetivo y zona actual sin cubrir controles (1.5331ms)
+✔ el objetivo fuera de cámara conserva rótulo y abrevia si el espacio es estrecho (1.4701ms)
+✔ walking across a facade threshold enters once without a button or cooldown (1.1246ms)
+✔ side walls and passing in front of a shop do not enter (0.224ms)
+✔ swept entrance chooses only the doorway crossed even during a long frame (0.2488ms)
+✔ interior returns through the physical exit and arrival cannot bounce outside (0.2525ms)
+✔ concurrent lobby and entry preload share critical requests without loading indoor models (14.7598ms)
+✔ failed engine preparation can retry rather than caching a permanent false result (4.1284ms)
+✔ rejected preloading releases its cache and allows the retry button to succeed (4.9536ms)
+✔ shared deferred requests do not block critical readiness or repeat staff upgrades (3.9855ms)
+✔ same-round closure suspends the world before a transaction can run (10.1935ms)
+✔ a hidden world schedules a wakeup without rendering or operating (5.2081ms)
+✔ idle animation does not replenish stock during pause or after shift end (4.5878ms)
+✔ suspension clears held keys, queued jump and velocity (4.9864ms)
+✔ visible pause draws once and then leaves physics, NPCs and GPU idle (3.6412ms)
+✔ vehicle audio reuses one voice and disconnects it when muted (4.5196ms)
+✔ flecha de objetivo respeta área segura y borde en móvil vertical (1.498ms)
+✔ flecha evita minimapa y controles táctiles en orientación vertical (0.6527ms)
+✔ flecha halla tramo libre de borde en orientación horizontal (0.2532ms)
+✔ objetivo detrás de cámara tiene dirección estable y viewport inviable no dibuja flecha (0.3719ms)
+✔ aviso de zona busca espacio entre estadísticas y minimapa (0.4102ms)
+ℹ tests 303
+ℹ suites 0
+ℹ pass 302
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 87917.0494
+
+✖ failing tests:
+
+test at tests\decision_roster.test.mjs:17:1
+✖ approved city manifest has 16 CC0 actors and strict roles exclude eligible avatars (7.1775ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  17 !== 16
+  
+      at TestContext.<anonymous> (file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/tests/decision_roster.test.mjs:21:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 17,
+    expected: 16,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+DONE node-completa: FAIL
+RUN decision_options_db.cjs
+PASS multiple options, exact quantities/costs, idempotent retries, scalar values, option removal, section isolation, revisions, cancellation and private RPC permissions
+DONE decision_options_db.cjs: PASS
+RUN student_admission_db.cjs
+PASS student admission: normalized identity, shared names, late rejection, CAS state, secure wrappers, denied legacy RPC/REST writes, no duplicates, race, demo and professor flow
+DONE student_admission_db.cjs: PASS
+RUN student_admission_matrix_db.cjs
+PASS student admission matrix DB: cases 1-19 with real repeatable migration
+DONE student_admission_matrix_db.cjs: PASS
+RUN teacher_history_db.cjs
+PASS idempotent SQL, empty history, manual close, all companies/cycles/catalog details/statements and live grades including zero
+PASS automatic close detected without professor, cancellation guard, newest replacement and late callbacks cannot revive older game
+PASS real authenticated/other-account RLS isolation, no client writes, unprivileged private functions and no anonymous student reads
+DONE teacher_history_db.cjs: PASS
+RUN game_lifecycle_db.cjs
+PASS manual: pre-start admission, Cycle 1 decisions, repeated start/advance, multiple students, late rejection
+PASS automatic: persistent 2-minute deadline, repeat reads/reload, no teacher, catch-up, late rejection
+PASS validation: invalid durations, enabled-only events in backend, direct REST guard, empty selection
+PASS database roles, internal RPC permissions, pause/resume/close and exact deadline boundary
+PASS existing one-active-game constraint
+DONE game_lifecycle_db.cjs: PASS
+RUN game_observations_db.cjs
+PASS unique alphanumeric codes, collision rejection and server presence heartbeat
+PASS cancellation in waiting/running/automatic games, persistence, admission/decision guards, owner permission and idempotency
+PASS manual event rules: first cycle, single occurrence, repeat, immutable past draws, cancellation preserves history, server validation
+PASS 4608-code exhaustion reports an error instead of duplicating a code
+DONE game_observations_db.cjs: PASS
+RUN waiting_room_db.cjs
+PASS waiting room: manual early start ignored, 7-minute persisted server deadline, UTC/Lima exact boundary, late block, exact reentry, immutable started_at, anon capability and REST denial
+DONE waiting_room_db.cjs: PASS
+RUN playable_hub.cjs
+Hub loaded
+Rendered geometry {"meshes":615,"skinned":1,"drawCalls":143,"triangles":63612,"backgroundImage":"none"}
+PASS playable hub: WebGL geometry, animated pedestrians, walking camera, collision, shop entry, district selection, rebuild and mobile layout
+DONE playable_hub.cjs: PASS
+RUN continuous_world.cjs
+PASS 1 Nuevo mapa único
+PASS 2 Entrada física tienda
+PASS 3 Salida física tienda
+PASS 4 Almacén equipado
+PASS 5 Producción equipada
+PASS 6 Paredes, estantes, máquinas y caja sólidos
+PASS 7 Vehículo conserva estacionamiento
+PASS 8 Inventario autoritativo y entrega única
+PASS 9 Ciclo sin escenas, NPCs, listeners o RAF duplicados
+PASS 10 Lobby, vehículo, pedido, caja, producción, decisiones y ciclo
+DONE continuous_world.cjs: PASS
+RUN gameplay_hud.cjs
+PASS read-only objectives, local WebGL, interior access and mobile HUD
+DONE gameplay_hud.cjs: PASS
+RUN world_business_ui.cjs
+PASS warehouse UI: paid order survives reload, exact stock +12, no repeated debit or delivery
+PASS real WebGL pause, hidden screen, tab visibility and resume; no browser exceptions
+DONE world_business_ui.cjs: PASS
+RUN world_cycle_restart.cjs
+PASS return after finished shift
+PASS restart clears previous panels without charging decisions again
+PASS cycle 2: independent session and world entry
+PASS cycle 3: independent session and world entry
+PASS retry day, next day, NPC names, no browser errors
+DONE world_cycle_restart.cjs: PASS
+RUN world_startup.cjs
+page.waitForFunction: Timeout 30000ms exceeded.
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\world_startup.cjs:67:15 {
+  log: [],
+  name: 'TimeoutError'
+}
+DONE world_startup.cjs: FAIL
+RUN world_loading.cjs
+PASS {"label":"current","warm":false,"navigationMs":343,"preloadMs":0,"ready":true,"entered":true,"prepareMs":6261.5,"entryMs":6676.100000023842,"startedAt":539,"firstRenderMs":12821.400000035763,"movableMs":13389.699999988079,"stages":{"loadThree":0,"buildPlayableHub":2258.800000011921},"requests":109,"bytes":16383144,"assets":[{"name":"/assets/models3d/npcs/chico2.glb","bytes":4163056,"ms":61,"start":1195.6000000238419},{"name":"/assets/models3d/props/shop_shelf_tall.glb","bytes":13120,"ms":524,"start":13338.600000023842},{"name":"/assets/models3d/props/shop_entry_door.glb","bytes":11172,"ms":569,"start":13339.900000035763},{"name":"/assets/models3d/props/shop_checkout_counter_end.glb","bytes":8828,"ms":498.30000001192093,"start":13338.100000023842},{"name":"/assets/models3d/props/shop_table_display.glb","bytes":8792,"ms":498.5999999642372,"start":13337.400000035763},{"name":"/assets/models3d/props/shop_shelf_low.glb","bytes":8448,"ms":563.3000000119209,"start":13338.800000011921},{"name":"/assets/models3d/props/shop_mirror_wall.glb","bytes":6704,"ms":562.8999999761581,"start":13339.100000023842},{"name":"/assets/models3d/props/shop_checkout_counter.glb","bytes":6516,"ms":499.2000000476837,"start":13337.699999988079}]}
+PASS {"label":"current","warm":true,"navigationMs":587,"preloadMs":4767,"ready":true,"entered":true,"prepareMs":3230.099999964237,"entryMs":3487.2999999523163,"startedAt":5810,"firstRenderMs":8994.199999988079,"movableMs":9003.599999964237,"stages":{"loadThree":0,"buildPlayableHub":3001.400000035763},"requests":102,"bytes":16319564,"assets":[{"name":"/assets/models3d/npcs/chico2.glb","bytes":4163056,"ms":3271,"start":2227.2999999523163}]}
+DONE world_loading.cjs: PASS
+RUN world_entry_assets.cjs
+PASS nonblocking entry, shared asset requests, staff upgrade in place, unchanged scene/ledger and no unused navigation/model
+DONE world_entry_assets.cjs: PASS
+RUN supplied_npcs.cjs
+PASS NPC world supplied player assets with procedural city NPCs
+AssertionError [ERR_ASSERTION]: customers complete a decision
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\supplied_npcs.cjs:136:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+DONE supplied_npcs.cjs: FAIL
+RUN mona_npc.cjs
+PASS Mona world GLB
+PASS Mona world fallback
+DONE mona_npc.cjs: PASS
+RUN npc_locomotion.cjs
+PASS NPC planted feet through turns, swing clearance, pivot steps, stop and pool reset
+[
+  {
+    "kind": "chico1",
+    "maxSupportSlip": 1.0894883602041343e-8,
+    "maxAnkleJump": 0.05898928439318692,
+    "maxSwingHeight": 0.0836554562630323,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.9045434676350786e-10,
+      "head": 0.0343761736747774
+    },
+    "pivotLift": 0.056844750185290074,
+    "finite": true
+  },
+  {
+    "kind": "chico2",
+    "maxSupportSlip": 9.048133742506552e-9,
+    "maxAnkleJump": 0.05866746296715561,
+    "maxSwingHeight": 0.08130791771493141,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.816988434775777e-10,
+      "head": 0.039998950910008185
+    },
+    "pivotLift": 0.05524798753827066,
+    "finite": true
+  },
+  {
+    "kind": "chico3",
+    "maxSupportSlip": 1.0146168244797921e-8,
+    "maxAnkleJump": 0.05917853729543936,
+    "maxSwingHeight": 0.08271967331685756,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.9628829930281418e-10,
+      "head": 0.034076405723492055
+    },
+    "pivotLift": 0.056206045126695664,
+    "finite": true
+  },
+  {
+    "kind": "mona",
+    "maxSupportSlip": 7.291981009805477e-9,
+    "maxAnkleJump": 0.05784790542340691,
+    "maxSwingHeight": 0.0789598435674775,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.7650175952410952e-10,
+      "head": 0.019389089577365577
+    },
+    "pivotLift": 0.053651224891423446,
+    "finite": true
+  }
+]
+DONE npc_locomotion.cjs: PASS
+RUN game_lifecycle_ui.cjs
+PASS UI manual: prepare, two live students auto-navigate to decisions before the 3D world; all/individual/random/zero events
+PASS UI share code/link, invitation, event rules, cancellation failure/retry and feedback on both students, presence and mobile grade layout
+PASS UI automatic: server countdown, reload, clock skew, multiple clients, late rejection and exact reentry on another device
+PASS no browser JavaScript errors
+DONE game_lifecycle_ui.cjs: PASS
+RUN decisions_cycle_ui.cjs
+PASS all tabs layout 1366x768
+PASS all tabs layout 1024x768
+PASS all tabs layout 768x1024
+PASS all tabs layout 390x844
+PASS all tabs layout 320x568
+PASS all tabs layout 844x390
+PASS multiple district checkboxes, keyboard, web, save once, reload and submission lock
+PASS real production record, live target, zero, overachievement and current DOP/summary plan parity
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(await page.evaluate(()=>window.scrollY>0))
+
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\decisions_cycle_ui.cjs:97:8 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+DONE decisions_cycle_ui.cjs: FAIL
+RUN teacher_lifecycle_ui.cjs
+PASS teacher setup, admission cycle, live roster, cycle advance and 24-hour podium
+PASS reentry without tutorial, integration lock and sticky student status at five viewports
+DONE teacher_lifecycle_ui.cjs: PASS
+RUN tablet_return_browser.cjs
+PASS 20 consecutive tablet exits from button: focus, keys, overlays, decisions and cycle
+PASS 20 consecutive tablet exits from news: focus, keys, overlays, decisions and cycle
+PASS 20 consecutive tablet exits from office: focus, keys, overlays, decisions and cycle
+PASS camera and WASD restored without browser errors
+DONE tablet_return_browser.cjs: PASS
+RUN npc_world_fixes_browser.cjs
+PASS all 4 outdoor NPCs: 60 seconds, 12 movement windows, actual animated mesh height/feet and ground roots
+PASS all streamed business interiors: real NPC GLB bounds and ground after 60 simulated seconds per room
+PASS production foot/car NPC contact, slide escape, walls and step budget in first/third camera
+PASS clean scene/DOM with preserved minimap destinations and HUD
+DONE npc_world_fixes_browser.cjs: PASS
+RUN world_orientation_mobile.cjs
+PASS 360x640
+PASS 390x844
+PASS 844x390
+DONE world_orientation_mobile.cjs: PASS
+RUN teacher_history_ui.cjs
+PASS 1366px: empty, multi-company/cycle statements/zero grade, read-only, XSS, latest replacement, missing migration feedback and existing navigation
+PASS 390px: empty, multi-company/cycle statements/zero grade, read-only, XSS, latest replacement, missing migration feedback and existing navigation
+PASS no new browser or console errors on desktop and mobile
+DONE teacher_history_ui.cjs: PASS
+RUN teacher_report_pdf_ui.cjs
+PASS: actual teacher download and preview; excluded companies; URL cleanup; empty roster; missing SDK; long names; 48 events; missing data; zero grade.
+DONE teacher_report_pdf_ui.cjs: PASS
+RUN character_selection_ui.cjs
+✔ selector supports selection, persistence, confirmation, keyboard and target desktop sizes (1560.3739ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1565.1986
+DONE character_selection_ui.cjs: PASS
+RUN decision_interiors_browser.cjs
+low office: 54 calls, 15534 triangles; entry/exit, decision, collision, actors passed
+low bank: 57 calls, 16550 triangles; entry/exit, decision, collision, actors passed
+low suppliers: 66 calls, 16756 triangles; entry/exit, decision, collision, actors passed
+medium office: 58 calls, 27102 triangles; entry/exit, decision, collision, actors passed
+medium bank: 57 calls, 23857 triangles; entry/exit, decision, collision, actors passed
+medium suppliers: 70 calls, 28324 triangles; entry/exit, decision, collision, actors passed
+high office: 55 calls, 25536 triangles; entry/exit, decision, collision, actors passed
+high bank: 51 calls, 18241 triangles; entry/exit, decision, collision, actors passed
+high suppliers: 68 calls, 28418 triangles; entry/exit, decision, collision, actors passed
+auto office: 58 calls, 27102 triangles; entry/exit, decision, collision, actors passed
+auto bank: 55 calls, 23660 triangles; entry/exit, decision, collision, actors passed
+auto suppliers: 70 calls, 28324 triangles; entry/exit, decision, collision, actors passed
+{
+  "measurement": "Actual scene, 1366x900, first-person at inner door; SwiftShader CPU renderer, no claim about GPU FPS",
+  "tiers": {
+    "low": {
+      "office": {
+        "mode": "low",
+        "room": "office",
+        "calls": 54,
+        "triangles": 15534,
+        "geometries": 272,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "low",
+        "room": "bank",
+        "calls": 57,
+        "triangles": 16550,
+        "geometries": 277,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_man_casual",
+              "visible": true,
+              "height": 1.7063120832953376,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit",
+            "city_man_casual"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "low",
+        "room": "suppliers",
+        "calls": 66,
+        "triangles": 16756,
+        "geometries": 307,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_worker",
+            "city_man_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "medium": {
+      "office": {
+        "mode": "medium",
+        "room": "office",
+        "calls": 58,
+        "triangles": 27102,
+        "geometries": 316,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "medium",
+        "room": "bank",
+        "calls": 57,
+        "triangles": 23857,
+        "geometries": 323,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_woman_tank",
+              "visible": true,
+              "height": 1.706453557544494,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit",
+            "city_woman_tank"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "medium",
+        "room": "suppliers",
+        "calls": 70,
+        "triangles": 28324,
+        "geometries": 323,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_worker",
+            "city_man_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "high": {
+      "office": {
+        "mode": "high",
+        "room": "office",
+        "calls": 55,
+        "triangles": 25536,
+        "geometries": 349,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_woman_formal",
+              "visible": true,
+              "height": 1.7062851204931482,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_woman_formal"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "high",
+        "room": "bank",
+        "calls": 51,
+        "triangles": 18241,
+        "geometries": 356,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_office",
+              "visible": true,
+              "height": 1.7034472528234077,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_woman_tank",
+              "visible": true,
+              "height": 1.706453557544494,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_office",
+            "city_woman_tank"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "high",
+        "room": "suppliers",
+        "calls": 68,
+        "triangles": 28418,
+        "geometries": 366,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_man_hoodie",
+              "visible": true,
+              "height": 1.7063110325691866,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_hoodie",
+            "city_man_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "auto": {
+      "office": {
+        "mode": "auto",
+        "room": "office",
+        "calls": 58,
+        "triangles": 27102,
+        "geometries": 376,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "auto",
+        "room": "bank",
+        "calls": 55,
+        "triangles": 23660,
+        "geometries": 376,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_woman_dress",
+              "visible": true,
+              "height": 1.7064535559978884,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit",
+            "city_woman_dress"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "auto",
+        "room": "suppliers",
+        "calls": 70,
+        "triangles": 28324,
+        "geometries": 376,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_worker",
+            "city_man_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    }
+  },
+  "checks": {
+    "low-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": false,
+      "actors": 2
+    },
+    "low-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": false,
+      "actors": 3
+    },
+    "low-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": false,
+      "actors": 2
+    },
+    "medium-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "medium-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "medium-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "high-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "high-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "high-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "auto-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "auto-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "auto-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    }
+  },
+  "deferred": [
+    {
+      "id": "office",
+      "deferred": true,
+      "children": 0
+    },
+    {
+      "id": "bank",
+      "deferred": true,
+      "children": 0
+    },
+    {
+      "id": "suppliers",
+      "deferred": true,
+      "children": 0
+    }
+  ]
+}
+DONE decision_interiors_browser.cjs: PASS
+RUN npc_navmesh_browser.cjs
+{"ready":true,"stats":{"cells":144,"walkable":128,"blocked":16,"triangles":256},"path":[[-3,1],[-3,1],[-2,2],[2,2],[4,0]]}
+DONE npc_navmesh_browser.cjs: PASS
+RUN tablet_item_draft_ui.cjs
+PASS Tablet: one draft button per section, persistence, quota errors, submission lock and five viewports
+DONE tablet_item_draft_ui.cjs: PASS
+RUN mobile_integral_ui.cjs
+PASS mobile panels 360x800
+PASS mobile panels 390x844
+PASS mobile panels 768x1024
+AssertionError [ERR_ASSERTION]: tablet-B 800: targets under44
++ actual - expected
+
++ [
++   {
++     height: 40,
++     id: 'exitDecisions',
++     text: 'Volver a la sala',
++     width: 44
++   },
++   {
++     height: 40,
++     id: 'topSubmitAllDecisions',
++     text: '✓ ENVIAR TODO',
++     width: 140
++   }
++ ]
+- []
+
+    at capture (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\mobile_integral_ui.cjs:30:12)
+    at async C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\mobile_integral_ui.cjs:40:161 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+DONE mobile_integral_ui.cjs: FAIL
+[
+  {
+    "suite": "local_server_test.py",
+    "kind": "server",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 1927,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\local_server_test.py.log"
+  },
+  {
+    "suite": "node-completa",
+    "kind": "node",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 88148,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\node-completa.log"
+  },
+  {
+    "suite": "decision_options_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 3302,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\decision_options_db.cjs.log"
+  },
+  {
+    "suite": "student_admission_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 10649,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\student_admission_db.cjs.log"
+  },
+  {
+    "suite": "student_admission_matrix_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 15454,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\student_admission_matrix_db.cjs.log"
+  },
+  {
+    "suite": "teacher_history_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2629,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\teacher_history_db.cjs.log"
+  },
+  {
+    "suite": "game_lifecycle_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2513,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\game_lifecycle_db.cjs.log"
+  },
+  {
+    "suite": "game_observations_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2460,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\game_observations_db.cjs.log"
+  },
+  {
+    "suite": "waiting_room_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2244,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\waiting_room_db.cjs.log"
+  },
+  {
+    "suite": "playable_hub.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 49740,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\playable_hub.cjs.log"
+  },
+  {
+    "suite": "continuous_world.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 94092,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\continuous_world.cjs.log"
+  },
+  {
+    "suite": "gameplay_hud.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 18885,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\gameplay_hud.cjs.log"
+  },
+  {
+    "suite": "world_business_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 27574,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_business_ui.cjs.log"
+  },
+  {
+    "suite": "world_cycle_restart.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 54642,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_cycle_restart.cjs.log"
+  },
+  {
+    "suite": "world_startup.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 57846,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_startup.cjs.log"
+  },
+  {
+    "suite": "world_loading.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 39331,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_loading.cjs.log"
+  },
+  {
+    "suite": "world_entry_assets.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 20406,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_entry_assets.cjs.log"
+  },
+  {
+    "suite": "supplied_npcs.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 84288,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\supplied_npcs.cjs.log"
+  },
+  {
+    "suite": "mona_npc.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 109916,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\mona_npc.cjs.log"
+  },
+  {
+    "suite": "npc_locomotion.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 15611,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\npc_locomotion.cjs.log"
+  },
+  {
+    "suite": "game_lifecycle_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 55879,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\game_lifecycle_ui.cjs.log"
+  },
+  {
+    "suite": "decisions_cycle_ui.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 21210,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\decisions_cycle_ui.cjs.log"
+  },
+  {
+    "suite": "teacher_lifecycle_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 16814,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\teacher_lifecycle_ui.cjs.log"
+  },
+  {
+    "suite": "tablet_return_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 37335,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\tablet_return_browser.cjs.log"
+  },
+  {
+    "suite": "npc_world_fixes_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 60708,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\npc_world_fixes_browser.cjs.log"
+  },
+  {
+    "suite": "world_orientation_mobile.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 106785,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\world_orientation_mobile.cjs.log"
+  },
+  {
+    "suite": "teacher_history_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 8086,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\teacher_history_ui.cjs.log"
+  },
+  {
+    "suite": "teacher_report_pdf_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 11140,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\teacher_report_pdf_ui.cjs.log"
+  },
+  {
+    "suite": "character_selection_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2050,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\character_selection_ui.cjs.log"
+  },
+  {
+    "suite": "decision_interiors_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 147180,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\decision_interiors_browser.cjs.log"
+  },
+  {
+    "suite": "npc_navmesh_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 5892,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\npc_navmesh_browser.cjs.log"
+  },
+  {
+    "suite": "tablet_item_draft_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 29117,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\tablet_item_draft_ui.cjs.log"
+  },
+  {
+    "suite": "mobile_integral_ui.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 66205,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-final\\runs\\2026-10-11T16-28-49-507Z\\mobile_integral_ui.cjs.log"
+  },
+  {
+    "suite": "side_full_flow.cjs",
+    "kind": "browser",
+    "status": "skipped",
+    "passed": false,
+    "reason": "Runner opcional aún no creado"
+  }
+]

@@ -1,0 +1,10 @@
+PASS 1 Nuevo mapa único
+PASS 2 Entrada física tienda
+PASS 3 Salida física tienda
+PASS 4 Almacén equipado
+PASS 5 Producción equipada
+PASS 6 Paredes, estantes, máquinas y caja sólidos
+PASS 7 Vehículo conserva estacionamiento
+PASS 8 Inventario autoritativo y entrega única
+PASS 9 Ciclo sin escenas, NPCs, listeners o RAF duplicados
+PASS 10 Lobby, vehículo, pedido, caja, producción, decisiones y ciclo
