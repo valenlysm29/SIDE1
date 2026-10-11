@@ -161,7 +161,7 @@ function updateIntegrationUI(){
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
   if(button){button.disabled=!access.canOperate;button.classList.toggle('hidden',!access.canOperate||decisionsComplete);}
   if(notice){
-    notice.classList.toggle('hidden',access.canOperate);
+    notice.classList.toggle('hidden',access.canOperate||(waiting&&Number.isFinite(access.remaining)));
     const reason=access.reason||'';
     if(notice.dataset.reason!==reason){notice.dataset.reason=reason;notice.textContent=reason;}
     if(access.integration&&Number.isFinite(access.remaining)){

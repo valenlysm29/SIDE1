@@ -1583,5 +1583,5 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 #studentWaiting .tutorial-hints span{font-size:12px;padding:7px 10px;letter-spacing:0}
 #studentWaiting .waiting-footer{flex:none;display:flex;align-items:center;justify-content:space-between;gap:18px}
 #studentWaiting #studentIntegrationNotice{max-width:none;margin:0;color:#b3c7dc;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
-#studentWaiting #waitingBackToProfiles{flex:none;margin:0;min-height:40px;padding:8px 14px;font-size:12px}
+#studentWaiting #waitingBackToProfiles{flex:none;margin:0 0 0 auto;min-height:40px;padding:8px 14px;font-size:12px}
 #studentWaiting button:focus-visible{outline:2px solid #ffd329;outline-offset:2px}
