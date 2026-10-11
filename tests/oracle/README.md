@@ -75,3 +75,17 @@ python tests/oracle/crear_libro_paridad.py
 ```
 
 Cobertura final:351base+468SIM1+504SIM2+1008SIM3+252bancarecuperación+252bancamezcla+56consecuencias=2891comparaciones sin diferencias. Cada empresa-ciclo agrega33campos financial: estadoResultados, balanceCaja, flujoCaja, balanceGeneral y financiamiento. Los intereses de deuda antigua conservan su tasa y se mezclan por saldo con nuevos préstamos; penalización afecta solo el préstamo siguiente. El generador no importa caja.js; el comparador de obtenidos sí llama adjuntarCaja, como hace UI.
+
+
+Cobertura de cada lote y mercado extendida a las tres simulaciones: SIM2 585/0 y SIM3 1140/0. Cada lote compara calidad, producción, capacidadAsignada y precioEfectivo; cada mercado de cada empresa/segmento compara puntajePrecio, puntajeTotal, porcentaje, asignado, demandaAjustada, calidadMercado y reputacionEscalada. SIM2 incluye el mercado Premium de inventario anterior en ciclo3. SIM3 incluye explícitamente la réplica de B en ciclo2. No cambian entradas ni cálculos del motor.
+
+Para conservar esta cobertura, construir los tres modelos usando el generador multilote:
+
+```powershell
+python tests/oracle/construir_sim2.py sim1
+python tests/oracle/construir_sim2.py sim2
+python tests/oracle/construir_sim2.py sim3
+python tests/oracle/extender_finanzas.py
+```
+
+Libro final:351+468+585+1140+252+252+56=3104 comparaciones, cero diferencias y cero pendientes.

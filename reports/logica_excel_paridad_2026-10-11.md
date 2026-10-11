@@ -2,21 +2,21 @@
 
 ## Estado de entrega
 
-Se implementó un motor puro compatible con Node y navegador y un **piloto local de activación opcional** para editar lotes, previsualizar producción y consultar resultados. Esta entrega todavía **no cumple la aceptación integral** del pedido: el cierre conectado de Supabase no utiliza el motor nuevo y las finanzas de caja/balance del juego anterior permanecen separadas de los resultados económicos Excel. La evidencia de fórmulas individuales no sustituye la prueba del flujo completo conectado.
+Motor puro Node/navegador, editor con las68 opciones Excel, cierre local/remoto e historial, y adaptador de caja común ya implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. Regresión y revisiónfinal están en curso: todavía no se declara aceptación ni publicación.
 
-**Push: no realizado.** No debe publicarse mientras persistan los incumplimientos, las verificaciones pendientes o hallazgos críticos de revisión. Los cambios ajenos que ya existían en modelos, capturas y reportes deben conservarse fuera de los commits de esta tarea.
+**Push: no realizado hasta completar todos los controles.** WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
 
 ## Implementación por hoja
 
 | Fuente | Implementación y alcance real |
 |---|---|
-| Catalogo_Decisiones / Seleccion_Ciclo0 | `js/engine/catalogo_excel.js` conserva las 68 filas y normaliza costos; `puntajes.js` valida una opción por grupo. El catálogo anterior de `js/decision_catalog.js` conserva IDs y costos de su jugabilidad, con metadatos Excel añadidos. Por tanto **el catálogo de jugabilidad anterior no quedó alineado fila por fila**. |
-| CANTIDAD DE PRODUCCIÓN | `produccion.js`: matrices de personal, 24 días, cuello de botella, eficiencia literal, reparto truncado, restricciones por insumo/lote, conversiones de compra e inventario. El adaptador piloto no sustituye toda la producción anterior. |
-| Costos De Producción | `costos.js`: cargas laborales literales MYPE/No MYPE, CTS manual, mantenimiento y depreciación, valorización MP, jerarquía de almacén y reputación operativa. Adquisición/instalación/capacitación se detallan por separado; falta conciliarlas con la caja y activos del flujo conectado. |
+| Catalogo_Decisiones / Seleccion_Ciclo0 | `js/engine/catalogo_excel.js` conserva las 68 filas y normaliza costos; `puntajes.js` valida una opción por grupo. En modo por lotes las 68 filas Excel son la fuente activa del editor, incluidos cuatro grupos nuevos. La interfaz anterior mantieneIDs para las empresas que continúan en ese modo; al activar lotes se impide seguir generando cargos desde sus categorías. |
+| CANTIDAD DE PRODUCCIÓN | `produccion.js`: matrices de personal, 24 días, cuello de botella, eficiencia literal, reparto truncado, restricciones por insumo/lote, conversiones de compra e inventario. Al activar lotes se deshabilita el cálculo productivo anterior para esa empresa. |
+| Costos De Producción | `costos.js`: cargas laborales literales MYPE/No MYPE, CTS manual, mantenimiento y depreciación, valorización MP, jerarquía de almacén y reputación operativa. El adaptador de caja paga compras netas y adquisiciones/instalación/capacitación una vez; depreciación afecta resultados, no caja. |
 | Lotes_Produccion / Motor_Puntajes | Calidad por lote, umbrales y mensajes; calidad ponderada de empresa; eficiencia, reputación y salud; niveles Alto/Medio/Bajo sin normalizar puntajes. Se incluyen cuatro grupos adicionales conforme al pedido. |
 | Matriz_Consecuencias | Ocho reglas en `consecuencias.js`; efectos por lote, reputación una vez por regla/ciclo, penalización productiva multiplicativa, historial y tasa futura. La conservación literal de textos incluye errores ortográficos del archivo. |
 | Ventas | `mercado.js`: modelo 2 por segmento y modelo 1 solo de contraste. `ciclo.js` reúne empresas, replica decisiones, elimina al no decidir inicialmente, vende stock anterior y conserva inventarios. |
-| Instrucciones / DECISIONES / FlujoWeb | Contexto conservado; editor local optativo en `ui_excel.js`. El cierre remoto y la contabilidad general requieren trabajo adicional. |
+| Instrucciones / DECISIONES / FlujoWeb | Editor en ui_excel.js, planes confirmados por ciclo, cierre remoto con el mismo motor y estados financieros comunes. |
 
 Los archivos del proyecto y temporales permanecen en SIDE1. La fuente se copió a `.codex-work/DECISIONES_SIDE_16.xlsx`, sin modificar el archivo de Descargas. No se debe añadir esa copia a Git; queda por confirmar si el usuario desea versionar el Excel original. Los oráculos derivados son entregables solicitados.
 
@@ -28,19 +28,18 @@ El original se leyó con dos cargas de openpyxl para distinguir fórmulas y valo
 
 Los caches abreviados del original y los números de presentación del pedido no se consideran verdad de precisión completa. Ejemplo: reputación operativa se presenta como 11.1876, mientras Excel recalculado entrega aproximadamente 11.187635078564613. La comparación usa enteros exactos y tolerancia relativa `1e-9` para decimales.
 
-| Verificación | Excel | SIDE | Estado al redactar |
+| Verificación | Excel real | SIDE | Resultado conocido |
 |---|---|---|---|
-| Costos base, 139 celdas | `tests/oracle/esperado_base.json` | `obtenido_costos.json`, calculado con motor y entradas literales | **139 comparadas; 0 diferencias** |
-| Base completo, 351 celdas | `esperado_base.json` | `obtenido_base.json` | PENDIENTE: consignar ejecución final de `tests/paridad_base.cjs` |
-| SIM-1: base UI con cuatro empresas | Oráculo base y mercado por segmento | Runner navegador | PENDIENTE: resultado final y ruta de evidencia |
-| SIM-2: dos empresas y tres ciclos | Fórmulas independientes de consecuencias y premium; no oráculo integral de dos lotes cambiantes | `tests/escenarios_excel.cjs`, motor y runner navegador | Las ocho reglas pasan tests; **paridad integral de simulación pendiente/no demostrada** |
-| SIM-3: cinco empresas y tres ciclos | `ORACULO_sim3.xlsx`, fórmulas generalizadas de un lote por empresa | `comparar_pipeline.cjs` y runner navegador | PENDIENTE: consignar comparación final, cobertura y diferencias |
-| Unitarios de costos | Fixtures originales | `tests/costos_excel.test.cjs` | **8/8 pasan** |
-| Invariantes del ciclo | Reglas y conservación de existencias | `tests/ciclo_excel.test.cjs` | **6/6 pasan** |
-| Resto de tests del motor y UI | Fixtures y contratos | `tests/*_excel.test.cjs` | PENDIENTE: número final consolidado |
-| Regresión existente y revisión independiente | Flujo anterior | Runner y revisor final | PENDIENTE: resultado final |
+| Base completo | esperado_base.json | obtenido_base.json |351 salidas;0 diferencias |
+| Consecuencias escalares | sim2 y sim2_premium | paridad_consecuencias |56 salidas;0 diferencias |
+| SIM1,4empresas,3segmentos,1ciclo | ORACULO_sim1.xlsx | cierre docente UI |468 salidas (incluye caja);0 diferencias;351 componentes base adicionales |
+| SIM2,2empresas,3ciclos | ORACULO_sim2.xlsx multilote | cierre docente UI |585 salidas (incluye caja y detalle de lotes/mercado);0 diferencias |
+| SIM3,5empresas,3ciclos | ORACULO_sim3.xlsx | cierre docente UI |1140 salidas (incluye caja y detalle de lotes/mercado);0 diferencias;recorte móvil corregido; repetición final pendiente tras ajuste del HUD |
+| Recuperación antes del préstamo | ORACULO_banca.xlsx | banca_recuperacion.cjs |252 salidas;0 diferencias |
+| Caja completa/intereses | Fórmulas independientes de extender_finanzas.py | adjuntarCaja y UI |33 campos por empresa/ciclo; cero diferencias en Node; repetición UI final en curso |
+| Regresión anterior | baseline 9fbe6ec exacto |8 ejecuciones comparadas |NPC 17/16, móvil de 40 px y scrollY preexistentes demostrados; doble DOM previo corregido (9/9) |
 
-No hay autorización para declarar «tres simulaciones con cero diferencias» hasta que la evidencia cubra todas las cifras del motor, la interfaz y cada ciclo requerido. SIM-2 usa un lote incompleto, otro de calidad 4 y cambio de insumos posterior; el oráculo simplificado de un lote e identidad constante no cubre ese caso completo.
+Total final del oráculo: **3104 comparaciones correctas, cero diferencias y cero pendientes**. Incluye dos casos bancarios de 252 salidas cada uno y 56 verificaciones escalares de consecuencias. Los perfiles§5.1,§5.2 y§5.3 usan cantidades/personal diferentes; son ejemplos independientes. Por eso SIM1 comprueba los 351 componentes canónicos y, además, un cierre coherente de tres lotes por empresa con entradas explícitas y oráculo independiente; no se afirma que un cierre único reproduzca tres perfiles contradictorios al mismo tiempo.
 
 ## Errores identificados y correcciones
 
@@ -50,7 +49,7 @@ No hay autorización para declarar «tres simulaciones con cero diferencias» ha
 - La depreciación acelerada recibe el ciclo real, sin agregar campos internos a las decisiones replicadas.
 - Se agregaron los costos recurrentes de RR.HH., marketing, canal e inventarios desde el catálogo, sin duplicar personal, MP ni mantenimiento ya calculados.
 - La garantía se provisiona por unidad vendida; esta interpretación operativa no constituye una fórmula original de cierre en el Excel.
-- Los préstamos se informan como financiamiento, separados del ingreso por ventas. No se inventó un calendario de amortización ausente en la fuente; la conciliación con deuda/caja del juego anterior permanece pendiente.
+- Los préstamos se informan como financiamiento, separados del ingreso por ventas. No se inventó un calendario de amortización ausente en la fuente; caja e intereses se calculan en el adaptador único. La tasa mensual equivalente es una extensión configurable y PENDIENTE_DEFINIR, no una fórmula bancaria del archivo fuente.
 - Se detectaron los hallazgos adicionales 34–35 de valorización y denominador de hilo, explicados abajo.
 
 ## Tabla de decisiones y ajustes
@@ -92,7 +91,7 @@ Todos los nombres de configuración se refieren a `js/engine/config_excel.js`. U
 | 31 | Costos texto normalizados; original conservado | `catalogo_excel.json` / `catalogo_excel.js`; regenerar desde fuente |
 | 32 | Catorce grupos más cuatro nuevos; fuera SEG/mesa/materiales | Filtro de grupos en `puntajes.js` (**decisión 6**); cambiar requiere actualizar pruebas |
 | 33 | Un ciclo equivale a un mes económico | `CICLO_EQUIVALE_A_MESES:1`; cronómetro real sigue independiente |
-| 34 | Valorización de ejemplo usa 107; almacén usa 107.5 | `paridad_costos.cjs` usa entrada propia AB89; juego usa consumo real. No flag que copie el ejemplo al juego |
+| 34 | Valorización de ejemplo usa 107; almacén usa 107.5 | `VALORIZACION_MP_MODO:"consumo_real"`; alternativa `"excel_literal"` exige mapa explícito consumoValorizado; fixtures AB89=107 y consumo107.5 se conservan por separado |
 | 35 | H61 excluye hilo N1 del denominador | `REPUTACION_HILO_DENOMINADOR_LITERAL:true` (false incluye todos) |
 
 Las seis decisiones destacadas requieren confirmar: fuente de reputación de mercado; calidad de mercado real; salarios Costos frente a catálogo; mantenimiento doble; modelo 2 de mercado; cuatro grupos adicionales en Motor.
@@ -101,19 +100,21 @@ Las seis decisiones destacadas requieren confirmar: fuente de reputación de mer
 
 Marcados `PENDIENTE_DEFINIR`: horas extra 25%, almacenaje S/2, aumento TEA 3 pp, vida productiva 100000 unidades para depreciación por uso, acumulación multiplicativa de descuentos, sobrecosto lead time rápido y porcentajes de inversiones alta/baja. Los dos últimos tienen valor 0 y no se presentan como beneficios económicos demostrados.
 
-También requieren definición de producto antes del despliegue: conciliación de adquisiciones con caja y balance; calendario financiero de préstamos; aplicación de ventas a crédito; relación entre publicidad numérica y marketing del catálogo; garantía por unidad vendida; comienzo exacto de CONS-04 cuando se cumple la segunda reputación baja; ejecución autoritativa del cierre y recuperación al perder conexión. Ninguna de estas ausencias queda subsanada por tener pruebas del motor en verde.
+Extensiones explícitas: interés equivalente mensual sobre deuda, sin amortización porque no existe calendario; adquisición de activos solo por incremento, sin liquidación; garantía por unidad vendida; REP baja se aplica desde el segundo ciclo. Tiendas por zona y porcentaje de ventas a crédito se capturan y conservan, pero el Excel no define su costo/demanda ni calendario de cobros; están marcados PENDIENTE_DEFINIR y no generan efectos inventados. El balance conserva caja, activos fijos e inventario MP; los productos terminados se registran en unidades, sin un método nuevo de capitalización contable. Confirmar esos criterios antes de ampliar reglas.
 
 ## Supabase
 
-**No se requiere cambio en Supabase PARA EL PILOTO LOCAL. No hay SQL nuevo que ejecutar ni orden de migraciones adicional.** No se ejecutó ninguna operación de prueba en producción y no se modificó `public.guardar_puntaje_docente`.
+SQL preparado: supabase/migrations/2026-10-11_logica_excel.sql. **No se ejecutó en producción.** Se aplica dos veces y se prueban funciones/triggers con PostgreSQL PGlite en memoria. No modifica public.guardar_puntaje_docente. Resultados, inventarios, personal, decisiones e historial se preservan en el JSON del cierre y del snapshot.
 
-Los JSON actuales permiten conservar decisiones y estado bajo `decision_state.__excel` y el resultado bajo `estado_resultados.excel`. Esto evita depender de columnas nuevas: el RPC de snapshots admite `decision_state` y el de reportes admite `estado_resultados`. Agregar propiedades nuevas a la raíz del snapshot/reporte sería insuficiente porque los RPC reconstruyen una lista cerrada de claves.
+Orden para una instalación SIDE ya migrada: ejecutar únicamente el archivo 2026-10-11_logica_excel.sql completo en el editor SQL de Supabase. Depende del esquema existente y de supabase_game_lifecycle.sql y supabase_student_admission.sql. No repetir migraciones antiguas de una base en uso sin revisar su estado. Para una base local nueva las pruebas cargan supabase_migration.sql → supabase_game_lifecycle.sql → supabase_student_admission.sql → 20260930_preservar_opciones_decisiones.sql → 20261009_sala_espera_identidad_exacta.sql → 2026-10-11_logica_excel.sql.
 
-El cierre conectado está **pendiente de integrar y validar**. No se afirma que el almacenamiento JSON disponible ya resuelva coordinación multiempresa, historial conectado, permisos autoritativos, idempotencia entre clientes ni todos los estados financieros. Si la integración definitiva necesita tablas/RPC adicionales, deberán prepararse y probarse en una migración posterior idempotente, indicando entonces el SQL exacto al usuario.
+Sin la migración nueva el flujo anterior funciona y la activación remota de lotes queda deshabilitada; modo local funciona completo. No se simula que un cierre conectado se guardó cuando falta la RPC. Cierres/historial son accesibles por las RPC autorizadas; anon no puede cerrar. CAS rechaza decisiones cambiadas y triggers preservan cierres frente a escrituras tardías.
+
+El SQL exacto copiable está en el archivo enlazado al final, y se agregará también a este informe una vez finalizadas sus correcciones.
 
 ## Skills, ejecución y próximos controles
 
-Skills `xlsx`, `frontend-design` y `webapp-testing` disponibles en `.agents/skills/`. Se usaron instrucciones de xlsx para doble lectura, fórmulas y separación de caches; recálculo Excel COM como alternativa a LibreOffice. Frontend y navegador: PENDIENTE consignar evidencia final del agente principal. Informe en Markdown; docx/doc-coauthoring no necesarios.
+Skills `xlsx`, `frontend-design` y `webapp-testing` disponibles en `.agents/skills/`. Se usaron instrucciones de xlsx para doble lectura, fórmulas y separación de caches; recálculo Excel COM como alternativa a LibreOffice. Frontend mantiene tokens SIDE y pruebas Chrome/Playwright; evidencia en reports/sim/. Informe en Markdown; docx/doc-coauthoring no necesarios.
 
 Comandos desde SIDE1:
 
@@ -126,3 +127,11 @@ node tests/run_integral.cjs --phase=final --no-fps
 ```
 
 Verificación final por completar: pruebas en navegador con empresas ingresadas por el flujo normal; capturas/logs dentro SIDE1; regresión completa; `node --check`; revisión independiente; revisión de remoto y commits locales ajenos; comprobación de ausencia de artefactos nuevos en el contenedor de SIDE1. Ningún push hasta satisfacer las condiciones del pedido.
+
+## Transición entre modelos
+
+No se permite activar lotes después de pagos/compras del mismo ciclo, porque se duplicarían gastos ya registrados. El mensaje indica hacerlo al comenzar el siguiente ciclo. En el ciclo limpio se conservan caja, activos y deuda; solo se importa MP cuando existe inventario físico explícito. Los activos conservados siguen generando mantenimiento/depreciación aunque se omitan en la nueva decisión.
+
+## Decisión sobre la fuente Excel
+
+¿Deseas que DECISIONES SIDE (16).xlsx original quede en el repositorio? Por defecto no se añadió: permanece en .codex-work/, ignorado. Los oráculos derivados son los entregables solicitados y sí se guardan.

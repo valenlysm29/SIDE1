@@ -24,7 +24,8 @@ begin
  select coalesce(jsonb_agg(jsonb_build_object('id',e.id::text,'capital',e.caja_inicial,'revision',s.revision,'envelope',s.snapshot#>'{decision_state,__excel}') order by e.id),'[]')
  into empresas from public.empresas e join public.participantes t on t.empresa_id=e.id
  join public.side_student_state s on s.empresa_id=e.id
- where t.partida_id=p.id and s.snapshot#>>'{decision_state,__excel,habilitado}'='true';
+ where t.partida_id=p.id and s.snapshot#>>'{decision_state,__excel,habilitado}'='true'
+ and (case when s.snapshot#>>'{decision_state,__excel,cicloActivacion}' ~ '^[0-9]{1,8}$' then (s.snapshot#>>'{decision_state,__excel,cicloActivacion}')::integer else 1 end)<=p_ciclo;
  select coalesce(cierre->'historialPorEmpresa','{}') into historia from public.side_excel_cierres where partida_id=p.id and ciclo<p_ciclo order by ciclo desc limit 1;
  historia:=coalesce(historia,'{}');token:=md5(empresas::text||historia::text||p_ciclo::text||p.configuracion::text);
  return jsonb_build_object('empresas',empresas,'historialPorEmpresa',historia,'token',token,'overrides',coalesce(p.configuracion->'excelParametros','{}'));

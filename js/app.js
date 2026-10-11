@@ -342,7 +342,7 @@ function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(de
 function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)}
 function cashBalance(){if(decisionState.__excel?.habilitado)return excelSavedResult()?.financial?.balanceCaja.cajaFinal??decisionState.__excel.historial?.cajaFinal??decisionState.__excel.cajaTransicion??initialCapital();return initialCapital()+ledgerTotal()}
 function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${currentRound()}`}
-function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
+function decisionsSubmitted(){if(decisionState.__excel?.habilitado)return !!decisionState.__excel.enviado&&Number(decisionState.__excel.round)===Number(currentRound());return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
 const CHARACTER_MODEL_IDS=Object.freeze({miguel:'chico2',joel:'chico3',gonzalo:'chico1',valeria:'mona'});
@@ -835,7 +835,7 @@ async function mountExcelProductionEditor(){
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
   window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,
-    save:value=>{if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateCashHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+    save:value=>{if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
 }
 function captureExcelTransition(){
   const maquinariaActivos={};let activosCosto=0;
@@ -1154,8 +1154,8 @@ function animateCash(netMovement){
   const cash=$('cashBalance');cash.classList.remove('cash-pulse');void cash.offsetWidth;cash.classList.add('cash-pulse');
 }
 function requiredDecisionItems(){return allDecisionItems().filter(i=>i.type!=='info'&&itemRequired(i))}
-function decisionProgressPercent(){const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
-function categoryCompletionMap(){const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
+function decisionProgressPercent(){if(decisionState.__excel?.habilitado)return decisionsSubmitted()?100:0;const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
+function categoryCompletionMap(){if(decisionState.__excel?.habilitado){const complete=decisionsSubmitted();return {C:{title:'Plan por lotes',done:complete?1:0,total:1,complete}};}const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
 let excelCashDisplayed={owner:null,value:null};
 function updateCashHud(){
   const cash=decisionState.__excel?.habilitado?cashBalance():typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
@@ -1164,6 +1164,16 @@ function updateCashHud(){
 }
 function updateHud(){
   updateCashHud();
+  if(decisionState.__excel?.habilitado){
+    const submitted=decisionsSubmitted(),pct=submitted?100:0;
+    $('decisionProgressText').textContent=`${submitted?1:0}/1 · ${pct}%`;$('decisionProgressBar').style.width=pct+'%';
+    $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',submitted?'Plan por lotes confirmado':'Plan por lotes pendiente');
+    for(const id of ['startSimulationBtn','submitAllDecisionsBtn','sendDecisionSection']){$(id)?.classList.add('hidden');if($(id))$(id).disabled=true;}
+    $('simulationLaunch')?.classList.add('hidden');
+    const top=$('topSubmitAllDecisions');if(top){top.disabled=submitted;top.textContent=submitted?'Plan confirmado':'Revisar plan';}
+    return;
+  }
+  const top=$('topSubmitAllDecisions');if(top){top.disabled=false;top.innerHTML='<span>✓</span> ENVIAR TODO';}
   const sections=decisionCategories(),submitted=sections.filter(category=>sectionSubmitted(category.cat)||decisionsSubmitted()).length,submittedPct=sections.length?Math.round(submitted/sections.length*100):0;
   $('decisionProgressText').textContent=`${submitted}/${sections.length} · ${submittedPct}%`;$('decisionProgressBar').style.width=submittedPct+'%';
   $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',`${submitted} de ${sections.length} apartados enviados, ${submittedPct}%`);
@@ -1421,7 +1431,7 @@ function restoreDraftsForRound(){
   const key=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;let store={};try{store=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}
   for(const cat of DECISION_CATALOG){if(sectionSubmitted(cat.cat))continue;const section=store[cat.cat]||{};cat.items.forEach(item=>{if(section[item.id])decisionDrafts[item.id]=deepClone(section[item.id])})}
 }
-function submitAllDecisions(){openCompanyReview();}
+function submitAllDecisions(){if(decisionState.__excel?.habilitado){currentCategory='C';renderTabs();renderDecisionCategory();scrollDecisionContentToTop();requestAnimationFrame(()=>document.querySelector('[data-excel-enviar]')?.focus({preventScroll:true}));return;}openCompanyReview();}
 $('submitAllDecisionsBtn')?.addEventListener('click',submitAllDecisions);
 $('topSubmitAllDecisions')?.addEventListener('click',submitAllDecisions);
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}

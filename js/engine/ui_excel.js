@@ -116,7 +116,7 @@
   function historial(game,id){return leer(historiaKey(game),{})[id]||{};}
   function resultado(game,ciclo,id){return leer(cierreKey(game,ciclo),{}).resultadosPorEmpresa?.[id]||null;}
   function cerrarLocal({game,ciclo,reports}){
-    const participantes=reports.filter(r=>r.partida===game&&r.excelDecisionState?.habilitado);
+    const participantes=reports.filter(r=>r.partida===game&&r.excelDecisionState?.habilitado&&Number(r.excelDecisionState.cicloActivacion??1)<=Number(ciclo));
     if(!participantes.length)return null;
     const previo=leer(cierreKey(game,ciclo),null);let cierre=previo;
     if(!cierre){

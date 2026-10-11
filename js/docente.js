@@ -340,10 +340,10 @@ function paintTeacherClock(){
   }
 }
 async function refreshTeacherGame(){
-  if(state.lifecycleVersion!==2||!gameStatus()?.active||teacherBusy)return;
+  if(state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
   if(state.partidaId){
     teacherBusy=true;
-    try{const previous=state.round;teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(result.success){const next=Number(result.data?.configuracion?.runtime?.round||previous),finished=result.data?.configuracion?.runtime?.phase==='finished';for(let cycle=previous;cycle<next||finished&&cycle===next;cycle++){if(!await closeExcelRemoteRound(cycle))break;}applyTeacherState(result.data);}}
+    try{teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(!result.success)return false;const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!await closeExcelRemoteRound(cycle))return false;}applyTeacherState(result.data);return true;}
     finally{teacherBusy=false;}
   }else{
     const c={...state.authoritative,runtime:RULES.resolveRuntime(state.authoritative,teacherNow())};
@@ -361,7 +361,7 @@ async function prepareGame(){
   if(gameStatus()?.active)return true;
   state.lifecycleVersion=2;state.integrationMinutes=0;state.authoritative=null;
   if(!saveConfig(false))return false;
-  if(gameStatus()?.finishedAt){await finishingPartida;state.partidaId=null;publishedState='';localStorage.removeItem('SIDE_PARTIDA_ID');localStorage.removeItem('SIDE_EVENT_SCHEDULE');}
+  if(gameStatus()?.finishedAt){if(state.partidaId&&!await refreshTeacherGame())return false;await finishingPartida;state.partidaId=null;publishedState='';localStorage.removeItem('SIDE_PARTIDA_ID');localStorage.removeItem('SIDE_EVENT_SCHEDULE');}
   state.round=1;state.roundClosed=false;
   if(!await ensureSupabasePartida(getConfig()))return false;
   if(!state.partidaId){
@@ -381,7 +381,7 @@ async function controlGame(action){
   try{
     if(state.partidaId){
       if(['cerrar','avanzar'].includes(action)&&state.authoritative?.runtime?.phase!=='integration'){
-        const excel=await closeExcelRemoteRound(expectedRound);if(!excel)return false;
+        for(let cycle=1;cycle<=expectedRound;cycle++){const excel=await closeExcelRemoteRound(cycle);if(!excel)return false;}
       }
       const result=await window.SIDE.PartidaService.controlar(state.partidaId,action,null,expectedRound);
       if(!result.success){toast(result.error||'No se pudo actualizar la partida.');return false;}
@@ -946,7 +946,7 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
   const r=runtime();
   if(r){state.round=Number(r.round||state.round);state.seconds=Number(r.remaining??roundSeconds());state.roundClosed=['finished','simulation-finished'].includes(r.status);}
   let game;try{game=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}
-  if(state.lifecycleVersion===2&&game?.active){watchTeacherGame();await refreshTeacherGame();}
+  if(state.lifecycleVersion===2&&(game?.active||state.partidaId)){watchTeacherGame();await refreshTeacherGame();}
   else if(cycleMode()==='automatic'&&game?.active){scheduleAutomaticStart();}
   else if(game?.active&&r?.running&&r.startedAt){
     state.seconds=Math.max(0,Number(r.duration||roundSeconds())-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));
@@ -980,4 +980,4 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
 })();
 
 window.addEventListener('pagehide',()=>{[teacherPoll,teacherTick,companiesPoll].forEach(clearInterval);teacherPoll=null;teacherTick=null;companiesPoll=null;if(companiesChannel)window.SIDE?.SupabaseClient?.get()?.removeChannel(companiesChannel);companiesChannel=null;companiesChannelId=null;});
-window.addEventListener('pageshow',()=>{if(gameStatus()?.active&&state.lifecycleVersion===2){watchTeacherGame();refreshTeacherGame();startLiveCompanies();}});
+window.addEventListener('pageshow',()=>{if((gameStatus()?.active||state.partidaId)&&state.lifecycleVersion===2){watchTeacherGame();refreshTeacherGame();startLiveCompanies();}});

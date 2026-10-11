@@ -32,9 +32,12 @@ def construir_multilote(original,config):
     def MF(key,row,formula):put(market,hm,key,row,'='+formula)
     def look(code,column):return f'IFERROR(INDEX(\'Catalogo_Numerico_{name}\'!${column}$2:${column}$69,MATCH({code},\'Catalogo_Numerico_{name}\'!$A$2:$A$69,0)),0)'
     codes=list(cfg['PRECIO_MP']);families=cfg['INSUMOS_POR_FAMILIA'];catalog_rows={};next_lot=2;next_market=2
-    identities={id:{} for id in original['empresas']};previous={};company_groups=[]
+    identities={id:{} for id in original['empresas']};previous={};company_groups=[];decisiones_anteriores={}
     for cycle,phase in enumerate(original['ciclos'],1):
-        for id,d in phase['decisionesPorEmpresa'].items():
+        for id in original['empresas']:
+            d=phase['decisionesPorEmpresa'].get(id,decisiones_anteriores.get(id))
+            if d is None:continue
+            decisiones_anteriores[id]=d
             cr=next(r for r in range(2,company.max_row+1) if company[CA('ciclo',r)].value==cycle and company[CA('empresa',r)].value==id)
             actual={tuple(x.get(k,'') for k in ['segmento','molde','cuero','accesorios','hilo']):x for x in d['lotes']}
             for key,lot in actual.items():
@@ -129,10 +132,10 @@ def construir_multilote(original,config):
             MF('porcentaje',r,f'IFERROR({R("puntajeTotal")}/SUMIF({gr},{R("grupo")},{tr}),0)')
             MF('asignado',r,f'IFERROR(ROUND({R("puntajeTotal")}/SUMIF({gr},{R("grupo")},{tr})*{m["unidades"]}*{m["penetracion"]},0),0)')
             MF('demandaAjustada',r,f'MAX(0,ROUNDDOWN({R("asignado")}*{CR("factorDemanda",cr)}*{1+cfg["BONO_DEMANDA_MARKETING"] if "INV-02B" in group["selection"] else 1},0))')
-            if name=='sim1':
+            if name in ['sim1','sim2','sim3']:
                 for field,colkey in [('puntajePrecio','puntajePrecio'),('puntajeTotal','puntajeTotal'),('porcentaje','porcentaje'),('asignado','asignado'),('demandaAjustada','demandaAjustada'),('calidadMercado','calidad'),('reputacionEscalada','reputacionEscalada')]:
                     plan['salidas'][f'ciclo.{group["cycle"]}.{group["id"]}.mercado.{item["segment"]}.{field}']=[market.title,R(colkey)]
-        if name=='sim1':
+        if name in ['sim1','sim2','sim3']:
             for index,lr in enumerate(group['current_lots']):
                 for field,colkey in [('calidad','calidad'),('producido','producido'),('capacidadAsignada','capacidadAsignada'),('precioEfectivo','precioEfectivo')]:
                     plan['salidas'][f'ciclo.{group["cycle"]}.{group["id"]}.lote.{index}.{field}']=[lots.title,LA(colkey,lr)]

@@ -93,7 +93,7 @@ async function ejecutar(numero=3){
     console.log(`PASS SIM-${numero}: registro normal, decisiones UI, cierre docente, ${history.length} ciclo(s), ${escenario.empresas.length} empresas; móvil sin desborde.`);return resultados;
   }finally{await browser.close();}
 }
-if(require.main===module)ejecutar(Number(process.argv[2]||3)).catch(e=>{console.error(e);process.exitCode=1;});module.exports={ejecutar};
+if(require.main===module)ejecutar(Number(process.argv[2]||3)).catch(e=>{console.error(e);process.exitCode=1;});module.exports={ejecutar,html};
 
 
 

@@ -32,3 +32,6 @@ A8 ejecutó SIM1 336/0(+351componentes), SIM2 306/0 y SIM3 612/0 y comprobó caj
 
 ## Hito A6 y A7 finales / controles finales en ejecución
 A6 finalizó transición segura (bloqueo tras operaciones del ciclo; importación de caja/activos/deuda al comenzar ciclo limpio), captura tiendas/%crédito sin efectos inventados y corrección móvil. A9 verificó hallazgos corregidos, sin críticos de código hasta ahora. A7 ampliótodos33campos financieros; SIM1 468/0,SIM2 504/0,SIM3 1008/0,banco recuperación252/0,banco mezcla252/0; base351+CONS56. Libro2891/2891OK0pendientes. Pruebas finales Node62/62PASS. A8repite3sim desde cero; regresión integral nueva en proceso sesión79361, log reports/sim/regresion_integral_final.log (fuera tests/output para evitarEBUSY).
+
+## Continuación 2 — recuperación
+Git recuperado: ocho WIP de la tarea sobre9fbe6ec, stash previo conservado, sin commits ajenos exclusivos. Se guardan ajustes sin commitear de UI/progreso/cierre, SQL y oráculo3104. reports/revision_final_excel.md todavía no existe: A9 se cortó antes de escribirlo; no se inventa aprobación. La corrida integral anterior sí terminó: revisar resumen de fallos, incluido timeout world_startup aún sin atribuir. Siguiente: A6 terminar reintento/indicador con pruebas dirigidas, A9 revisión corta, raíz prepara una única corrida final y entregables. Sin push mientras falte evidencia.

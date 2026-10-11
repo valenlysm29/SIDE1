@@ -274,6 +274,7 @@ function paintReviewDialog(message=''){
   bindSummaryLinks(dialog);
 }
 function openCompanyReview(){
+  if(decisionState.__excel?.habilitado){submitAllDecisions();return;}
   // Working drafts are already persisted by the existing input handlers. This
   // read-only path does not call saveCurrentSection or mark anything submitted.
   migrateCurrentReceipts();paintReviewDialog();const dialog=ensureReviewDialog();if(!dialog.open)dialog.showModal();

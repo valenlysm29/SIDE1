@@ -45,3 +45,8 @@ test('Editor conserva cantidades de tiendas y porcentaje crédito validado al co
  assert.equal(saved.enviado,true);assert.deepEqual(JSON.parse(JSON.stringify(saved.decisiones.tiendasPorZona)),{alta:3,media:2,baja:0});assert.equal(saved.decisiones.porcentajeVentasCredito,100);
  assert.equal(saved.planesPorCiclo[1].tiendasPorZona.alta,3);
 });
+test('Activación en ciclo 2 no elimina retroactivamente una empresa durante cierre del ciclo 1',()=>{
+ const {api}=entorno(),reports=[{id:'A',partida:'DEMO',capital:100000,excelDecisionState:{habilitado:true,cicloActivacion:2,round:2,enviado:true,decisiones:decision(api)}}];
+ assert.equal(api.cerrarLocal({game:'DEMO',ciclo:1,reports}),null);assert.notEqual(reports[0].estado,'eliminada');
+ const ciclo2=api.cerrarLocal({game:'DEMO',ciclo:2,reports});assert.equal(ciclo2.eliminadas.length,0);assert.ok(ciclo2.resultadosPorEmpresa.A);
+});

@@ -130,7 +130,7 @@
                     "ciclo.1.C.asignado":  40,
                     "ciclo.1.C.demandaAjustada":  44,
                     "ciclo.1.C.vendido":  44,
-                    "ciclo.1.C.ingresos":  16015.999999999998,
+                    "ciclo.1.C.ingresos":  16016,
                     "ciclo.1.C.inventarioProducto":  78,
                     "ciclo.1.C.almacenaje":  156,
                     "ciclo.1.C.horasExtra":  1914.7008196721313,
@@ -334,7 +334,7 @@
                     "ciclo.2.C.asignado":  40,
                     "ciclo.2.C.demandaAjustada":  44,
                     "ciclo.2.C.vendido":  44,
-                    "ciclo.2.C.ingresos":  16015.999999999998,
+                    "ciclo.2.C.ingresos":  16016,
                     "ciclo.2.C.inventarioProducto":  156,
                     "ciclo.2.C.almacenaje":  312,
                     "ciclo.2.C.horasExtra":  1914.7008196721313,
@@ -538,7 +538,7 @@
                     "ciclo.3.C.asignado":  40,
                     "ciclo.3.C.demandaAjustada":  44,
                     "ciclo.3.C.vendido":  44,
-                    "ciclo.3.C.ingresos":  16015.999999999998,
+                    "ciclo.3.C.ingresos":  16016,
                     "ciclo.3.C.inventarioProducto":  234,
                     "ciclo.3.C.almacenaje":  468,
                     "ciclo.3.C.horasExtra":  1914.7008196721313,
@@ -619,6 +619,138 @@
                     "ciclo.3.D.financiamiento.tasaTEA":  23,
                     "ciclo.3.D.financiamiento.deudaPrincipal":  0,
                     "ciclo.3.D.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.1.A.mercado.SEG-01.puntajePrecio":  100,
+                    "ciclo.1.A.mercado.SEG-01.puntajeTotal":  74,
+                    "ciclo.1.A.mercado.SEG-01.porcentaje":  0.94871794871794868,
+                    "ciclo.1.A.mercado.SEG-01.asignado":  38,
+                    "ciclo.1.A.mercado.SEG-01.demandaAjustada":  38,
+                    "ciclo.1.A.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.1.A.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.1.A.lote.0.calidad":  4,
+                    "ciclo.1.A.lote.0.producido":  113,
+                    "ciclo.1.A.lote.0.capacidadAsignada":  113,
+                    "ciclo.1.A.lote.0.precioEfectivo":  40,
+                    "ciclo.1.B.mercado.SEG-02.puntajePrecio":  90,
+                    "ciclo.1.B.mercado.SEG-02.puntajeTotal":  53.5,
+                    "ciclo.1.B.mercado.SEG-02.porcentaje":  1,
+                    "ciclo.1.B.mercado.SEG-02.asignado":  40,
+                    "ciclo.1.B.mercado.SEG-02.demandaAjustada":  44,
+                    "ciclo.1.B.mercado.SEG-02.calidadMercado":  70,
+                    "ciclo.1.B.mercado.SEG-02.reputacionEscalada":  0,
+                    "ciclo.1.B.lote.0.calidad":  7,
+                    "ciclo.1.B.lote.0.producido":  122,
+                    "ciclo.1.B.lote.0.capacidadAsignada":  122,
+                    "ciclo.1.B.lote.0.precioEfectivo":  110,
+                    "ciclo.1.C.mercado.SEG-03.puntajePrecio":  96,
+                    "ciclo.1.C.mercado.SEG-03.puntajeTotal":  159.6,
+                    "ciclo.1.C.mercado.SEG-03.porcentaje":  1,
+                    "ciclo.1.C.mercado.SEG-03.asignado":  40,
+                    "ciclo.1.C.mercado.SEG-03.demandaAjustada":  44,
+                    "ciclo.1.C.mercado.SEG-03.calidadMercado":  100,
+                    "ciclo.1.C.mercado.SEG-03.reputacionEscalada":  220,
+                    "ciclo.1.C.lote.0.calidad":  12,
+                    "ciclo.1.C.lote.0.producido":  122,
+                    "ciclo.1.C.lote.0.capacidadAsignada":  122,
+                    "ciclo.1.C.lote.0.precioEfectivo":  364,
+                    "ciclo.1.D.mercado.SEG-01.puntajePrecio":  0,
+                    "ciclo.1.D.mercado.SEG-01.puntajeTotal":  4,
+                    "ciclo.1.D.mercado.SEG-01.porcentaje":  0.05128205128205128,
+                    "ciclo.1.D.mercado.SEG-01.asignado":  2,
+                    "ciclo.1.D.mercado.SEG-01.demandaAjustada":  2,
+                    "ciclo.1.D.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.1.D.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.1.D.lote.0.calidad":  4,
+                    "ciclo.1.D.lote.0.producido":  122,
+                    "ciclo.1.D.lote.0.capacidadAsignada":  122,
+                    "ciclo.1.D.lote.0.precioEfectivo":  45,
+                    "ciclo.2.A.mercado.SEG-01.puntajePrecio":  100,
+                    "ciclo.2.A.mercado.SEG-01.puntajeTotal":  74,
+                    "ciclo.2.A.mercado.SEG-01.porcentaje":  0.94871794871794868,
+                    "ciclo.2.A.mercado.SEG-01.asignado":  38,
+                    "ciclo.2.A.mercado.SEG-01.demandaAjustada":  38,
+                    "ciclo.2.A.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.2.A.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.2.A.lote.0.calidad":  4,
+                    "ciclo.2.A.lote.0.producido":  113,
+                    "ciclo.2.A.lote.0.capacidadAsignada":  113,
+                    "ciclo.2.A.lote.0.precioEfectivo":  40,
+                    "ciclo.2.B.mercado.SEG-02.puntajePrecio":  90,
+                    "ciclo.2.B.mercado.SEG-02.puntajeTotal":  53.5,
+                    "ciclo.2.B.mercado.SEG-02.porcentaje":  1,
+                    "ciclo.2.B.mercado.SEG-02.asignado":  40,
+                    "ciclo.2.B.mercado.SEG-02.demandaAjustada":  44,
+                    "ciclo.2.B.mercado.SEG-02.calidadMercado":  70,
+                    "ciclo.2.B.mercado.SEG-02.reputacionEscalada":  0,
+                    "ciclo.2.B.lote.0.calidad":  7,
+                    "ciclo.2.B.lote.0.producido":  122,
+                    "ciclo.2.B.lote.0.capacidadAsignada":  122,
+                    "ciclo.2.B.lote.0.precioEfectivo":  110,
+                    "ciclo.2.C.mercado.SEG-03.puntajePrecio":  96,
+                    "ciclo.2.C.mercado.SEG-03.puntajeTotal":  159.6,
+                    "ciclo.2.C.mercado.SEG-03.porcentaje":  1,
+                    "ciclo.2.C.mercado.SEG-03.asignado":  40,
+                    "ciclo.2.C.mercado.SEG-03.demandaAjustada":  44,
+                    "ciclo.2.C.mercado.SEG-03.calidadMercado":  100,
+                    "ciclo.2.C.mercado.SEG-03.reputacionEscalada":  220,
+                    "ciclo.2.C.lote.0.calidad":  12,
+                    "ciclo.2.C.lote.0.producido":  122,
+                    "ciclo.2.C.lote.0.capacidadAsignada":  122,
+                    "ciclo.2.C.lote.0.precioEfectivo":  364,
+                    "ciclo.2.D.mercado.SEG-01.puntajePrecio":  0,
+                    "ciclo.2.D.mercado.SEG-01.puntajeTotal":  4,
+                    "ciclo.2.D.mercado.SEG-01.porcentaje":  0.05128205128205128,
+                    "ciclo.2.D.mercado.SEG-01.asignado":  2,
+                    "ciclo.2.D.mercado.SEG-01.demandaAjustada":  2,
+                    "ciclo.2.D.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.2.D.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.2.D.lote.0.calidad":  4,
+                    "ciclo.2.D.lote.0.producido":  122,
+                    "ciclo.2.D.lote.0.capacidadAsignada":  122,
+                    "ciclo.2.D.lote.0.precioEfectivo":  45,
+                    "ciclo.3.A.mercado.SEG-01.puntajePrecio":  100,
+                    "ciclo.3.A.mercado.SEG-01.puntajeTotal":  74,
+                    "ciclo.3.A.mercado.SEG-01.porcentaje":  0.94871794871794868,
+                    "ciclo.3.A.mercado.SEG-01.asignado":  38,
+                    "ciclo.3.A.mercado.SEG-01.demandaAjustada":  38,
+                    "ciclo.3.A.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.3.A.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.3.A.lote.0.calidad":  4,
+                    "ciclo.3.A.lote.0.producido":  113,
+                    "ciclo.3.A.lote.0.capacidadAsignada":  113,
+                    "ciclo.3.A.lote.0.precioEfectivo":  40,
+                    "ciclo.3.B.mercado.SEG-02.puntajePrecio":  90,
+                    "ciclo.3.B.mercado.SEG-02.puntajeTotal":  53.5,
+                    "ciclo.3.B.mercado.SEG-02.porcentaje":  1,
+                    "ciclo.3.B.mercado.SEG-02.asignado":  40,
+                    "ciclo.3.B.mercado.SEG-02.demandaAjustada":  44,
+                    "ciclo.3.B.mercado.SEG-02.calidadMercado":  70,
+                    "ciclo.3.B.mercado.SEG-02.reputacionEscalada":  0,
+                    "ciclo.3.B.lote.0.calidad":  7,
+                    "ciclo.3.B.lote.0.producido":  122,
+                    "ciclo.3.B.lote.0.capacidadAsignada":  122,
+                    "ciclo.3.B.lote.0.precioEfectivo":  110,
+                    "ciclo.3.C.mercado.SEG-03.puntajePrecio":  96,
+                    "ciclo.3.C.mercado.SEG-03.puntajeTotal":  159.6,
+                    "ciclo.3.C.mercado.SEG-03.porcentaje":  1,
+                    "ciclo.3.C.mercado.SEG-03.asignado":  40,
+                    "ciclo.3.C.mercado.SEG-03.demandaAjustada":  44,
+                    "ciclo.3.C.mercado.SEG-03.calidadMercado":  100,
+                    "ciclo.3.C.mercado.SEG-03.reputacionEscalada":  220,
+                    "ciclo.3.C.lote.0.calidad":  12,
+                    "ciclo.3.C.lote.0.producido":  122,
+                    "ciclo.3.C.lote.0.capacidadAsignada":  122,
+                    "ciclo.3.C.lote.0.precioEfectivo":  364,
+                    "ciclo.3.D.mercado.SEG-01.puntajePrecio":  0,
+                    "ciclo.3.D.mercado.SEG-01.puntajeTotal":  4,
+                    "ciclo.3.D.mercado.SEG-01.porcentaje":  0.05128205128205128,
+                    "ciclo.3.D.mercado.SEG-01.asignado":  2,
+                    "ciclo.3.D.mercado.SEG-01.demandaAjustada":  2,
+                    "ciclo.3.D.mercado.SEG-01.calidadMercado":  40,
+                    "ciclo.3.D.mercado.SEG-01.reputacionEscalada":  0,
+                    "ciclo.3.D.lote.0.calidad":  4,
+                    "ciclo.3.D.lote.0.producido":  122,
+                    "ciclo.3.D.lote.0.capacidadAsignada":  122,
+                    "ciclo.3.D.lote.0.precioEfectivo":  45,
                     "ciclo.1.A.financial.estadoResultados.ingresos":  1520,
                     "ciclo.1.A.financial.estadoResultados.ventasNetas":  1520,
                     "ciclo.1.A.financial.estadoResultados.costos":  17311.788720955752,
@@ -685,19 +817,19 @@
                     "ciclo.1.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.1.B.financial.financiamiento.tasaMensual":  0,
                     "ciclo.1.B.financial.financiamiento.intereses":  0,
-                    "ciclo.1.C.financial.estadoResultados.ingresos":  16015.999999999998,
-                    "ciclo.1.C.financial.estadoResultados.ventasNetas":  16015.999999999998,
+                    "ciclo.1.C.financial.estadoResultados.ingresos":  16016,
+                    "ciclo.1.C.financial.estadoResultados.ventasNetas":  16016,
                     "ciclo.1.C.financial.estadoResultados.costos":  45133.329647644161,
                     "ciclo.1.C.financial.estadoResultados.utilidad":  -29117.329647644161,
                     "ciclo.1.C.financial.estadoResultados.depreciacion":  109.31818181818181,
                     "ciclo.1.C.financial.estadoResultados.intereses":  0,
                     "ciclo.1.C.financial.estadoResultados.costosProduccion":  45133.329647644161,
                     "ciclo.1.C.financial.balanceCaja.cajaInicial":  1000000,
-                    "ciclo.1.C.financial.balanceCaja.entradas":  16015.999999999998,
+                    "ciclo.1.C.financial.balanceCaja.entradas":  16016,
                     "ciclo.1.C.financial.balanceCaja.salidas":  103051.85466582597,
                     "ciclo.1.C.financial.balanceCaja.cajaFinal":  912964.145334174,
                     "ciclo.1.C.financial.flujoCaja.cajaInicial":  1000000,
-                    "ciclo.1.C.financial.flujoCaja.cobrosVentas":  16015.999999999998,
+                    "ciclo.1.C.financial.flujoCaja.cobrosVentas":  16016,
                     "ciclo.1.C.financial.flujoCaja.pagosOperacion":  94969.854665825973,
                     "ciclo.1.C.financial.flujoCaja.compraActivos":  8082,
                     "ciclo.1.C.financial.flujoCaja.financiamiento":  0,
@@ -817,19 +949,19 @@
                     "ciclo.2.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.2.B.financial.financiamiento.tasaMensual":  0,
                     "ciclo.2.B.financial.financiamiento.intereses":  0,
-                    "ciclo.2.C.financial.estadoResultados.ingresos":  16015.999999999998,
-                    "ciclo.2.C.financial.estadoResultados.ventasNetas":  16015.999999999998,
+                    "ciclo.2.C.financial.estadoResultados.ingresos":  16016,
+                    "ciclo.2.C.financial.estadoResultados.ventasNetas":  16016,
                     "ciclo.2.C.financial.estadoResultados.costos":  45289.329647644161,
                     "ciclo.2.C.financial.estadoResultados.utilidad":  -29273.329647644161,
                     "ciclo.2.C.financial.estadoResultados.depreciacion":  109.31818181818181,
                     "ciclo.2.C.financial.estadoResultados.intereses":  0,
                     "ciclo.2.C.financial.estadoResultados.costosProduccion":  45289.329647644161,
                     "ciclo.2.C.financial.balanceCaja.cajaInicial":  912964.145334174,
-                    "ciclo.2.C.financial.balanceCaja.entradas":  16015.999999999998,
+                    "ciclo.2.C.financial.balanceCaja.entradas":  16016,
                     "ciclo.2.C.financial.balanceCaja.salidas":  95125.854665825973,
                     "ciclo.2.C.financial.balanceCaja.cajaFinal":  833854.29066834808,
                     "ciclo.2.C.financial.flujoCaja.cajaInicial":  912964.145334174,
-                    "ciclo.2.C.financial.flujoCaja.cobrosVentas":  16015.999999999998,
+                    "ciclo.2.C.financial.flujoCaja.cobrosVentas":  16016,
                     "ciclo.2.C.financial.flujoCaja.pagosOperacion":  95125.854665825973,
                     "ciclo.2.C.financial.flujoCaja.compraActivos":  0,
                     "ciclo.2.C.financial.flujoCaja.financiamiento":  0,
@@ -949,19 +1081,19 @@
                     "ciclo.3.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.3.B.financial.financiamiento.tasaMensual":  0,
                     "ciclo.3.B.financial.financiamiento.intereses":  0,
-                    "ciclo.3.C.financial.estadoResultados.ingresos":  16015.999999999998,
-                    "ciclo.3.C.financial.estadoResultados.ventasNetas":  16015.999999999998,
+                    "ciclo.3.C.financial.estadoResultados.ingresos":  16016,
+                    "ciclo.3.C.financial.estadoResultados.ventasNetas":  16016,
                     "ciclo.3.C.financial.estadoResultados.costos":  45445.329647644161,
                     "ciclo.3.C.financial.estadoResultados.utilidad":  -29429.329647644161,
                     "ciclo.3.C.financial.estadoResultados.depreciacion":  109.31818181818181,
                     "ciclo.3.C.financial.estadoResultados.intereses":  0,
                     "ciclo.3.C.financial.estadoResultados.costosProduccion":  45445.329647644161,
                     "ciclo.3.C.financial.balanceCaja.cajaInicial":  833854.29066834808,
-                    "ciclo.3.C.financial.balanceCaja.entradas":  16015.999999999998,
+                    "ciclo.3.C.financial.balanceCaja.entradas":  16016,
                     "ciclo.3.C.financial.balanceCaja.salidas":  95281.854665825973,
                     "ciclo.3.C.financial.balanceCaja.cajaFinal":  754588.43600252212,
                     "ciclo.3.C.financial.flujoCaja.cajaInicial":  833854.29066834808,
-                    "ciclo.3.C.financial.flujoCaja.cobrosVentas":  16015.999999999998,
+                    "ciclo.3.C.financial.flujoCaja.cobrosVentas":  16016,
                     "ciclo.3.C.financial.flujoCaja.pagosOperacion":  95281.854665825973,
                     "ciclo.3.C.financial.flujoCaja.compraActivos":  0,
                     "ciclo.3.C.financial.flujoCaja.financiamiento":  0,
@@ -3465,6 +3597,534 @@
                                                                                  "Pipeline_sim3",
                                                                                  "AT13"
                                                                              ],
+                   "ciclo.1.A.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K2"
+                                                              ],
+                   "ciclo.1.A.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L2"
+                                                             ],
+                   "ciclo.1.A.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N2"
+                                                           ],
+                   "ciclo.1.A.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J2"
+                                                         ],
+                   "ciclo.1.A.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I2"
+                                                                ],
+                   "ciclo.1.A.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H2"
+                                                               ],
+                   "ciclo.1.A.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M2"
+                                                                   ],
+                   "ciclo.1.A.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J2"
+                                                ],
+                   "ciclo.1.A.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U2"
+                                                  ],
+                   "ciclo.1.A.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S2"
+                                                          ],
+                   "ciclo.1.A.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU2"
+                                                       ],
+                   "ciclo.1.B.mercado.SEG-02.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K3"
+                                                              ],
+                   "ciclo.1.B.mercado.SEG-02.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L3"
+                                                             ],
+                   "ciclo.1.B.mercado.SEG-02.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N3"
+                                                           ],
+                   "ciclo.1.B.mercado.SEG-02.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J3"
+                                                         ],
+                   "ciclo.1.B.mercado.SEG-02.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I3"
+                                                                ],
+                   "ciclo.1.B.mercado.SEG-02.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H3"
+                                                               ],
+                   "ciclo.1.B.mercado.SEG-02.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M3"
+                                                                   ],
+                   "ciclo.1.B.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J3"
+                                                ],
+                   "ciclo.1.B.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U3"
+                                                  ],
+                   "ciclo.1.B.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S3"
+                                                          ],
+                   "ciclo.1.B.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU3"
+                                                       ],
+                   "ciclo.1.C.mercado.SEG-03.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K4"
+                                                              ],
+                   "ciclo.1.C.mercado.SEG-03.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L4"
+                                                             ],
+                   "ciclo.1.C.mercado.SEG-03.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N4"
+                                                           ],
+                   "ciclo.1.C.mercado.SEG-03.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J4"
+                                                         ],
+                   "ciclo.1.C.mercado.SEG-03.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I4"
+                                                                ],
+                   "ciclo.1.C.mercado.SEG-03.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H4"
+                                                               ],
+                   "ciclo.1.C.mercado.SEG-03.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M4"
+                                                                   ],
+                   "ciclo.1.C.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J4"
+                                                ],
+                   "ciclo.1.C.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U4"
+                                                  ],
+                   "ciclo.1.C.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S4"
+                                                          ],
+                   "ciclo.1.C.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU4"
+                                                       ],
+                   "ciclo.1.D.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K5"
+                                                              ],
+                   "ciclo.1.D.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L5"
+                                                             ],
+                   "ciclo.1.D.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N5"
+                                                           ],
+                   "ciclo.1.D.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J5"
+                                                         ],
+                   "ciclo.1.D.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I5"
+                                                                ],
+                   "ciclo.1.D.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H5"
+                                                               ],
+                   "ciclo.1.D.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M5"
+                                                                   ],
+                   "ciclo.1.D.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J5"
+                                                ],
+                   "ciclo.1.D.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U5"
+                                                  ],
+                   "ciclo.1.D.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S5"
+                                                          ],
+                   "ciclo.1.D.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU5"
+                                                       ],
+                   "ciclo.2.A.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K6"
+                                                              ],
+                   "ciclo.2.A.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L6"
+                                                             ],
+                   "ciclo.2.A.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N6"
+                                                           ],
+                   "ciclo.2.A.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J6"
+                                                         ],
+                   "ciclo.2.A.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I6"
+                                                                ],
+                   "ciclo.2.A.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H6"
+                                                               ],
+                   "ciclo.2.A.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M6"
+                                                                   ],
+                   "ciclo.2.A.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J6"
+                                                ],
+                   "ciclo.2.A.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U6"
+                                                  ],
+                   "ciclo.2.A.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S6"
+                                                          ],
+                   "ciclo.2.A.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU6"
+                                                       ],
+                   "ciclo.2.B.mercado.SEG-02.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K7"
+                                                              ],
+                   "ciclo.2.B.mercado.SEG-02.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L7"
+                                                             ],
+                   "ciclo.2.B.mercado.SEG-02.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N7"
+                                                           ],
+                   "ciclo.2.B.mercado.SEG-02.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J7"
+                                                         ],
+                   "ciclo.2.B.mercado.SEG-02.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I7"
+                                                                ],
+                   "ciclo.2.B.mercado.SEG-02.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H7"
+                                                               ],
+                   "ciclo.2.B.mercado.SEG-02.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M7"
+                                                                   ],
+                   "ciclo.2.B.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J7"
+                                                ],
+                   "ciclo.2.B.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U7"
+                                                  ],
+                   "ciclo.2.B.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S7"
+                                                          ],
+                   "ciclo.2.B.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU7"
+                                                       ],
+                   "ciclo.2.C.mercado.SEG-03.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K8"
+                                                              ],
+                   "ciclo.2.C.mercado.SEG-03.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L8"
+                                                             ],
+                   "ciclo.2.C.mercado.SEG-03.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N8"
+                                                           ],
+                   "ciclo.2.C.mercado.SEG-03.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J8"
+                                                         ],
+                   "ciclo.2.C.mercado.SEG-03.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I8"
+                                                                ],
+                   "ciclo.2.C.mercado.SEG-03.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H8"
+                                                               ],
+                   "ciclo.2.C.mercado.SEG-03.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M8"
+                                                                   ],
+                   "ciclo.2.C.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J8"
+                                                ],
+                   "ciclo.2.C.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U8"
+                                                  ],
+                   "ciclo.2.C.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S8"
+                                                          ],
+                   "ciclo.2.C.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU8"
+                                                       ],
+                   "ciclo.2.D.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K9"
+                                                              ],
+                   "ciclo.2.D.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L9"
+                                                             ],
+                   "ciclo.2.D.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N9"
+                                                           ],
+                   "ciclo.2.D.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J9"
+                                                         ],
+                   "ciclo.2.D.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I9"
+                                                                ],
+                   "ciclo.2.D.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H9"
+                                                               ],
+                   "ciclo.2.D.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M9"
+                                                                   ],
+                   "ciclo.2.D.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J9"
+                                                ],
+                   "ciclo.2.D.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U9"
+                                                  ],
+                   "ciclo.2.D.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S9"
+                                                          ],
+                   "ciclo.2.D.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU9"
+                                                       ],
+                   "ciclo.3.A.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K10"
+                                                              ],
+                   "ciclo.3.A.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L10"
+                                                             ],
+                   "ciclo.3.A.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N10"
+                                                           ],
+                   "ciclo.3.A.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J10"
+                                                         ],
+                   "ciclo.3.A.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I10"
+                                                                ],
+                   "ciclo.3.A.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H10"
+                                                               ],
+                   "ciclo.3.A.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M10"
+                                                                   ],
+                   "ciclo.3.A.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J10"
+                                                ],
+                   "ciclo.3.A.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U10"
+                                                  ],
+                   "ciclo.3.A.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S10"
+                                                          ],
+                   "ciclo.3.A.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU10"
+                                                       ],
+                   "ciclo.3.B.mercado.SEG-02.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K11"
+                                                              ],
+                   "ciclo.3.B.mercado.SEG-02.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L11"
+                                                             ],
+                   "ciclo.3.B.mercado.SEG-02.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N11"
+                                                           ],
+                   "ciclo.3.B.mercado.SEG-02.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J11"
+                                                         ],
+                   "ciclo.3.B.mercado.SEG-02.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I11"
+                                                                ],
+                   "ciclo.3.B.mercado.SEG-02.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H11"
+                                                               ],
+                   "ciclo.3.B.mercado.SEG-02.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M11"
+                                                                   ],
+                   "ciclo.3.B.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J11"
+                                                ],
+                   "ciclo.3.B.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U11"
+                                                  ],
+                   "ciclo.3.B.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S11"
+                                                          ],
+                   "ciclo.3.B.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU11"
+                                                       ],
+                   "ciclo.3.C.mercado.SEG-03.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K12"
+                                                              ],
+                   "ciclo.3.C.mercado.SEG-03.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L12"
+                                                             ],
+                   "ciclo.3.C.mercado.SEG-03.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N12"
+                                                           ],
+                   "ciclo.3.C.mercado.SEG-03.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J12"
+                                                         ],
+                   "ciclo.3.C.mercado.SEG-03.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I12"
+                                                                ],
+                   "ciclo.3.C.mercado.SEG-03.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H12"
+                                                               ],
+                   "ciclo.3.C.mercado.SEG-03.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M12"
+                                                                   ],
+                   "ciclo.3.C.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J12"
+                                                ],
+                   "ciclo.3.C.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U12"
+                                                  ],
+                   "ciclo.3.C.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S12"
+                                                          ],
+                   "ciclo.3.C.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU12"
+                                                       ],
+                   "ciclo.3.D.mercado.SEG-01.puntajePrecio":  [
+                                                                  "Mercados_Pipeline_sim3",
+                                                                  "K13"
+                                                              ],
+                   "ciclo.3.D.mercado.SEG-01.puntajeTotal":  [
+                                                                 "Mercados_Pipeline_sim3",
+                                                                 "L13"
+                                                             ],
+                   "ciclo.3.D.mercado.SEG-01.porcentaje":  [
+                                                               "Mercados_Pipeline_sim3",
+                                                               "N13"
+                                                           ],
+                   "ciclo.3.D.mercado.SEG-01.asignado":  [
+                                                             "Mercados_Pipeline_sim3",
+                                                             "J13"
+                                                         ],
+                   "ciclo.3.D.mercado.SEG-01.demandaAjustada":  [
+                                                                    "Mercados_Pipeline_sim3",
+                                                                    "I13"
+                                                                ],
+                   "ciclo.3.D.mercado.SEG-01.calidadMercado":  [
+                                                                   "Mercados_Pipeline_sim3",
+                                                                   "H13"
+                                                               ],
+                   "ciclo.3.D.mercado.SEG-01.reputacionEscalada":  [
+                                                                       "Mercados_Pipeline_sim3",
+                                                                       "M13"
+                                                                   ],
+                   "ciclo.3.D.lote.0.calidad":  [
+                                                    "Lotes_Pipeline_sim3",
+                                                    "J13"
+                                                ],
+                   "ciclo.3.D.lote.0.producido":  [
+                                                      "Lotes_Pipeline_sim3",
+                                                      "U13"
+                                                  ],
+                   "ciclo.3.D.lote.0.capacidadAsignada":  [
+                                                              "Lotes_Pipeline_sim3",
+                                                              "S13"
+                                                          ],
+                   "ciclo.3.D.lote.0.precioEfectivo":  [
+                                                           "Lotes_Pipeline_sim3",
+                                                           "AU13"
+                                                       ],
                    "ciclo.1.A.financial.estadoResultados.ingresos":  [
                                                                          "Pipeline_sim3",
                                                                          "FP2"

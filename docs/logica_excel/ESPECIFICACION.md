@@ -283,3 +283,8 @@ La ampliación `tests/oracle/extender_finanzas.py` añade33campos por empresa-ci
 `PRESTAMO_COBRAR_INTERES_CICLO=true` es PENDIENTE_DEFINIR: Excel no trae calendario de préstamo. La fórmula de interés usa tasa mensual equivalente `(1+TEA/100)^(1/12)-1`, conserva tasa vigente de deuda previa y usa tasa penalizada exclusivamente para el préstamo nuevo. BANCAmezcla confirma saldos5000anterioresTEA20+5000nuevosTEA23 sin retasar la deuda anterior. Después del préstamo se conserva la tasa mensual ponderada por deuda para el ciclo siguiente.
 
 Resultados completos actuales:SIM1 468/0, SIM2 504/0, SIM3 1008/0, recuperación bancaria252/0 y tasas conservadas252/0. Libro consolidado2891comparaciones, cero diferencias y cero pendientes. Los generadores solo leen parámetros y decisiones; resultados financieros esperados provienen del recálculo COM, jamás de caja.js.
+
+
+## Cobertura final por lote y segmento
+
+La comprobación de detalles se amplía a SIM2 y SIM3: calidad/producido/capacidadAsignada/precioEfectivo de cada lote y los siete campos de cada reparto de mercado. SIM2 compara también el segmento Premium con inventario arrastrado en ciclo3; SIM3 compara B replicada en ciclo2. Cantidades físicas y stock por insumo ya estaban incluidos. Resultados finales:SIM1 468/0, SIM2 585/0, SIM3 1140/0, bancos252/0 cadauno. Libro consolidado3104comparaciones0diferencias0pendientes. Las cifras esperadas adicionales fueron recalculadas por Excel COM con las mismas entradas, sin usar resultados JavaScript.
