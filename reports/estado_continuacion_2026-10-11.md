@@ -62,3 +62,6 @@ Auditoría25entradasbase y18grupospreviosentregada; usuarioresolviótodoscasosco
 
 ## Continuación 3 — hito A9/oráculo
 A9freshrevisósolodiffcontinuación: encontróproyeccionesresumensin ciclo paraanalista; rootpasócicloactualen3llamadas ytestVMmotoreal ciclo2PASS; A9verificó0hallazgosabiertos. ExcelCOMregenerófinales468/0,585/0,1140/0,banca252/0,mezcla252/0; libroconsolidado3104/3104,0diff,0pendientes. Esperadosgeneradossólodesdeentradasfinales/config/fórmulasliteral+reglaslegacyautorizadas. FullrunúnicopendienteA8mediciones20runs; sinSQLchanges.
+
+## Continuación 3 — hito A8 medición terminada
+20ejecuciones controladas: continuousbaseline5/5HEAD5/5; reiniciobaseline5/5HEAD5/5. Mediana preparación3.2192sbaseline y3.4056sHEAD(+5.79%); primeraespera2.993/3.061s ysuite58.122/55.737s. SinPointerLock/shim/timeoutsalterados, sinNPC3Dmodificados. HEADmedido459c062congelado, nofiltroactual; verificaciónintegralúnica comprobaráHEADactual. Summarycompacto44KB+informearnésreproducibleversionados; raw/blobs/logsgrandeslocales. Arrancacorridafinalunasolavez tests/verificacion_excel_final.cjs--continuacion=3, outputseparadofinal-continuacion-3.

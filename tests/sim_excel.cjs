@@ -44,6 +44,18 @@ async function ejecutar(numero=3){
       for(const code of d.seleccion||[]){if(derivados.includes(code))continue;const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
       d.lotes.forEach((l,i)=>{for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])dispatch(`[data-lote="${i}"][data-campo="${campo}"]`,l[campo]??'');});
     },d);
+    if(numero===3&&ciclo===1&&d.garantiaDias===180){
+      await p.setViewportSize({width:390,height:844});
+      await p.locator('.excel-editor details').evaluateAll(items=>items.forEach(el=>el.open=true));
+      await p.screenshot({path:path.join(evidence,'auditoria-menu-congelado-movil.png'),fullPage:true});
+      const menu=await p.evaluate(()=>({ancho:document.documentElement.scrollWidth,viewport:innerWidth,
+        grupos:[...document.querySelectorAll('[data-excel-grupo]')].map(el=>({grupo:el.parentElement.firstChild.textContent,opciones:[...el.options].map(o=>o.value)})),
+        garantia:[...document.querySelector('[data-excel-garantia]').options].map(o=>o.value),marketing:[...document.querySelector('[data-excel-marketing]').options].map(o=>o.textContent),
+        creditoEditable:!!document.querySelector('[data-excel-credito]'),publicidadLibre:!!document.querySelector('[data-excel-publicidad]')}));
+      assert.ok(menu.ancho<=menu.viewport+1,'Editor congelado sin desborde móvil');assert.equal(menu.creditoEditable,false);assert.equal(menu.publicidadLibre,false);
+      fs.writeFileSync(path.join(evidence,'auditoria-menu-congelado.json'),JSON.stringify(menu,null,2));
+      await p.setViewportSize({width:1366,height:900});
+    }
     await p.locator('[data-excel-enviar]').click();assert.match(await p.locator('[data-excel-status]').innerText(),/confirmado/);
     await p.evaluate(()=>updateHud());assert.equal(await p.evaluate(()=>decisionProgressPercent()),100,'Confirmar lotes completa progreso');assert.match(await p.locator('#decisionProgressText').innerText(),/1\/1.*100%/);assert.equal(await p.locator('#topSubmitAllDecisions').isDisabled(),true,'Plan confirmado no reabre revisión antigua');
     assert.equal(await p.evaluate(()=>JSON.stringify(cashLedger)),ledgerAntes,'Confirmar Excel no vuelve a descontar el ledger anterior');

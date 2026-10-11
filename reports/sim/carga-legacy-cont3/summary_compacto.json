@@ -1,0 +1,2133 @@
+{
+  "conditions": {
+    "chrome": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "headless": true,
+    "args": [
+      "--enable-webgl",
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader"
+    ],
+    "concurrentBrowsers": 1,
+    "commits": {
+      "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "head": "459c062d87dc6615e9a0cb8a5111624572608286"
+    }
+  },
+  "pointerLockShim": false,
+  "timeoutChanged": false,
+  "sampling": "5 parejas alternadas baseline/HEAD por suite; un navegador de prueba a la vez",
+  "metricDefinition": "world_cycle_restart: duración de startSimulationLoading inicial (PREPARE), no duración total de suite; firstWait mide espera activa. Continuous initialPreparation no registrada porque DOMContentLoaded antecedió a load; firstWait mide primeros >3 frames.",
+  "excluded": "Intentos sintácticamente inválidos del arnés antes de lanzar Chrome, conservados localmente.",
+  "evidence": {
+    "baseline": {
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "verifiedBlobs": 744,
+      "manifestSha256": "e215a4f76f98b5e9fc2cd3373aac4298501ae990ddcaf14c735fb95d3a1cf44f"
+    },
+    "head": {
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "verifiedBlobs": 785,
+      "manifestSha256": "25e492e7abcb3dd709d0cf69c1a4799024669b9ed13a1806387a811245b4fdcb"
+    }
+  },
+  "aggregates": [
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "n": 5,
+      "passed": 5,
+      "medianDurationMs": 57674,
+      "medianFirstWaitMs": 6130,
+      "medianInitialPreparationMs": null
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "n": 5,
+      "passed": 5,
+      "medianDurationMs": 64585,
+      "medianFirstWaitMs": 5354,
+      "medianInitialPreparationMs": null
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "n": 5,
+      "passed": 5,
+      "medianDurationMs": 58122,
+      "medianFirstWaitMs": 2993,
+      "medianInitialPreparationMs": 3219.199999988079
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "n": 5,
+      "passed": 5,
+      "medianDurationMs": 55737,
+      "medianFirstWaitMs": 3061,
+      "medianInitialPreparationMs": 3405.599999964237
+    }
+  ],
+  "results": [
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 1,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 88469,
+      "firstWaitMs": 9637,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 9637,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 38,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1980,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 87,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 16.700000047683716,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-baseline-1.log",
+      "rawLogSha256": "b8d5dc0113c6dd38920abcacdcbf973624f12e2448fc7f725632938bb3e0c4cc"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 1,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 93499,
+      "firstWaitMs": 9862,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 9862,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 37,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1756,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 83,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 16.399999976158142,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-head-1.log",
+      "rawLogSha256": "2a43b66863ee290318870d98982cc111764262da4d98dbc60a634b74a0a0768c"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 2,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 56099,
+      "firstWaitMs": 6130,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 6130,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 30,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1720,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 27,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 12.099999964237213,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-baseline-2.log",
+      "rawLogSha256": "04796a1b9da5bb72a134b04d8eddab47996f93817916bc44f4ded02777c513cd"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 2,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 49593,
+      "firstWaitMs": 6082,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 6082,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 49,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1513,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 19,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 12.800000011920929,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-head-2.log",
+      "rawLogSha256": "da6aaff156dcc94afa51e5ed0e109e017eb53935209581c72b33c1c17d6520f7"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 3,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 57501,
+      "firstWaitMs": 6460,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 6460,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 49,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 2455,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 40,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 86.19999998807907,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-baseline-3.log",
+      "rawLogSha256": "83ee1e0b16ef16934ba6b9e309af27951a47c972046c1240224e4aac5cc688cf"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 3,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 64585,
+      "firstWaitMs": 4586,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 4586,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 32,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1898,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 26,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 77.90000003576279,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-head-3.log",
+      "rawLogSha256": "920dc169725baa7a487280064c970ce1ac89096b274bf9409839287b52656b80"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 4,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 57674,
+      "firstWaitMs": 5604,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 5604,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 42,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 1882,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 17,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 11.800000011920929,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-baseline-4.log",
+      "rawLogSha256": "e3eaf887d8a1910c6cd13eb1b1e352ada42ed6a7303b339d5181c5aeb80fb822"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 4,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 62320,
+      "firstWaitMs": 5354,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 5354,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 32,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 3360,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 27,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 12.700000047683716,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-head-4.log",
+      "rawLogSha256": "e3e97f2e02f3813023f24a6efe5392a09ef25a67a568b499f734f3c6e03dd6f1"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 5,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 58160,
+      "firstWaitMs": 5747,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 5747,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 30,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 3623,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 23,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 12.100000023841858,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-baseline-5.log",
+      "rawLogSha256": "d9599b72aa49e1b1bb11b33f1e4ab7b4e353a3d86988dc31c8c40cc672a6325c"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 5,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 70286,
+      "firstWaitMs": 4333,
+      "initialPreparationMs": null,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 4333,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 82,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 114,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 103,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 61.799999952316284,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\continuous_world.cjs-head-5.log",
+      "rawLogSha256": "3e8af2fd6d90fc98f5bd11bb32ef247a5add2c6ad03b29c82561ce22d88a1745"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 1,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 64117,
+      "firstWaitMs": 3340,
+      "initialPreparationMs": 3485.5,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 3340,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3815,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 52,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3561,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 619,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 3336,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 567,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2592,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 1282,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 33,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 1425,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 51,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 2006,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 193,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 91,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 2736,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 48,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 2305,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 35,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 1944,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 37,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 1510,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3485.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 23.099999964237213,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 305.89999997615814,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 15.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 20.30000001192093,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 49.60000002384186,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 18,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-baseline-1.log",
+      "rawLogSha256": "495469080b9191a7e12693b731429eb53132cd2e2219523dfb5ff51edace25ee"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 1,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 66262,
+      "firstWaitMs": 3313,
+      "initialPreparationMs": 3525.600000023842,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 3313,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3224,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 83,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3617,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 169,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 2447,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 35,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2644,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 981,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 35,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 1428,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 36,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 1214,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 166,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 83,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 1332,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 131,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 3886,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 39,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 2075,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 29,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 1427,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3525.600000023842,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 18.69999998807907,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 117.30000001192093,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 15.599999964237213,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 19.69999998807907,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 16.19999998807907,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 28.399999976158142,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-head-1.log",
+      "rawLogSha256": "864e0d7e667d1458b1a18e4470141019d9ca77e67e6f06f0a6b3a35db299b320"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 2,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 62161,
+      "firstWaitMs": 3203,
+      "initialPreparationMs": 3526.5,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 3203,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3255,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 75,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3551,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 166,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 1612,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 978,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2530,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 1072,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 33,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 1425,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 87,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 3650,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 197,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 478,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 2708,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 145,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 4876,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 53,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 1689,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 137,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 648,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3526.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 17.400000035762787,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 332.10000002384186,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 15.299999952316284,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 23.799999952316284,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 87.80000001192093,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 26.899999976158142,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-baseline-2.log",
+      "rawLogSha256": "3192133bf2289c850cac77f0f9af019cae73e818a5819200dac3a8e164bedc56"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 2,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 57923,
+      "firstWaitMs": 3333,
+      "initialPreparationMs": 3507.800000011921,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 3333,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3371,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 32,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3828,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 112,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 1671,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 876,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2872,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 840,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 33,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 1425,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 34,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 1189,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 401,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 266,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 532,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 48,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 1225,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 46,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 2203,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 84,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 2525,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3507.800000011921,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 19,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 294.60000002384186,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 14.699999988079071,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 19.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 16.100000023841858,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 22,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-head-2.log",
+      "rawLogSha256": "91645f9d6a4a806b6f25724c08cc3240cf5c0b6ed9f59a40a4dd0c505983b145"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 3,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 58122,
+      "firstWaitMs": 2993,
+      "initialPreparationMs": 3219.199999988079,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 2993,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3925,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 46,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3782,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 54,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 2058,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 39,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2012,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 1547,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 38,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 325,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 43,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 203,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 199,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 321,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 1664,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 121,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 1499,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 57,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 2516,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 45,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 1964,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3219.199999988079,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 10.399999976158142,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 62.59999996423721,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 12.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 23.399999976158142,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 16.600000023841858,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 29.400000035762787,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-baseline-3.log",
+      "rawLogSha256": "6d065544493903aae116dbfb65e622462a2ad87df62f01e696dbe79b2d7eb09b"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 3,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 55737,
+      "firstWaitMs": 3061,
+      "initialPreparationMs": 3405.599999964237,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 3061,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3136,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 189,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3545,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 35,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 1326,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 275,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 1749,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 1113,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 136,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 672,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 50,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 247,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 536,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 64,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 1331,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 54,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 1208,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 41,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 2127,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 93,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 2126,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3405.599999964237,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 20.299999952316284,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 334.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 14.300000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 23.69999998807907,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 128,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 21.899999976158142,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-head-3.log",
+      "rawLogSha256": "36d532c0649365e4b331bc79144b4f1a50fa761837e7454bd70ff32041a8efe9"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 4,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 43947,
+      "firstWaitMs": 2855,
+      "initialPreparationMs": 3187.399999976158,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 2855,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 2723,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 55,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 3792,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 68,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 1639,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 972,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 2733,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 1271,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 76,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 1336,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 18,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 287,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 429,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 166,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 739,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 63,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 257,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 23,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 1067,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 24,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 405,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 3187.399999976158,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 10.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 10.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 14.800000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 9.800000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 13,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 12.600000023841858,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-baseline-4.log",
+      "rawLogSha256": "a8134cd13ce83ccc26ab28b7aed629315a2e3ef354c69c62eaab179fd0db84c2"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 4,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 29883,
+      "firstWaitMs": 2471,
+      "initialPreparationMs": 2761.600000023842,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 2471,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 3142,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 24,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 2619,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 21,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 558,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 23,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 1045,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 923,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 24,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 598,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 31,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 536,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 420,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 26,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 530,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 31,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 459,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 22,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 594,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 21,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 435,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 2761.600000023842,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 6.599999964237213,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 11,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 10.300000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 13.200000047683716,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 12.299999952316284,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 11.900000035762787,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-head-4.log",
+      "rawLogSha256": "2c62209aff08c397f6e563cda917c212e53aa24fb69d78bd7740f377323e0b3a"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "baseline",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "corrida": 5,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 31068,
+      "firstWaitMs": 2449,
+      "initialPreparationMs": 2752.5,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 2449,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 2645,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 25,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 2352,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 24,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 140,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 28,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 1153,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 929,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 23,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 547,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 29,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 494,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 418,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 22,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 514,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 23,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 355,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 26,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 1032,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 25,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 441,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 2752.5,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 7.800000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 10.199999988079071,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 9.699999988079071,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 9.900000035762787,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 11.800000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 9.800000011920929,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-baseline-5.log",
+      "rawLogSha256": "e704b7f2dedc384f600ce864717467ecd0fd65bf698292fb6e252457311d6e95"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "version": "head",
+      "commit": "459c062d87dc6615e9a0cb8a5111624572608286",
+      "corrida": 5,
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 32106,
+      "firstWaitMs": 2444,
+      "initialPreparationMs": 2725.100000023842,
+      "waits": [
+        {
+          "id": 1,
+          "ms": 2444,
+          "ok": true
+        },
+        {
+          "id": 2,
+          "ms": 2959,
+          "ok": true
+        },
+        {
+          "id": 3,
+          "ms": 35,
+          "ok": true
+        },
+        {
+          "id": 4,
+          "ms": 2671,
+          "ok": true
+        },
+        {
+          "id": 5,
+          "ms": 23,
+          "ok": true
+        },
+        {
+          "id": 6,
+          "ms": 84,
+          "ok": true
+        },
+        {
+          "id": 7,
+          "ms": 64,
+          "ok": true
+        },
+        {
+          "id": 8,
+          "ms": 1054,
+          "ok": true
+        },
+        {
+          "id": 9,
+          "ms": 869,
+          "ok": true
+        },
+        {
+          "id": 10,
+          "ms": 63,
+          "ok": true
+        },
+        {
+          "id": 11,
+          "ms": 465,
+          "ok": true
+        },
+        {
+          "id": 12,
+          "ms": 43,
+          "ok": true
+        },
+        {
+          "id": 13,
+          "ms": 529,
+          "ok": true
+        },
+        {
+          "id": 14,
+          "ms": 455,
+          "ok": true
+        },
+        {
+          "id": 15,
+          "ms": 25,
+          "ok": true
+        },
+        {
+          "id": 16,
+          "ms": 498,
+          "ok": true
+        },
+        {
+          "id": 17,
+          "ms": 28,
+          "ok": true
+        },
+        {
+          "id": 18,
+          "ms": 382,
+          "ok": true
+        },
+        {
+          "id": 19,
+          "ms": 21,
+          "ok": true
+        },
+        {
+          "id": 20,
+          "ms": 604,
+          "ok": true
+        },
+        {
+          "id": 21,
+          "ms": 28,
+          "ok": true
+        },
+        {
+          "id": 22,
+          "ms": 489,
+          "ok": true
+        }
+      ],
+      "preparations": [
+        {
+          "ms": 2725.100000023842,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 6.300000011920929,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 7.100000023841858,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 9.699999988079071,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 8.399999976158142,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 11.699999988079071,
+          "value": true,
+          "error": null
+        },
+        {
+          "ms": 11.100000023841858,
+          "value": true,
+          "error": null
+        }
+      ],
+      "message": "PASS: suite completa y assertions finales de errores vacíos",
+      "rawLog": "reports\\sim\\carga-legacy-cont3\\world_cycle_restart.cjs-head-5.log",
+      "rawLogSha256": "2387e1adabe4affeccdc974cf9133689a73f4f48ce6cbc6bd461949214c5d51e"
+    }
+  ]
+}
