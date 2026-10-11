@@ -41,3 +41,6 @@ A6 terminó reintento remoto de todos los cierres pendientes, recarga terminal, 
 
 ## Continuación 2 — hito de atribución adicional
 A0 comprobó world_startup contra baseline9fbe6ec con assets verificados y contra actual: ambos PASS. El timeout anterior no se reprodujo; no se atribuye a integración. La corrida final Node terminó361/362: único fallo NPC17/16 demostrado previo. SQL de cierre y activación PASS; siete suites existentes BD PASS. Navegador final detectó continuous_world línea68 (inicio=false), pendiente baseline dirigido; mientras esté sin atribuir bloquea push. La corrida única continúa sin reiniciarse.
+
+## Continuación 2 — hito A0 terminado
+A0 entregó atribución adicional: startup antes/actual PASS; NPC rama normal PASS en ambos, fallback agotó240s y no atribuye assertion anterior; continuous_world baseline10escenariosPASS y actualfalse en inicio, pendiente causa; world_cycle_restart timeout53 sin atribuir. Estos pendientes impiden push. A6 revisa solo causa potencial legacy/integración, sin repetir suites completas. Evidencia baseline exacta y hashes dentro reports/sim/atribucion-*.
