@@ -95,6 +95,10 @@
       const inventarioFinal=inventarioInicial+comprado-consumido;
       detallesMP.push({codigo,precio,comprado,inventarioInicial,consumido,inventarioFinal,valorComprado:comprado*precio,valorConsumido:consumido*precio,valorInventario:inventarioFinal*precio});
     }
+    if(c.VALORIZACION_MP_MODO==='excel_literal'){
+      if(!entrada.consumoValorizado)throw new TypeError('El modo excel_literal requiere consumoValorizado explícito.');
+      for(const detalle of detallesMP){const usado=positivo(entrada.consumoValorizado[detalle.codigo]);if(usado>detalle.comprado+detalle.inventarioInicial)throw new RangeError('Valorización superior al stock: '+detalle.codigo);detalle.valorConsumido=usado*detalle.precio;detalle.valorInventario=(detalle.comprado+detalle.inventarioInicial-usado)*detalle.precio;}
+    }
     const valorComprado=sumar(detallesMP.map(detalle=>detalle.valorComprado)),valorConsumido=sumar(detallesMP.map(detalle=>detalle.valorConsumido)),valorInventario=sumar(detallesMP.map(detalle=>detalle.valorInventario));
     const valorCompradoNeto=valorComprado*factorDescuento,valorConsumidoNeto=valorConsumido*factorDescuento,valorInventarioNeto=valorInventario*factorDescuento;
     const reputacion=reputacionOperativa({produccion:entrada.produccion,consumoMP,publicidad:entrada.publicidad,proporcionN3:entrada.produccion?.proporcionN3??(trabajadores?n3/trabajadores:0)},c);

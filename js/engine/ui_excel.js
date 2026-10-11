@@ -40,7 +40,8 @@
       <p>Planeado: <b>${format(pro.totalPlaneado)}</b> · Producción: <b>${format(pro.totalProducido)}</b> · Capacidad con eficiencia: <b>${format(pro.produccionCapacidad)}</b></p>
       <p>Cuello de botella: ${pro.cuelloBotella.map(a=>areas[a]).join(', ')} · Factor de producción: ${format(pro.factorEficienciaProduccion)} · Personal: ${format(pro.totalTrabajadores)}</p>
       <div class="excel-table-wrap"><table><caption>Producción y materia prima utilizada</caption><thead><tr><th>Lote</th><th>Planeado</th><th>Producido</th><th>Cuero m²</th><th>Accesorios u</th><th>Hilo m</th></tr></thead><tbody>${pro.lotes.map((l,i)=>`<tr><th>${i+1}</th><td>${format(l.cantidad)}</td><td>${format(l.producido)}</td><td>${format(l.consumo.cuero)}</td><td>${format(l.consumo.accesorios)}</td><td>${format(l.consumo.hilo)}</td></tr>`).join('')}</tbody></table></div>
-      <p>Costos ${preview?'estimados':'del ciclo'}: <b>${money(r.costosTotales??r.costos.totalCostos)}</b>${preview?'':` · Ventas: <b>${format(r.unidadesVendidas)}</b> · Ingreso: <b>${money(r.ingresos)}</b> · Utilidad: <b>${money(r.utilidad)}</b>`}</p>
+      <p>Costos ${preview?'estimados':'del ciclo'}: <b>${money(r.financial?.estadoResultados.costos??r.costosTotales??r.costos.totalCostos)}</b>${preview?'':` · Ventas: <b>${format(r.unidadesVendidas)}</b> · Ingreso: <b>${money(r.ingresos)}</b> · Utilidad: <b>${money(r.financial?.estadoResultados.utilidad??r.utilidad)}</b>`}</p>
+      ${r.financial?`<p>Caja inicial: <b>${money(r.financial.balanceCaja.cajaInicial)}</b> · Caja final: <b>${money(r.financial.balanceCaja.cajaFinal)}</b> · Intereses: <b>${money(r.financial.estadoResultados.intereses)}</b></p>`:''}
       ${preview?'<p class="excel-help">Las ventas se calculan al cierre entre las empresas del mismo segmento.</p>':''}
       <details><summary>Inventario de materia prima al cierre</summary><ul>${Object.entries(pro.inventarioFinal).map(([k,v])=>`<li>${e(root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)}: ${format(v)}</li>`).join('')}</ul></details>
       ${r.inventarioProductos?`<p>Productos sin vender: <b>${format(r.inventarioSinVender)}</b></p>`:''}
@@ -65,9 +66,9 @@
     function render(){
       const frozen=locked||confirmed;
       container.innerHTML=`<section class="excel-editor" aria-labelledby="excelEditorTitle"><header><img src="assets/icons/categories/recursos_humanos.svg" alt=""><div><h2 id="excelEditorTitle">Plan de producción por lotes</h2><p>Organiza personal, materiales y segmento para cada lote.</p></div></header>
-        <p class="excel-help">Piloto local del modelo del curso. Al activarlo, el docente cierra las ventas de todas las empresas participantes desde su panel. El movimiento de caja del mundo 3D pertenece al flujo anterior.</p>
-        <label class="excel-toggle"><input type="checkbox" data-excel-enable ${enabled?'checked':''} ${locked||confirmed||!local?'disabled':''}>Usar el modelo por lotes en esta empresa</label>
-        ${!local?'<p>La activación está disponible en partidas locales. El cierre de partidas conectadas requiere integrar el motor en el servidor.</p>':''}
+        <p class="excel-help">El docente cierra las ventas de todas las empresas participantes desde su panel. Caja, costos, compras y préstamos se registran una sola vez al cerrar el ciclo.</p>
+        <label class="excel-toggle"><input type="checkbox" data-excel-enable ${enabled?'checked':''} ${locked||confirmed?'disabled':''}>Usar el modelo por lotes en esta empresa</label>
+        ${!local?'<p>Confirma el plan para sincronizarlo. El docente necesita aplicar la migración del cierre por lotes antes del primer cierre conectado.</p>':''}
         ${enabled?`<div class="excel-grid"><label>Régimen laboral<select data-excel-regimen ${frozen?'disabled':''}><option value="MYPE" ${draft.regimen==='MYPE'?'selected':''}>MYPE</option><option value="NO_MYPE" ${draft.regimen==='NO_MYPE'?'selected':''}>No MYPE</option></select></label><label>Publicidad del ciclo (S/)<input type="number" min="0" max="${cfg().PUBLICIDAD_MAX}" step="1" value="${e(draft.publicidad)}" data-excel-publicidad ${frozen?'disabled':''}></label><label>Préstamo solicitado (S/)<input type="number" min="0" step="0.01" value="${e(draft.montoPrestamo)}" data-excel-prestamo ${frozen?'disabled':''}></label></div>
           <details><summary>Decisiones del ciclo</summary><p>Las opciones sin elegir aportan cero. Un material faltante también aporta cero a la calidad y puede impedir producir.</p><div class="excel-grid">${grupos().map((g,i)=>`<label>${e(g)}<select data-excel-grupo="${i}" ${frozen?'disabled':''}>${opciones(opcionesGrupo(g),draft.seleccion.find(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo===g))}</select></label>`).join('')}</div></details>
           <details><summary>Personal por nivel y máquina</summary><p>La cantidad corresponde a operarios. Corte utiliza la columna manual.</p><button type="button" data-excel-importar class="side-button" ${frozen?'disabled':''}>Importar personal de mis decisiones</button><div class="excel-table-wrap"><table><thead><tr><th>Área y nivel</th>${maquinas.map(m=>`<th>${m}</th>`).join('')}</tr></thead><tbody>${Object.entries(areas).flatMap(([a,label])=>[0,1,2].map(n=>`<tr><th>${label} N${n+1}</th>${[0,1,2].map(m=>`<td><input aria-label="${label} nivel ${n+1} ${maquinas[m]}" data-personal="${a},${n},${m}" type="number" min="0" step="1" value="${draft.personal[a][n][m]}" ${frozen||a==='corte'&&m!==0?'disabled':''}></td>`).join('')}</tr>`)).join('')}</tbody></table></div></details>
@@ -97,7 +98,7 @@
       if(el.hasAttribute('data-excel-guardar')||el.hasAttribute('data-excel-enviar')){
         const enviar=el.hasAttribute('data-excel-enviar'),error=enviar?validar(draft):'';
         if(error){container.querySelector('[data-excel-status]').textContent=error;return;}
-        stored={habilitado:true,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};context.save(stored);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.':'Borrador guardado.';
+        stored={...stored,habilitado:true,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};if(enviar)stored.planesPorCiclo={...stored.planesPorCiclo,[context.round]:clone(stored.decisiones)};context.save(stored);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.':'Borrador guardado.';
       }
     };
     render();
@@ -113,10 +114,12 @@
     const previo=leer(cierreKey(game,ciclo),null);let cierre=previo;
     if(!cierre){
       const decisionesPorEmpresa={};participantes.forEach(r=>{const d=r.excelDecisionState;if(Number(d.round)===Number(ciclo)&&d.enviado)decisionesPorEmpresa[r.id]=prepararDecisiones(d.decisiones);});
-      cierre=root.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:participantes.map(r=>r.id),decisionesPorEmpresa,historialPorEmpresa:leer(historiaKey(game),{})});
+      const historialAnterior=leer(historiaKey(game),{});
+      cierre=root.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:participantes.map(r=>r.id),decisionesPorEmpresa,historialPorEmpresa:historialAnterior});
+      if(root.SIDE_EXCEL_CAJA)cierre=root.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.capital])),baseCajaPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.excelDecisionState.cajaTransicion??r.capital])),historialAnterior});
       localStorage.setItem(cierreKey(game,ciclo),JSON.stringify(cierre));localStorage.setItem(historiaKey(game),JSON.stringify(cierre.historialPorEmpresa));
     }
-    participantes.forEach(r=>{const value=cierre.resultadosPorEmpresa[r.id];if(value){r.estadoResultados={...r.estadoResultados,excel:value,ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad};Object.assign(r,{ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad,ronda:ciclo,updatedAt:new Date().toISOString()});}if(cierre.eliminadas.includes(r.id))r.estado='eliminada';});
+    participantes.forEach(r=>{const value=cierre.resultadosPorEmpresa[r.id];if(value){r.estadoResultados={...r.estadoResultados,excel:value,ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad};Object.assign(r,{ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad,ronda:ciclo,updatedAt:new Date().toISOString()});root.SIDE_EXCEL_CAJA?.aplicarReporte(r,value);}if(cierre.eliminadas.includes(r.id))r.estado='eliminada';});
     localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));return cierre;
   }
   root.SIDE_EXCEL_UI=Object.freeze({mountEditor,nuevasDecisiones,prepararDecisiones,resumenHtml,validar,cerrarLocal,historial,resultado,cierreKey,historiaKey});

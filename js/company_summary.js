@@ -82,6 +82,7 @@ function reviewFingerprint(){
     flags:decisionCategories().map(c=>sectionSubmitted(c.cat)),all:decisionsSubmitted()});
 }
 function commitReviewedSections(cats,finalize){
+  if(decisionState.__excel?.habilitado){toast('Confirma el plan por lotes en Producción.');return false;}
   if(!studentAccess().canOperate){toast(studentAccess().reason);return false;}
   if(reviewCommitBusy||decisionsSubmitted())return false;
   reviewCommitBusy=true;
@@ -210,6 +211,13 @@ function navigateFromSummary(cat){
 function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
 function renderCompanySummary(){
   const mount=$('companySummaryMount');if(!mount)return;
+  if(decisionState.__excel?.habilitado){
+    const result=excelSavedResult(),f=financialReport();
+    let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>Caja disponible: <b>${reviewMoney(f.balanceCaja.cajaFinal)}</b></p><p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa y confirma tu plan en Producción.'}</p></section>`;
+    if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
+    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
+    mount.innerHTML=html;return;
+  }
   const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
   migrateCurrentReceipts();
   const history=companySummaryRound!=='current'&&Number(companySummaryRound)!==currentRound(),review=liveCompanyReview();

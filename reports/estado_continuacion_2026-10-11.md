@@ -20,3 +20,6 @@ Oráculos ampliados: SIM1 336, SIM2 306, SIM3 612 salidas0diferencias Node (impo
 
 ## Hito A7 final
 A7 terminó: base351 + consecuencias56 + SIM1 336 + SIM2 306 + SIM3 612 + banco153 =1814 comparaciones0diferencias, libro consolidado0pendientes. Banco conserva3pp durante recuperación sinpréstamo y losconsume cuando llega préstamo5000 (deuda5000). A8final delegado; espera A6 para repetir UI y verificar caja. Archivos oracle y entregables derivados guardados en WIP; fuente original no versionada.
+
+## Hito A6 integración inicial / SQL local
+A6 implementó adaptador de caja, cierre remoto CAS y migración idempotente 2026-10-11_logica_excel.sql. Root validó PostgreSQL local PGlite: aplicar2veces, acceso profesor/denegaciónanon, idempotencia, contexto stale rechazado, reporte y snapshot tardíos protegidos; PASS tests/excel_sql_db.cjs. No se ejecutó SQL en producción. Pendiente ajuste tasa de préstamos existentes, activación sin SQL, oráculo de caja y revisión independiente. A8 inició pruebas de interfaz con igualdad caja/HUD/resumen/reporte y ledger sin doblecargo.

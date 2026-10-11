@@ -343,7 +343,7 @@ async function refreshTeacherGame(){
   if(state.lifecycleVersion!==2||!gameStatus()?.active||teacherBusy)return;
   if(state.partidaId){
     teacherBusy=true;
-    try{teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(result.success)applyTeacherState(result.data);}
+    try{const previous=state.round;teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(result.success){const next=Number(result.data?.configuracion?.runtime?.round||previous),finished=result.data?.configuracion?.runtime?.phase==='finished';for(let cycle=previous;cycle<next||finished&&cycle===next;cycle++){if(!await closeExcelRemoteRound(cycle))break;}applyTeacherState(result.data);}}
     finally{teacherBusy=false;}
   }else{
     const c={...state.authoritative,runtime:RULES.resolveRuntime(state.authoritative,teacherNow())};
@@ -380,6 +380,9 @@ async function controlGame(action){
   teacherBusy=true;
   try{
     if(state.partidaId){
+      if(['cerrar','avanzar'].includes(action)&&state.authoritative?.runtime?.phase!=='integration'){
+        const excel=await closeExcelRemoteRound(expectedRound);if(!excel)return false;
+      }
       const result=await window.SIDE.PartidaService.controlar(state.partidaId,action,null,expectedRound);
       if(!result.success){toast(result.error||'No se pudo actualizar la partida.');return false;}
       if(action==='cancelar'&&!result.data?.configuracion?.cancelledAt){toast('La cancelación no se aplicó. Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql.');return false;}
@@ -625,6 +628,7 @@ async function supabaseReports(){
       enviado:rows.some(d=>d.enviada)||!!local?.enviado,
       eventos:local?.eventos||[],
       estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
+      excelDecisionState:rep?.estado_resultados?.excelDecisionState||local?.excelDecisionState||null,
       balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
       balanceGeneral:rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
       flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
@@ -778,7 +782,7 @@ function renderResults(){
   const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
   $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',[['Ventas netas',er.ventasNetas??er.ingresos??r.ingresos],['Gastos operativos',er.costos??r.costos],['Impacto de eventos',er.impactoEventos],['Otros resultados',Number(er.resultadoVentaActivos||0)+Number(er.otros||0)],['Utilidad',er.utilidad??r.utilidad]])}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Activos fijos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
-  if(er.excel&&window.SIDE_EXCEL_UI)$('detailReports').insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(er.excel)+'<p class="hint">Piloto local por lotes: los cuadros de caja y balance del flujo anterior se muestran por separado y no incluyen este cierre.</p>');
+  if(er.excel&&window.SIDE_EXCEL_UI)$('detailReports').insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(er.excel));
 }
 function closeExcelLocalRound(){
   if(state.partidaId||!window.SIDE_EXCEL_UI)return null;
@@ -786,6 +790,20 @@ function closeExcelLocalRound(){
   const closure=window.SIDE_EXCEL_UI.cerrarLocal({game:$('gameCode').value||'SIDE-000',ciclo:state.round,reports});
   if(closure){state.reports=reports;renderResults();addEvent('Cierre local por lotes calculado para las empresas participantes.','sistema');}
   return closure;
+}
+async function closeExcelRemoteRound(ciclo){
+  if(!state.partidaId)return true;
+  const service=window.SIDE?.PartidaService;if(!service?.cerrarExcel)return false;
+  const response=await service.cerrarExcel(state.partidaId,ciclo);
+  if(!response.success){
+    if(response.migrationMissing&&!state.reports.some(r=>r.excelDecisionState?.habilitado||r.estadoResultados?.excel))return true;
+    toast(response.migrationMissing?'Aplica supabase/migrations/2026-10-11_logica_excel.sql para cerrar las empresas por lotes.':response.error||'No se pudo guardar el cierre.');return false;
+  }
+  if(response.data){
+    for(const r of state.reports){const result=response.data.resultadosPorEmpresa?.[String(r.empresaId)];if(result)window.SIDE_EXCEL_CAJA.aplicarReporte(r,result);}
+    persistReports();renderResults();
+  }
+  return true;
 }
 function renderWinnerSelect(){renderPodium();
 }

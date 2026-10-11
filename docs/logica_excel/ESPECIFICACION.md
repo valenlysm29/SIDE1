@@ -263,3 +263,14 @@ SIM-3 usa doce filas empresa-ciclo: cinco empresas iniciales, E eliminada al no 
 Una discrepancia detectada por la prueba de enteros exactos fue consumoCuero=21.000000000000004 frente a21 del Excel; se normalizó el consumo agregado del pipeline a quince cifras significativas, precisión de Excel. No se relajó la tolerancia para ocultarla.
 
 Las comprobaciones de navegador se documentan por el agente principal; estas pruebas de oráculo y Node no se presentan por sí mismas como evidencia de UI.
+
+
+## Ampliación verificada de SIM-1 y banca
+
+SIM-1 ahora se cierra también como pipeline: cuatro empresas, tres lotes por empresa, tres mercados y perfiles personales de producción. Se conservan las 351 comprobaciones originales por componentes porque los perfiles de costos y lotes del ejemplo son independientes. El pipeline de SIM-1 añade 336 comparaciones independientes, incluidos siete resultados de mercado por empresa y segmento, detalle de cada lote y cuatro campos de financiamiento; cero diferencias.
+
+Banca se comprueba también en SIM-2 (306 comparaciones) y SIM-3 (612 comparaciones). El escenario adicional BANCA tiene 153 comparaciones: salud -1 sin préstamo guarda +3pp; salud recuperada10 y ausencia de préstamo conserva +3pp; salud8 con préstamo5000 aplica TEA23 (base20+3), deuda5000 y limpia la penalización para el préstamo siguiente. Estos criterios son extensiones autorizadas, no fórmulas del Excel original.
+
+La hoja SIDE vs Excel reúne 1814 comparaciones y cero diferencias:351base+336SIM1+306SIM2+612SIM3+153banca+56consecuencias. Los escenarios y sus parámetros se exportan antes del cálculo; las columnas esperadas vienen exclusivamente del recálculo Excel COM.
+
+`tests/fixtures_excel.cjs` centraliza entradas de producción, personal, precios y reputaciones de mercados dorados, lotes y selección. Rechaza fórmulas como entradas literales. Las pruebas de base/costos y la UI pueden usar el mismo cargador sin consultar resultados esperados.
