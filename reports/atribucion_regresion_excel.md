@@ -33,3 +33,11 @@ Ese log sirve para identificar la primera falla; la atribución se fundamenta en
 ## Regresión final
 
 Pendiente de ejecutar cuando termine la integración del agente A6. No se inicia mientras se editan UI/motor para evitar comparar versiones cambiantes. El agente principal conservará el log de la nueva corrida en `reports/sim/` y consignará suites, fallos y omisiones. Esta atribución no transforma fallos preexistentes en pruebas aprobadas ni autoriza el push sin cumplir los criterios completos.
+
+## Seguimiento de fallos intermitentes de la corrida excel-final
+
+La corrida `tests/output/mejora-integral-2026-10-01/excel-final/runs/2026-10-11T16-28-49-507Z/` registró timeout de 30 s en `world_startup.cjs:67`, al esperar `assets.detailsReady`. Para compararla se completaron **todos los assets y vendor tracked** de la línea base exacta. Cada archivo se verificó mediante SHA-1 con cabecera de blob Git; solo se reutilizaron enlaces duros cuando el contenido coincidía con el OID del commit. Las diferencias se extrajeron desde Git y se verificaron. Evidencia: `reports/sim/atribucion-startup/assets-verificados.json`.
+
+Una ejecución completa por versión de `world_startup.cjs`, con servidor HTTP propio para cada checkout, pasó tanto `all` como `sections`: baseline exit 0, 94 277 ms; actual exit 0, 82 253 ms. Los valores `loadMs` respectivos fueron 38 390/39 384 y 28 982/34 342 ms; miden la prueba completa de cada modo, no exclusivamente el intervalo de espera de detalles. El timeout original **no se reprodujo**: no queda demostrado que sea preexistente ni causado por Excel. Logs y resultados: `reports/sim/atribucion-startup/{antes.log,actual.log,resultados.json}`. No se cambiaron assertions ni tiempos de la suite.
+
+La misma corrida original falló en `supplied_npcs.cjs:136`, `customers complete a decision`, después de aprobar la rama normal y durante fallback. El primer intento de baseline abortó antes de assertions porque faltaba `tools/npc_preview.html`: quedó conservado como `reports/sim/atribucion-supplied-npcs/intento-invalido-404.log`, excluido de toda atribución causal. El preview se completó con el blob exacto `9ca3a4d4eafe587b880d688bfb96ce939200a905` del commit; evidencia en `preview-verificado.json`. No se copiaron resultados actuales al baseline.

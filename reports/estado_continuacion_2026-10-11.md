@@ -38,3 +38,6 @@ Git recuperado: ocho WIP de la tarea sobre9fbe6ec, stash previo conservado, sin 
 
 ## Continuación 2 — hito A6/A9 y comienzo final único
 A6 terminó reintento remoto de todos los cierres pendientes, recarga terminal, fase results, ciclo de activación y progreso1/1 del plan confirmado. A9 escribió reports/revision_final_excel.md: sin críticos de código abiertos, aprobación global condicionada a evidencia final. Root añadió pérdida de acuse después de commit PostgreSQL y reintento misma(partida,ciclo): mismo cierre recuperado, solo1fila. DirigidoPASS. Se ejecuta una sola corrida final secuencial tests/verificacion_excel_final.cjs; resultados por fase persisten en reports/sim/final-continuacion-2/summary.json. Todavía sin push; atribución world_startup/supplied_npcs en evaluación A0.
+
+## Continuación 2 — hito de atribución adicional
+A0 comprobó world_startup contra baseline9fbe6ec con assets verificados y contra actual: ambos PASS. El timeout anterior no se reprodujo; no se atribuye a integración. La corrida final Node terminó361/362: único fallo NPC17/16 demostrado previo. SQL de cierre y activación PASS; siete suites existentes BD PASS. Navegador final detectó continuous_world línea68 (inicio=false), pendiente baseline dirigido; mientras esté sin atribuir bloquea push. La corrida única continúa sin reiniciarse.
