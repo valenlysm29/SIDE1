@@ -44,3 +44,6 @@ A0 comprobó world_startup contra baseline9fbe6ec con assets verificados y contr
 
 ## Continuación 2 — hito A0 terminado
 A0 entregó atribución adicional: startup antes/actual PASS; NPC rama normal PASS en ambos, fallback agotó240s y no atribuye assertion anterior; continuous_world baseline10escenariosPASS y actualfalse en inicio, pendiente causa; world_cycle_restart timeout53 sin atribuir. Estos pendientes impiden push. A6 revisa solo causa potencial legacy/integración, sin repetir suites completas. Evidencia baseline exacta y hashes dentro reports/sim/atribucion-*.
+
+## Continuación 2 — hito A6 diagnóstico dirigido
+A6 no encontró bloqueo legacy por Excel: __excel ausente, acceso permitido; ambas entradas de continuous devolvieron true y nueve escenarios pasaron, prueba terminó por Pointer Lock. world_cycle_restart repitió timeout30s durante preparación3D (initialized=false,lastError vacío), causa sin determinar. No hubo cambios de producción ni más corridas. reports/diagnostico_carga_legacy_excel.md conserva evidencia. Sin push porque navegador no está aceptado; corrida única sigue hasta simulaciones/oráculo/sintaxis.
