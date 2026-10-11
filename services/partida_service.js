@@ -34,6 +34,33 @@
     return { success: false, offline: true, error: 'Supabase no disponible (modo local).' };
   }
 
+  const creationMigration = 'supabase/migrations/2026-10-11_fix_crear_partida.sql';
+  function creationError(error, data) {
+    const code=error?.code||data?.code;
+    const message=error?.message||data?.error||'El servidor no devolvió una sala válida.';
+    const missing=/PGRST202|PGRST204|42883|42703/.test(code||'');
+    console.error('SIDE: crear/recuperar sala:', error||data);
+    return {success:false,code:missing?'MIGRACION_PENDIENTE':code,error:missing?'Falta actualizar la base de datos: ejecuta '+creationMigration+'.':message,data:data?.partida||data?.id&&data||undefined,migrationMissing:missing};
+  }
+  function requestUuid() {
+    if(global.crypto?.randomUUID)return global.crypto.randomUUID();
+    if(!global.crypto?.getRandomValues)throw new Error('No se pudo generar la solicitud. Recarga el panel desde una conexión segura.');
+    const bytes=global.crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+    const hex=Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');
+    return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');
+  }
+  async function obtenerActiva() {
+    const sb=client();if(!sb)return offline();
+    try {
+      const {data,error}=await sb.rpc('obtener_sala_docente');
+      if(error||data?.error)return creationError(error,data);
+      if(data&&(!data.id||!data.codigo||!['esperando','activa'].includes(data.estado)||
+        (data.estado==='esperando'?data.configuracion?.runtime?.phase!=='integration':!['decisions','results'].includes(data.configuracion?.runtime?.phase))||
+        !Number.isFinite(Date.parse(data.serverTime||''))))return creationError(null,data);
+      return {success:true,data:data||null};
+    } catch(error){return creationError(error);}
+  }
+
   /**
    * Busca una partida en estado 'esperando' por su código (ej. SIDE-WG2).
    * @param {string} codigo Código de partida.
@@ -69,19 +96,23 @@
     try {
       const { data: userData, error: userError } = await sb.auth.getUser();
       if (userError || !userData || !userData.user) {
+        if(userError)console.error('SIDE: sesión al crear sala:',userError);
         return { success: false, error: 'Debes iniciar sesión como profesor.' };
       }
       if(d.configuracion?.lifecycleVersion===2){
       const {data:admissionFeatures,error:admissionFeatureError}=await sb.rpc('side_admission_features');
+      if(admissionFeatureError)console.error('SIDE: comprobar admisión:',admissionFeatureError);
       if(admissionFeatureError&&!/PGRST202|42883/.test(admissionFeatureError.code||''))return {success:false,error:'No se pudo comprobar la conexión con Supabase. Intenta nuevamente.',code:admissionFeatureError.code};
       if(admissionFeatureError||admissionFeatures?.waitingRoomVersion!==3||admissionFeatures?.exactIdentityVersion!==2)return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.'};
 
         const {data:features,error:featuresError}=await sb.rpc('side_game_features');
+        if(featuresError)console.error('SIDE: comprobar lifecycle:',featuresError);
         if(featuresError&&!/PGRST202|42883/.test(featuresError.code||''))return {success:false,error:featuresError.message||'No se pudo comprobar Supabase. Vuelve a intentarlo.'};
         if(featuresError||features?.observationsVersion!==1)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql para habilitar cancelación y eventos sin repetición.'};
         if(features?.gameCodeVersion!==2)return {success:false,error:'Actualiza Supabase con supabase/migrations/supabase_game_codes.sql para habilitar códigos como SIDE-WG2.'};
         // Read-only readiness check: do not leave an unusable lobby in an old DB.
         const {error:readinessError}=await sb.rpc('controlar_partida',{p_partida_id:null,p_accion:'sincronizar'});
+        if(readinessError)console.error('SIDE: comprobar firma controlar_partida:',readinessError);
         if(readinessError)return {success:false,error:/PGRST202|42883/.test(readinessError.code||'')?'Aplica supabase/migrations/supabase_game_lifecycle.sql en Supabase antes de crear partidas.':readinessError.message};
       }
       const payload = {
@@ -92,17 +123,24 @@
         configuracion: d.configuracion || {},
         eventos_habilitados: d.eventos_habilitados || []
       };
-      const { data, error } = await sb.from('partidas').insert(payload).select().single();
-      if (error) return { success: false, error: error.message };
       if(d.configuracion?.lifecycleVersion===2){
-        const synced=await controlar(data.id,'sincronizar');
-        if(!synced.success)return {success:false,error:'La partida fue creada, pero no se pudo consultar su reloj del servidor: '+(synced.error||'error de conexión'),data};
-        if(!Number.isFinite(Date.parse(synced.data?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).',data};
-        return synced;
+        const {data,error}=await sb.rpc('crear_sala_docente',{
+          p_config:payload.configuracion,p_nombre:payload.nombre,p_curso:payload.curso||'',p_segmento:payload.segmento,
+          p_request_id:d.requestId||requestUuid(),p_reemplazar_id:d.reemplazarId||null
+        });
+        if(error||data?.error)return creationError(error,data);
+        const phase=data?.configuracion?.runtime?.phase;
+        if(data?.estado==='finalizada'||['cancelled','finished'].includes(phase))return creationError(null,{error:'La sala de esa solicitud ya terminó. Pulsa Reintentar para crear una nueva.',code:'SOLICITUD_FINALIZADA',partida:data});
+        if(!data?.id||!data.codigo||!['esperando','activa'].includes(data.estado)||
+          (data.estado==='esperando'?phase!=='integration':!['decisions','results'].includes(phase))||
+          !Number.isFinite(Date.parse(data.serverTime||'')))return creationError(null,data);
+        return {success:true,data};
       }
+      const { data, error } = await sb.from('partidas').insert(payload).select().single();
+      if (error) return creationError(error);
       return { success: true, data };
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      return creationError(err);
     }
   }
 
@@ -261,5 +299,5 @@
       return {success:true,data:data.cierre,reused:!!data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar,contextoExcel,cerrarExcel,excelDisponible };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar,contextoExcel,cerrarExcel,excelDisponible };
 })(window);
