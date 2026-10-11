@@ -65,3 +65,6 @@ A9freshrevisósolodiffcontinuación: encontróproyeccionesresumensin ciclo paraa
 
 ## Continuación 3 — hito A8 medición terminada
 20ejecuciones controladas: continuousbaseline5/5HEAD5/5; reiniciobaseline5/5HEAD5/5. Mediana preparación3.2192sbaseline y3.4056sHEAD(+5.79%); primeraespera2.993/3.061s ysuite58.122/55.737s. SinPointerLock/shim/timeoutsalterados, sinNPC3Dmodificados. HEADmedido459c062congelado, nofiltroactual; verificaciónintegralúnica comprobaráHEADactual. Summarycompacto44KB+informearnésreproducibleversionados; raw/blobs/logsgrandeslocales. Arrancacorridafinalunasolavez tests/verificacion_excel_final.cjs--continuacion=3, outputseparadofinal-continuacion-3.
+
+## Continuación 3 — revisión del arnés cerrada
+A9inspeccionóarnésmediciónsin ejecutarlo: instrumentaciónsimétrica,asserts/timeoutsoriginalespreservados. Rootseparóoutputopcional--lock parapreservarmuestraoriginal; A9verificócorreccióny0incidencias. No se usóshimPointerLock. Resumenfinal20/20PASSconrangos2.753–3.527sbaseline/2.725–3.526sHEAD; diferencialpareadomediano−18.7ms,3/5paresHEADmásrápido. Comparaciónfijada459c062; aceptaciónfinalactualsujetaacorridaúnicaenproceso.

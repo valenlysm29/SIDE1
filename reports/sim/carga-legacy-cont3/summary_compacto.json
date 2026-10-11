@@ -11,7 +11,9 @@
     "commits": {
       "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
       "head": "459c062d87dc6615e9a0cb8a5111624572608286"
-    }
+    },
+    "chromeVersion": "156.0.8078.12",
+    "playwrightVersion": "1.62.1"
   },
   "pointerLockShim": false,
   "timeoutChanged": false,
