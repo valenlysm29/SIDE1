@@ -50,3 +50,6 @@ A6 no encontró bloqueo legacy por Excel: __excel ausente, acceso permitido; amb
 
 ## Continuación 2 — cierre de verificación única
 Corrida única terminó20:36:52UTC: Node361/362 (NPCprevio), sieteBDPASS, SQLExcel/activaciónPASS, navegador20PASS4FAIL1skip; SIM1468/0,SIM2585/0,SIM31140/0, transiciónPASS, oráculo3104/0 y sintaxis49/0. Capturas móvil390 contenidas y progreso1/1 100%. A9 sin críticos Excel; aceptación global bloqueada por continuous_world/reinicio3D sin resolver. NPC/manifiesto, scroll y touch40px previos con evidencia. Startup y suppliedNPC actualPASS. Sin push; fetchconfirmósolo commits de tarea sobreorigin9fbe6ec. Informe final incluye SQLexacto y orden, tabla decisiones, pendientes y motivos. Próximo paso: resolver preparación3D/PointerLock de forma dirigida; no rehacer motor, oráculos ni sims validados.
+
+## Publicación autorizada posteriormente
+Tras recibir el informe de fallos pendientes, el usuario pidió explícitamente push a main. Se publica la serie de esta tarea hasta d596779 junto con esta anotación, sin resolver ni ocultar los dos fallos de carga3D documentados. Fetch confirmó main local sin commits remotos pendientes y todos los commits exclusivos corresponden a la integración Excel. Los cambios sin commit ajenos permanecen locales. No se ejecuta SQL en producción.
