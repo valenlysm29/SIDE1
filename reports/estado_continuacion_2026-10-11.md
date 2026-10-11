@@ -68,3 +68,6 @@ A9freshrevisósolodiffcontinuación: encontróproyeccionesresumensin ciclo paraa
 
 ## Continuación 3 — revisión del arnés cerrada
 A9inspeccionóarnésmediciónsin ejecutarlo: instrumentaciónsimétrica,asserts/timeoutsoriginalespreservados. Rootseparóoutputopcional--lock parapreservarmuestraoriginal; A9verificócorreccióny0incidencias. No se usóshimPointerLock. Resumenfinal20/20PASSconrangos2.753–3.527sbaseline/2.725–3.526sHEAD; diferencialpareadomediano−18.7ms,3/5paresHEADmásrápido. Comparaciónfijada459c062; aceptaciónfinalactualsujetaacorridaúnicaenproceso.
+
+## Continuación 3 — revisión adicional y verificación en curso
+A9 revisó de nuevo las tres resoluciones del usuario sobre el diff 459c062..HEAD: opciones anteriores preservadas, marketing único, proveedores internos sin selección automática; cero hallazgos nuevos o críticos. La corrida completa única está en proceso. Node registró 365/368: manifiesto NPC preexistente y timeout del subtest de sincronización (contabilizado también en su suite padre). A6 hizo revisión estática sin encontrar causa Excel; se comprobará únicamente esa suite con Chrome exclusivo cuando termine la batería. No se atribuye aún ese timeout ni se autoriza publicación con él pendiente. SQL Excel y activación PASS; la regresión ya aprobó continuous_world actual.
