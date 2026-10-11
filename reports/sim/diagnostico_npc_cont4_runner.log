@@ -1,0 +1,32 @@
+RUN baseline-1
+DONE baseline-1 0
+RUN head-1
+DONE head-1 0
+RUN baseline-2
+DONE baseline-2 0
+RUN head-2
+DONE head-2 0
+RUN baseline-3
+DONE baseline-3 0
+RUN head-3
+DONE head-3 0
+RUN baseline-4
+DONE baseline-4 0
+RUN head-4
+DONE head-4 0
+RUN baseline-5
+DONE baseline-5 0
+RUN head-5
+DONE head-5 0
+RUN baseline-6
+DONE baseline-6 0
+RUN head-6
+DONE head-6 0
+RUN baseline-7
+DONE baseline-7 0
+RUN head-7
+DONE head-7 0
+RUN baseline-8
+DONE baseline-8 0
+RUN head-8
+DONE head-8 1

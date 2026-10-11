@@ -1,0 +1,10 @@
+[TRAVEL] {"fallback":true,"states":["ENTER_STORE","BROWSE"],"details":[{"kind":"city:city_woman_tank","state":"BROWSE","x":127.28641811525435,"z":22.608433837408512,"route":[[130.75,22.71],[128.5,22.7],[132.5,22.7]],"index":1,"blocked":0,"routeBlocked":false}]}
+AssertionError [ERR_ASSERTION]: customers complete a decision
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\supplied_npcs_atribucion_head-8.cjs:87:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

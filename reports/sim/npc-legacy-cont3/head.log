@@ -1,0 +1,4 @@
+[TRAVEL] {"fallback":false,"states":["ENTER_STORE","BROWSE","COMPARE","LEAVE_STORE"],"details":[]}
+PASS NPC world supplied player assets with procedural city NPCs
+[TRAVEL] {"fallback":true,"states":["ENTER_STORE","BROWSE","COMPARE","LEAVE_STORE"],"details":[]}
+PASS NPC world fallback

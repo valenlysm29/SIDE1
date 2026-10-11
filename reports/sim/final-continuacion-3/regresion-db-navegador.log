@@ -1,0 +1,1352 @@
+RUN local_server_test.py
+test_busy_port_does_not_bind_another_server (__main__.LocalServerTest.test_busy_port_does_not_bind_another_server) ... ok
+test_entry_and_versioned_resources (__main__.LocalServerTest.test_entry_and_versioned_resources) ... 127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /index.html?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /js/app.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /css/styles.css?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /js/production_model.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /css/responsive.css?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /js/simulator3d-config.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /js/simulator3d.js?v=20260917-realismo3 HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2026 16:11:34] "GET /assets/models/yuka.glb HTTP/1.1" 200 -
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.416s
+
+OK
+DONE local_server_test.py: PASS
+RUN decision_options_db.cjs
+PASS multiple options, exact quantities/costs, idempotent retries, scalar values, option removal, section isolation, revisions, cancellation and private RPC permissions
+DONE decision_options_db.cjs: PASS
+RUN student_admission_db.cjs
+PASS student admission: normalized identity, shared names, late rejection, CAS state, secure wrappers, denied legacy RPC/REST writes, no duplicates, race, demo and professor flow
+DONE student_admission_db.cjs: PASS
+RUN student_admission_matrix_db.cjs
+PASS student admission matrix DB: cases 1-19 with real repeatable migration
+DONE student_admission_matrix_db.cjs: PASS
+RUN teacher_history_db.cjs
+PASS idempotent SQL, empty history, manual close, all companies/cycles/catalog details/statements and live grades including zero
+PASS automatic close detected without professor, cancellation guard, newest replacement and late callbacks cannot revive older game
+PASS real authenticated/other-account RLS isolation, no client writes, unprivileged private functions and no anonymous student reads
+DONE teacher_history_db.cjs: PASS
+RUN game_lifecycle_db.cjs
+PASS manual: pre-start admission, Cycle 1 decisions, repeated start/advance, multiple students, late rejection
+PASS automatic: persistent 2-minute deadline, repeat reads/reload, no teacher, catch-up, late rejection
+PASS validation: invalid durations, enabled-only events in backend, direct REST guard, empty selection
+PASS database roles, internal RPC permissions, pause/resume/close and exact deadline boundary
+PASS existing one-active-game constraint
+DONE game_lifecycle_db.cjs: PASS
+RUN game_observations_db.cjs
+PASS unique alphanumeric codes, collision rejection and server presence heartbeat
+PASS cancellation in waiting/running/automatic games, persistence, admission/decision guards, owner permission and idempotency
+PASS manual event rules: first cycle, single occurrence, repeat, immutable past draws, cancellation preserves history, server validation
+PASS 4608-code exhaustion reports an error instead of duplicating a code
+DONE game_observations_db.cjs: PASS
+RUN waiting_room_db.cjs
+PASS waiting room: manual early start ignored, 7-minute persisted server deadline, UTC/Lima exact boundary, late block, exact reentry, immutable started_at, anon capability and REST denial
+DONE waiting_room_db.cjs: PASS
+RUN playable_hub.cjs
+Hub loaded
+Rendered geometry {"meshes":615,"skinned":1,"drawCalls":143,"triangles":63612,"backgroundImage":"none"}
+PASS playable hub: WebGL geometry, animated pedestrians, walking camera, collision, shop entry, district selection, rebuild and mobile layout
+DONE playable_hub.cjs: PASS
+RUN continuous_world.cjs
+PASS 1 Nuevo mapa único
+PASS 2 Entrada física tienda
+PASS 3 Salida física tienda
+PASS 4 Almacén equipado
+PASS 5 Producción equipada
+PASS 6 Paredes, estantes, máquinas y caja sólidos
+PASS 7 Vehículo conserva estacionamiento
+PASS 8 Inventario autoritativo y entrega única
+PASS 9 Ciclo sin escenas, NPCs, listeners o RAF duplicados
+PASS 10 Lobby, vehículo, pedido, caja, producción, decisiones y ciclo
+DONE continuous_world.cjs: PASS
+RUN gameplay_hud.cjs
+PASS read-only objectives, local WebGL, interior access and mobile HUD
+DONE gameplay_hud.cjs: PASS
+RUN world_business_ui.cjs
+PASS warehouse UI: paid order survives reload, exact stock +12, no repeated debit or delivery
+PASS real WebGL pause, hidden screen, tab visibility and resume; no browser exceptions
+DONE world_business_ui.cjs: PASS
+RUN world_cycle_restart.cjs
+PASS return after finished shift
+PASS restart clears previous panels without charging decisions again
+PASS cycle 2: independent session and world entry
+PASS cycle 3: independent session and world entry
+PASS retry day, next day, NPC names, no browser errors
+DONE world_cycle_restart.cjs: PASS
+RUN world_startup.cjs
+PASS all {"mode":"all","passed":true,"loadMs":29576,"diagnostic":{"initialized":true,"running":true,"session":{"context":"SIDE-000_QA_MUNDO_1","day":1,"timeLeft":299.51999999999975,"shiftEnded":false},"navigationReady":true,"navigationSystem":"yuka-three-pathfinding+aabb","navigationGrid":{"cells":3481,"walkable":3180,"blocked":301,"triangles":6360},"models":["female","male"],"characters":[{"kind":"city:city_man_suit","characterId":null,"role":"cashier","name":"Asesor","x":136,"y":0.025,"z":20.2,"height":1.7149999999999999,"groundY":0.025},{"kind":"city:city_woman_suit","characterId":null,"role":"salesperson","name":"Asesora","x":133,"y":0.025,"z":15.2,"height":1.68,"groundY":0.025},{"kind":"city:city_man_casual","characterId":null,"role":"customer","name":"Vecino","x":128.62119895328732,"y":0.025,"z":19.838172768993683,"height":1.70625,"groundY":0.025},{"kind":"city:city_woman_dress","characterId":null,"role":"customer","name":"Clienta de vestido","x":133.5,"y":0.025,"z":17.33549999999977,"height":1.70625,"groundY":0.025},{"kind":"player","characterId":"chico2","role":"player","name":"Miguel","x":131,"y":0.025,"z":20.95522067289487,"height":1.75,"groundY":0.025},{"kind":"city:city_woman_suit","characterId":null,"role":"guide","name":"Guía SIDE","x":164.00148844007023,"y":0.02200000000000299,"z":26.008500287251586,"height":1.68,"groundY":0.02200000000000299},{"kind":"city:city_woman_casual","characterId":null,"role":"hub-pedestrian","name":"Vecina","x":163.50148844007023,"y":0.02200000000000299,"z":13.508500287251586,"height":1.70625,"groundY":0.02200000000000299},{"kind":"city:city_woman_cardigan","characterId":null,"role":"hub-pedestrian","name":"Vecina con cárdigan","x":157,"y":0.02200000000000299,"z":12.508639999999998,"height":1.70625,"groundY":0.02200000000000299},{"kind":"city:city_woman_green","characterId":null,"role":"hub-pedestrian","name":"Cliente de polo verde","x":161.00148844007023,"y":-0.0049999999999968125,"z":-9.891499712748415,"height":1.70625,"groundY":-0.0049999999999968125}],"assets":{"detailsLoading":false,"detailsReady":true,"lighting":"baked-studio","storeProps":{"loaded":["table","counter","counterEnd","shelfTall","shelfLow","mirror","register","entryDoor","ceilingLight","windowPanel","atm"],"errors":{}},"warehouseProps":{"loaded":["boxLarge","boxSmall","boxLong","boxWide","loadingDoor","highWindow","floorArrow","rackTall","warningBeacon","cuttingTable","bagStack","pallet","pendantLight","fabricRolls","palletTruck","sewingMachine","fireExtinguisher"],"errors":{}},"productionProps":{"loaded":["rackTall","cuttingTable","pendantLight","fabricRolls","sewingMachine","ironingStation","overlockMachine","mannequin","garmentRack"],"errors":{}},"outdoorProps":{"loaded":["treeDefault","treeOak","treeTall","bush","bench","fountain","trafficLight","streetLight","planter","trashcan","birdBrown","stopSign"],"errors":{}},"cache":{"count":60,"ready":60,"loading":0,"byPriority":{"CRITICAL":1,"IMPORTANT":5,"LAZY":54},"assets":[{"key":"character:chico2","type":"character","url":"assets/models3d/npcs/chico2.glb","priority":"CRITICAL","state":"ready","hits":0,"references":0,"durationMs":431},{"key":"gltf:assets/models3d/props/shop_table_display.glb","type":"gltf","url":"assets/models3d/props/shop_table_display.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":223.8},{"key":"gltf:assets/models3d/props/shop_checkout_counter.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":226.4},{"key":"gltf:assets/models3d/props/shop_checkout_counter_end.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter_end.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":227.3},{"key":"gltf:assets/models3d/props/shop_shelf_tall.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":228.1},{"key":"gltf:assets/models3d/props/shop_shelf_low.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_low.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":228.8},{"key":"gltf:assets/models3d/props/shop_mirror_wall.glb","type":"gltf","url":"assets/models3d/props/shop_mirror_wall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":230.5},{"key":"gltf:assets/models3d/props/shop_cash_register.glb","type":"gltf","url":"assets/models3d/props/shop_cash_register.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":231.8},{"key":"gltf:assets/models3d/props/shop_entry_door.glb","type":"gltf","url":"assets/models3d/props/shop_entry_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":235.9},{"key":"gltf:assets/models3d/props/shop_window_panel.glb","type":"gltf","url":"assets/models3d/props/shop_window_panel.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":238.8},{"key":"gltf:assets/models3d/props/shop_ceiling_light.glb","type":"gltf","url":"assets/models3d/props/shop_ceiling_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":236.9},{"key":"gltf:assets/models3d/props/shop_atm.glb","type":"gltf","url":"assets/models3d/props/shop_atm.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":240.8},{"key":"gltf:assets/models3d/props/warehouse_box_large.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_large.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":247.4},{"key":"gltf:assets/models3d/props/warehouse_box_long.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_long.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":267.1},{"key":"gltf:assets/models3d/props/warehouse_box_small.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_small.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":266.5},{"key":"gltf:assets/models3d/props/warehouse_box_wide.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_wide.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":480.9},{"key":"gltf:assets/models3d/props/warehouse_loading_door.glb","type":"gltf","url":"assets/models3d/props/warehouse_loading_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":481.4},{"key":"gltf:assets/models3d/props/warehouse_high_window.glb","type":"gltf","url":"assets/models3d/props/warehouse_high_window.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":483.2},{"key":"gltf:assets/models3d/props/warehouse_floor_arrow.glb","type":"gltf","url":"assets/models3d/props/warehouse_floor_arrow.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":498.9},{"key":"gltf:assets/models3d/props/warehouse_warning_beacon.glb","type":"gltf","url":"assets/models3d/props/warehouse_warning_beacon.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":525.7},{"key":"gltf:assets/models3d/props/warehouse_pallet.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":534.5},{"key":"gltf:assets/models3d/props/warehouse_rack_tall.glb","type":"gltf","url":"assets/models3d/props/warehouse_rack_tall.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":524.4},{"key":"gltf:assets/models3d/props/warehouse_bag_stack.glb","type":"gltf","url":"assets/models3d/props/warehouse_bag_stack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":526.9},{"key":"gltf:assets/models3d/props/warehouse_cutting_table.glb","type":"gltf","url":"assets/models3d/props/warehouse_cutting_table.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":526.5},{"key":"gltf:assets/models3d/props/warehouse_pendant_light.glb","type":"gltf","url":"assets/models3d/props/warehouse_pendant_light.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":535.1},{"key":"gltf:assets/models3d/props/warehouse_pallet_truck.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet_truck.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":553},{"key":"gltf:assets/models3d/props/warehouse_fabric_rolls.glb","type":"gltf","url":"assets/models3d/props/warehouse_fabric_rolls.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":552},{"key":"gltf:assets/models3d/props/warehouse_fire_extinguisher.glb","type":"gltf","url":"assets/models3d/props/warehouse_fire_extinguisher.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":559.3},{"key":"gltf:assets/models3d/props/warehouse_sewing_machine.glb","type":"gltf","url":"assets/models3d/props/warehouse_sewing_machine.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":554.4},{"key":"gltf:assets/models3d/props/production_overlock_machine.glb","type":"gltf","url":"assets/models3d/props/production_overlock_machine.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":812.2},{"key":"gltf:assets/models3d/props/production_ironing_station.glb","type":"gltf","url":"assets/models3d/props/production_ironing_station.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":810.9},{"key":"gltf:assets/models3d/props/production_mannequin.glb","type":"gltf","url":"assets/models3d/props/production_mannequin.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":814.3},{"key":"gltf:assets/models3d/props/production_garment_rack.glb","type":"gltf","url":"assets/models3d/props/production_garment_rack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":830.1},{"key":"gltf:assets/models3d/props/outdoor_tree_default.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_default.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":818.9},{"key":"gltf:assets/models3d/props/outdoor_tree_oak.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_oak.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":847},{"key":"gltf:assets/models3d/props/outdoor_tree_tall.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":863.7},{"key":"gltf:assets/models3d/props/outdoor_bush.glb","type":"gltf","url":"assets/models3d/props/outdoor_bush.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":866.1},{"key":"gltf:assets/models3d/props/outdoor_bench.glb","type":"gltf","url":"assets/models3d/props/outdoor_bench.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":866.6},{"key":"gltf:assets/models3d/props/outdoor_fountain.glb","type":"gltf","url":"assets/models3d/props/outdoor_fountain.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":867.6},{"key":"gltf:assets/models3d/props/outdoor_traffic_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_traffic_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":869},{"key":"gltf:assets/models3d/props/outdoor_street_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_street_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":879.1},{"key":"gltf:assets/models3d/props/outdoor_planter.glb","type":"gltf","url":"assets/models3d/props/outdoor_planter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":889.5},{"key":"gltf:assets/models3d/props/outdoor_trashcan.glb","type":"gltf","url":"assets/models3d/props/outdoor_trashcan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":892.4},{"key":"gltf:assets/models3d/props/outdoor_stop_sign.glb","type":"gltf","url":"assets/models3d/props/outdoor_stop_sign.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":907},{"key":"gltf:assets/models3d/props/outdoor_bird_brown.glb","type":"gltf","url":"assets/models3d/props/outdoor_bird_brown.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":896.6},{"key":"character:chico1","type":"character","url":"assets/models3d/npcs/chico1.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3681.4},{"key":"character:chico3","type":"character","url":"assets/models3d/npcs/chico3.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3831.3},{"key":"character:mona","type":"character","url":"assets/models3d/npcs/mona.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3668.8},{"key":"gltf:assets/models3d/npc_realistic_male.glb","type":"gltf","url":"assets/models3d/npc_realistic_male.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":2991.2},{"key":"gltf:assets/models3d/npc_realistic_female.glb","type":"gltf","url":"assets/models3d/npc_realistic_female.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3467.7},{"key":"gltf:assets/models/npc/city_woman_casual.glb","type":"gltf","url":"assets/models/npc/city_woman_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1501.5},{"key":"gltf:assets/models/npc/city_man_casual.glb","type":"gltf","url":"assets/models/npc/city_man_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1465.7},{"key":"gltf:assets/models/npc/city_woman_suit.glb","type":"gltf","url":"assets/models/npc/city_woman_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2116},{"key":"gltf:assets/models/npc/city_man_suit.glb","type":"gltf","url":"assets/models/npc/city_man_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1656.9},{"key":"gltf:assets/models/npc/city_woman_worker.glb","type":"gltf","url":"assets/models/npc/city_woman_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1523.9},{"key":"gltf:assets/models/npc/city_man_worker.glb","type":"gltf","url":"assets/models/npc/city_man_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2143.9},{"key":"gltf:assets/models/npc/city_woman_cardigan.glb","type":"gltf","url":"assets/models/npc/city_woman_cardigan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2163.8},{"key":"gltf:assets/models/npc/city_woman_tank.glb","type":"gltf","url":"assets/models/npc/city_woman_tank.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2158.9},{"key":"gltf:assets/models/npc/city_woman_green.glb","type":"gltf","url":"assets/models/npc/city_woman_green.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2169.1},{"key":"gltf:assets/models/npc/city_woman_dress.glb","type":"gltf","url":"assets/models/npc/city_woman_dress.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2173.7}]}},"character":{"selected":"chico2","name":"Miguel","selectedInstances":1,"playerInstances":1,"manager":{"selected":"chico2","selectedName":"Miguel","playerInstances":1,"instances":[{"id":"chico2","role":"player"}],"duplicates":[],"loaded":["chico1","chico2","chico3","mona"],"errors":{},"cache":{"count":60,"ready":60,"loading":0,"byPriority":{"CRITICAL":1,"IMPORTANT":5,"LAZY":54},"assets":[{"key":"character:chico2","type":"character","url":"assets/models3d/npcs/chico2.glb","priority":"CRITICAL","state":"ready","hits":0,"references":0,"durationMs":431},{"key":"gltf:assets/models3d/props/shop_table_display.glb","type":"gltf","url":"assets/models3d/props/shop_table_display.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":223.8},{"key":"gltf:assets/models3d/props/shop_checkout_counter.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":226.4},{"key":"gltf:assets/models3d/props/shop_checkout_counter_end.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter_end.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":227.3},{"key":"gltf:assets/models3d/props/shop_shelf_tall.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":228.1},{"key":"gltf:assets/models3d/props/shop_shelf_low.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_low.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":228.8},{"key":"gltf:assets/models3d/props/shop_mirror_wall.glb","type":"gltf","url":"assets/models3d/props/shop_mirror_wall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":230.5},{"key":"gltf:assets/models3d/props/shop_cash_register.glb","type":"gltf","url":"assets/models3d/props/shop_cash_register.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":231.8},{"key":"gltf:assets/models3d/props/shop_entry_door.glb","type":"gltf","url":"assets/models3d/props/shop_entry_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":235.9},{"key":"gltf:assets/models3d/props/shop_window_panel.glb","type":"gltf","url":"assets/models3d/props/shop_window_panel.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":238.8},{"key":"gltf:assets/models3d/props/shop_ceiling_light.glb","type":"gltf","url":"assets/models3d/props/shop_ceiling_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":236.9},{"key":"gltf:assets/models3d/props/shop_atm.glb","type":"gltf","url":"assets/models3d/props/shop_atm.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":240.8},{"key":"gltf:assets/models3d/props/warehouse_box_large.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_large.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":247.4},{"key":"gltf:assets/models3d/props/warehouse_box_long.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_long.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":267.1},{"key":"gltf:assets/models3d/props/warehouse_box_small.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_small.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":266.5},{"key":"gltf:assets/models3d/props/warehouse_box_wide.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_wide.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":480.9},{"key":"gltf:assets/models3d/props/warehouse_loading_door.glb","type":"gltf","url":"assets/models3d/props/warehouse_loading_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":481.4},{"key":"gltf:assets/models3d/props/warehouse_high_window.glb","type":"gltf","url":"assets/models3d/props/warehouse_high_window.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":483.2},{"key":"gltf:assets/models3d/props/warehouse_floor_arrow.glb","type":"gltf","url":"assets/models3d/props/warehouse_floor_arrow.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":498.9},{"key":"gltf:assets/models3d/props/warehouse_warning_beacon.glb","type":"gltf","url":"assets/models3d/props/warehouse_warning_beacon.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":525.7},{"key":"gltf:assets/models3d/props/warehouse_pallet.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":534.5},{"key":"gltf:assets/models3d/props/warehouse_rack_tall.glb","type":"gltf","url":"assets/models3d/props/warehouse_rack_tall.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":524.4},{"key":"gltf:assets/models3d/props/warehouse_bag_stack.glb","type":"gltf","url":"assets/models3d/props/warehouse_bag_stack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":526.9},{"key":"gltf:assets/models3d/props/warehouse_cutting_table.glb","type":"gltf","url":"assets/models3d/props/warehouse_cutting_table.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":526.5},{"key":"gltf:assets/models3d/props/warehouse_pendant_light.glb","type":"gltf","url":"assets/models3d/props/warehouse_pendant_light.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":535.1},{"key":"gltf:assets/models3d/props/warehouse_pallet_truck.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet_truck.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":553},{"key":"gltf:assets/models3d/props/warehouse_fabric_rolls.glb","type":"gltf","url":"assets/models3d/props/warehouse_fabric_rolls.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":552},{"key":"gltf:assets/models3d/props/warehouse_fire_extinguisher.glb","type":"gltf","url":"assets/models3d/props/warehouse_fire_extinguisher.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":559.3},{"key":"gltf:assets/models3d/props/warehouse_sewing_machine.glb","type":"gltf","url":"assets/models3d/props/warehouse_sewing_machine.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":554.4},{"key":"gltf:assets/models3d/props/production_overlock_machine.glb","type":"gltf","url":"assets/models3d/props/production_overlock_machine.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":812.2},{"key":"gltf:assets/models3d/props/production_ironing_station.glb","type":"gltf","url":"assets/models3d/props/production_ironing_station.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":810.9},{"key":"gltf:assets/models3d/props/production_mannequin.glb","type":"gltf","url":"assets/models3d/props/production_mannequin.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":814.3},{"key":"gltf:assets/models3d/props/production_garment_rack.glb","type":"gltf","url":"assets/models3d/props/production_garment_rack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":830.1},{"key":"gltf:assets/models3d/props/outdoor_tree_default.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_default.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":818.9},{"key":"gltf:assets/models3d/props/outdoor_tree_oak.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_oak.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":847},{"key":"gltf:assets/models3d/props/outdoor_tree_tall.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":863.7},{"key":"gltf:assets/models3d/props/outdoor_bush.glb","type":"gltf","url":"assets/models3d/props/outdoor_bush.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":866.1},{"key":"gltf:assets/models3d/props/outdoor_bench.glb","type":"gltf","url":"assets/models3d/props/outdoor_bench.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":866.6},{"key":"gltf:assets/models3d/props/outdoor_fountain.glb","type":"gltf","url":"assets/models3d/props/outdoor_fountain.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":867.6},{"key":"gltf:assets/models3d/props/outdoor_traffic_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_traffic_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":869},{"key":"gltf:assets/models3d/props/outdoor_street_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_street_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":879.1},{"key":"gltf:assets/models3d/props/outdoor_planter.glb","type":"gltf","url":"assets/models3d/props/outdoor_planter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":889.5},{"key":"gltf:assets/models3d/props/outdoor_trashcan.glb","type":"gltf","url":"assets/models3d/props/outdoor_trashcan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":892.4},{"key":"gltf:assets/models3d/props/outdoor_stop_sign.glb","type":"gltf","url":"assets/models3d/props/outdoor_stop_sign.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":907},{"key":"gltf:assets/models3d/props/outdoor_bird_brown.glb","type":"gltf","url":"assets/models3d/props/outdoor_bird_brown.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":896.6},{"key":"character:chico1","type":"character","url":"assets/models3d/npcs/chico1.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3681.4},{"key":"character:chico3","type":"character","url":"assets/models3d/npcs/chico3.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3831.3},{"key":"character:mona","type":"character","url":"assets/models3d/npcs/mona.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3668.8},{"key":"gltf:assets/models3d/npc_realistic_male.glb","type":"gltf","url":"assets/models3d/npc_realistic_male.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":2991.2},{"key":"gltf:assets/models3d/npc_realistic_female.glb","type":"gltf","url":"assets/models3d/npc_realistic_female.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":3467.7},{"key":"gltf:assets/models/npc/city_woman_casual.glb","type":"gltf","url":"assets/models/npc/city_woman_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1501.5},{"key":"gltf:assets/models/npc/city_man_casual.glb","type":"gltf","url":"assets/models/npc/city_man_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1465.7},{"key":"gltf:assets/models/npc/city_woman_suit.glb","type":"gltf","url":"assets/models/npc/city_woman_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2116},{"key":"gltf:assets/models/npc/city_man_suit.glb","type":"gltf","url":"assets/models/npc/city_man_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1656.9},{"key":"gltf:assets/models/npc/city_woman_worker.glb","type":"gltf","url":"assets/models/npc/city_woman_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1523.9},{"key":"gltf:assets/models/npc/city_man_worker.glb","type":"gltf","url":"assets/models/npc/city_man_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2143.9},{"key":"gltf:assets/models/npc/city_woman_cardigan.glb","type":"gltf","url":"assets/models/npc/city_woman_cardigan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2163.8},{"key":"gltf:assets/models/npc/city_woman_tank.glb","type":"gltf","url":"assets/models/npc/city_woman_tank.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2158.9},{"key":"gltf:assets/models/npc/city_woman_green.glb","type":"gltf","url":"assets/models/npc/city_woman_green.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2169.1},{"key":"gltf:assets/models/npc/city_woman_dress.glb","type":"gltf","url":"assets/models/npc/city_woman_dress.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2173.7}]}},"animation":{"state":"WALK","previousState":"IDLE","interaction":null,"speed":2.649999999208461,"fallback":true,"clip":null,"metadata":{"provider":{"name":"Ready Player Me animation-library","repository":"https://github.com/readyplayerme/animation-library","bundledAssets":false,"integration":"Clips are injected by the caller after rig compatibility or retargeting is verified."},"fallback":{"name":"SIDE npc_motion","module":"services/npc_motion.js","bundledAssets":false,"integration":"Distance-driven procedural motion; it does not create an AnimationMixer or a render loop."},"rig":"SIDE-17","retargeted":false}},"controllers":1,"mixers":0},"suppliedNpcs":{"loaded":["chico2","chico1","chico3"],"errors":{},"customers":[],"actors":[{"kind":"city:city_woman_suit","x":164.00148844007023,"z":26.008500287251586,"phase":0,"distance":0,"rigged":false}]},"cityNpcModels":{"approved":17,"loaded":10,"active":10,"visibleHub":3},"mona":{"loaded":true,"error":"","instances":0},"hub":{"active":true,"district":"miraflores","mode":"third","interior":"store","actors":3,"visited":["store"],"drawCalls":199,"triangles":92874,"meshes":283,"outdoorProps":{"quality":"auto","seed":4107,"placementSignature":"4107:35fa974c","installed":["benches","birds","bushes","fountain","planters","signage","streetLights","trafficSignals","trashcans","trees"],"batches":12,"instances":70,"visibleBatches":12,"visibleInstances":68,"drawables":20,"triangles":7768,"shadows":1,"categories":{"trees":14,"bushes":21,"benches":6,"fountain":1,"trafficSignals":4,"streetLights":10,"planters":4,"trashcans":3,"signage":3,"birds":2},"birds":2,"fallbackVisible":[]}},"world":{"id":"side-city","continuous":true,"legacyActive":false,"interiors":{"rooms":6,"deferredRooms":3,"navigation":{"initialized":1,"ready":1,"rooms":[{"id":"store","ready":true,"failed":false,"cells":589,"walkable":315,"blocked":274,"triangles":630}]},"colliders":39,"stockLevels":{"store":0,"warehouse":0,"production":0,"office":0,"bank":0,"suppliers":0},"activeNpcs":4,"activeLights":1,"instancedBatches":221,"geometryInstances":1258,"visibleBatches":98,"sharedGeometries":2,"stockBatches":40,"storeProps":{"quality":"auto","installed":["atm","checkout","doors","lighting","mirrors","shelves","table","windows"],"batches":12,"visibleBatches":12,"instances":24,"visibleInstances":24,"drawables":31,"triangles":6982,"realLights":1,"visibleShelfBays":4,"visibleMirrors":2},"warehouseProps":{"quality":"auto","installed":["lighting","loadingDoor","pallet","palletTruck","racks","safety","windows","workbench"],"batches":19,"instances":32,"visibleBatches":19,"visibleInstances":32,"rackBays":4,"lights":4},"productionProps":{"quality":"auto","installed":["cutting","decor","ironing","lighting","packing","sewing","storage"],"batches":11,"instances":23,"visibleBatches":11,"visibleInstances":23,"drawables":33,"triangles":8156,"realLights":1}},"queueCapacity":3},"driving":null,"vehicles":[{"x":166,"z":33.3,"speed":0,"traffic":false},{"x":116.8047377059022,"z":-39,"speed":2.8460741062206547,"traffic":true},{"x":189,"z":-33.19526229409789,"speed":2.8460741062206547,"traffic":true},{"x":183.195262294098,"z":39,"speed":2.8460741062206547,"traffic":true},{"x":111,"z":33.19526229409817,"speed":2.8460741062206547,"traffic":true}],"playerControl":{"mode":"PLAYER_ON_FOOT","locomotion":"WALK","zoom":5.2,"transition":null},"player":{"x":131,"z":20.95522067289487},"renderedFrames":13,"lastError":""}}
+PASS sections {"mode":"sections","passed":true,"loadMs":36204,"diagnostic":{"initialized":true,"running":true,"session":{"context":"SIDE-000_QA_MUNDO_1","day":1,"timeLeft":299.3599999999997,"shiftEnded":false},"navigationReady":true,"navigationSystem":"city-aabb","navigationGrid":{"cells":3481,"walkable":3180,"blocked":301,"triangles":6360},"models":["female","male"],"characters":[{"kind":"city:city_man_suit","characterId":null,"role":"cashier","name":"Asesor","x":136,"y":0.025,"z":20.2,"height":1.7149999999999999,"groundY":0.025},{"kind":"city:city_woman_suit","characterId":null,"role":"salesperson","name":"Asesora","x":133,"y":0.025,"z":15.2,"height":1.68,"groundY":0.025},{"kind":"city:city_woman_green","characterId":null,"role":"customer","name":"Cliente de polo verde","x":128.62119895328732,"y":0.025,"z":19.838172768993683,"height":1.70625,"groundY":0.025},{"kind":"city:city_woman_casual","characterId":null,"role":"customer","name":"Vecina","x":133.5,"y":0.025,"z":17.33549999999977,"height":1.70625,"groundY":0.025},{"kind":"player","characterId":"chico2","role":"player","name":"Miguel","x":131,"y":0.025,"z":20.95522067289487,"height":1.75,"groundY":0.025},{"kind":"city:city_woman_suit","characterId":null,"role":"guide","name":"Guía SIDE","x":164.00148844007023,"y":0.02200000000000299,"z":26.008500287251586,"height":1.68,"groundY":0.02200000000000299},{"kind":"city:city_man_casual","characterId":null,"role":"hub-pedestrian","name":"Vecino","x":163.50148844007023,"y":0.02200000000000299,"z":13.508500287251586,"height":1.70625,"groundY":0.02200000000000299},{"kind":"city:city_woman_dress","characterId":null,"role":"hub-pedestrian","name":"Clienta de vestido","x":157,"y":0.02200000000000299,"z":12.508639999999998,"height":1.70625,"groundY":0.02200000000000299},{"kind":"city:city_woman_cardigan","characterId":null,"role":"hub-pedestrian","name":"Vecina con cárdigan","x":161.00148844007023,"y":-0.0049999999999968125,"z":-9.891499712748415,"height":1.70625,"groundY":-0.0049999999999968125}],"assets":{"detailsLoading":false,"detailsReady":true,"lighting":"baked-studio","storeProps":{"loaded":["table","counter","counterEnd","shelfTall","shelfLow","mirror","register","entryDoor","windowPanel","ceilingLight","atm"],"errors":{}},"warehouseProps":{"loaded":["boxLarge","boxLong","boxWide","boxSmall","loadingDoor","highWindow","floorArrow","warningBeacon","pallet","rackTall","bagStack","cuttingTable","pendantLight","palletTruck","fireExtinguisher","fabricRolls","sewingMachine"],"errors":{}},"productionProps":{"loaded":["rackTall","cuttingTable","pendantLight","fabricRolls","sewingMachine","overlockMachine","ironingStation","garmentRack","mannequin"],"errors":{}},"outdoorProps":{"loaded":["treeDefault","treeOak","treeTall","bush","bench","fountain","trafficLight","streetLight","planter","trashcan","birdBrown","stopSign"],"errors":{}},"cache":{"count":60,"ready":60,"loading":0,"byPriority":{"CRITICAL":1,"IMPORTANT":5,"LAZY":54},"assets":[{"key":"character:chico2","type":"character","url":"assets/models3d/npcs/chico2.glb","priority":"CRITICAL","state":"ready","hits":0,"references":0,"durationMs":219.4},{"key":"gltf:assets/models3d/props/shop_table_display.glb","type":"gltf","url":"assets/models3d/props/shop_table_display.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":139.3},{"key":"gltf:assets/models3d/props/shop_checkout_counter.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":144.4},{"key":"gltf:assets/models3d/props/shop_checkout_counter_end.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter_end.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":221.9},{"key":"gltf:assets/models3d/props/shop_shelf_tall.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":231.8},{"key":"gltf:assets/models3d/props/shop_shelf_low.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_low.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":232.5},{"key":"gltf:assets/models3d/props/shop_mirror_wall.glb","type":"gltf","url":"assets/models3d/props/shop_mirror_wall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":242.4},{"key":"gltf:assets/models3d/props/shop_cash_register.glb","type":"gltf","url":"assets/models3d/props/shop_cash_register.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":246.4},{"key":"gltf:assets/models3d/props/shop_entry_door.glb","type":"gltf","url":"assets/models3d/props/shop_entry_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":291.4},{"key":"gltf:assets/models3d/props/shop_window_panel.glb","type":"gltf","url":"assets/models3d/props/shop_window_panel.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":292.5},{"key":"gltf:assets/models3d/props/shop_ceiling_light.glb","type":"gltf","url":"assets/models3d/props/shop_ceiling_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":293.2},{"key":"gltf:assets/models3d/props/shop_atm.glb","type":"gltf","url":"assets/models3d/props/shop_atm.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":294.5},{"key":"gltf:assets/models3d/props/warehouse_box_large.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_large.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":302.4},{"key":"gltf:assets/models3d/props/warehouse_box_long.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_long.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":303},{"key":"gltf:assets/models3d/props/warehouse_box_small.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_small.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":365.6},{"key":"gltf:assets/models3d/props/warehouse_box_wide.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_wide.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":304.1},{"key":"gltf:assets/models3d/props/warehouse_loading_door.glb","type":"gltf","url":"assets/models3d/props/warehouse_loading_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":366.1},{"key":"gltf:assets/models3d/props/warehouse_high_window.glb","type":"gltf","url":"assets/models3d/props/warehouse_high_window.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":366.8},{"key":"gltf:assets/models3d/props/warehouse_floor_arrow.glb","type":"gltf","url":"assets/models3d/props/warehouse_floor_arrow.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":378.2},{"key":"gltf:assets/models3d/props/warehouse_warning_beacon.glb","type":"gltf","url":"assets/models3d/props/warehouse_warning_beacon.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":381.8},{"key":"gltf:assets/models3d/props/warehouse_pallet.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":392.5},{"key":"gltf:assets/models3d/props/warehouse_rack_tall.glb","type":"gltf","url":"assets/models3d/props/warehouse_rack_tall.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":393.5},{"key":"gltf:assets/models3d/props/warehouse_bag_stack.glb","type":"gltf","url":"assets/models3d/props/warehouse_bag_stack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":394.2},{"key":"gltf:assets/models3d/props/warehouse_cutting_table.glb","type":"gltf","url":"assets/models3d/props/warehouse_cutting_table.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":410.4},{"key":"gltf:assets/models3d/props/warehouse_pendant_light.glb","type":"gltf","url":"assets/models3d/props/warehouse_pendant_light.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":450},{"key":"gltf:assets/models3d/props/warehouse_pallet_truck.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet_truck.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":453.4},{"key":"gltf:assets/models3d/props/warehouse_fabric_rolls.glb","type":"gltf","url":"assets/models3d/props/warehouse_fabric_rolls.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":703},{"key":"gltf:assets/models3d/props/warehouse_fire_extinguisher.glb","type":"gltf","url":"assets/models3d/props/warehouse_fire_extinguisher.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":471.2},{"key":"gltf:assets/models3d/props/warehouse_sewing_machine.glb","type":"gltf","url":"assets/models3d/props/warehouse_sewing_machine.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":973.9},{"key":"gltf:assets/models3d/props/production_overlock_machine.glb","type":"gltf","url":"assets/models3d/props/production_overlock_machine.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":996.7},{"key":"gltf:assets/models3d/props/production_ironing_station.glb","type":"gltf","url":"assets/models3d/props/production_ironing_station.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1010.6},{"key":"gltf:assets/models3d/props/production_mannequin.glb","type":"gltf","url":"assets/models3d/props/production_mannequin.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1018.4},{"key":"gltf:assets/models3d/props/production_garment_rack.glb","type":"gltf","url":"assets/models3d/props/production_garment_rack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1016.6},{"key":"gltf:assets/models3d/props/outdoor_tree_default.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_default.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1017.4},{"key":"gltf:assets/models3d/props/outdoor_tree_oak.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_oak.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1032.4},{"key":"gltf:assets/models3d/props/outdoor_tree_tall.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1056.9},{"key":"gltf:assets/models3d/props/outdoor_bush.glb","type":"gltf","url":"assets/models3d/props/outdoor_bush.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1078.5},{"key":"gltf:assets/models3d/props/outdoor_bench.glb","type":"gltf","url":"assets/models3d/props/outdoor_bench.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1085.2},{"key":"gltf:assets/models3d/props/outdoor_fountain.glb","type":"gltf","url":"assets/models3d/props/outdoor_fountain.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1086},{"key":"gltf:assets/models3d/props/outdoor_traffic_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_traffic_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1086.6},{"key":"gltf:assets/models3d/props/outdoor_street_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_street_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1094.9},{"key":"gltf:assets/models3d/props/outdoor_planter.glb","type":"gltf","url":"assets/models3d/props/outdoor_planter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1100},{"key":"gltf:assets/models3d/props/outdoor_trashcan.glb","type":"gltf","url":"assets/models3d/props/outdoor_trashcan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1109},{"key":"gltf:assets/models3d/props/outdoor_stop_sign.glb","type":"gltf","url":"assets/models3d/props/outdoor_stop_sign.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1114.7},{"key":"gltf:assets/models3d/props/outdoor_bird_brown.glb","type":"gltf","url":"assets/models3d/props/outdoor_bird_brown.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1112.7},{"key":"character:chico1","type":"character","url":"assets/models3d/npcs/chico1.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4495.1},{"key":"character:chico3","type":"character","url":"assets/models3d/npcs/chico3.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4468.8},{"key":"character:mona","type":"character","url":"assets/models3d/npcs/mona.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4507.1},{"key":"gltf:assets/models3d/npc_realistic_male.glb","type":"gltf","url":"assets/models3d/npc_realistic_male.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":2214},{"key":"gltf:assets/models3d/npc_realistic_female.glb","type":"gltf","url":"assets/models3d/npc_realistic_female.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":6464.3},{"key":"gltf:assets/models/npc/city_woman_casual.glb","type":"gltf","url":"assets/models/npc/city_woman_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1114},{"key":"gltf:assets/models/npc/city_man_casual.glb","type":"gltf","url":"assets/models/npc/city_man_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1139.1},{"key":"gltf:assets/models/npc/city_woman_suit.glb","type":"gltf","url":"assets/models/npc/city_woman_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1167.2},{"key":"gltf:assets/models/npc/city_man_suit.glb","type":"gltf","url":"assets/models/npc/city_man_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1779.9},{"key":"gltf:assets/models/npc/city_woman_worker.glb","type":"gltf","url":"assets/models/npc/city_woman_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1517.9},{"key":"gltf:assets/models/npc/city_man_worker.glb","type":"gltf","url":"assets/models/npc/city_man_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2142.3},{"key":"gltf:assets/models/npc/city_woman_cardigan.glb","type":"gltf","url":"assets/models/npc/city_woman_cardigan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2154.2},{"key":"gltf:assets/models/npc/city_woman_tank.glb","type":"gltf","url":"assets/models/npc/city_woman_tank.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2149.4},{"key":"gltf:assets/models/npc/city_woman_green.glb","type":"gltf","url":"assets/models/npc/city_woman_green.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2161.4},{"key":"gltf:assets/models/npc/city_woman_dress.glb","type":"gltf","url":"assets/models/npc/city_woman_dress.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2164.7}]}},"character":{"selected":"chico2","name":"Miguel","selectedInstances":1,"playerInstances":1,"manager":{"selected":"chico2","selectedName":"Miguel","playerInstances":1,"instances":[{"id":"chico2","role":"player"}],"duplicates":[],"loaded":["chico1","chico2","chico3","mona"],"errors":{},"cache":{"count":60,"ready":60,"loading":0,"byPriority":{"CRITICAL":1,"IMPORTANT":5,"LAZY":54},"assets":[{"key":"character:chico2","type":"character","url":"assets/models3d/npcs/chico2.glb","priority":"CRITICAL","state":"ready","hits":0,"references":0,"durationMs":219.4},{"key":"gltf:assets/models3d/props/shop_table_display.glb","type":"gltf","url":"assets/models3d/props/shop_table_display.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":139.3},{"key":"gltf:assets/models3d/props/shop_checkout_counter.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":144.4},{"key":"gltf:assets/models3d/props/shop_checkout_counter_end.glb","type":"gltf","url":"assets/models3d/props/shop_checkout_counter_end.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":221.9},{"key":"gltf:assets/models3d/props/shop_shelf_tall.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":231.8},{"key":"gltf:assets/models3d/props/shop_shelf_low.glb","type":"gltf","url":"assets/models3d/props/shop_shelf_low.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":232.5},{"key":"gltf:assets/models3d/props/shop_mirror_wall.glb","type":"gltf","url":"assets/models3d/props/shop_mirror_wall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":242.4},{"key":"gltf:assets/models3d/props/shop_cash_register.glb","type":"gltf","url":"assets/models3d/props/shop_cash_register.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":246.4},{"key":"gltf:assets/models3d/props/shop_entry_door.glb","type":"gltf","url":"assets/models3d/props/shop_entry_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":291.4},{"key":"gltf:assets/models3d/props/shop_window_panel.glb","type":"gltf","url":"assets/models3d/props/shop_window_panel.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":292.5},{"key":"gltf:assets/models3d/props/shop_ceiling_light.glb","type":"gltf","url":"assets/models3d/props/shop_ceiling_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":293.2},{"key":"gltf:assets/models3d/props/shop_atm.glb","type":"gltf","url":"assets/models3d/props/shop_atm.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":294.5},{"key":"gltf:assets/models3d/props/warehouse_box_large.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_large.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":302.4},{"key":"gltf:assets/models3d/props/warehouse_box_long.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_long.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":303},{"key":"gltf:assets/models3d/props/warehouse_box_small.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_small.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":365.6},{"key":"gltf:assets/models3d/props/warehouse_box_wide.glb","type":"gltf","url":"assets/models3d/props/warehouse_box_wide.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":304.1},{"key":"gltf:assets/models3d/props/warehouse_loading_door.glb","type":"gltf","url":"assets/models3d/props/warehouse_loading_door.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":366.1},{"key":"gltf:assets/models3d/props/warehouse_high_window.glb","type":"gltf","url":"assets/models3d/props/warehouse_high_window.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":366.8},{"key":"gltf:assets/models3d/props/warehouse_floor_arrow.glb","type":"gltf","url":"assets/models3d/props/warehouse_floor_arrow.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":378.2},{"key":"gltf:assets/models3d/props/warehouse_warning_beacon.glb","type":"gltf","url":"assets/models3d/props/warehouse_warning_beacon.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":381.8},{"key":"gltf:assets/models3d/props/warehouse_pallet.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":392.5},{"key":"gltf:assets/models3d/props/warehouse_rack_tall.glb","type":"gltf","url":"assets/models3d/props/warehouse_rack_tall.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":393.5},{"key":"gltf:assets/models3d/props/warehouse_bag_stack.glb","type":"gltf","url":"assets/models3d/props/warehouse_bag_stack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":394.2},{"key":"gltf:assets/models3d/props/warehouse_cutting_table.glb","type":"gltf","url":"assets/models3d/props/warehouse_cutting_table.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":410.4},{"key":"gltf:assets/models3d/props/warehouse_pendant_light.glb","type":"gltf","url":"assets/models3d/props/warehouse_pendant_light.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":450},{"key":"gltf:assets/models3d/props/warehouse_pallet_truck.glb","type":"gltf","url":"assets/models3d/props/warehouse_pallet_truck.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":453.4},{"key":"gltf:assets/models3d/props/warehouse_fabric_rolls.glb","type":"gltf","url":"assets/models3d/props/warehouse_fabric_rolls.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":703},{"key":"gltf:assets/models3d/props/warehouse_fire_extinguisher.glb","type":"gltf","url":"assets/models3d/props/warehouse_fire_extinguisher.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":471.2},{"key":"gltf:assets/models3d/props/warehouse_sewing_machine.glb","type":"gltf","url":"assets/models3d/props/warehouse_sewing_machine.glb","priority":"LAZY","state":"ready","hits":1,"references":0,"durationMs":973.9},{"key":"gltf:assets/models3d/props/production_overlock_machine.glb","type":"gltf","url":"assets/models3d/props/production_overlock_machine.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":996.7},{"key":"gltf:assets/models3d/props/production_ironing_station.glb","type":"gltf","url":"assets/models3d/props/production_ironing_station.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1010.6},{"key":"gltf:assets/models3d/props/production_mannequin.glb","type":"gltf","url":"assets/models3d/props/production_mannequin.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1018.4},{"key":"gltf:assets/models3d/props/production_garment_rack.glb","type":"gltf","url":"assets/models3d/props/production_garment_rack.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1016.6},{"key":"gltf:assets/models3d/props/outdoor_tree_default.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_default.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1017.4},{"key":"gltf:assets/models3d/props/outdoor_tree_oak.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_oak.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1032.4},{"key":"gltf:assets/models3d/props/outdoor_tree_tall.glb","type":"gltf","url":"assets/models3d/props/outdoor_tree_tall.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1056.9},{"key":"gltf:assets/models3d/props/outdoor_bush.glb","type":"gltf","url":"assets/models3d/props/outdoor_bush.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1078.5},{"key":"gltf:assets/models3d/props/outdoor_bench.glb","type":"gltf","url":"assets/models3d/props/outdoor_bench.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1085.2},{"key":"gltf:assets/models3d/props/outdoor_fountain.glb","type":"gltf","url":"assets/models3d/props/outdoor_fountain.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1086},{"key":"gltf:assets/models3d/props/outdoor_traffic_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_traffic_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1086.6},{"key":"gltf:assets/models3d/props/outdoor_street_light.glb","type":"gltf","url":"assets/models3d/props/outdoor_street_light.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1094.9},{"key":"gltf:assets/models3d/props/outdoor_planter.glb","type":"gltf","url":"assets/models3d/props/outdoor_planter.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1100},{"key":"gltf:assets/models3d/props/outdoor_trashcan.glb","type":"gltf","url":"assets/models3d/props/outdoor_trashcan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1109},{"key":"gltf:assets/models3d/props/outdoor_stop_sign.glb","type":"gltf","url":"assets/models3d/props/outdoor_stop_sign.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1114.7},{"key":"gltf:assets/models3d/props/outdoor_bird_brown.glb","type":"gltf","url":"assets/models3d/props/outdoor_bird_brown.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1112.7},{"key":"character:chico1","type":"character","url":"assets/models3d/npcs/chico1.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4495.1},{"key":"character:chico3","type":"character","url":"assets/models3d/npcs/chico3.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4468.8},{"key":"character:mona","type":"character","url":"assets/models3d/npcs/mona.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":4507.1},{"key":"gltf:assets/models3d/npc_realistic_male.glb","type":"gltf","url":"assets/models3d/npc_realistic_male.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":2214},{"key":"gltf:assets/models3d/npc_realistic_female.glb","type":"gltf","url":"assets/models3d/npc_realistic_female.glb","priority":"IMPORTANT","state":"ready","hits":0,"references":0,"durationMs":6464.3},{"key":"gltf:assets/models/npc/city_woman_casual.glb","type":"gltf","url":"assets/models/npc/city_woman_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1114},{"key":"gltf:assets/models/npc/city_man_casual.glb","type":"gltf","url":"assets/models/npc/city_man_casual.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1139.1},{"key":"gltf:assets/models/npc/city_woman_suit.glb","type":"gltf","url":"assets/models/npc/city_woman_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1167.2},{"key":"gltf:assets/models/npc/city_man_suit.glb","type":"gltf","url":"assets/models/npc/city_man_suit.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1779.9},{"key":"gltf:assets/models/npc/city_woman_worker.glb","type":"gltf","url":"assets/models/npc/city_woman_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":1517.9},{"key":"gltf:assets/models/npc/city_man_worker.glb","type":"gltf","url":"assets/models/npc/city_man_worker.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2142.3},{"key":"gltf:assets/models/npc/city_woman_cardigan.glb","type":"gltf","url":"assets/models/npc/city_woman_cardigan.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2154.2},{"key":"gltf:assets/models/npc/city_woman_tank.glb","type":"gltf","url":"assets/models/npc/city_woman_tank.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2149.4},{"key":"gltf:assets/models/npc/city_woman_green.glb","type":"gltf","url":"assets/models/npc/city_woman_green.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2161.4},{"key":"gltf:assets/models/npc/city_woman_dress.glb","type":"gltf","url":"assets/models/npc/city_woman_dress.glb","priority":"LAZY","state":"ready","hits":0,"references":0,"durationMs":2164.7}]}},"animation":{"state":"WALK","previousState":"IDLE","interaction":null,"speed":2.649999999208461,"fallback":true,"clip":null,"metadata":{"provider":{"name":"Ready Player Me animation-library","repository":"https://github.com/readyplayerme/animation-library","bundledAssets":false,"integration":"Clips are injected by the caller after rig compatibility or retargeting is verified."},"fallback":{"name":"SIDE npc_motion","module":"services/npc_motion.js","bundledAssets":false,"integration":"Distance-driven procedural motion; it does not create an AnimationMixer or a render loop."},"rig":"SIDE-17","retargeted":false}},"controllers":1,"mixers":0},"suppliedNpcs":{"loaded":["chico2","chico1","chico3"],"errors":{},"customers":[],"actors":[{"kind":"city:city_woman_suit","x":164.00148844007023,"z":26.008500287251586,"phase":0,"distance":0,"rigged":false}]},"cityNpcModels":{"approved":17,"loaded":10,"active":10,"visibleHub":3},"mona":{"loaded":true,"error":"","instances":0},"hub":{"active":true,"district":"miraflores","mode":"third","interior":"store","actors":3,"visited":["store"],"drawCalls":203,"triangles":93740,"meshes":283,"outdoorProps":{"quality":"auto","seed":4107,"placementSignature":"4107:35fa974c","installed":["benches","birds","bushes","fountain","planters","signage","streetLights","trafficSignals","trashcans","trees"],"batches":12,"instances":70,"visibleBatches":12,"visibleInstances":68,"drawables":20,"triangles":7768,"shadows":1,"categories":{"trees":14,"bushes":21,"benches":6,"fountain":1,"trafficSignals":4,"streetLights":10,"planters":4,"trashcans":3,"signage":3,"birds":2},"birds":2,"fallbackVisible":[]}},"world":{"id":"side-city","continuous":true,"legacyActive":false,"interiors":{"rooms":6,"deferredRooms":3,"navigation":{"initialized":1,"ready":0,"rooms":[{"id":"store","ready":false,"failed":false,"cells":589,"walkable":315,"blocked":274,"triangles":630}]},"colliders":39,"stockLevels":{"store":0,"warehouse":0,"production":0,"office":0,"bank":0,"suppliers":0},"activeNpcs":4,"activeLights":1,"instancedBatches":221,"geometryInstances":1258,"visibleBatches":100,"sharedGeometries":2,"stockBatches":40,"storeProps":{"quality":"auto","installed":["atm","checkout","doors","lighting","mirrors","shelves","table","windows"],"batches":12,"visibleBatches":12,"instances":24,"visibleInstances":24,"drawables":31,"triangles":6982,"realLights":1,"visibleShelfBays":4,"visibleMirrors":2},"warehouseProps":{"quality":"auto","installed":["lighting","loadingDoor","pallet","palletTruck","racks","safety","windows","workbench"],"batches":19,"instances":32,"visibleBatches":19,"visibleInstances":32,"rackBays":4,"lights":4},"productionProps":{"quality":"auto","installed":["cutting","decor","ironing","lighting","packing","sewing","storage"],"batches":11,"instances":23,"visibleBatches":11,"visibleInstances":23,"drawables":33,"triangles":8156,"realLights":1}},"queueCapacity":3},"driving":null,"vehicles":[{"x":166,"z":33.3,"speed":0,"traffic":false},{"x":117.32547209720002,"z":-39,"speed":3.4843898629042966,"traffic":true},{"x":189,"z":-32.674527902800065,"speed":3.4843898629042966,"traffic":true},{"x":182.67452790280018,"z":39,"speed":3.4843898629042966,"traffic":true},{"x":111,"z":32.67452790280035,"speed":3.4843898629042966,"traffic":true}],"playerControl":{"mode":"PLAYER_ON_FOOT","locomotion":"WALK","zoom":5.2,"transition":null},"player":{"x":131,"z":20.95522067289487},"renderedFrames":17,"lastError":""}}
+DONE world_startup.cjs: PASS
+RUN world_loading.cjs
+PASS {"label":"current","warm":false,"navigationMs":315,"preloadMs":0,"ready":true,"entered":true,"prepareMs":5266.799999952316,"entryMs":5611.299999952316,"startedAt":494.4000000357628,"firstRenderMs":11317,"movableMs":11428.399999976158,"stages":{"loadThree":0,"buildPlayableHub":2201.099999964237},"requests":106,"bytes":16348125,"assets":[{"name":"/assets/models3d/npcs/chico2.glb","bytes":4163056,"ms":36.60000002384186,"start":774.6999999880791},{"name":"/assets/models3d/props/shop_checkout_counter_end.glb","bytes":8828,"ms":400.19999998807907,"start":11908.900000035763},{"name":"/assets/models3d/props/shop_table_display.glb","bytes":8792,"ms":387.80000001192093,"start":11908.300000011921},{"name":"/assets/models3d/props/shop_checkout_counter.glb","bytes":6516,"ms":387.7000000476837,"start":11908.699999988079}]}
+PASS {"label":"current","warm":true,"navigationMs":588,"preloadMs":972,"ready":true,"entered":true,"prepareMs":2564.100000023842,"entryMs":2810.800000011921,"startedAt":1844.0999999642372,"firstRenderMs":7876.200000047684,"movableMs":7880.600000023842,"stages":{"loadThree":0,"buildPlayableHub":2334.100000023842},"requests":102,"bytes":16323989,"assets":[{"name":"/assets/models3d/npcs/chico2.glb","bytes":4163056,"ms":114.39999997615814,"start":1639.699999988079}]}
+DONE world_loading.cjs: PASS
+RUN world_entry_assets.cjs
+PASS nonblocking entry, shared asset requests, staff upgrade in place, unchanged scene/ledger and no unused navigation/model
+DONE world_entry_assets.cjs: PASS
+RUN supplied_npcs.cjs
+PASS NPC world supplied player assets with procedural city NPCs
+AssertionError [ERR_ASSERTION]: customers complete a decision
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\supplied_npcs.cjs:136:12 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+DONE supplied_npcs.cjs: FAIL
+RUN mona_npc.cjs
+PASS Mona world GLB
+PASS Mona world fallback
+DONE mona_npc.cjs: PASS
+RUN npc_locomotion.cjs
+PASS NPC planted feet through turns, swing clearance, pivot steps, stop and pool reset
+[
+  {
+    "kind": "chico1",
+    "maxSupportSlip": 1.0894883602041343e-8,
+    "maxAnkleJump": 0.05898928439318692,
+    "maxSwingHeight": 0.0836554562630323,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.9045434676350786e-10,
+      "head": 0.0343761736747774
+    },
+    "pivotLift": 0.056844750185290074,
+    "finite": true
+  },
+  {
+    "kind": "chico2",
+    "maxSupportSlip": 9.048133742506552e-9,
+    "maxAnkleJump": 0.05866746296715561,
+    "maxSwingHeight": 0.08130791771493141,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.816988434775777e-10,
+      "head": 0.039998950910008185
+    },
+    "pivotLift": 0.05524798753827066,
+    "finite": true
+  },
+  {
+    "kind": "chico3",
+    "maxSupportSlip": 1.0146168244797921e-8,
+    "maxAnkleJump": 0.05917853729543936,
+    "maxSwingHeight": 0.08271967331685756,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.9628829930281418e-10,
+      "head": 0.034076405723492055
+    },
+    "pivotLift": 0.056206045126695664,
+    "finite": true
+  },
+  {
+    "kind": "mona",
+    "maxSupportSlip": 7.291981009805477e-9,
+    "maxAnkleJump": 0.05784790542340691,
+    "maxSwingHeight": 0.0789598435674775,
+    "teleport": {
+      "phaseStable": true,
+      "distanceStable": true
+    },
+    "idle": {
+      "blend": 1.3108565047066208e-8,
+      "knee": 1.7650175952410952e-10,
+      "head": 0.019389089577365577
+    },
+    "pivotLift": 0.053651224891423446,
+    "finite": true
+  }
+]
+DONE npc_locomotion.cjs: PASS
+RUN game_lifecycle_ui.cjs
+PASS UI manual: prepare, two live students auto-navigate to decisions before the 3D world; all/individual/random/zero events
+PASS UI share code/link, invitation, event rules, cancellation failure/retry and feedback on both students, presence and mobile grade layout
+PASS UI automatic: server countdown, reload, clock skew, multiple clients, late rejection and exact reentry on another device
+PASS no browser JavaScript errors
+DONE game_lifecycle_ui.cjs: PASS
+RUN decisions_cycle_ui.cjs
+PASS all tabs layout 1366x768
+PASS all tabs layout 1024x768
+PASS all tabs layout 768x1024
+PASS all tabs layout 390x844
+PASS all tabs layout 320x568
+PASS all tabs layout 844x390
+PASS multiple district checkboxes, keyboard, web, save once, reload and submission lock
+PASS real production record, live target, zero, overachievement and current DOP/summary plan parity
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(await page.evaluate(()=>window.scrollY>0))
+
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\decisions_cycle_ui.cjs:97:8 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+DONE decisions_cycle_ui.cjs: FAIL
+RUN teacher_lifecycle_ui.cjs
+PASS teacher setup, admission cycle, live roster, cycle advance and 24-hour podium
+PASS reentry without tutorial, integration lock and sticky student status at five viewports
+DONE teacher_lifecycle_ui.cjs: PASS
+RUN tablet_return_browser.cjs
+PASS 20 consecutive tablet exits from button: focus, keys, overlays, decisions and cycle
+PASS 20 consecutive tablet exits from news: focus, keys, overlays, decisions and cycle
+PASS 20 consecutive tablet exits from office: focus, keys, overlays, decisions and cycle
+PASS camera and WASD restored without browser errors
+DONE tablet_return_browser.cjs: PASS
+RUN npc_world_fixes_browser.cjs
+PASS all 4 outdoor NPCs: 60 seconds, 12 movement windows, actual animated mesh height/feet and ground roots
+PASS all streamed business interiors: real NPC GLB bounds and ground after 60 simulated seconds per room
+PASS production foot/car NPC contact, slide escape, walls and step budget in first/third camera
+PASS clean scene/DOM with preserved minimap destinations and HUD
+DONE npc_world_fixes_browser.cjs: PASS
+RUN world_orientation_mobile.cjs
+PASS 360x640
+PASS 390x844
+PASS 844x390
+DONE world_orientation_mobile.cjs: PASS
+RUN teacher_history_ui.cjs
+PASS 1366px: empty, multi-company/cycle statements/zero grade, read-only, XSS, latest replacement, missing migration feedback and existing navigation
+PASS 390px: empty, multi-company/cycle statements/zero grade, read-only, XSS, latest replacement, missing migration feedback and existing navigation
+PASS no new browser or console errors on desktop and mobile
+DONE teacher_history_ui.cjs: PASS
+RUN teacher_report_pdf_ui.cjs
+PASS: actual teacher download and preview; excluded companies; URL cleanup; empty roster; missing SDK; long names; 48 events; missing data; zero grade.
+DONE teacher_report_pdf_ui.cjs: PASS
+RUN character_selection_ui.cjs
+✔ selector supports selection, persistence, confirmation, keyboard and target desktop sizes (1898.5921ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1902.9153
+DONE character_selection_ui.cjs: PASS
+RUN decision_interiors_browser.cjs
+low office: 50 calls, 14548 triangles; entry/exit, decision, collision, actors passed
+low bank: 57 calls, 16550 triangles; entry/exit, decision, collision, actors passed
+low suppliers: 66 calls, 16756 triangles; entry/exit, decision, collision, actors passed
+medium office: 54 calls, 26116 triangles; entry/exit, decision, collision, actors passed
+medium bank: 59 calls, 28298 triangles; entry/exit, decision, collision, actors passed
+medium suppliers: 70 calls, 28324 triangles; entry/exit, decision, collision, actors passed
+high office: 54 calls, 21638 triangles; entry/exit, decision, collision, actors passed
+high bank: 53 calls, 22534 triangles; entry/exit, decision, collision, actors passed
+high suppliers: 62 calls, 25054 triangles; entry/exit, decision, collision, actors passed
+auto office: 54 calls, 21638 triangles; entry/exit, decision, collision, actors passed
+auto bank: 60 calls, 23878 triangles; entry/exit, decision, collision, actors passed
+auto suppliers: 70 calls, 28324 triangles; entry/exit, decision, collision, actors passed
+{
+  "measurement": "Actual scene, 1366x900, first-person at inner door; SwiftShader CPU renderer, no claim about GPU FPS",
+  "tiers": {
+    "low": {
+      "office": {
+        "mode": "low",
+        "room": "office",
+        "calls": 50,
+        "triangles": 14548,
+        "geometries": 272,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_suit",
+            "city_woman_suit"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "low",
+        "room": "bank",
+        "calls": 57,
+        "triangles": 16550,
+        "geometries": 277,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_man_casual",
+              "visible": true,
+              "height": 1.7063120832953376,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit",
+            "city_man_casual"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "low",
+        "room": "suppliers",
+        "calls": 66,
+        "triangles": 16756,
+        "geometries": 307,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_worker",
+            "city_woman_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "medium": {
+      "office": {
+        "mode": "medium",
+        "room": "office",
+        "calls": 54,
+        "triangles": 26116,
+        "geometries": 326,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_suit",
+            "city_woman_suit"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "medium",
+        "room": "bank",
+        "calls": 59,
+        "triangles": 28298,
+        "geometries": 326,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_woman_casual",
+              "visible": true,
+              "height": 1.7062868755954508,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_suit",
+            "city_man_suit",
+            "city_woman_casual"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "medium",
+        "room": "suppliers",
+        "calls": 70,
+        "triangles": 28324,
+        "geometries": 326,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_worker",
+            "city_woman_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "high": {
+      "office": {
+        "mode": "high",
+        "room": "office",
+        "calls": 54,
+        "triangles": 21638,
+        "geometries": 347,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_woman_cardigan",
+              "visible": true,
+              "height": 1.7021181975848447,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente",
+                "oficina"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_suit",
+            "city_woman_cardigan"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "high",
+        "room": "bank",
+        "calls": 53,
+        "triangles": 22534,
+        "geometries": 363,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_formal",
+              "visible": true,
+              "height": 1.7062851204931482,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_woman_suit",
+              "visible": true,
+              "height": 1.7062866742863103,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_man_shorts",
+              "visible": true,
+              "height": 1.704393553193103,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "cliente"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_formal",
+            "city_woman_suit",
+            "city_man_shorts"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "high",
+        "room": "suppliers",
+        "calls": 62,
+        "triangles": 25054,
+        "geometries": 368,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_man_long_sleeves",
+              "visible": true,
+              "height": 1.7064601966781576,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "cliente",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_long_sleeves",
+            "city_woman_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    },
+    "auto": {
+      "office": {
+        "mode": "auto",
+        "room": "office",
+        "calls": 54,
+        "triangles": 21638,
+        "geometries": 368,
+        "actors": {
+          "local": [
+            {
+              "role": "oficina",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "oficina",
+              "id": "city_woman_cardigan",
+              "visible": true,
+              "height": 1.7021181975848447,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente",
+                "oficina"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_suit",
+            "city_woman_cardigan"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 169,
+          "y": 1.72,
+          "z": 71.1
+        }
+      },
+      "bank": {
+        "mode": "auto",
+        "room": "bank",
+        "calls": 60,
+        "triangles": 23878,
+        "geometries": 368,
+        "actors": {
+          "local": [
+            {
+              "role": "cajero",
+              "id": "city_woman_formal",
+              "visible": true,
+              "height": 1.7065294007156078,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "cajero"
+              ]
+            },
+            {
+              "role": "banco",
+              "id": "city_man_suit",
+              "visible": true,
+              "height": 1.706322516019757,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "tienda",
+                "oficina",
+                "banco",
+                "guardia"
+              ]
+            },
+            {
+              "role": "cliente",
+              "id": "city_woman_cardigan",
+              "visible": true,
+              "height": 1.7021181975848447,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "cliente",
+                "oficina"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_woman_formal",
+            "city_man_suit",
+            "city_woman_cardigan"
+          ],
+          "count": 3
+        },
+        "camera": {
+          "x": 221.1,
+          "y": 1.72,
+          "z": 19
+        }
+      },
+      "suppliers": {
+        "mode": "auto",
+        "room": "suppliers",
+        "calls": 70,
+        "triangles": 28324,
+        "geometries": 368,
+        "actors": {
+          "local": [
+            {
+              "role": "proveedor",
+              "id": "city_man_worker",
+              "visible": true,
+              "height": 1.706316563162501,
+              "approvedHeight": 1.76,
+              "manifestRoles": [
+                "almacen",
+                "produccion",
+                "proveedor"
+              ]
+            },
+            {
+              "role": "almacen",
+              "id": "city_woman_worker",
+              "visible": true,
+              "height": 1.7062904726951489,
+              "approvedHeight": 1.68,
+              "manifestRoles": [
+                "produccion",
+                "almacen",
+                "proveedor"
+              ]
+            }
+          ],
+          "visibleIds": [
+            "city_man_worker",
+            "city_woman_worker"
+          ],
+          "count": 2
+        },
+        "camera": {
+          "x": 79.4,
+          "y": 1.72,
+          "z": -19
+        }
+      }
+    }
+  },
+  "checks": {
+    "low-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": false,
+      "actors": 2
+    },
+    "low-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": false,
+      "actors": 3
+    },
+    "low-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": false,
+      "actors": 2
+    },
+    "medium-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "medium-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "medium-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "high-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "high-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "high-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "auto-office": {
+      "entered": true,
+      "exited": true,
+      "category": "B",
+      "colliders": 11,
+      "navigationReady": true,
+      "actors": 2
+    },
+    "auto-bank": {
+      "entered": true,
+      "exited": true,
+      "category": "E",
+      "colliders": 6,
+      "navigationReady": true,
+      "actors": 3
+    },
+    "auto-suppliers": {
+      "entered": true,
+      "exited": true,
+      "category": "F",
+      "colliders": 7,
+      "navigationReady": true,
+      "actors": 2
+    }
+  },
+  "deferred": [
+    {
+      "id": "office",
+      "deferred": true,
+      "children": 0
+    },
+    {
+      "id": "bank",
+      "deferred": true,
+      "children": 0
+    },
+    {
+      "id": "suppliers",
+      "deferred": true,
+      "children": 0
+    }
+  ]
+}
+DONE decision_interiors_browser.cjs: PASS
+RUN npc_navmesh_browser.cjs
+{"ready":true,"stats":{"cells":144,"walkable":128,"blocked":16,"triangles":256},"path":[[-3,1],[-3,1],[-2,2],[2,2],[4,0]]}
+DONE npc_navmesh_browser.cjs: PASS
+RUN tablet_item_draft_ui.cjs
+PASS Tablet: one draft button per section, persistence, quota errors, submission lock and five viewports
+DONE tablet_item_draft_ui.cjs: PASS
+RUN mobile_integral_ui.cjs
+PASS mobile panels 360x800
+PASS mobile panels 390x844
+PASS mobile panels 768x1024
+AssertionError [ERR_ASSERTION]: tablet-B 800: targets under44
++ actual - expected
+
++ [
++   {
++     height: 40,
++     id: 'exitDecisions',
++     text: 'Volver a la sala',
++     width: 44
++   },
++   {
++     height: 40,
++     id: 'topSubmitAllDecisions',
++     text: '✓ ENVIAR TODO',
++     width: 140
++   }
++ ]
+- []
+
+    at capture (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\mobile_integral_ui.cjs:30:12)
+    at async C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\mobile_integral_ui.cjs:40:161 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+DONE mobile_integral_ui.cjs: FAIL
+[
+  {
+    "suite": "local_server_test.py",
+    "kind": "server",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 1880,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\local_server_test.py.log"
+  },
+  {
+    "suite": "decision_options_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2458,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\decision_options_db.cjs.log"
+  },
+  {
+    "suite": "student_admission_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 4018,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\student_admission_db.cjs.log"
+  },
+  {
+    "suite": "student_admission_matrix_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 7129,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\student_admission_matrix_db.cjs.log"
+  },
+  {
+    "suite": "teacher_history_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2518,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\teacher_history_db.cjs.log"
+  },
+  {
+    "suite": "game_lifecycle_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2474,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\game_lifecycle_db.cjs.log"
+  },
+  {
+    "suite": "game_observations_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2551,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\game_observations_db.cjs.log"
+  },
+  {
+    "suite": "waiting_room_db.cjs",
+    "kind": "db",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2765,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\waiting_room_db.cjs.log"
+  },
+  {
+    "suite": "playable_hub.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 50112,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\playable_hub.cjs.log"
+  },
+  {
+    "suite": "continuous_world.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 88124,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\continuous_world.cjs.log"
+  },
+  {
+    "suite": "gameplay_hud.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 26698,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\gameplay_hud.cjs.log"
+  },
+  {
+    "suite": "world_business_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 35886,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_business_ui.cjs.log"
+  },
+  {
+    "suite": "world_cycle_restart.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 55214,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_cycle_restart.cjs.log"
+  },
+  {
+    "suite": "world_startup.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 82262,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_startup.cjs.log"
+  },
+  {
+    "suite": "world_loading.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 27461,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_loading.cjs.log"
+  },
+  {
+    "suite": "world_entry_assets.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 24454,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_entry_assets.cjs.log"
+  },
+  {
+    "suite": "supplied_npcs.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 85917,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\supplied_npcs.cjs.log"
+  },
+  {
+    "suite": "mona_npc.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 106681,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\mona_npc.cjs.log"
+  },
+  {
+    "suite": "npc_locomotion.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 17082,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\npc_locomotion.cjs.log"
+  },
+  {
+    "suite": "game_lifecycle_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 57154,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\game_lifecycle_ui.cjs.log"
+  },
+  {
+    "suite": "decisions_cycle_ui.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 23139,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\decisions_cycle_ui.cjs.log"
+  },
+  {
+    "suite": "teacher_lifecycle_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 15462,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\teacher_lifecycle_ui.cjs.log"
+  },
+  {
+    "suite": "tablet_return_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 30738,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\tablet_return_browser.cjs.log"
+  },
+  {
+    "suite": "npc_world_fixes_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 49698,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\npc_world_fixes_browser.cjs.log"
+  },
+  {
+    "suite": "world_orientation_mobile.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 84328,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\world_orientation_mobile.cjs.log"
+  },
+  {
+    "suite": "teacher_history_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 6415,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\teacher_history_ui.cjs.log"
+  },
+  {
+    "suite": "teacher_report_pdf_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 10908,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\teacher_report_pdf_ui.cjs.log"
+  },
+  {
+    "suite": "character_selection_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2488,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\character_selection_ui.cjs.log"
+  },
+  {
+    "suite": "decision_interiors_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 147619,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\decision_interiors_browser.cjs.log"
+  },
+  {
+    "suite": "npc_navmesh_browser.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 2346,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\npc_navmesh_browser.cjs.log"
+  },
+  {
+    "suite": "tablet_item_draft_ui.cjs",
+    "kind": "browser",
+    "status": "passed",
+    "passed": true,
+    "exitCode": 0,
+    "timedOut": false,
+    "durationMs": 26679,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\tablet_item_draft_ui.cjs.log"
+  },
+  {
+    "suite": "mobile_integral_ui.cjs",
+    "kind": "browser",
+    "status": "failed",
+    "passed": false,
+    "exitCode": 1,
+    "timedOut": false,
+    "durationMs": 46964,
+    "log": "tests\\output\\mejora-integral-2026-10-01\\excel-cont3-final\\runs\\2026-10-11T21-11-31-693Z\\mobile_integral_ui.cjs.log"
+  },
+  {
+    "suite": "side_full_flow.cjs",
+    "kind": "browser",
+    "status": "skipped",
+    "passed": false,
+    "reason": "Runner opcional aún no creado"
+  }
+]

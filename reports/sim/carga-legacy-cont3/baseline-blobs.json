@@ -1,0 +1,3725 @@
+{
+  "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+  "files": [
+    {
+      "file": "assets/categories/b.png",
+      "oid": "3be2ccbb05242bd1ccf80291845613ad889fe7a4",
+      "bytes": 51513
+    },
+    {
+      "file": "assets/categories/c.png",
+      "oid": "48aba9baebb70694cb806f8248a6f1e13fe1743e",
+      "bytes": 50474
+    },
+    {
+      "file": "assets/categories/d.png",
+      "oid": "5216d9bbc5d491e3fe7c6311b7779b042427edaf",
+      "bytes": 54840
+    },
+    {
+      "file": "assets/categories/e.png",
+      "oid": "867ea53b518c7e764ddf57092e0045fc06e4e0e6",
+      "bytes": 53641
+    },
+    {
+      "file": "assets/categories/f.png",
+      "oid": "090c77ef2079e641af223f46cd3737f17ee5c8d4",
+      "bytes": 49236
+    },
+    {
+      "file": "assets/categories/g.png",
+      "oid": "974ad55b6dce607a3515cee0d2512c526da15c75",
+      "bytes": 51016
+    },
+    {
+      "file": "assets/categories/menu.png",
+      "oid": "03be9ca28cdb485cba24ac3056f04ca7b38a04c7",
+      "bytes": 362033
+    },
+    {
+      "file": "assets/characters/thumbnails/chico1.webp",
+      "oid": "ca7860e9f3fdbed054b88dc2aedc6fe483e7cadb",
+      "bytes": 17404
+    },
+    {
+      "file": "assets/characters/thumbnails/chico2.webp",
+      "oid": "968cac008d896feb4e9579a770e8c45e3e979eb9",
+      "bytes": 16976
+    },
+    {
+      "file": "assets/characters/thumbnails/chico3.webp",
+      "oid": "8fa386a3750bdffcb017dea1965ec8690075d9d3",
+      "bytes": 15962
+    },
+    {
+      "file": "assets/characters/thumbnails/mona.webp",
+      "oid": "503d31fe8e7121bc585490ab3ca7093113223b1e",
+      "bytes": 15148
+    },
+    {
+      "file": "assets/characters_full.png",
+      "oid": "f11e5066e64d641c3d25e1a2941cefa3b2700a37",
+      "bytes": 2120460
+    },
+    {
+      "file": "assets/decision-icons/B_INFRAESTRUCTURA.gif",
+      "oid": "db16f394baed297afa7443a86fbed6f09dc2274f",
+      "bytes": 153753
+    },
+    {
+      "file": "assets/decision-icons/B_banner.gif",
+      "oid": "db16f394baed297afa7443a86fbed6f09dc2274f",
+      "bytes": 153753
+    },
+    {
+      "file": "assets/decision-icons/B_hover.gif",
+      "oid": "30841fd273d660565990ec69209903e5005dbe06",
+      "bytes": 205564
+    },
+    {
+      "file": "assets/decision-icons/B_hover.png",
+      "oid": "63534ba45ebc7122a5507928e1894a027a5c1d94",
+      "bytes": 109078
+    },
+    {
+      "file": "assets/decision-icons/B_idle.gif",
+      "oid": "db16f394baed297afa7443a86fbed6f09dc2274f",
+      "bytes": 153753
+    },
+    {
+      "file": "assets/decision-icons/B_idle.png",
+      "oid": "3de16abe8056e0a47c40b965256b564463de7c43",
+      "bytes": 94107
+    },
+    {
+      "file": "assets/decision-icons/B_select.gif",
+      "oid": "9986051e711f9e6659f25002dfbf7959729e6d23",
+      "bytes": 248097
+    },
+    {
+      "file": "assets/decision-icons/B_select.png",
+      "oid": "56b8bea7fc1a2531562ba666dfe2f5ce5b7cddc3",
+      "bytes": 119233
+    },
+    {
+      "file": "assets/decision-icons/C_RRHH.gif",
+      "oid": "1b4a1a4fdfb70e5c2f381a76fbff79e34ac967fb",
+      "bytes": 175901
+    },
+    {
+      "file": "assets/decision-icons/C_banner.gif",
+      "oid": "1b4a1a4fdfb70e5c2f381a76fbff79e34ac967fb",
+      "bytes": 175901
+    },
+    {
+      "file": "assets/decision-icons/C_hover.gif",
+      "oid": "82fbbdb38720f7b73cbde9c82e6b368c91af2589",
+      "bytes": 248418
+    },
+    {
+      "file": "assets/decision-icons/C_hover.png",
+      "oid": "96086103a64caaccbdaf17e72f107c3d11402afe",
+      "bytes": 125935
+    },
+    {
+      "file": "assets/decision-icons/C_idle.gif",
+      "oid": "1b4a1a4fdfb70e5c2f381a76fbff79e34ac967fb",
+      "bytes": 175901
+    },
+    {
+      "file": "assets/decision-icons/C_idle.png",
+      "oid": "82810cb05a76e7cc372a6dbec550b5259822e5b8",
+      "bytes": 110286
+    },
+    {
+      "file": "assets/decision-icons/C_select.gif",
+      "oid": "326221a7ac21d73741cfe93f0b43d138d0f4c873",
+      "bytes": 264072
+    },
+    {
+      "file": "assets/decision-icons/C_select.png",
+      "oid": "680bab53820254dc6211735d294379c2e7c36283",
+      "bytes": 128581
+    },
+    {
+      "file": "assets/decision-icons/D_CANALES_Y_VENTAS.gif",
+      "oid": "74e2f2ed2d247a307d60485cf372b53ee222bbfc",
+      "bytes": 199153
+    },
+    {
+      "file": "assets/decision-icons/D_banner.gif",
+      "oid": "74e2f2ed2d247a307d60485cf372b53ee222bbfc",
+      "bytes": 199153
+    },
+    {
+      "file": "assets/decision-icons/D_hover.gif",
+      "oid": "1e51fd974cbd38a892d92b9c24cb86f609429229",
+      "bytes": 206762
+    },
+    {
+      "file": "assets/decision-icons/D_hover.png",
+      "oid": "3bf3d0323f7157a20abc4fa9fa513febe45bfe4b",
+      "bytes": 107519
+    },
+    {
+      "file": "assets/decision-icons/D_idle.gif",
+      "oid": "74e2f2ed2d247a307d60485cf372b53ee222bbfc",
+      "bytes": 199153
+    },
+    {
+      "file": "assets/decision-icons/D_idle.png",
+      "oid": "71bfdcbe2fc1350cb6ca1e1a6e98a7f38b52d971",
+      "bytes": 104290
+    },
+    {
+      "file": "assets/decision-icons/D_select.gif",
+      "oid": "ed7975a37a3c29de7550d201dcc344538081c73e",
+      "bytes": 256706
+    },
+    {
+      "file": "assets/decision-icons/D_select.png",
+      "oid": "adca1ebcf2b6ef217d49386b5284534a2c33775e",
+      "bytes": 121355
+    },
+    {
+      "file": "assets/decision-icons/E_INSUMOS.gif",
+      "oid": "038bbccf627940d2ad55df8d146b2474909ca399",
+      "bytes": 142906
+    },
+    {
+      "file": "assets/decision-icons/E_banner.gif",
+      "oid": "038bbccf627940d2ad55df8d146b2474909ca399",
+      "bytes": 142906
+    },
+    {
+      "file": "assets/decision-icons/E_hover.gif",
+      "oid": "5eee3606ef2a0ccf7906b714fabe993e8d28eee6",
+      "bytes": 178609
+    },
+    {
+      "file": "assets/decision-icons/E_hover.png",
+      "oid": "90c63a50d09a9cc11d2fef5b431c94f61d601a89",
+      "bytes": 118482
+    },
+    {
+      "file": "assets/decision-icons/E_idle.gif",
+      "oid": "038bbccf627940d2ad55df8d146b2474909ca399",
+      "bytes": 142906
+    },
+    {
+      "file": "assets/decision-icons/E_idle.png",
+      "oid": "cc7cf365bb297b7428324987532ac19d2f7490cd",
+      "bytes": 105513
+    },
+    {
+      "file": "assets/decision-icons/E_select.gif",
+      "oid": "a826ecfda52c55977181e2260b575ee9c8b7e0f2",
+      "bytes": 206908
+    },
+    {
+      "file": "assets/decision-icons/E_select.png",
+      "oid": "a49dc15de5e15accb98306c360659148e8e5c58c",
+      "bytes": 126505
+    },
+    {
+      "file": "assets/decision-icons/F_INVERSIONES.gif",
+      "oid": "e0c7cf7c53cbf1578fe6b394cda721cff79a13ad",
+      "bytes": 146396
+    },
+    {
+      "file": "assets/decision-icons/F_banner.gif",
+      "oid": "e0c7cf7c53cbf1578fe6b394cda721cff79a13ad",
+      "bytes": 146396
+    },
+    {
+      "file": "assets/decision-icons/F_hover.gif",
+      "oid": "6815c1ab07631828370b16d71d197e23dc22645d",
+      "bytes": 191782
+    },
+    {
+      "file": "assets/decision-icons/F_hover.png",
+      "oid": "aab10c0f8c677524a41fdf9f75c4f4cbb58a78e1",
+      "bytes": 111432
+    },
+    {
+      "file": "assets/decision-icons/F_idle.gif",
+      "oid": "e0c7cf7c53cbf1578fe6b394cda721cff79a13ad",
+      "bytes": 146396
+    },
+    {
+      "file": "assets/decision-icons/F_idle.png",
+      "oid": "440c82ae0ccb62ab5a038be3992ea3a33e3f37e3",
+      "bytes": 97973
+    },
+    {
+      "file": "assets/decision-icons/F_select.gif",
+      "oid": "5aaa067d99006dc12346ababcdddd7f8389e0dc0",
+      "bytes": 227204
+    },
+    {
+      "file": "assets/decision-icons/F_select.png",
+      "oid": "78e9657296b67fa674cc9b41b8cdce6209b190a6",
+      "bytes": 123136
+    },
+    {
+      "file": "assets/decision-icons/G_FINANZAS.gif",
+      "oid": "86b616cff0d901d40efa3cb29297b36d2dcaf3f0",
+      "bytes": 135779
+    },
+    {
+      "file": "assets/decision-icons/G_banner.gif",
+      "oid": "86b616cff0d901d40efa3cb29297b36d2dcaf3f0",
+      "bytes": 135779
+    },
+    {
+      "file": "assets/decision-icons/G_hover.gif",
+      "oid": "34125177271b4331cd87a3778030586c31de3148",
+      "bytes": 207478
+    },
+    {
+      "file": "assets/decision-icons/G_hover.png",
+      "oid": "99bb097a27621290aaeec57a5aa5c223554295ff",
+      "bytes": 110539
+    },
+    {
+      "file": "assets/decision-icons/G_idle.gif",
+      "oid": "86b616cff0d901d40efa3cb29297b36d2dcaf3f0",
+      "bytes": 135779
+    },
+    {
+      "file": "assets/decision-icons/G_idle.png",
+      "oid": "33360bf0a3248885fae499caf303b09a5254cfcd",
+      "bytes": 94897
+    },
+    {
+      "file": "assets/decision-icons/G_select.gif",
+      "oid": "413be931d3e1efdeb7e434bc169b3afb4b158b11",
+      "bytes": 221707
+    },
+    {
+      "file": "assets/decision-icons/G_select.png",
+      "oid": "31460b80c33054402a47d14eb6eba3ccb48a811f",
+      "bytes": 117668
+    },
+    {
+      "file": "assets/decision-icons/atencion.gif",
+      "oid": "181a8f4293aa5860870a09d6758623cefd9d068c",
+      "bytes": 119603
+    },
+    {
+      "file": "assets/decision-icons/canales_ventas.png",
+      "oid": "23be2f4c0ff4654038ef6701de224f064f2096c9",
+      "bytes": 242696
+    },
+    {
+      "file": "assets/decision-icons/carga_progreso.gif",
+      "oid": "c1fa68c3233fe7e19b07f6854511890d52d2caa7",
+      "bytes": 148010
+    },
+    {
+      "file": "assets/decision-icons/cofre_recompensa.gif",
+      "oid": "892a951db219e77570948a8e34bf7d9f0c0e6f49",
+      "bytes": 176338
+    },
+    {
+      "file": "assets/decision-icons/confirmar_btn.gif",
+      "oid": "dee6159f7f9ffee9ee45d43d7befb0093bce0e20",
+      "bytes": 88118
+    },
+    {
+      "file": "assets/decision-icons/finanzas.png",
+      "oid": "4a173cf9206fc066b342866026c6b3270a6d3526",
+      "bytes": 261616
+    },
+    {
+      "file": "assets/decision-icons/infraestructura.png",
+      "oid": "79d42b01a4ce8da416a55084bb685088b365d0cd",
+      "bytes": 262291
+    },
+    {
+      "file": "assets/decision-icons/insumos.png",
+      "oid": "0aa09de6fd4e70d59eeb0553a7d7432dd8004c4c",
+      "bytes": 246684
+    },
+    {
+      "file": "assets/decision-icons/inversiones.png",
+      "oid": "c1363e7e10701a866fc512cc933b23dbef2c7820",
+      "bytes": 241818
+    },
+    {
+      "file": "assets/decision-icons/recursos_humanos.png",
+      "oid": "52b44e3c62f7a01b90419b38133f6a21b90b1936",
+      "bytes": 249555
+    },
+    {
+      "file": "assets/decision-icons/trofeo_victoria.gif",
+      "oid": "78e34b03897e6cbf518991e06510dd2fb7187b40",
+      "bytes": 151677
+    },
+    {
+      "file": "assets/decision-icons/trofeo_victoria.png",
+      "oid": "a9173777ae7b12467999bcfef15a7f2019aa8ab7",
+      "bytes": 55015
+    },
+    {
+      "file": "assets/decision-icons/ui/alerta.png",
+      "oid": "42b7d3405f3e31827ddde4736949b59c882f38a8",
+      "bytes": 109852
+    },
+    {
+      "file": "assets/decision-icons/ui/ayuda.png",
+      "oid": "29e76f7c788b295eac53f64ec03b94fa5a28ebc5",
+      "bytes": 172685
+    },
+    {
+      "file": "assets/decision-icons/ui/cohete.png",
+      "oid": "20a2ba64593e6a6b99e7d113bdbf0990ae663c90",
+      "bytes": 154414
+    },
+    {
+      "file": "assets/decision-icons/ui/confirmar.png",
+      "oid": "7e5a9db708d4b0e740b3071cf93886aecc753d0b",
+      "bytes": 166887
+    },
+    {
+      "file": "assets/decision-icons/ui/jugar.png",
+      "oid": "92dabb2569b4abc58d06eabc2395b9328050ba9f",
+      "bytes": 141704
+    },
+    {
+      "file": "assets/decision-icons/ui/mapa.png",
+      "oid": "91b463784fa3a683a10cfd9dc8db46e7b184d8b5",
+      "bytes": 153752
+    },
+    {
+      "file": "assets/decision-icons/ui/objetivo.png",
+      "oid": "e1f50973a21204f25e99e5ab00ce65aa23c99f1c",
+      "bytes": 146006
+    },
+    {
+      "file": "assets/decision-icons/ui/recompensa.png",
+      "oid": "3180f6fbe3904e69f80729fc84d43fc505f71562",
+      "bytes": 158940
+    },
+    {
+      "file": "assets/decision-icons/ui/reloj.png",
+      "oid": "145cb99f456691d60caf024037c9ce3b6f2e8f4b",
+      "bytes": 144161
+    },
+    {
+      "file": "assets/decision-icons/ui/trofeo.png",
+      "oid": "f4a5b3b67533dd55cf14201024e429933112115e",
+      "bytes": 163502
+    },
+    {
+      "file": "assets/decision-icons/ui/volver.png",
+      "oid": "d7bb45d719e02b28da2e55f3f276a45fcfea6655",
+      "bytes": 164866
+    },
+    {
+      "file": "assets/decision-icons/volver_btn.gif",
+      "oid": "27a9e5ade628fdb3371538bea1e250cc83215814",
+      "bytes": 86496
+    },
+    {
+      "file": "assets/environments/studio-128.bin",
+      "oid": "1d0ce68e562a031c91de52bdab0bfc2a8f71a8e9",
+      "bytes": 1572880
+    },
+    {
+      "file": "assets/estudiante.png",
+      "oid": "1dca5a2a122a8d5e8875554cebcae4e84f3e5188",
+      "bytes": 766580
+    },
+    {
+      "file": "assets/icons/categories/canales_ventas.svg",
+      "oid": "e1208a9a6c086627220c3ef2f7f583f8f70da8fc",
+      "bytes": 1232
+    },
+    {
+      "file": "assets/icons/categories/finanzas.svg",
+      "oid": "891405aba447ce6454a0bb18a0b9ce5c484dddea",
+      "bytes": 1245
+    },
+    {
+      "file": "assets/icons/categories/infraestructura.svg",
+      "oid": "1b16ef2b72304adfe5dce1f0a0f35c82a52131c5",
+      "bytes": 1271
+    },
+    {
+      "file": "assets/icons/categories/insumos.svg",
+      "oid": "1a5c332eafa1829761248a1d8043debcf1edc478",
+      "bytes": 1224
+    },
+    {
+      "file": "assets/icons/categories/inversiones.svg",
+      "oid": "38fe0b802da3bb772ef5859a0cef92b7f6186794",
+      "bytes": 1176
+    },
+    {
+      "file": "assets/icons/categories/recursos_humanos.svg",
+      "oid": "e8683abaf7f8029e668874248b6dd5ab4cd21d34",
+      "bytes": 1098
+    },
+    {
+      "file": "assets/icons/profesor_sidebar/configuracion.svg",
+      "oid": "46f27a567736829deea985ed0a044e9dfaa7e97b",
+      "bytes": 925
+    },
+    {
+      "file": "assets/icons/profesor_sidebar/empresas.svg",
+      "oid": "d4f3f4ff725ec9496ccb8ec02e3330fa2ea9f29b",
+      "bytes": 886
+    },
+    {
+      "file": "assets/icons/profesor_sidebar/podio.svg",
+      "oid": "178cf5fb737191bf48eafb487167bfdf38b8c64a",
+      "bytes": 974
+    },
+    {
+      "file": "assets/icons/profesor_sidebar/resultados.svg",
+      "oid": "aa5830f5f0e1bbd23b0ae66d300c2ceb52b4299c",
+      "bytes": 1039
+    },
+    {
+      "file": "assets/icons/profesor_sidebar/rondas_eventos.svg",
+      "oid": "862f9315f94dbe8023824e4cb22aef4f88b5ba2d",
+      "bytes": 955
+    },
+    {
+      "file": "assets/icons/teacher/configuracion.svg",
+      "oid": "87ca8d1511a2ddeab720d14acc7af8565c9c6f50",
+      "bytes": 344
+    },
+    {
+      "file": "assets/icons/teacher/decisiones.svg",
+      "oid": "beeae06c25329fed04bd7b9c6c7b5cdc7a7161db",
+      "bytes": 380
+    },
+    {
+      "file": "assets/icons/teacher/empresas.svg",
+      "oid": "dddc87a5eb8d5ec103556c2e7e9a38e9aa61b4c6",
+      "bytes": 362
+    },
+    {
+      "file": "assets/icons/teacher/podio.svg",
+      "oid": "5f2a0c4e5edda9972634f489857eafca5768992e",
+      "bytes": 371
+    },
+    {
+      "file": "assets/icons/teacher/resultados.svg",
+      "oid": "66beea58927c011413b872bc6479b9479522f811",
+      "bytes": 343
+    },
+    {
+      "file": "assets/icons/teacher/rondas.svg",
+      "oid": "b22818bf6a0b754c8fc4e3e7bd8ffd340dc20140",
+      "bytes": 358
+    },
+    {
+      "file": "assets/icons/ui/arrow-left-thick.svg",
+      "oid": "41a3e08c71b4532f0598ae46403ea2d2af60e507",
+      "bytes": 290
+    },
+    {
+      "file": "assets/icons/ui/arrow-right-thick.svg",
+      "oid": "ac1fac8ddd5ddc5a584b5949db8d8807943a4873",
+      "bytes": 290
+    },
+    {
+      "file": "assets/icons/ui/back.svg",
+      "oid": "4e55c0ae2b0cd0f955d2f359d7a7e95aa488c78a",
+      "bytes": 267
+    },
+    {
+      "file": "assets/icons/ui/check.svg",
+      "oid": "0943ba9a040c8779c28f8425c985e0a86be2f73b",
+      "bytes": 265
+    },
+    {
+      "file": "assets/icons/ui/lock.svg",
+      "oid": "5cb08972e616fd90ed84085c87de67780b50686e",
+      "bytes": 252
+    },
+    {
+      "file": "assets/icons/ui/play.svg",
+      "oid": "7d869a26310013a412d46e5b736a71cb650e092c",
+      "bytes": 167
+    },
+    {
+      "file": "assets/landing_bg.png",
+      "oid": "eb1cfea6c48084637866f7dc41a1ec49d4b6b93f",
+      "bytes": 3872861
+    },
+    {
+      "file": "assets/login_bg.png",
+      "oid": "efbb8279f34cf1b53c0c4e7bfab074f6b6f3861b",
+      "bytes": 2840576
+    },
+    {
+      "file": "assets/models/incoming/curated.json",
+      "oid": "a06c88b922e969a863f0e50c41f284d13bc426c3",
+      "bytes": 6846
+    },
+    {
+      "file": "assets/models/incoming/licencias.md",
+      "oid": "c06acc278d65eac6616a3c33780820614ca101bd",
+      "bytes": 5190
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/AQsd9ngvKU.glb",
+      "oid": "23c793a5528ddf1598ac38103bcf8e674062a2c7",
+      "bytes": 510392
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/DLptRuewTn.glb",
+      "oid": "41d21876d6d018506064251bc75bea7a8e086d01",
+      "bytes": 503988
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/HMnuH5geEG.glb",
+      "oid": "938feebca107e40a6e6d9a5a24856c65ff07a41a",
+      "bytes": 493196
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/XqzeZGB7iU.glb",
+      "oid": "6e2fe8a83c26dded1e7bbb5574e8c9f27b878144",
+      "bytes": 540404
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/fjHyMd5Wxw.glb",
+      "oid": "52a2b766cfa799f2def3bf6c1cc25b85d7a4c61c",
+      "bytes": 498160
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/jpKRgGDxhk.glb",
+      "oid": "a1c76be94f94bd7ac0ddbdf9407b82c42ae2c280",
+      "bytes": 586108
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/mQnGoME1ez.glb",
+      "oid": "d5309cdc6ace341f308ee7525637701587926c59",
+      "bytes": 583416
+    },
+    {
+      "file": "assets/models/incoming/quaternius-animated/zMyPlQXBzq.glb",
+      "oid": "9df9fd9d98f0f0a44026c8d14d2bcfe3d56d81ce",
+      "bytes": 481600
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/man_casual.gltf",
+      "oid": "c40c07aee26776fc46c20c2a5d05460b1fcd4923",
+      "bytes": 3058092
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/man_farmer.gltf",
+      "oid": "b0982928320163d9d67d03d92990c3481769a4ca",
+      "bytes": 2998119
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/man_hoodie.gltf",
+      "oid": "70878aec4464137c6c92ec99a74ef79578d29480",
+      "bytes": 3104001
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/man_suit.gltf",
+      "oid": "87188c67defa72f5d4fd6b16ecf23caca268d24a",
+      "bytes": 3315342
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/man_worker.gltf",
+      "oid": "9f91bffab489f315dccc9f5a26f0b270f9c65027",
+      "bytes": 2967023
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/woman_casual.gltf",
+      "oid": "0678c376512c8d0ca1e93a4a050172cae20126ff",
+      "bytes": 3131788
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/woman_formal.gltf",
+      "oid": "990016e9a8de964712a4f5f28ff417b0538a248c",
+      "bytes": 3082953
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/woman_suit.gltf",
+      "oid": "90774ed30e0bd4713a0b1c9c49c6653f3c8f312c",
+      "bytes": 3142156
+    },
+    {
+      "file": "assets/models/incoming/quaternius-city/woman_worker.gltf",
+      "oid": "a876c4a0fe68c2ffc706e2cde48b68dc500427ba",
+      "bytes": 3095030
+    },
+    {
+      "file": "assets/models/npc/city_man_casual.glb",
+      "oid": "1a3514a025eb131e4fd4e8974e8d92d54b6510ef",
+      "bytes": 1283684
+    },
+    {
+      "file": "assets/models/npc/city_man_farmer.glb",
+      "oid": "1f5f50d993631c737157b6f10c94eb6c5fcfdb99",
+      "bytes": 1243692
+    },
+    {
+      "file": "assets/models/npc/city_man_hoodie.glb",
+      "oid": "3e6f998a759505fd94773d5b6713de850429fbdf",
+      "bytes": 1312692
+    },
+    {
+      "file": "assets/models/npc/city_man_long_sleeves.glb",
+      "oid": "65150ff633bb7c98ea1d3c4b4ff80a056a0ceb1d",
+      "bytes": 471512
+    },
+    {
+      "file": "assets/models/npc/city_man_maroon.glb",
+      "oid": "965fe88068710a129f8907f20dcf5f14b2746b87",
+      "bytes": 464632
+    },
+    {
+      "file": "assets/models/npc/city_man_office.glb",
+      "oid": "acdc7f40a70f814136fb749113782f6a606d21db",
+      "bytes": 510464
+    },
+    {
+      "file": "assets/models/npc/city_man_shorts.glb",
+      "oid": "803644087b67de123566ffa6dcceace48e7e38e6",
+      "bytes": 459960
+    },
+    {
+      "file": "assets/models/npc/city_man_suit.glb",
+      "oid": "0e3bfbdebb1da82de92e7b5cd3453e03fb44f18e",
+      "bytes": 1460044
+    },
+    {
+      "file": "assets/models/npc/city_man_worker.glb",
+      "oid": "3facf3373462944964a9c5aca137f0e16834b37f",
+      "bytes": 1222828
+    },
+    {
+      "file": "assets/models/npc/city_woman_cardigan.glb",
+      "oid": "b67a351a5652acddc59c380261fa904595072cb7",
+      "bytes": 476156
+    },
+    {
+      "file": "assets/models/npc/city_woman_casual.glb",
+      "oid": "20f60bf17ff0a511781facdd411289c7cc04749d",
+      "bytes": 1338176
+    },
+    {
+      "file": "assets/models/npc/city_woman_dress.glb",
+      "oid": "aa1d6c685e4a5150a5495cd7ebcda452be65813a",
+      "bytes": 450848
+    },
+    {
+      "file": "assets/models/npc/city_woman_formal.glb",
+      "oid": "a192b86d7269c743775b2140a221b1e83133f79f",
+      "bytes": 1306040
+    },
+    {
+      "file": "assets/models/npc/city_woman_green.glb",
+      "oid": "02dfc46d73aa9e9df73c4e9f9b61b9fb0a9df249",
+      "bytes": 553208
+    },
+    {
+      "file": "assets/models/npc/city_woman_suit.glb",
+      "oid": "9b9d19b719f180382ebbc9c2669f8513991c5135",
+      "bytes": 1344184
+    },
+    {
+      "file": "assets/models/npc/city_woman_tank.glb",
+      "oid": "6c604e543f5871a908405e1b4b81a886461dd4f6",
+      "bytes": 473328
+    },
+    {
+      "file": "assets/models/npc/city_woman_worker.glb",
+      "oid": "aa9d5e965773534c228845968f1684745070116f",
+      "bytes": 1312984
+    },
+    {
+      "file": "assets/models/npc/manifest.json",
+      "oid": "59ce7fead5409c0eab67daa229c337d083ea004e",
+      "bytes": 16259
+    },
+    {
+      "file": "assets/models/npc/manifest.pending.json",
+      "oid": "431e556851cc81cffa17b88891d7c71b4d13a17d",
+      "bytes": 1345
+    },
+    {
+      "file": "assets/models/yuka.glb",
+      "oid": "2cbcbbb94985eec3a282dfaba189380208e1d717",
+      "bytes": 5555408
+    },
+    {
+      "file": "assets/models3d/bag_esencial.glb",
+      "oid": "7f71af7a2321fe725b98d1e01e1585f335d75814",
+      "bytes": 32440
+    },
+    {
+      "file": "assets/models3d/bag_premium.glb",
+      "oid": "17ce590ae107246ef7ffdea7c57d624a4e29b6e0",
+      "bytes": 26156
+    },
+    {
+      "file": "assets/models3d/bag_urbano.glb",
+      "oid": "38d8793ca3bb033126a11b800c96a2eb2e9b1c20",
+      "bytes": 27112
+    },
+    {
+      "file": "assets/models3d/car_sedan.glb",
+      "oid": "ff96fd044e21004f0fa9414eb89fca7b8bc1fa98",
+      "bytes": 11004
+    },
+    {
+      "file": "assets/models3d/checkout.glb",
+      "oid": "277c430e1ca237b2c204761ecf055c88df15dc15",
+      "bytes": 11096
+    },
+    {
+      "file": "assets/models3d/npc_exec_female.glb",
+      "oid": "db0f2ecf90edfd74c4f3b5d612acd584472f321f",
+      "bytes": 80700
+    },
+    {
+      "file": "assets/models3d/npc_exec_male.glb",
+      "oid": "3ab4d6a2880e1481cf91bb6cc948eadd09c278f2",
+      "bytes": 92244
+    },
+    {
+      "file": "assets/models3d/npc_female.glb",
+      "oid": "cf10524ffcbeb93e840af41d58f219b5707c1478",
+      "bytes": 75848
+    },
+    {
+      "file": "assets/models3d/npc_male.glb",
+      "oid": "e23231a3bb98c45a5003cb33d2c79a74613f1320",
+      "bytes": 69548
+    },
+    {
+      "file": "assets/models3d/npc_realistic_female.glb",
+      "oid": "8084f347936f2c3018f81b30ab0d7b4c6a6bfe12",
+      "bytes": 15347564
+    },
+    {
+      "file": "assets/models3d/npc_realistic_male.glb",
+      "oid": "4d0c3595ce5052eab922910e289d7ea852ffc234",
+      "bytes": 14000632
+    },
+    {
+      "file": "assets/models3d/npc_realistic_male_casual.glb",
+      "oid": "9f07bf0b4da60d478e0c6430cc02881efd5dd928",
+      "bytes": 20477252
+    },
+    {
+      "file": "assets/models3d/npc_staff.glb",
+      "oid": "c8d48d2053ab348632b64e90d34dd0b1f3cffda7",
+      "bytes": 71744
+    },
+    {
+      "file": "assets/models3d/npcs/chico1.glb",
+      "oid": "9c5bb4eb61ce346e4a2ca9e9628997d33c16031c",
+      "bytes": 4058852
+    },
+    {
+      "file": "assets/models3d/npcs/chico2.glb",
+      "oid": "77aa1a14af9dd3322b6e3fa2af9ac8b680818365",
+      "bytes": 4163056
+    },
+    {
+      "file": "assets/models3d/npcs/chico3.glb",
+      "oid": "1e252d8c651886c0c4d2efb5ae83ce9fbc08548d",
+      "bytes": 4682424
+    },
+    {
+      "file": "assets/models3d/npcs/mona.glb",
+      "oid": "c91d3ff5e02ed3129e53c78c23048ca9c987a418",
+      "bytes": 4161772
+    },
+    {
+      "file": "assets/models3d/props/outdoor_bench.glb",
+      "oid": "2f1149abe52a9ee27984d2d6807e737d5f00fd71",
+      "bytes": 7908
+    },
+    {
+      "file": "assets/models3d/props/outdoor_bird_brown.glb",
+      "oid": "83e5ce9ae2e9be367b1db4ac48e0b3792f1a055d",
+      "bytes": 7216
+    },
+    {
+      "file": "assets/models3d/props/outdoor_bush.glb",
+      "oid": "d654fe96c2d520e4d32eb61241d261f5565a7f2f",
+      "bytes": 3228
+    },
+    {
+      "file": "assets/models3d/props/outdoor_fountain.glb",
+      "oid": "cdfcd3d77b0b3101f59926fe39b57ba61dce3ce9",
+      "bytes": 54828
+    },
+    {
+      "file": "assets/models3d/props/outdoor_planter.glb",
+      "oid": "46b6fbe01b75dd72b1a7f99e66b1e4a9d61ce9c0",
+      "bytes": 6544
+    },
+    {
+      "file": "assets/models3d/props/outdoor_stop_sign.glb",
+      "oid": "4d09bd57ca447491baec988f78aec431332b19b1",
+      "bytes": 5976
+    },
+    {
+      "file": "assets/models3d/props/outdoor_street_light.glb",
+      "oid": "4684babfd8a22615735267a654e80a91f8d5b731",
+      "bytes": 3964
+    },
+    {
+      "file": "assets/models3d/props/outdoor_traffic_light.glb",
+      "oid": "cbc2de8d503aaa74d0ee5119828f6bd1a8d6e6ae",
+      "bytes": 10876
+    },
+    {
+      "file": "assets/models3d/props/outdoor_trashcan.glb",
+      "oid": "45c24075b56d75d8309153b19d8cbdc93e6d0ea2",
+      "bytes": 5724
+    },
+    {
+      "file": "assets/models3d/props/outdoor_tree_default.glb",
+      "oid": "9a5fb4654928df6fe6913ba6ce3d3a505764db6e",
+      "bytes": 7540
+    },
+    {
+      "file": "assets/models3d/props/outdoor_tree_oak.glb",
+      "oid": "1f8a8ab858af16127c5fdd45c6d656a846e809e5",
+      "bytes": 11148
+    },
+    {
+      "file": "assets/models3d/props/outdoor_tree_tall.glb",
+      "oid": "3f2551f62d2e771b48e0325fda53945874836861",
+      "bytes": 5820
+    },
+    {
+      "file": "assets/models3d/props/production_garment_rack.glb",
+      "oid": "71fae98dfa8cc70b8360adc69f284391c597380b",
+      "bytes": 9604
+    },
+    {
+      "file": "assets/models3d/props/production_ironing_station.glb",
+      "oid": "7dded6a95c365eca043ce084c5fc1f5b9ca33cc4",
+      "bytes": 11196
+    },
+    {
+      "file": "assets/models3d/props/production_mannequin.glb",
+      "oid": "240efdf972c80996ec45d2a778631be67ef77bea",
+      "bytes": 11408
+    },
+    {
+      "file": "assets/models3d/props/production_overlock_machine.glb",
+      "oid": "a873f323a2cd4fcacb6c25fd18b4fbb161e56007",
+      "bytes": 10028
+    },
+    {
+      "file": "assets/models3d/props/shop_atm.glb",
+      "oid": "bc49a6e1c5399f08bf1c017cccb74fcbfd35c5e4",
+      "bytes": 42040
+    },
+    {
+      "file": "assets/models3d/props/shop_cash_register.glb",
+      "oid": "7cd89a9d8fe6b18a1ae80d6439277b631ef531e0",
+      "bytes": 167624
+    },
+    {
+      "file": "assets/models3d/props/shop_ceiling_light.glb",
+      "oid": "8354c6732598a1abfbac5078b5a4ed8a221a4b6f",
+      "bytes": 5008
+    },
+    {
+      "file": "assets/models3d/props/shop_checkout_counter.glb",
+      "oid": "984b89850816a2313a1e2ba766e26dbfda45120f",
+      "bytes": 6516
+    },
+    {
+      "file": "assets/models3d/props/shop_checkout_counter_end.glb",
+      "oid": "65b5fe4fdda356146d21595e75f002c035e99a48",
+      "bytes": 8828
+    },
+    {
+      "file": "assets/models3d/props/shop_entry_door.glb",
+      "oid": "e71e8ab39de14a55290b599f119281bfc873ada4",
+      "bytes": 11172
+    },
+    {
+      "file": "assets/models3d/props/shop_mirror_wall.glb",
+      "oid": "4ce55bc412b40148bb49b1dabfa4c6d099e56ae8",
+      "bytes": 6704
+    },
+    {
+      "file": "assets/models3d/props/shop_shelf_low.glb",
+      "oid": "bf334c6410813c0cbc30ef645939a6ca0c015529",
+      "bytes": 8448
+    },
+    {
+      "file": "assets/models3d/props/shop_shelf_tall.glb",
+      "oid": "bc66d4e6057db828eb729ed63c2f64933409ec03",
+      "bytes": 13120
+    },
+    {
+      "file": "assets/models3d/props/shop_table_display.glb",
+      "oid": "72c57ca3489aea0e4244d16783920056bbe376fd",
+      "bytes": 8792
+    },
+    {
+      "file": "assets/models3d/props/shop_window_panel.glb",
+      "oid": "fc1ba2b19d5d132eda9c82bf502cb0c06b20973c",
+      "bytes": 11940
+    },
+    {
+      "file": "assets/models3d/props/warehouse_bag_stack.glb",
+      "oid": "23d63fc044f0680d3f02c77559b02d485698ce3d",
+      "bytes": 18988
+    },
+    {
+      "file": "assets/models3d/props/warehouse_box_large.glb",
+      "oid": "8ec815a1882574c5fcef2969e03d6d65ea62b52e",
+      "bytes": 4248
+    },
+    {
+      "file": "assets/models3d/props/warehouse_box_long.glb",
+      "oid": "e011304ae9f1ad778366d4aad6e598b5c407ab5b",
+      "bytes": 4284
+    },
+    {
+      "file": "assets/models3d/props/warehouse_box_small.glb",
+      "oid": "72d9520876bdf0131d4174b1cf09459b1cdfe858",
+      "bytes": 4284
+    },
+    {
+      "file": "assets/models3d/props/warehouse_box_wide.glb",
+      "oid": "feeb62329a533ca8d3dacf957e18cef6f987c9ea",
+      "bytes": 4284
+    },
+    {
+      "file": "assets/models3d/props/warehouse_cutting_table.glb",
+      "oid": "e6e088357087841ae411319a6ee9d3fd9cd898c5",
+      "bytes": 15580
+    },
+    {
+      "file": "assets/models3d/props/warehouse_fabric_rolls.glb",
+      "oid": "309762c22caf941321f25545dccbd0e7cc24650b",
+      "bytes": 48756
+    },
+    {
+      "file": "assets/models3d/props/warehouse_fire_extinguisher.glb",
+      "oid": "bea522cf964ce014a98aa9f559482ce3b28cb911",
+      "bytes": 32728
+    },
+    {
+      "file": "assets/models3d/props/warehouse_floor_arrow.glb",
+      "oid": "694b3fe662f7a57c498fbc9f6a242bd404253c8e",
+      "bytes": 1612
+    },
+    {
+      "file": "assets/models3d/props/warehouse_high_window.glb",
+      "oid": "78ab2349687fddf365382d7f397ca11fce5e14fb",
+      "bytes": 12660
+    },
+    {
+      "file": "assets/models3d/props/warehouse_loading_door.glb",
+      "oid": "4b6e0f76b170844ce2767f2a908522fecf639558",
+      "bytes": 2076
+    },
+    {
+      "file": "assets/models3d/props/warehouse_pallet.glb",
+      "oid": "4b40a0cbb96fac7886e56138af9171563944a42f",
+      "bytes": 13720
+    },
+    {
+      "file": "assets/models3d/props/warehouse_pallet_truck.glb",
+      "oid": "39de2129ed553296f3f40d7da908548e09966524",
+      "bytes": 30100
+    },
+    {
+      "file": "assets/models3d/props/warehouse_pendant_light.glb",
+      "oid": "b57d4febdc9b6e880327504273a68cd389974de0",
+      "bytes": 8416
+    },
+    {
+      "file": "assets/models3d/props/warehouse_rack_tall.glb",
+      "oid": "d56e99909fb8dbfc58486e7d8ba7be16409f6b0b",
+      "bytes": 20304
+    },
+    {
+      "file": "assets/models3d/props/warehouse_sewing_machine.glb",
+      "oid": "3c640c494802fcab17ec594c1adc01ee11d07864",
+      "bytes": 13264
+    },
+    {
+      "file": "assets/models3d/props/warehouse_warning_beacon.glb",
+      "oid": "c3be794512c039f8e97b7c1dccd22937ea544ae3",
+      "bytes": 9652
+    },
+    {
+      "file": "assets/models3d/shelf.glb",
+      "oid": "a2a52056ef4bbc3a35f5204a3fe3733c26938581",
+      "bytes": 5920
+    },
+    {
+      "file": "assets/models3d/sofa.glb",
+      "oid": "8b164829d028330353c3debf8a7fe2c61aed2bc8",
+      "bytes": 15004
+    },
+    {
+      "file": "assets/models3d/streetlamp.glb",
+      "oid": "4eeec42bc3759c6d0cc6a728c59f51132efbc2ad",
+      "bytes": 4884
+    },
+    {
+      "file": "assets/profesor.png",
+      "oid": "84216556c8686cb7401035492925224cbb4d58d1",
+      "bytes": 962406
+    },
+    {
+      "file": "assets/side_logo.png",
+      "oid": "4f02b7cd07e623992779de924d8de1a8c6ddb378",
+      "bytes": 1331796
+    },
+    {
+      "file": "assets/upch_logo.png",
+      "oid": "6445f4fd508eca5e41d73a6f7a700a01bbf6b1a6",
+      "bytes": 101770
+    },
+    {
+      "file": "css/character-selection.css",
+      "oid": "b22100053a7967584df4834ef70e48fefa30e1c5",
+      "bytes": 6752
+    },
+    {
+      "file": "css/company_summary.css",
+      "oid": "ab486eefc0c9516bf98fb7efbc32471a04a7cb73",
+      "bytes": 17138
+    },
+    {
+      "file": "css/design-system.css",
+      "oid": "187c5c9fb2b616cc913e0fd60b1cdc6a830f9a83",
+      "bytes": 4980
+    },
+    {
+      "file": "css/docente.css",
+      "oid": "51b52e7568a8141b146e65e79a4c515c3e8c799d",
+      "bytes": 47799
+    },
+    {
+      "file": "css/hub-world.css",
+      "oid": "005f906fcc252a720d31fd89c7ed969b3cbc36e0",
+      "bytes": 10538
+    },
+    {
+      "file": "css/production.css",
+      "oid": "eec4f26040f6768e5f4cbd8f51d6753f195e37c0",
+      "bytes": 29308
+    },
+    {
+      "file": "css/responsive.css",
+      "oid": "933ac3c22e277f3308631b7019af50a10529fcad",
+      "bytes": 28529
+    },
+    {
+      "file": "css/role-selection.css",
+      "oid": "770865cbb85023cb8f7c7e9b5173f2210ea612e7",
+      "bytes": 5209
+    },
+    {
+      "file": "css/simulator3d.css",
+      "oid": "752faa9c1c0b3e7c43344fc15189e96b61ee3ff6",
+      "bytes": 48743
+    },
+    {
+      "file": "css/student-interface.css",
+      "oid": "8a2d7c02705acaf22dca20412004cf0b81fc4a98",
+      "bytes": 9766
+    },
+    {
+      "file": "css/styles.css",
+      "oid": "ebc157fe101f0c33a8d02cbeb32a741f8bea9f39",
+      "bytes": 147560
+    },
+    {
+      "file": "css/tablet-return.css",
+      "oid": "3d6509249f9f9296b10cefe3a96150503c1185a5",
+      "bytes": 1034
+    },
+    {
+      "file": "css/world_minimap.css",
+      "oid": "8149350a559cc642e0de9d1957ff9d3835578e0b",
+      "bytes": 6076
+    },
+    {
+      "file": "docente.html",
+      "oid": "3f7d8446ffb804a0eae91d4313d33a9e50512bf5",
+      "bytes": 21181
+    },
+    {
+      "file": "index.html",
+      "oid": "b1910784507ae17c3aeebf827896c3ce9d7cd7af",
+      "bytes": 46155
+    },
+    {
+      "file": "js/app.js",
+      "oid": "5e2a694e2f447cf987c9240bb37640ae1b541565",
+      "bytes": 124368
+    },
+    {
+      "file": "js/company_summary.js",
+      "oid": "5a7c4d80cc140c5608bc616ab344e208a018e12e",
+      "bytes": 31550
+    },
+    {
+      "file": "js/config.js",
+      "oid": "13095e287e66d80672060c1d5fa924ff9a87f0cc",
+      "bytes": 361
+    },
+    {
+      "file": "js/correcciones_observaciones.js",
+      "oid": "11ab69d901aef1ce192cf54f5fb1a895e2418b5a",
+      "bytes": 2592
+    },
+    {
+      "file": "js/decision_catalog.js",
+      "oid": "bfb1d7ba93c5864ac945b5b7d9242692b64cc623",
+      "bytes": 12547
+    },
+    {
+      "file": "js/decision_review_model.js",
+      "oid": "8deb640ed816cb7b72bb60acfd672e0fd42291c3",
+      "bytes": 11764
+    },
+    {
+      "file": "js/docente.js",
+      "oid": "26138864399d4d05ddea10293db11fd29c06c9a2",
+      "bytes": 81855
+    },
+    {
+      "file": "js/enterprise_visual_v10.js",
+      "oid": "e086c54a8dfedf1ce1b1e39f3b9c4aab46d90865",
+      "bytes": 1181
+    },
+    {
+      "file": "js/enterprise_visual_v8.js",
+      "oid": "201996b359f9a5cef8f44fd1d3d6e57f060a7918",
+      "bytes": 566
+    },
+    {
+      "file": "js/enterprise_visual_v9.js",
+      "oid": "9209f265e9114f7f6b37304cb5171f33e26cfd11",
+      "bytes": 494
+    },
+    {
+      "file": "js/enterprise_world_v5.js",
+      "oid": "3245a75c7cd3d5c985967d9577d75b6f3a7c40af",
+      "bytes": 1215
+    },
+    {
+      "file": "js/enterprise_world_v6.js",
+      "oid": "ec56acf3802d55fbbf8c1f8b6bb4b16d266142f0",
+      "bytes": 1227
+    },
+    {
+      "file": "js/enterprise_world_v7.js",
+      "oid": "a6d57e7cedc42aa44fd76b119c17bb0048d76316",
+      "bytes": 800
+    },
+    {
+      "file": "js/events_catalog.js",
+      "oid": "b222acb12f5d66e111f31ad6c02fd54a5a68c324",
+      "bytes": 28763
+    },
+    {
+      "file": "js/financial_model.js",
+      "oid": "b7b00781ca47d6477a06860cd69a1bf956873102",
+      "bytes": 4653
+    },
+    {
+      "file": "js/icon_bank.js",
+      "oid": "e81fcc168bc4a982b4c803850f0652e6d26bd2b4",
+      "bytes": 970
+    },
+    {
+      "file": "js/production_dop.js",
+      "oid": "9850a417b4d7495c805184757bd6065a70320f5d",
+      "bytes": 8615
+    },
+    {
+      "file": "js/production_model.js",
+      "oid": "baa9df00f9bb29ac845ef3425e3ab797bc697107",
+      "bytes": 12396
+    },
+    {
+      "file": "js/side_rules.js",
+      "oid": "c699f56a6ec9792d945c8451b0ddb0116599a6b1",
+      "bytes": 11397
+    },
+    {
+      "file": "js/simulator3d-config.js",
+      "oid": "4070b3513160ff73615f0dc4f5928cb6d055973d",
+      "bytes": 3332
+    },
+    {
+      "file": "js/simulator3d.js",
+      "oid": "00f2cad1aecfd3b4d26dad01605d0b7b27f58e73",
+      "bytes": 234636
+    },
+    {
+      "file": "js/student_financial_view.js",
+      "oid": "f1289c22c08469295d478bb48403931ec870d303",
+      "bytes": 4473
+    },
+    {
+      "file": "js/teacher_history.js",
+      "oid": "4176e34bd7e2767b3d5aabf324881d7b894dd46c",
+      "bytes": 13888
+    },
+    {
+      "file": "js/teacher_podium.js",
+      "oid": "b630fda15a898c73c1dad7e3e472db14548d44e1",
+      "bytes": 2084
+    },
+    {
+      "file": "js/teacher_report_pdf.js",
+      "oid": "a565e054a3aceb9bdd3b4a19b6bd04e8ff463075",
+      "bytes": 12341
+    },
+    {
+      "file": "js/tutorial.js",
+      "oid": "8d62a622e40fd64e5a60c6d1a9a6ba6be55abf1b",
+      "bytes": 3910
+    },
+    {
+      "file": "services/asset_manager.mjs",
+      "oid": "2dec5b0336a598c048d164f3217b65673671dbc9",
+      "bytes": 4112
+    },
+    {
+      "file": "services/bank_interior.mjs",
+      "oid": "236209463ed532d6ed6769faf6522d56ce82857b",
+      "bytes": 3832
+    },
+    {
+      "file": "services/business_interiors.mjs",
+      "oid": "d94af9066415df1063e784e8f3bf7dcf949d1765",
+      "bytes": 66425
+    },
+    {
+      "file": "services/character_animation_controller.mjs",
+      "oid": "3d0d84541b1f6d4e5305846a5bd6a69504a6af98",
+      "bytes": 12686
+    },
+    {
+      "file": "services/character_geometry.mjs",
+      "oid": "cfc9cee96e4457ca13a5ac10f6c76bb2cd1df830",
+      "bytes": 3554
+    },
+    {
+      "file": "services/character_manager.mjs",
+      "oid": "ac7fad892e8f8d05c84d400dfd48e0cc196d1d04",
+      "bytes": 4645
+    },
+    {
+      "file": "services/character_selection.js",
+      "oid": "bf87c4e9e899eea26de8329a5ea092146970afb9",
+      "bytes": 4842
+    },
+    {
+      "file": "services/credits_data.js",
+      "oid": "2e5ea08927e76f50cac9f9b8fd76b9b06ffbba6d",
+      "bytes": 5803
+    },
+    {
+      "file": "services/decisiones_service.js",
+      "oid": "9e0d45176a42e78c5b5ca0314936884772dd81e4",
+      "bytes": 7747
+    },
+    {
+      "file": "services/empresa_service.js",
+      "oid": "ce57ca13341947a3a6936f4c41847e54b7d491be",
+      "bytes": 7966
+    },
+    {
+      "file": "services/gameplay_objectives.mjs",
+      "oid": "27e8d1a9d2de57099ab4038d9b8ccdcc0f18c974",
+      "bytes": 1668
+    },
+    {
+      "file": "services/hub_vehicles.js",
+      "oid": "18d4538b68ec0138b7613b0c17deab87c87d3428",
+      "bytes": 7437
+    },
+    {
+      "file": "services/hub_world.js",
+      "oid": "c53ce8ba060958cd948a8a5fb9d2da3b1ed9ccd9",
+      "bytes": 43752
+    },
+    {
+      "file": "services/interior_navigation.mjs",
+      "oid": "df7bb74f75ae5afc29f7e18a018072c478918517",
+      "bytes": 3160
+    },
+    {
+      "file": "services/mona_npc.js",
+      "oid": "6f9e46db9dfc6d60a854a267ce5f128841649eab",
+      "bytes": 2223
+    },
+    {
+      "file": "services/npc_city_roster.mjs",
+      "oid": "51ab31e69e432595efb20b8c661d708c18174821",
+      "bytes": 2912
+    },
+    {
+      "file": "services/npc_clip_controller.mjs",
+      "oid": "7b996bbed9d2ce404f67815f8e6708cdda564acf",
+      "bytes": 4416
+    },
+    {
+      "file": "services/npc_motion.js",
+      "oid": "86f2b1764d7f140b4d2435a52bfd25d59f6d1a9f",
+      "bytes": 9474
+    },
+    {
+      "file": "services/npc_names.js",
+      "oid": "008fd2f713710038b2cb5725dcaf7b17700067cc",
+      "bytes": 1094
+    },
+    {
+      "file": "services/npc_navigation.mjs",
+      "oid": "018b01d37cd86b8e8fcd356c11733d5793dde0fb",
+      "bytes": 7748
+    },
+    {
+      "file": "services/npc_navmesh_grid.mjs",
+      "oid": "693e31262d0fa610fde13ca18a8bfb7b48d5b917",
+      "bytes": 2037
+    },
+    {
+      "file": "services/npc_optional_navigation.mjs",
+      "oid": "686b9c5b05c6c54254fd2fb7ffe99034463d2dd8",
+      "bytes": 5541
+    },
+    {
+      "file": "services/npc_patrol.mjs",
+      "oid": "956813cffd20bec4d75c471c812062749aad5e7a",
+      "bytes": 5300
+    },
+    {
+      "file": "services/npc_streaming.mjs",
+      "oid": "1bfec704455d9489aecb804db275ace871df776d",
+      "bytes": 1487
+    },
+    {
+      "file": "services/office_interior.mjs",
+      "oid": "9d1498ede9c0cde115551b9e0ec215bb4a825d23",
+      "bytes": 3717
+    },
+    {
+      "file": "services/partida_service.js",
+      "oid": "66677ff13bdb3bc172118fe51b6f1bbac56fcf00",
+      "bytes": 13061
+    },
+    {
+      "file": "services/player_motion.mjs",
+      "oid": "ada4fb69f84cc566380b9ea61a6f298d9f3e33f5",
+      "bytes": 3278
+    },
+    {
+      "file": "services/startup_environment.mjs",
+      "oid": "9039b319d75e8c2ed09d8fff8dd91f8d938517fa",
+      "bytes": 1256
+    },
+    {
+      "file": "services/student_sync.js",
+      "oid": "f3faeae89896f1068bbbb63d3c7d3836414982b3",
+      "bytes": 6421
+    },
+    {
+      "file": "services/supabase_client.js",
+      "oid": "86757418ec31a765d4952363504b963ecc101b88",
+      "bytes": 2400
+    },
+    {
+      "file": "services/suppliers_interior.mjs",
+      "oid": "86a987f334c26b86f4571165e89667b87456a80d",
+      "bytes": 4476
+    },
+    {
+      "file": "services/teacher_history_service.js",
+      "oid": "e69f7761c0aedc26a5b20618ba31bb0197b8bc37",
+      "bytes": 1589
+    },
+    {
+      "file": "services/teacher_sync.js",
+      "oid": "841c7174d67ea3151fd1f5b605a6ad6b27f4650b",
+      "bytes": 4112
+    },
+    {
+      "file": "services/vehicle_motion.mjs",
+      "oid": "0912d1e6d4b093d8be7d6352b264daf622db77ee",
+      "bytes": 2384
+    },
+    {
+      "file": "services/world_decision_state.mjs",
+      "oid": "d258ab29645dda486bcf070c62af64a594db8377",
+      "bytes": 6423
+    },
+    {
+      "file": "services/world_event_visuals.mjs",
+      "oid": "26bed10527feb7e44ba66335e7b796b49874d2bc",
+      "bytes": 2293
+    },
+    {
+      "file": "services/world_minimap_control.mjs",
+      "oid": "4f95e6ce974107a2dbf8763f64df53b78e98afe9",
+      "bytes": 3114
+    },
+    {
+      "file": "services/world_orientation.mjs",
+      "oid": "54055521b23a446a7d5904060f4e9ca8c2798cd0",
+      "bytes": 7610
+    },
+    {
+      "file": "services/world_portals.mjs",
+      "oid": "4070c2c57c4876ccaf9e135537e6b3f5b5b05c08",
+      "bytes": 1096
+    },
+    {
+      "file": "services/world_wayfinding.mjs",
+      "oid": "6970119f1b16d2e92a6fa06a4fa31200d4b903cd",
+      "bytes": 6494
+    },
+    {
+      "file": "tests/browser_git_baseline.cjs",
+      "oid": "105efd2f5db3361bf29396e6ef5eb1b2e2b4a41f",
+      "bytes": 782
+    },
+    {
+      "file": "tests/character_preview.cjs",
+      "oid": "2a93bb96ed97f8de2cf67ccb76df482cf8bb8ab2",
+      "bytes": 1671
+    },
+    {
+      "file": "tests/character_selection_ui.cjs",
+      "oid": "917871edebedafaf8f9f147bcd844c8f9c1911eb",
+      "bytes": 4937
+    },
+    {
+      "file": "tests/continuous_world.cjs",
+      "oid": "108439221489d2b71328653ebebb43ac7ffea149",
+      "bytes": 20125
+    },
+    {
+      "file": "tests/decision_interiors_browser.cjs",
+      "oid": "ffb10dac5452efc1fc931210d6f44137d4b4c5e4",
+      "bytes": 11264
+    },
+    {
+      "file": "tests/decision_options_db.cjs",
+      "oid": "b977f6bcf77b0f3e340fb84311b59d820e8d58d8",
+      "bytes": 3872
+    },
+    {
+      "file": "tests/decision_sticky_ui.cjs",
+      "oid": "ae4b859e2fe3052c48ab37677d40a82508c63164",
+      "bytes": 12420
+    },
+    {
+      "file": "tests/decisions_cycle_ui.cjs",
+      "oid": "ca60655cb380ecb547261ab0f5f7768c535cad0b",
+      "bytes": 10881
+    },
+    {
+      "file": "tests/game_lifecycle_db.cjs",
+      "oid": "be83cc5f55b8f60461cc4a8c3697dd0b34999c0f",
+      "bytes": 8587
+    },
+    {
+      "file": "tests/game_lifecycle_ui.cjs",
+      "oid": "c6cd94941b942f6eba3d8cde4c7814e18da8e404",
+      "bytes": 21193
+    },
+    {
+      "file": "tests/game_observations_db.cjs",
+      "oid": "fd5c4cc3f21e6d11480516827f0eaa4d9f113416",
+      "bytes": 7075
+    },
+    {
+      "file": "tests/gameplay_hud.cjs",
+      "oid": "70d804d3d907fa11f24513b0c13ef4636d2e83c2",
+      "bytes": 6510
+    },
+    {
+      "file": "tests/lifecycle_db_fixture.cjs",
+      "oid": "7a17cd5c144e379d870a01d6f78c25a7ccbdddb9",
+      "bytes": 4295
+    },
+    {
+      "file": "tests/mobile_integral_ui.cjs",
+      "oid": "6d9287233a1d10c68449ef218244058e03c4cf0f",
+      "bytes": 9655
+    },
+    {
+      "file": "tests/mona_npc.cjs",
+      "oid": "8c1313556d6e3fc8c06eb9bee3913ca9a3baf30c",
+      "bytes": 6772
+    },
+    {
+      "file": "tests/npc_fps_benchmark.cjs",
+      "oid": "38e60c16f0534f451e60df192aca296c953a9271",
+      "bytes": 4801
+    },
+    {
+      "file": "tests/npc_locomotion.cjs",
+      "oid": "c8c3f35adf06e733f4d15283390bcc94cd252733",
+      "bytes": 5480
+    },
+    {
+      "file": "tests/npc_navmesh_browser.cjs",
+      "oid": "a0b9df5304a729ee9b3f4c00e0cd65f330ada65d",
+      "bytes": 2255
+    },
+    {
+      "file": "tests/npc_world_fixes_browser.cjs",
+      "oid": "caf646b4fa5b18ff191d4a0875f31c54a4c96ae6",
+      "bytes": 11762
+    },
+    {
+      "file": "tests/outdoor_performance.cjs",
+      "oid": "ae72984ea5e797e7a3d611b8111c88f27c78ad64",
+      "bytes": 7271
+    },
+    {
+      "file": "tests/playable_hub.cjs",
+      "oid": "155e8d6b39c61d59b24228fda67c45002f355113",
+      "bytes": 24545
+    },
+    {
+      "file": "tests/production_performance.cjs",
+      "oid": "f75ea10d84701d11da61eb7561294d79caad5240",
+      "bytes": 11864
+    },
+    {
+      "file": "tests/production_performance_compare.cjs",
+      "oid": "3acbf7417b3cd0d63bc60d33a853a66c7d07b71e",
+      "bytes": 2034
+    },
+    {
+      "file": "tests/role_selection_ui.cjs",
+      "oid": "a90a409ed56782ebae9f843ec1c1f6cc171debcb",
+      "bytes": 4902
+    },
+    {
+      "file": "tests/run_integral.cjs",
+      "oid": "3138e61e5ae14c32522e3752bd617df16c3951b9",
+      "bytes": 9597
+    },
+    {
+      "file": "tests/run_world_regression.cjs",
+      "oid": "ec05f49ad1a543481a07a4de691360a2d631d821",
+      "bytes": 2926
+    },
+    {
+      "file": "tests/start_world_baseline.cjs",
+      "oid": "8551b206180cffcd4a8c94835bcf8ea34eaf54da",
+      "bytes": 2249
+    },
+    {
+      "file": "tests/student_admission_db.cjs",
+      "oid": "2613337dae041fc2b993d75c2f0569e163da6479",
+      "bytes": 18891
+    },
+    {
+      "file": "tests/student_admission_matrix_db.cjs",
+      "oid": "20fe0edfccc2f9ad508cdbb3a595f9b6e860097a",
+      "bytes": 29121
+    },
+    {
+      "file": "tests/supplied_npcs.cjs",
+      "oid": "2bf6b74b64ac1c72998cf3e8bebd58e2455989de",
+      "bytes": 12429
+    },
+    {
+      "file": "tests/tablet_item_draft_ui.cjs",
+      "oid": "0f6ea3afc20637edb050c20067038624eb73ba8a",
+      "bytes": 6468
+    },
+    {
+      "file": "tests/tablet_return_browser.cjs",
+      "oid": "0cc0459e4f05fe373f86183b4dd2fe313490ff42",
+      "bytes": 6173
+    },
+    {
+      "file": "tests/tablet_visual_capture.cjs",
+      "oid": "24ff0056bca124e3ccd853323d38833d10e4b63e",
+      "bytes": 4658
+    },
+    {
+      "file": "tests/teacher_grades_ui.cjs",
+      "oid": "c94059829f214523772ed370fcc31c51b02d7f7f",
+      "bytes": 8662
+    },
+    {
+      "file": "tests/teacher_history_db.cjs",
+      "oid": "f33f322faeb6e28569c3aae00450c861ac985a63",
+      "bytes": 8340
+    },
+    {
+      "file": "tests/teacher_history_ui.cjs",
+      "oid": "c4191235ca16e29acc2c3c3677c4f21a2f21579f",
+      "bytes": 7409
+    },
+    {
+      "file": "tests/teacher_lifecycle_ui.cjs",
+      "oid": "4f239890d59a0b40fdbebf48464f284f6c1e8891",
+      "bytes": 9169
+    },
+    {
+      "file": "tests/teacher_report_pdf_ui.cjs",
+      "oid": "5aaa7337b67edab01873201ebb2904d9ec588555",
+      "bytes": 7906
+    },
+    {
+      "file": "tests/waiting_room_db.cjs",
+      "oid": "d3aefb8f17556a516702a7248b9dc4e6488560a5",
+      "bytes": 4487
+    },
+    {
+      "file": "tests/waiting_tutorial_ui.cjs",
+      "oid": "ead5de665e71bf55c2c4f691025f9d0458c1038e",
+      "bytes": 9344
+    },
+    {
+      "file": "tests/world_business_ui.cjs",
+      "oid": "0f6cd5d2da76f98e794843cdfe147419c26116bc",
+      "bytes": 5620
+    },
+    {
+      "file": "tests/world_cycle_restart.cjs",
+      "oid": "d083e0ee94ed0dcfe193ac9c82fbd0b51e764019",
+      "bytes": 8151
+    },
+    {
+      "file": "tests/world_entry_assets.cjs",
+      "oid": "2f0042b3549e5afca6f8261844189593728e9a0b",
+      "bytes": 5487
+    },
+    {
+      "file": "tests/world_finance.test.cjs",
+      "oid": "4e900c9fb82ded9ed05adf5325f965514901685d",
+      "bytes": 7299
+    },
+    {
+      "file": "tests/world_loading.cjs",
+      "oid": "10e7d7b4540a047c157a5426dbdc9ce6372ce6bf",
+      "bytes": 4993
+    },
+    {
+      "file": "tests/world_orientation_mobile.cjs",
+      "oid": "24b45f0764bbad6975251cb93dd6d4795eec116c",
+      "bytes": 6261
+    },
+    {
+      "file": "tests/world_startup.cjs",
+      "oid": "69fb9423d1e7bcc9f04fd9a4fdb3cc09678d8148",
+      "bytes": 8367
+    },
+    {
+      "file": "tutorial.html",
+      "oid": "c40753eff277f20c51676507dde30c5dffc20c39",
+      "bytes": 5425
+    },
+    {
+      "file": "vendor/recast-core/LICENSE",
+      "oid": "85b70a6105903d685e32c1ba74e8cd9efdb60f04",
+      "bytes": 1071
+    },
+    {
+      "file": "vendor/recast-core/SOURCE.json",
+      "oid": "5036dd27e0b71527468776d93b11e47f20328c45",
+      "bytes": 257
+    },
+    {
+      "file": "vendor/recast-core/dist/index.mjs",
+      "oid": "460c184cce8b96988ed4f90a3415fd3161ca2d6b",
+      "bytes": 102029
+    },
+    {
+      "file": "vendor/recast-core/package.json",
+      "oid": "6756d22c90ad5c763485c431074259488416b75a",
+      "bytes": 1266
+    },
+    {
+      "file": "vendor/recast-generators/LICENSE",
+      "oid": "85b70a6105903d685e32c1ba74e8cd9efdb60f04",
+      "bytes": 1071
+    },
+    {
+      "file": "vendor/recast-generators/SOURCE.json",
+      "oid": "66356d1d840d371197d0f63cde6c55141ad6bd88",
+      "bytes": 275
+    },
+    {
+      "file": "vendor/recast-generators/dist/index.mjs",
+      "oid": "adc727017665f1db5b3b71ee0fdc158a99fb7762",
+      "bytes": 42989
+    },
+    {
+      "file": "vendor/recast-generators/package.json",
+      "oid": "2f64649dcfe6f0bcf3439c90452fba62c41bbd54",
+      "bytes": 1310
+    },
+    {
+      "file": "vendor/recast-wasm/LICENSE",
+      "oid": "85b70a6105903d685e32c1ba74e8cd9efdb60f04",
+      "bytes": 1071
+    },
+    {
+      "file": "vendor/recast-wasm/SOURCE.json",
+      "oid": "0209351e1ce2637b86269e24f58ce3f913bf51e8",
+      "bytes": 257
+    },
+    {
+      "file": "vendor/recast-wasm/dist/recast-navigation.wasm-compat.js",
+      "oid": "3ae394bc3cc2330642be995ec4a7ddbcf5c77a6f",
+      "bytes": 1011280
+    },
+    {
+      "file": "vendor/recast-wasm/dist/recast-navigation.wasm.js",
+      "oid": "6c3fcfbe8fc23afbd13e8b197dd6e769f282107e",
+      "bytes": 559543
+    },
+    {
+      "file": "vendor/recast-wasm/dist/recast-navigation.wasm.wasm",
+      "oid": "38dbd7ca739c81d223ac1a5592c927a3f3d9e0d2",
+      "bytes": 338824
+    },
+    {
+      "file": "vendor/recast-wasm/package.json",
+      "oid": "a0d8e696230c30fd2c9a3a19a7fff42fb796e80d",
+      "bytes": 1499
+    },
+    {
+      "file": "vendor/three-pathfinding.module.js",
+      "oid": "bb36ef209ac045ca51d2308307d534daf5c51275",
+      "bytes": 10539
+    },
+    {
+      "file": "vendor/three/LICENSE",
+      "oid": "cf781430404b0ae0ba7d8dea3457a3515dd7c9b9",
+      "bytes": 1081
+    },
+    {
+      "file": "vendor/three/SOURCE.json",
+      "oid": "e21aae7f2fbd967626c49796fe4ef7ca5295878a",
+      "bytes": 224
+    },
+    {
+      "file": "vendor/three/build/three.core.js",
+      "oid": "7dcd0fbcbc04b8d9a20ecb96c1ce344cb55150d5",
+      "bytes": 1403455
+    },
+    {
+      "file": "vendor/three/build/three.core.min.js",
+      "oid": "70c40977daa0f6e1e312c6b58e9bfe49cb5a87a4",
+      "bytes": 381124
+    },
+    {
+      "file": "vendor/three/build/three.module.js",
+      "oid": "477ca4dafa7af919a2b9818e01b5ae25198d4aa4",
+      "bytes": 603113
+    },
+    {
+      "file": "vendor/three/build/three.module.min.js",
+      "oid": "20d3c112761a519c7780a5ccc9f72a40937fa83b",
+      "bytes": 338908
+    },
+    {
+      "file": "vendor/three/build/three.tsl.js",
+      "oid": "ad19811ad80e14c70dd3e8d4e8b73f77a13598ee",
+      "bytes": 32271
+    },
+    {
+      "file": "vendor/three/build/three.tsl.min.js",
+      "oid": "9f0212a0f62bde9bba8bb59b7dcbf1a6ba442861",
+      "bytes": 22331
+    },
+    {
+      "file": "vendor/three/build/three.webgpu.js",
+      "oid": "81b64e4760cf020bd28d6b7bf286c57c725ec68d",
+      "bytes": 1875505
+    },
+    {
+      "file": "vendor/three/build/three.webgpu.min.js",
+      "oid": "53a398eafc912f5c13aafcc2aa1d57f9a3c1a99b",
+      "bytes": 579780
+    },
+    {
+      "file": "vendor/three/build/three.webgpu.nodes.js",
+      "oid": "f7222eb4022960f0811e388c57af38121a79c1e8",
+      "bytes": 1868520
+    },
+    {
+      "file": "vendor/three/build/three.webgpu.nodes.min.js",
+      "oid": "582dcdf388d7bfe593db31a279a91a076095dc9a",
+      "bytes": 578388
+    },
+    {
+      "file": "vendor/three/examples/fonts/LICENSE",
+      "oid": "2cc6575a5e49209ecc0cc838a7dc50cc9127d68c",
+      "bytes": 2006
+    },
+    {
+      "file": "vendor/three/examples/jsm/Addons.js",
+      "oid": "417e3e0cb5213b86133a07b953dc56f450271868",
+      "bytes": 11810
+    },
+    {
+      "file": "vendor/three/examples/jsm/animation/AnimationClipCreator.js",
+      "oid": "806f87ee3de8aaa87ee4ef5a56ead3fb0e855a43",
+      "bytes": 4543
+    },
+    {
+      "file": "vendor/three/examples/jsm/animation/CCDIKSolver.js",
+      "oid": "ab85e40ee3d13dc225816fba334f5f37d854c556",
+      "bytes": 13341
+    },
+    {
+      "file": "vendor/three/examples/jsm/capabilities/WebGL.js",
+      "oid": "f1827999b90a53e58649281ed08e7a81dcf4c6c0",
+      "bytes": 2555
+    },
+    {
+      "file": "vendor/three/examples/jsm/capabilities/WebGPU.js",
+      "oid": "fafaa7f7df8e8e5ee8e7c82a9d0540309178454c",
+      "bytes": 1485
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/ArcballControls.js",
+      "oid": "5d95ff1be09d933b34a558130b7df31e8c59d717",
+      "bytes": 86910
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/DragControls.js",
+      "oid": "0429c88f5a0b3b93d3148b031629e801c3d97707",
+      "bytes": 9493
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/FirstPersonControls.js",
+      "oid": "15d9f881b7991e331ab1e448402e42e267208001",
+      "bytes": 9320
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/FlyControls.js",
+      "oid": "d94e1ed156ffb7365dd6047cd07a76d36fcdd364",
+      "bytes": 8890
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/MapControls.js",
+      "oid": "e300e14b484f126cc2b93131e457da335847bb3e",
+      "bytes": 1694
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/OrbitControls.js",
+      "oid": "eea26706dae735dade19367026185f6e68f5cf55",
+      "bytes": 38703
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/PointerLockControls.js",
+      "oid": "a879acff712dd02f93110f01ba1ae378ccee0076",
+      "bytes": 5899
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/TrackballControls.js",
+      "oid": "3693294c86460f172c26cdda62d27cafc4a10715",
+      "bytes": 21662
+    },
+    {
+      "file": "vendor/three/examples/jsm/controls/TransformControls.js",
+      "oid": "4370e062ce1190c3d023d07acc011a33b32599e4",
+      "bytes": 49397
+    },
+    {
+      "file": "vendor/three/examples/jsm/csm/CSM.js",
+      "oid": "0d3c4fafd6e1330d190054023cd8a81a6a20149d",
+      "bytes": 13838
+    },
+    {
+      "file": "vendor/three/examples/jsm/csm/CSMFrustum.js",
+      "oid": "8e8a97df6e12175a941cd8cea1b4ee39d49262c7",
+      "bytes": 4673
+    },
+    {
+      "file": "vendor/three/examples/jsm/csm/CSMHelper.js",
+      "oid": "caac9a3c4929d91c9fd4eca817eed811e9eabab4",
+      "bytes": 6896
+    },
+    {
+      "file": "vendor/three/examples/jsm/csm/CSMShader.js",
+      "oid": "297b196ec581be8449bf3b5ee620723995a575f7",
+      "bytes": 11034
+    },
+    {
+      "file": "vendor/three/examples/jsm/csm/CSMShadowNode.js",
+      "oid": "57c42e0c0b64b88359397888dcf194d51931ab71",
+      "bytes": 13839
+    },
+    {
+      "file": "vendor/three/examples/jsm/curves/CurveExtras.js",
+      "oid": "7bcd3f76a479cc2a884a38ee13bc9b6f6a45bd92",
+      "bytes": 15979
+    },
+    {
+      "file": "vendor/three/examples/jsm/curves/NURBSCurve.js",
+      "oid": "0969f096aaddf27aa164c4bb25847590d58fa91f",
+      "bytes": 3888
+    },
+    {
+      "file": "vendor/three/examples/jsm/curves/NURBSSurface.js",
+      "oid": "67da9f2bff77174fe077b521586d9df6a11101a1",
+      "bytes": 2687
+    },
+    {
+      "file": "vendor/three/examples/jsm/curves/NURBSUtils.js",
+      "oid": "3c1649937b4a3fa85f380e3cf0762df5135c201c",
+      "bytes": 10802
+    },
+    {
+      "file": "vendor/three/examples/jsm/curves/NURBSVolume.js",
+      "oid": "70ed12ba61fc1a47c3887fc8f25591ae8a16e5ef",
+      "bytes": 2945
+    },
+    {
+      "file": "vendor/three/examples/jsm/effects/AnaglyphEffect.js",
+      "oid": "a33bf044fb37b30aa66ee0a455c04c8a7390be05",
+      "bytes": 4440
+    },
+    {
+      "file": "vendor/three/examples/jsm/effects/AsciiEffect.js",
+      "oid": "641606a080a6a3d141ef18217d1887a92d61b8af",
+      "bytes": 7638
+    },
+    {
+      "file": "vendor/three/examples/jsm/effects/OutlineEffect.js",
+      "oid": "e2fd11417fe433a93c555afc1e051d15a5b4d76e",
+      "bytes": 12661
+    },
+    {
+      "file": "vendor/three/examples/jsm/effects/ParallaxBarrierEffect.js",
+      "oid": "90573306be731a4f6034c5af1a1b04243a816902",
+      "bytes": 3502
+    },
+    {
+      "file": "vendor/three/examples/jsm/effects/StereoEffect.js",
+      "oid": "e5056f7173e573a74537063302775f1454b18eef",
+      "bytes": 2180
+    },
+    {
+      "file": "vendor/three/examples/jsm/environments/DebugEnvironment.js",
+      "oid": "fd7db25fbc73aa058110e7247c1e6e642b77231f",
+      "bytes": 2621
+    },
+    {
+      "file": "vendor/three/examples/jsm/environments/RoomEnvironment.js",
+      "oid": "2f2bedd77a6417a8855fea7143903252a890637c",
+      "bytes": 4899
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/DRACOExporter.js",
+      "oid": "792f2f57e7191ddec61889540c2a42cefb95ca1d",
+      "bytes": 8453
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/EXRExporter.js",
+      "oid": "8bfa9ddd526e4a970484d6a6d787101df808271a",
+      "bytes": 14639
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/GLTFExporter.js",
+      "oid": "2da060f940b591fa0a461a34b936d94c80a0cebd",
+      "bytes": 86392
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/KTX2Exporter.js",
+      "oid": "1019c77a12943e2533ce434b1a36fac8e000b7f0",
+      "bytes": 8408
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/OBJExporter.js",
+      "oid": "9960b903bdc9e8f8a8acaac858738ff106c4787b",
+      "bytes": 6070
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/PLYExporter.js",
+      "oid": "22feb7d2a1b0f62695893ea3d461b16977d298d1",
+      "bytes": 13523
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/STLExporter.js",
+      "oid": "7408c96efa650b6cc04e386d36b8c2d3d69fa73e",
+      "bytes": 4884
+    },
+    {
+      "file": "vendor/three/examples/jsm/exporters/USDZExporter.js",
+      "oid": "acdb8d71d6a839f47f3ce8f40497bc488c2bd312",
+      "bytes": 27840
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/BoxLineGeometry.js",
+      "oid": "9ee5476bd33c499c1e59e80a794f4c5613dc06b8",
+      "bytes": 3088
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/ConvexGeometry.js",
+      "oid": "c35db77fdb6929b89d5ad5b249e6d3ad9d439f4f",
+      "bytes": 1710
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/DecalGeometry.js",
+      "oid": "e672f1b04d61fb1bbe5a83e2d1ede50a105a71b5",
+      "bytes": 10112
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/ParametricFunctions.js",
+      "oid": "9173fad3c67b405e0811baaa599f949c5648ae1d",
+      "bytes": 2938
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/ParametricGeometry.js",
+      "oid": "f87a6e39ce8f21cb38f0688882306c5c96b731cb",
+      "bytes": 3820
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/RoundedBoxGeometry.js",
+      "oid": "25cbf6154fc1f92f25ba26233ce1ba3efe42b3ba",
+      "bytes": 6476
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/TeapotGeometry.js",
+      "oid": "72cc009e25b25840863167514a84ca80b9c310a0",
+      "bytes": 18855
+    },
+    {
+      "file": "vendor/three/examples/jsm/geometries/TextGeometry.js",
+      "oid": "9b253733b77ce9d40bf5185a6daff15eeefa52d4",
+      "bytes": 2901
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/LightProbeHelper.js",
+      "oid": "e6da80faa45945265b65d9f628dda1628653950c",
+      "bytes": 3613
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/LightProbeHelperGPU.js",
+      "oid": "6d6d45b431b71a49829a413109b01cec88a02669",
+      "bytes": 2216
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/OctreeHelper.js",
+      "oid": "076abf1685a86e5626f64a427470d1f65c66228c",
+      "bytes": 2804
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/PositionalAudioHelper.js",
+      "oid": "dfd9ca8dcabde2c40b58ad23ebd9db762971e2e8",
+      "bytes": 4384
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/RapierHelper.js",
+      "oid": "f3b37b682944f3f376ac07e7fea7d36558af3b70",
+      "bytes": 1298
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/RectAreaLightHelper.js",
+      "oid": "e5b820578b25b2e257dc2a558f57ec7754f74a6f",
+      "bytes": 2971
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/TextureHelper.js",
+      "oid": "8ea9ee6ea95c2fa5f0ee6867b29ef11b5adef022",
+      "bytes": 5355
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/TextureHelperGPU.js",
+      "oid": "fba2b965a80866774472a974a0fbf3b02409a16a",
+      "bytes": 4753
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/VertexNormalsHelper.js",
+      "oid": "284ce1edefe45f35569e93147fce857102e6bcb4",
+      "bytes": 3458
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/VertexTangentsHelper.js",
+      "oid": "41325432e0dc65b954cc5f32379827ba8f61433a",
+      "bytes": 2955
+    },
+    {
+      "file": "vendor/three/examples/jsm/helpers/ViewHelper.js",
+      "oid": "5194c974799c923c6c2b47922afcf92c2c062e9b",
+      "bytes": 10999
+    },
+    {
+      "file": "vendor/three/examples/jsm/interactive/HTMLMesh.js",
+      "oid": "4c20df847f1180657416db6713bdcc03f125d142",
+      "bytes": 14092
+    },
+    {
+      "file": "vendor/three/examples/jsm/interactive/InteractiveGroup.js",
+      "oid": "57fe724dcec797305b5bb67840d7206a361aa324",
+      "bytes": 5809
+    },
+    {
+      "file": "vendor/three/examples/jsm/interactive/SelectionBox.js",
+      "oid": "93bb0c3e3f61d7201711dbbcb02a637cf3e5e08e",
+      "bytes": 7756
+    },
+    {
+      "file": "vendor/three/examples/jsm/interactive/SelectionHelper.js",
+      "oid": "8e02f3a4fb9c39aabcc610929c71de4c617095c5",
+      "bytes": 3623
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/ammo.wasm.js",
+      "oid": "a7f835cf6cb85cb7fbd67f84b3dc3814ba2ca8e6",
+      "bytes": 393768
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/basis/basis_transcoder.js",
+      "oid": "6f02a4ac8504ea07512bd1106e7fe98012aecd6a",
+      "bytes": 57529
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/chevrotain.module.min.js",
+      "oid": "424790cbae7ef31bdf6c59724a435842460b1f75",
+      "bytes": 157440
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/demuxer_mp4.js",
+      "oid": "d5cd68de2526c0f8599ba736f8d6fb994356f37b",
+      "bytes": 3527
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/draco_decoder.js",
+      "oid": "6629469b21328fc180e8385e324acaf85ce0d93d",
+      "bytes": 719410
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/draco_encoder.js",
+      "oid": "2ace437282e9beeb7712143820fffa1937b2a41a",
+      "bytes": 928718
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/draco_wasm_wrapper.js",
+      "oid": "bb5b1224121134740fe6832a1aa8605bb128d2fd",
+      "bytes": 58763
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/gltf/draco_decoder.js",
+      "oid": "7c84b0be2aa46407df9f3f3371d574dc165b55f8",
+      "bytes": 512465
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/gltf/draco_encoder.js",
+      "oid": "a67cdf20607147c05c53de9d009653efa43ff7c0",
+      "bytes": 954360
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js",
+      "oid": "43f15568384c84f9506cd86fc4a8736e1ba2ec1f",
+      "bytes": 58456
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/ecsy.module.js",
+      "oid": "6f6759921b9c7be455c9dad6c83b1aaf07217c02",
+      "bytes": 45516
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/fflate.module.js",
+      "oid": "06383895963036ad297dc51421e6b2d1910f5df7",
+      "bytes": 89384
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/ktx-parse.module.js",
+      "oid": "74d2808ed59b389d4cf1fc87adbea8ff3b95c1c0",
+      "bytes": 19932
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/lil-gui.module.min.js",
+      "oid": "c76a5ef8a54e7685bf22eef690486077cf53dd0e",
+      "bytes": 29526
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/lottie_canvas.module.js",
+      "oid": "512a84c1198bbc5c0579cfbc65f1e073a03be52a",
+      "bytes": 476971
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/meshopt_decoder.module.js",
+      "oid": "a9bd05fe7b1ff20acf46fcc3031818119a851358",
+      "bytes": 24848
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/mikktspace.module.js",
+      "oid": "0a1baaa3a4339d801e2ae68894aa6c4e3d3c36b4",
+      "bytes": 48525
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/motion-controllers.module.js",
+      "oid": "ef36613c5d3e581ee95e9e03a37b599fd8b77474",
+      "bytes": 13492
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/opentype.module.js",
+      "oid": "7b5d64ea797057e3df4bad92f427a817f58f58e3",
+      "bytes": 467478
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/potpack.module.js",
+      "oid": "efba9a4dafd9ea1a92ed7c3898cdebf9a6621706",
+      "bytes": 3951
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/rhino3dm/rhino3dm.js",
+      "oid": "8b4170570eaf84bbba2f42396a5222aab989eff3",
+      "bytes": 142554
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/rhino3dm/rhino3dm.module.js",
+      "oid": "14ec13305173a18eb015c560f05a54955a4395f6",
+      "bytes": 142396
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/stats.module.js",
+      "oid": "0d372ba2603efa8f8b61d7c69ab8bb7ef7093a7b",
+      "bytes": 3514
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/surfaceNet.js",
+      "oid": "527c3eef6eeaa797d95552746f11aea68be1fc5f",
+      "bytes": 5545
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/tween.module.js",
+      "oid": "ba359a499ca93e0a6ee88d13ecb10e145e53a46c",
+      "bytes": 32316
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/utif.module.js",
+      "oid": "9a655bd26d1dfc4c441ce0b9036626006a454d65",
+      "bytes": 100835
+    },
+    {
+      "file": "vendor/three/examples/jsm/libs/zstddec.module.js",
+      "oid": "ed19f91162d2afaa5d058c67a2f6ed074ba8c197",
+      "bytes": 39754
+    },
+    {
+      "file": "vendor/three/examples/jsm/lighting/TiledLighting.js",
+      "oid": "2c4487524924c3878967e361a02496048ce2f04c",
+      "bytes": 1002
+    },
+    {
+      "file": "vendor/three/examples/jsm/lights/LightProbeGenerator.js",
+      "oid": "659488e1b64c7a42b4c9a12d81927dc78aeea314",
+      "bytes": 7728
+    },
+    {
+      "file": "vendor/three/examples/jsm/lights/RectAreaLightTexturesLib.js",
+      "oid": "c1cb661ce2af4f6e241b9a7cf5567a07b9b35f91",
+      "bytes": 314770
+    },
+    {
+      "file": "vendor/three/examples/jsm/lights/RectAreaLightUniformsLib.js",
+      "oid": "b9a6a51a6cf3b804747c2d2af5b7b353cb63c8fb",
+      "bytes": 1014
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/Line2.js",
+      "oid": "34aeecbcb9eb1abc0736f6b6372993b0126bbdf2",
+      "bytes": 1486
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/LineGeometry.js",
+      "oid": "dc8010873bf76fc2de263f1ccca4be892685b02b",
+      "bytes": 3479
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/LineMaterial.js",
+      "oid": "f14534aa964f2bfcf362f9b956e670d43fcc13a8",
+      "bytes": 13228
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/LineSegments2.js",
+      "oid": "6fce6f25a135b40c2bb0e6c3d9680679b5f1e7f7",
+      "bytes": 11277
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/LineSegmentsGeometry.js",
+      "oid": "500117bb69daeb34d083452803154df12f7099f6",
+      "bytes": 6893
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/Wireframe.js",
+      "oid": "e9247143085e9d445ea1066a6f299792b735fc79",
+      "bytes": 2981
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/WireframeGeometry2.js",
+      "oid": "ed9145b73cd62882385c8551647a6b18dd272935",
+      "bytes": 1081
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/webgpu/Line2.js",
+      "oid": "ea8eed842dee5edd790253c8cb63cdd415e6f2af",
+      "bytes": 1212
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/webgpu/LineSegments2.js",
+      "oid": "3d9f75f79f20b8f1a7ce935127b5dd63c1e1fdc4",
+      "bytes": 10833
+    },
+    {
+      "file": "vendor/three/examples/jsm/lines/webgpu/Wireframe.js",
+      "oid": "3ecc6ecf8a79fbe56250e7f5f3536159a2e06f60",
+      "bytes": 2455
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/3DMLoader.js",
+      "oid": "08dcee508d297b25ebef09300f68be7f5d83fd80",
+      "bytes": 40107
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/3MFLoader.js",
+      "oid": "57c5c92df492a3eb3833f9c5e158f8b19d945662",
+      "bytes": 38685
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/AMFLoader.js",
+      "oid": "a89328e5f8c3e7ed87b59ebc525f83f63d6750f9",
+      "bytes": 11440
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/BVHLoader.js",
+      "oid": "05a3d6bb9e8ac11dfa52cd422f88b9618ca0b77e",
+      "bytes": 10649
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/ColladaLoader.js",
+      "oid": "07ac10ef172be1b0c2a9059e47967bc6ab0da6e4",
+      "bytes": 85542
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/DDSLoader.js",
+      "oid": "89f80b1891f7f7c822ab3820c9b89147b614a443",
+      "bytes": 9070
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/DRACOLoader.js",
+      "oid": "385167cd8863fcb54f5a523b7e93b0df82d37988",
+      "bytes": 16781
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/EXRLoader.js",
+      "oid": "2307151b0aaacf10e50922be7473f48277c3330e",
+      "bytes": 66746
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/FBXLoader.js",
+      "oid": "09d8c68dbff25cc43adcf98e04bac82f9d0aae63",
+      "bytes": 104876
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/FontLoader.js",
+      "oid": "51e4b74c1173b49a38c4db7605a26427b4c87b0a",
+      "bytes": 4960
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/GCodeLoader.js",
+      "oid": "7cb83916cc5f6cb84b5c7c66c95199a00417ba49",
+      "bytes": 6375
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/GLTFLoader.js",
+      "oid": "38f8c14fb500631f01d39cd54c202eefddcf0987",
+      "bytes": 114739
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/HDRCubeTextureLoader.js",
+      "oid": "179012672c223e2edaed7df2e1e1660686a7211b",
+      "bytes": 3731
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/HDRLoader.js",
+      "oid": "3a1ada92b19400f3b96dd8701041e11af583c677",
+      "bytes": 12456
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/IESLoader.js",
+      "oid": "f8714321ddccd9a9cfef3c68aab8421b874f35bd",
+      "bytes": 8373
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/KMZLoader.js",
+      "oid": "d01e3110f71dc309171d8a73411a18b521f3be96",
+      "bytes": 3279
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/KTX2Loader.js",
+      "oid": "363d48c19e5db1beb928c4b3e7d51bd534005f08",
+      "bytes": 34635
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/KTXLoader.js",
+      "oid": "026f83e6a2a5bc82da224b24b7f53c5fc871f878",
+      "bytes": 7199
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LDrawLoader.js",
+      "oid": "0baaecac406383c5e1be0d0e49ed5e2e3ea03da5",
+      "bytes": 60968
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LUT3dlLoader.js",
+      "oid": "c9515aa58ad465c3e0264f3da0951dbf1c54eb99",
+      "bytes": 5077
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LUTCubeLoader.js",
+      "oid": "509291bd173ea8b8cb45a142c35f0fbf3e0e0499",
+      "bytes": 4629
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LUTImageLoader.js",
+      "oid": "e45b6dbbcea206a4a907116c27785b02fd5f13c7",
+      "bytes": 4184
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LWOLoader.js",
+      "oid": "87ed6419794d7b4684842877f7d4743650d3eb5c",
+      "bytes": 24674
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/LottieLoader.js",
+      "oid": "586388cbad866b9395c6d48afe9879fbc633b7b6",
+      "bytes": 3479
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/MD2Loader.js",
+      "oid": "d3a8a06afb17fd1c65d773f2a2709b22aac6706b",
+      "bytes": 13625
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/MDDLoader.js",
+      "oid": "5ce29b3470894f3f6241862c6ce1d49e2fb4cf5a",
+      "bytes": 3936
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/MTLLoader.js",
+      "oid": "3ce468d9ba454842a4bb7e3692b69fd446403c38",
+      "bytes": 11356
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/MaterialXLoader.js",
+      "oid": "8028ff4c4fdcd0791bcabd63d7af11f3531fbf26",
+      "bytes": 25738
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/NRRDLoader.js",
+      "oid": "9b56761885ef1812e15dc35090967c35a9e9f3cb",
+      "bytes": 14553
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/OBJLoader.js",
+      "oid": "4e38f046a3a3622341c05b333a04d3d5daf3e6f4",
+      "bytes": 22922
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/PCDLoader.js",
+      "oid": "3d88d11cdcc4ae10bb38e7e265834dd426de5926",
+      "bytes": 16287
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/PDBLoader.js",
+      "oid": "267b06f783a716cdda98f63862071b9827e3a2a4",
+      "bytes": 8261
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/PLYLoader.js",
+      "oid": "dc0fc6d773adb6e815ac7a770bf47db661b8e646",
+      "bytes": 17700
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/PVRLoader.js",
+      "oid": "bdedd56c3289c9bd0e8e2bd6558e64cd3900e07c",
+      "bytes": 5411
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/RGBELoader.js",
+      "oid": "4dc5748da82b9515876a58c7b12b3db2f4d74fbc",
+      "bytes": 268
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/STLLoader.js",
+      "oid": "45f8ddfcab5882d938cceb0527e83a6a586bfd17",
+      "bytes": 10715
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/SVGLoader.js",
+      "oid": "055ddd70adb2dce2ccd4d48c7d9eec07c6d1f0c7",
+      "bytes": 72749
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/TDSLoader.js",
+      "oid": "00ab3d24932fd5c4147c46d59777568c74f6f997",
+      "bytes": 25190
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/TGALoader.js",
+      "oid": "14fd3f0ff0287a973c93fbef3f9c6e79f3437069",
+      "bytes": 11818
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/TIFFLoader.js",
+      "oid": "07b941e966496b5a19c3f09c0f851b02d0743c12",
+      "bytes": 1221
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/TTFLoader.js",
+      "oid": "98e2179546102af3727ba0ae5df94db0d68bbd64",
+      "bytes": 5553
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/USDLoader.js",
+      "oid": "81eae8cad34d2a2ae5cd12f3e88ea8aca54633f0",
+      "bytes": 4502
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/USDZLoader.js",
+      "oid": "cdff6681d7e11b51940b6fa282776695788cf3b8",
+      "bytes": 266
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/UltraHDRLoader.js",
+      "oid": "7e7e29e98fe1ea129fae3833d68db3959fabe934",
+      "bytes": 15009
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/VOXLoader.js",
+      "oid": "e149a967a5642de0b45a329ddabf415b845c7b58",
+      "bytes": 10540
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/VRMLLoader.js",
+      "oid": "c109a076c458132cd8e088f7b6941957a08a6f9c",
+      "bytes": 74449
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/VTKLoader.js",
+      "oid": "af74d3f7da3eeb94dc54a06de7f7bb1db1ad3b01",
+      "bytes": 30369
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/XYZLoader.js",
+      "oid": "68665e3458c9fe72d24cd144f4d632b6c966078e",
+      "bytes": 3280
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/lwo/IFFParser.js",
+      "oid": "cd64e081b3a98d390b175cc1a1ae933f2b6f3f55",
+      "bytes": 26740
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/lwo/LWO2Parser.js",
+      "oid": "ecea9f57870f50fd16e64ec405771ad48fbfe7f5",
+      "bytes": 10137
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/lwo/LWO3Parser.js",
+      "oid": "ff2c50900a49037a02e6dddaae6871d9f0c97c8c",
+      "bytes": 9269
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/usd/USDAParser.js",
+      "oid": "090b4adfdf062f18248acba16d4ab6beb31636fc",
+      "bytes": 15954
+    },
+    {
+      "file": "vendor/three/examples/jsm/loaders/usd/USDCParser.js",
+      "oid": "0cfb9275582939785378696e929f217cba8fd144",
+      "bytes": 137
+    },
+    {
+      "file": "vendor/three/examples/jsm/materials/LDrawConditionalLineMaterial.js",
+      "oid": "9bb6be87afe1b7dd6118376bfd8c570090df4053",
+      "bytes": 4472
+    },
+    {
+      "file": "vendor/three/examples/jsm/materials/LDrawConditionalLineNodeMaterial.js",
+      "oid": "8de20cf35a3eda7ab88009589e833896ef571e22",
+      "bytes": 3985
+    },
+    {
+      "file": "vendor/three/examples/jsm/materials/MeshGouraudMaterial.js",
+      "oid": "d2feba83b4aca277fd3afabfdcef699144b26296",
+      "bytes": 10106
+    },
+    {
+      "file": "vendor/three/examples/jsm/materials/MeshPostProcessingMaterial.js",
+      "oid": "0e63601ee3423585398c77ca907afccbd3668a8d",
+      "bytes": 4810
+    },
+    {
+      "file": "vendor/three/examples/jsm/materials/WoodNodeMaterial.js",
+      "oid": "166b85fff86b3fbafa79e78b4f889219cab514a2",
+      "bytes": 19407
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/Capsule.js",
+      "oid": "902eefeba2e410603c1ba4630eecc4ecdcfc41c1",
+      "bytes": 3543
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/ColorConverter.js",
+      "oid": "c257f4446fa114e24af56e4462839facaafcb2f0",
+      "bytes": 1487
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/ColorSpaces.js",
+      "oid": "1f588fe0a58f3d82c62c32b3e954ab76744a1ac0",
+      "bytes": 4290
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/ConvexHull.js",
+      "oid": "d529fa6ee5e321c09f521d6441c4fa087986983b",
+      "bytes": 32980
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/ImprovedNoise.js",
+      "oid": "9115ebcd7cecc08cfff3bf6015c28ad49f825fc1",
+      "bytes": 3040
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/Lut.js",
+      "oid": "1b41192e9aeae32f45fd737e08ee039d2f354ea9",
+      "bytes": 6688
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/MeshSurfaceSampler.js",
+      "oid": "a218f734f24fd72d7b5cbb53cdacfc811ed0b42e",
+      "bytes": 8161
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/OBB.js",
+      "oid": "f838fb270d7723ceaff9fb050681abb7b2eb962b",
+      "bytes": 13862
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/Octree.js",
+      "oid": "962fb0293999171ac32c707c6c1ef4fe3d039af4",
+      "bytes": 14863
+    },
+    {
+      "file": "vendor/three/examples/jsm/math/SimplexNoise.js",
+      "oid": "6712f3410a42a424e0545dbc2811d9fee3601bc0",
+      "bytes": 15154
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/ConvexObjectBreaker.js",
+      "oid": "a6c7ffc972d4c17e2b7843ff8fed0a1e0d30d1ce",
+      "bytes": 14856
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/GPUComputationRenderer.js",
+      "oid": "94ec75aca7f8c214f30cc69f587b11b0579b915e",
+      "bytes": 14123
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/Gyroscope.js",
+      "oid": "83ca3d32d7febcba7ddd7c97cb0cfe9e311bc665",
+      "bytes": 1617
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/MD2Character.js",
+      "oid": "9f4355ff0e3e62c7a5a0b268a5d25e82ddb4c908",
+      "bytes": 7389
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/MD2CharacterComplex.js",
+      "oid": "005a9a5133568eb0bf8fd19960a2c5e06f1da378",
+      "bytes": 15251
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/MorphAnimMesh.js",
+      "oid": "d67fd915a351831cc8399eedf56288248597a178",
+      "bytes": 2349
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/MorphBlendMesh.js",
+      "oid": "7a28f092548fb09214f13f3c660600246772e317",
+      "bytes": 8091
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/ProgressiveLightMap.js",
+      "oid": "64bf63caa1838a1b7326096a8d82400b71af44fd",
+      "bytes": 11897
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/ProgressiveLightMapGPU.js",
+      "oid": "50b8a456dfb02d4d71cfcede2b9d7eb2fde70e34",
+      "bytes": 9915
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/RollerCoaster.js",
+      "oid": "a1c82cf4d9205f0974b82f31a6c2d419c59a4e33",
+      "bytes": 15506
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/TubePainter.js",
+      "oid": "e6ad0485d1340f155abdae3e12ed176a8cf4d702",
+      "bytes": 5784
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/Volume.js",
+      "oid": "355ed7ceb03a7b67cdb713a516eb29c2a6bbe954",
+      "bytes": 13338
+    },
+    {
+      "file": "vendor/three/examples/jsm/misc/VolumeSlice.js",
+      "oid": "be0afbc19aa9dbe06bc46e272145ff46e98b9394",
+      "bytes": 6525
+    },
+    {
+      "file": "vendor/three/examples/jsm/modifiers/CurveModifier.js",
+      "oid": "77a076ee6535906efcdd838a627c8f34bb4ce854",
+      "bytes": 10538
+    },
+    {
+      "file": "vendor/three/examples/jsm/modifiers/CurveModifierGPU.js",
+      "oid": "e3ecaaa1158d18be4fe26f9ea991e37164bd9faf",
+      "bytes": 7284
+    },
+    {
+      "file": "vendor/three/examples/jsm/modifiers/EdgeSplitModifier.js",
+      "oid": "04aeae4a464b4e0ddfc0db63445c4a594a4a63f3",
+      "bytes": 6131
+    },
+    {
+      "file": "vendor/three/examples/jsm/modifiers/SimplifyModifier.js",
+      "oid": "54ccf64bb84eab7f691ee09ec2b747617978ee57",
+      "bytes": 12918
+    },
+    {
+      "file": "vendor/three/examples/jsm/modifiers/TessellateModifier.js",
+      "oid": "47f3bf15659575cd1512b5b2f839a8d7ce8a8a5a",
+      "bytes": 7079
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/GroundedSkybox.js",
+      "oid": "d794f1ef328585ab9697fbf07d551648cd21c3a6",
+      "bytes": 1973
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Lensflare.js",
+      "oid": "b3a7d8f4e0759d23db82bd80bb868ce025783fe6",
+      "bytes": 11110
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/LensflareMesh.js",
+      "oid": "d219b465c5832774cd9d00b8bbb2caeaf1eb3420",
+      "bytes": 9714
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/MarchingCubes.js",
+      "oid": "29a405be3eae30a7e2b1ff04827068921d31d5dc",
+      "bytes": 40408
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Reflector.js",
+      "oid": "19b96b1f7dc424861bf41e32f3a4e08d3b333ead",
+      "bytes": 9476
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/ReflectorForSSRPass.js",
+      "oid": "1813c3c507135a262feec300d63fbb5cd8f45135",
+      "bytes": 11960
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Refractor.js",
+      "oid": "e0743119662e22bcd310e92d8d789b1b51debbed",
+      "bytes": 10176
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/ShadowMesh.js",
+      "oid": "fab5dca0b84372fde972c61d6d589585f17acf7d",
+      "bytes": 3288
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Sky.js",
+      "oid": "3b490e8ef81467706f743bc0abf2fd7d3b09e568",
+      "bytes": 7257
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/SkyMesh.js",
+      "oid": "0b97a6af36da84b108bcf29a1e89b2b4f29c1aef",
+      "bytes": 7588
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Water.js",
+      "oid": "e9d3fc1ebad89ea336e0174f7d5e82d0705c7b6f",
+      "bytes": 12912
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Water2.js",
+      "oid": "3ba6894b5f05e4ef6206acbccd321e0e28106cfd",
+      "bytes": 10439
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/Water2Mesh.js",
+      "oid": "f3c168cc228364ede8b5de785350b95a04a30992",
+      "bytes": 5947
+    },
+    {
+      "file": "vendor/three/examples/jsm/objects/WaterMesh.js",
+      "oid": "43b15299c9b00511e23f147df858cf1cec647d92",
+      "bytes": 6008
+    },
+    {
+      "file": "vendor/three/examples/jsm/offscreen/jank.js",
+      "oid": "2a4f1e78268869dfc640023513f7bff1f0b12edf",
+      "bytes": 645
+    },
+    {
+      "file": "vendor/three/examples/jsm/offscreen/offscreen.js",
+      "oid": "ba69f0a4d5d64548551268ecbf0bc502ac9c6d81",
+      "bytes": 188
+    },
+    {
+      "file": "vendor/three/examples/jsm/offscreen/scene.js",
+      "oid": "fa18baafe5d5c6810e0ecf4558994fd277432a7e",
+      "bytes": 2078
+    },
+    {
+      "file": "vendor/three/examples/jsm/physics/AmmoPhysics.js",
+      "oid": "d1258497fd944f6047a08f7474d6c64533aa3d11",
+      "bytes": 8534
+    },
+    {
+      "file": "vendor/three/examples/jsm/physics/JoltPhysics.js",
+      "oid": "0a3582eb84095d78b7f9129573d264611e369612",
+      "bytes": 8387
+    },
+    {
+      "file": "vendor/three/examples/jsm/physics/RapierPhysics.js",
+      "oid": "98fd2812b6c0245be3a4bad6fa1767f942a095b7",
+      "bytes": 10551
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/AfterimagePass.js",
+      "oid": "b770622c62dc192d352bc5148a5ebd09e58953bc",
+      "bytes": 4342
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/BloomPass.js",
+      "oid": "5394a43ea04f239832319c8ba05120a5ba0cdf9a",
+      "bytes": 6405
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/BokehPass.js",
+      "oid": "3bc06db46f53055d244c8287ca4b2fb350d4e984",
+      "bytes": 5531
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/ClearPass.js",
+      "oid": "9b1cc0e1cce8ecac4a7ea09c86382ed4cd87a0c2",
+      "bytes": 2167
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/CubeTexturePass.js",
+      "oid": "8089e2b42d5255860bab9ef1c2557022817146c1",
+      "bytes": 3519
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/DotScreenPass.js",
+      "oid": "8efc56be1b791d2711687627901fcc59a6e0f672",
+      "bytes": 2941
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/EffectComposer.js",
+      "oid": "cc807df391d6d01b7eb5c7097fbc6fe8ad96084a",
+      "bytes": 8477
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/FXAAPass.js",
+      "oid": "50c5287610ca5dc0b7f097caf86064015385dbe9",
+      "bytes": 738
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/FilmPass.js",
+      "oid": "00017af6c3cd2c4244faba181b86130230f5f5fc",
+      "bytes": 2684
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/GTAOPass.js",
+      "oid": "d1e2f661735644e7b95446e5cbd5ec43231dbf41",
+      "bytes": 19890
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/GlitchPass.js",
+      "oid": "31552125328e966a9346e1c8689f41b6b16aefac",
+      "bytes": 4303
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/HalftonePass.js",
+      "oid": "5445cdcbd922e68b0eb48b4c04b2d1725d9928a3",
+      "bytes": 2882
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/LUTPass.js",
+      "oid": "4ddffb94126f6c5f0e986acc060bacaaae130529",
+      "bytes": 2230
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/MaskPass.js",
+      "oid": "3a2afff8cf261faa6972d87c4843580901eac7ad",
+      "bytes": 4694
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/OutlinePass.js",
+      "oid": "e38580bd9e9f29026ad026f5c33548cf114a72e4",
+      "bytes": 23172
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/OutputPass.js",
+      "oid": "1148de644671f9af49023dcd50bbd3993d2f678c",
+      "bytes": 4029
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/Pass.js",
+      "oid": "50acb4784ee0d67f34f5efcb574b55d0b083c81b",
+      "bytes": 4218
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/RenderPass.js",
+      "oid": "c85f0e559a7a7813f911e87ef24a589fd61f2a0f",
+      "bytes": 4112
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/RenderPixelatedPass.js",
+      "oid": "4eebcfa3f5ab83fcaf9e9037a7547a42b80345af",
+      "bytes": 8151
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/RenderTransitionPass.js",
+      "oid": "4e1535bb9e4026392e22aa277ea94ec633f7fc50",
+      "bytes": 5847
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SAOPass.js",
+      "oid": "5956de5d60a90451d786e5f25ca1f87b955e1954",
+      "bytes": 13085
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SMAAPass.js",
+      "oid": "e330f9048562e08168233513a8f701e801e65e73",
+      "bytes": 50379
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SSAARenderPass.js",
+      "oid": "797c466f1f49c76ec736f0f7c0f5614f6192f369",
+      "bytes": 8150
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SSAOPass.js",
+      "oid": "dfe8d8b4cf86ff7331bc24f6bb410da14ebe3372",
+      "bytes": 13443
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SSRPass.js",
+      "oid": "022fbfd9e403837a02b7794c021abafaffa5ce23",
+      "bytes": 23254
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/SavePass.js",
+      "oid": "f92292e9df34bb6bca31d58074ee6ceaf1b6af4c",
+      "bytes": 2978
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/ShaderPass.js",
+      "oid": "ce72fcf13ec3daff78b940fe2bfc78def01729e8",
+      "bytes": 3228
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/TAARenderPass.js",
+      "oid": "eeec12813407322cfe5b62603c973c163d3bd231",
+      "bytes": 6467
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/TexturePass.js",
+      "oid": "649a235416d3a1194c9e0509140e3f21c9a7f209",
+      "bytes": 2920
+    },
+    {
+      "file": "vendor/three/examples/jsm/postprocessing/UnrealBloomPass.js",
+      "oid": "5ad6fc0ce4ac2a9d5f09fefab745a57d15c97402",
+      "bytes": 14388
+    },
+    {
+      "file": "vendor/three/examples/jsm/renderers/CSS2DRenderer.js",
+      "oid": "1def549b33f3db5725b9661cd947a2b9cf10e094",
+      "bytes": 6976
+    },
+    {
+      "file": "vendor/three/examples/jsm/renderers/CSS3DRenderer.js",
+      "oid": "94aacafc9d77924ac22cfc477b51fb55ef2ba19d",
+      "bytes": 11103
+    },
+    {
+      "file": "vendor/three/examples/jsm/renderers/Projector.js",
+      "oid": "2d3882984412fc266e2e71d47308335a4eac8552",
+      "bytes": 20281
+    },
+    {
+      "file": "vendor/three/examples/jsm/renderers/SVGRenderer.js",
+      "oid": "87f0c08acd67b81ea0c485ff9e322bd0ac25b97b",
+      "bytes": 15806
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ACESFilmicToneMappingShader.js",
+      "oid": "8c3544bc7a270748a7a824e1bd14c4760ea3b112",
+      "bytes": 2147
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/AfterimageShader.js",
+      "oid": "e2fda0c6d5640c772ed5adac5ee698d402263f22",
+      "bytes": 1054
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BasicShader.js",
+      "oid": "2a5da5603608fe4aa860175045e8b99efa908562",
+      "bytes": 523
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BleachBypassShader.js",
+      "oid": "b170f3e3094eda1abdc6483c1ec7994e901a64a9",
+      "bytes": 1362
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BlendShader.js",
+      "oid": "8fc453120d284847241308ecdc0e7991caf7964b",
+      "bytes": 920
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BokehShader.js",
+      "oid": "8bead5eb08817f43f320bf1dfa23e1bb43011d5b",
+      "bytes": 5940
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BokehShader2.js",
+      "oid": "04784d8a343d77ff05e9a8e30b3152c7ba70b75b",
+      "bytes": 9871
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/BrightnessContrastShader.js",
+      "oid": "073f07e1bb56f90375141af171ff9d1c7f7693ba",
+      "bytes": 1275
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ColorCorrectionShader.js",
+      "oid": "0ae42d99de7fd0cc964dd2cc3beb35c554bc05ba",
+      "bytes": 1024
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ColorifyShader.js",
+      "oid": "029671fff857e6108d2e7663d1ca269d17c46db8",
+      "bytes": 834
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ConvolutionShader.js",
+      "oid": "5db1cdf2bef318ec914f59da43d5c300c6886c89",
+      "bytes": 1281
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/CopyShader.js",
+      "oid": "6deb24849e1dd080f35af75728d29028920f1fb3",
+      "bytes": 729
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/DOFMipMapShader.js",
+      "oid": "4cddc6142c70678dac0ea7db203d875f2c595880",
+      "bytes": 1092
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/DepthLimitedBlurShader.js",
+      "oid": "ef5e8525124e8536e53c591a6ea1daa639e7cec8",
+      "bytes": 3952
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/DigitalGlitch.js",
+      "oid": "23e873bcede6b00ac0c691dcf955a4d2aec82152",
+      "bytes": 2525
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/DotScreenShader.js",
+      "oid": "dbea3516f8316fb2c42ce43c5807cc6711b6e54c",
+      "bytes": 1384
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ExposureShader.js",
+      "oid": "d61d492f396875249620fecda0b8acf4f02f005a",
+      "bytes": 729
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/FXAAShader.js",
+      "oid": "7181751daf5275f580c0f240e38dd925c717417c",
+      "bytes": 6815
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/FilmShader.js",
+      "oid": "2f25c5945fb34ee3949488c5386cf02353302da1",
+      "bytes": 1133
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/FocusShader.js",
+      "oid": "6bde0cc5882194ec348354c6771ec5809fbb48ba",
+      "bytes": 2473
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/FreiChenShader.js",
+      "oid": "9912356cf612349529a048529e6ed92331d015c7",
+      "bytes": 3153
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/GTAOShader.js",
+      "oid": "83ff79fcb96bf20f8202061d884904319b9f24ea",
+      "bytes": 11910
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/GammaCorrectionShader.js",
+      "oid": "3f5c8a617a81905ce9b65d3a7f33359593de3579",
+      "bytes": 818
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/GodRaysShader.js",
+      "oid": "ba0dd89d880d8c8197827d99c3861491b079a3bb",
+      "bytes": 7135
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/HalftoneShader.js",
+      "oid": "78b3f57ff84071c9675ab46ea57c619b74cf82ba",
+      "bytes": 8771
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/HorizontalBlurShader.js",
+      "oid": "46c7892a4d29290796dc14457bb557344600aad4",
+      "bytes": 1667
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/HorizontalTiltShiftShader.js",
+      "oid": "2d4a90261064c57ebe48b603f7b69bbf182bbd5d",
+      "bytes": 1792
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/HueSaturationShader.js",
+      "oid": "08bf3cd6b4929aa1f79886a820f82570d129edff",
+      "bytes": 1678
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/KaleidoShader.js",
+      "oid": "46da8d8c13462d34ee9dd0a1329ec9ba8f0ce842",
+      "bytes": 1200
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/LuminosityHighPassShader.js",
+      "oid": "16ff4e69f7cf741409060477770d4c91e62a944a",
+      "bytes": 1291
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/LuminosityShader.js",
+      "oid": "6e2ef6107fb322eeb154179fcbd85aa9972c9470",
+      "bytes": 768
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/MirrorShader.js",
+      "oid": "7850e0f206297fb5a208d09d34511e98fc083df2",
+      "bytes": 1066
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/NormalMapShader.js",
+      "oid": "b600c551b388d01e5f501cad8ec04dfa995aad85",
+      "bytes": 1165
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/OutputShader.js",
+      "oid": "5f257829fe655f74252d67585e1d63e035c05b67",
+      "bytes": 1876
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/PoissonDenoiseShader.js",
+      "oid": "cd2e788226de0bce72eda0bc64e00da895c81bdb",
+      "bytes": 6945
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/RGBShiftShader.js",
+      "oid": "acbe4413cb1cbb088459ddca70bafe2790a7e49c",
+      "bytes": 1288
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SAOShader.js",
+      "oid": "dbf9c6ff371f8e05d96c51589e9d2a9a3026db47",
+      "bytes": 5075
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SMAAShader.js",
+      "oid": "ce1b47e75965626bb01870e74d7ea094e0d9fd1a",
+      "bytes": 15002
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SSAOShader.js",
+      "oid": "ab1dc6f25eca7eb7947564bf6506eb804cbb022d",
+      "bytes": 6826
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SSRShader.js",
+      "oid": "a05834f68d280ba702319a05ef8793d16f5d9eff",
+      "bytes": 9856
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SepiaShader.js",
+      "oid": "5e37d4b383f91e876470eca417526f9f2a305ab5",
+      "bytes": 1104
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SobelOperatorShader.js",
+      "oid": "43d190f93a7295f5a9c1a90a2163d0212d1ff47b",
+      "bytes": 2546
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/SubsurfaceScatteringShader.js",
+      "oid": "faab31834f181d7a4f40c67096d2cd0ba2a4e59f",
+      "bytes": 3270
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/TechnicolorShader.js",
+      "oid": "8752a056f59ac1737654a0c6cadfa72699b0cd86",
+      "bytes": 1043
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/ToonShader.js",
+      "oid": "59daae98f2616852b03e92021a59755bfe5fc428",
+      "bytes": 7147
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/TriangleBlurShader.js",
+      "oid": "7d75459ec9b8c73b11b3bf56ceb9bc7c7e94750e",
+      "bytes": 1467
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/UnpackDepthRGBAShader.js",
+      "oid": "ef0271df1880c343adcb8e5e2e92bde00e20e71a",
+      "bytes": 1017
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/VelocityShader.js",
+      "oid": "9c5ef710fa3864b8245b84082e5d63e9c5c38ec6",
+      "bytes": 3173
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/VerticalBlurShader.js",
+      "oid": "e4c953a8c4a6c952032d7cf427404f0a964696ab",
+      "bytes": 1639
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/VerticalTiltShiftShader.js",
+      "oid": "f4442b4ef84b05c6a4a96dc11123c1ff8644d949",
+      "bytes": 1779
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/VignetteShader.js",
+      "oid": "4d3856730dfa6a3c743542a57eb5f6690a18bafb",
+      "bytes": 1054
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/VolumeShader.js",
+      "oid": "069f2d7ffeea1f9712a8e1f801ab210ee4620e8c",
+      "bytes": 9950
+    },
+    {
+      "file": "vendor/three/examples/jsm/shaders/WaterRefractionShader.js",
+      "oid": "680c4ad5c7b6e9568db902879801683744ddfe45",
+      "bytes": 2046
+    },
+    {
+      "file": "vendor/three/examples/jsm/textures/FlakesTexture.js",
+      "oid": "c0f4986d069ec913e1ddc54073a25fff826ec99d",
+      "bytes": 1422
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/AST.js",
+      "oid": "7473a23e04b7e2f8ec51b1e6268bbf0fb0720cad",
+      "bytes": 7334
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/GLSLDecoder.js",
+      "oid": "6661d818e5f03ef5c8556da74a273e5273be2c3e",
+      "bytes": 22231
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/Linker.js",
+      "oid": "5cb4c980c7d65c9489fe1fe5affea4c982bc1a9f",
+      "bytes": 5065
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/ShaderToyDecoder.js",
+      "oid": "f4fe871432e18c261595927983756d16101e671e",
+      "bytes": 1010
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/TSLEncoder.js",
+      "oid": "42fe86d0715f0797b7c407b867a64eec091aa7d4",
+      "bytes": 17461
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/Transpiler.js",
+      "oid": "a8e67d0789f89d25a0990e0c77743d73cce490eb",
+      "bytes": 1560
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/TranspilerUtils.js",
+      "oid": "d9e74a32504183f91bd4a5efa63c46d5f14c54a6",
+      "bytes": 608
+    },
+    {
+      "file": "vendor/three/examples/jsm/transpiler/WGSLEncoder.js",
+      "oid": "3f588973a671efb4fd7ff8b19e452e36f31885bd",
+      "bytes": 18171
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/AfterImageNode.js",
+      "oid": "2d4c9e91ce5eb67aec84da6413958ce8328765c0",
+      "bytes": 5981
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/AnaglyphPassNode.js",
+      "oid": "d50adcbbc424c6602474c5842afe676e738833a5",
+      "bytes": 2706
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/AnamorphicNode.js",
+      "oid": "c46a6aafefdcfd9524ae98e54f09b40215279a94",
+      "bytes": 6983
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/BleachBypass.js",
+      "oid": "0a3c5b2defa1535f2b025896bccac392e056cd84",
+      "bytes": 987
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/BloomNode.js",
+      "oid": "f967e04a75b7cae5cb7cea4de68a6c47e90c225e",
+      "bytes": 14849
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/ChromaticAberrationNode.js",
+      "oid": "3fedafbcaaad95590de6682d536b8f6a3a039066",
+      "bytes": 5766
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/DenoiseNode.js",
+      "oid": "1b4958960a7cfc94c6b4a964f76383b3805c6c55",
+      "bytes": 9763
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/DepthOfFieldNode.js",
+      "oid": "9c97ee0e849160c08191cc4310150e1b21ed239a",
+      "bytes": 14705
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/DotScreenNode.js",
+      "oid": "35939efe3e0edc5899c2c1a114684faedaa5f08c",
+      "bytes": 2587
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/FXAANode.js",
+      "oid": "f90b6fcff2f6be1b1bb52f88e53243b2ac597e1f",
+      "bytes": 9478
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/FilmNode.js",
+      "oid": "7c955c4de3295038c8be5c47b7c6fc3b067a3be6",
+      "bytes": 2330
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/GTAONode.js",
+      "oid": "f2e9a0e0233744964cb31163caefa0cf18f35b10",
+      "bytes": 15353
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/GaussianBlurNode.js",
+      "oid": "ba72461b0849942ac2379ed630074ce4faceb338",
+      "bytes": 10287
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/LensflareNode.js",
+      "oid": "9654ace92348bd6eee6faf4e3314482647a203d2",
+      "bytes": 8190
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/Lut3DNode.js",
+      "oid": "3b588f637fb3432c1ee4a6d63691b1b816fee973",
+      "bytes": 2722
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/MotionBlur.js",
+      "oid": "91862dbc50a0008af440f9d4d0bd824b8eff20f3",
+      "bytes": 1099
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/OutlineNode.js",
+      "oid": "dced22cfe1039c5ebe56ed07c3f090598b7be863",
+      "bytes": 19791
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/ParallaxBarrierPassNode.js",
+      "oid": "8403e2b19bf14926a22e18db66d7c689f68eeb7f",
+      "bytes": 2080
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/PixelationPassNode.js",
+      "oid": "da8e8b60fe8c21fe5d031fac72e5e460161147ce",
+      "bytes": 9346
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/RGBShiftNode.js",
+      "oid": "c615737c1ab41a84ee60190cedfc9e2502e00e5b",
+      "bytes": 2459
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/SMAANode.js",
+      "oid": "bf907e1f0f7a172bad890b955ca174f77d0d0665",
+      "bytes": 68049
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/SSAAPassNode.js",
+      "oid": "88d2426b473b204837f52792e91f8c21b41308e4",
+      "bytes": 8724
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/SSRNode.js",
+      "oid": "0e2f85a95c528193b6105cc2613a88ce05c18a83",
+      "bytes": 20241
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/Sepia.js",
+      "oid": "d703032b2e868ecc72044b1bc3ee11901bd20a74",
+      "bytes": 572
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/SobelOperatorNode.js",
+      "oid": "14762dd60d02235791c31dae6598668b1e5c0a3f",
+      "bytes": 4551
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/StereoCompositePassNode.js",
+      "oid": "5c72b6cc27657388209ea2f077190757cc5cf87e",
+      "bytes": 4311
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/StereoPassNode.js",
+      "oid": "7dd442963bc7df7edb6aebe60f1e758d3fd894ea",
+      "bytes": 2970
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/TRAANode.js",
+      "oid": "6784797a5c9169abfddc8c20f5d4643df24160b7",
+      "bytes": 12718
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/TransitionNode.js",
+      "oid": "d2d745d34a95b48f314d99528e68d42d6da43f15",
+      "bytes": 4326
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/boxBlur.js",
+      "oid": "a1b7692fc4c742e47d19c3993adb27db98f434f3",
+      "bytes": 2740
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/display/hashBlur.js",
+      "oid": "d8ebeac3e4997451ca68a65e9f0e198772abccd2",
+      "bytes": 2310
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/lighting/TiledLightsNode.js",
+      "oid": "57e2edf21b7e520b7051683e548e597186bd122a",
+      "bytes": 10189
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/math/Bayer.js",
+      "oid": "6ab6734942550ef86bb82443b65716fe78c3f8b7",
+      "bytes": 3789
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/shadows/TileShadowNode.js",
+      "oid": "4a1179a1266b9367d2e3dcba9a3639d5585ce9d3",
+      "bytes": 12402
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/shadows/TileShadowNodeHelper.js",
+      "oid": "aaba411088fdf1d2f783469b33af89614c400b3e",
+      "bytes": 5321
+    },
+    {
+      "file": "vendor/three/examples/jsm/tsl/utils/Raymarching.js",
+      "oid": "a1a60d3365c424a0da7e5f03aac4bb4eb191124a",
+      "bytes": 1986
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/BufferGeometryUtils.js",
+      "oid": "c84dc7b2bbc99849373e17a6efae609e326f9536",
+      "bytes": 35539
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/CameraUtils.js",
+      "oid": "c50551356aff3beed3e4f9e1967268c513c8035a",
+      "bytes": 3204
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/GeometryCompressionUtils.js",
+      "oid": "9d14bd0ac66b4dcfc4fee26609f8e66fef95d66a",
+      "bytes": 13010
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/GeometryUtils.js",
+      "oid": "7e831f64df1c9b5f7f7da53ce7316d2607d32a2f",
+      "bytes": 5593
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/LDrawUtils.js",
+      "oid": "96726fff04012035072fa9139ed343eff0ec8d3f",
+      "bytes": 6054
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/SceneOptimizer.js",
+      "oid": "748adb2d800d610341e2c99d721e4d16162a3a1f",
+      "bytes": 10253
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/SceneUtils.js",
+      "oid": "987669621dc423215c7b5239c9038b37a8f9a0ef",
+      "bytes": 8634
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/ShadowMapViewer.js",
+      "oid": "5e43cae4c8653938b24336bac6eff794bfd8c7d5",
+      "bytes": 5925
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/ShadowMapViewerGPU.js",
+      "oid": "368f0abc0c36100bbfe8805584aa46cc0c83e5d8",
+      "bytes": 5974
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/SkeletonUtils.js",
+      "oid": "e208c7422862941bc55a4cfca4fd2b3a91285954",
+      "bytes": 11062
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/SortUtils.js",
+      "oid": "84df1828ecc472c27ca01e3f2244aad49d1499d0",
+      "bytes": 3354
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/UVsDebug.js",
+      "oid": "ee733f800b0cc1757efd6b6c1dafe6b2ff8efef6",
+      "bytes": 3427
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/WebGLTextureUtils.js",
+      "oid": "952ddd97b89bf05a3de7a3a148780beac23e04a5",
+      "bytes": 3068
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/WebGPUTextureUtils.js",
+      "oid": "1286fe6c478fa14156d5654784655dbf43edcc29",
+      "bytes": 2266
+    },
+    {
+      "file": "vendor/three/examples/jsm/utils/WorkerPool.js",
+      "oid": "9d76566b42f1e3ceea8aef056561c088426a88e9",
+      "bytes": 3110
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/ARButton.js",
+      "oid": "ef2642914d0b3ab4674c47d7a2578419c42d4f1b",
+      "bytes": 5485
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/OculusHandModel.js",
+      "oid": "37cea089375c5862acb1eef85174f59bb926dd1c",
+      "bytes": 3795
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/OculusHandPointerModel.js",
+      "oid": "6df9c10d77fa164f7f66fcda5e9e5c691243dfb5",
+      "bytes": 13518
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/Text2D.js",
+      "oid": "771c8556a535ed69c81b759ddd68c02d404a9597",
+      "bytes": 1482
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/VRButton.js",
+      "oid": "e3f2a658f28aa3d7ea9c3a1efb8239d8230016cd",
+      "bytes": 5866
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRButton.js",
+      "oid": "fab56eef0152dea9c4db1e8a0b36576f30575fce",
+      "bytes": 4959
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRControllerModelFactory.js",
+      "oid": "4667423fa58d69a537e72af24386967ce904ef28",
+      "bytes": 9959
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XREstimatedLight.js",
+      "oid": "ccf90117b99f7f7792c86e09da9c568699deb30a",
+      "bytes": 6112
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRHandMeshModel.js",
+      "oid": "9af2a29b5384571ab87c0e279c039d2343b8f8e2",
+      "bytes": 3556
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRHandModelFactory.js",
+      "oid": "27c0c0a8b76b63b46d36ad04355bae71563ea832",
+      "bytes": 4260
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRHandPrimitiveModel.js",
+      "oid": "b4800fba9b34094ec7c42f612292720fae3475bf",
+      "bytes": 3494
+    },
+    {
+      "file": "vendor/three/examples/jsm/webxr/XRPlanes.js",
+      "oid": "37833e44a8fb72a185dbda67a74bafade80e7842",
+      "bytes": 2455
+    },
+    {
+      "file": "vendor/three/package.json",
+      "oid": "fb4fe9d2224cffaf922f006cbff4b4adda87ecf5",
+      "bytes": 4635
+    },
+    {
+      "file": "vendor/yuka.module.js",
+      "oid": "4a4cc6e779b9b4e9fc14b8f2de34fefcae6f729c",
+      "bytes": 442887
+    }
+  ]
+}

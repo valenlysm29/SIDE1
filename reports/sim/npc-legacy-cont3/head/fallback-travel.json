@@ -1,0 +1,1622 @@
+{
+  "travel": {
+    "states": [
+      "ENTER_STORE",
+      "BROWSE",
+      "COMPARE",
+      "LEAVE_STORE"
+    ],
+    "violations": [],
+    "diag": {
+      "initialized": true,
+      "running": true,
+      "session": {
+        "context": "SIDE-000_QA_NPC_1",
+        "day": 1,
+        "timeLeft": 299.50549999999976,
+        "shiftEnded": false
+      },
+      "navigationReady": true,
+      "navigationSystem": "yuka-three-pathfinding+aabb",
+      "navigationGrid": {
+        "cells": 3481,
+        "walkable": 3180,
+        "blocked": 301,
+        "triangles": 6360
+      },
+      "models": [
+        "male",
+        "female",
+        "casual"
+      ],
+      "characters": [
+        {
+          "kind": "city:city_man_suit",
+          "characterId": null,
+          "role": "cashier",
+          "name": "Asesor",
+          "x": 136,
+          "y": 0.025,
+          "z": 20.2,
+          "height": 1.7149999999999999,
+          "groundY": 0.025
+        },
+        {
+          "kind": "city:city_woman_suit",
+          "characterId": null,
+          "role": "salesperson",
+          "name": "Asesora",
+          "x": 133,
+          "y": 0.025,
+          "z": 15.2,
+          "height": 1.68,
+          "groundY": 0.025
+        },
+        {
+          "kind": "city:city_woman_tank",
+          "characterId": null,
+          "role": "customer",
+          "name": "Transeúnte deportiva",
+          "x": 131.35686225456072,
+          "y": 0.025,
+          "z": 16.45672352208331,
+          "height": 1.70625,
+          "groundY": 0.025
+        },
+        {
+          "kind": "city:city_man_casual",
+          "characterId": null,
+          "role": "customer",
+          "name": "Vecino",
+          "x": 132.95942259835502,
+          "y": 0.025,
+          "z": 19.948634935965945,
+          "height": 1.70625,
+          "groundY": 0.025
+        },
+        {
+          "kind": "player",
+          "characterId": "chico2",
+          "role": "player",
+          "name": "Miguel",
+          "x": 131,
+          "y": 0.025,
+          "z": 17,
+          "height": 1.75,
+          "groundY": 0.02200000000000299
+        },
+        {
+          "kind": "city:city_woman_suit",
+          "characterId": null,
+          "role": "guide",
+          "name": "Guía SIDE",
+          "x": 167.9774276761318,
+          "y": 0.02200000000000299,
+          "z": 13.26262770404194,
+          "height": 1.68,
+          "groundY": 0.02200000000000299
+        },
+        {
+          "kind": "city:city_woman_dress",
+          "characterId": null,
+          "role": "hub-pedestrian",
+          "name": "Clienta de vestido",
+          "x": 175.06639964303358,
+          "y": 0.02200000000000299,
+          "z": 25.782391600763688,
+          "height": 1.70625,
+          "groundY": 0.02200000000000299
+        },
+        {
+          "kind": "city:city_woman_casual",
+          "characterId": null,
+          "role": "hub-pedestrian",
+          "name": "Vecina",
+          "x": 158.54054664430174,
+          "y": 0.02200000000000299,
+          "z": 25.500949141844874,
+          "height": 1.70625,
+          "groundY": 0.02200000000000299
+        },
+        {
+          "kind": "city:city_woman_green",
+          "characterId": null,
+          "role": "hub-pedestrian",
+          "name": "Cliente de polo verde",
+          "x": 167.05958615768125,
+          "y": -0.0049999999999968125,
+          "z": -10.216056894231038,
+          "height": 1.70625,
+          "groundY": -0.0049999999999968125
+        }
+      ],
+      "assets": {
+        "detailsLoading": false,
+        "detailsReady": true,
+        "lighting": "baked-studio",
+        "storeProps": {
+          "loaded": [
+            "table",
+            "counter",
+            "counterEnd",
+            "shelfTall",
+            "shelfLow",
+            "mirror",
+            "entryDoor",
+            "windowPanel",
+            "atm",
+            "ceilingLight",
+            "register"
+          ],
+          "errors": {}
+        },
+        "warehouseProps": {
+          "loaded": [
+            "boxLarge",
+            "boxLong",
+            "boxSmall",
+            "boxWide",
+            "loadingDoor",
+            "highWindow",
+            "floorArrow",
+            "warningBeacon",
+            "pallet",
+            "rackTall",
+            "bagStack",
+            "cuttingTable",
+            "pendantLight",
+            "fabricRolls",
+            "palletTruck",
+            "fireExtinguisher",
+            "sewingMachine"
+          ],
+          "errors": {}
+        },
+        "productionProps": {
+          "loaded": [
+            "rackTall",
+            "cuttingTable",
+            "pendantLight",
+            "fabricRolls",
+            "sewingMachine",
+            "overlockMachine",
+            "ironingStation",
+            "garmentRack",
+            "mannequin"
+          ],
+          "errors": {}
+        },
+        "outdoorProps": {
+          "loaded": [
+            "treeDefault",
+            "treeOak",
+            "treeTall",
+            "bush",
+            "fountain",
+            "bench",
+            "trafficLight",
+            "streetLight",
+            "planter",
+            "trashcan",
+            "stopSign",
+            "birdBrown"
+          ],
+          "errors": {}
+        },
+        "cache": {
+          "count": 57,
+          "ready": 57,
+          "loading": 0,
+          "byPriority": {
+            "CRITICAL": 0,
+            "IMPORTANT": 3,
+            "LAZY": 54
+          },
+          "assets": [
+            {
+              "key": "gltf:assets/models3d/props/shop_table_display.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_table_display.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 275.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_checkout_counter.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_checkout_counter.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 314
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_checkout_counter_end.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_checkout_counter_end.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 320.7
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_shelf_tall.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_shelf_tall.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 322
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_shelf_low.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_shelf_low.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 325.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_mirror_wall.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_mirror_wall.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 422.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_cash_register.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_cash_register.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 455.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_entry_door.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_entry_door.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 431.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_window_panel.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_window_panel.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 435.2
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_ceiling_light.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_ceiling_light.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 441.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/shop_atm.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/shop_atm.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 439.8
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_box_large.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_box_large.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 473.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_box_long.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_box_long.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 475.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_box_small.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_box_small.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 478.7
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_box_wide.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_box_wide.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 480.5
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_loading_door.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_loading_door.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 482.9
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_high_window.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_high_window.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 533.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_floor_arrow.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_floor_arrow.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 957.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_warning_beacon.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_warning_beacon.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 965.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_pallet.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_pallet.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 966.2
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_rack_tall.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_rack_tall.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 1,
+              "references": 0,
+              "durationMs": 971
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_bag_stack.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_bag_stack.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 983.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_cutting_table.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_cutting_table.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 1,
+              "references": 0,
+              "durationMs": 992.4
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_pendant_light.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_pendant_light.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 1,
+              "references": 0,
+              "durationMs": 998.8
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_pallet_truck.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_pallet_truck.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1005.8
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_fabric_rolls.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_fabric_rolls.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 1,
+              "references": 0,
+              "durationMs": 1005.2
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_fire_extinguisher.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_fire_extinguisher.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1009.7
+            },
+            {
+              "key": "gltf:assets/models3d/props/warehouse_sewing_machine.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/warehouse_sewing_machine.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 1,
+              "references": 0,
+              "durationMs": 1013.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/production_overlock_machine.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/production_overlock_machine.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1022.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/production_ironing_station.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/production_ironing_station.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1028.4
+            },
+            {
+              "key": "gltf:assets/models3d/props/production_mannequin.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/production_mannequin.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1202.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/production_garment_rack.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/production_garment_rack.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1201.8
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_tree_default.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_tree_default.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1209.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_tree_oak.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_tree_oak.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1214.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_tree_tall.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_tree_tall.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1224.9
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_bush.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_bush.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1228.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_bench.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_bench.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1232.1
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_fountain.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_fountain.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1230.6
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_traffic_light.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_traffic_light.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1239
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_street_light.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_street_light.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1245.9
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_planter.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_planter.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1426
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_trashcan.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_trashcan.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1438.3
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_stop_sign.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_stop_sign.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1445.2
+            },
+            {
+              "key": "gltf:assets/models3d/props/outdoor_bird_brown.glb",
+              "type": "gltf",
+              "url": "assets/models3d/props/outdoor_bird_brown.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 1450.8
+            },
+            {
+              "key": "gltf:assets/models3d/npc_realistic_male.glb",
+              "type": "gltf",
+              "url": "assets/models3d/npc_realistic_male.glb",
+              "priority": "IMPORTANT",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 5665
+            },
+            {
+              "key": "gltf:assets/models3d/npc_realistic_female.glb",
+              "type": "gltf",
+              "url": "assets/models3d/npc_realistic_female.glb",
+              "priority": "IMPORTANT",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 5673.5
+            },
+            {
+              "key": "gltf:assets/models3d/npc_realistic_male_casual.glb",
+              "type": "gltf",
+              "url": "assets/models3d/npc_realistic_male_casual.glb",
+              "priority": "IMPORTANT",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 6474.3
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_casual.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_casual.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 157.8
+            },
+            {
+              "key": "gltf:assets/models/npc/city_man_casual.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_man_casual.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 273.6
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_suit.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_suit.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 238.7
+            },
+            {
+              "key": "gltf:assets/models/npc/city_man_suit.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_man_suit.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 259.3
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_worker.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_worker.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 224.8
+            },
+            {
+              "key": "gltf:assets/models/npc/city_man_worker.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_man_worker.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 338.8
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_cardigan.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_cardigan.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 364.1
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_tank.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_tank.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 368.6
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_green.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_green.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 373.1
+            },
+            {
+              "key": "gltf:assets/models/npc/city_woman_dress.glb",
+              "type": "gltf",
+              "url": "assets/models/npc/city_woman_dress.glb",
+              "priority": "LAZY",
+              "state": "ready",
+              "hits": 0,
+              "references": 0,
+              "durationMs": 376.8
+            }
+          ]
+        }
+      },
+      "character": {
+        "selected": "chico2",
+        "name": "Miguel",
+        "selectedInstances": 1,
+        "playerInstances": 1,
+        "manager": {
+          "selected": "chico2",
+          "selectedName": "Miguel",
+          "playerInstances": 0,
+          "instances": [],
+          "duplicates": [],
+          "loaded": [],
+          "errors": {
+            "chico2": "Failed to fetch",
+            "chico1": "Failed to fetch",
+            "chico3": "Failed to fetch",
+            "mona": "Failed to fetch"
+          },
+          "cache": {
+            "count": 57,
+            "ready": 57,
+            "loading": 0,
+            "byPriority": {
+              "CRITICAL": 0,
+              "IMPORTANT": 3,
+              "LAZY": 54
+            },
+            "assets": [
+              {
+                "key": "gltf:assets/models3d/props/shop_table_display.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_table_display.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 275.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_checkout_counter.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_checkout_counter.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 314
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_checkout_counter_end.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_checkout_counter_end.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 320.7
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_shelf_tall.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_shelf_tall.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 322
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_shelf_low.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_shelf_low.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 325.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_mirror_wall.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_mirror_wall.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 422.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_cash_register.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_cash_register.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 455.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_entry_door.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_entry_door.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 431.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_window_panel.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_window_panel.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 435.2
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_ceiling_light.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_ceiling_light.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 441.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/shop_atm.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/shop_atm.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 439.8
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_box_large.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_box_large.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 473.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_box_long.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_box_long.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 475.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_box_small.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_box_small.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 478.7
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_box_wide.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_box_wide.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 480.5
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_loading_door.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_loading_door.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 482.9
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_high_window.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_high_window.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 533.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_floor_arrow.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_floor_arrow.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 957.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_warning_beacon.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_warning_beacon.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 965.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_pallet.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_pallet.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 966.2
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_rack_tall.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_rack_tall.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 1,
+                "references": 0,
+                "durationMs": 971
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_bag_stack.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_bag_stack.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 983.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_cutting_table.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_cutting_table.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 1,
+                "references": 0,
+                "durationMs": 992.4
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_pendant_light.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_pendant_light.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 1,
+                "references": 0,
+                "durationMs": 998.8
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_pallet_truck.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_pallet_truck.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1005.8
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_fabric_rolls.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_fabric_rolls.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 1,
+                "references": 0,
+                "durationMs": 1005.2
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_fire_extinguisher.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_fire_extinguisher.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1009.7
+              },
+              {
+                "key": "gltf:assets/models3d/props/warehouse_sewing_machine.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/warehouse_sewing_machine.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 1,
+                "references": 0,
+                "durationMs": 1013.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/production_overlock_machine.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/production_overlock_machine.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1022.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/production_ironing_station.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/production_ironing_station.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1028.4
+              },
+              {
+                "key": "gltf:assets/models3d/props/production_mannequin.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/production_mannequin.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1202.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/production_garment_rack.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/production_garment_rack.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1201.8
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_tree_default.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_tree_default.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1209.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_tree_oak.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_tree_oak.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1214.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_tree_tall.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_tree_tall.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1224.9
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_bush.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_bush.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1228.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_bench.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_bench.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1232.1
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_fountain.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_fountain.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1230.6
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_traffic_light.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_traffic_light.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1239
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_street_light.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_street_light.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1245.9
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_planter.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_planter.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1426
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_trashcan.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_trashcan.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1438.3
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_stop_sign.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_stop_sign.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1445.2
+              },
+              {
+                "key": "gltf:assets/models3d/props/outdoor_bird_brown.glb",
+                "type": "gltf",
+                "url": "assets/models3d/props/outdoor_bird_brown.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 1450.8
+              },
+              {
+                "key": "gltf:assets/models3d/npc_realistic_male.glb",
+                "type": "gltf",
+                "url": "assets/models3d/npc_realistic_male.glb",
+                "priority": "IMPORTANT",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 5665
+              },
+              {
+                "key": "gltf:assets/models3d/npc_realistic_female.glb",
+                "type": "gltf",
+                "url": "assets/models3d/npc_realistic_female.glb",
+                "priority": "IMPORTANT",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 5673.5
+              },
+              {
+                "key": "gltf:assets/models3d/npc_realistic_male_casual.glb",
+                "type": "gltf",
+                "url": "assets/models3d/npc_realistic_male_casual.glb",
+                "priority": "IMPORTANT",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 6474.3
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_casual.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_casual.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 157.8
+              },
+              {
+                "key": "gltf:assets/models/npc/city_man_casual.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_man_casual.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 273.6
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_suit.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_suit.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 238.7
+              },
+              {
+                "key": "gltf:assets/models/npc/city_man_suit.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_man_suit.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 259.3
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_worker.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_worker.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 224.8
+              },
+              {
+                "key": "gltf:assets/models/npc/city_man_worker.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_man_worker.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 338.8
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_cardigan.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_cardigan.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 364.1
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_tank.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_tank.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 368.6
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_green.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_green.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 373.1
+              },
+              {
+                "key": "gltf:assets/models/npc/city_woman_dress.glb",
+                "type": "gltf",
+                "url": "assets/models/npc/city_woman_dress.glb",
+                "priority": "LAZY",
+                "state": "ready",
+                "hits": 0,
+                "references": 0,
+                "durationMs": 376.8
+              }
+            ]
+          }
+        },
+        "animation": null,
+        "controllers": 0,
+        "mixers": 0
+      },
+      "suppliedNpcs": {
+        "loaded": [],
+        "errors": {
+          "chico2": "Failed to fetch"
+        },
+        "customers": [],
+        "actors": [
+          {
+            "kind": "city:city_woman_suit",
+            "x": 167.9774276761318,
+            "z": 13.26262770404194,
+            "phase": 0,
+            "distance": 0,
+            "rigged": false
+          }
+        ]
+      },
+      "cityNpcModels": {
+        "approved": 17,
+        "loaded": 10,
+        "active": 10,
+        "visibleHub": 3
+      },
+      "mona": {
+        "loaded": false,
+        "error": "",
+        "instances": 0
+      },
+      "hub": {
+        "active": true,
+        "district": "miraflores",
+        "mode": "third",
+        "interior": "store",
+        "actors": 3,
+        "visited": [
+          "store"
+        ],
+        "drawCalls": 163,
+        "triangles": 38220,
+        "meshes": 283,
+        "outdoorProps": {
+          "quality": "auto",
+          "seed": 4107,
+          "placementSignature": "4107:35fa974c",
+          "installed": [
+            "benches",
+            "birds",
+            "bushes",
+            "fountain",
+            "planters",
+            "signage",
+            "streetLights",
+            "trafficSignals",
+            "trashcans",
+            "trees"
+          ],
+          "batches": 12,
+          "instances": 70,
+          "visibleBatches": 12,
+          "visibleInstances": 68,
+          "drawables": 20,
+          "triangles": 7768,
+          "shadows": 1,
+          "categories": {
+            "trees": 14,
+            "bushes": 21,
+            "benches": 6,
+            "fountain": 1,
+            "trafficSignals": 4,
+            "streetLights": 10,
+            "planters": 4,
+            "trashcans": 3,
+            "signage": 3,
+            "birds": 2
+          },
+          "birds": 2,
+          "fallbackVisible": []
+        }
+      },
+      "world": {
+        "id": "side-city",
+        "continuous": true,
+        "legacyActive": false,
+        "interiors": {
+          "rooms": 6,
+          "deferredRooms": 3,
+          "navigation": {
+            "initialized": 1,
+            "ready": 0,
+            "rooms": [
+              {
+                "id": "store",
+                "ready": false,
+                "failed": false,
+                "cells": 589,
+                "walkable": 315,
+                "blocked": 274,
+                "triangles": 630
+              }
+            ]
+          },
+          "colliders": 39,
+          "stockLevels": {
+            "store": 0,
+            "warehouse": 0,
+            "production": 0,
+            "office": 0,
+            "bank": 0,
+            "suppliers": 0
+          },
+          "activeNpcs": 4,
+          "activeLights": 1,
+          "instancedBatches": 221,
+          "geometryInstances": 1258,
+          "visibleBatches": 100,
+          "sharedGeometries": 2,
+          "stockBatches": 40,
+          "storeProps": {
+            "quality": "auto",
+            "installed": [
+              "atm",
+              "checkout",
+              "doors",
+              "lighting",
+              "mirrors",
+              "shelves",
+              "table",
+              "windows"
+            ],
+            "batches": 12,
+            "visibleBatches": 12,
+            "instances": 24,
+            "visibleInstances": 24,
+            "drawables": 31,
+            "triangles": 6982,
+            "realLights": 1,
+            "visibleShelfBays": 4,
+            "visibleMirrors": 2
+          },
+          "warehouseProps": {
+            "quality": "auto",
+            "installed": [
+              "lighting",
+              "loadingDoor",
+              "pallet",
+              "palletTruck",
+              "racks",
+              "safety",
+              "windows",
+              "workbench"
+            ],
+            "batches": 19,
+            "instances": 32,
+            "visibleBatches": 19,
+            "visibleInstances": 32,
+            "rackBays": 4,
+            "lights": 4
+          },
+          "productionProps": {
+            "quality": "auto",
+            "installed": [
+              "cutting",
+              "decor",
+              "ironing",
+              "lighting",
+              "packing",
+              "sewing",
+              "storage"
+            ],
+            "batches": 11,
+            "instances": 23,
+            "visibleBatches": 11,
+            "visibleInstances": 23,
+            "drawables": 33,
+            "triangles": 8156,
+            "realLights": 1
+          }
+        },
+        "queueCapacity": 3
+      },
+      "driving": null,
+      "vehicles": [
+        {
+          "x": 166,
+          "z": 33.3,
+          "speed": 0,
+          "traffic": false
+        },
+        {
+          "x": 116.84679658179482,
+          "z": -39,
+          "speed": 2.9091024797250875,
+          "traffic": true
+        },
+        {
+          "x": 189,
+          "z": -33.153203418205266,
+          "speed": 2.9091024797250875,
+          "traffic": true
+        },
+        {
+          "x": 183.15320341820538,
+          "z": 39,
+          "speed": 2.9091024797250875,
+          "traffic": true
+        },
+        {
+          "x": 111,
+          "z": 33.15320341820555,
+          "speed": 2.9091024797250875,
+          "traffic": true
+        }
+      ],
+      "playerControl": {
+        "mode": "PLAYER_ON_FOOT",
+        "locomotion": "IDLE",
+        "zoom": 5.2,
+        "transition": null
+      },
+      "player": {
+        "x": 131,
+        "z": 17
+      },
+      "renderedFrames": 14,
+      "lastError": ""
+    }
+  },
+  "details": []
+}

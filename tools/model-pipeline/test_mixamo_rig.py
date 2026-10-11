@@ -20,7 +20,7 @@ def armature(names=("Hips", "Spine"), offset=0, parent="Hips"):
             matrix[0][3] = offset
         bones.append(types.SimpleNamespace(name=name, matrix_local=matrix,
                                            parent=types.SimpleNamespace(name=parent) if name == "Spine" else None))
-    return types.SimpleNamespace(data=types.SimpleNamespace(bones=bones))
+    return types.SimpleNamespace(data=types.SimpleNamespace(bones=bones), matrix_world=identity)
 
 
 class MixamoRigGuardTests(unittest.TestCase):
@@ -38,6 +38,12 @@ class MixamoRigGuardTests(unittest.TestCase):
     def test_different_rest_pose_fails(self):
         with self.assertRaisesRegex(RuntimeError, "rest pose differs"):
             mixamo.compatible(armature(), armature(offset=.02), "walk.fbx")
+
+    def test_different_armature_transform_fails(self):
+        candidate = armature()
+        candidate.matrix_world[0][3] = .02
+        with self.assertRaisesRegex(RuntimeError, "armature object transform differs"):
+            mixamo.compatible(armature(), candidate, "walk.fbx")
 
 
 if __name__ == "__main__":

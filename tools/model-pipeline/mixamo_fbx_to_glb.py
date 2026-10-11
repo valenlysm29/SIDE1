@@ -5,6 +5,9 @@ exports of the same Mixamo rig; no unverified cross-rig retargeting occurs.
 """
 import bpy
 import json
+import math
+import os
+import struct
 import sys
 
 
@@ -23,6 +26,10 @@ def imported_fbx(filename):
 
 
 def compatible(base, animated, filename):
+    object_delta = max(abs(base.matrix_world[row][col] - animated.matrix_world[row][col])
+                       for row in range(4) for col in range(4))
+    if object_delta > 0.002:
+        fail(f"{filename}: armature object transform differs ({object_delta:.5f})")
     original = {bone.name: bone for bone in base.data.bones}
     candidate = {bone.name: bone for bone in animated.data.bones}
     if original.keys() != candidate.keys():
@@ -47,6 +54,55 @@ def action_for(armature, filename):
     return data.action
 
 
+def hips_motion(armature, action, filename):
+    """Reject root travel while allowing a normal in-place gait's small sway."""
+    hips = next((bone for bone in armature.pose.bones
+                 if bone.name.split(":")[-1].lower() == "hips"), None)
+    if hips is None:
+        fail(f"{filename}: Hips bone missing")
+    start, end = [int(round(value)) for value in action.frame_range]
+    if end <= start:
+        fail(f"{filename}: action has no duration")
+    scene = bpy.context.scene
+    previous_frame = scene.frame_current
+    points = []
+    try:
+        for frame in range(start, end + 1):
+            scene.frame_set(frame)
+            evaluated = armature.evaluated_get(bpy.context.evaluated_depsgraph_get())
+            bone = evaluated.pose.bones[hips.name]
+            point = evaluated.matrix_world @ bone.matrix.translation
+            points.append((point.x, point.y))
+    finally:
+        scene.frame_set(previous_frame)
+    net = math.dist(points[0], points[-1])
+    if net > 0.05:
+        fail(f"{filename}: Hips travels {net:.4f} m horizontally (limit 0.05 m)")
+    return {"hip_horizontal_net_m": round(net, 5), "frames": len(points)}
+
+
+def glb_summary(path):
+    with open(path, "rb") as stream:
+        header = stream.read(20)
+        if len(header) != 20:
+            fail(f"{path}: incomplete GLB header")
+        magic, version, total_length, chunk_length, chunk_type = struct.unpack("<4sIIII", header)
+        if magic != b"glTF" or version != 2 or chunk_type != 0x4E4F534A:
+            fail(f"{path}: invalid GLB header")
+        document = json.loads(stream.read(chunk_length).decode("utf-8"))
+        if os.path.getsize(path) != total_length:
+            fail(f"{path}: incorrect GLB length")
+    names = [clip.get("name") for clip in document.get("animations", [])]
+    if sorted(names) != ["Idle", "Run", "Walk"]:
+        fail(f"{path}: expected exactly Idle, Walk, Run; got {names}")
+    if not document.get("skins") or not document.get("meshes"):
+        fail(f"{path}: missing skin or mesh")
+    if any(image.get("uri") for image in document.get("images", [])):
+        fail(f"{path}: external image URI in GLB")
+    return {"animations": names, "skins": len(document["skins"]),
+            "meshes": len(document["meshes"]), "bytes": total_length}
+
+
 def main():
     args = sys.argv[sys.argv.index("--") + 1:]
     if len(args) != 3:
@@ -68,15 +124,22 @@ def main():
     base.animation_data_create()
     if base.animation_data.action:
         base.animation_data.action = None
-    for clip_name, filename in animations.items():
+    for track in list(base.animation_data.nla_tracks):
+        base.animation_data.nla_tracks.remove(track)
+    measurements = {}
+    for clip_name in ("idle", "walk", "run"):
+        filename = animations[clip_name]
+        if not os.path.isfile(filename):
+            fail(f"{filename}: animation file missing")
         animated, imported = imported_fbx(filename)
         compatible(base, animated, filename)
         action = action_for(animated, filename)
-        action.name = str(clip_name)
+        measurements[clip_name] = hips_motion(animated, action, filename)
+        action.name = clip_name.capitalize()
         action.use_fake_user = True
         track = base.animation_data.nla_tracks.new()
-        track.name = str(clip_name)
-        track.strips.new(str(clip_name), int(action.frame_range[0]), action)
+        track.name = clip_name.capitalize()
+        track.strips.new(clip_name.capitalize(), int(action.frame_range[0]), action)
         for obj in imported:
             bpy.data.objects.remove(obj, do_unlink=True)
 
@@ -85,7 +148,8 @@ def main():
         if obj.name in bpy.data.objects:
             obj.select_set(True)
     bpy.context.view_layer.objects.active = base
-    export_args = dict(filepath=target, export_format="GLB", use_selection=True,
+    temporary_target = target + ".tmp.glb"
+    export_args = dict(filepath=temporary_target, export_format="GLB", use_selection=True,
                        export_animations=True, export_skins=True)
     properties = bpy.ops.export_scene.gltf.get_rna_type().properties.keys()
     if "export_animation_mode" in properties:
@@ -94,7 +158,15 @@ def main():
         export_args["export_nla_strips"] = True
     else:
         fail("Blender glTF exporter cannot export NLA tracks on this version")
-    bpy.ops.export_scene.gltf(**export_args)
+    try:
+        bpy.ops.export_scene.gltf(**export_args)
+        summary = glb_summary(temporary_target)
+        os.replace(temporary_target, target)
+    finally:
+        if os.path.exists(temporary_target):
+            os.remove(temporary_target)
+    print("NPC_CONVERSION_PASS " + json.dumps({"source": source, "target": target,
+                                               "clips": measurements, "glb": summary}, sort_keys=True))
 
 
 if __name__ == "__main__":
