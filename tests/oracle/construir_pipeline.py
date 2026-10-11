@@ -57,8 +57,9 @@ def construir(escenario,config):
             selection=decisions.get('seleccion',[])
             for i in range(18):setv(f'seleccion{i}',r,selection[i] if i<len(selection) else '')
             selection_refs=[R(f'seleccion{i}') for i in range(18)]
-            allowed=__import__('re').compile(r'^(INF-0[2-9]|INF-10|RH-0[1-9]|RH-10[AB]|COM-01[ABC]|FIN-01[AB]|INS-09[AB]|INS-10[AB]|INS-11[ABC]|INV-0[12][ABC]|FIN-02[ABC]|COM-06[ABC]|INF-11[ABC]|INS-12[ABC])$')
-            selected=[selection_refs[i] for i,code in enumerate(selection[:18]) if allowed.match(code)]
+            # El catálogo literal conserva 68 filas; el Motor usa los grupos autorizados.
+            catalog_groups={cat.cell(j,1).value:cat.cell(j,3).value for j in range(2,70)}
+            selected=[selection_refs[i] for i,code in enumerate(selection[:18]) if catalog_groups.get(code) in cfg['GRUPOS_MOTOR']]
             for key,column in [('puntajeEficiencia','I'),('reputacionBase','J'),('saludFinanciera','K')]:form(key,r,'+'.join(look(code,column) for code in selected) or '0')
             form('calidad',r,'+'.join(look(R(k),'H') for k in ['cuero','accesorios','hilo','molde']))
             form('reputacionCambio',r,f'IF(AND({R("segmento")}="SEG-03",{R("planeado")}>0),IF({R("calidad")}<4,-2,IF({R("calidad")}>=7,2,0)),0)')
@@ -121,9 +122,11 @@ def construir(escenario,config):
             if decisions.get('local',True):labor += [f'\'{cost_sheet}\'!AC33']
             form('costoMO',r,'('+('+'.join(labor))+f')*{cfg["CICLO_EQUIVALE_A_MESES"]}')
             factor=(1-cfg['DESCUENTO_CANTIDAD'])*(1-cfg['DESCUENTO_PROVEEDOR_UNICO'] if 'INS-09A' in selection else 1)*(1-cfg['DESCUENTO_CONTADO'] if 'INS-10A' in selection else 1)
+            if decisions.get('analistaCompras'):
+                analyst=cfg['ANALISTA_BASE'];factor*=1-max(analyst['descuentoMinimoPct'],analyst['descuentoInicialPct']-(cycle-1)*analyst['reduccionPorCicloPct'])/100
             form('costoMP',r,'('+('+'.join(f'{R("usado_"+c)}*{cfg["PRECIO_MP"][c]}' for c in codes))+f')*{factor}')
             maintenance=[];depreciation=[]
-            method=next((c for c in selection if c.startswith('FIN-02')),'FIN-02A')
+            method=next((c for c in selection if c.startswith('FIN-02') and catalog_groups.get(c) in cfg['GRUPOS_MOTOR']),'FIN-02A')
             rates=cfg['TASAS_ACTIVOS']['NO_MYPE' if decisions.get('regimen')=='NO_MYPE' else 'MYPE']
             activos_actuales=dict(activos_conservados.get(id,{}))
             for code,count in decisions.get('maquinaria',{}).items():
@@ -136,7 +139,10 @@ def construir(escenario,config):
                 elif method=='FIN-02C':dep=f'{base}*({life}-MIN({life},MAX(1,ROUNDUP({cycle}*{cfg["CICLO_EQUIVALE_A_MESES"]}/{cfg["MESES_ANIO"]},0)))+1)/({life}*({life}+1)/2)/{cfg["MESES_ANIO"]}*{cfg["CICLO_EQUIVALE_A_MESES"]}'
                 else:dep=f'{base}/{life}/{cfg["MESES_ANIO"]}*{cfg["CICLO_EQUIVALE_A_MESES"]}'
                 depreciation.append(f'{count}*({dep})')
-            maintenance += [look(selection_refs[i],'G') for i,c in enumerate(selection[:18]) if c.startswith('INF-11')]
+            if 'mantenimientoPreventivo' not in decisions:
+                maintenance += [look(selection_refs[i],'G') for i,c in enumerate(selection[:18]) if c.startswith('INF-11')]
+            if decisions.get('mantenimientoPreventivo'):
+                maintenance.append(str(cfg['COSTO_MANTENIMIENTO_BASE']))
             form('mantenimiento',r,'+'.join(maintenance) or '0');form('depreciacion',r,'+'.join(depreciation) or '0')
             proportions=[]
             for family,famcodes in families.items():
@@ -171,11 +177,13 @@ def construir(escenario,config):
         form('almacenaje',r,f'{R("inventarioProducto")}*{cfg["COSTO_ALMACENAJE_UNIDAD"]}')
         form('horasExtra',r,f'IF({R("planeado")}>{R("produccionCapacidad")},{cfg["HORAS_EXTRA_PCT"]}*{R("costoMO")}*IFERROR(MIN(1,({R("planeado")}-{R("produccionCapacidad")})/{R("produccionCapacidad")}),1),0)')
         warranty=next((c for c in selection if c.startswith('COM-06')),'')
-        form('costoGarantia',r,f'{look(quoted(warranty),"G")}*{R("vendido")}')
-        recurring=[c for c in selection if c in cfg.get('CODIGOS_COSTO_RECURRENTE',[])]
+        # Las opciones base GARANTIA_PT no tenían efecto de caja. No inventar una provisión.
+        form('costoGarantia',r,'0' if 'garantiaDias' in d else f'{look(quoted(warranty),"G")}*{R("vendido")}')
+        recurring=[c for c in selection if c in cfg.get('CODIGOS_COSTO_RECURRENTE',[]) and catalog_groups.get(c) in cfg['GRUPOS_MOTOR'] and not ('marketingNivel' in d and catalog_groups.get(c)=='Inversion en marketing')]
         form('costoRecurrente',r,'('+('+'.join(look(quoted(c),'G') for c in recurring) or '0')+f')*{cfg["CICLO_EQUIVALE_A_MESES"]}')
         form('costoLeadTime',r,('('+('+'.join(f'{R("comprado_"+c)}*{cfg["PRECIO_MP"][c]}' for c in codes))+')*'+str((1-cfg['DESCUENTO_CANTIDAD'])*(1-cfg['DESCUENTO_PROVEEDOR_UNICO'] if 'INS-09A' in selection else 1)*(1-cfg['DESCUENTO_CONTADO'] if 'INS-10A' in selection else 1)*cfg['LEAD_TIME_SOBRECOSTO'])) if 'INS-11A' in selection else '0')
-        form('costosTotales',r,'+'.join(R(k) for k in ['costoMO','costoMP','mantenimiento','depreciacion','publicidad','almacenaje','horasExtra','costoGarantia','costoRecurrente','costoLeadTime']))
+        setv('costoAnalista',r,cfg['ANALISTA_BASE']['costo']*cfg['CICLO_EQUIVALE_A_MESES'] if d.get('analistaCompras') else 0)
+        form('costosTotales',r,'+'.join(R(k) for k in ['costoMO','costoMP','mantenimiento','depreciacion','publicidad','almacenaje','horasExtra','costoGarantia','costoRecurrente','costoLeadTime','costoAnalista']))
         form('utilidad',r,f'{R("ingresos")}-{R("costosTotales")}')
         for i,expr in enumerate([f'AND({R("segmento")}="SEG-03",{R("calidad")}<4,{R("planeado")}>0)',f'AND({R("segmento")}="SEG-03",{R("calidad")}> =7,{R("planeado")}>0)'.replace('> =','>='),f'{R("puntajeEficiencia")}<4',f'{R("ciclosReputacionBaja")}> =2'.replace('> =','>='),f'{R("saludFinanciera")}<3',f'{R("planeado")}>{R("produccionCapacidad")}',f'{R("producido")}>{R("vendido")}',f'AND({R("jefes")}=0,{R("puntajeEficiencia")}<5)'],1):
             form(f'CONS-{i:02}',r,expr)

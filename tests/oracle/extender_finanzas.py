@@ -32,6 +32,8 @@ def extender(escenario,config):
         capital=d.get('capitalInicial',escenario.get('capitalInicial',1000000));value('capitalInicial',r,capital)
         formula('compraActivos',r,'+'.join(purchase) or '0');formula('adquisicionNeta',r,'+'.join(acquisition) or '0')
         factor=(1-cfg['DESCUENTO_CANTIDAD'])*(1-cfg['DESCUENTO_PROVEEDOR_UNICO'] if 'INS-09A' in d['seleccion'] else 1)*(1-cfg['DESCUENTO_CONTADO'] if 'INS-10A' in d['seleccion'] else 1)
+        if d.get('analistaCompras'):
+            analyst=cfg['ANALISTA_BASE'];factor*=1-max(analyst['descuentoMinimoPct'],analyst['descuentoInicialPct']-(cycle-1)*analyst['reduccionPorCicloPct'])/100
         formula('valorCompradoNeto',r,'('+('+'.join(f'{R("comprado_"+c)}*{price}' for c,price in cfg['PRECIO_MP'].items()))+f')*{factor}')
         formula('valorInventarioNeto',r,'('+('+'.join(f'{R("stockMP_"+c)}*{price}' for c,price in cfg['PRECIO_MP'].items()))+f')*{factor}')
         formula('cajaInicial',r,P('cajaFinal') if prev else R('capitalInicial'))

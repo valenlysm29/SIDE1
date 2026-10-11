@@ -32,12 +32,16 @@ async function ejecutar(numero=3){
     if(!await p.locator('[data-excel-regimen]').count())console.log('DIAGNOSTICO',await p.evaluate(()=>({round:currentRound(),cat:currentCategory,excel:decisionState.__excel,dom:document.querySelector('#excelProductionMount')?.innerHTML,access:studentAccess()})));
     await p.evaluate(d=>{
       const dispatch=(selector,value)=>{const el=document.querySelector(selector);if(!el)throw new Error('Falta control '+selector);el.value=String(value??'');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
-      dispatch('[data-excel-regimen]',d.regimen||'MYPE');dispatch('[data-excel-publicidad]',d.publicidad||0);dispatch('[data-excel-prestamo]',d.montoPrestamo||0);
+      dispatch('[data-excel-regimen]',d.regimen||'MYPE');dispatch('[data-excel-prestamo]',d.montoPrestamo||0);
+      dispatch('[data-excel-garantia]',d.garantiaDias??'');dispatch('[data-excel-marketing]',d.marketingNivel??'');dispatch('[data-excel-garantia-proveedor]',d.garantiaProveedor??0);
+      for(const [selector,checked] of [['[data-excel-mantenimiento]',d.mantenimientoPreventivo],['[data-excel-analista]',d.analistaCompras]]){const el=document.querySelector(selector);if(!el)throw new Error('Falta control '+selector);el.checked=!!checked;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}
+      for(const [district,count] of Object.entries(d.tiendasPorDistrito||{}))dispatch(`[data-excel-tienda="${district}"]`,count);
       const normal=SIDE_EXCEL_PRODUCCION.normalizarPersonal(d.personal||{});for(const [area,filas] of Object.entries(normal))filas.forEach((fila,n)=>fila.forEach((v,m)=>dispatch(`[data-personal="${area},${n},${m}"]`,v)));
       for(const [k,v] of Object.entries(d.maquinaria||{}))dispatch(`[data-activo="${k}"]`,v);
       for(const [k,v] of Object.entries(d.comprasUnidades||{}))dispatch(`[data-compra="${k}"]`,v);
       for(const [k,v] of Object.entries(d.compras||{}))dispatch(`[data-compra="${k}"]`,v/SIDE_EXCEL_CONFIG.CONFIG.CONVERSION_COMPRA[k]);
-      for(const code of d.seleccion||[]){const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
+      const derivados=[...Object.values(SIDE_EXCEL_CONFIG.CONFIG.GARANTIA_MAPEO_EXACTO),...Object.values(SIDE_EXCEL_CONFIG.CONFIG.MARKETING_BASE).map(row=>row.codigo)];
+      for(const code of d.seleccion||[]){if(derivados.includes(code))continue;const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
       d.lotes.forEach((l,i)=>{for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])dispatch(`[data-lote="${i}"][data-campo="${campo}"]`,l[campo]??'');});
     },d);
     await p.locator('[data-excel-enviar]').click();assert.match(await p.locator('[data-excel-status]').innerText(),/confirmado/);
@@ -46,6 +50,9 @@ async function ejecutar(numero=3){
     const report=await p.evaluate(()=>syncStudentReportPreview());const enviadas=report.excelDecisionState?.decisiones;assert.ok(enviadas,'Reporte conserva plan confirmado');assert.equal(enviadas.montoPrestamo,d.montoPrestamo||0,'Préstamo UI igual al escenario');if(d.reputacionLiteral!==undefined)assert.equal(enviadas.reputacionLiteral,d.reputacionLiteral,'Reputación literal igual al escenario');assert.equal(enviadas.lotes.length,d.lotes.length,'Lotes completos');
     for(const [i,lote] of d.lotes.entries())for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])assert.equal(enviadas.lotes[i][campo]??'',lote[campo]??'',`Lote ${i} ${campo}: UI conserva entrada`);
     const personalEsperado=require('../js/engine/produccion.js').normalizarPersonal(d.personal||{});assert.deepEqual(enviadas.personal,personalEsperado,'Personal UI igual al escenario');
+    assert.deepEqual([...enviadas.seleccion].sort(),[...d.seleccion].sort(),'UI y oráculo reciben los mismos grupos finales');
+    for(const campo of ['garantiaDias','marketingNivel','analistaCompras','mantenimientoPreventivo','garantiaProveedor','publicidad'])assert.equal(enviadas[campo],d[campo],`UI conserva ${campo}`);
+    assert.deepEqual(enviadas.tiendasPorDistrito,d.tiendasPorDistrito,'UI conserva distritos anteriores');
     for(const [codigo,cantidad] of Object.entries(d.compras||{}))assert.equal(enviadas.comprasUnidades[codigo],cantidad/CONFIG.CONVERSION_COMPRA[codigo],`Compra ${codigo}: mismas unidades`);
     return report;
   }

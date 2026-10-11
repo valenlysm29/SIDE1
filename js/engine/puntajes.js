@@ -14,9 +14,9 @@
     const evaluados=lotes.map(l=>evaluarLote(l,overrides)),totalCantidades=evaluados.reduce((a,l)=>a+Number(l.cantidad||0),0);
     const calidadEmpresaMotor=totalCantidades?evaluados.reduce((a,l)=>a+Number(l.cantidad||0)*l.calidad,0)/totalCantidades:0;
     // El rango del Motor omite SEG, mesa, materiales, COM-05 y roles fijos.
-    const permitidos=/^(INF-0[2-9]|INF-10|RH-0[1-9]|RH-10[AB]|COM-01[ABC]|FIN-01[AB]|INS-09[AB]|INS-10[AB]|INS-11[ABC]|INV-0[12][ABC]|FIN-02[ABC]|COM-06[ABC]|INF-11[ABC]|INS-12[ABC])$/;
+    const permitidos=new Set(c.GRUPOS_MOTOR);
     const grupos=new Set(),p={puntajeEficiencia:0,reputacionMatriz:0,saludFinanciera:0};
-    for(const codigo of codigosSeleccion){const row=indice[codigo];if(!row||!permitidos.test(codigo))continue;if(grupos.has(row.grupo))throw new RangeError('Elige una sola opción por grupo: '+row.grupo);grupos.add(row.grupo);p.puntajeEficiencia+=row.eficiencia;p.reputacionMatriz+=row.reputacion;p.saludFinanciera+=row.financiero;}
+    for(const codigo of codigosSeleccion){const row=indice[codigo];if(!row||!permitidos.has(row.grupo))continue;if(grupos.has(row.grupo))throw new RangeError('Elige una sola opción por grupo: '+row.grupo);grupos.add(row.grupo);p.puntajeEficiencia+=row.eficiencia;p.reputacionMatriz+=row.reputacion;p.saludFinanciera+=row.financiero;}
     return {...p,lotes:evaluados,calidadEmpresaMotor,totalCantidades,costoInsumos:evaluados.reduce((a,l)=>a+Number(l.cantidad||0)*l.costoUnitario,0),niveles:{calidad:nivel(calidadEmpresaMotor,overrides),eficiencia:nivel(p.puntajeEficiencia,overrides),reputacion:nivel(p.reputacionMatriz,overrides),salud:nivel(p.saludFinanciera,overrides)}};
   }
   return {catalogo,indice,nivel,evaluarLote,calcularPuntajes};

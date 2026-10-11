@@ -33,17 +33,45 @@ test('Cierre local tardío conserva plan confirmado previo aunque editor ya avan
  const reports=[{id:'A',partida:'DEMO',capital:100000,excelDecisionState:{habilitado:true,round:2,enviado:true,decisiones:nuevo,planesPorCiclo:{1:original}}}];
  const r=api.cerrarLocal({game:'DEMO',ciclo:1,reports});assert.equal(r.resultadosPorEmpresa.A.produccion.totalPlaneado,100);assert.equal(r.eliminadas.length,0);
 });
-test('Editor conserva cantidades de tiendas y porcentaje crédito validado al confirmar',()=>{
+test('Editor conserva distritos y opciones base; no ofrece ni reactiva decisiones retiradas',()=>{
  const {api}=entorno(),d=decision(api);let saved;
+ d.seleccion=['RH-10A','FIN-02B','INS-12C','INS-09A','INS-10A','INS-11A','INF-11C','COM-06C'];
  const status={textContent:''},container={innerHTML:'',querySelectorAll:()=>[],querySelector:selector=>selector==='[data-excel-status]'?status:null};
  api.mountEditor(container,{round:1,getState:()=>({habilitado:true,decisiones:d}),save:envelope=>{saved=envelope;}});
- container.oninput({target:{dataset:{excelTienda:'alta'},value:'3',matches:()=>false}});
- container.oninput({target:{dataset:{excelTienda:'media'},value:'2',matches:()=>false}});
+ assert.doesNotMatch(container.innerHTML,/data-excel-creditopct|Método de depreciación|Política de inventarios|Numero de proveedores|Politica de pago a proveedores|Lead time|Zona alta/);
+ assert.match(container.innerHTML,/Cobertura comercial 180 días/);assert.match(container.innerHTML,/Mantenimiento preventivo opcional \(S\/ 200\.00\)/);
+ assert.equal((container.innerHTML.match(/data-excel-marketing/g)||[]).length,1);assert.doesNotMatch(container.innerHTML,/data-excel-publicidad/);
+ container.oninput({target:{dataset:{excelTienda:'los_olivos'},value:'3',matches:()=>false}});
+ container.oninput({target:{dataset:{excelTienda:'miraflores'},value:'2',matches:()=>false}});
  container.oninput({target:{dataset:{},value:'120',matches:selector=>selector==='[data-excel-creditopct]'}});
+ container.oninput({target:{dataset:{},value:'180',matches:selector=>selector==='[data-excel-garantia]'}});
+ container.oninput({target:{dataset:{},checked:true,matches:selector=>selector==='[data-excel-mantenimiento]'}});
  const button={disabled:false,dataset:{},hasAttribute:attr=>attr==='data-excel-enviar'};
  container.onclick({target:{closest:()=>button}});
- assert.equal(saved.enviado,true);assert.deepEqual(JSON.parse(JSON.stringify(saved.decisiones.tiendasPorZona)),{alta:3,media:2,baja:0});assert.equal(saved.decisiones.porcentajeVentasCredito,100);
- assert.equal(saved.planesPorCiclo[1].tiendasPorZona.alta,3);
+ assert.equal(saved.enviado,true);assert.deepEqual(JSON.parse(JSON.stringify(saved.decisiones.tiendasPorDistrito)),{los_olivos:3,miraflores:2,sjl:0});assert.equal(saved.decisiones.porcentajeVentasCredito,undefined);
+ assert.equal(saved.planesPorCiclo[1].tiendasPorDistrito.los_olivos,3);assert.equal(saved.decisiones.garantiaDias,180);assert.equal(saved.decisiones.mantenimientoPreventivo,true);
+ assert.deepEqual(Array.from(saved.decisiones.seleccion),['RH-10A']);
+});
+
+test('Marketing base alto pasa S/12000 al Excel sin doble cobro y analista conserva su negociación por ciclo',()=>{
+ const {api}=entorno(),d=api.prepararDecisiones({...decision(api),marketingNivel:'alta',analistaCompras:true,garantiaProveedor:80});
+ assert.equal(d.publicidad,12000);assert.equal(d.seleccion.filter(k=>k==='INV-02C').length,1);
+ const reports=[{id:'A',partida:'MARKETING',capital:100000,excelDecisionState:{habilitado:true,round:1,enviado:true,decisiones:d}}];
+ const r=api.cerrarLocal({game:'MARKETING',ciclo:1,reports}).resultadosPorEmpresa.A;
+ assert.equal(r.costos.costoPublicidad,12000);assert.equal(r.costos.costoDecisionesRecurrentes,0);
+ assert.equal(r.costos.costoAnalistaCompras,5000);assert.equal(r.costos.descuentoAnalistaPct,12);assert.equal(r.costos.factorDescuento,0.92*0.88);
+ assert.equal(r.costos.reputacion.factorPublicidad,12);assert.equal(r.decisiones.garantiaProveedor,80);
+});
+
+test('Garantías 30/90 tienen mapeo exacto de puntaje y conservan costo base cero; mantenimiento opcional cobra S/200 una vez',()=>{
+ const {api}=entorno(),base=decision(api);
+ for(const [dias,codigo] of [[30,'COM-06B'],[90,'COM-06C'],[180,null]]){
+  const d=api.prepararDecisiones({...base,garantiaDias:dias,mantenimientoPreventivo:true});
+  assert.equal(d.seleccion.includes(codigo),!!codigo);
+  const reports=[{id:'A',partida:'G'+dias,capital:100000,excelDecisionState:{habilitado:true,round:1,enviado:true,decisiones:d}}];
+  const r=api.cerrarLocal({game:'G'+dias,ciclo:1,reports}).resultadosPorEmpresa.A;
+  assert.equal(r.costos.costoGarantia,0);assert.equal(r.costos.costoPoliticaMantenimiento,200);assert.equal(r.costos.costoDecisionesRecurrentes,0);
+ }
 });
 test('Activación en ciclo 2 no elimina retroactivamente una empresa durante cierre del ciclo 1',()=>{
  const {api}=entorno(),reports=[{id:'A',partida:'DEMO',capital:100000,excelDecisionState:{habilitado:true,cicloActivacion:2,round:2,enviado:true,decisiones:decision(api)}}];

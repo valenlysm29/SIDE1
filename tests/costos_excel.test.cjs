@@ -70,3 +70,18 @@ test('métodos de depreciación definidos y pendientes usan parámetros inyectab
   cerca(costoMaquinaria('mesa','MYPE',{metodo:'FIN-02C',ciclo:1}).depreciacionCiclo,2375*10/55/12);
   cerca(costoMaquinaria('mesa','MYPE',{metodo:'FIN-02C',ciclo:13}).depreciacionCiclo,2375*9/55/12);
 });
+
+test('Depreciación e inventarios retirados no generan efectos por selección antigua; mantenimiento base no se convierte en política Excel',()=>{
+ const d={maquinaria:{mesa:1},limpieza:false,local:false},base=calcularCostos(d);
+ const retiradas=calcularCostos({...d,seleccion:['FIN-02C','INS-12C']});
+ cerca(retiradas.totalCostos,base.totalCostos);assert.equal(retiradas.detalles.maquinaria[0].metodo,'FIN-02A');
+ cerca(calcularCostos({...d,mantenimientoPreventivo:true,seleccion:['INF-11C']}).costoPoliticaMantenimiento,200);
+ cerca(calcularCostos({...d,mantenimientoPreventivo:false,seleccion:['INF-11C']}).costoPoliticaMantenimiento,0);
+});
+
+test('Analista usa la negociación base 12/10/2 por ciclo y cobra su contratación una sola vez',()=>{
+ for(const [ciclo,pct] of [[1,12],[2,10],[9,2]]){
+  const r=calcularCostos({analistaCompras:true,ciclo,compras:{'INS-01':10},consumoMP:{'INS-01':4},marketingNivel:'baja'});
+  cerca(r.descuentoAnalistaPct,pct);cerca(r.valorCompradoNeto,250*0.92*(1-pct/100));cerca(r.costoAnalistaCompras,5000);cerca(r.costoPublicidad,1500);
+ }
+});

@@ -12,11 +12,11 @@ test('Lotes de igual material conservan sus precios distintos al venderse',()=>{
 });
 test('La penalización bancaria se conserva hasta el préstamo siguiente',()=>{
   let c=cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:decision({seleccion:[]})}});
-  const saludable=decision({seleccion:['RH-10B','COM-01A','INS-09A','INS-10B','INS-11C','FIN-01A']});
+  const saludable=decision({seleccion:['RH-10B','COM-01A','FIN-01B'],garantiaDias:30});
   c=cerrarCiclo({ciclo:2,empresas:['A'],decisionesPorEmpresa:{A:saludable},historialPorEmpresa:c.historialPorEmpresa});
   assert.equal(c.historialPorEmpresa.A.tasaAdicionalPP,3);
-  c=cerrarCiclo({ciclo:3,empresas:['A'],decisionesPorEmpresa:{A:{...saludable,montoPrestamo:5000}},historialPorEmpresa:c.historialPorEmpresa});
-  assert.equal(c.resultadosPorEmpresa.A.financiamiento.tasaTEA,23);assert.equal(c.historialPorEmpresa.A.tasaAdicionalPP,0);
+  c=cerrarCiclo({ciclo:3,empresas:['A'],decisionesPorEmpresa:{A:{...saludable,seleccion:saludable.seleccion.filter(k=>k!=='FIN-01B').concat('FIN-01A'),montoPrestamo:5000}},historialPorEmpresa:c.historialPorEmpresa});
+  assert.equal(c.resultadosPorEmpresa.A.financiamiento.tasaTEA,23);assert.equal(c.historialPorEmpresa.A.tasaAdicionalPP,3,'la salud baja del nuevo préstamo genera una penalización nueva');
 });
 test('SIM-2 dispara las ocho reglas en tres ciclos; no atribuye efectos al lote calidad4',()=>{
   const escenario=crearSim2(),resultados=ejecutarEscenario(escenario,cerrarCiclo);
@@ -40,13 +40,13 @@ test('factores productivos reducen consumo y restauran MP antes de calcular cost
   }
   cerca(r.produccion.consumoTotal.cuero,r.produccion.totalProducido*0.3);
 });
-test('redondeo de consecuencia conserva 200×0.70×0.95=133 y acelerada recibe ciclo real',()=>{
-  const d=decision({personal:{corte:[4,0,0],ensamble:[4,0,0],acabado:[4,0,0]}});
+test('redondeo conserva 200×0.70×0.95=133 y depreciación retirada no altera costo',()=>{
+  const d=decision({seleccion:['INF-08','RH-01','RH-04','RH-07','RH-10B'],personal:{corte:[4,0,0],ensamble:[4,0,0],acabado:[4,0,0]}});
   assert.equal(prepararEmpresa(d).produccion.totalProducido,133);
   const acelerada=decision({seleccion:[...d.seleccion,'FIN-02C']});
   const inicial=cerrarCiclo({ciclo:1,empresas:['A'],decisionesPorEmpresa:{A:acelerada}},{MERCADOS:mercados(10)}).resultadosPorEmpresa.A;
   const posterior=cerrarCiclo({ciclo:13,empresas:['A'],decisionesPorEmpresa:{A:acelerada}},{MERCADOS:mercados(10)}).resultadosPorEmpresa.A;
-  assert.ok(posterior.costos.depreciacion<inicial.costos.depreciacion);
+  assert.equal(posterior.costos.depreciacion,inicial.costos.depreciacion,'la opción de depreciación retirada no altera el costo');
   assert.deepEqual(posterior.decisiones,acelerada);
 });
 test('SIM-3 arrastra existencias, replica decisiones y mantiene eliminación inicial',()=>{
@@ -62,8 +62,8 @@ test('SIM-3 arrastra existencias, replica decisiones y mantiene eliminación ini
     assert.ok(Number.isFinite(r.utilidad));
   }
   const primero=resultados[0].resultadosPorEmpresa;
-  cerca(primero.A.costos.factorDescuento,0.92*0.98*0.97);assert.equal(primero.B.produccion.factorCapacidad,1.08);
-  assert.equal(primero.B.costos.detalles.maquinaria[0].metodo,'FIN-02B');assert.equal(primero.C.costos.detalles.maquinaria[0].metodo,'FIN-02C');
+  cerca(primero.A.costos.factorDescuento,0.92);assert.equal(primero.B.produccion.factorCapacidad,1.08);
+  assert.equal(primero.B.costos.detalles.maquinaria[0].metodo,'FIN-02A');assert.equal(primero.C.costos.detalles.maquinaria[0].metodo,'FIN-02A');
 });
 test('inventario anterior se vende aunque la nueva producción sea cero',()=>{
   const d=decision({compras:{},lotes:[]});
@@ -71,9 +71,9 @@ test('inventario anterior se vende aunque la nueva producción sea cero',()=>{
   const resultado=cerrarCiclo({ciclo:2,empresas:['A'],decisionesPorEmpresa:{A:d},historialPorEmpresa:{A:{inventarioProductos:{anterior:stock}}}},{MERCADOS:mercados(10)}).resultadosPorEmpresa.A;
   assert.equal(resultado.produccion.totalProducido,0);assert.equal(resultado.unidadesVendidas,10);assert.equal(resultado.inventarioSinVender,10);cerca(resultado.ingresos,400);
 });
-test('costo recurrente y garantía se contabilizan una vez desde catálogo; préstamo no es ingreso',()=>{
+test('costo recurrente se cuenta una vez y garantía base no cobra; préstamo no es ingreso',()=>{
   const escenario=crearSim3(),r=ejecutarEscenario(escenario,cerrarCiclo)[0].resultadosPorEmpresa.C;
-  cerca(r.costos.costoDecisionesRecurrentes,1500+6000+6000);cerca(r.costos.costoGarantia,r.unidadesVendidas*10);
+  cerca(r.costos.costoDecisionesRecurrentes,1500+6000);cerca(r.costos.costoPublicidad,6000);cerca(r.costos.costoGarantia,0);
   cerca(r.costosTotales,r.costos.totalCostos+r.costos.costoDecisionesRecurrentes+r.costos.costoGarantia+r.costos.costoAlmacenaje+r.consecuencias.efectos.costoHorasExtra);
   const d=decision({montoPrestamo:5000}),prestamo=cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:d}},{MERCADOS:mercados(10)}).resultadosPorEmpresa.A;
   cerca(prestamo.financiamiento.montoPrestamo,5000);cerca(prestamo.financiamiento.deudaPrincipal,5000);

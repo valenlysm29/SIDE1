@@ -44,8 +44,8 @@
       r.unidadesVendidas=r.ventas.reduce((a,l)=>a+l.vendido,0);r.ingresos=r.ventas.reduce((a,l)=>a+l.ingreso,0);r.inventarioSinVender=Object.values(r.inventarioProductos).reduce((a,l)=>a+l.cantidad,0);
       const extra=CON.evaluarConsecuencias({puntajes:r.puntajes,lotes:r.puntajes.lotes,jefes:r.decisiones.jefes,producido:r.produccion.totalProducido,demanda:r.unidadesVendidas},historialPorEmpresa[id]||{},overrides);
       const almacenaje=r.inventarioSinVender*c.COSTO_ALMACENAJE_UNIDAD;r.consecuencias.mensajes.push(...extra.mensajes.filter(m=>m.id==='CONS-07'));r.costos.costoAlmacenaje=almacenaje;
-      const garantia=(r.decisiones.seleccion||[]).map(k=>P.indice[k]).find(o=>o?.grupo==='Garantía del producto');r.costos.costoGarantia=(garantia?.costo||0)*r.unidadesVendidas;
-      r.costos.detallesRecurrentes=(r.decisiones.seleccion||[]).filter(codigo=>c.CODIGOS_COSTO_RECURRENTE.includes(codigo)).map(codigo=>({codigo,costo:Number(P.indice[codigo]?.costo||0)*c.CICLO_EQUIVALE_A_MESES}));
+      const garantia=c.GRUPOS_MOTOR.includes('Garantía del producto')&&(r.decisiones.seleccion||[]).map(k=>P.indice[k]).find(o=>o?.grupo==='Garantía del producto');r.costos.costoGarantia=Object.hasOwn(r.decisiones,'garantiaDias')?0:(garantia?.costo||0)*r.unidadesVendidas;
+      r.costos.detallesRecurrentes=(r.decisiones.seleccion||[]).filter(codigo=>c.CODIGOS_COSTO_RECURRENTE.includes(codigo)&&c.GRUPOS_MOTOR.includes(P.indice[codigo]?.grupo)&&!(Object.hasOwn(r.decisiones,'marketingNivel')&&P.indice[codigo]?.grupo==='Inversion en marketing')).map(codigo=>({codigo,costo:Number(P.indice[codigo]?.costo||0)*c.CICLO_EQUIVALE_A_MESES}));
       r.costos.costoDecisionesRecurrentes=r.costos.detallesRecurrentes.reduce((total,detalle)=>total+detalle.costo,0);
       r.costosTotales=r.costos.totalCostos+almacenaje+r.consecuencias.efectos.costoHorasExtra+r.costos.costoGarantia+r.costos.costoDecisionesRecurrentes;r.utilidad=r.ingresos-r.costosTotales;
       // El Excel no define calendario de cuotas: la tasa se informa al préstamo siguiente.

@@ -3,6 +3,14 @@
   'use strict';
   const CONFIG={
     VERSION:'excel-16',DIAS_CICLO:24,CICLO_EQUIVALE_A_MESES:1,
+    // Decisiones congeladas: 14 grupos de Seleccion_Ciclo0 y los dos temas ya presentes en 9fbe6ec.
+    GRUPOS_MOTOR:['Maquina de ensamblado','Maquina de acabados','Molde','Personal de corte','Personal de ensamble','Personal de acabados','Jefatura','Canal de venta','Acceso a prestamo bancario','Numero de proveedores','Politica de pago a proveedores','Lead time','Inversion en RR.HH.','Inversion en marketing','Garantía del producto','Mantenimiento de maquinaria'],
+    DECISIONES_VISIBLES:['Maquina de ensamblado','Maquina de acabados','Molde','Personal de corte','Personal de ensamble','Personal de acabados','Jefatura','Canal de venta','Acceso a prestamo bancario','Inversion en RR.HH.'],
+    CAMPOS_LEGACY_VISIBLES:['garantiaDias','mantenimientoPreventivo','tiendasPorDistrito','marketingNivel','analistaCompras','garantiaProveedor'],
+    GARANTIA_DIAS_BASE:[30,90,180],GARANTIA_MAPEO_EXACTO:{30:'COM-06B',90:'COM-06C'},COSTO_MANTENIMIENTO_BASE:200,
+    MARKETING_BASE:{baja:{codigo:'INV-02A',costo:1500},media:{codigo:'INV-02B',costo:6000},alta:{codigo:'INV-02C',costo:12000}},
+    ANALISTA_BASE:{costo:5000,descuentoInicialPct:12,reduccionPorCicloPct:2,descuentoMinimoPct:2},GARANTIA_PROVEEDOR_BASE:[0,80,100],
+    DISTRITOS_TIENDAS:{los_olivos:'Los Olivos',miraflores:'Miraflores',sjl:'San Juan de Lurigancho'},
     PRODUCTIVIDAD:{corte:[5,7,9],ensamble:[6,8,12],acabado:[6,7,10]},
     MULTIPLICADORES_MAQUINA:[1,1.2,1.5],EFICIENCIA_BASE:0.9,BONO_N3:0.01,BONO_JEFATURA:0.04,
     EFICIENCIA_N3_LITERAL:true,ESSALUD_ANUAL_LITERAL:true,CONS08_MODO:'multiplicativo',
@@ -20,7 +28,7 @@
     UMBRAL_SEGMENTO:{'SEG-01':0,'SEG-02':4,'SEG-03':7},
     CONSECUENCIAS:{CALIDAD_BAJA:4,CALIDAD_PREMIUM:7,PRECIO_BAJO:0.65,PRECIO_PREMIUM:1.4,REPUTACION_CAMBIO:2,EFICIENCIA_BAJA:4,PRODUCCION_BAJA:0.7,REPUTACION_BAJA:3,CICLOS_REPUTACION:2,DEMANDA_BAJA:0.8,SALUD_BAJA:3,EFICIENCIA_SIN_JEFE:5,PRODUCCION_SIN_JEFE:0.95},
     HORAS_EXTRA_PCT:0.25,COSTO_ALMACENAJE_UNIDAD:2,TEA_ADICIONAL_PP:3,TEA_BASE:20,UNIDADES_VIDA:100000,
-    CODIGOS_COSTO_RECURRENTE:['COM-01A','COM-01B','COM-01C','INV-01A','INV-01B','INV-01C','INV-02A','INV-02B','INV-02C','INS-12A','INS-12B','INS-12C'],
+    CODIGOS_COSTO_RECURRENTE:['COM-01A','COM-01B','COM-01C','INV-01A','INV-01B','INV-01C','INV-02A','INV-02B','INV-02C'],
     PENDIENTE_DEFINIR:['HORAS_EXTRA_PCT','COSTO_ALMACENAJE_UNIDAD','TEA_ADICIONAL_PP','UNIDADES_VIDA','DESCUENTOS_MULTIPLICATIVOS','LEAD_TIME_SOBRECOSTO','INVERSION_ALTA_BAJA','PRESTAMO_COBRAR_INTERES_CICLO','COM_02_03_04_COSTO_DEMANDA','COM_05N_CALENDARIO_COBROS'],
     LEAD_TIME_SOBRECOSTO:0,INVERSION_ALTA_BAJA:0,
     MERCADOS:{'SEG-01':{unidades:7000,penetracion:0.5,pesos:[0.7,0.2,0.1]},'SEG-02':{unidades:5000,penetracion:0.7,pesos:[0.4,0.35,0.25],precioIdeal:100},'SEG-03':{unidades:2000,penetracion:0.4,pesos:[0.1,0.5,0.4],precioIdeal:250}},

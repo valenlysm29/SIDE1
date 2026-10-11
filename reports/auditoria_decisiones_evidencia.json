@@ -1,0 +1,262 @@
+{
+  "headAuditado": "459c062",
+  "catalogoLegacyIdentico": true,
+  "idsBaseline": [
+    "MESA_CORTE",
+    "ENSAMBLE",
+    "ACABADOS",
+    "MOLDE",
+    "LOCAL_PROD",
+    "MANTENIMIENTO",
+    "PRODUCCION_META",
+    "PERS_CORTE",
+    "PERS_ENSAMBLE",
+    "PERS_ACABADO",
+    "JEFATURA",
+    "LIMPIEZA",
+    "GARANTIA_PT",
+    "ANALISTA_COMPRAS",
+    "CUERO",
+    "ACCESORIOS",
+    "HILO",
+    "GARANTIA_PROV",
+    "CANALES",
+    "PERSONAL_VENTAS",
+    "CREDITO_VENTAS",
+    "DEVOLUCIONES",
+    "INV_RRHH",
+    "INV_MARKETING",
+    "PRESTAMO"
+  ],
+  "idsHEAD": [
+    "MESA_CORTE",
+    "ENSAMBLE",
+    "ACABADOS",
+    "MOLDE",
+    "LOCAL_PROD",
+    "MANTENIMIENTO",
+    "PRODUCCION_META",
+    "PERS_CORTE",
+    "PERS_ENSAMBLE",
+    "PERS_ACABADO",
+    "JEFATURA",
+    "LIMPIEZA",
+    "GARANTIA_PT",
+    "ANALISTA_COMPRAS",
+    "CUERO",
+    "ACCESORIOS",
+    "HILO",
+    "GARANTIA_PROV",
+    "CANALES",
+    "PERSONAL_VENTAS",
+    "CREDITO_VENTAS",
+    "DEVOLUCIONES",
+    "INV_RRHH",
+    "INV_MARKETING",
+    "PRESTAMO"
+  ],
+  "evidenciaBaseline": [
+    {
+      "line": 14,
+      "text": "{id:'MESA_CORTE',required:false,name:'Mesas de corte',type:'quantity',asset:true,unlimited:true,options:["
+    },
+    {
+      "line": 17,
+      "text": "{id:'ENSAMBLE',required:false,name:'Máquinas de ensamblado',type:'quantity-choice',asset:true,unlimited:true,options:["
+    },
+    {
+      "line": 22,
+      "text": "{id:'ACABADOS',required:false,name:'Máquinas de acabados',type:'quantity-choice',asset:true,unlimited:true,options:["
+    },
+    {
+      "line": 27,
+      "text": "{id:'MOLDE',name:'Molde de producto',type:'choice',fixed:false,lockAfterPurchase:false,noDepreciation:true,required:true,options:["
+    },
+    {
+      "line": 32,
+      "text": "{id:'LOCAL_PROD',name:'Local de producción',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['local_std'],options:["
+    },
+    {
+      "line": 35,
+      "text": "{id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:["
+    },
+    {
+      "line": 44,
+      "text": "{id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Calcula la producción deseada por cada tipo de molde. SIDE mostrará los insumos requeridos y una sugerencia basada en la capacidad instalada.',cost:0},"
+    },
+    {
+      "line": 45,
+      "text": "{id:'PERS_CORTE',required:false,name:'Personal de corte',type:'quantity-choice',recurring:true,severanceEligible:true,options:["
+    },
+    {
+      "line": 50,
+      "text": "{id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',type:'quantity-choice',recurring:true,severanceEligible:true,options:["
+    },
+    {
+      "line": 55,
+      "text": "{id:'PERS_ACABADO',required:false,name:'Personal de acabados',type:'quantity-choice',recurring:true,severanceEligible:true,options:["
+    },
+    {
+      "line": 64,
+      "text": "{id:'LIMPIEZA',name:'Limpieza y servicios generales',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['limpieza'],options:["
+    },
+    {
+      "line": 67,
+      "text": "{id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:["
+    },
+    {
+      "line": 78,
+      "text": "{id:'ANALISTA_COMPRAS',required:false,name:'Analista de compras',type:'choice',recurring:true,options:["
+    },
+    {
+      "line": 82,
+      "text": "{id:'CUERO',name:'Compra de cuero',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:["
+    },
+    {
+      "line": 87,
+      "text": "{id:'ACCESORIOS',name:'Compra de accesorios',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:["
+    },
+    {
+      "line": 91,
+      "text": "{id:'HILO',name:'Compra de hilo',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:["
+    },
+    {
+      "line": 96,
+      "text": "{id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:["
+    },
+    {
+      "line": 107,
+      "text": "{id:'CANALES',name:'Canales de venta',type:'multi-choice',recurring:true,required:true,minSelections:1,options:["
+    },
+    {
+      "line": 114,
+      "text": "{id:'CREDITO_VENTAS',name:'Ventas a crédito',type:'info',desc:'El porcentaje inicia fijo y aumenta según avanzan los ciclos. No es una decisión del jugador.'},"
+    },
+    {
+      "line": 122,
+      "text": "{id:'INV_RRHH',name:'Capacitación del equipo',type:'choice',recurring:true,required:false,options:["
+    },
+    {
+      "line": 128,
+      "text": "{id:'INV_MARKETING',name:'Inversión en marketing',type:'choice',recurring:true,required:true,options:["
+    },
+    {
+      "line": 133,
+      "text": "{id:'PRESTAMO',name:'Línea de crédito',type:'loan',required:false,desc:'La línea inicia en 70% de la caja. En los siguientes ciclos puede aumentar o disminuir según la caja y los activos; el monto utilizado reduce la línea disponible.'}"
+    }
+  ],
+  "evidenciaApp": [
+    {
+      "line": 235,
+      "text": "}else if(item.type==='production-plan'){"
+    },
+    {
+      "line": 577,
+      "text": "if(item.type==='production-plan')return (e.moldTargets?Object.values(e.moldTargets).reduce((total,value)=>total+Number(value||0),0):Number(e.value||0))>=Number(item.min||0);"
+    },
+    {
+      "line": 605,
+      "text": "if(item.type==='production-plan'){"
+    },
+    {
+      "line": 617,
+      "text": "RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});"
+    },
+    {
+      "line": 637,
+      "text": "RULES.STORE_IDS.forEach(id=>{if((d.optionIds||[]).includes(id))d.quantities[id]=RULES.storeQuantity(d,id)});"
+    },
+    {
+      "line": 660,
+      "text": "if(RULES.storeQuantity(d,id)<RULES.committedQuantity(previous,id,currentRound())){toast('Debes mantener las tiendas con contrato vigente.');return false}"
+    },
+    {
+      "line": 664,
+      "text": "function creditPercent(){const base=Number(teacherConfig().creditPercentStart??20);return Math.min(70,base+(currentRound()-1)*5+(analystSelected()?5:0))}"
+    },
+    {
+      "line": 752,
+      "text": "if(item.type==='production-plan')return Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)>=Number(item.min||0);"
+    },
+    {
+      "line": 790,
+      "text": "if(event.target?.matches?.('[data-qty], [data-mold-target]'))refreshProductionDop();"
+    },
+    {
+      "line": 820,
+      "text": "} else if(item.type==='production-plan'){"
+    },
+    {
+      "line": 822,
+      "text": "body=`<div class=\"production-calculator\"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class=\"production-total\"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class=\"mold-production-grid\">${plan.productLines.map(line=>`<article class=\"mold-production-card ${line.available?'is-available':'is-unavailable'}\"><div class=\"mold-production-title\"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for=\"production-${line.id}\">¿Cuánto deseas producir con este molde?</label><div class=\"mold-target-control\"><button type=\"button\" data-mold-step=\"${line.id}\" data-delta=\"-10\" ${locked?'disabled':''}>−10</button><input id=\"production-${line.id}\" data-mold-target=\"${line.id}\" type=\"number\" inputmode=\"numeric\" min=\"0\" step=\"1\" value=\"${line.target}\" ${locked?'disabled':''}><button type=\"button\" data-mold-step=\"${line.id}\" data-delta=\"10\" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type=\"button\" class=\"mold-suggestion\" data-mold-suggest=\"${line.id}\" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class=\"mold-requirements\"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;"
+    },
+    {
+      "line": 836,
+      "text": "document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty], [data-mold-target]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});"
+    },
+    {
+      "line": 870,
+      "text": "document.querySelectorAll('[data-mold-target]').forEach(input=>{"
+    },
+    {
+      "line": 928,
+      "text": "if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}"
+    },
+    {
+      "line": 950,
+      "text": "if(item.type==='production-plan'){"
+    },
+    {
+      "line": 969,
+      "text": "RULES.STORE_IDS.forEach(id=>{const q=RULES.storeQuantity(d,id);if(q){quantities[id]=q;storeContracts[id]=RULES.nextStoreBatches(prev,id,q,round);optionRounds[id]=Math.min(...storeContracts[id].map(b=>b.round));}});"
+    },
+    {
+      "line": 1321,
+      "text": "if(item.type==='production-plan'){"
+    }
+  ],
+  "evidenciaEditor": [
+    {
+      "line": 25,
+      "text": "const select=(campo,label,rows)=>`<label>${label}<select data-lote=\"${i}\" data-campo=\"${campo}\" ${locked?'disabled':''}>${opciones(rows,l[campo])}</select></label>`;"
+    },
+    {
+      "line": 28,
+      "text": "<label>Cantidad a producir<input type=\"number\" min=\"0\" step=\"1\" value=\"${e(l.cantidad)}\" data-lote=\"${i}\" data-campo=\"cantidad\" ${locked?'disabled':''}></label>"
+    },
+    {
+      "line": 30,
+      "text": "<label>Precio por bolso (S/)<input type=\"number\" min=\"0\" step=\"0.01\" value=\"${e(l.precio)}\" data-lote=\"${i}\" data-campo=\"precio\" ${locked?'disabled':''}></label>"
+    },
+    {
+      "line": 76,
+      "text": "${enabled?`<div class=\"excel-grid\"><label>Régimen laboral<select data-excel-regimen ${frozen?'disabled':''}><option value=\"MYPE\" ${draft.regimen==='MYPE'?'selected':''}>MYPE</option><option value=\"NO_MYPE\" ${draft.regimen==='NO_MYPE'?'selected':''}>No MYPE</option></select></label><label>Publicidad del ciclo (S/)<input type=\"number\" min=\"0\" max=\"${cfg().PUBLICIDAD_MAX}\" step=\"1\" value=\"${e(draft.publicidad)}\" data-excel-publicidad ${frozen?'disabled':''}></label><label>Préstamo solicitado (S/)<input type=\"number\" min=\"0\" step=\"0.01\" value=\"${e(draft.montoPrestamo)}\" data-excel-prestamo ${frozen?'disabled':''}></label></div>"
+    },
+    {
+      "line": 77,
+      "text": "<details><summary>Tiendas y ventas a crédito</summary><p>Estas decisiones se conservan en el plan. El Excel no define su costo por zona ni el calendario de cobros: esos efectos están pendientes de definición.</p><div class=\"excel-grid\">${Object.entries({alta:'Zona alta',media:'Zona media',baja:'Zona baja'}).map(([key,label])=>`<label>Tiendas en ${label.toLowerCase()} (unidades)<input type=\"number\" min=\"0\" step=\"1\" value=\"${draft.tiendasPorZona[key]}\" data-excel-tienda=\"${key}\" ${frozen?'disabled':''}></label>`).join('')}<label>Ventas a crédito (%)<input type=\"number\" min=\"0\" max=\"${cfg().PORCENTAJE_CREDITO_MAX}\" step=\"0.01\" value=\"${draft.porcentajeVentasCredito}\" data-excel-creditopct ${frozen?'disabled':''}></label></div></details>"
+    },
+    {
+      "line": 78,
+      "text": "<details><summary>Decisiones del ciclo</summary><p>Las opciones sin elegir aportan cero. Un material faltante también aporta cero a la calidad y puede impedir producir.</p><div class=\"excel-grid\">${grupos().map((g,i)=>`<label>${e(g)}<select data-excel-grupo=\"${i}\" ${frozen?'disabled':''}>${opciones(opcionesGrupo(g),draft.seleccion.find(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo===g))}</select></label>`).join('')}</div></details>"
+    },
+    {
+      "line": 79,
+      "text": "<details><summary>Personal por nivel y máquina</summary><p>La cantidad corresponde a operarios. Corte utiliza la columna manual.</p><button type=\"button\" data-excel-importar class=\"side-button\" ${frozen?'disabled':''}>Importar personal de mis decisiones</button><div class=\"excel-table-wrap\"><table><thead><tr><th>Área y nivel</th>${maquinas.map(m=>`<th>${m}</th>`).join('')}</tr></thead><tbody>${Object.entries(areas).flatMap(([a,label])=>[0,1,2].map(n=>`<tr><th>${label} N${n+1}</th>${[0,1,2].map(m=>`<td><input aria-label=\"${label} nivel ${n+1} ${maquinas[m]}\" data-personal=\"${a},${n},${m}\" type=\"number\" min=\"0\" step=\"1\" value=\"${draft.personal[a][n][m]}\" ${frozen||a==='corte'&&m!==0?'disabled':''}></td>`).join('')}</tr>`)).join('')}</tbody></table></div></details>"
+    },
+    {
+      "line": 80,
+      "text": "<details><summary>Compras de materiales y maquinaria</summary><p>Declara cantidades de compra: rollos, pieles completas, juegos y carretes. La materia prima sobrante se conserva.</p><div class=\"excel-grid\">${Object.keys(cfg().CONVERSION_COMPRA).map(k=>`<label>${e(root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)}<input type=\"number\" min=\"0\" step=\"1\" data-compra=\"${k}\" value=\"${e(draft.comprasUnidades[k]||0)}\" ${frozen?'disabled':''}><small>1 compra = ${cfg().CONVERSION_COMPRA[k]} ${k.startsWith('INS-0')&&['INS-01','INS-02','INS-03'].includes(k)?'m²':['INS-04','INS-05'].includes(k)?'u':'m'}</small></label>`).join('')}</div><p>Activos disponibles en el ciclo</p><div class=\"excel-grid\">${Object.keys(cfg().MAQUINARIA).map(k=>`<label>${e(k==='mesa'?'Mesa de corte':root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)}<input type=\"number\" min=\"0\" step=\"1\" data-activo=\"${k}\" value=\"${e(draft.maquinaria[k]||0)}\" ${frozen?'disabled':''}></label>`).join('')}</div></details>"
+    },
+    {
+      "line": 92,
+      "text": "else if(el.matches('[data-excel-regimen]'))draft.regimen=el.value;"
+    },
+    {
+      "line": 96,
+      "text": "else if(el.matches('[data-excel-publicidad]'))draft.publicidad=Math.min(cfg().PUBLICIDAD_MAX,numero(el.value));"
+    }
+  ],
+  "commitBaseline": "9fbe6ec",
+  "catalogoLegacySemanticoIdentico": true
+}

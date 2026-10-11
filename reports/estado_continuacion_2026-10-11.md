@@ -56,3 +56,6 @@ Tras recibir el informe de fallos pendientes, el usuario pidió explícitamente 
 
 ## Continuación 3 — inicio y decisiones congeladas
 Inicio HEAD/originmain459c062 (pushanteriorrealizado), stash/cambiosajenosconservados. A0audita menúbase9fbe6ec vsactual; A8congelaHEAD ybaseline, mide20corridas secuenciales3D; A6implementalistasblancas. Skillsxlsx/webapp-testing/frontend-designleídas. Usuarioresolviódudas: conservargarantía30/90/180,mantenimientoopcionalS/200,tiendasdistritos; proveedorescantidad/pago/plazointernossinselector/efectoautomático. Depreciación/políticainventariosno nuevasdecisiones; créditoantesinformativo nodecisión. Oráculose regenerará trascontratofinal; verificacióncompletaunasolavez alfinal. NoChromeparaleloa mediciónA8.
+
+## Continuación 3 — hitos A0/A6
+Auditoría25entradasbase y18grupospreviosentregada; usuarioresolviótodoscasosconsultados: garantías/mantenimiento/tiendasbase, proveedoresinternos,marketingúnico1500/6000/12000,analista5000 ygarproveedor0/80/100. A6terminófiltroCFG16motor/10selectores+6camposlegacy; catálogo68intacto. Depreciación/política/proveedores/créditoeditablenuevosfueraUI; FIN02/INS12noefectodefault. 37dirigidasPASS. OráculosExcelregenerándose coninputs finales; A9freshrevisasóloesta continuación. A8mide20runsalternadosconexclusiónChrome. SQLsincambios.

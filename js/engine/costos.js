@@ -7,6 +7,7 @@
   const sumar=values=>values.reduce((total,value)=>total+n(value),0);
   const cfg=overrides=>configApi.configurar(overrides);
   const regimenValido=regimen=>regimen==='NO_MYPE'?'NO_MYPE':'MYPE';
+  function descuentoAnalista(ciclo=1,overrides={}){const a=cfg(overrides).ANALISTA_BASE;return Math.max(a.descuentoMinimoPct,a.descuentoInicialPct-(Math.max(1,n(ciclo))-1)*a.reduccionPorCicloPct);}
 
   function costoLaboral(rol,nivel=1,regimen='MYPE',overrides={}){
     if(typeof rol==='object'){const entrada=rol;return costoLaboral(entrada.rol,entrada.nivel,entrada.regimen,nivel&&typeof nivel==='object'?nivel:overrides);}
@@ -79,16 +80,17 @@
       const detalle=costoLaboral(rol,1,regimen,c);detallesMO.push({...detalle,cantidad,costo:detalle.pagoMensual*cantidad*c.CICLO_EQUIVALE_A_MESES});
     }
     const costoMOciclo=sumar(detallesMO.map(detalle=>detalle.costo));
-    const metodo=seleccion.find(codigo=>/^FIN-02[ABC]$/.test(codigo))||'FIN-02A';
+    const metodo=(c.GRUPOS_MOTOR.includes('Método de depreciación')&&seleccion.find(codigo=>/^FIN-02[ABC]$/.test(codigo)))||'FIN-02A';
     const detallesMaquinaria=Object.entries(entrada.maquinaria||{}).filter(([,cantidad])=>positivo(cantidad)>0).map(([codigo,cantidad])=>({...costoMaquinaria(codigo,regimen,{metodo,unidadesCiclo:entrada.produccion?.totalProducido,ciclo:entrada.ciclo},c),cantidad:positivo(cantidad)}));
     const mantenimientoAnual=sumar(detallesMaquinaria.map(detalle=>detalle.mantenimientoAnual*detalle.cantidad));
-    const costoPoliticaMantenimiento=sumar(seleccion.filter(codigo=>Object.hasOwn(c.COSTO_POLITICA_MANTENIMIENTO,codigo)).map(codigo=>c.COSTO_POLITICA_MANTENIMIENTO[codigo]));
+    const costoPoliticaMantenimiento=Object.hasOwn(entrada,'mantenimientoPreventivo')?(entrada.mantenimientoPreventivo?c.COSTO_MANTENIMIENTO_BASE:0):c.GRUPOS_MOTOR.includes('Mantenimiento de maquinaria')?sumar(seleccion.filter(codigo=>Object.hasOwn(c.COSTO_POLITICA_MANTENIMIENTO,codigo)).map(codigo=>c.COSTO_POLITICA_MANTENIMIENTO[codigo])):0;
     const costoMantenimiento=sumar(detallesMaquinaria.map(detalle=>detalle.mantenimientoCiclo*detalle.cantidad))+costoPoliticaMantenimiento;
     const depreciacion=sumar(detallesMaquinaria.map(detalle=>detalle.depreciacionCiclo*detalle.cantidad));
     const compras=entrada.compras||{},inicial=entrada.inventarioInicial||{};
     const almacen=consumirAlmacen({inventarioInicial:inicial,compras,necesidad:entrada.necesidadMP||{}},c);
     const consumoMP=entrada.consumoMP||almacen.consumoMP,detallesMP=[];
-    const factorDescuento=(1-c.DESCUENTO_CANTIDAD)*(seleccion.includes('INS-09A')?1-c.DESCUENTO_PROVEEDOR_UNICO:1)*(seleccion.includes('INS-10A')?1-c.DESCUENTO_CONTADO:1);
+    const descuentoAnalistaPct=entrada.analistaCompras?descuentoAnalista(entrada.ciclo,c):0;
+    const factorDescuento=(1-c.DESCUENTO_CANTIDAD)*(seleccion.includes('INS-09A')?1-c.DESCUENTO_PROVEEDOR_UNICO:1)*(seleccion.includes('INS-10A')?1-c.DESCUENTO_CONTADO:1)*(1-descuentoAnalistaPct/100);
     for(const [codigo,precio] of Object.entries(c.PRECIO_MP)){
       const comprado=positivo(compras[codigo]),inventarioInicial=positivo(inicial[codigo]),consumido=positivo(consumoMP[codigo]);
       if(consumido>comprado+inventarioInicial)throw new RangeError('Consumo superior al inventario disponible: '+codigo);
@@ -101,14 +103,14 @@
     }
     const valorComprado=sumar(detallesMP.map(detalle=>detalle.valorComprado)),valorConsumido=sumar(detallesMP.map(detalle=>detalle.valorConsumido)),valorInventario=sumar(detallesMP.map(detalle=>detalle.valorInventario));
     const valorCompradoNeto=valorComprado*factorDescuento,valorConsumidoNeto=valorConsumido*factorDescuento,valorInventarioNeto=valorInventario*factorDescuento;
-    const reputacion=reputacionOperativa({produccion:entrada.produccion,consumoMP,publicidad:entrada.publicidad,proporcionN3:entrada.produccion?.proporcionN3??(trabajadores?n3/trabajadores:0)},c);
-    const costoMP=valorConsumidoNeto,costoPublicidad=positivo(entrada.publicidad),costoAlmacenaje=positivo(entrada.unidadesSinVender)*c.COSTO_ALMACENAJE_UNIDAD,costoHorasExtra=positivo(entrada.costoHorasExtra);
+    const reputacion=reputacionOperativa({produccion:entrada.produccion,consumoMP,publicidad:Object.hasOwn(entrada,'marketingNivel')?(c.MARKETING_BASE[entrada.marketingNivel]?.costo||0):entrada.publicidad,proporcionN3:entrada.produccion?.proporcionN3??(trabajadores?n3/trabajadores:0)},c);
+    const costoMP=valorConsumidoNeto,costoPublicidad=Object.hasOwn(entrada,'marketingNivel')?(c.MARKETING_BASE[entrada.marketingNivel]?.costo||0):positivo(entrada.publicidad),costoAnalistaCompras=entrada.analistaCompras?c.ANALISTA_BASE.costo:0,costoAlmacenaje=positivo(entrada.unidadesSinVender)*c.COSTO_ALMACENAJE_UNIDAD,costoHorasExtra=positivo(entrada.costoHorasExtra);
     const costoLeadTime=seleccion.includes('INS-11A')?valorCompradoNeto*c.LEAD_TIME_SOBRECOSTO:0;
     return {costoMOciclo,costoMantenimiento,costoPoliticaMantenimiento,mantenimientoAnual,depreciacion,costoMP,valorComprado,valorConsumido,valorInventario,
-      valorCompradoNeto,valorConsumidoNeto,valorInventarioNeto,factorDescuento,costoPublicidad,costoAlmacenaje,costoHorasExtra,costoLeadTime,
+      valorCompradoNeto,valorConsumidoNeto,valorInventarioNeto,factorDescuento,costoPublicidad,costoAnalistaCompras,descuentoAnalistaPct,costoAlmacenaje,costoHorasExtra,costoLeadTime,
       reputacionOperativa:reputacion.valor,reputacion,consumoMP,inventarioFinal:Object.fromEntries(detallesMP.map(detalle=>[detalle.codigo,detalle.inventarioFinal])),
-      totalCostos:costoMOciclo+costoMantenimiento+depreciacion+costoMP+costoPublicidad+costoAlmacenaje+costoHorasExtra+costoLeadTime,
+      totalCostos:costoMOciclo+costoMantenimiento+depreciacion+costoMP+costoPublicidad+costoAnalistaCompras+costoAlmacenaje+costoHorasExtra+costoLeadTime,
       detalles:{manoObra:detallesMO,maquinaria:detallesMaquinaria,materiaPrima:detallesMP}};
   }
-  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa};
+  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa,descuentoAnalista};
 });
