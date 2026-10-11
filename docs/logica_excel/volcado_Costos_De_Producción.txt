@@ -1,0 +1,1273 @@
+Hoja: Costos De Producción
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"Calculo de MO"	"Calculo de MO"	"s"	null
+"T2"	"Costos: MO"	"Costos: MO"	"s"	null
+"A3"	"AREA DE CORTE "	"AREA DE CORTE "	"s"	null
+"E4"	"Bolsas por día "	"Bolsas por día "	"s"	null
+"F4"	"Mesa de corte"	"Mesa de corte"	"s"	null
+"K4"	"Producción por día "	"Producción por día "	"s"	null
+"L4"	"AL MES"	"AL MES"	"s"	null
+"M4"	"Eficiencia"	"Eficiencia"	"s"	null
+"N4"	"Produccion Real"	"Produccion Real"	"s"	null
+"T4"	"O.Basico"	"O.Basico"	"s"	null
+"U4"	"MYPE"	"MYPE"	"s"	null
+"V4"	"NoMype"	"NoMype"	"s"	null
+"X4"	"Costurero básico"	"Costurero básico"	"s"	null
+"Y4"	"MYPE"	"MYPE"	"s"	null
+"Z4"	"NoMype"	"NoMype"	"s"	null
+"AB4"	"Operario de acabado clásico"	"Operario de acabado clásico"	"s"	null
+"AC4"	"MYPE"	"MYPE"	"s"	null
+"AD4"	"NoMype"	"NoMype"	"s"	null
+"C5"	"Nivel 1 - Operario basico "	"Nivel 1 - Operario basico "	"s"	null
+"E5"	6.0	6.0	"n"	null
+"F5"	1.0	1.0	"n"	null
+"I5"	"=E5*F5"	6	"f"	null
+"K5"	"=MIN(I8,I14,I20)"	14	"f"	null
+"L5"	"=K5*30"	420	"f"	null
+"M5"	"=K7+(F7+F13+F19)/100+4%*F21"	0.91	"f"	null
+"N5"	"=ROUND(L5*M5,0)"	382	"f"	null
+"O5"	"Esta produccion no puede ser superior a lo que permite el material"	"Esta produccion no puede ser superior a lo que permite el material"	"s"	null
+"T5"	"Sueldo base"	"Sueldo base"	"s"	null
+"U5"	1500.0	1500.0	"n"	null
+"V5"	1500.0	1500.0	"n"	null
+"X5"	"Sueldo base"	"Sueldo base"	"s"	null
+"Y5"	1500.0	1500.0	"n"	null
+"Z5"	1500.0	1500.0	"n"	null
+"AB5"	"Sueldo base"	"Sueldo base"	"s"	null
+"AC5"	1500.0	1500.0	"n"	null
+"AD5"	1500.0	1500.0	"n"	null
+"C6"	"Nivel 2 - Cortador con experiencia "	"Nivel 2 - Cortador con experiencia "	"s"	null
+"E6"	8.0	8.0	"n"	null
+"F6"	1.0	1.0	"n"	null
+"I6"	"=E6*F6"	8	"f"	null
+"K6"	"Eficiencia BASE"	"Eficiencia BASE"	"s"	null
+"T6"	"Essalud"	"Essalud"	"s"	null
+"U6"	"=U5*0.09"	135	"f"	null
+"V6"	"=V5*0.09"	135	"f"	null
+"X6"	"Essalud"	"Essalud"	"s"	null
+"Y6"	"=Y5*0.09"	135	"f"	null
+"Z6"	"=Z5*0.09"	135	"f"	null
+"AB6"	"Essalud"	"Essalud"	"s"	null
+"AC6"	"=AC5*0.09"	135	"f"	null
+"AD6"	"=AD5*0.09"	135	"f"	null
+"C7"	"Nivel 3 - Maestro cortador "	"Nivel 3 - Maestro cortador "	"s"	null
+"E7"	12.0	12.0	"n"	null
+"F7"	0.0	0.0	"n"	null
+"I7"	"=E7*F7"	0	"f"	null
+"K7"	0.9	0.9	"n"	null
+"T7"	"Grati"	"Grati"	"s"	null
+"U7"	"=U5"	1500	"f"	null
+"V7"	"=V5*2"	3000	"f"	null
+"X7"	"Grati"	"Grati"	"s"	null
+"Y7"	"=Y5"	1500	"f"	null
+"Z7"	"=Z5*2"	3000	"f"	null
+"AB7"	"Grati"	"Grati"	"s"	null
+"AC7"	"=AC5"	1500	"f"	null
+"AD7"	"=AD5*2"	3000	"f"	null
+"A8"	"AREA DE ENSAMBLADO"	"AREA DE ENSAMBLADO"	"s"	null
+"I8"	"=SUM(I5:I7)"	14	"f"	null
+"T8"	"CTS"	"CTS"	"s"	null
+"U8"	750.0	750.0	"n"	null
+"V8"	1500.0	1500.0	"n"	null
+"X8"	"CTS"	"CTS"	"s"	null
+"Y8"	750.0	750.0	"n"	null
+"Z8"	1500.0	1500.0	"n"	null
+"AB8"	"CTS"	"CTS"	"s"	null
+"AC8"	750.0	750.0	"n"	null
+"AD8"	1500.0	1500.0	"n"	null
+"C9"	"Operarios"	"Operarios"	"s"	null
+"F9"	"MAQUINARIA MANUAL"	"MAQUINARIA MANUAL"	"s"	null
+"G9"	"MAQUINARIA SEMIINDUSTRIAL "	"MAQUINARIA SEMIINDUSTRIAL "	"s"	null
+"H9"	"MAQUINARIA INDUSTRIAL "	"MAQUINARIA INDUSTRIAL "	"s"	null
+"K9"	"Total de trabajadores"	"Total de trabajadores"	"s"	null
+"L9"	"=SUM(F5:F7,F11:H13,F17:H19)"	7	"f"	null
+"T9"	"vacaciones"	"vacaciones"	"s"	null
+"U9"	"=U5/2"	750	"f"	null
+"V9"	"=V5"	1500	"f"	null
+"X9"	"vacaciones"	"vacaciones"	"s"	null
+"Y9"	"=Y5/2"	750	"f"	null
+"Z9"	"=Z5"	1500	"f"	null
+"AB9"	"vacaciones"	"vacaciones"	"s"	null
+"AC9"	"=AC5/2"	750	"f"	null
+"AD9"	"=AD5"	1500	"f"	null
+"F10"	1.0	1.0	"n"	null
+"G10"	1.2	1.2	"n"	null
+"H10"	1.5	1.5	"n"	null
+"K10"	"total de trabajadores N3"	"total de trabajadores N3"	"s"	null
+"L10"	"=SUM(F7,F13:H13,F19:H19)"	2	"f"	null
+"M10"	"=L10/L9"	0.2857142857	"f"	null
+"T10"	"Suma anual"	"Suma anual"	"s"	null
+"U10"	"=SUM(U6:U9)+U5*12"	21135	"f"	null
+"V10"	"=SUM(V6:V9)+V5*12"	24135	"f"	null
+"X10"	"Suma anual"	"Suma anual"	"s"	null
+"Y10"	"=SUM(Y6:Y9)+Y5*12"	21135	"f"	null
+"Z10"	"=SUM(Z6:Z9)+Z5*12"	24135	"f"	null
+"AB10"	"Suma anual"	"Suma anual"	"s"	null
+"AC10"	"=SUM(AC6:AC9)+AC5*12"	21135	"f"	null
+"AD10"	"=SUM(AD6:AD9)+AD5*12"	24135	"f"	null
+"C11"	"Nivel 1"	"Nivel 1"	"s"	null
+"E11"	6.0	6.0	"n"	null
+"H11"	1.0	1.0	"n"	null
+"I11"	"=SUM(F11*E11*$F$10,G11*E11*$G$10,H11*E11*$H$10)"	9	"f"	null
+"T11"	"Pago mensual"	"Pago mensual"	"s"	null
+"U11"	"=U10/12.5"	1690.8	"f"	null
+"V11"	"=V10/13"	1856.538462	"f"	null
+"X11"	"Pago mensual"	"Pago mensual"	"s"	null
+"Y11"	"=Y10/12.5"	1690.8	"f"	null
+"Z11"	"=Z10/13"	1856.538462	"f"	null
+"AB11"	"Pago mensual"	"Pago mensual"	"s"	null
+"AC11"	"=AC10/12.5"	1690.8	"f"	null
+"AD11"	"=AD10/13"	1856.538462	"f"	null
+"C12"	"Nivel 2"	"Nivel 2"	"s"	null
+"E12"	8.0	8.0	"n"	null
+"F12"	1.0	1.0	"n"	null
+"I12"	"=SUM(F12*E12*$F$10,G12*E12*$G$10,H12*E12*$H$10)"	8	"f"	null
+"C13"	"Nivel 3"	"Nivel 3"	"s"	null
+"E13"	12.0	12.0	"n"	null
+"G13"	1.0	1.0	"n"	null
+"I13"	"=SUM(F13*E13*$F$10,G13*E13*$G$10,H13*E13*$H$10)"	14.4	"f"	null
+"T13"	"Cortador con experiencia"	"Cortador con experiencia"	"s"	null
+"U13"	"MYPE"	"MYPE"	"s"	null
+"V13"	"NoMype"	"NoMype"	"s"	null
+"X13"	"Maquinista industrial"	"Maquinista industrial"	"s"	null
+"Y13"	"MYPE"	"MYPE"	"s"	null
+"Z13"	"NoMype"	"NoMype"	"s"	null
+"AB13"	"Técnico de acabado"	"Técnico de acabado"	"s"	null
+"AC13"	"MYPE"	"MYPE"	"s"	null
+"AD13"	"NoMype"	"NoMype"	"s"	null
+"A14"	"AREA DE ACABADO "	"AREA DE ACABADO "	"s"	null
+"I14"	"=SUM(I11:I13)"	31.4	"f"	null
+"T14"	"Sueldo base"	"Sueldo base"	"s"	null
+"U14"	2000.0	2000.0	"n"	null
+"V14"	2000.0	2000.0	"n"	null
+"X14"	"Sueldo base"	"Sueldo base"	"s"	null
+"Y14"	2800.0	2800.0	"n"	null
+"Z14"	2800.0	2800.0	"n"	null
+"AB14"	"Sueldo base"	"Sueldo base"	"s"	null
+"AC14"	2800.0	2800.0	"n"	null
+"AD14"	2800.0	2800.0	"n"	null
+"C15"	"Operarios"	"Operarios"	"s"	null
+"F15"	"MAQUINARIA MANUAL"	"MAQUINARIA MANUAL"	"s"	null
+"G15"	"MAQUINARIA SEMIINDUSTRIAL "	"MAQUINARIA SEMIINDUSTRIAL "	"s"	null
+"H15"	"MAQUINARIA INDUSTRIAL "	"MAQUINARIA INDUSTRIAL "	"s"	null
+"T15"	"Essalud"	"Essalud"	"s"	null
+"U15"	"=U14*0.09"	180	"f"	null
+"V15"	"=V14*0.09"	180	"f"	null
+"X15"	"Essalud"	"Essalud"	"s"	null
+"Y15"	"=Y14*0.09"	252	"f"	null
+"Z15"	"=Z14*0.09"	252	"f"	null
+"AB15"	"Essalud"	"Essalud"	"s"	null
+"AC15"	"=AC14*0.09"	252	"f"	null
+"AD15"	"=AD14*0.09"	252	"f"	null
+"F16"	1.0	1.0	"n"	null
+"G16"	1.2	1.2	"n"	null
+"H16"	1.5	1.5	"n"	null
+"T16"	"Grati"	"Grati"	"s"	null
+"U16"	"=U14"	2000	"f"	null
+"V16"	"=V14*2"	4000	"f"	null
+"X16"	"Grati"	"Grati"	"s"	null
+"Y16"	"=Y14"	2800	"f"	null
+"Z16"	"=Z14*2"	5600	"f"	null
+"AB16"	"Grati"	"Grati"	"s"	null
+"AC16"	"=AC14"	2800	"f"	null
+"AD16"	"=AD14*2"	5600	"f"	null
+"C17"	"Nivel 1"	"Nivel 1"	"s"	null
+"E17"	6.0	6.0	"n"	null
+"I17"	"=SUM(F17*E17*$F$16,G17*E17*$G$16,H17*E17*$H$16)"	0	"f"	null
+"T17"	"CTS"	"CTS"	"s"	null
+"U17"	"=U14/2"	1000	"f"	null
+"V17"	"=V14"	2000	"f"	null
+"X17"	"CTS"	"CTS"	"s"	null
+"Y17"	750.0	750.0	"n"	null
+"Z17"	1500.0	1500.0	"n"	null
+"AB17"	"CTS"	"CTS"	"s"	null
+"AC17"	750.0	750.0	"n"	null
+"AD17"	1500.0	1500.0	"n"	null
+"C18"	"Nivel 2"	"Nivel 2"	"s"	null
+"E18"	8.0	8.0	"n"	null
+"H18"	1.0	1.0	"n"	null
+"I18"	"=SUM(F18*E18*$F$16,G18*E18*$G$16,H18*E18*$H$16)"	12	"f"	null
+"T18"	"vacaciones"	"vacaciones"	"s"	null
+"U18"	"=U14/2"	1000	"f"	null
+"V18"	"=V14"	2000	"f"	null
+"X18"	"vacaciones"	"vacaciones"	"s"	null
+"Y18"	"=Y14/2"	1400	"f"	null
+"Z18"	"=Z14"	2800	"f"	null
+"AB18"	"vacaciones"	"vacaciones"	"s"	null
+"AC18"	"=AC14/2"	1400	"f"	null
+"AD18"	"=AD14"	2800	"f"	null
+"C19"	"Nivel 3"	"Nivel 3"	"s"	null
+"E19"	12.0	12.0	"n"	null
+"F19"	1.0	1.0	"n"	null
+"I19"	"=SUM(F19*E19*$F$16,G19*E19*$G$16,H19*E19*$H$16)"	12	"f"	null
+"T19"	"Suma anual"	"Suma anual"	"s"	null
+"U19"	"=SUM(U15:U18)+U14*12"	28180	"f"	null
+"V19"	"=SUM(V15:V18)+V14*12"	32180	"f"	null
+"X19"	"Suma anual"	"Suma anual"	"s"	null
+"Y19"	"=SUM(Y15:Y18)+Y14*12"	38802	"f"	null
+"Z19"	"=SUM(Z15:Z18)+Z14*12"	43752	"f"	null
+"AB19"	"Suma anual"	"Suma anual"	"s"	null
+"AC19"	"=SUM(AC15:AC18)+AC14*12"	38802	"f"	null
+"AD19"	"=SUM(AD15:AD18)+AD14*12"	43752	"f"	null
+"I20"	"=SUM(I17:I19)"	24	"f"	null
+"T20"	"Pago mensual"	"Pago mensual"	"s"	null
+"U20"	"=U19/12.5"	2254.4	"f"	null
+"V20"	"=V19/13"	2475.384615	"f"	null
+"X20"	"Pago mensual"	"Pago mensual"	"s"	null
+"Y20"	"=Y19/12.5"	3104.16	"f"	null
+"Z20"	"=Z19/13"	3365.538462	"f"	null
+"AB20"	"Pago mensual"	"Pago mensual"	"s"	null
+"AC20"	"=AC19/12.5"	3104.16	"f"	null
+"AD20"	"=AD19/13"	3365.538462	"f"	null
+"A21"	"Jefe de Produccion"	"Jefe de Produccion"	"s"	null
+"F21"	0.0	0.0	"n"	null
+"T22"	"Maestro cortador"	"Maestro cortador"	"s"	null
+"U22"	"MYPE"	"MYPE"	"s"	null
+"V22"	"NoMype"	"NoMype"	"s"	null
+"X22"	"Marroquinero especializado"	"Marroquinero especializado"	"s"	null
+"Y22"	"MYPE"	"MYPE"	"s"	null
+"Z22"	"NoMype"	"NoMype"	"s"	null
+"AB22"	"Artesano acabador"	"Artesano acabador"	"s"	null
+"AC22"	"MYPE"	"MYPE"	"s"	null
+"AD22"	"NoMype"	"NoMype"	"s"	null
+"B23"	"NOTA: EL PROCETANJE DE TRABAJADORES DE NIVEL 3 AFECTA POSITIVAMENTE A LA EFICIENCIA "	"NOTA: EL PROCETANJE DE TRABAJADORES DE NIVEL 3 AFECTA POSITIVAMENTE A LA EFICIENCIA "	"s"	null
+"T23"	"Sueldo base"	"Sueldo base"	"s"	null
+"U23"	3800.0	3800.0	"n"	null
+"V23"	3800.0	3800.0	"n"	null
+"X23"	"Sueldo base"	"Sueldo base"	"s"	null
+"Y23"	4500.0	4500.0	"n"	null
+"Z23"	4500.0	4500.0	"n"	null
+"AB23"	"Sueldo base"	"Sueldo base"	"s"	null
+"AC23"	4500.0	4500.0	"n"	null
+"AD23"	4500.0	4500.0	"n"	null
+"T24"	"Essalud"	"Essalud"	"s"	null
+"U24"	"=U23*0.09"	342	"f"	null
+"V24"	"=V23*0.09"	342	"f"	null
+"X24"	"Essalud"	"Essalud"	"s"	null
+"Y24"	"=Y23*0.09"	405	"f"	null
+"Z24"	"=Z23*0.09"	405	"f"	null
+"AB24"	"Essalud"	"Essalud"	"s"	null
+"AC24"	"=AC23*0.09"	405	"f"	null
+"AD24"	"=AD23*0.09"	405	"f"	null
+"A25"	"Calculo de MP"	"Calculo de MP"	"s"	null
+"T25"	"Grati"	"Grati"	"s"	null
+"U25"	"=U23"	3800	"f"	null
+"V25"	"=V23*2"	7600	"f"	null
+"X25"	"Grati"	"Grati"	"s"	null
+"Y25"	"=Y23"	4500	"f"	null
+"Z25"	"=Z23*2"	9000	"f"	null
+"AB25"	"Grati"	"Grati"	"s"	null
+"AC25"	"=AC23"	4500	"f"	null
+"AD25"	"=AD23*2"	9000	"f"	null
+"T26"	"CTS"	"CTS"	"s"	null
+"U26"	750.0	750.0	"n"	null
+"V26"	1500.0	1500.0	"n"	null
+"X26"	"CTS"	"CTS"	"s"	null
+"Y26"	750.0	750.0	"n"	null
+"Z26"	1500.0	1500.0	"n"	null
+"AB26"	"CTS"	"CTS"	"s"	null
+"AC26"	750.0	750.0	"n"	null
+"AD26"	1500.0	1500.0	"n"	null
+"D27"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"E27"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"F27"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"G27"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"H27"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"I27"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"J27"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"K27"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"T27"	"vacaciones"	"vacaciones"	"s"	null
+"U27"	"=U23/2"	1900	"f"	null
+"V27"	"=V23"	3800	"f"	null
+"X27"	"vacaciones"	"vacaciones"	"s"	null
+"Y27"	"=Y23/2"	2250	"f"	null
+"Z27"	"=Z23"	4500	"f"	null
+"AB27"	"vacaciones"	"vacaciones"	"s"	null
+"AC27"	"=AC23/2"	2250	"f"	null
+"AD27"	"=AD23"	4500	"f"	null
+"D28"	"Nivel 1 - Cuero sintetico"	"Nivel 1 - Cuero sintetico"	"s"	null
+"E28"	"Nivel 2 - Cuero genuino estandar"	"Nivel 2 - Cuero genuino estandar"	"s"	null
+"F28"	"Nivel 3 - Cuero genuino premium"	"Nivel 3 - Cuero genuino premium"	"s"	null
+"G28"	"Nivel 1 - Aleacion economica"	"Nivel 1 - Aleacion economica"	"s"	null
+"H28"	"Nivel 2 - Metal premium"	"Nivel 2 - Metal premium"	"s"	null
+"I28"	"Nivel 1 - Poliester estandar"	"Nivel 1 - Poliester estandar"	"s"	null
+"J28"	"Nivel 2 - Encerado reforzado"	"Nivel 2 - Encerado reforzado"	"s"	null
+"K28"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"s"	null
+"T28"	"Suma anual"	"Suma anual"	"s"	null
+"U28"	"=SUM(U24:U27)+U23*12"	52392	"f"	null
+"V28"	"=SUM(V24:V27)+V23*12"	58842	"f"	null
+"X28"	"Suma anual"	"Suma anual"	"s"	null
+"Y28"	"=SUM(Y24:Y27)+Y23*12"	61905	"f"	null
+"Z28"	"=SUM(Z24:Z27)+Z23*12"	69405	"f"	null
+"AB28"	"Suma anual"	"Suma anual"	"s"	null
+"AC28"	"=SUM(AC24:AC27)+AC23*12"	61905	"f"	null
+"AD28"	"=SUM(AD24:AD27)+AD23*12"	69405	"f"	null
+"C29"	"UM Compra"	"UM Compra"	"s"	null
+"D29"	"rollo"	"rollo"	"s"	null
+"E29"	"Piel completa"	"Piel completa"	"s"	null
+"F29"	"Piel completa"	"Piel completa"	"s"	null
+"G29"	"Juego"	"Juego"	"s"	null
+"H29"	"Juego"	"Juego"	"s"	null
+"I29"	"Carrete"	"Carrete"	"s"	null
+"J29"	"Carrete"	"Carrete"	"s"	null
+"K29"	"Carrete"	"Carrete"	"s"	null
+"T29"	"Pago mensual"	"Pago mensual"	"s"	null
+"U29"	"=U28/12.5"	4191.36	"f"	null
+"V29"	"=V28/13"	4526.307692	"f"	null
+"X29"	"Pago mensual"	"Pago mensual"	"s"	null
+"Y29"	"=Y28/12.5"	4952.4	"f"	null
+"Z29"	"=Z28/13"	5338.846154	"f"	null
+"AB29"	"Pago mensual"	"Pago mensual"	"s"	null
+"AC29"	"=AC28/12.5"	4952.4	"f"	null
+"AD29"	"=AD28/13"	5338.846154	"f"	null
+"C30"	"UM Produccion"	"UM Produccion"	"s"	null
+"D30"	"m2"	"m2"	"s"	null
+"E30"	"m2"	"m2"	"s"	null
+"F30"	"m2"	"m2"	"s"	null
+"G30"	"unidad"	"unidad"	"s"	null
+"H30"	"unidad"	"unidad"	"s"	null
+"I30"	"metro"	"metro"	"s"	null
+"J30"	"metro"	"metro"	"s"	null
+"K30"	"metro"	"metro"	"s"	null
+"B31"	"Cantidad necesaria"	"Cantidad necesaria"	"s"	null
+"C31"	"Compra Jugador"	"Compra Jugador"	"s"	null
+"D31"	60.0	60.0	"n"	null
+"E31"	55.0	55.0	"n"	null
+"F31"	15.0	15.0	"n"	null
+"G31"	200.0	200.0	"n"	null
+"H31"	190.0	190.0	"n"	null
+"I31"	0.0	0.0	"n"	null
+"J31"	6.0	6.0	"n"	null
+"K31"	7.0	7.0	"n"	null
+"C32"	"Cantidad Produccion"	"Cantidad Produccion"	"s"	null
+"D32"	1.0	1.0	"n"	null
+"E32"	2.0	2.0	"n"	null
+"F32"	2.0	2.0	"n"	null
+"G32"	1.0	1.0	"n"	null
+"H32"	1.0	1.0	"n"	null
+"I32"	270.0	270.0	"n"	null
+"J32"	250.0	250.0	"n"	null
+"K32"	200.0	200.0	"n"	null
+"T32"	"Jefatura"	"Jefatura"	"s"	null
+"U32"	"MYPE"	"MYPE"	"s"	null
+"V32"	"NoMype"	"NoMype"	"s"	null
+"X32"	"Limpieza"	"Limpieza"	"s"	null
+"Y32"	"MYPE"	"MYPE"	"s"	null
+"Z32"	"NoMype"	"NoMype"	"s"	null
+"AB32"	"Local de producción"	"Local de producción"	"s"	null
+"AC32"	"MYPE"	"MYPE"	"s"	null
+"AD32"	"NoMype"	"NoMype"	"s"	null
+"D33"	"=D31*D32"	60	"f"	null
+"E33"	"=E31*E32"	110	"f"	null
+"F33"	"=F31*F32"	30	"f"	null
+"G33"	"=G31*G32"	200	"f"	null
+"H33"	"=H31*H32"	190	"f"	null
+"I33"	"=I31*I32"	0	"f"	null
+"J33"	"=J31*J32"	1500	"f"	null
+"K33"	"=K31*K32"	1400	"f"	null
+"T33"	"Sueldo base"	"Sueldo base"	"s"	null
+"U33"	3000.0	3000.0	"n"	null
+"V33"	3000.0	3000.0	"n"	null
+"X33"	"Sueldo base"	"Sueldo base"	"s"	null
+"Y33"	600.0	600.0	"n"	null
+"Z33"	600.0	600.0	"n"	null
+"AB33"	"Costo fijo"	"Costo fijo"	"s"	null
+"AC33"	2000.0	2000.0	"n"	null
+"AD33"	2000.0	2000.0	"n"	null
+"T34"	"Essalud"	"Essalud"	"s"	null
+"U34"	"=U33*0.09"	270	"f"	null
+"V34"	"=V33*0.09"	270	"f"	null
+"X34"	"Essalud"	"Essalud"	"s"	null
+"Y34"	"=Y33*0.09"	54	"f"	null
+"Z34"	"=Z33*0.09"	54	"f"	null
+"H35"	"InventarioFinal = InventarioInicial + compras - produccido"	"InventarioFinal = InventarioInicial + compras - produccido"	"s"	null
+"T35"	"Grati"	"Grati"	"s"	null
+"U35"	"=U33"	3000	"f"	null
+"V35"	"=V33*2"	6000	"f"	null
+"X35"	"Grati"	"Grati"	"s"	null
+"Y35"	"=Y33"	600	"f"	null
+"Z35"	"=Z33*2"	1200	"f"	null
+"D36"	"m2"	"m2"	"s"	null
+"E36"	"unidad"	"unidad"	"s"	null
+"F36"	"metro"	"metro"	"s"	null
+"H36"	"Almacen"	"Almacen"	"s"	null
+"T36"	"CTS"	"CTS"	"s"	null
+"U36"	750.0	750.0	"n"	null
+"V36"	1500.0	1500.0	"n"	null
+"X36"	"CTS"	"CTS"	"s"	null
+"Y36"	750.0	750.0	"n"	null
+"Z36"	1500.0	1500.0	"n"	null
+"C37"	"Moldes (siempre debe comprar al menos uno)"	"Moldes (siempre debe comprar al menos uno)"	"s"	null
+"D37"	"Cuero"	"Cuero"	"s"	null
+"E37"	"Accesorios"	"Accesorios"	"s"	null
+"F37"	"Hilos"	"Hilos"	"s"	null
+"H37"	"Cuero"	"Cuero"	"s"	null
+"I37"	"Accesorios"	"Accesorios"	"s"	null
+"J37"	"Hilos"	"Hilos"	"s"	null
+"T37"	"vacaciones"	"vacaciones"	"s"	null
+"U37"	"=U33/2"	1500	"f"	null
+"V37"	"=V33"	3000	"f"	null
+"X37"	"vacaciones"	"vacaciones"	"s"	null
+"Y37"	"=Y33/2"	300	"f"	null
+"Z37"	"=Z33"	600	"f"	null
+"C38"	"Nivel 1 - Generico basico"	"Nivel 1 - Generico basico"	"s"	null
+"D38"	0.3	0.3	"n"	null
+"E38"	1.0	1.0	"n"	null
+"F38"	6.0	6.0	"n"	null
+"H38"	"=SUM(D33:F33)"	200	"f"	null
+"I38"	"=SUM(G33:H33)"	390	"f"	null
+"J38"	"=SUM(I33:K33)"	2900	"f"	null
+"T38"	"Suma anual"	"Suma anual"	"s"	null
+"U38"	"=SUM(U34:U37)+U33*12"	41520	"f"	null
+"V38"	"=SUM(V34:V37)+V33*12"	46770	"f"	null
+"X38"	"Suma anual"	"Suma anual"	"s"	null
+"Y38"	"=SUM(Y34:Y37)+Y33*12"	8904	"f"	null
+"Z38"	"=SUM(Z34:Z37)+Z33*12"	10554	"f"	null
+"C39"	"Nivel 2 - Generico mejorado"	"Nivel 2 - Generico mejorado"	"s"	null
+"D39"	0.4	0.4	"n"	null
+"E39"	1.0	1.0	"n"	null
+"F39"	7.0	7.0	"n"	null
+"T39"	"Pago mensual"	"Pago mensual"	"s"	null
+"U39"	"=U38/12.5"	3321.6	"f"	null
+"V39"	"=V38/13"	3597.692308	"f"	null
+"X39"	"Pago mensual"	"Pago mensual"	"s"	null
+"Y39"	"=Y38/12.5"	712.32	"f"	null
+"Z39"	"=Z38/13"	811.8461538	"f"	null
+"C40"	"Nivel 3 - Premium"	"Nivel 3 - Premium"	"s"	null
+"D40"	0.7	0.7	"n"	null
+"E40"	1.0	1.0	"n"	null
+"F40"	13.0	13.0	"n"	null
+"T42"	"Costos: Maquinaria"	"Costos: Maquinaria"	"s"	null
+"T44"	"Mesa de corte"	"Mesa de corte"	"s"	null
+"U44"	"MYPE"	"MYPE"	"s"	null
+"V44"	"NoMype"	"NoMype"	"s"	null
+"X44"	"Maquina de Ensamblado N1"	"Maquina de Ensamblado N1"	"s"	null
+"Y44"	"MYPE"	"MYPE"	"s"	null
+"Z44"	"NoMype"	"NoMype"	"s"	null
+"AB44"	"Maquina de acabado N1"	"Maquina de acabado N1"	"s"	null
+"AC44"	"MYPE"	"MYPE"	"s"	null
+"AD44"	"NoMype"	"NoMype"	"s"	null
+"C45"	"Cuantos Bolso deseas producir ?"	"Cuantos Bolso deseas producir ?"	"s"	null
+"E45"	"Producido luego del termino del ciclo"	"Producido luego del termino del ciclo"	"s"	null
+"H45"	"Total Cuero Necesario"	"Total Cuero Necesario"	"s"	null
+"I45"	"Total Accesorios Necesario"	"Total Accesorios Necesario"	"s"	null
+"J45"	"Total Hilo Necesario"	"Total Hilo Necesario"	"s"	null
+"L45"	"Total Cuero Utilizado"	"Total Cuero Utilizado"	"s"	null
+"M45"	"Total Accesorios Utilizado"	"Total Accesorios Utilizado"	"s"	null
+"N45"	"Total Hilo Utilizado"	"Total Hilo Utilizado"	"s"	null
+"T45"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"U45"	2500.0	2500.0	"n"	null
+"V45"	2500.0	2500.0	"n"	null
+"X45"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"Y45"	3500.0	3500.0	"n"	null
+"Z45"	3500.0	3500.0	"n"	null
+"AB45"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"AC45"	1200.0	1200.0	"n"	null
+"AD45"	1200.0	1200.0	"n"	null
+"C46"	"Nivel 1 - Generico basico"	"Nivel 1 - Generico basico"	"s"	null
+"D46"	150.0	150.0	"n"	null
+"E46"	150.0	150.0	"n"	null
+"F46"	"=E46/E49"	0.4076086957	"f"	null
+"H46"	"=D38*D46"	45	"f"	null
+"I46"	"=D46*E38"	150	"f"	null
+"J46"	"=F38*D46"	900	"f"	null
+"L46"	"=E46*D38"	45	"f"	null
+"M46"	"=E46*E38"	150	"f"	null
+"N46"	"=F38*E46"	900	"f"	null
+"T46"	"Instalación "	"Instalación "	"s"	null
+"U46"	"=U45*3%"	75	"f"	null
+"V46"	"=V45*5%"	125	"f"	null
+"X46"	"Instalación "	"Instalación "	"s"	null
+"Y46"	"=Y45*3%"	105	"f"	null
+"Z46"	"=Z45*5%"	175	"f"	null
+"AB46"	"Instalación "	"Instalación "	"s"	null
+"AC46"	"=AC45*3%"	36	"f"	null
+"AD46"	"=AD45*5%"	60	"f"	null
+"C47"	"Nivel 2 - Generico mejorado"	"Nivel 2 - Generico mejorado"	"s"	null
+"D47"	140.0	140.0	"n"	null
+"E47"	140.0	140.0	"n"	null
+"F47"	"=E47/E49"	0.3804347826	"f"	null
+"H47"	"=D39*D47"	56	"f"	null
+"I47"	"=D47*E39"	140	"f"	null
+"J47"	"=F39*D47"	980	"f"	null
+"L47"	"=E47*D39"	56	"f"	null
+"M47"	"=E47*E39"	140	"f"	null
+"N47"	"=F39*E47"	980	"f"	null
+"T47"	"Capacitación"	"Capacitación"	"s"	null
+"U47"	"=U45*2%"	50	"f"	null
+"V47"	"=V45*3%"	75	"f"	null
+"X47"	"Capacitación"	"Capacitación"	"s"	null
+"Y47"	"=Y45*2%"	70	"f"	null
+"Z47"	"=Z45*3%"	105	"f"	null
+"AB47"	"Capacitación"	"Capacitación"	"s"	null
+"AC47"	"=AC45*2%"	24	"f"	null
+"AD47"	"=AD45*3%"	36	"f"	null
+"C48"	"Nivel 3 - Premium"	"Nivel 3 - Premium"	"s"	null
+"D48"	95.0	95.0	"n"	null
+"E48"	78.0	78.0	"n"	null
+"F48"	"=E48/E49"	0.2119565217	"f"	null
+"H48"	"=D40*D48"	66.5	"f"	null
+"I48"	"=D48*E40"	95	"f"	null
+"J48"	"=F40*D48"	1235	"f"	null
+"L48"	"=D40*E48"	54.6	"f"	null
+"M48"	"=E48*E40"	78	"f"	null
+"N48"	"=F40*E48"	1014	"f"	null
+"T48"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"U48"	"=U45*5%"	125	"f"	null
+"V48"	"=V45*8%"	200	"f"	null
+"X48"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"Y48"	"=Y45*5%"	175	"f"	null
+"Z48"	"=Z45*8%"	280	"f"	null
+"AB48"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"AC48"	"=AC45*5%"	60	"f"	null
+"AD48"	"=AD45*8%"	96	"f"	null
+"D49"	"=SUM(D46:D48)"	385	"f"	null
+"E49"	"=SUM(E46:E48)"	368	"f"	null
+"F49"	"=SUM(F46:F48)"	1	"f"	null
+"H49"	"=SUM(H46:H48)"	167.5	"f"	null
+"I49"	"=SUM(I46:I48)"	385	"f"	null
+"J49"	"=SUM(J46:J48)"	3115	"f"	null
+"L49"	"=SUM(L46:L48)"	155.6	"f"	null
+"M49"	"=SUM(M46:M48)"	368	"f"	null
+"N49"	"=SUM(N46:N48)"	2894	"f"	null
+"T49"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"U49"	"=-((U45-U45*5%)/10)"	-237.5	"f"	null
+"V49"	"=-((V45-V45*10%)/10)"	-225	"f"	null
+"X49"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"Y49"	"=-(Y45-Y45*5%)/10"	-332.5	"f"	null
+"Z49"	"=-(Z45-Z45*10%)/10"	-315	"f"	null
+"AB49"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"AC49"	"=-(AC45-AC45*5%)/8"	-142.5	"f"	null
+"AD49"	"=-(AD45-AD45*10%)/8"	-135	"f"	null
+"T50"	"Suma anual"	"Suma anual"	"s"	null
+"U50"	"=SUM(U46:U49)+U45"	2512.5	"f"	null
+"V50"	"=SUM(V46:V49)+V45"	2675	"f"	null
+"X50"	"Suma anual"	"Suma anual"	"s"	null
+"Y50"	"=SUM(Y46:Y49)+Y45"	3517.5	"f"	null
+"Z50"	"=SUM(Z46:Z49)+Z45"	3745	"f"	null
+"AB50"	"Suma anual"	"Suma anual"	"s"	null
+"AC50"	"=SUM(AC46:AC49)+AC45"	1177.5	"f"	null
+"AD50"	"=SUM(AD46:AD49)+AD45"	1257	"f"	null
+"C52"	"ALMACEN"	"ALMACEN"	"s"	null
+"T52"	"Molde 1"	"Molde 1"	"s"	null
+"U52"	"MYPE"	"MYPE"	"s"	null
+"V52"	"NoMype"	"NoMype"	"s"	null
+"X52"	"Maquina de Ensamblado N2"	"Maquina de Ensamblado N2"	"s"	null
+"Y52"	"MYPE"	"MYPE"	"s"	null
+"Z52"	"NoMype"	"NoMype"	"s"	null
+"AB52"	"Maquina de acabado N2"	"Maquina de acabado N2"	"s"	null
+"AC52"	"MYPE"	"MYPE"	"s"	null
+"AD52"	"NoMype"	"NoMype"	"s"	null
+"D53"	"Inventario Inicial"	"Inventario Inicial"	"s"	null
+"E53"	"Compras"	"Compras"	"s"	null
+"F53"	"Produccion"	"Produccion"	"s"	null
+"G53"	"Inventario Final"	"Inventario Final"	"s"	null
+"T53"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"U53"	300.0	300.0	"n"	null
+"V53"	300.0	300.0	"n"	null
+"X53"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"Y53"	7500.0	7500.0	"n"	null
+"Z53"	7500.0	7500.0	"n"	null
+"AB53"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"AC53"	4500.0	4500.0	"n"	null
+"AD53"	4500.0	4500.0	"n"	null
+"C54"	"Nivel 1 - Cuero sintetico"	"Nivel 1 - Cuero sintetico"	"s"	null
+"D54"	0.0	0.0	"n"	null
+"E54"	"=D33"	60	"f"	null
+"F54"	"=MIN(E54,H49)"	60	"f"	null
+"G54"	"=D54+E54-F54"	0	"f"	null
+"T54"	"Capacitación"	"Capacitación"	"s"	null
+"U54"	"=U53*1%"	3	"f"	null
+"V54"	"=V53*2%"	6	"f"	null
+"X54"	"Instalación "	"Instalación "	"s"	null
+"Y54"	"=Y53*3%"	225	"f"	null
+"Z54"	"=Z53*5%"	375	"f"	null
+"AB54"	"Instalación "	"Instalación "	"s"	null
+"AC54"	"=AC53*3%"	135	"f"	null
+"AD54"	"=AD53*5%"	225	"f"	null
+"C55"	"Nivel 2 - Cuero genuino estandar"	"Nivel 2 - Cuero genuino estandar"	"s"	null
+"D55"	0.0	0.0	"n"	null
+"E55"	"=E33"	110	"f"	null
+"F55"	"=min(E55,H49-F54)"	107.5	"f"	null
+"G55"	"=D55+E55-F55"	2.5	"f"	null
+"T55"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"U55"	"=U53*5%"	15	"f"	null
+"V55"	"=V53*8%"	24	"f"	null
+"X55"	"Capacitación"	"Capacitación"	"s"	null
+"Y55"	"=Y53*2%"	150	"f"	null
+"Z55"	"=Z53*3%"	225	"f"	null
+"AB55"	"Capacitación"	"Capacitación"	"s"	null
+"AC55"	"=AC53*2%"	90	"f"	null
+"AD55"	"=AD53*3%"	135	"f"	null
+"C56"	"Nivel 3 - Cuero genuino premium"	"Nivel 3 - Cuero genuino premium"	"s"	null
+"D56"	0.0	0.0	"n"	null
+"E56"	"=F33"	30	"f"	null
+"F56"	"=MIN(E56,H49-F54-F55)"	0	"f"	null
+"G56"	"=D56+E56-F56"	30	"f"	null
+"H56"	"=F56/SUM(F54:F56)"	0	"f"	null
+"T56"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"U56"	"=-((U53-U53*5%)/5)"	-57	"f"	null
+"V56"	"=-((V53-V53*10%)/5)"	-54	"f"	null
+"X56"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"Y56"	"=Y53*5%"	375	"f"	null
+"Z56"	"=Z53*8%"	600	"f"	null
+"AB56"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"AC56"	"=AC53*5%"	225	"f"	null
+"AD56"	"=AD53*8%"	360	"f"	null
+"C57"	"Nivel 1 - Aleacion economica"	"Nivel 1 - Aleacion economica"	"s"	null
+"D57"	0.0	0.0	"n"	null
+"E57"	"=G33"	200	"f"	null
+"F57"	"=MIN(E57,I49)"	200	"f"	null
+"G57"	"=D57+E57-F57"	0	"f"	null
+"T57"	"Suma anual"	"Suma anual"	"s"	null
+"U57"	"=SUM(U54:U56)+U53"	261	"f"	null
+"V57"	"=SUM(V54:V56)+V53"	276	"f"	null
+"X57"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"Y57"	"=-(Y53-Y53*5%)/10"	-712.5	"f"	null
+"Z57"	"=-(Z53-Z53*10%)/10"	-675	"f"	null
+"AB57"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"AC57"	"=-(AC53-AC53*5%)/8"	-534.375	"f"	null
+"AD57"	"=-(AD53-AD53*10%)/8"	-506.25	"f"	null
+"C58"	"Nivel 2 - Metal premium"	"Nivel 2 - Metal premium"	"s"	null
+"D58"	0.0	0.0	"n"	null
+"E58"	"=H33"	190	"f"	null
+"F58"	"=MIN(E58,I49-F57)"	185	"f"	null
+"G58"	"=D58+E58-F58"	5	"f"	null
+"H58"	"=F58/SUM(F57:F58)"	0.4805194805	"f"	null
+"X58"	"Suma anual"	"Suma anual"	"s"	null
+"Y58"	"=SUM(Y54:Y57)+Y53"	7537.5	"f"	null
+"Z58"	"=SUM(Z54:Z57)+Z53"	8025	"f"	null
+"AB58"	"Suma anual"	"Suma anual"	"s"	null
+"AC58"	"=SUM(AC54:AC57)+AC53"	4415.625	"f"	null
+"AD58"	"=SUM(AD54:AD57)+AD53"	4713.75	"f"	null
+"C59"	"Nivel 1 - Poliester estandar"	"Nivel 1 - Poliester estandar"	"s"	null
+"D59"	0.0	0.0	"n"	null
+"E59"	"=I33"	0	"f"	null
+"F59"	"=MIN(E59,J49)"	0	"f"	null
+"G59"	"=D59+E59-F59"	0	"f"	null
+"T59"	"Molde 2"	"Molde 2"	"s"	null
+"U59"	"MYPE"	"MYPE"	"s"	null
+"V59"	"NoMype"	"NoMype"	"s"	null
+"C60"	"Nivel 2 - Encerado reforzado"	"Nivel 2 - Encerado reforzado"	"s"	null
+"D60"	0.0	0.0	"n"	null
+"E60"	"=J33"	1500	"f"	null
+"F60"	"=MIN(E60,J49-F59)"	1500	"f"	null
+"G60"	"=D60+E60-F60"	0	"f"	null
+"T60"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"U60"	1200.0	1200.0	"n"	null
+"V60"	1200.0	1200.0	"n"	null
+"X60"	"Maquina de Ensamblado N3"	"Maquina de Ensamblado N3"	"s"	null
+"Y60"	"MYPE"	"MYPE"	"s"	null
+"Z60"	"NoMype"	"NoMype"	"s"	null
+"AB60"	"Maquina de acabado N3"	"Maquina de acabado N3"	"s"	null
+"AC60"	"MYPE"	"MYPE"	"s"	null
+"AD60"	"NoMype"	"NoMype"	"s"	null
+"C61"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"s"	null
+"D61"	0.0	0.0	"n"	null
+"E61"	"=K33"	1400	"f"	null
+"F61"	"=MIN(E61,J49-F59-F60)"	1400	"f"	null
+"G61"	"=D61+E61-F61"	0	"f"	null
+"H61"	"=F61/(SUM(F60:F61))"	0.4827586207	"f"	null
+"T61"	"Capacitación"	"Capacitación"	"s"	null
+"U61"	"=U60*1%"	12	"f"	null
+"V61"	"=V60*2%"	24	"f"	null
+"X61"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"Y61"	15000.0	15000.0	"n"	null
+"Z61"	15000.0	15000.0	"n"	null
+"AB61"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"AC61"	9500.0	9500.0	"n"	null
+"AD61"	9500.0	9500.0	"n"	null
+"B62"	"0 - 10,000(rango en soles)"	"0 - 10,000(rango en soles)"	"s"	null
+"T62"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"U62"	"=U60*5%"	60	"f"	null
+"V62"	"=V60*8%"	96	"f"	null
+"X62"	"Instalación "	"Instalación "	"s"	null
+"Y62"	"=Y61*3%"	450	"f"	null
+"Z62"	"=Z61*5%"	750	"f"	null
+"AB62"	"Instalación "	"Instalación "	"s"	null
+"AC62"	"=AC61*3%"	285	"f"	null
+"AD62"	"=AD61*5%"	475	"f"	null
+"A63"	"Gastos del ciclo en publicidad"	"Gastos del ciclo en publicidad"	"s"	null
+"B63"	3000.0	3000.0	"n"	null
+"T63"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"U63"	"=-((U60-U60*5%)/5)"	-228	"f"	null
+"V63"	"=-((V60-V60*10%)/5)"	-216	"f"	null
+"X63"	"Capacitación"	"Capacitación"	"s"	null
+"Y63"	"=Y61*2%"	300	"f"	null
+"Z63"	"=Z61*3%"	450	"f"	null
+"AB63"	"Capacitación"	"Capacitación"	"s"	null
+"AC63"	"=AC61*2%"	190	"f"	null
+"AD63"	"=AD61*3%"	285	"f"	null
+"T64"	"Suma anual"	"Suma anual"	"s"	null
+"U64"	"=SUM(U61:U63)+U60"	1044	"f"	null
+"V64"	"=SUM(V61:V63)+V60"	1104	"f"	null
+"X64"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"Y64"	"=Y61*5%"	750	"f"	null
+"Z64"	"=Z61*8%"	1200	"f"	null
+"AB64"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"AC64"	"=AC61*5%"	475	"f"	null
+"AD64"	"=AD61*8%"	760	"f"	null
+"A65"	"Calculo de Reputacion"	"Calculo de Reputacion"	"s"	null
+"C65"	"=F48*10"	2.119565217	"f"	null
+"D65"	"=M10*10"	2.857142857	"f"	null
+"E65"	"=AVERAGE(H56,H58,H61)*10"	3.210927004	"f"	null
+"F65"	"=B63/10000*10"	3	"f"	null
+"G65"	"=SUM(C65:F65)"	11.18763508	"f"	null
+"H65"	"ptos de reputación"	"ptos de reputación"	"s"	null
+"X65"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"Y65"	"=-(Y61-Y61*5%)/10"	-1425	"f"	null
+"Z65"	"=-(Z61-Z61*10%)/10"	-1350	"f"	null
+"AB65"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"AC65"	"=-(AC61-AC61*5%)/8"	-1128.125	"f"	null
+"AD65"	"=-(AD61-AD61*10%)/8"	-1068.75	"f"	null
+"C66"	"Factor de producción"	"Factor de producción"	"s"	null
+"D66"	"Factor de MO"	"Factor de MO"	"s"	null
+"E66"	"Factor de MP (utilizacion)"	"Factor de MP (utilizacion)"	"s"	null
+"F66"	"Factor de Publicidad"	"Factor de Publicidad"	"s"	null
+"T66"	"Moldes 3"	"Moldes 3"	"s"	null
+"U66"	"MYPE"	"MYPE"	"s"	null
+"V66"	"NoMype"	"NoMype"	"s"	null
+"X66"	"Suma anual"	"Suma anual"	"s"	null
+"Y66"	"=SUM(Y62:Y65)+Y61"	15075	"f"	null
+"Z66"	"=SUM(Z62:Z65)+Z61"	16050	"f"	null
+"AB66"	"Suma anual"	"Suma anual"	"s"	null
+"AC66"	"=SUM(AC62:AC65)+AC61"	9321.875	"f"	null
+"AD66"	"=SUM(AD62:AD65)+AD61"	9951.25	"f"	null
+"T67"	"Costo de adquisición"	"Costo de adquisición"	"s"	null
+"U67"	3500.0	3500.0	"n"	null
+"V67"	3500.0	3500.0	"n"	null
+"T68"	"Capacitación"	"Capacitación"	"s"	null
+"U68"	"=U67*1%"	35	"f"	null
+"V68"	"=V67*2%"	70	"f"	null
+"T69"	"Mantenimiento anual"	"Mantenimiento anual"	"s"	null
+"U69"	"=U67*5%"	175	"f"	null
+"V69"	"=V67*8%"	280	"f"	null
+"T70"	"Depreciación anual"	"Depreciación anual"	"s"	null
+"U70"	"=-((U67-U67*5%)/5)"	-665	"f"	null
+"V70"	"=-((V67-V67*10%)/5)"	-630	"f"	null
+"T71"	"Suma anual"	"Suma anual"	"s"	null
+"U71"	"=SUM(U68:U70)+U67"	3045	"f"	null
+"V71"	"=SUM(V68:V70)+V67"	3220	"f"	null
+"B72"	"EJEMPLO de distribución de Ventas (Bolsos Economicos)"	"EJEMPLO de distribución de Ventas (Bolsos Economicos)"	"s"	null
+"C72"	"Reputacion"	"Reputacion"	"s"	null
+"D72"	"Precio"	"Precio"	"s"	null
+"E72"	"Puntaje del precio"	"Puntaje del precio"	"s"	null
+"F72"	"Puntaje total"	"Puntaje total"	"s"	null
+"G72"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"H72"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"B73"	"Empresa A"	"Empresa A"	"s"	null
+"C73"	7.0	7.0	"n"	null
+"D73"	40.0	40.0	"n"	null
+"E73"	"=(MAX($D$73:$D$76)*2-D73)/10"	5	"f"	null
+"F73"	"=SUM(C73,E73)"	12	"f"	null
+"G73"	"=F73/$F$77"	0.223880597	"f"	null
+"H73"	"=ROUND(G73*$B$81,0)"	784	"f"	null
+"T73"	"Costos: MP"	"Costos: MP"	"s"	null
+"B74"	"Empresa B"	"Empresa B"	"s"	null
+"C74"	8.3	8.3	"n"	null
+"D74"	45.0	45.0	"n"	null
+"E74"	"=(MAX($D$73:$D$76)*2-D74)/10"	4.5	"f"	null
+"F74"	"=SUM(C74,E74)"	12.8	"f"	null
+"G74"	"=F74/$F$77"	0.2388059701	"f"	null
+"H74"	"=ROUND(G74*$B$81,0)"	836	"f"	null
+"T74"	"Tabla de materia base."	"Tabla de materia base."	"s"	null
+"Z74"	"Lo que sea comprado por un equipo:"	"Lo que sea comprado por un equipo:"	"s"	null
+"B75"	"Empresa C"	"Empresa C"	"s"	null
+"C75"	10.2	10.2	"n"	null
+"D75"	43.0	43.0	"n"	null
+"E75"	"=(MAX($D$73:$D$76)*2-D75)/10"	4.7	"f"	null
+"F75"	"=SUM(C75,E75)"	14.9	"f"	null
+"G75"	"=F75/$F$77"	0.2779850746	"f"	null
+"H75"	"=ROUND(G75*$B$81,0)"	973	"f"	null
+"T75"	"Grupo de decisión"	"Grupo de decisión"	"s"	null
+"U75"	"Opción/Nivel"	"Opción/Nivel"	"s"	null
+"V75"	"Precio de lista"	"Precio de lista"	"s"	null
+"W75"	"Descontado por cantidad"	"Descontado por cantidad"	"s"	null
+"X75"	"Unidad"	"Unidad"	"s"	null
+"Z75"	"Grupo de decisión"	"Grupo de decisión"	"s"	null
+"AA75"	"Opción/Nivel"	"Opción/Nivel"	"s"	null
+"AB75"	"Precio de lista"	"Precio de lista"	"s"	null
+"AC75"	"Descontado por cantidad"	"Descontado por cantidad"	"s"	null
+"AD75"	"Unidad"	"Unidad"	"s"	null
+"B76"	"Empresa D"	"Empresa D"	"s"	null
+"C76"	9.0	9.0	"n"	null
+"D76"	41.0	41.0	"n"	null
+"E76"	"=(MAX($D$73:$D$76)*2-D76)/10"	4.9	"f"	null
+"F76"	"=SUM(C76,E76)"	13.9	"f"	null
+"G76"	"=F76/$F$77"	0.2593283582	"f"	null
+"H76"	"=ROUND(G76*$B$81,0)"	908	"f"	null
+"T76"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U76"	"1- Cuero sintético"	"1- Cuero sintético"	"s"	null
+"V76"	25.0	25.0	"n"	null
+"W76"	"=V76-V76*8%"	23	"f"	null
+"X76"	"m²"	"m²"	"s"	null
+"Z76"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA76"	"1- Cuero sintético"	"1- Cuero sintético"	"s"	null
+"AB76"	"=25*60"	1500	"f"	null
+"AC76"	"=AB76-AB76*8%"	1380	"f"	null
+"AD76"	"60m²"	"60m²"	"s"	null
+"E77"	"Total"	"Total"	"s"	null
+"F77"	"=SUM(F73:F76)"	53.6	"f"	null
+"H77"	"=SUM(H73:H76)"	3501	"f"	null
+"T77"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U77"	"2- Cuero genuino estándar"	"2- Cuero genuino estándar"	"s"	null
+"V77"	45.0	45.0	"n"	null
+"W77"	"=V77-V77*8%"	41.4	"f"	null
+"X77"	"m²"	"m²"	"s"	null
+"Z77"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA77"	"2- Cuero genuino estándar"	"2- Cuero genuino estándar"	"s"	null
+"AB77"	"=45*55"	2475	"f"	null
+"AC77"	"=AB77-AB77*8%"	2277	"f"	null
+"AD77"	"55m²"	"55m²"	"s"	null
+"T78"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U78"	"3-Cuero genuino premium"	"3-Cuero genuino premium"	"s"	null
+"V78"	80.0	80.0	"n"	null
+"W78"	"=V78-V78*8%"	73.6	"f"	null
+"X78"	"m²"	"m²"	"s"	null
+"Z78"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA78"	"3-Cuero genuino premium"	"3-Cuero genuino premium"	"s"	null
+"AB78"	"=80*15"	1200	"f"	null
+"AC78"	"=AB78-AB78*8%"	1104	"f"	null
+"AD78"	"15m²"	"15m²"	"s"	null
+"B79"	7000.0	7000.0	"n"	null
+"C79"	"unidades mercado"	"unidades mercado"	"s"	null
+"T79"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"U79"	"1- Aleación económica"	"1- Aleación económica"	"s"	null
+"V79"	4.0	4.0	"n"	null
+"W79"	"=V79-V79*8%"	3.68	"f"	null
+"X79"	"unidad"	"unidad"	"s"	null
+"Z79"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"AA79"	"1- Aleación económica"	"1- Aleación económica"	"s"	null
+"AB79"	"=4*200"	800	"f"	null
+"AC79"	"=AB79-AB79*8%"	736	"f"	null
+"AD79"	"200 unidad"	"200 unidad"	"s"	null
+"B80"	0.5	0.5	"n"	null
+"T80"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"U80"	"2- Metal premium"	"2- Metal premium"	"s"	null
+"V80"	9.0	9.0	"n"	null
+"W80"	"=V80-V80*8%"	8.28	"f"	null
+"X80"	"unidad"	"unidad"	"s"	null
+"Z80"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"AA80"	"2- Metal premium"	"2- Metal premium"	"s"	null
+"AB80"	"=9*190"	1710	"f"	null
+"AC80"	"=AB80-AB80*8%"	1573.2	"f"	null
+"AD80"	"190 unidad"	"190 unidad"	"s"	null
+"B81"	"=B79*B80"	3500	"f"	null
+"C81"	"unidades mercado real"	"unidades mercado real"	"s"	null
+"T81"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U81"	"1- Poliéster estándar"	"1- Poliéster estándar"	"s"	null
+"V81"	2.0	2.0	"n"	null
+"W81"	"=V81-V81*8%"	1.84	"f"	null
+"X81"	"m"	"m"	"s"	null
+"Z81"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA81"	"1- Poliéster estándar"	"1- Poliéster estándar"	"s"	null
+"AB81"	"=2*0"	0	"f"	null
+"AC81"	"=AB81-AB81*8%"	0	"f"	null
+"AD81"	"0 m"	"0 m"	"s"	null
+"T82"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U82"	"2- Encerado reforzado"	"2- Encerado reforzado"	"s"	null
+"V82"	4.0	4.0	"n"	null
+"W82"	"=V82-V82*8%"	3.68	"f"	null
+"X82"	"m"	"m"	"s"	null
+"Z82"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA82"	"2- Encerado reforzado"	"2- Encerado reforzado"	"s"	null
+"AB82"	"=4*6"	24	"f"	null
+"AC82"	"=AB82-AB82*8%"	22.08	"f"	null
+"AD82"	"6 m"	"6 m"	"s"	null
+"T83"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U83"	"3- Alta tenacidad"	"3- Alta tenacidad"	"s"	null
+"V83"	7.0	7.0	"n"	null
+"W83"	"=V83-V83*8%"	6.44	"f"	null
+"X83"	"m"	"m"	"s"	null
+"Z83"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA83"	"3- Alta tenacidad"	"3- Alta tenacidad"	"s"	null
+"AB83"	"=7*7"	49	"f"	null
+"AC83"	"=AB83-AB83*8%"	45.08	"f"	null
+"AD83"	"7 m"	"7 m"	"s"	null
+"Z84"	"Total"	"Total"	"s"	null
+"AB84"	"=SUM(AB76:AB83)"	7758	"f"	null
+"AC84"	"=SUM(AC76:AC83)"	7137.36	"f"	null
+"T85"	"Inventario Inicial:"	"Inventario Inicial:"	"s"	null
+"B86"	"EJEMPLO de distribución de Ventas (Bolsos promedio)"	"EJEMPLO de distribución de Ventas (Bolsos promedio)"	"s"	null
+"C86"	"Reputacion"	"Reputacion"	"s"	null
+"D86"	"Precio"	"Precio"	"s"	null
+"E86"	"Puntaje del precio"	"Puntaje del precio"	"s"	null
+"F86"	"Puntaje total"	"Puntaje total"	"s"	null
+"G86"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"H86"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"T86"	"Grupo de decisión"	"Grupo de decisión"	"s"	null
+"U86"	"Opción/Nivel"	"Opción/Nivel"	"s"	null
+"V86"	"Precio de lista"	"Precio de lista"	"s"	null
+"W86"	"Descontado por cantidad"	"Descontado por cantidad"	"s"	null
+"X86"	"Unidad*cant. producida"	"Unidad*cant. producida"	"s"	null
+"Z86"	"Producción:"	"Producción:"	"s"	null
+"B87"	"Empresa A"	"Empresa A"	"s"	null
+"C87"	7.0	7.0	"n"	null
+"D87"	120.0	120.0	"n"	null
+"E87"	"=(MAX($D$87:$D$90)*2-D87)/10"	28	"f"	null
+"F87"	"=SUM(C87,E87)"	35	"f"	null
+"G87"	"=F87/$F$91"	0.2723735409	"f"	null
+"H87"	"=ROUND(G87*$B$81,0)"	953	"f"	null
+"T87"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U87"	"1- Cuero sintético"	"1- Cuero sintético"	"s"	null
+"V87"	"=25*60"	1500	"f"	null
+"W87"	"=V87-V87*8%"	1380	"f"	null
+"X87"	"60m²"	"60m²"	"s"	null
+"Z87"	"Grupo de decisión"	"Grupo de decisión"	"s"	null
+"AA87"	"Opción/Nivel"	"Opción/Nivel"	"s"	null
+"AB87"	"Precio de lista"	"Precio de lista"	"s"	null
+"AC87"	"Descontado por cantidad"	"Descontado por cantidad"	"s"	null
+"AD87"	"Unidad*cant. producida"	"Unidad*cant. producida"	"s"	null
+"B88"	"Empresa B"	"Empresa B"	"s"	null
+"C88"	8.3	8.3	"n"	null
+"D88"	150.0	150.0	"n"	null
+"E88"	"=(MAX($D$87:$D$90)*2-D88)/10"	25	"f"	null
+"F88"	"=SUM(C88,E88)"	33.3	"f"	null
+"G88"	"=F88/$F$91"	0.2591439689	"f"	null
+"H88"	"=ROUND(G88*$B$81,0)"	907	"f"	null
+"T88"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U88"	"2- Cuero genuino estándar"	"2- Cuero genuino estándar"	"s"	null
+"V88"	"=45*110"	4950	"f"	null
+"W88"	"=V88-V88*8%"	4554	"f"	null
+"X88"	"110m²"	"110m²"	"s"	null
+"Z88"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA88"	"1- Cuero sintético"	"1- Cuero sintético"	"s"	null
+"AB88"	"=25*60"	1500	"f"	null
+"AC88"	"=AB88-AB88*8%"	1380	"f"	null
+"AD88"	"60m²"	"60m²"	"s"	null
+"B89"	"Empresa C"	"Empresa C"	"s"	null
+"C89"	10.2	10.2	"n"	null
+"D89"	190.0	190.0	"n"	null
+"E89"	"=(MAX($D$87:$D$90)*2-D89)/10"	21	"f"	null
+"F89"	"=SUM(C89,E89)"	31.2	"f"	null
+"G89"	"=F89/$F$91"	0.2428015564	"f"	null
+"H89"	"=ROUND(G89*$B$81,0)"	850	"f"	null
+"T89"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"U89"	"3-Cuero genuino premium"	"3-Cuero genuino premium"	"s"	null
+"V89"	"=80*30"	2400	"f"	null
+"W89"	"=V89-V89*8%"	2208	"f"	null
+"X89"	"30m²"	"30m²"	"s"	null
+"Z89"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA89"	"2- Cuero genuino estándar"	"2- Cuero genuino estándar"	"s"	null
+"AB89"	"=45*107"	4815	"f"	null
+"AC89"	"=AB89-AB89*8%"	4429.8	"f"	null
+"AD89"	"107m²"	"107m²"	"s"	null
+"B90"	"Empresa D"	"Empresa D"	"s"	null
+"C90"	9.0	9.0	"n"	null
+"D90"	200.0	200.0	"n"	null
+"E90"	"=(MAX($D$87:$D$90)*2-D90)/10"	20	"f"	null
+"F90"	"=SUM(C90,E90)"	29	"f"	null
+"G90"	"=F90/$F$91"	0.2256809339	"f"	null
+"H90"	"=ROUND(G90*$B$81,0)"	790	"f"	null
+"T90"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"U90"	"1- Aleación económica"	"1- Aleación económica"	"s"	null
+"V90"	"=4*200"	800	"f"	null
+"W90"	"=V90-V90*8%"	736	"f"	null
+"X90"	"200 unidad"	"200 unidad"	"s"	null
+"Z90"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"AA90"	"3-Cuero genuino premium"	"3-Cuero genuino premium"	"s"	null
+"AB90"	"=80*0"	0	"f"	null
+"AC90"	"=AB90-AB90*8%"	0	"f"	null
+"AD90"	"0m²"	"0m²"	"s"	null
+"E91"	"Total"	"Total"	"s"	null
+"F91"	"=SUM(F87:F90)"	128.5	"f"	null
+"T91"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"U91"	"2- Metal premium"	"2- Metal premium"	"s"	null
+"V91"	"=9*190"	1710	"f"	null
+"W91"	"=V91-V91*8%"	1573.2	"f"	null
+"X91"	"190 unidad"	"190 unidad"	"s"	null
+"Z91"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"AA91"	"1- Aleación económica"	"1- Aleación económica"	"s"	null
+"AB91"	"=4*200"	800	"f"	null
+"AC91"	"=AB91-AB91*8%"	736	"f"	null
+"AD91"	"200 unidad"	"200 unidad"	"s"	null
+"T92"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U92"	"1- Poliéster estándar"	"1- Poliéster estándar"	"s"	null
+"V92"	"=2*0"	0	"f"	null
+"W92"	"=V92-V92*8%"	0	"f"	null
+"X92"	"0 m"	"0 m"	"s"	null
+"Z92"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"AA92"	"2- Metal premium"	"2- Metal premium"	"s"	null
+"AB92"	"=9*185"	1665	"f"	null
+"AC92"	"=AB92-AB92*8%"	1531.8	"f"	null
+"AD92"	"185 unidad"	"185 unidad"	"s"	null
+"B93"	5000.0	5000.0	"n"	null
+"C93"	"unidades mercado"	"unidades mercado"	"s"	null
+"T93"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U93"	"2- Encerado reforzado"	"2- Encerado reforzado"	"s"	null
+"V93"	"=4*1500"	6000	"f"	null
+"W93"	"=V93-V93*8%"	5520	"f"	null
+"X93"	"1500 m"	"1500 m"	"s"	null
+"Z93"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA93"	"1- Poliéster estándar"	"1- Poliéster estándar"	"s"	null
+"AB93"	"=2*0"	0	"f"	null
+"AC93"	"=AB93-AB93*8%"	0	"f"	null
+"AD93"	"0 m"	"0 m"	"s"	null
+"B94"	0.7	0.7	"n"	null
+"T94"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"U94"	"3- Alta tenacidad"	"3- Alta tenacidad"	"s"	null
+"V94"	"=7*1400"	9800	"f"	null
+"W94"	"=V94-V94*8%"	9016	"f"	null
+"X94"	"1400 m"	"1400 m"	"s"	null
+"Z94"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA94"	"2- Encerado reforzado"	"2- Encerado reforzado"	"s"	null
+"AB94"	"=4*1500"	6000	"f"	null
+"AC94"	"=AB94-AB94*8%"	5520	"f"	null
+"AD94"	"1500 m"	"1500 m"	"s"	null
+"B95"	"=B93*B94"	3500	"f"	null
+"C95"	"unidades mercado real"	"unidades mercado real"	"s"	null
+"T95"	"Total"	"Total"	"s"	null
+"V95"	"=SUM(V87:V94)"	27160	"f"	null
+"W95"	"=SUM(W87:W94)"	24987.2	"f"	null
+"Z95"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"AA95"	"3- Alta tenacidad"	"3- Alta tenacidad"	"s"	null
+"AB95"	"=7*1400"	9800	"f"	null
+"AC95"	"=AB95-AB95*8%"	9016	"f"	null
+"AD95"	"1400 m"	"1400 m"	"s"	null
+"Z96"	"Total"	"Total"	"s"	null
+"AB96"	"=SUM(AB88:AB95)"	24580	"f"	null
+"AC96"	"=SUM(AC88:AC95)"	22613.6	"f"	null
+"T98"	"Inventario final: Inventario inicial - Producción"	"Inventario final: Inventario inicial - Producción"	"s"	null
+"B100"	"EJEMPLO de distribución de Ventas (Bolsos Premium)"	"EJEMPLO de distribución de Ventas (Bolsos Premium)"	"s"	null
+"C100"	"Reputacion"	"Reputacion"	"s"	null
+"D100"	"Precio"	"Precio"	"s"	null
+"E100"	"Puntaje del precio"	"Puntaje del precio"	"s"	null
+"F100"	"Puntaje total"	"Puntaje total"	"s"	null
+"G100"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"H100"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"T100"	"Total"	"Total"	"s"	null
+"V100"	"=V95-AB96"	2580	"f"	null
+"W100"	"=W95-AC96"	2373.6	"f"	null
+"B101"	"Empresa A"	"Empresa A"	"s"	null
+"C101"	7.0	7.0	"n"	null
+"D101"	250.0	250.0	"n"	null
+"E101"	"=(MAX($D$101:$D$104)*2-D101)/10"	55	"f"	null
+"F101"	"=SUM(C101,E101)"	62	"f"	null
+"G101"	"=F101/$F$105"	0.2610526316	"f"	null
+"H101"	"=ROUND(G101*$B$109,0)"	209	"f"	null
+"B102"	"Empresa B"	"Empresa B"	"s"	null
+"C102"	8.3	8.3	"n"	null
+"D102"	300.0	300.0	"n"	null
+"E102"	"=(MAX($D$101:$D$104)*2-D102)/10"	50	"f"	null
+"F102"	"=SUM(C102,E102)"	58.3	"f"	null
+"G102"	"=F102/$F$105"	0.2454736842	"f"	null
+"H102"	"=ROUND(G102*$B$109,0)"	196	"f"	null
+"B103"	"Empresa C"	"Empresa C"	"s"	null
+"C103"	10.2	10.2	"n"	null
+"D103"	220.0	220.0	"n"	null
+"E103"	"=(MAX($D$101:$D$104)*2-D103)/10"	58	"f"	null
+"F103"	"=SUM(C103,E103)"	68.2	"f"	null
+"G103"	"=F103/$F$105"	0.2871578947	"f"	null
+"H103"	"=ROUND(G103*$B$109,0)"	230	"f"	null
+"B104"	"Empresa D"	"Empresa D"	"s"	null
+"C104"	9.0	9.0	"n"	null
+"D104"	400.0	400.0	"n"	null
+"E104"	"=(MAX($D$101:$D$104)*2-D104)/10"	40	"f"	null
+"F104"	"=SUM(C104,E104)"	49	"f"	null
+"G104"	"=F104/$F$105"	0.2063157895	"f"	null
+"H104"	"=ROUND(G104*$B$109,0)"	165	"f"	null
+"E105"	"Total"	"Total"	"s"	null
+"F105"	"=SUM(F101:F104)"	237.5	"f"	null
+"B107"	2000.0	2000.0	"n"	null
+"C107"	"unidades mercado"	"unidades mercado"	"s"	null
+"B108"	0.4	0.4	"n"	null
+"B109"	"=B107*B108"	800	"f"	null
+"C109"	"unidades mercado real"	"unidades mercado real"	"s"	null
+"A113"	"Calculo de Reputacion"	"Calculo de Reputacion"	"s"	null
+"C113"	"=F48*10"	2.119565217	"f"	null
+"D113"	"=M10*10"	2.857142857	"f"	null
+"E113"	"=AVERAGE(H56,H58,H61)*10"	3.210927004	"f"	null
+"F113"	"=B63/10000*10"	3	"f"	null
+"G113"	"=SUM(C113:F113)"	11.18763508	"f"	null
+"H113"	"ptos de reputación"	"ptos de reputación"	"s"	null
+"C114"	"Factor de producción"	"Factor de producción"	"s"	null
+"D114"	"Factor de MO"	"Factor de MO"	"s"	null
+"E114"	"Factor de MP (utilizacion)"	"Factor de MP (utilizacion)"	"s"	null
+"F114"	"Factor de Publicidad"	"Factor de Publicidad"	"s"	null
+"L114"	"Peso precio"	"Peso precio"	"s"	null
+"M114"	0.7	0.7	"n"	null
+"L115"	"peso reputación"	"peso reputación"	"s"	null
+"M115"	0.2	0.2	"n"	null
+"L116"	"Peso calidad"	"Peso calidad"	"s"	null
+"M116"	0.1	0.1	"n"	null
+"B117"	"EJEMPLO de distribución de Ventas (Bolsos Economicos)"	"EJEMPLO de distribución de Ventas (Bolsos Economicos)"	"s"	null
+"C117"	"Precio"	"Precio"	"s"	null
+"D117"	"Reputación (0-10)"	"Reputación (0-10)"	"s"	null
+"E117"	"Calidad (0-100)"	"Calidad (0-100)"	"s"	null
+"F117"	"Precio Económico (0-100)"	"Precio Económico (0-100)"	"s"	null
+"G117"	"Reputación (0-100)"	"Reputación (0-100)"	"s"	null
+"H117"	"Puntaje total"	"Puntaje total"	"s"	null
+"I117"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"J117"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"B118"	"Empresa A"	"Empresa A"	"s"	null
+"C118"	40.0	40.0	"n"	null
+"D118"	7.0	7.0	"n"	null
+"E118"	"=ROUND((D118/$D$122)*100,0)"	20	"f"	null
+"F118"	"=100*(MAX($C$118:$C$121)-C118)/(MAX($C$118:$C$121)-MIN($C$118:$C$121))"	100	"f"	null
+"G118"	"=D118*10"	70	"f"	null
+"H118"	"=$M$114*F118+$M$115*G118+$M$116*E118"	86	"f"	null
+"I118"	"=H118/$H$122"	0.3690987124	"f"	null
+"J118"	"=ROUND(I118*$B$126,0)"	1292	"f"	null
+"B119"	"Empresa B"	"Empresa B"	"s"	null
+"C119"	45.0	45.0	"n"	null
+"D119"	8.3	8.3	"n"	null
+"E119"	"=ROUND((D119/$D$122)*100,0)"	24	"f"	null
+"F119"	"=100*(MAX($C$118:$C$121)-C119)/(MAX($C$118:$C$121)-MIN($C$118:$C$121))"	0	"f"	null
+"G119"	"=D119*10"	83	"f"	null
+"H119"	"=$M$114*F119+$M$115*G119+$M$116*E119"	19	"f"	null
+"I119"	"=H119/$H$122"	0.08154506438	"f"	null
+"J119"	"=ROUND(I119*$B$126,0)"	285	"f"	null
+"B120"	"Empresa C"	"Empresa C"	"s"	null
+"C120"	43.0	43.0	"n"	null
+"D120"	10.2	10.2	"n"	null
+"E120"	"=ROUND((D120/$D$122)*100,0)"	30	"f"	null
+"F120"	"=100*(MAX($C$118:$C$121)-C120)/(MAX($C$118:$C$121)-MIN($C$118:$C$121))"	40	"f"	null
+"G120"	"=D120*10"	102	"f"	null
+"H120"	"=$M$114*F120+$M$115*G120+$M$116*E120"	51.4	"f"	null
+"I120"	"=H120/$H$122"	0.2206008584	"f"	null
+"J120"	"=ROUND(I120*$B$126,0)"	772	"f"	null
+"B121"	"Empresa D"	"Empresa D"	"s"	null
+"C121"	41.0	41.0	"n"	null
+"D121"	9.0	9.0	"n"	null
+"E121"	"=ROUND((D121/$D$122)*100,0)"	26	"f"	null
+"F121"	"=100*(MAX($C$118:$C$121)-C121)/(MAX($C$118:$C$121)-MIN($C$118:$C$121))"	80	"f"	null
+"G121"	"=D121*10"	90	"f"	null
+"H121"	"=$M$114*F121+$M$115*G121+$M$116*E121"	76.6	"f"	null
+"I121"	"=H121/$H$122"	0.3287553648	"f"	null
+"J121"	"=ROUND(I121*$B$126,0)"	1151	"f"	null
+"C122"	"SUMA"	"SUMA"	"s"	null
+"D122"	"=SUM(D118:D121)"	34.5	"f"	null
+"G122"	"TOTAL"	"TOTAL"	"s"	null
+"H122"	"=SUM(H118:H121)"	233	"f"	null
+"J122"	"=SUM(J118:J121)"	3500	"f"	null
+"B124"	7000.0	7000.0	"n"	null
+"C124"	"Unidades mercado "	"Unidades mercado "	"s"	null
+"B125"	0.5	0.5	"n"	null
+"B126"	3500.0	3500.0	"n"	null
+"C126"	"Unidades mercado real "	"Unidades mercado real "	"s"	null
+"L127"	"Peso precio"	"Peso precio"	"s"	null
+"M127"	0.4	0.4	"n"	null
+"L128"	"peso reputación"	"peso reputación"	"s"	null
+"M128"	0.35	0.35	"n"	null
+"L129"	"Peso calidad"	"Peso calidad"	"s"	null
+"M129"	0.25	0.25	"n"	null
+"B130"	"EJEMPLO de distribución de Ventas (Bolsos Medio)"	"EJEMPLO de distribución de Ventas (Bolsos Medio)"	"s"	null
+"C130"	"Precio"	"Precio"	"s"	null
+"D130"	"Reputación (0-10)"	"Reputación (0-10)"	"s"	null
+"E130"	"Calidad (0-100)"	"Calidad (0-100)"	"s"	null
+"F130"	"Precio Económico (0-100)"	"Precio Económico (0-100)"	"s"	null
+"G130"	"Reputación (0-100)"	"Reputación (0-100)"	"s"	null
+"H130"	"Puntaje total"	"Puntaje total"	"s"	null
+"I130"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"J130"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"L130"	"Precio ideal"	"Precio ideal"	"s"	null
+"M130"	100.0	100.0	"n"	null
+"B131"	"Empresa A"	"Empresa A"	"s"	null
+"C131"	120.0	120.0	"n"	null
+"D131"	7.0	7.0	"n"	null
+"E131"	"=ROUND((D131/$D$122)*100,0)"	20	"f"	null
+"F131"	"=100-(ABS(C131-$M$130)/$M$130*100)"	80	"f"	null
+"G131"	"=D131*10"	70	"f"	null
+"H131"	"=$M$127*F131+$M$128*G131+$M$129*E131"	61.5	"f"	null
+"I131"	"=H131/$H$135"	0.3048327138	"f"	null
+"J131"	"=ROUND(I131*$B$139,0)"	1067	"f"	null
+"B132"	"Empresa B"	"Empresa B"	"s"	null
+"C132"	150.0	150.0	"n"	null
+"D132"	8.3	8.3	"n"	null
+"E132"	"=ROUND((D132/$D$122)*100,0)"	24	"f"	null
+"F132"	"=100-(ABS(C132-$M$130)/$M$130*100)"	50	"f"	null
+"G132"	"=D132*10"	83	"f"	null
+"H132"	"=$M$127*F132+$M$128*G132+$M$129*E132"	55.05	"f"	null
+"I132"	"=H132/$H$135"	0.2728624535	"f"	null
+"J132"	"=ROUND(I132*$B$139,0)"	955	"f"	null
+"B133"	"Empresa C"	"Empresa C"	"s"	null
+"C133"	190.0	190.0	"n"	null
+"D133"	10.2	10.2	"n"	null
+"E133"	"=ROUND((D133/$D$122)*100,0)"	30	"f"	null
+"F133"	"=100-(ABS(C133-$M$130)/$M$130*100)"	10	"f"	null
+"G133"	"=D133*10"	102	"f"	null
+"H133"	"=$M$127*F133+$M$128*G133+$M$129*E133"	47.2	"f"	null
+"I133"	"=H133/$H$135"	0.233952912	"f"	null
+"J133"	"=ROUND(I133*$B$139,0)"	819	"f"	null
+"B134"	"Empresa D"	"Empresa D"	"s"	null
+"C134"	200.0	200.0	"n"	null
+"D134"	9.0	9.0	"n"	null
+"E134"	"=ROUND((D134/$D$122)*100,0)"	26	"f"	null
+"F134"	"=100-(ABS(C134-$M$130)/$M$130*100)"	0	"f"	null
+"G134"	"=D134*10"	90	"f"	null
+"H134"	"=$M$127*F134+$M$128*G134+$M$129*E134"	38	"f"	null
+"I134"	"=H134/$H$135"	0.1883519207	"f"	null
+"J134"	"=ROUND(I134*$B$139,0)"	659	"f"	null
+"C135"	"SUMA"	"SUMA"	"s"	null
+"D135"	"=SUM(D131:D134)"	34.5	"f"	null
+"G135"	"TOTAL"	"TOTAL"	"s"	null
+"H135"	"=SUM(H131:H134)"	201.75	"f"	null
+"J135"	"=SUM(J131:J134)"	3500	"f"	null
+"B137"	5000.0	5000.0	"n"	null
+"C137"	"Unidades mercado "	"Unidades mercado "	"s"	null
+"B138"	0.7	0.7	"n"	null
+"B139"	3500.0	3500.0	"n"	null
+"C139"	"Unidades mercado real "	"Unidades mercado real "	"s"	null
+"L140"	"Peso precio"	"Peso precio"	"s"	null
+"M140"	0.1	0.1	"n"	null
+"L141"	"peso reputación"	"peso reputación"	"s"	null
+"M141"	0.5	0.5	"n"	null
+"L142"	"Peso calidad"	"Peso calidad"	"s"	null
+"M142"	0.4	0.4	"n"	null
+"B143"	"EJEMPLO de distribución de Ventas (Bolsos Caros)"	"EJEMPLO de distribución de Ventas (Bolsos Caros)"	"s"	null
+"C143"	"Precio"	"Precio"	"s"	null
+"D143"	"Reputación (0-10)"	"Reputación (0-10)"	"s"	null
+"E143"	"Calidad (0-100)"	"Calidad (0-100)"	"s"	null
+"F143"	"Precio Económico (0-100)"	"Precio Económico (0-100)"	"s"	null
+"G143"	"Reputación (0-100)"	"Reputación (0-100)"	"s"	null
+"H143"	"Puntaje total"	"Puntaje total"	"s"	null
+"I143"	"Porcentaje parcial"	"Porcentaje parcial"	"s"	null
+"J143"	"Unidades Vendidas"	"Unidades Vendidas"	"s"	null
+"L143"	"Precio ideal"	"Precio ideal"	"s"	null
+"M143"	250.0	250.0	"n"	null
+"B144"	"Empresa A"	"Empresa A"	"s"	null
+"C144"	250.0	250.0	"n"	null
+"D144"	7.0	7.0	"n"	null
+"E144"	"=ROUND((D144/$D$122)*100,0)"	20	"f"	null
+"F144"	"=100-(ABS(C144-$M$143)/$M$143*100)"	100	"f"	null
+"G144"	"=D144*10"	70	"f"	null
+"H144"	"=$M$140*F144+$M$141*G144+$M$142*E144"	53	"f"	null
+"I144"	"=H144/$H$148"	0.21783806	"f"	null
+"J144"	"=ROUND(I144*$B$152,0)"	174	"f"	null
+"B145"	"Empresa B"	"Empresa B"	"s"	null
+"C145"	300.0	300.0	"n"	null
+"D145"	8.3	8.3	"n"	null
+"E145"	"=ROUND((D145/$D$122)*100,0)"	24	"f"	null
+"F145"	"=100-(ABS(C145-$M$143)/$M$143*100)"	80	"f"	null
+"G145"	"=D145*10"	83	"f"	null
+"H145"	"=$M$140*F145+$M$141*G145+$M$142*E145"	59.1	"f"	null
+"I145"	"=H145/$H$148"	0.2429099877	"f"	null
+"J145"	"=ROUND(I145*$B$152,0)"	194	"f"	null
+"B146"	"Empresa C"	"Empresa C"	"s"	null
+"C146"	220.0	220.0	"n"	null
+"D146"	10.2	10.2	"n"	null
+"E146"	"=ROUND((D146/$D$122)*100,0)"	30	"f"	null
+"F146"	"=100-(ABS(C146-$M$143)/$M$143*100)"	88	"f"	null
+"G146"	"=D146*10"	102	"f"	null
+"H146"	"=$M$140*F146+$M$141*G146+$M$142*E146"	71.8	"f"	null
+"I146"	"=H146/$H$148"	0.295108919	"f"	null
+"J146"	"=ROUND(I146*$B$152,0)"	236	"f"	null
+"B147"	"Empresa D"	"Empresa D"	"s"	null
+"C147"	400.0	400.0	"n"	null
+"D147"	9.0	9.0	"n"	null
+"E147"	"=ROUND((D147/$D$122)*100,0)"	26	"f"	null
+"F147"	"=100-(ABS(C147-$M$143)/$M$143*100)"	40	"f"	null
+"G147"	"=D147*10"	90	"f"	null
+"H147"	"=$M$140*F147+$M$141*G147+$M$142*E147"	59.4	"f"	null
+"I147"	"=H147/$H$148"	0.2441430333	"f"	null
+"J147"	"=ROUND(I147*$B$152,0)"	195	"f"	null
+"C148"	"SUMA"	"SUMA"	"s"	null
+"D148"	"=SUM(D144:D147)"	34.5	"f"	null
+"G148"	"TOTAL"	"TOTAL"	"s"	null
+"H148"	"=SUM(H144:H147)"	243.3	"f"	null
+"J148"	"=SUM(J144:J147)"	799	"f"	null
+"B150"	2000.0	2000.0	"n"	null
+"C150"	"Unidades mercado "	"Unidades mercado "	"s"	null
+"B151"	0.4	0.4	"n"	null
+"B152"	800.0	800.0	"n"	null
+"C152"	"Unidades mercado real "	"Unidades mercado real "	"s"	null

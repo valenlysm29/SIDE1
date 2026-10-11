@@ -134,3 +134,19 @@ window.SIDE_DECISION_CATALOG = [
     ]
   }
 ];
+
+// Puente de metadatos: el flujo anterior conserva identificadores y precios.
+// El catálogo Excel completo y los cuatro grupos nuevos viven en el editor de lotes.
+(function(){
+  const mappings={
+    MESA_CORTE:['INF-01'],ENSAMBLE:['INF-02','INF-03','INF-04'],ACABADOS:['INF-05','INF-06','INF-07'],MOLDE:['INF-08','INF-09','INF-10'],
+    PERS_CORTE:['RH-01','RH-02','RH-03'],PERS_ENSAMBLE:['RH-04','RH-05','RH-06'],PERS_ACABADO:['RH-07','RH-08','RH-09'],
+    JEFATURA:['RH-10B','RH-10A'],CUERO:['INS-01','INS-02','INS-03'],ACCESORIOS:['INS-04','INS-05'],HILO:['INS-06','INS-07','INS-08'],
+    INV_RRHH:[null,'INV-01A','INV-01B','INV-01C'],INV_MARKETING:['INV-02A','INV-02B','INV-02C']
+  };
+  const indice=Object.fromEntries((window.SIDE_EXCEL_CATALOGO||[]).map(row=>[row.codigo,row]));
+  for(const section of window.SIDE_DECISION_CATALOG)for(const item of section.items||[])(item.options||[]).forEach((option,index)=>{
+    const codigo=mappings[item.id]?.[index],row=indice[codigo];if(!row)return;
+    Object.assign(option,{codigoExcel:codigo,costoReferencialExcel:row.costo,aportesExcel:{calidad:row.calidad,eficiencia:row.eficiencia,reputacion:row.reputacion,financiero:row.financiero}});
+  });
+}());

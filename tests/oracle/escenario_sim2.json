@@ -1,0 +1,134 @@
+{
+  "nombre": "sim2",
+  "descripcion": "Escenario numérico con baja calidad Premium, eficiencia baja sin jefe, reputación baja segundo ciclo, salud baja y exceso de plan y producción; CONS-02 en escenario premium separado.",
+  "entradas": {
+    "Consecuencias_Oracle": {
+      "B2": 3,
+      "B3": "SEG-03",
+      "B4": 2,
+      "B5": 2,
+      "B6": 1,
+      "B7": 2,
+      "B8": false,
+      "B9": 520,
+      "B10": 396,
+      "B11": 365,
+      "B12": 200,
+      "B13": 10000
+    }
+  },
+  "salidas": {
+    "consecuencias.CONS-01.activa": [
+      "Consecuencias_Oracle",
+      "D2"
+    ],
+    "consecuencias.CONS-01.efecto": [
+      "Consecuencias_Oracle",
+      "E2"
+    ],
+    "consecuencias.CONS-01.mensaje": [
+      "Consecuencias_Oracle",
+      "F2"
+    ],
+    "consecuencias.CONS-02.activa": [
+      "Consecuencias_Oracle",
+      "D3"
+    ],
+    "consecuencias.CONS-02.efecto": [
+      "Consecuencias_Oracle",
+      "E3"
+    ],
+    "consecuencias.CONS-02.mensaje": [
+      "Consecuencias_Oracle",
+      "F3"
+    ],
+    "consecuencias.CONS-03.activa": [
+      "Consecuencias_Oracle",
+      "D4"
+    ],
+    "consecuencias.CONS-03.efecto": [
+      "Consecuencias_Oracle",
+      "E4"
+    ],
+    "consecuencias.CONS-03.mensaje": [
+      "Consecuencias_Oracle",
+      "F4"
+    ],
+    "consecuencias.CONS-04.activa": [
+      "Consecuencias_Oracle",
+      "D5"
+    ],
+    "consecuencias.CONS-04.efecto": [
+      "Consecuencias_Oracle",
+      "E5"
+    ],
+    "consecuencias.CONS-04.mensaje": [
+      "Consecuencias_Oracle",
+      "F5"
+    ],
+    "consecuencias.CONS-05.activa": [
+      "Consecuencias_Oracle",
+      "D6"
+    ],
+    "consecuencias.CONS-05.efecto": [
+      "Consecuencias_Oracle",
+      "E6"
+    ],
+    "consecuencias.CONS-05.mensaje": [
+      "Consecuencias_Oracle",
+      "F6"
+    ],
+    "consecuencias.CONS-06.activa": [
+      "Consecuencias_Oracle",
+      "D7"
+    ],
+    "consecuencias.CONS-06.efecto": [
+      "Consecuencias_Oracle",
+      "E7"
+    ],
+    "consecuencias.CONS-06.mensaje": [
+      "Consecuencias_Oracle",
+      "F7"
+    ],
+    "consecuencias.CONS-07.activa": [
+      "Consecuencias_Oracle",
+      "D8"
+    ],
+    "consecuencias.CONS-07.efecto": [
+      "Consecuencias_Oracle",
+      "E8"
+    ],
+    "consecuencias.CONS-07.mensaje": [
+      "Consecuencias_Oracle",
+      "F8"
+    ],
+    "consecuencias.CONS-08.activa": [
+      "Consecuencias_Oracle",
+      "D9"
+    ],
+    "consecuencias.CONS-08.efecto": [
+      "Consecuencias_Oracle",
+      "E9"
+    ],
+    "consecuencias.CONS-08.mensaje": [
+      "Consecuencias_Oracle",
+      "F9"
+    ],
+    "consecuencias.produccion": [
+      "Consecuencias_Oracle",
+      "B14"
+    ],
+    "consecuencias.reputacionCambio": [
+      "Consecuencias_Oracle",
+      "B15"
+    ],
+    "consecuencias.precioFactor": [
+      "Consecuencias_Oracle",
+      "B16"
+    ],
+    "consecuencias.ciclosBajaFinal": [
+      "Consecuencias_Oracle",
+      "B17"
+    ]
+  }
+}

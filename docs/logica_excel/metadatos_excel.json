@@ -1,0 +1,108 @@
+{
+  "sha256": "3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1",
+  "hojas": [
+    {
+      "nombre": "Instrucciones",
+      "filas": 14,
+      "columnas": 2,
+      "celdasNoVacias": 9,
+      "formulas": 0,
+      "matriciales": 0
+    },
+    {
+      "nombre": "DECISIONES",
+      "filas": 25,
+      "columnas": 3,
+      "celdasNoVacias": 6,
+      "formulas": 0,
+      "matriciales": 0
+    },
+    {
+      "nombre": "Seleccion_Ciclo0",
+      "filas": 22,
+      "columnas": 9,
+      "celdasNoVacias": 134,
+      "formulas": 98,
+      "matriciales": 98
+    },
+    {
+      "nombre": "Catalogo_Decisiones",
+      "filas": 69,
+      "columnas": 12,
+      "celdasNoVacias": 793,
+      "formulas": 11,
+      "matriciales": 0
+    },
+    {
+      "nombre": "FlujoWeb",
+      "filas": 39,
+      "columnas": 8,
+      "celdasNoVacias": 75,
+      "formulas": 0,
+      "matriciales": 0
+    },
+    {
+      "nombre": "CANTIDAD DE PRODUCCIÓN",
+      "filas": 162,
+      "columnas": 28,
+      "celdasNoVacias": 642,
+      "formulas": 225,
+      "matriciales": 0
+    },
+    {
+      "nombre": "Costos De Producción",
+      "filas": 200,
+      "columnas": 30,
+      "celdasNoVacias": 1271,
+      "formulas": 503,
+      "matriciales": 0
+    },
+    {
+      "nombre": "Lotes_Produccion",
+      "filas": 7,
+      "columnas": 12,
+      "celdasNoVacias": 37,
+      "formulas": 17,
+      "matriciales": 6
+    },
+    {
+      "nombre": "Motor_Puntajes",
+      "filas": 13,
+      "columnas": 4,
+      "celdasNoVacias": 35,
+      "formulas": 17,
+      "matriciales": 0
+    },
+    {
+      "nombre": "Matriz_Consecuencias",
+      "filas": 9,
+      "columnas": 5,
+      "celdasNoVacias": 45,
+      "formulas": 0,
+      "matriciales": 0
+    }
+  ],
+  "catalogoFilas": 68,
+  "errores_cache_original": [
+    {
+      "hoja": "CANTIDAD DE PRODUCCIÓN",
+      "celda": "E75",
+      "valor": "#DIV/0!"
+    },
+    {
+      "hoja": "CANTIDAD DE PRODUCCIÓN",
+      "celda": "G75",
+      "valor": "#DIV/0!"
+    },
+    {
+      "hoja": "CANTIDAD DE PRODUCCIÓN",
+      "celda": "E123",
+      "valor": "#DIV/0!"
+    },
+    {
+      "hoja": "CANTIDAD DE PRODUCCIÓN",
+      "celda": "G123",
+      "valor": "#DIV/0!"
+    }
+  ]
+}

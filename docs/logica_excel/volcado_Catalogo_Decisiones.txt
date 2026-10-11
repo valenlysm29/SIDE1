@@ -1,0 +1,795 @@
+Hoja: Catalogo_Decisiones
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"Codigo"	"Codigo"	"s"	null
+"B1"	"Bloque"	"Bloque"	"s"	null
+"C1"	"Grupo de decision"	"Grupo de decision"	"s"	null
+"D1"	"Opcion / Nivel"	"Opcion / Nivel"	"s"	null
+"E1"	"Permanencia"	"Permanencia"	"s"	null
+"F1"	"Descripcion"	"Descripcion"	"s"	null
+"G1"	"Costo referencial (S/)"	"Costo referencial (S/)"	"s"	null
+"H1"	"Aporte Calidad"	"Aporte Calidad"	"s"	null
+"I1"	"Aporte Eficiencia"	"Aporte Eficiencia"	"s"	null
+"J1"	"Aporte Reputacion"	"Aporte Reputacion"	"s"	null
+"K1"	"Aporte Financiero"	"Aporte Financiero"	"s"	null
+"L1"	"Notas"	"Notas"	"s"	null
+"A2"	"GEN-01"	"GEN-01"	"s"	null
+"B2"	"A. Empresa"	"A. Empresa"	"s"	null
+"C2"	"Razon social"	"Razon social"	"s"	null
+"D2"	"Texto libre"	"Texto libre"	"s"	null
+"E2"	"Fija"	"Fija"	"s"	null
+"F2"	"Nombre legal de la empresa (texto)"	"Nombre legal de la empresa (texto)"	"s"	null
+"G2"	0.0	0.0	"n"	null
+"H2"	0.0	0.0	"n"	null
+"I2"	0.0	0.0	"n"	null
+"J2"	0.0	0.0	"n"	null
+"K2"	0.0	0.0	"n"	null
+"L2"	"Sin efecto en puntajes"	"Sin efecto en puntajes"	"s"	null
+"A3"	"GEN-02"	"GEN-02"	"s"	null
+"B3"	"A. Empresa"	"A. Empresa"	"s"	null
+"C3"	"Nombre comercial / marca"	"Nombre comercial / marca"	"s"	null
+"D3"	"Texto libre"	"Texto libre"	"s"	null
+"E3"	"Fija"	"Fija"	"s"	null
+"F3"	"Marca comercial (texto)"	"Marca comercial (texto)"	"s"	null
+"G3"	0.0	0.0	"n"	null
+"H3"	0.0	0.0	"n"	null
+"I3"	0.0	0.0	"n"	null
+"J3"	0.0	0.0	"n"	null
+"K3"	0.0	0.0	"n"	null
+"L3"	"Sin efecto en puntajes"	"Sin efecto en puntajes"	"s"	null
+"A4"	"GEN-04"	"GEN-04"	"s"	null
+"B4"	"A. Empresa"	"A. Empresa"	"s"	null
+"C4"	"Tipos de bolsos"	"Tipos de bolsos"	"s"	null
+"D4"	"Texto libre"	"Texto libre"	"s"	null
+"E4"	"Fija"	"Fija"	"s"	null
+"F4"	"Linea de productos que fabrica (tote, cartera, mochila, etc.)"	"Linea de productos que fabrica (tote, cartera, mochila, etc.)"	"s"	null
+"G4"	0.0	0.0	"n"	null
+"H4"	0.0	0.0	"n"	null
+"I4"	0.0	0.0	"n"	null
+"J4"	0.0	0.0	"n"	null
+"K4"	0.0	0.0	"n"	null
+"L4"	"Sin efecto en puntajes"	"Sin efecto en puntajes"	"s"	null
+"A5"	"SEG-01"	"SEG-01"	"s"	null
+"B5"	"A. Empresa"	"A. Empresa"	"s"	null
+"C5"	"Segmento / linea"	"Segmento / linea"	"s"	null
+"D5"	"Economico"	"Economico"	"s"	null
+"E5"	"Fija"	"Fija"	"s"	null
+"F5"	"Precio bajo, prioriza volumen y costo"	"Precio bajo, prioriza volumen y costo"	"s"	null
+"G5"	0.0	0.0	"n"	null
+"H5"	0.0	0.0	"n"	null
+"I5"	0.0	0.0	"n"	null
+"J5"	1.0	1.0	"n"	null
+"K5"	0.0	0.0	"n"	null
+"L5"	"Exige coherencia con Calidad real"	"Exige coherencia con Calidad real"	"s"	null
+"A6"	"SEG-02"	"SEG-02"	"s"	null
+"B6"	"A. Empresa"	"A. Empresa"	"s"	null
+"C6"	"Segmento / linea"	"Segmento / linea"	"s"	null
+"D6"	"Estandar"	"Estandar"	"s"	null
+"E6"	"Fija"	"Fija"	"s"	null
+"F6"	"Equilibra costo, calidad, demanda y margen"	"Equilibra costo, calidad, demanda y margen"	"s"	null
+"G6"	0.0	0.0	"n"	null
+"H6"	1.0	1.0	"n"	null
+"I6"	0.0	0.0	"n"	null
+"J6"	1.0	1.0	"n"	null
+"K6"	0.0	0.0	"n"	null
+"A7"	"SEG-03"	"SEG-03"	"s"	null
+"B7"	"A. Empresa"	"A. Empresa"	"s"	null
+"C7"	"Segmento / linea"	"Segmento / linea"	"s"	null
+"D7"	"Premium"	"Premium"	"s"	null
+"E7"	"Fija"	"Fija"	"s"	null
+"F7"	"Precio alto; requiere Calidad>=7 para sostenerse"	"Precio alto; requiere Calidad>=7 para sostenerse"	"s"	null
+"G7"	0.0	0.0	"n"	null
+"H7"	2.0	2.0	"n"	null
+"I7"	0.0	0.0	"n"	null
+"J7"	2.0	2.0	"n"	null
+"K7"	0.0	0.0	"n"	null
+"L7"	"Riesgo si Calidad interna es baja (ver Matriz)"	"Riesgo si Calidad interna es baja (ver Matriz)"	"s"	null
+"A8"	"INF-01"	"INF-01"	"s"	null
+"B8"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C8"	"Mesa de corte"	"Mesa de corte"	"s"	null
+"D8"	"Unica (obligatoria)"	"Unica (obligatoria)"	"s"	null
+"E8"	"Fija"	"Fija"	"s"	null
+"F8"	"Inversion fija para todos; habilita la etapa de corte"	"Inversion fija para todos; habilita la etapa de corte"	"s"	null
+"G8"	2500.0	2500.0	"n"	null
+"H8"	0.0	0.0	"n"	null
+"I8"	1.0	1.0	"n"	null
+"J8"	0.0	0.0	"n"	null
+"K8"	0.0	0.0	"n"	null
+"L8"	"Obligatoria, no otorga niveles"	"Obligatoria, no otorga niveles"	"s"	null
+"A9"	"INF-02"	"INF-02"	"s"	null
+"B9"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C9"	"Maquina de ensamblado"	"Maquina de ensamblado"	"s"	null
+"D9"	"Nivel 1: manual/basica"	"Nivel 1: manual/basica"	"s"	null
+"E9"	"Fija"	"Fija"	"s"	null
+"F9"	"Costura Singer 4423 Heavy Duty; desbastadora a mano con cuchilla o lija"	"Costura Singer 4423 Heavy Duty; desbastadora a mano con cuchilla o lija"	"s"	null
+"G9"	3500.0	3500.0	"n"	null
+"H9"	1.0	1.0	"n"	null
+"I9"	1.0	1.0	"n"	null
+"J9"	0.0	0.0	"n"	null
+"K9"	0.0	0.0	"n"	null
+"A10"	"INF-03"	"INF-03"	"s"	null
+"B10"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C10"	"Maquina de ensamblado"	"Maquina de ensamblado"	"s"	null
+"D10"	"Nivel 2: semi-industrial"	"Nivel 2: semi-industrial"	"s"	null
+"E10"	"Fija"	"Fija"	"s"	null
+"F10"	"Maquina de coser de columna/brazo (poste) Typical TB-801"	"Maquina de coser de columna/brazo (poste) Typical TB-801"	"s"	null
+"G10"	7500.0	7500.0	"n"	null
+"H10"	2.0	2.0	"n"	null
+"I10"	2.0	2.0	"n"	null
+"J10"	0.0	0.0	"n"	null
+"K10"	0.0	0.0	"n"	null
+"A11"	"INF-04"	"INF-04"	"s"	null
+"B11"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C11"	"Maquina de ensamblado"	"Maquina de ensamblado"	"s"	null
+"D11"	"Nivel 3: industrial"	"Nivel 3: industrial"	"s"	null
+"E11"	"Fija"	"Fija"	"s"	null
+"F11"	"Juki de triple accionamiento; desbastadora automatica de alta precision, servomotor"	"Juki de triple accionamiento; desbastadora automatica de alta precision, servomotor"	"s"	null
+"G11"	15000.0	15000.0	"n"	null
+"H11"	3.0	3.0	"n"	null
+"I11"	3.0	3.0	"n"	null
+"J11"	0.0	0.0	"n"	null
+"K11"	0.0	0.0	"n"	null
+"A12"	"INF-05"	"INF-05"	"s"	null
+"B12"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C12"	"Maquina de acabados"	"Maquina de acabados"	"s"	null
+"D12"	"Nivel 1: manual/basica"	"Nivel 1: manual/basica"	"s"	null
+"E12"	"Fija"	"Fija"	"s"	null
+"F12"	"Acabado a mano con cera/tinte de bordes, bruñido manual. Lento, variable en calidad"	"Acabado a mano con cera/tinte de bordes, bruñido manual. Lento, variable en calidad"	"s"	null
+"G12"	1200.0	1200.0	"n"	null
+"H12"	1.0	1.0	"n"	null
+"I12"	1.0	1.0	"n"	null
+"J12"	0.0	0.0	"n"	null
+"K12"	0.0	0.0	"n"	null
+"A13"	"INF-06"	"INF-06"	"s"	null
+"B13"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C13"	"Maquina de acabados"	"Maquina de acabados"	"s"	null
+"D13"	"Nivel 2: semi-industrial"	"Nivel 2: semi-industrial"	"s"	null
+"E13"	"Fija"	"Fija"	"s"	null
+"F13"	"Maquina de pulido de bordes (edge burnisher) electrica, tinte con pincel/aerografo"	"Maquina de pulido de bordes (edge burnisher) electrica, tinte con pincel/aerografo"	"s"	null
+"G13"	4500.0	4500.0	"n"	null
+"H13"	2.0	2.0	"n"	null
+"I13"	2.0	2.0	"n"	null
+"J13"	0.0	0.0	"n"	null
+"K13"	0.0	0.0	"n"	null
+"A14"	"INF-07"	"INF-07"	"s"	null
+"B14"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C14"	"Maquina de acabados"	"Maquina de acabados"	"s"	null
+"D14"	"Nivel 3: industrial"	"Nivel 3: industrial"	"s"	null
+"E14"	"Fija"	"Fija"	"s"	null
+"F14"	"Linea de acabado con teñido automatico + pulido, control de temperatura y velocidad"	"Linea de acabado con teñido automatico + pulido, control de temperatura y velocidad"	"s"	null
+"G14"	9500.0	9500.0	"n"	null
+"H14"	3.0	3.0	"n"	null
+"I14"	3.0	3.0	"n"	null
+"J14"	0.0	0.0	"n"	null
+"K14"	0.0	0.0	"n"	null
+"A15"	"INF-08"	"INF-08"	"s"	null
+"B15"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C15"	"Molde"	"Molde"	"s"	null
+"D15"	"Nivel 1 - Generico basico"	"Nivel 1 - Generico basico"	"s"	null
+"E15"	"Fija"	"Fija"	"s"	null
+"F15"	"Patrones simples, tipo plantilla estandar de internet o catalogo generico"	"Patrones simples, tipo plantilla estandar de internet o catalogo generico"	"s"	null
+"G15"	300.0	300.0	"n"	null
+"H15"	1.0	1.0	"n"	null
+"I15"	1.0	1.0	"n"	null
+"J15"	0.0	0.0	"n"	null
+"K15"	0.0	0.0	"n"	null
+"L15"	"Bajo aprovechamiento de cuero"	"Bajo aprovechamiento de cuero"	"s"	null
+"A16"	"INF-09"	"INF-09"	"s"	null
+"B16"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C16"	"Molde"	"Molde"	"s"	null
+"D16"	"Nivel 2 - Generico mejorado"	"Nivel 2 - Generico mejorado"	"s"	null
+"E16"	"Fija"	"Fija"	"s"	null
+"F16"	"Patron tecnico mas elaborado, con lineas de corte, marcado y perforaciones bien definidas"	"Patron tecnico mas elaborado, con lineas de corte, marcado y perforaciones bien definidas"	"s"	null
+"G16"	1200.0	1200.0	"n"	null
+"H16"	2.0	2.0	"n"	null
+"I16"	2.0	2.0	"n"	null
+"J16"	1.0	1.0	"n"	null
+"K16"	0.0	0.0	"n"	null
+"L16"	"Aprovechamiento medio-alto"	"Aprovechamiento medio-alto"	"s"	null
+"A17"	"INF-10"	"INF-10"	"s"	null
+"B17"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C17"	"Molde"	"Molde"	"s"	null
+"D17"	"Nivel 3 - Premium"	"Nivel 3 - Premium"	"s"	null
+"E17"	"Fija"	"Fija"	"s"	null
+"F17"	"La empresa desarrolla su propio patron desde cero, adaptado a su propuesta de marca"	"La empresa desarrolla su propio patron desde cero, adaptado a su propuesta de marca"	"s"	null
+"G17"	3500.0	3500.0	"n"	null
+"H17"	4.0	4.0	"n"	null
+"I17"	2.0	2.0	"n"	null
+"J17"	2.0	2.0	"n"	null
+"K17"	0.0	0.0	"n"	null
+"L17"	"Maximo aprovechamiento y diferenciacion"	"Maximo aprovechamiento y diferenciacion"	"s"	null
+"A18"	"RH-01"	"RH-01"	"s"	null
+"B18"	"C. RRHH"	"C. RRHH"	"s"	null
+"C18"	"Personal de corte"	"Personal de corte"	"s"	null
+"D18"	"Nivel 1 - Operario basico"	"Nivel 1 - Operario basico"	"s"	null
+"E18"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F18"	"Corta con plantilla simple, sin experiencia previa. Mas lento, mas margen de error"	"Corta con plantilla simple, sin experiencia previa. Mas lento, mas margen de error"	"s"	null
+"G18"	1500.0	1500.0	"n"	null
+"H18"	0.0	0.0	"n"	null
+"I18"	1.0	1.0	"n"	null
+"J18"	0.0	0.0	"n"	null
+"K18"	0.0	0.0	"n"	null
+"A19"	"RH-02"	"RH-02"	"s"	null
+"B19"	"C. RRHH"	"C. RRHH"	"s"	null
+"C19"	"Personal de corte"	"Personal de corte"	"s"	null
+"D19"	"Nivel 2 - Cortador con experiencia"	"Nivel 2 - Cortador con experiencia"	"s"	null
+"E19"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F19"	"Optimiza el aprovechamiento del cuero, reduce desperdicio, mas rapido"	"Optimiza el aprovechamiento del cuero, reduce desperdicio, mas rapido"	"s"	null
+"G19"	2500.0	2500.0	"n"	null
+"H19"	1.0	1.0	"n"	null
+"I19"	2.0	2.0	"n"	null
+"J19"	0.0	0.0	"n"	null
+"K19"	0.0	0.0	"n"	null
+"A20"	"RH-03"	"RH-03"	"s"	null
+"B20"	"C. RRHH"	"C. RRHH"	"s"	null
+"C20"	"Personal de corte"	"Personal de corte"	"s"	null
+"D20"	"Nivel 3 - Maestro cortador"	"Nivel 3 - Maestro cortador"	"s"	null
+"E20"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F20"	"Trabaja cueros irregulares/premium, maximo aprovechamiento, minimo desperdicio"	"Trabaja cueros irregulares/premium, maximo aprovechamiento, minimo desperdicio"	"s"	null
+"G20"	4000.0	4000.0	"n"	null
+"H20"	2.0	2.0	"n"	null
+"I20"	3.0	3.0	"n"	null
+"J20"	0.0	0.0	"n"	null
+"K20"	0.0	0.0	"n"	null
+"A21"	"RH-04"	"RH-04"	"s"	null
+"B21"	"C. RRHH"	"C. RRHH"	"s"	null
+"C21"	"Personal de ensamble"	"Personal de ensamble"	"s"	null
+"D21"	"Nivel 1 - Costurero basico"	"Nivel 1 - Costurero basico"	"s"	null
+"E21"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F21"	"Maquina domestica, puntadas rectas simples, funciona con diseños sencillos"	"Maquina domestica, puntadas rectas simples, funciona con diseños sencillos"	"s"	null
+"G21"	1500.0	1500.0	"n"	null
+"H21"	0.0	0.0	"n"	null
+"I21"	1.0	1.0	"n"	null
+"J21"	0.0	0.0	"n"	null
+"K21"	0.0	0.0	"n"	null
+"A22"	"RH-05"	"RH-05"	"s"	null
+"B22"	"C. RRHH"	"C. RRHH"	"s"	null
+"C22"	"Personal de ensamble"	"Personal de ensamble"	"s"	null
+"D22"	"Nivel 2 - Maquinista industrial"	"Nivel 2 - Maquinista industrial"	"s"	null
+"E22"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F22"	"Maquina semi-industrial/industrial, costuras reforzadas, mayor velocidad"	"Maquina semi-industrial/industrial, costuras reforzadas, mayor velocidad"	"s"	null
+"G22"	2800.0	2800.0	"n"	null
+"H22"	1.0	1.0	"n"	null
+"I22"	2.0	2.0	"n"	null
+"J22"	0.0	0.0	"n"	null
+"K22"	0.0	0.0	"n"	null
+"A23"	"RH-06"	"RH-06"	"s"	null
+"B23"	"C. RRHH"	"C. RRHH"	"s"	null
+"C23"	"Personal de ensamble"	"Personal de ensamble"	"s"	null
+"D23"	"Nivel 3 - Marroquinero especializado"	"Nivel 3 - Marroquinero especializado"	"s"	null
+"E23"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F23"	"Costura a mano de alta gama, ejecuta moldes exclusivos complejos, ideal linea premium"	"Costura a mano de alta gama, ejecuta moldes exclusivos complejos, ideal linea premium"	"s"	null
+"G23"	4500.0	4500.0	"n"	null
+"H23"	2.0	2.0	"n"	null
+"I23"	3.0	3.0	"n"	null
+"J23"	1.0	1.0	"n"	null
+"K23"	0.0	0.0	"n"	null
+"A24"	"RH-07"	"RH-07"	"s"	null
+"B24"	"C. RRHH"	"C. RRHH"	"s"	null
+"C24"	"Personal de acabados"	"Personal de acabados"	"s"	null
+"D24"	"Nivel 1 - Operario de acabado basico"	"Nivel 1 - Operario de acabado basico"	"s"	null
+"E24"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F24"	"Aplica tinte y cera de forma simple, resultado variable"	"Aplica tinte y cera de forma simple, resultado variable"	"s"	null
+"G24"	1500.0	1500.0	"n"	null
+"H24"	0.0	0.0	"n"	null
+"I24"	1.0	1.0	"n"	null
+"J24"	0.0	0.0	"n"	null
+"K24"	0.0	0.0	"n"	null
+"A25"	"RH-08"	"RH-08"	"s"	null
+"B25"	"C. RRHH"	"C. RRHH"	"s"	null
+"C25"	"Personal de acabados"	"Personal de acabados"	"s"	null
+"D25"	"Nivel 2 - Tecnico en acabados"	"Nivel 2 - Tecnico en acabados"	"s"	null
+"E25"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F25"	"Maneja maquina de pulido de bordes, tinte con aerografo, resultado consistente"	"Maneja maquina de pulido de bordes, tinte con aerografo, resultado consistente"	"s"	null
+"G25"	2800.0	2800.0	"n"	null
+"H25"	1.0	1.0	"n"	null
+"I25"	2.0	2.0	"n"	null
+"J25"	0.0	0.0	"n"	null
+"K25"	0.0	0.0	"n"	null
+"A26"	"RH-09"	"RH-09"	"s"	null
+"B26"	"C. RRHH"	"C. RRHH"	"s"	null
+"C26"	"Personal de acabados"	"Personal de acabados"	"s"	null
+"D26"	"Nivel 3 - Artesano acabador"	"Nivel 3 - Artesano acabador"	"s"	null
+"E26"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F26"	"Bruñido fino, dorado, decoracion compleja (pedreria, herrajes especiales)"	"Bruñido fino, dorado, decoracion compleja (pedreria, herrajes especiales)"	"s"	null
+"G26"	4500.0	4500.0	"n"	null
+"H26"	2.0	2.0	"n"	null
+"I26"	3.0	3.0	"n"	null
+"J26"	1.0	1.0	"n"	null
+"K26"	0.0	0.0	"n"	null
+"A27"	"RH-10A"	"RH-10A"	"s"	null
+"B27"	"C. RRHH"	"C. RRHH"	"s"	null
+"C27"	"Jefatura"	"Jefatura"	"s"	null
+"D27"	"Contratar jefatura"	"Contratar jefatura"	"s"	null
+"E27"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F27"	"Coordina el equipo, reduce riesgo de descoordinacion"	"Coordina el equipo, reduce riesgo de descoordinacion"	"s"	null
+"G27"	3000.0	3000.0	"n"	null
+"H27"	0.0	0.0	"n"	null
+"I27"	2.0	2.0	"n"	null
+"J27"	1.0	1.0	"n"	null
+"K27"	0.0	0.0	"n"	null
+"A28"	"RH-10B"	"RH-10B"	"s"	null
+"B28"	"C. RRHH"	"C. RRHH"	"s"	null
+"C28"	"Jefatura"	"Jefatura"	"s"	null
+"D28"	"No contratar jefatura"	"No contratar jefatura"	"s"	null
+"E28"	"Revisable con costo"	"Revisable con costo"	"s"	null
+"F28"	"Ahorra costo fijo, pero aumenta el riesgo de descoordinacion"	"Ahorra costo fijo, pero aumenta el riesgo de descoordinacion"	"s"	null
+"G28"	0.0	0.0	"n"	null
+"H28"	0.0	0.0	"n"	null
+"I28"	-1.0	-1.0	"n"	null
+"J28"	0.0	0.0	"n"	null
+"K28"	1.0	1.0	"n"	null
+"L28"	"Ahorro de caja pero baja Eficiencia"	"Ahorro de caja pero baja Eficiencia"	"s"	null
+"A29"	"RH-11"	"RH-11"	"s"	null
+"B29"	"C. RRHH"	"C. RRHH"	"s"	null
+"C29"	"Limpieza y servicios generales"	"Limpieza y servicios generales"	"s"	null
+"D29"	"Unica (obligatoria)"	"Unica (obligatoria)"	"s"	null
+"E29"	"Fija"	"Fija"	"s"	null
+"F29"	"Monto fijo obligatorio para mantener la operacion"	"Monto fijo obligatorio para mantener la operacion"	"s"	null
+"G29"	600.0	600.0	"n"	null
+"H29"	0.0	0.0	"n"	null
+"I29"	0.0	0.0	"n"	null
+"J29"	0.0	0.0	"n"	null
+"K29"	0.0	0.0	"n"	null
+"A30"	"RH-12"	"RH-12"	"s"	null
+"B30"	"C. RRHH"	"C. RRHH"	"s"	null
+"C30"	"Local de produccion"	"Local de produccion"	"s"	null
+"D30"	"Estandar (unico)"	"Estandar (unico)"	"s"	null
+"E30"	"Fija"	"Fija"	"s"	null
+"F30"	"Local de produccion estandar; alquiler fijo igual para todos los equipos"	"Local de produccion estandar; alquiler fijo igual para todos los equipos"	"s"	null
+"G30"	2000.0	2000.0	"n"	null
+"H30"	0.0	0.0	"n"	null
+"I30"	0.0	0.0	"n"	null
+"J30"	0.0	0.0	"n"	null
+"K30"	0.0	0.0	"n"	null
+"A31"	"COM-01A"	"COM-01A"	"s"	null
+"B31"	"D. Canales"	"D. Canales"	"s"	null
+"C31"	"Canal de venta"	"Canal de venta"	"s"	null
+"D31"	"Solo tienda fisica"	"Solo tienda fisica"	"s"	null
+"E31"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F31"	"Menor cobertura y demanda; menor complejidad y costo"	"Menor cobertura y demanda; menor complejidad y costo"	"s"	null
+"G31"	0.0	0.0	"n"	null
+"H31"	0.0	0.0	"n"	null
+"I31"	0.0	0.0	"n"	null
+"J31"	0.0	0.0	"n"	null
+"K31"	1.0	1.0	"n"	null
+"A32"	"COM-01B"	"COM-01B"	"s"	null
+"B32"	"D. Canales"	"D. Canales"	"s"	null
+"C32"	"Canal de venta"	"Canal de venta"	"s"	null
+"D32"	"Solo web"	"Solo web"	"s"	null
+"E32"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F32"	"Cobertura amplia con menor costo fijo; depende de marketing digital"	"Cobertura amplia con menor costo fijo; depende de marketing digital"	"s"	null
+"G32"	500.0	500.0	"n"	null
+"H32"	0.0	0.0	"n"	null
+"I32"	0.0	0.0	"n"	null
+"J32"	1.0	1.0	"n"	null
+"K32"	0.0	0.0	"n"	null
+"A33"	"COM-01C"	"COM-01C"	"s"	null
+"B33"	"D. Canales"	"D. Canales"	"s"	null
+"C33"	"Canal de venta"	"Canal de venta"	"s"	null
+"D33"	"Web y fisico"	"Web y fisico"	"s"	null
+"E33"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F33"	"Mayor cobertura y demanda; incrementa complejidad y costo"	"Mayor cobertura y demanda; incrementa complejidad y costo"	"s"	null
+"G33"	1500.0	1500.0	"n"	null
+"H33"	0.0	0.0	"n"	null
+"I33"	0.0	0.0	"n"	null
+"J33"	2.0	2.0	"n"	null
+"K33"	-1.0	-1.0	"n"	null
+"A34"	"FIN-01A"	"FIN-01A"	"s"	null
+"B34"	"D. Canales"	"D. Canales"	"s"	null
+"C34"	"Acceso a prestamo bancario"	"Acceso a prestamo bancario"	"s"	null
+"D34"	"Solicitar prestamo"	"Solicitar prestamo"	"s"	null
+"E34"	"Fija: habilita"	"Fija: habilita"	"s"	null
+"F34"	"Habilita apalancamiento; permite invertir mas rapido"	"Habilita apalancamiento; permite invertir mas rapido"	"s"	null
+"G34"	0.0	0.0	"n"	null
+"H34"	0.0	0.0	"n"	null
+"I34"	0.0	0.0	"n"	null
+"J34"	0.0	0.0	"n"	null
+"K34"	-1.0	-1.0	"n"	null
+"L34"	"Aumenta apalancamiento"	"Aumenta apalancamiento"	"s"	null
+"A35"	"FIN-01B"	"FIN-01B"	"s"	null
+"B35"	"D. Canales"	"D. Canales"	"s"	null
+"C35"	"Acceso a prestamo bancario"	"Acceso a prestamo bancario"	"s"	null
+"D35"	"No solicitar prestamo"	"No solicitar prestamo"	"s"	null
+"E35"	"Fija: habilita"	"Fija: habilita"	"s"	null
+"F35"	"Evita intereses; la expansion depende del capital propio"	"Evita intereses; la expansion depende del capital propio"	"s"	null
+"G35"	0.0	0.0	"n"	null
+"H35"	0.0	0.0	"n"	null
+"I35"	0.0	0.0	"n"	null
+"J35"	1.0	1.0	"n"	null
+"K35"	1.0	1.0	"n"	null
+"A36"	"INS-01"	"INS-01"	"s"	null
+"B36"	"E. Insumos"	"E. Insumos"	"s"	null
+"C36"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"D36"	"Nivel 1 - Cuero sintetico"	"Nivel 1 - Cuero sintetico"	"s"	null
+"E36"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F36"	"Bajo costo, menor durabilidad, acabado menos premium"	"Bajo costo, menor durabilidad, acabado menos premium"	"s"	null
+"G36"	25.0	25.0	"n"	null
+"H36"	1.0	1.0	"n"	null
+"I36"	0.0	0.0	"n"	null
+"J36"	0.0	0.0	"n"	null
+"K36"	1.0	1.0	"n"	null
+"L36"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A37"	"INS-02"	"INS-02"	"s"	null
+"B37"	"E. Insumos"	"E. Insumos"	"s"	null
+"C37"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"D37"	"Nivel 2 - Cuero genuino estandar"	"Nivel 2 - Cuero genuino estandar"	"s"	null
+"E37"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F37"	"Costo medio, durabilidad media"	"Costo medio, durabilidad media"	"s"	null
+"G37"	45.0	45.0	"n"	null
+"H37"	2.0	2.0	"n"	null
+"I37"	0.0	0.0	"n"	null
+"J37"	0.0	0.0	"n"	null
+"K37"	0.0	0.0	"n"	null
+"L37"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A38"	"INS-03"	"INS-03"	"s"	null
+"B38"	"E. Insumos"	"E. Insumos"	"s"	null
+"C38"	"Calidad del cuero"	"Calidad del cuero"	"s"	null
+"D38"	"Nivel 3 - Cuero genuino premium"	"Nivel 3 - Cuero genuino premium"	"s"	null
+"E38"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F38"	"Full grain / curtido vegetal: alto costo, alta durabilidad, mejor acabado"	"Full grain / curtido vegetal: alto costo, alta durabilidad, mejor acabado"	"s"	null
+"G38"	80.0	80.0	"n"	null
+"H38"	3.0	3.0	"n"	null
+"I38"	0.0	0.0	"n"	null
+"J38"	1.0	1.0	"n"	null
+"K38"	-1.0	-1.0	"n"	null
+"L38"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A39"	"INS-04"	"INS-04"	"s"	null
+"B39"	"E. Insumos"	"E. Insumos"	"s"	null
+"C39"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"D39"	"Nivel 1 - Aleacion economica"	"Nivel 1 - Aleacion economica"	"s"	null
+"E39"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F39"	"Bajo costo, se oxida/desgasta mas rapido"	"Bajo costo, se oxida/desgasta mas rapido"	"s"	null
+"G39"	4.0	4.0	"n"	null
+"H39"	1.0	1.0	"n"	null
+"I39"	0.0	0.0	"n"	null
+"J39"	0.0	0.0	"n"	null
+"K39"	1.0	1.0	"n"	null
+"L39"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A40"	"INS-05"	"INS-05"	"s"	null
+"B40"	"E. Insumos"	"E. Insumos"	"s"	null
+"C40"	"Calidad de accesorios"	"Calidad de accesorios"	"s"	null
+"D40"	"Nivel 2 - Metal premium"	"Nivel 2 - Metal premium"	"s"	null
+"E40"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F40"	"Laton macizo o acero inoxidable, alto costo, mayor durabilidad y brillo"	"Laton macizo o acero inoxidable, alto costo, mayor durabilidad y brillo"	"s"	null
+"G40"	9.0	9.0	"n"	null
+"H40"	2.0	2.0	"n"	null
+"I40"	0.0	0.0	"n"	null
+"J40"	1.0	1.0	"n"	null
+"K40"	-1.0	-1.0	"n"	null
+"L40"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A41"	"INS-06"	"INS-06"	"s"	null
+"B41"	"E. Insumos"	"E. Insumos"	"s"	null
+"C41"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"D41"	"Nivel 1 - Poliester estandar"	"Nivel 1 - Poliester estandar"	"s"	null
+"E41"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F41"	"Economico, resistencia media"	"Economico, resistencia media"	"s"	null
+"G41"	2.0	2.0	"n"	null
+"H41"	1.0	1.0	"n"	null
+"I41"	0.0	0.0	"n"	null
+"J41"	0.0	0.0	"n"	null
+"K41"	1.0	1.0	"n"	null
+"L41"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A42"	"INS-07"	"INS-07"	"s"	null
+"B42"	"E. Insumos"	"E. Insumos"	"s"	null
+"C42"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"D42"	"Nivel 2 - Encerado reforzado"	"Nivel 2 - Encerado reforzado"	"s"	null
+"E42"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F42"	"Costo medio, mayor resistencia a tension"	"Costo medio, mayor resistencia a tension"	"s"	null
+"G42"	4.0	4.0	"n"	null
+"H42"	2.0	2.0	"n"	null
+"I42"	0.0	0.0	"n"	null
+"J42"	0.0	0.0	"n"	null
+"K42"	0.0	0.0	"n"	null
+"L42"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A43"	"INS-08"	"INS-08"	"s"	null
+"B43"	"E. Insumos"	"E. Insumos"	"s"	null
+"C43"	"Calidad del hilo"	"Calidad del hilo"	"s"	null
+"D43"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"Nivel 3 - Alta tenacidad (nylon trenzado)"	"s"	null
+"E43"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F43"	"Costoso, maxima durabilidad, ideal para costura visible/detalle"	"Costoso, maxima durabilidad, ideal para costura visible/detalle"	"s"	null
+"G43"	7.0	7.0	"n"	null
+"H43"	3.0	3.0	"n"	null
+"I43"	0.0	0.0	"n"	null
+"J43"	1.0	1.0	"n"	null
+"K43"	-1.0	-1.0	"n"	null
+"L43"	"por unidad, referencial"	"por unidad, referencial"	"s"	null
+"A44"	"INS-09A"	"INS-09A"	"s"	null
+"B44"	"E. Insumos"	"E. Insumos"	"s"	null
+"C44"	"Numero de proveedores"	"Numero de proveedores"	"s"	null
+"D44"	"Proveedor unico"	"Proveedor unico"	"s"	null
+"E44"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F44"	"Obtiene 2% adicional de descuento, pero concentra el riesgo de abastecimiento"	"Obtiene 2% adicional de descuento, pero concentra el riesgo de abastecimiento"	"s"	null
+"G44"	0.0	0.0	"n"	null
+"H44"	0.0	0.0	"n"	null
+"I44"	0.0	0.0	"n"	null
+"J44"	0.0	0.0	"n"	null
+"K44"	1.0	1.0	"n"	null
+"L44"	"Riesgo de desabastecimiento"	"Riesgo de desabastecimiento"	"s"	null
+"A45"	"INS-09B"	"INS-09B"	"s"	null
+"B45"	"E. Insumos"	"E. Insumos"	"s"	null
+"C45"	"Numero de proveedores"	"Numero de proveedores"	"s"	null
+"D45"	"Varios proveedores"	"Varios proveedores"	"s"	null
+"E45"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F45"	"Menor descuento, pero reduce el riesgo de desabastecimiento"	"Menor descuento, pero reduce el riesgo de desabastecimiento"	"s"	null
+"G45"	0.0	0.0	"n"	null
+"H45"	0.0	0.0	"n"	null
+"I45"	1.0	1.0	"n"	null
+"J45"	0.0	0.0	"n"	null
+"K45"	0.0	0.0	"n"	null
+"A46"	"INS-10A"	"INS-10A"	"s"	null
+"B46"	"E. Insumos"	"E. Insumos"	"s"	null
+"C46"	"Politica de pago a proveedores"	"Politica de pago a proveedores"	"s"	null
+"D46"	"Contado"	"Contado"	"s"	null
+"E46"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F46"	"Obtiene 3% de descuento; reduce la caja inmediatamente"	"Obtiene 3% de descuento; reduce la caja inmediatamente"	"s"	null
+"G46"	0.0	0.0	"n"	null
+"H46"	0.0	0.0	"n"	null
+"I46"	0.0	0.0	"n"	null
+"J46"	0.0	0.0	"n"	null
+"K46"	-1.0	-1.0	"n"	null
+"A47"	"INS-10B"	"INS-10B"	"s"	null
+"B47"	"E. Insumos"	"E. Insumos"	"s"	null
+"C47"	"Politica de pago a proveedores"	"Politica de pago a proveedores"	"s"	null
+"D47"	"Credito"	"Credito"	"s"	null
+"E47"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F47"	"Sin descuento; conserva liquidez en el ciclo"	"Sin descuento; conserva liquidez en el ciclo"	"s"	null
+"G47"	0.0	0.0	"n"	null
+"H47"	0.0	0.0	"n"	null
+"I47"	0.0	0.0	"n"	null
+"J47"	0.0	0.0	"n"	null
+"K47"	1.0	1.0	"n"	null
+"A48"	"INS-11A"	"INS-11A"	"s"	null
+"B48"	"E. Insumos"	"E. Insumos"	"s"	null
+"C48"	"Lead time"	"Lead time"	"s"	null
+"D48"	"Rapido (urgente, con sobrecosto)"	"Rapido (urgente, con sobrecosto)"	"s"	null
+"E48"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F48"	"Entrega en menos dias, pero con sobrecosto"	"Entrega en menos dias, pero con sobrecosto"	"s"	null
+"G48"	0.0	0.0	"n"	null
+"H48"	0.0	0.0	"n"	null
+"I48"	1.0	1.0	"n"	null
+"J48"	0.0	0.0	"n"	null
+"K48"	-1.0	-1.0	"n"	null
+"A49"	"INS-11B"	"INS-11B"	"s"	null
+"B49"	"E. Insumos"	"E. Insumos"	"s"	null
+"C49"	"Lead time"	"Lead time"	"s"	null
+"D49"	"Normal - 7 dias"	"Normal - 7 dias"	"s"	null
+"E49"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F49"	"Equilibrio entre costo y disponibilidad"	"Equilibrio entre costo y disponibilidad"	"s"	null
+"G49"	0.0	0.0	"n"	null
+"H49"	0.0	0.0	"n"	null
+"I49"	0.0	0.0	"n"	null
+"J49"	0.0	0.0	"n"	null
+"K49"	0.0	0.0	"n"	null
+"A50"	"INS-11C"	"INS-11C"	"s"	null
+"B50"	"E. Insumos"	"E. Insumos"	"s"	null
+"C50"	"Lead time"	"Lead time"	"s"	null
+"D50"	"Lento (economico)"	"Lento (economico)"	"s"	null
+"E50"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F50"	"Menor costo, mayor riesgo de quiebre de stock"	"Menor costo, mayor riesgo de quiebre de stock"	"s"	null
+"G50"	0.0	0.0	"n"	null
+"H50"	0.0	0.0	"n"	null
+"I50"	-1.0	-1.0	"n"	null
+"J50"	0.0	0.0	"n"	null
+"K50"	1.0	1.0	"n"	null
+"A51"	"COM-05"	"COM-05"	"s"	null
+"B51"	"D. Canales"	"D. Canales"	"s"	null
+"C51"	"% de ventas a credito"	"% de ventas a credito"	"s"	null
+"D51"	"20% a credito (referencia)"	"20% a credito (referencia)"	"s"	null
+"E51"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F51"	"Balancea liquidez y ventas; riesgo de cobranza bajo"	"Balancea liquidez y ventas; riesgo de cobranza bajo"	"s"	null
+"G51"	0.0	0.0	"n"	null
+"H51"	0.0	0.0	"n"	null
+"I51"	0.0	0.0	"n"	null
+"J51"	1.0	1.0	"n"	null
+"K51"	-1.0	-1.0	"n"	null
+"L51"	"Valor ingresado por el jugador en hoja Seleccion"	"Valor ingresado por el jugador en hoja Seleccion"	"s"	null
+"A52"	"INV-01A"	"INV-01A"	"s"	null
+"B52"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C52"	"Inversion en RR.HH."	"Inversion en RR.HH."	"s"	null
+"D52"	"Baja"	"Baja"	"s"	null
+"E52"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F52"	"Poca capacitacion tecnica"	"Poca capacitacion tecnica"	"s"	null
+"G52"	1000.0	1000.0	"n"	null
+"H52"	0.0	0.0	"n"	null
+"I52"	1.0	1.0	"n"	null
+"J52"	0.0	0.0	"n"	null
+"K52"	-1.0	-1.0	"n"	null
+"A53"	"INV-01B"	"INV-01B"	"s"	null
+"B53"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C53"	"Inversion en RR.HH."	"Inversion en RR.HH."	"s"	null
+"D53"	"Media"	"Media"	"s"	null
+"E53"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F53"	"Capacitacion tecnica: +8% de capacidad y mejor reputacion"	"Capacitacion tecnica: +8% de capacidad y mejor reputacion"	"s"	null
+"G53"	6000.0	6000.0	"n"	null
+"H53"	0.0	0.0	"n"	null
+"I53"	2.0	2.0	"n"	null
+"J53"	1.0	1.0	"n"	null
+"K53"	-1.0	-1.0	"n"	null
+"A54"	"INV-01C"	"INV-01C"	"s"	null
+"B54"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C54"	"Inversion en RR.HH."	"Inversion en RR.HH."	"s"	null
+"D54"	"Alta"	"Alta"	"s"	null
+"E54"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F54"	"Capacitacion avanzada: mayor capacidad y reputacion, alto costo"	"Capacitacion avanzada: mayor capacidad y reputacion, alto costo"	"s"	null
+"G54"	12000.0	12000.0	"n"	null
+"H54"	0.0	0.0	"n"	null
+"I54"	3.0	3.0	"n"	null
+"J54"	2.0	2.0	"n"	null
+"K54"	-2.0	-2.0	"n"	null
+"A55"	"INV-02A"	"INV-02A"	"s"	null
+"B55"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C55"	"Inversion en marketing"	"Inversion en marketing"	"s"	null
+"D55"	"Baja"	"Baja"	"s"	null
+"E55"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F55"	"Poca visibilidad de marca"	"Poca visibilidad de marca"	"s"	null
+"G55"	1500.0	1500.0	"n"	null
+"H55"	0.0	0.0	"n"	null
+"I55"	0.0	0.0	"n"	null
+"J55"	1.0	1.0	"n"	null
+"K55"	-1.0	-1.0	"n"	null
+"A56"	"INV-02B"	"INV-02B"	"s"	null
+"B56"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C56"	"Inversion en marketing"	"Inversion en marketing"	"s"	null
+"D56"	"Media"	"Media"	"s"	null
+"E56"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F56"	"S/ 6,000 por ciclo; aumenta demanda estimada 12% y reputacion"	"S/ 6,000 por ciclo; aumenta demanda estimada 12% y reputacion"	"s"	null
+"G56"	6000.0	6000.0	"n"	null
+"H56"	0.0	0.0	"n"	null
+"I56"	0.0	0.0	"n"	null
+"J56"	2.0	2.0	"n"	null
+"K56"	-1.0	-1.0	"n"	null
+"A57"	"INV-02C"	"INV-02C"	"s"	null
+"B57"	"F. Inversiones"	"F. Inversiones"	"s"	null
+"C57"	"Inversion en marketing"	"Inversion en marketing"	"s"	null
+"D57"	"Alta"	"Alta"	"s"	null
+"E57"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F57"	"Alto costo; mayor aumento de demanda y reputacion"	"Alto costo; mayor aumento de demanda y reputacion"	"s"	null
+"G57"	12000.0	12000.0	"n"	null
+"H57"	0.0	0.0	"n"	null
+"I57"	0.0	0.0	"n"	null
+"J57"	3.0	3.0	"n"	null
+"K57"	-2.0	-2.0	"n"	null
+"A58"	"FIN-02A"	"FIN-02A"	"s"	null
+"B58"	"G. Finanzas"	"G. Finanzas"	"s"	null
+"C58"	"Método de depreciación"	"Método de depreciación"	"s"	null
+"D58"	"Línea recta"	"Línea recta"	"s"	null
+"E58"	"Fija en Ciclo 0"	"Fija en Ciclo 0"	"s"	null
+"F58"	"Distribuye el valor depreciable de la maquinaria en cuotas iguales durante su vida útil"	"Distribuye el valor depreciable de la maquinaria en cuotas iguales durante su vida útil"	"s"	null
+"G58"	"S/0"	"S/0"	"s"	null
+"H58"	0.0	0.0	"n"	null
+"I58"	0.0	0.0	"n"	null
+"J58"	0.0	0.0	"n"	null
+"K58"	0.0	0.0	"n"	null
+"L58"	"Gasto contable constante; no representa una salida de efectivo"	"Gasto contable constante; no representa una salida de efectivo"	"s"	null
+"A59"	"FIN-02B"	"FIN-02B"	"s"	null
+"B59"	"G. Finanzas"	"G. Finanzas"	"s"	null
+"C59"	"Método de depreciación"	"Método de depreciación"	"s"	null
+"D59"	"Unidades producidas"	"Unidades producidas"	"s"	null
+"E59"	"Fija en Ciclo 0"	"Fija en Ciclo 0"	"s"	null
+"F59"	"Calcula la depreciación según el uso real de la maquinaria y las unidades fabricadas"	"Calcula la depreciación según el uso real de la maquinaria y las unidades fabricadas"	"s"	null
+"G59"	"S/0"	"S/0"	"s"	null
+"H59"	0.0	0.0	"n"	null
+"I59"	0.0	0.0	"n"	null
+"J59"	0.0	0.0	"n"	null
+"K59"	"=+1"	1	"f"	null
+"L59"	"Mejora la asignación del costo por unidad; no representa una salida de efectivo"	"Mejora la asignación del costo por unidad; no representa una salida de efectivo"	"s"	null
+"A60"	"FIN-02C"	"FIN-02C"	"s"	null
+"B60"	"G. Finanzas"	"G. Finanzas"	"s"	null
+"C60"	"Método de depreciación"	"Método de depreciación"	"s"	null
+"D60"	"Acelerada"	"Acelerada"	"s"	null
+"E60"	"Fija en Ciclo 0"	"Fija en Ciclo 0"	"s"	null
+"F60"	"Reconoce una mayor depreciación durante los primeros ciclos y una menor depreciación después"	"Reconoce una mayor depreciación durante los primeros ciclos y una menor depreciación después"	"s"	null
+"G60"	"S/0"	"S/0"	"s"	null
+"H60"	0.0	0.0	"n"	null
+"I60"	0.0	0.0	"n"	null
+"J60"	0.0	0.0	"n"	null
+"K60"	-1.0	-1.0	"n"	null
+"L60"	"Reduce la utilidad contable inicial; no representa una salida de efectivo"	"Reduce la utilidad contable inicial; no representa una salida de efectivo"	"s"	null
+"A61"	"COM-06A"	"COM-06A"	"s"	null
+"B61"	"D. Canales"	"D. Canales"	"s"	null
+"C61"	"Garantía del producto"	"Garantía del producto"	"s"	null
+"D61"	"Sin garantía"	"Sin garantía"	"s"	null
+"E61"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F61"	"No cubre fallas posteriores a la venta; reduce el costo inmediato, pero genera desconfianza"	"No cubre fallas posteriores a la venta; reduce el costo inmediato, pero genera desconfianza"	"s"	null
+"G61"	"S/0"	"S/0"	"s"	null
+"H61"	0.0	0.0	"n"	null
+"I61"	0.0	0.0	"n"	null
+"J61"	-1.0	-1.0	"n"	null
+"K61"	"=+1"	1	"f"	null
+"L61"	"Mayor riesgo de reclamos y pérdida de clientes"	"Mayor riesgo de reclamos y pérdida de clientes"	"s"	null
+"A62"	"COM-06B"	"COM-06B"	"s"	null
+"B62"	"D. Canales"	"D. Canales"	"s"	null
+"C62"	"Garantía del producto"	"Garantía del producto"	"s"	null
+"D62"	"Garantía de 30 días"	"Garantía de 30 días"	"s"	null
+"E62"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F62"	"Cubre defectos de fabricación durante 30 días y brinda seguridad básica al cliente"	"Cubre defectos de fabricación durante 30 días y brinda seguridad básica al cliente"	"s"	null
+"G62"	"S/5"	"S/5"	"s"	null
+"H62"	0.0	0.0	"n"	null
+"I62"	0.0	0.0	"n"	null
+"J62"	"=+1"	1	"f"	null
+"K62"	0.0	0.0	"n"	null
+"L62"	"Costo referencial por unidad vendida para atender cambios o reparaciones"	"Costo referencial por unidad vendida para atender cambios o reparaciones"	"s"	null
+"A63"	"COM-06C"	"COM-06C"	"s"	null
+"B63"	"D. Canales"	"D. Canales"	"s"	null
+"C63"	"Garantía del producto"	"Garantía del producto"	"s"	null
+"D63"	"Garantía de 90 días"	"Garantía de 90 días"	"s"	null
+"E63"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F63"	"Cubre defectos durante 90 días; aumenta la confianza, pero exige una mayor provisión"	"Cubre defectos durante 90 días; aumenta la confianza, pero exige una mayor provisión"	"s"	null
+"G63"	"S/10"	"S/10"	"s"	null
+"H63"	0.0	0.0	"n"	null
+"I63"	0.0	0.0	"n"	null
+"J63"	"=+2"	2	"f"	null
+"K63"	-1.0	-1.0	"n"	null
+"L63"	"Costo referencial por unidad vendida; mayor exposición a devoluciones"	"Costo referencial por unidad vendida; mayor exposición a devoluciones"	"s"	null
+"A64"	"INF-11A"	"INF-11A"	"s"	null
+"B64"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C64"	"Mantenimiento de maquinaria"	"Mantenimiento de maquinaria"	"s"	null
+"D64"	"Solo correctivo"	"Solo correctivo"	"s"	null
+"E64"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F64"	"La empresa repara las máquinas únicamente cuando presentan una falla"	"La empresa repara las máquinas únicamente cuando presentan una falla"	"s"	null
+"G64"	"S/0"	"S/0"	"s"	null
+"H64"	0.0	0.0	"n"	null
+"I64"	-1.0	-1.0	"n"	null
+"J64"	0.0	0.0	"n"	null
+"K64"	"=+1"	1	"f"	null
+"L64"	"Ahorra al inicio, pero aumenta el riesgo de paradas y retrasos"	"Ahorra al inicio, pero aumenta el riesgo de paradas y retrasos"	"s"	null
+"A65"	"INF-11B"	"INF-11B"	"s"	null
+"B65"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C65"	"Mantenimiento de maquinaria"	"Mantenimiento de maquinaria"	"s"	null
+"D65"	"Preventivo básico"	"Preventivo básico"	"s"	null
+"E65"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F65"	"Incluye revisión, limpieza, lubricación y ajustes básicos para prevenir fallas"	"Incluye revisión, limpieza, lubricación y ajustes básicos para prevenir fallas"	"s"	null
+"G65"	"S/1,500"	"S/1,500"	"s"	null
+"H65"	0.0	0.0	"n"	null
+"I65"	"=+1"	1	"f"	null
+"J65"	0.0	0.0	"n"	null
+"K65"	0.0	0.0	"n"	null
+"L65"	"Costo referencial por ciclo; reduce parcialmente las averías"	"Costo referencial por ciclo; reduce parcialmente las averías"	"s"	null
+"A66"	"INF-11C"	"INF-11C"	"s"	null
+"B66"	"B. Infraestructura"	"B. Infraestructura"	"s"	null
+"C66"	"Mantenimiento de maquinaria"	"Mantenimiento de maquinaria"	"s"	null
+"D66"	"Preventivo integral"	"Preventivo integral"	"s"	null
+"E66"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F66"	"Incluye mantenimiento programado, cambio de piezas críticas y calibración de equipos"	"Incluye mantenimiento programado, cambio de piezas críticas y calibración de equipos"	"s"	null
+"G66"	"S/3,000"	"S/3,000"	"s"	null
+"H66"	"=+1"	1	"f"	null
+"I66"	"=+2"	2	"f"	null
+"J66"	0.0	0.0	"n"	null
+"K66"	-1.0	-1.0	"n"	null
+"L66"	"Costo referencial por ciclo; minimiza paradas y defectos de fabricación"	"Costo referencial por ciclo; minimiza paradas y defectos de fabricación"	"s"	null
+"A67"	"INS-12A"	"INS-12A"	"s"	null
+"B67"	"E. Insumos"	"E. Insumos"	"s"	null
+"C67"	"Política de inventarios"	"Política de inventarios"	"s"	null
+"D67"	"Justo a tiempo"	"Justo a tiempo"	"s"	null
+"E67"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F67"	"Mantiene inventario mínimo y compra cerca de la fecha de producción"	"Mantiene inventario mínimo y compra cerca de la fecha de producción"	"s"	null
+"G67"	"S/0"	"S/0"	"s"	null
+"H67"	0.0	0.0	"n"	null
+"I67"	-1.0	-1.0	"n"	null
+"J67"	0.0	0.0	"n"	null
+"K67"	"=+1"	1	"f"	null
+"L67"	"Menor dinero inmovilizado, pero mayor riesgo de quedarse sin insumos"	"Menor dinero inmovilizado, pero mayor riesgo de quedarse sin insumos"	"s"	null
+"A68"	"INS-12B"	"INS-12B"	"s"	null
+"B68"	"E. Insumos"	"E. Insumos"	"s"	null
+"C68"	"Política de inventarios"	"Política de inventarios"	"s"	null
+"D68"	"Stock de seguridad medio"	"Stock de seguridad medio"	"s"	null
+"E68"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F68"	"Mantiene una reserva moderada para cubrir retrasos del proveedor o cambios de demanda"	"Mantiene una reserva moderada para cubrir retrasos del proveedor o cambios de demanda"	"s"	null
+"G68"	"S/1,000"	"S/1,000"	"s"	null
+"H68"	0.0	0.0	"n"	null
+"I68"	"=+1"	1	"f"	null
+"J68"	0.0	0.0	"n"	null
+"K68"	0.0	0.0	"n"	null
+"L68"	"Costo referencial de almacenamiento por ciclo; alternativa equilibrada"	"Costo referencial de almacenamiento por ciclo; alternativa equilibrada"	"s"	null
+"A69"	"INS-12C"	"INS-12C"	"s"	null
+"B69"	"E. Insumos"	"E. Insumos"	"s"	null
+"C69"	"Política de inventarios"	"Política de inventarios"	"s"	null
+"D69"	"Stock de seguridad alto"	"Stock de seguridad alto"	"s"	null
+"E69"	"Revisable cada ciclo"	"Revisable cada ciclo"	"s"	null
+"F69"	"Mantiene una reserva amplia de materiales para evitar interrupciones de producción"	"Mantiene una reserva amplia de materiales para evitar interrupciones de producción"	"s"	null
+"G69"	"S/2,500"	"S/2,500"	"s"	null
+"H69"	0.0	0.0	"n"	null
+"I69"	"=+2"	2	"f"	null
+"J69"	0.0	0.0	"n"	null
+"K69"	-1.0	-1.0	"n"	null
+"L69"	"Reduce quiebres de stock, pero inmoviliza más efectivo y aumenta el almacenaje"	"Reduce quiebres de stock, pero inmoviliza más efectivo y aumenta el almacenaje"	"s"	null

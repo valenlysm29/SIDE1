@@ -1,0 +1,8 @@
+Hoja: DECISIONES
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"B2"	"DECISIONES "	"DECISIONES "	"s"	null
+"C2"	"Puntaje"	"Puntaje"	"s"	null
+"B3"	"Depreciación"	"Depreciación"	"s"	null
+"B4"	"Garantía del producto"	"Garantía del producto"	"s"	null
+"B5"	"Mantenimiento de maquinaria"	"Mantenimiento de maquinaria"	"s"	null
+"B6"	"Política de inventarios"	"Política de inventarios"	"s"	null

@@ -1,0 +1,147 @@
+{
+  "nombre": "sim3",
+  "descripcion": "Mercado generalizado cinco empresas; ciclo 1. Para ciclos siguientes, inyectar inventarioInicial y producción en F y factores de demanda en G; pruebas de UI externas.",
+  "entradas": {},
+  "salidas": {
+    "mercado.1.puntajePrecio": [
+      "Mercado_Oracle",
+      "M2"
+    ],
+    "mercado.1.puntajeTotal": [
+      "Mercado_Oracle",
+      "N2"
+    ],
+    "mercado.1.porcentaje": [
+      "Mercado_Oracle",
+      "O2"
+    ],
+    "mercado.1.asignado": [
+      "Mercado_Oracle",
+      "P2"
+    ],
+    "mercado.1.vendido": [
+      "Mercado_Oracle",
+      "Q2"
+    ],
+    "mercado.1.ingreso": [
+      "Mercado_Oracle",
+      "R2"
+    ],
+    "mercado.1.inventarioFinal": [
+      "Mercado_Oracle",
+      "S2"
+    ],
+    "mercado.2.puntajePrecio": [
+      "Mercado_Oracle",
+      "M3"
+    ],
+    "mercado.2.puntajeTotal": [
+      "Mercado_Oracle",
+      "N3"
+    ],
+    "mercado.2.porcentaje": [
+      "Mercado_Oracle",
+      "O3"
+    ],
+    "mercado.2.asignado": [
+      "Mercado_Oracle",
+      "P3"
+    ],
+    "mercado.2.vendido": [
+      "Mercado_Oracle",
+      "Q3"
+    ],
+    "mercado.2.ingreso": [
+      "Mercado_Oracle",
+      "R3"
+    ],
+    "mercado.2.inventarioFinal": [
+      "Mercado_Oracle",
+      "S3"
+    ],
+    "mercado.3.puntajePrecio": [
+      "Mercado_Oracle",
+      "M4"
+    ],
+    "mercado.3.puntajeTotal": [
+      "Mercado_Oracle",
+      "N4"
+    ],
+    "mercado.3.porcentaje": [
+      "Mercado_Oracle",
+      "O4"
+    ],
+    "mercado.3.asignado": [
+      "Mercado_Oracle",
+      "P4"
+    ],
+    "mercado.3.vendido": [
+      "Mercado_Oracle",
+      "Q4"
+    ],
+    "mercado.3.ingreso": [
+      "Mercado_Oracle",
+      "R4"
+    ],
+    "mercado.3.inventarioFinal": [
+      "Mercado_Oracle",
+      "S4"
+    ],
+    "mercado.4.puntajePrecio": [
+      "Mercado_Oracle",
+      "M5"
+    ],
+    "mercado.4.puntajeTotal": [
+      "Mercado_Oracle",
+      "N5"
+    ],
+    "mercado.4.porcentaje": [
+      "Mercado_Oracle",
+      "O5"
+    ],
+    "mercado.4.asignado": [
+      "Mercado_Oracle",
+      "P5"
+    ],
+    "mercado.4.vendido": [
+      "Mercado_Oracle",
+      "Q5"
+    ],
+    "mercado.4.ingreso": [
+      "Mercado_Oracle",
+      "R5"
+    ],
+    "mercado.4.inventarioFinal": [
+      "Mercado_Oracle",
+      "S5"
+    ],
+    "mercado.5.puntajePrecio": [
+      "Mercado_Oracle",
+      "M6"
+    ],
+    "mercado.5.puntajeTotal": [
+      "Mercado_Oracle",
+      "N6"
+    ],
+    "mercado.5.porcentaje": [
+      "Mercado_Oracle",
+      "O6"
+    ],
+    "mercado.5.asignado": [
+      "Mercado_Oracle",
+      "P6"
+    ],
+    "mercado.5.vendido": [
+      "Mercado_Oracle",
+      "Q6"
+    ],
+    "mercado.5.ingreso": [
+      "Mercado_Oracle",
+      "R6"
+    ],
+    "mercado.5.inventarioFinal": [
+      "Mercado_Oracle",
+      "S6"
+    ]
+  }
+}

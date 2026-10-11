@@ -1,0 +1,37 @@
+Hoja: Motor_Puntajes
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"Puntaje interno"	"Puntaje interno"	"s"	null
+"B1"	"Valor (suma de aportes)"	"Valor (suma de aportes)"	"s"	null
+"C1"	"Escala"	"Escala"	"s"	null
+"D1"	"Nivel resultante"	"Nivel resultante"	"s"	null
+"A2"	"CALIDAD POR LOTE (detalle)"	"CALIDAD POR LOTE (detalle)"	"s"	null
+"A3"	"Puntaje Calidad - Lote 1"	"Puntaje Calidad - Lote 1"	"s"	null
+"B3"	"=Lotes_Produccion!I2"	0	"f"	null
+"C3"	"=IF(Lotes_Produccion!B2=\"\",\"\",\"Segmento: \"&Lotes_Produccion!B2)"	null	"f"	null
+"D3"	"=Lotes_Produccion!K2"	null	"f"	null
+"A4"	"Puntaje Calidad - Lote 2"	"Puntaje Calidad - Lote 2"	"s"	null
+"B4"	"=Lotes_Produccion!I3"	0	"f"	null
+"C4"	"=IF(Lotes_Produccion!B3=\"\",\"\",\"Segmento: \"&Lotes_Produccion!B3)"	null	"f"	null
+"D4"	"=Lotes_Produccion!K3"	null	"f"	null
+"A5"	"Puntaje Calidad - Lote 3"	"Puntaje Calidad - Lote 3"	"s"	null
+"B5"	"=Lotes_Produccion!I4"	0	"f"	null
+"C5"	"=IF(Lotes_Produccion!B4=\"\",\"\",\"Segmento: \"&Lotes_Produccion!B4)"	null	"f"	null
+"D5"	"=Lotes_Produccion!K4"	null	"f"	null
+"A6"	"Puntaje Calidad EMPRESA (promedio ponderado por unidades)"	"Puntaje Calidad EMPRESA (promedio ponderado por unidades)"	"s"	null
+"B6"	"=IFERROR(SUMPRODUCT(Lotes_Produccion!C2:C4,Lotes_Produccion!I2:I4)/SUM(Lotes_Produccion!C2:C4),0)"	0	"f"	null
+"C6"	"0 - 10 (referencial)"	"0 - 10 (referencial)"	"s"	null
+"D6"	"=IF(B6>=7,\"Alto\",IF(B6>=4,\"Medio\",\"Bajo\"))"	"Bajo"	"f"	null
+"A8"	"OTROS PUNTAJES DE EMPRESA"	"OTROS PUNTAJES DE EMPRESA"	"s"	null
+"A9"	"Puntaje de Eficiencia"	"Puntaje de Eficiencia"	"s"	null
+"B9"	"=SUM(Seleccion_Ciclo0!G2:G15)"	0	"f"	null
+"C9"	"0 - 10 (referencial)"	"0 - 10 (referencial)"	"s"	null
+"D9"	"=IF(B9>=7,\"Alto\",IF(B9>=4,\"Medio\",\"Bajo\"))"	"Bajo"	"f"	null
+"A10"	"Puntaje de Reputacion"	"Puntaje de Reputacion"	"s"	null
+"B10"	"=SUM(Seleccion_Ciclo0!H2:H15)"	0	"f"	null
+"C10"	"0 - 10 (referencial)"	"0 - 10 (referencial)"	"s"	null
+"D10"	"=IF(B10>=7,\"Alto\",IF(B10>=4,\"Medio\",\"Bajo\"))"	"Bajo"	"f"	null
+"A11"	"Puntaje de Salud Financiera"	"Puntaje de Salud Financiera"	"s"	null
+"B11"	"=SUM(Seleccion_Ciclo0!I2:I15)"	0	"f"	null
+"C11"	"0 - 10 (referencial)"	"0 - 10 (referencial)"	"s"	null
+"D11"	"=IF(B11>=7,\"Alto\",IF(B11>=4,\"Medio\",\"Bajo\"))"	"Bajo"	"f"	null
+"A13"	"Nota: cada 'Aporte' se define en la hoja Catalogo_Decisiones (columnas H-K) y se suma automaticamente segun lo elegido en Seleccion_Ciclo0."	"Nota: cada 'Aporte' se define en la hoja Catalogo_Decisiones (columnas H-K) y se suma automaticamente segun lo elegido en Seleccion_Ciclo0."	"s"	null

@@ -1,0 +1,2833 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "sim3_pipeline",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "ciclo.1.A.calidad":  4,
+                    "ciclo.1.A.puntajeEficiencia":  14,
+                    "ciclo.1.A.reputacionMatriz":  5,
+                    "ciclo.1.A.saludFinanciera":  0,
+                    "ciclo.1.A.capacidadDiaria":  5,
+                    "ciclo.1.A.capacidadCiclo":  120,
+                    "ciclo.1.A.factorEficiencia":  0.94000000000000006,
+                    "ciclo.1.A.produccionCapacidad":  113,
+                    "ciclo.1.A.producido":  113,
+                    "ciclo.1.A.consumoCuero":  33.9,
+                    "ciclo.1.A.consumoAccesorios":  113,
+                    "ciclo.1.A.consumoHilo":  678,
+                    "ciclo.1.A.costoMO":  11106.32,
+                    "ciclo.1.A.costoMP":  2322.372836,
+                    "ciclo.1.A.mantenimiento":  31.25,
+                    "ciclo.1.A.depreciacion":  64.125,
+                    "ciclo.1.A.reputacionOperativa":  0,
+                    "ciclo.1.A.reputacionMercado":  0,
+                    "ciclo.1.A.asignado":  38,
+                    "ciclo.1.A.demandaAjustada":  38,
+                    "ciclo.1.A.vendido":  38,
+                    "ciclo.1.A.ingresos":  1520,
+                    "ciclo.1.A.inventarioProducto":  75,
+                    "ciclo.1.A.almacenaje":  150,
+                    "ciclo.1.A.horasExtra":  2137.7208849557519,
+                    "ciclo.1.A.costoGarantia":  0,
+                    "ciclo.1.A.costoRecurrente":  1500,
+                    "ciclo.1.A.costosTotales":  17311.788720955752,
+                    "ciclo.1.A.utilidad":  -15791.788720955752,
+                    "ciclo.1.A.ciclosReputacionBaja":  0,
+                    "ciclo.1.A.tasaAdicionalPP":  3,
+                    "ciclo.1.A.stockMP_INS-01":  266.1,
+                    "ciclo.1.A.stockMP_INS-02":  0,
+                    "ciclo.1.A.stockMP_INS-03":  0,
+                    "ciclo.1.A.stockMP_INS-04":  887,
+                    "ciclo.1.A.stockMP_INS-05":  0,
+                    "ciclo.1.A.stockMP_INS-06":  5322,
+                    "ciclo.1.A.stockMP_INS-07":  0,
+                    "ciclo.1.A.stockMP_INS-08":  0,
+                    "ciclo.1.A.CONS-01":  false,
+                    "ciclo.1.A.CONS-02":  false,
+                    "ciclo.1.A.CONS-03":  false,
+                    "ciclo.1.A.CONS-04":  false,
+                    "ciclo.1.A.CONS-05":  true,
+                    "ciclo.1.A.CONS-06":  true,
+                    "ciclo.1.A.CONS-07":  true,
+                    "ciclo.1.A.CONS-08":  false,
+                    "ciclo.1.B.calidad":  7,
+                    "ciclo.1.B.puntajeEficiencia":  18,
+                    "ciclo.1.B.reputacionMatriz":  8,
+                    "ciclo.1.B.saludFinanciera":  -2,
+                    "ciclo.1.B.capacidadDiaria":  5,
+                    "ciclo.1.B.capacidadCiclo":  129.60000000000002,
+                    "ciclo.1.B.factorEficiencia":  0.94000000000000006,
+                    "ciclo.1.B.produccionCapacidad":  122,
+                    "ciclo.1.B.producido":  122,
+                    "ciclo.1.B.consumoCuero":  48.800000000000004,
+                    "ciclo.1.B.consumoAccesorios":  122,
+                    "ciclo.1.B.consumoHilo":  854,
+                    "ciclo.1.B.costoMO":  11106.32,
+                    "ciclo.1.B.costoMP":  5443.6399999999994,
+                    "ciclo.1.B.mantenimiento":  31.25,
+                    "ciclo.1.B.depreciacion":  8.692499999999999,
+                    "ciclo.1.B.reputacionOperativa":  0,
+                    "ciclo.1.B.reputacionMercado":  0,
+                    "ciclo.1.B.asignado":  40,
+                    "ciclo.1.B.demandaAjustada":  44,
+                    "ciclo.1.B.vendido":  44,
+                    "ciclo.1.B.ingresos":  4840,
+                    "ciclo.1.B.inventarioProducto":  78,
+                    "ciclo.1.B.almacenaje":  156,
+                    "ciclo.1.B.horasExtra":  1775.1904918032787,
+                    "ciclo.1.B.costoGarantia":  0,
+                    "ciclo.1.B.costoRecurrente":  14500,
+                    "ciclo.1.B.costosTotales":  33021.092991803278,
+                    "ciclo.1.B.utilidad":  -28181.092991803278,
+                    "ciclo.1.B.ciclosReputacionBaja":  0,
+                    "ciclo.1.B.tasaAdicionalPP":  3,
+                    "ciclo.1.B.stockMP_INS-01":  0,
+                    "ciclo.1.B.stockMP_INS-02":  251.2,
+                    "ciclo.1.B.stockMP_INS-03":  0,
+                    "ciclo.1.B.stockMP_INS-04":  878,
+                    "ciclo.1.B.stockMP_INS-05":  0,
+                    "ciclo.1.B.stockMP_INS-06":  0,
+                    "ciclo.1.B.stockMP_INS-07":  5146,
+                    "ciclo.1.B.stockMP_INS-08":  0,
+                    "ciclo.1.B.CONS-01":  false,
+                    "ciclo.1.B.CONS-02":  false,
+                    "ciclo.1.B.CONS-03":  false,
+                    "ciclo.1.B.CONS-04":  false,
+                    "ciclo.1.B.CONS-05":  true,
+                    "ciclo.1.B.CONS-06":  true,
+                    "ciclo.1.B.CONS-07":  true,
+                    "ciclo.1.B.CONS-08":  false,
+                    "ciclo.1.C.calidad":  12,
+                    "ciclo.1.C.puntajeEficiencia":  17,
+                    "ciclo.1.C.reputacionMatriz":  12,
+                    "ciclo.1.C.saludFinanciera":  -5,
+                    "ciclo.1.C.capacidadDiaria":  5,
+                    "ciclo.1.C.capacidadCiclo":  129.60000000000002,
+                    "ciclo.1.C.factorEficiencia":  0.94000000000000006,
+                    "ciclo.1.C.produccionCapacidad":  122,
+                    "ciclo.1.C.producido":  122,
+                    "ciclo.1.C.consumoCuero":  85.399999999999991,
+                    "ciclo.1.C.consumoAccesorios":  122,
+                    "ciclo.1.C.consumoHilo":  1586,
+                    "ciclo.1.C.costoMO":  11979.153846153846,
+                    "ciclo.1.C.costoMP":  16984.1568,
+                    "ciclo.1.C.mantenimiento":  50,
+                    "ciclo.1.C.depreciacion":  109.31818181818181,
+                    "ciclo.1.C.reputacionOperativa":  20,
+                    "ciclo.1.C.reputacionMercado":  22,
+                    "ciclo.1.C.asignado":  40,
+                    "ciclo.1.C.demandaAjustada":  44,
+                    "ciclo.1.C.vendido":  44,
+                    "ciclo.1.C.ingresos":  16015.999999999998,
+                    "ciclo.1.C.inventarioProducto":  78,
+                    "ciclo.1.C.almacenaje":  156,
+                    "ciclo.1.C.horasExtra":  1914.7008196721313,
+                    "ciclo.1.C.costoGarantia":  440,
+                    "ciclo.1.C.costoRecurrente":  13500,
+                    "ciclo.1.C.costosTotales":  45133.329647644161,
+                    "ciclo.1.C.utilidad":  -29117.329647644161,
+                    "ciclo.1.C.ciclosReputacionBaja":  0,
+                    "ciclo.1.C.tasaAdicionalPP":  3,
+                    "ciclo.1.C.stockMP_INS-01":  0,
+                    "ciclo.1.C.stockMP_INS-02":  0,
+                    "ciclo.1.C.stockMP_INS-03":  214.60000000000002,
+                    "ciclo.1.C.stockMP_INS-04":  0,
+                    "ciclo.1.C.stockMP_INS-05":  878,
+                    "ciclo.1.C.stockMP_INS-06":  0,
+                    "ciclo.1.C.stockMP_INS-07":  0,
+                    "ciclo.1.C.stockMP_INS-08":  4414,
+                    "ciclo.1.C.CONS-01":  false,
+                    "ciclo.1.C.CONS-02":  true,
+                    "ciclo.1.C.CONS-03":  false,
+                    "ciclo.1.C.CONS-04":  false,
+                    "ciclo.1.C.CONS-05":  true,
+                    "ciclo.1.C.CONS-06":  true,
+                    "ciclo.1.C.CONS-07":  true,
+                    "ciclo.1.C.CONS-08":  false,
+                    "ciclo.1.D.calidad":  4,
+                    "ciclo.1.D.puntajeEficiencia":  17,
+                    "ciclo.1.D.reputacionMatriz":  9,
+                    "ciclo.1.D.saludFinanciera":  -3,
+                    "ciclo.1.D.capacidadDiaria":  5,
+                    "ciclo.1.D.capacidadCiclo":  129.60000000000002,
+                    "ciclo.1.D.factorEficiencia":  0.94000000000000006,
+                    "ciclo.1.D.produccionCapacidad":  122,
+                    "ciclo.1.D.producido":  122,
+                    "ciclo.1.D.consumoCuero":  36.6,
+                    "ciclo.1.D.consumoAccesorios":  122,
+                    "ciclo.1.D.consumoHilo":  732,
+                    "ciclo.1.D.costoMO":  11106.32,
+                    "ciclo.1.D.costoMP":  2558.5108,
+                    "ciclo.1.D.mantenimiento":  31.25,
+                    "ciclo.1.D.depreciacion":  64.125,
+                    "ciclo.1.D.reputacionOperativa":  0,
+                    "ciclo.1.D.reputacionMercado":  0,
+                    "ciclo.1.D.asignado":  2,
+                    "ciclo.1.D.demandaAjustada":  2,
+                    "ciclo.1.D.vendido":  2,
+                    "ciclo.1.D.ingresos":  90,
+                    "ciclo.1.D.inventarioProducto":  120,
+                    "ciclo.1.D.almacenaje":  240,
+                    "ciclo.1.D.horasExtra":  1775.1904918032787,
+                    "ciclo.1.D.costoGarantia":  10,
+                    "ciclo.1.D.costoRecurrente":  13500,
+                    "ciclo.1.D.costosTotales":  29285.396291803278,
+                    "ciclo.1.D.utilidad":  -29195.396291803278,
+                    "ciclo.1.D.ciclosReputacionBaja":  0,
+                    "ciclo.1.D.tasaAdicionalPP":  3,
+                    "ciclo.1.D.stockMP_INS-01":  263.4,
+                    "ciclo.1.D.stockMP_INS-02":  0,
+                    "ciclo.1.D.stockMP_INS-03":  0,
+                    "ciclo.1.D.stockMP_INS-04":  878,
+                    "ciclo.1.D.stockMP_INS-05":  0,
+                    "ciclo.1.D.stockMP_INS-06":  5268,
+                    "ciclo.1.D.stockMP_INS-07":  0,
+                    "ciclo.1.D.stockMP_INS-08":  0,
+                    "ciclo.1.D.CONS-01":  false,
+                    "ciclo.1.D.CONS-02":  false,
+                    "ciclo.1.D.CONS-03":  false,
+                    "ciclo.1.D.CONS-04":  false,
+                    "ciclo.1.D.CONS-05":  true,
+                    "ciclo.1.D.CONS-06":  true,
+                    "ciclo.1.D.CONS-07":  true,
+                    "ciclo.1.D.CONS-08":  false,
+                    "ciclo.2.A.calidad":  4,
+                    "ciclo.2.A.puntajeEficiencia":  14,
+                    "ciclo.2.A.reputacionMatriz":  5,
+                    "ciclo.2.A.saludFinanciera":  0,
+                    "ciclo.2.A.capacidadDiaria":  5,
+                    "ciclo.2.A.capacidadCiclo":  120,
+                    "ciclo.2.A.factorEficiencia":  0.94000000000000006,
+                    "ciclo.2.A.produccionCapacidad":  113,
+                    "ciclo.2.A.producido":  113,
+                    "ciclo.2.A.consumoCuero":  33.9,
+                    "ciclo.2.A.consumoAccesorios":  113,
+                    "ciclo.2.A.consumoHilo":  678,
+                    "ciclo.2.A.costoMO":  11106.32,
+                    "ciclo.2.A.costoMP":  2322.372836,
+                    "ciclo.2.A.mantenimiento":  31.25,
+                    "ciclo.2.A.depreciacion":  64.125,
+                    "ciclo.2.A.reputacionOperativa":  0,
+                    "ciclo.2.A.reputacionMercado":  0,
+                    "ciclo.2.A.asignado":  38,
+                    "ciclo.2.A.demandaAjustada":  38,
+                    "ciclo.2.A.vendido":  38,
+                    "ciclo.2.A.ingresos":  1520,
+                    "ciclo.2.A.inventarioProducto":  150,
+                    "ciclo.2.A.almacenaje":  300,
+                    "ciclo.2.A.horasExtra":  2137.7208849557519,
+                    "ciclo.2.A.costoGarantia":  0,
+                    "ciclo.2.A.costoRecurrente":  1500,
+                    "ciclo.2.A.costosTotales":  17461.788720955752,
+                    "ciclo.2.A.utilidad":  -15941.788720955752,
+                    "ciclo.2.A.ciclosReputacionBaja":  0,
+                    "ciclo.2.A.tasaAdicionalPP":  3,
+                    "ciclo.2.A.stockMP_INS-01":  532.2,
+                    "ciclo.2.A.stockMP_INS-02":  0,
+                    "ciclo.2.A.stockMP_INS-03":  0,
+                    "ciclo.2.A.stockMP_INS-04":  1774,
+                    "ciclo.2.A.stockMP_INS-05":  0,
+                    "ciclo.2.A.stockMP_INS-06":  10644,
+                    "ciclo.2.A.stockMP_INS-07":  0,
+                    "ciclo.2.A.stockMP_INS-08":  0,
+                    "ciclo.2.A.CONS-01":  false,
+                    "ciclo.2.A.CONS-02":  false,
+                    "ciclo.2.A.CONS-03":  false,
+                    "ciclo.2.A.CONS-04":  false,
+                    "ciclo.2.A.CONS-05":  true,
+                    "ciclo.2.A.CONS-06":  true,
+                    "ciclo.2.A.CONS-07":  true,
+                    "ciclo.2.A.CONS-08":  false,
+                    "ciclo.2.B.calidad":  7,
+                    "ciclo.2.B.puntajeEficiencia":  18,
+                    "ciclo.2.B.reputacionMatriz":  8,
+                    "ciclo.2.B.saludFinanciera":  -2,
+                    "ciclo.2.B.capacidadDiaria":  5,
+                    "ciclo.2.B.capacidadCiclo":  129.60000000000002,
+                    "ciclo.2.B.factorEficiencia":  0.94000000000000006,
+                    "ciclo.2.B.produccionCapacidad":  122,
+                    "ciclo.2.B.producido":  122,
+                    "ciclo.2.B.consumoCuero":  48.800000000000004,
+                    "ciclo.2.B.consumoAccesorios":  122,
+                    "ciclo.2.B.consumoHilo":  854,
+                    "ciclo.2.B.costoMO":  11106.32,
+                    "ciclo.2.B.costoMP":  5443.6399999999994,
+                    "ciclo.2.B.mantenimiento":  31.25,
+                    "ciclo.2.B.depreciacion":  8.692499999999999,
+                    "ciclo.2.B.reputacionOperativa":  0,
+                    "ciclo.2.B.reputacionMercado":  0,
+                    "ciclo.2.B.asignado":  40,
+                    "ciclo.2.B.demandaAjustada":  44,
+                    "ciclo.2.B.vendido":  44,
+                    "ciclo.2.B.ingresos":  4840,
+                    "ciclo.2.B.inventarioProducto":  156,
+                    "ciclo.2.B.almacenaje":  312,
+                    "ciclo.2.B.horasExtra":  1775.1904918032787,
+                    "ciclo.2.B.costoGarantia":  0,
+                    "ciclo.2.B.costoRecurrente":  14500,
+                    "ciclo.2.B.costosTotales":  33177.092991803278,
+                    "ciclo.2.B.utilidad":  -28337.092991803278,
+                    "ciclo.2.B.ciclosReputacionBaja":  0,
+                    "ciclo.2.B.tasaAdicionalPP":  3,
+                    "ciclo.2.B.stockMP_INS-01":  0,
+                    "ciclo.2.B.stockMP_INS-02":  502.40000000000003,
+                    "ciclo.2.B.stockMP_INS-03":  0,
+                    "ciclo.2.B.stockMP_INS-04":  1756,
+                    "ciclo.2.B.stockMP_INS-05":  0,
+                    "ciclo.2.B.stockMP_INS-06":  0,
+                    "ciclo.2.B.stockMP_INS-07":  10292,
+                    "ciclo.2.B.stockMP_INS-08":  0,
+                    "ciclo.2.B.CONS-01":  false,
+                    "ciclo.2.B.CONS-02":  false,
+                    "ciclo.2.B.CONS-03":  false,
+                    "ciclo.2.B.CONS-04":  false,
+                    "ciclo.2.B.CONS-05":  true,
+                    "ciclo.2.B.CONS-06":  true,
+                    "ciclo.2.B.CONS-07":  true,
+                    "ciclo.2.B.CONS-08":  false,
+                    "ciclo.2.C.calidad":  12,
+                    "ciclo.2.C.puntajeEficiencia":  17,
+                    "ciclo.2.C.reputacionMatriz":  12,
+                    "ciclo.2.C.saludFinanciera":  -5,
+                    "ciclo.2.C.capacidadDiaria":  5,
+                    "ciclo.2.C.capacidadCiclo":  129.60000000000002,
+                    "ciclo.2.C.factorEficiencia":  0.94000000000000006,
+                    "ciclo.2.C.produccionCapacidad":  122,
+                    "ciclo.2.C.producido":  122,
+                    "ciclo.2.C.consumoCuero":  85.399999999999991,
+                    "ciclo.2.C.consumoAccesorios":  122,
+                    "ciclo.2.C.consumoHilo":  1586,
+                    "ciclo.2.C.costoMO":  11979.153846153846,
+                    "ciclo.2.C.costoMP":  16984.1568,
+                    "ciclo.2.C.mantenimiento":  50,
+                    "ciclo.2.C.depreciacion":  109.31818181818181,
+                    "ciclo.2.C.reputacionOperativa":  20,
+                    "ciclo.2.C.reputacionMercado":  22,
+                    "ciclo.2.C.asignado":  40,
+                    "ciclo.2.C.demandaAjustada":  44,
+                    "ciclo.2.C.vendido":  44,
+                    "ciclo.2.C.ingresos":  16015.999999999998,
+                    "ciclo.2.C.inventarioProducto":  156,
+                    "ciclo.2.C.almacenaje":  312,
+                    "ciclo.2.C.horasExtra":  1914.7008196721313,
+                    "ciclo.2.C.costoGarantia":  440,
+                    "ciclo.2.C.costoRecurrente":  13500,
+                    "ciclo.2.C.costosTotales":  45289.329647644161,
+                    "ciclo.2.C.utilidad":  -29273.329647644161,
+                    "ciclo.2.C.ciclosReputacionBaja":  0,
+                    "ciclo.2.C.tasaAdicionalPP":  3,
+                    "ciclo.2.C.stockMP_INS-01":  0,
+                    "ciclo.2.C.stockMP_INS-02":  0,
+                    "ciclo.2.C.stockMP_INS-03":  429.20000000000005,
+                    "ciclo.2.C.stockMP_INS-04":  0,
+                    "ciclo.2.C.stockMP_INS-05":  1756,
+                    "ciclo.2.C.stockMP_INS-06":  0,
+                    "ciclo.2.C.stockMP_INS-07":  0,
+                    "ciclo.2.C.stockMP_INS-08":  8828,
+                    "ciclo.2.C.CONS-01":  false,
+                    "ciclo.2.C.CONS-02":  true,
+                    "ciclo.2.C.CONS-03":  false,
+                    "ciclo.2.C.CONS-04":  false,
+                    "ciclo.2.C.CONS-05":  true,
+                    "ciclo.2.C.CONS-06":  true,
+                    "ciclo.2.C.CONS-07":  true,
+                    "ciclo.2.C.CONS-08":  false,
+                    "ciclo.2.D.calidad":  4,
+                    "ciclo.2.D.puntajeEficiencia":  17,
+                    "ciclo.2.D.reputacionMatriz":  9,
+                    "ciclo.2.D.saludFinanciera":  -3,
+                    "ciclo.2.D.capacidadDiaria":  5,
+                    "ciclo.2.D.capacidadCiclo":  129.60000000000002,
+                    "ciclo.2.D.factorEficiencia":  0.94000000000000006,
+                    "ciclo.2.D.produccionCapacidad":  122,
+                    "ciclo.2.D.producido":  122,
+                    "ciclo.2.D.consumoCuero":  36.6,
+                    "ciclo.2.D.consumoAccesorios":  122,
+                    "ciclo.2.D.consumoHilo":  732,
+                    "ciclo.2.D.costoMO":  11106.32,
+                    "ciclo.2.D.costoMP":  2558.5108,
+                    "ciclo.2.D.mantenimiento":  31.25,
+                    "ciclo.2.D.depreciacion":  64.125,
+                    "ciclo.2.D.reputacionOperativa":  0,
+                    "ciclo.2.D.reputacionMercado":  0,
+                    "ciclo.2.D.asignado":  2,
+                    "ciclo.2.D.demandaAjustada":  2,
+                    "ciclo.2.D.vendido":  2,
+                    "ciclo.2.D.ingresos":  90,
+                    "ciclo.2.D.inventarioProducto":  240,
+                    "ciclo.2.D.almacenaje":  480,
+                    "ciclo.2.D.horasExtra":  1775.1904918032787,
+                    "ciclo.2.D.costoGarantia":  10,
+                    "ciclo.2.D.costoRecurrente":  13500,
+                    "ciclo.2.D.costosTotales":  29525.396291803278,
+                    "ciclo.2.D.utilidad":  -29435.396291803278,
+                    "ciclo.2.D.ciclosReputacionBaja":  0,
+                    "ciclo.2.D.tasaAdicionalPP":  3,
+                    "ciclo.2.D.stockMP_INS-01":  526.8,
+                    "ciclo.2.D.stockMP_INS-02":  0,
+                    "ciclo.2.D.stockMP_INS-03":  0,
+                    "ciclo.2.D.stockMP_INS-04":  1756,
+                    "ciclo.2.D.stockMP_INS-05":  0,
+                    "ciclo.2.D.stockMP_INS-06":  10536,
+                    "ciclo.2.D.stockMP_INS-07":  0,
+                    "ciclo.2.D.stockMP_INS-08":  0,
+                    "ciclo.2.D.CONS-01":  false,
+                    "ciclo.2.D.CONS-02":  false,
+                    "ciclo.2.D.CONS-03":  false,
+                    "ciclo.2.D.CONS-04":  false,
+                    "ciclo.2.D.CONS-05":  true,
+                    "ciclo.2.D.CONS-06":  true,
+                    "ciclo.2.D.CONS-07":  true,
+                    "ciclo.2.D.CONS-08":  false,
+                    "ciclo.3.A.calidad":  4,
+                    "ciclo.3.A.puntajeEficiencia":  14,
+                    "ciclo.3.A.reputacionMatriz":  5,
+                    "ciclo.3.A.saludFinanciera":  0,
+                    "ciclo.3.A.capacidadDiaria":  5,
+                    "ciclo.3.A.capacidadCiclo":  120,
+                    "ciclo.3.A.factorEficiencia":  0.94000000000000006,
+                    "ciclo.3.A.produccionCapacidad":  113,
+                    "ciclo.3.A.producido":  113,
+                    "ciclo.3.A.consumoCuero":  33.9,
+                    "ciclo.3.A.consumoAccesorios":  113,
+                    "ciclo.3.A.consumoHilo":  678,
+                    "ciclo.3.A.costoMO":  11106.32,
+                    "ciclo.3.A.costoMP":  2322.372836,
+                    "ciclo.3.A.mantenimiento":  31.25,
+                    "ciclo.3.A.depreciacion":  64.125,
+                    "ciclo.3.A.reputacionOperativa":  0,
+                    "ciclo.3.A.reputacionMercado":  0,
+                    "ciclo.3.A.asignado":  38,
+                    "ciclo.3.A.demandaAjustada":  38,
+                    "ciclo.3.A.vendido":  38,
+                    "ciclo.3.A.ingresos":  1520,
+                    "ciclo.3.A.inventarioProducto":  225,
+                    "ciclo.3.A.almacenaje":  450,
+                    "ciclo.3.A.horasExtra":  2137.7208849557519,
+                    "ciclo.3.A.costoGarantia":  0,
+                    "ciclo.3.A.costoRecurrente":  1500,
+                    "ciclo.3.A.costosTotales":  17611.788720955752,
+                    "ciclo.3.A.utilidad":  -16091.788720955752,
+                    "ciclo.3.A.ciclosReputacionBaja":  0,
+                    "ciclo.3.A.tasaAdicionalPP":  3,
+                    "ciclo.3.A.stockMP_INS-01":  798.30000000000007,
+                    "ciclo.3.A.stockMP_INS-02":  0,
+                    "ciclo.3.A.stockMP_INS-03":  0,
+                    "ciclo.3.A.stockMP_INS-04":  2661,
+                    "ciclo.3.A.stockMP_INS-05":  0,
+                    "ciclo.3.A.stockMP_INS-06":  15966,
+                    "ciclo.3.A.stockMP_INS-07":  0,
+                    "ciclo.3.A.stockMP_INS-08":  0,
+                    "ciclo.3.A.CONS-01":  false,
+                    "ciclo.3.A.CONS-02":  false,
+                    "ciclo.3.A.CONS-03":  false,
+                    "ciclo.3.A.CONS-04":  false,
+                    "ciclo.3.A.CONS-05":  true,
+                    "ciclo.3.A.CONS-06":  true,
+                    "ciclo.3.A.CONS-07":  true,
+                    "ciclo.3.A.CONS-08":  false,
+                    "ciclo.3.B.calidad":  7,
+                    "ciclo.3.B.puntajeEficiencia":  18,
+                    "ciclo.3.B.reputacionMatriz":  8,
+                    "ciclo.3.B.saludFinanciera":  -2,
+                    "ciclo.3.B.capacidadDiaria":  5,
+                    "ciclo.3.B.capacidadCiclo":  129.60000000000002,
+                    "ciclo.3.B.factorEficiencia":  0.94000000000000006,
+                    "ciclo.3.B.produccionCapacidad":  122,
+                    "ciclo.3.B.producido":  122,
+                    "ciclo.3.B.consumoCuero":  48.800000000000004,
+                    "ciclo.3.B.consumoAccesorios":  122,
+                    "ciclo.3.B.consumoHilo":  854,
+                    "ciclo.3.B.costoMO":  11106.32,
+                    "ciclo.3.B.costoMP":  5443.6399999999994,
+                    "ciclo.3.B.mantenimiento":  31.25,
+                    "ciclo.3.B.depreciacion":  8.692499999999999,
+                    "ciclo.3.B.reputacionOperativa":  0,
+                    "ciclo.3.B.reputacionMercado":  0,
+                    "ciclo.3.B.asignado":  40,
+                    "ciclo.3.B.demandaAjustada":  44,
+                    "ciclo.3.B.vendido":  44,
+                    "ciclo.3.B.ingresos":  4840,
+                    "ciclo.3.B.inventarioProducto":  234,
+                    "ciclo.3.B.almacenaje":  468,
+                    "ciclo.3.B.horasExtra":  1775.1904918032787,
+                    "ciclo.3.B.costoGarantia":  0,
+                    "ciclo.3.B.costoRecurrente":  14500,
+                    "ciclo.3.B.costosTotales":  33333.092991803278,
+                    "ciclo.3.B.utilidad":  -28493.092991803278,
+                    "ciclo.3.B.ciclosReputacionBaja":  0,
+                    "ciclo.3.B.tasaAdicionalPP":  3,
+                    "ciclo.3.B.stockMP_INS-01":  0,
+                    "ciclo.3.B.stockMP_INS-02":  753.60000000000014,
+                    "ciclo.3.B.stockMP_INS-03":  0,
+                    "ciclo.3.B.stockMP_INS-04":  2634,
+                    "ciclo.3.B.stockMP_INS-05":  0,
+                    "ciclo.3.B.stockMP_INS-06":  0,
+                    "ciclo.3.B.stockMP_INS-07":  15438,
+                    "ciclo.3.B.stockMP_INS-08":  0,
+                    "ciclo.3.B.CONS-01":  false,
+                    "ciclo.3.B.CONS-02":  false,
+                    "ciclo.3.B.CONS-03":  false,
+                    "ciclo.3.B.CONS-04":  false,
+                    "ciclo.3.B.CONS-05":  true,
+                    "ciclo.3.B.CONS-06":  true,
+                    "ciclo.3.B.CONS-07":  true,
+                    "ciclo.3.B.CONS-08":  false,
+                    "ciclo.3.C.calidad":  12,
+                    "ciclo.3.C.puntajeEficiencia":  17,
+                    "ciclo.3.C.reputacionMatriz":  12,
+                    "ciclo.3.C.saludFinanciera":  -5,
+                    "ciclo.3.C.capacidadDiaria":  5,
+                    "ciclo.3.C.capacidadCiclo":  129.60000000000002,
+                    "ciclo.3.C.factorEficiencia":  0.94000000000000006,
+                    "ciclo.3.C.produccionCapacidad":  122,
+                    "ciclo.3.C.producido":  122,
+                    "ciclo.3.C.consumoCuero":  85.399999999999991,
+                    "ciclo.3.C.consumoAccesorios":  122,
+                    "ciclo.3.C.consumoHilo":  1586,
+                    "ciclo.3.C.costoMO":  11979.153846153846,
+                    "ciclo.3.C.costoMP":  16984.1568,
+                    "ciclo.3.C.mantenimiento":  50,
+                    "ciclo.3.C.depreciacion":  109.31818181818181,
+                    "ciclo.3.C.reputacionOperativa":  20,
+                    "ciclo.3.C.reputacionMercado":  22,
+                    "ciclo.3.C.asignado":  40,
+                    "ciclo.3.C.demandaAjustada":  44,
+                    "ciclo.3.C.vendido":  44,
+                    "ciclo.3.C.ingresos":  16015.999999999998,
+                    "ciclo.3.C.inventarioProducto":  234,
+                    "ciclo.3.C.almacenaje":  468,
+                    "ciclo.3.C.horasExtra":  1914.7008196721313,
+                    "ciclo.3.C.costoGarantia":  440,
+                    "ciclo.3.C.costoRecurrente":  13500,
+                    "ciclo.3.C.costosTotales":  45445.329647644161,
+                    "ciclo.3.C.utilidad":  -29429.329647644161,
+                    "ciclo.3.C.ciclosReputacionBaja":  0,
+                    "ciclo.3.C.tasaAdicionalPP":  3,
+                    "ciclo.3.C.stockMP_INS-01":  0,
+                    "ciclo.3.C.stockMP_INS-02":  0,
+                    "ciclo.3.C.stockMP_INS-03":  643.80000000000007,
+                    "ciclo.3.C.stockMP_INS-04":  0,
+                    "ciclo.3.C.stockMP_INS-05":  2634,
+                    "ciclo.3.C.stockMP_INS-06":  0,
+                    "ciclo.3.C.stockMP_INS-07":  0,
+                    "ciclo.3.C.stockMP_INS-08":  13242,
+                    "ciclo.3.C.CONS-01":  false,
+                    "ciclo.3.C.CONS-02":  true,
+                    "ciclo.3.C.CONS-03":  false,
+                    "ciclo.3.C.CONS-04":  false,
+                    "ciclo.3.C.CONS-05":  true,
+                    "ciclo.3.C.CONS-06":  true,
+                    "ciclo.3.C.CONS-07":  true,
+                    "ciclo.3.C.CONS-08":  false,
+                    "ciclo.3.D.calidad":  4,
+                    "ciclo.3.D.puntajeEficiencia":  17,
+                    "ciclo.3.D.reputacionMatriz":  9,
+                    "ciclo.3.D.saludFinanciera":  -3,
+                    "ciclo.3.D.capacidadDiaria":  5,
+                    "ciclo.3.D.capacidadCiclo":  129.60000000000002,
+                    "ciclo.3.D.factorEficiencia":  0.94000000000000006,
+                    "ciclo.3.D.produccionCapacidad":  122,
+                    "ciclo.3.D.producido":  122,
+                    "ciclo.3.D.consumoCuero":  36.6,
+                    "ciclo.3.D.consumoAccesorios":  122,
+                    "ciclo.3.D.consumoHilo":  732,
+                    "ciclo.3.D.costoMO":  11106.32,
+                    "ciclo.3.D.costoMP":  2558.5108,
+                    "ciclo.3.D.mantenimiento":  31.25,
+                    "ciclo.3.D.depreciacion":  64.125,
+                    "ciclo.3.D.reputacionOperativa":  0,
+                    "ciclo.3.D.reputacionMercado":  0,
+                    "ciclo.3.D.asignado":  2,
+                    "ciclo.3.D.demandaAjustada":  2,
+                    "ciclo.3.D.vendido":  2,
+                    "ciclo.3.D.ingresos":  90,
+                    "ciclo.3.D.inventarioProducto":  360,
+                    "ciclo.3.D.almacenaje":  720,
+                    "ciclo.3.D.horasExtra":  1775.1904918032787,
+                    "ciclo.3.D.costoGarantia":  10,
+                    "ciclo.3.D.costoRecurrente":  13500,
+                    "ciclo.3.D.costosTotales":  29765.396291803278,
+                    "ciclo.3.D.utilidad":  -29675.396291803278,
+                    "ciclo.3.D.ciclosReputacionBaja":  0,
+                    "ciclo.3.D.tasaAdicionalPP":  3,
+                    "ciclo.3.D.stockMP_INS-01":  790.19999999999993,
+                    "ciclo.3.D.stockMP_INS-02":  0,
+                    "ciclo.3.D.stockMP_INS-03":  0,
+                    "ciclo.3.D.stockMP_INS-04":  2634,
+                    "ciclo.3.D.stockMP_INS-05":  0,
+                    "ciclo.3.D.stockMP_INS-06":  15804,
+                    "ciclo.3.D.stockMP_INS-07":  0,
+                    "ciclo.3.D.stockMP_INS-08":  0,
+                    "ciclo.3.D.CONS-01":  false,
+                    "ciclo.3.D.CONS-02":  false,
+                    "ciclo.3.D.CONS-03":  false,
+                    "ciclo.3.D.CONS-04":  false,
+                    "ciclo.3.D.CONS-05":  true,
+                    "ciclo.3.D.CONS-06":  true,
+                    "ciclo.3.D.CONS-07":  true,
+                    "ciclo.3.D.CONS-08":  false
+                },
+    "celdas":  {
+                   "ciclo.1.A.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI2"
+                                         ],
+                   "ciclo.1.A.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF2"
+                                                   ],
+                   "ciclo.1.A.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL2"
+                                                  ],
+                   "ciclo.1.A.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH2"
+                                                 ],
+                   "ciclo.1.A.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX2"
+                                                 ],
+                   "ciclo.1.A.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY2"
+                                                ],
+                   "ciclo.1.A.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW2"
+                                                  ],
+                   "ciclo.1.A.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ2"
+                                                     ],
+                   "ciclo.1.A.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU2"
+                                           ],
+                   "ciclo.1.A.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV2"
+                                              ],
+                   "ciclo.1.A.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC2"
+                                                   ],
+                   "ciclo.1.A.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH2"
+                                             ],
+                   "ciclo.1.A.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO2"
+                                         ],
+                   "ciclo.1.A.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP2"
+                                         ],
+                   "ciclo.1.A.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ2"
+                                               ],
+                   "ciclo.1.A.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR2"
+                                              ],
+                   "ciclo.1.A.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS2"
+                                                     ],
+                   "ciclo.1.A.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT2"
+                                                   ],
+                   "ciclo.1.A.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC2"
+                                          ],
+                   "ciclo.1.A.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED2"
+                                                 ],
+                   "ciclo.1.A.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE2"
+                                         ],
+                   "ciclo.1.A.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF2"
+                                          ],
+                   "ciclo.1.A.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX2"
+                                                    ],
+                   "ciclo.1.A.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG2"
+                                            ],
+                   "ciclo.1.A.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH2"
+                                            ],
+                   "ciclo.1.A.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI2"
+                                               ],
+                   "ciclo.1.A.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ2"
+                                                 ],
+                   "ciclo.1.A.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL2"
+                                               ],
+                   "ciclo.1.A.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM2"
+                                          ],
+                   "ciclo.1.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM2"
+                                                      ],
+                   "ciclo.1.A.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO2"
+                                                 ],
+                   "ciclo.1.A.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN2"
+                                                ],
+                   "ciclo.1.A.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN2"
+                                         ],
+                   "ciclo.1.A.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO2"
+                                         ],
+                   "ciclo.1.A.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP2"
+                                         ],
+                   "ciclo.1.A.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ2"
+                                         ],
+                   "ciclo.1.A.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER2"
+                                         ],
+                   "ciclo.1.A.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES2"
+                                         ],
+                   "ciclo.1.A.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET2"
+                                         ],
+                   "ciclo.1.A.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU2"
+                                         ],
+                   "ciclo.1.B.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI3"
+                                         ],
+                   "ciclo.1.B.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF3"
+                                                   ],
+                   "ciclo.1.B.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL3"
+                                                  ],
+                   "ciclo.1.B.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH3"
+                                                 ],
+                   "ciclo.1.B.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX3"
+                                                 ],
+                   "ciclo.1.B.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY3"
+                                                ],
+                   "ciclo.1.B.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW3"
+                                                  ],
+                   "ciclo.1.B.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ3"
+                                                     ],
+                   "ciclo.1.B.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU3"
+                                           ],
+                   "ciclo.1.B.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV3"
+                                              ],
+                   "ciclo.1.B.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC3"
+                                                   ],
+                   "ciclo.1.B.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH3"
+                                             ],
+                   "ciclo.1.B.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO3"
+                                         ],
+                   "ciclo.1.B.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP3"
+                                         ],
+                   "ciclo.1.B.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ3"
+                                               ],
+                   "ciclo.1.B.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR3"
+                                              ],
+                   "ciclo.1.B.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS3"
+                                                     ],
+                   "ciclo.1.B.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT3"
+                                                   ],
+                   "ciclo.1.B.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC3"
+                                          ],
+                   "ciclo.1.B.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED3"
+                                                 ],
+                   "ciclo.1.B.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE3"
+                                         ],
+                   "ciclo.1.B.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF3"
+                                          ],
+                   "ciclo.1.B.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX3"
+                                                    ],
+                   "ciclo.1.B.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG3"
+                                            ],
+                   "ciclo.1.B.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH3"
+                                            ],
+                   "ciclo.1.B.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI3"
+                                               ],
+                   "ciclo.1.B.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ3"
+                                                 ],
+                   "ciclo.1.B.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL3"
+                                               ],
+                   "ciclo.1.B.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM3"
+                                          ],
+                   "ciclo.1.B.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM3"
+                                                      ],
+                   "ciclo.1.B.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO3"
+                                                 ],
+                   "ciclo.1.B.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL3"
+                                                ],
+                   "ciclo.1.B.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN3"
+                                                ],
+                   "ciclo.1.B.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN3"
+                                         ],
+                   "ciclo.1.B.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO3"
+                                         ],
+                   "ciclo.1.B.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP3"
+                                         ],
+                   "ciclo.1.B.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ3"
+                                         ],
+                   "ciclo.1.B.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER3"
+                                         ],
+                   "ciclo.1.B.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES3"
+                                         ],
+                   "ciclo.1.B.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET3"
+                                         ],
+                   "ciclo.1.B.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU3"
+                                         ],
+                   "ciclo.1.C.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI4"
+                                         ],
+                   "ciclo.1.C.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF4"
+                                                   ],
+                   "ciclo.1.C.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL4"
+                                                  ],
+                   "ciclo.1.C.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH4"
+                                                 ],
+                   "ciclo.1.C.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX4"
+                                                 ],
+                   "ciclo.1.C.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY4"
+                                                ],
+                   "ciclo.1.C.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW4"
+                                                  ],
+                   "ciclo.1.C.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ4"
+                                                     ],
+                   "ciclo.1.C.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU4"
+                                           ],
+                   "ciclo.1.C.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV4"
+                                              ],
+                   "ciclo.1.C.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC4"
+                                                   ],
+                   "ciclo.1.C.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH4"
+                                             ],
+                   "ciclo.1.C.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO4"
+                                         ],
+                   "ciclo.1.C.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP4"
+                                         ],
+                   "ciclo.1.C.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ4"
+                                               ],
+                   "ciclo.1.C.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR4"
+                                              ],
+                   "ciclo.1.C.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS4"
+                                                     ],
+                   "ciclo.1.C.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT4"
+                                                   ],
+                   "ciclo.1.C.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC4"
+                                          ],
+                   "ciclo.1.C.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED4"
+                                                 ],
+                   "ciclo.1.C.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE4"
+                                         ],
+                   "ciclo.1.C.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF4"
+                                          ],
+                   "ciclo.1.C.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX4"
+                                                    ],
+                   "ciclo.1.C.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG4"
+                                            ],
+                   "ciclo.1.C.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH4"
+                                            ],
+                   "ciclo.1.C.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI4"
+                                               ],
+                   "ciclo.1.C.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ4"
+                                                 ],
+                   "ciclo.1.C.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL4"
+                                               ],
+                   "ciclo.1.C.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM4"
+                                          ],
+                   "ciclo.1.C.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM4"
+                                                      ],
+                   "ciclo.1.C.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO4"
+                                                 ],
+                   "ciclo.1.C.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL4"
+                                                ],
+                   "ciclo.1.C.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN4"
+                                                ],
+                   "ciclo.1.C.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN4"
+                                         ],
+                   "ciclo.1.C.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO4"
+                                         ],
+                   "ciclo.1.C.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP4"
+                                         ],
+                   "ciclo.1.C.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ4"
+                                         ],
+                   "ciclo.1.C.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER4"
+                                         ],
+                   "ciclo.1.C.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES4"
+                                         ],
+                   "ciclo.1.C.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET4"
+                                         ],
+                   "ciclo.1.C.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU4"
+                                         ],
+                   "ciclo.1.D.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI5"
+                                         ],
+                   "ciclo.1.D.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF5"
+                                                   ],
+                   "ciclo.1.D.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL5"
+                                                  ],
+                   "ciclo.1.D.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH5"
+                                                 ],
+                   "ciclo.1.D.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX5"
+                                                 ],
+                   "ciclo.1.D.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY5"
+                                                ],
+                   "ciclo.1.D.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW5"
+                                                  ],
+                   "ciclo.1.D.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ5"
+                                                     ],
+                   "ciclo.1.D.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU5"
+                                           ],
+                   "ciclo.1.D.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV5"
+                                              ],
+                   "ciclo.1.D.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC5"
+                                                   ],
+                   "ciclo.1.D.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH5"
+                                             ],
+                   "ciclo.1.D.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO5"
+                                         ],
+                   "ciclo.1.D.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP5"
+                                         ],
+                   "ciclo.1.D.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ5"
+                                               ],
+                   "ciclo.1.D.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR5"
+                                              ],
+                   "ciclo.1.D.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS5"
+                                                     ],
+                   "ciclo.1.D.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT5"
+                                                   ],
+                   "ciclo.1.D.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC5"
+                                          ],
+                   "ciclo.1.D.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED5"
+                                                 ],
+                   "ciclo.1.D.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE5"
+                                         ],
+                   "ciclo.1.D.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF5"
+                                          ],
+                   "ciclo.1.D.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX5"
+                                                    ],
+                   "ciclo.1.D.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG5"
+                                            ],
+                   "ciclo.1.D.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH5"
+                                            ],
+                   "ciclo.1.D.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI5"
+                                               ],
+                   "ciclo.1.D.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ5"
+                                                 ],
+                   "ciclo.1.D.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL5"
+                                               ],
+                   "ciclo.1.D.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM5"
+                                          ],
+                   "ciclo.1.D.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM5"
+                                                      ],
+                   "ciclo.1.D.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO5"
+                                                 ],
+                   "ciclo.1.D.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL5"
+                                                ],
+                   "ciclo.1.D.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN5"
+                                                ],
+                   "ciclo.1.D.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN5"
+                                         ],
+                   "ciclo.1.D.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO5"
+                                         ],
+                   "ciclo.1.D.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP5"
+                                         ],
+                   "ciclo.1.D.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ5"
+                                         ],
+                   "ciclo.1.D.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER5"
+                                         ],
+                   "ciclo.1.D.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES5"
+                                         ],
+                   "ciclo.1.D.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET5"
+                                         ],
+                   "ciclo.1.D.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU5"
+                                         ],
+                   "ciclo.2.A.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI6"
+                                         ],
+                   "ciclo.2.A.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF6"
+                                                   ],
+                   "ciclo.2.A.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL6"
+                                                  ],
+                   "ciclo.2.A.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH6"
+                                                 ],
+                   "ciclo.2.A.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX6"
+                                                 ],
+                   "ciclo.2.A.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY6"
+                                                ],
+                   "ciclo.2.A.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW6"
+                                                  ],
+                   "ciclo.2.A.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ6"
+                                                     ],
+                   "ciclo.2.A.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU6"
+                                           ],
+                   "ciclo.2.A.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV6"
+                                              ],
+                   "ciclo.2.A.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC6"
+                                                   ],
+                   "ciclo.2.A.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH6"
+                                             ],
+                   "ciclo.2.A.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO6"
+                                         ],
+                   "ciclo.2.A.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP6"
+                                         ],
+                   "ciclo.2.A.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ6"
+                                               ],
+                   "ciclo.2.A.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR6"
+                                              ],
+                   "ciclo.2.A.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS6"
+                                                     ],
+                   "ciclo.2.A.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT6"
+                                                   ],
+                   "ciclo.2.A.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC6"
+                                          ],
+                   "ciclo.2.A.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED6"
+                                                 ],
+                   "ciclo.2.A.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE6"
+                                         ],
+                   "ciclo.2.A.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF6"
+                                          ],
+                   "ciclo.2.A.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX6"
+                                                    ],
+                   "ciclo.2.A.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG6"
+                                            ],
+                   "ciclo.2.A.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH6"
+                                            ],
+                   "ciclo.2.A.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI6"
+                                               ],
+                   "ciclo.2.A.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ6"
+                                                 ],
+                   "ciclo.2.A.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL6"
+                                               ],
+                   "ciclo.2.A.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM6"
+                                          ],
+                   "ciclo.2.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM6"
+                                                      ],
+                   "ciclo.2.A.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO6"
+                                                 ],
+                   "ciclo.2.A.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL6"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN6"
+                                                ],
+                   "ciclo.2.A.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN6"
+                                         ],
+                   "ciclo.2.A.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO6"
+                                         ],
+                   "ciclo.2.A.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP6"
+                                         ],
+                   "ciclo.2.A.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ6"
+                                         ],
+                   "ciclo.2.A.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER6"
+                                         ],
+                   "ciclo.2.A.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES6"
+                                         ],
+                   "ciclo.2.A.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET6"
+                                         ],
+                   "ciclo.2.A.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU6"
+                                         ],
+                   "ciclo.2.B.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI7"
+                                         ],
+                   "ciclo.2.B.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF7"
+                                                   ],
+                   "ciclo.2.B.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL7"
+                                                  ],
+                   "ciclo.2.B.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH7"
+                                                 ],
+                   "ciclo.2.B.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX7"
+                                                 ],
+                   "ciclo.2.B.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY7"
+                                                ],
+                   "ciclo.2.B.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW7"
+                                                  ],
+                   "ciclo.2.B.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ7"
+                                                     ],
+                   "ciclo.2.B.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU7"
+                                           ],
+                   "ciclo.2.B.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV7"
+                                              ],
+                   "ciclo.2.B.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC7"
+                                                   ],
+                   "ciclo.2.B.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH7"
+                                             ],
+                   "ciclo.2.B.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO7"
+                                         ],
+                   "ciclo.2.B.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP7"
+                                         ],
+                   "ciclo.2.B.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ7"
+                                               ],
+                   "ciclo.2.B.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR7"
+                                              ],
+                   "ciclo.2.B.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS7"
+                                                     ],
+                   "ciclo.2.B.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT7"
+                                                   ],
+                   "ciclo.2.B.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC7"
+                                          ],
+                   "ciclo.2.B.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED7"
+                                                 ],
+                   "ciclo.2.B.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE7"
+                                         ],
+                   "ciclo.2.B.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF7"
+                                          ],
+                   "ciclo.2.B.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX7"
+                                                    ],
+                   "ciclo.2.B.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG7"
+                                            ],
+                   "ciclo.2.B.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH7"
+                                            ],
+                   "ciclo.2.B.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI7"
+                                               ],
+                   "ciclo.2.B.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ7"
+                                                 ],
+                   "ciclo.2.B.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL7"
+                                               ],
+                   "ciclo.2.B.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM7"
+                                          ],
+                   "ciclo.2.B.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM7"
+                                                      ],
+                   "ciclo.2.B.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO7"
+                                                 ],
+                   "ciclo.2.B.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL7"
+                                                ],
+                   "ciclo.2.B.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN7"
+                                                ],
+                   "ciclo.2.B.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN7"
+                                         ],
+                   "ciclo.2.B.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO7"
+                                         ],
+                   "ciclo.2.B.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP7"
+                                         ],
+                   "ciclo.2.B.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ7"
+                                         ],
+                   "ciclo.2.B.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER7"
+                                         ],
+                   "ciclo.2.B.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES7"
+                                         ],
+                   "ciclo.2.B.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET7"
+                                         ],
+                   "ciclo.2.B.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU7"
+                                         ],
+                   "ciclo.2.C.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI8"
+                                         ],
+                   "ciclo.2.C.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF8"
+                                                   ],
+                   "ciclo.2.C.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL8"
+                                                  ],
+                   "ciclo.2.C.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH8"
+                                                 ],
+                   "ciclo.2.C.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX8"
+                                                 ],
+                   "ciclo.2.C.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY8"
+                                                ],
+                   "ciclo.2.C.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW8"
+                                                  ],
+                   "ciclo.2.C.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ8"
+                                                     ],
+                   "ciclo.2.C.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU8"
+                                           ],
+                   "ciclo.2.C.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV8"
+                                              ],
+                   "ciclo.2.C.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC8"
+                                                   ],
+                   "ciclo.2.C.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH8"
+                                             ],
+                   "ciclo.2.C.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO8"
+                                         ],
+                   "ciclo.2.C.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP8"
+                                         ],
+                   "ciclo.2.C.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ8"
+                                               ],
+                   "ciclo.2.C.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR8"
+                                              ],
+                   "ciclo.2.C.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS8"
+                                                     ],
+                   "ciclo.2.C.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT8"
+                                                   ],
+                   "ciclo.2.C.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC8"
+                                          ],
+                   "ciclo.2.C.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED8"
+                                                 ],
+                   "ciclo.2.C.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE8"
+                                         ],
+                   "ciclo.2.C.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF8"
+                                          ],
+                   "ciclo.2.C.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX8"
+                                                    ],
+                   "ciclo.2.C.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG8"
+                                            ],
+                   "ciclo.2.C.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH8"
+                                            ],
+                   "ciclo.2.C.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI8"
+                                               ],
+                   "ciclo.2.C.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ8"
+                                                 ],
+                   "ciclo.2.C.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL8"
+                                               ],
+                   "ciclo.2.C.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM8"
+                                          ],
+                   "ciclo.2.C.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM8"
+                                                      ],
+                   "ciclo.2.C.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO8"
+                                                 ],
+                   "ciclo.2.C.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL8"
+                                                ],
+                   "ciclo.2.C.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN8"
+                                                ],
+                   "ciclo.2.C.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN8"
+                                         ],
+                   "ciclo.2.C.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO8"
+                                         ],
+                   "ciclo.2.C.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP8"
+                                         ],
+                   "ciclo.2.C.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ8"
+                                         ],
+                   "ciclo.2.C.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER8"
+                                         ],
+                   "ciclo.2.C.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES8"
+                                         ],
+                   "ciclo.2.C.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET8"
+                                         ],
+                   "ciclo.2.C.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU8"
+                                         ],
+                   "ciclo.2.D.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI9"
+                                         ],
+                   "ciclo.2.D.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF9"
+                                                   ],
+                   "ciclo.2.D.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL9"
+                                                  ],
+                   "ciclo.2.D.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH9"
+                                                 ],
+                   "ciclo.2.D.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX9"
+                                                 ],
+                   "ciclo.2.D.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY9"
+                                                ],
+                   "ciclo.2.D.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW9"
+                                                  ],
+                   "ciclo.2.D.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ9"
+                                                     ],
+                   "ciclo.2.D.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU9"
+                                           ],
+                   "ciclo.2.D.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV9"
+                                              ],
+                   "ciclo.2.D.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC9"
+                                                   ],
+                   "ciclo.2.D.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH9"
+                                             ],
+                   "ciclo.2.D.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO9"
+                                         ],
+                   "ciclo.2.D.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP9"
+                                         ],
+                   "ciclo.2.D.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ9"
+                                               ],
+                   "ciclo.2.D.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR9"
+                                              ],
+                   "ciclo.2.D.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS9"
+                                                     ],
+                   "ciclo.2.D.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT9"
+                                                   ],
+                   "ciclo.2.D.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC9"
+                                          ],
+                   "ciclo.2.D.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED9"
+                                                 ],
+                   "ciclo.2.D.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE9"
+                                         ],
+                   "ciclo.2.D.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF9"
+                                          ],
+                   "ciclo.2.D.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX9"
+                                                    ],
+                   "ciclo.2.D.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG9"
+                                            ],
+                   "ciclo.2.D.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH9"
+                                            ],
+                   "ciclo.2.D.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI9"
+                                               ],
+                   "ciclo.2.D.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ9"
+                                                 ],
+                   "ciclo.2.D.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL9"
+                                               ],
+                   "ciclo.2.D.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM9"
+                                          ],
+                   "ciclo.2.D.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM9"
+                                                      ],
+                   "ciclo.2.D.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO9"
+                                                 ],
+                   "ciclo.2.D.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL9"
+                                                ],
+                   "ciclo.2.D.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN9"
+                                                ],
+                   "ciclo.2.D.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN9"
+                                         ],
+                   "ciclo.2.D.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO9"
+                                         ],
+                   "ciclo.2.D.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP9"
+                                         ],
+                   "ciclo.2.D.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ9"
+                                         ],
+                   "ciclo.2.D.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER9"
+                                         ],
+                   "ciclo.2.D.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES9"
+                                         ],
+                   "ciclo.2.D.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET9"
+                                         ],
+                   "ciclo.2.D.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU9"
+                                         ],
+                   "ciclo.3.A.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI10"
+                                         ],
+                   "ciclo.3.A.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF10"
+                                                   ],
+                   "ciclo.3.A.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL10"
+                                                  ],
+                   "ciclo.3.A.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH10"
+                                                 ],
+                   "ciclo.3.A.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX10"
+                                                 ],
+                   "ciclo.3.A.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY10"
+                                                ],
+                   "ciclo.3.A.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW10"
+                                                  ],
+                   "ciclo.3.A.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ10"
+                                                     ],
+                   "ciclo.3.A.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU10"
+                                           ],
+                   "ciclo.3.A.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV10"
+                                              ],
+                   "ciclo.3.A.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC10"
+                                                   ],
+                   "ciclo.3.A.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH10"
+                                             ],
+                   "ciclo.3.A.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO10"
+                                         ],
+                   "ciclo.3.A.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP10"
+                                         ],
+                   "ciclo.3.A.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ10"
+                                               ],
+                   "ciclo.3.A.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR10"
+                                              ],
+                   "ciclo.3.A.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS10"
+                                                     ],
+                   "ciclo.3.A.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT10"
+                                                   ],
+                   "ciclo.3.A.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC10"
+                                          ],
+                   "ciclo.3.A.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED10"
+                                                 ],
+                   "ciclo.3.A.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE10"
+                                         ],
+                   "ciclo.3.A.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF10"
+                                          ],
+                   "ciclo.3.A.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX10"
+                                                    ],
+                   "ciclo.3.A.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG10"
+                                            ],
+                   "ciclo.3.A.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH10"
+                                            ],
+                   "ciclo.3.A.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI10"
+                                               ],
+                   "ciclo.3.A.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ10"
+                                                 ],
+                   "ciclo.3.A.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL10"
+                                               ],
+                   "ciclo.3.A.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM10"
+                                          ],
+                   "ciclo.3.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM10"
+                                                      ],
+                   "ciclo.3.A.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO10"
+                                                 ],
+                   "ciclo.3.A.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL10"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN10"
+                                                ],
+                   "ciclo.3.A.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN10"
+                                         ],
+                   "ciclo.3.A.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO10"
+                                         ],
+                   "ciclo.3.A.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP10"
+                                         ],
+                   "ciclo.3.A.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ10"
+                                         ],
+                   "ciclo.3.A.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER10"
+                                         ],
+                   "ciclo.3.A.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES10"
+                                         ],
+                   "ciclo.3.A.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET10"
+                                         ],
+                   "ciclo.3.A.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU10"
+                                         ],
+                   "ciclo.3.B.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI11"
+                                         ],
+                   "ciclo.3.B.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF11"
+                                                   ],
+                   "ciclo.3.B.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL11"
+                                                  ],
+                   "ciclo.3.B.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH11"
+                                                 ],
+                   "ciclo.3.B.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX11"
+                                                 ],
+                   "ciclo.3.B.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY11"
+                                                ],
+                   "ciclo.3.B.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW11"
+                                                  ],
+                   "ciclo.3.B.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ11"
+                                                     ],
+                   "ciclo.3.B.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU11"
+                                           ],
+                   "ciclo.3.B.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV11"
+                                              ],
+                   "ciclo.3.B.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC11"
+                                                   ],
+                   "ciclo.3.B.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH11"
+                                             ],
+                   "ciclo.3.B.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO11"
+                                         ],
+                   "ciclo.3.B.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP11"
+                                         ],
+                   "ciclo.3.B.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ11"
+                                               ],
+                   "ciclo.3.B.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR11"
+                                              ],
+                   "ciclo.3.B.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS11"
+                                                     ],
+                   "ciclo.3.B.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT11"
+                                                   ],
+                   "ciclo.3.B.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC11"
+                                          ],
+                   "ciclo.3.B.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED11"
+                                                 ],
+                   "ciclo.3.B.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE11"
+                                         ],
+                   "ciclo.3.B.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF11"
+                                          ],
+                   "ciclo.3.B.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX11"
+                                                    ],
+                   "ciclo.3.B.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG11"
+                                            ],
+                   "ciclo.3.B.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH11"
+                                            ],
+                   "ciclo.3.B.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI11"
+                                               ],
+                   "ciclo.3.B.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ11"
+                                                 ],
+                   "ciclo.3.B.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL11"
+                                               ],
+                   "ciclo.3.B.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM11"
+                                          ],
+                   "ciclo.3.B.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM11"
+                                                      ],
+                   "ciclo.3.B.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO11"
+                                                 ],
+                   "ciclo.3.B.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL11"
+                                                ],
+                   "ciclo.3.B.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN11"
+                                                ],
+                   "ciclo.3.B.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN11"
+                                         ],
+                   "ciclo.3.B.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO11"
+                                         ],
+                   "ciclo.3.B.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP11"
+                                         ],
+                   "ciclo.3.B.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ11"
+                                         ],
+                   "ciclo.3.B.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER11"
+                                         ],
+                   "ciclo.3.B.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES11"
+                                         ],
+                   "ciclo.3.B.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET11"
+                                         ],
+                   "ciclo.3.B.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU11"
+                                         ],
+                   "ciclo.3.C.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI12"
+                                         ],
+                   "ciclo.3.C.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF12"
+                                                   ],
+                   "ciclo.3.C.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL12"
+                                                  ],
+                   "ciclo.3.C.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH12"
+                                                 ],
+                   "ciclo.3.C.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX12"
+                                                 ],
+                   "ciclo.3.C.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY12"
+                                                ],
+                   "ciclo.3.C.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW12"
+                                                  ],
+                   "ciclo.3.C.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ12"
+                                                     ],
+                   "ciclo.3.C.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU12"
+                                           ],
+                   "ciclo.3.C.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV12"
+                                              ],
+                   "ciclo.3.C.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC12"
+                                                   ],
+                   "ciclo.3.C.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH12"
+                                             ],
+                   "ciclo.3.C.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO12"
+                                         ],
+                   "ciclo.3.C.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP12"
+                                         ],
+                   "ciclo.3.C.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ12"
+                                               ],
+                   "ciclo.3.C.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR12"
+                                              ],
+                   "ciclo.3.C.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS12"
+                                                     ],
+                   "ciclo.3.C.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT12"
+                                                   ],
+                   "ciclo.3.C.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC12"
+                                          ],
+                   "ciclo.3.C.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED12"
+                                                 ],
+                   "ciclo.3.C.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE12"
+                                         ],
+                   "ciclo.3.C.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF12"
+                                          ],
+                   "ciclo.3.C.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX12"
+                                                    ],
+                   "ciclo.3.C.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG12"
+                                            ],
+                   "ciclo.3.C.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH12"
+                                            ],
+                   "ciclo.3.C.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI12"
+                                               ],
+                   "ciclo.3.C.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ12"
+                                                 ],
+                   "ciclo.3.C.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL12"
+                                               ],
+                   "ciclo.3.C.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM12"
+                                          ],
+                   "ciclo.3.C.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM12"
+                                                      ],
+                   "ciclo.3.C.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO12"
+                                                 ],
+                   "ciclo.3.C.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL12"
+                                                ],
+                   "ciclo.3.C.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN12"
+                                                ],
+                   "ciclo.3.C.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN12"
+                                         ],
+                   "ciclo.3.C.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO12"
+                                         ],
+                   "ciclo.3.C.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP12"
+                                         ],
+                   "ciclo.3.C.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ12"
+                                         ],
+                   "ciclo.3.C.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER12"
+                                         ],
+                   "ciclo.3.C.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES12"
+                                         ],
+                   "ciclo.3.C.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET12"
+                                         ],
+                   "ciclo.3.C.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU12"
+                                         ],
+                   "ciclo.3.D.calidad":  [
+                                             "Pipeline_sim3",
+                                             "AI13"
+                                         ],
+                   "ciclo.3.D.puntajeEficiencia":  [
+                                                       "Pipeline_sim3",
+                                                       "AF13"
+                                                   ],
+                   "ciclo.3.D.reputacionMatriz":  [
+                                                      "Pipeline_sim3",
+                                                      "AL13"
+                                                  ],
+                   "ciclo.3.D.saludFinanciera":  [
+                                                     "Pipeline_sim3",
+                                                     "AH13"
+                                                 ],
+                   "ciclo.3.D.capacidadDiaria":  [
+                                                     "Pipeline_sim3",
+                                                     "BX13"
+                                                 ],
+                   "ciclo.3.D.capacidadCiclo":  [
+                                                    "Pipeline_sim3",
+                                                    "BY13"
+                                                ],
+                   "ciclo.3.D.factorEficiencia":  [
+                                                      "Pipeline_sim3",
+                                                      "BW13"
+                                                  ],
+                   "ciclo.3.D.produccionCapacidad":  [
+                                                         "Pipeline_sim3",
+                                                         "BZ13"
+                                                     ],
+                   "ciclo.3.D.producido":  [
+                                               "Pipeline_sim3",
+                                               "CU13"
+                                           ],
+                   "ciclo.3.D.consumoCuero":  [
+                                                  "Pipeline_sim3",
+                                                  "CV13"
+                                              ],
+                   "ciclo.3.D.consumoAccesorios":  [
+                                                       "Pipeline_sim3",
+                                                       "DC13"
+                                                   ],
+                   "ciclo.3.D.consumoHilo":  [
+                                                 "Pipeline_sim3",
+                                                 "DH13"
+                                             ],
+                   "ciclo.3.D.costoMO":  [
+                                             "Pipeline_sim3",
+                                             "DO13"
+                                         ],
+                   "ciclo.3.D.costoMP":  [
+                                             "Pipeline_sim3",
+                                             "DP13"
+                                         ],
+                   "ciclo.3.D.mantenimiento":  [
+                                                   "Pipeline_sim3",
+                                                   "DQ13"
+                                               ],
+                   "ciclo.3.D.depreciacion":  [
+                                                  "Pipeline_sim3",
+                                                  "DR13"
+                                              ],
+                   "ciclo.3.D.reputacionOperativa":  [
+                                                         "Pipeline_sim3",
+                                                         "DS13"
+                                                     ],
+                   "ciclo.3.D.reputacionMercado":  [
+                                                       "Pipeline_sim3",
+                                                       "DT13"
+                                                   ],
+                   "ciclo.3.D.asignado":  [
+                                              "Pipeline_sim3",
+                                              "EC13"
+                                          ],
+                   "ciclo.3.D.demandaAjustada":  [
+                                                     "Pipeline_sim3",
+                                                     "ED13"
+                                                 ],
+                   "ciclo.3.D.vendido":  [
+                                             "Pipeline_sim3",
+                                             "EE13"
+                                         ],
+                   "ciclo.3.D.ingresos":  [
+                                              "Pipeline_sim3",
+                                              "EF13"
+                                          ],
+                   "ciclo.3.D.inventarioProducto":  [
+                                                        "Pipeline_sim3",
+                                                        "DX13"
+                                                    ],
+                   "ciclo.3.D.almacenaje":  [
+                                                "Pipeline_sim3",
+                                                "EG13"
+                                            ],
+                   "ciclo.3.D.horasExtra":  [
+                                                "Pipeline_sim3",
+                                                "EH13"
+                                            ],
+                   "ciclo.3.D.costoGarantia":  [
+                                                   "Pipeline_sim3",
+                                                   "EI13"
+                                               ],
+                   "ciclo.3.D.costoRecurrente":  [
+                                                     "Pipeline_sim3",
+                                                     "EJ13"
+                                                 ],
+                   "ciclo.3.D.costosTotales":  [
+                                                   "Pipeline_sim3",
+                                                   "EL13"
+                                               ],
+                   "ciclo.3.D.utilidad":  [
+                                              "Pipeline_sim3",
+                                              "EM13"
+                                          ],
+                   "ciclo.3.D.ciclosReputacionBaja":  [
+                                                          "Pipeline_sim3",
+                                                          "AM13"
+                                                      ],
+                   "ciclo.3.D.tasaAdicionalPP":  [
+                                                     "Pipeline_sim3",
+                                                     "AO13"
+                                                 ],
+                   "ciclo.3.D.stockMP_INS-01":  [
+                                                    "Pipeline_sim3",
+                                                    "CX13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-02":  [
+                                                    "Pipeline_sim3",
+                                                    "CZ13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-03":  [
+                                                    "Pipeline_sim3",
+                                                    "DB13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-04":  [
+                                                    "Pipeline_sim3",
+                                                    "DE13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-05":  [
+                                                    "Pipeline_sim3",
+                                                    "DG13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-06":  [
+                                                    "Pipeline_sim3",
+                                                    "DJ13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-07":  [
+                                                    "Pipeline_sim3",
+                                                    "DL13"
+                                                ],
+                   "ciclo.3.D.stockMP_INS-08":  [
+                                                    "Pipeline_sim3",
+                                                    "DN13"
+                                                ],
+                   "ciclo.3.D.CONS-01":  [
+                                             "Pipeline_sim3",
+                                             "EN13"
+                                         ],
+                   "ciclo.3.D.CONS-02":  [
+                                             "Pipeline_sim3",
+                                             "EO13"
+                                         ],
+                   "ciclo.3.D.CONS-03":  [
+                                             "Pipeline_sim3",
+                                             "EP13"
+                                         ],
+                   "ciclo.3.D.CONS-04":  [
+                                             "Pipeline_sim3",
+                                             "EQ13"
+                                         ],
+                   "ciclo.3.D.CONS-05":  [
+                                             "Pipeline_sim3",
+                                             "ER13"
+                                         ],
+                   "ciclo.3.D.CONS-06":  [
+                                             "Pipeline_sim3",
+                                             "ES13"
+                                         ],
+                   "ciclo.3.D.CONS-07":  [
+                                             "Pipeline_sim3",
+                                             "ET13"
+                                         ],
+                   "ciclo.3.D.CONS-08":  [
+                                             "Pipeline_sim3",
+                                             "EU13"
+                                         ]
+               }
+}

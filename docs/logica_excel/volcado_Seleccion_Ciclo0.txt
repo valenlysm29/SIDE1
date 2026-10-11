@@ -1,0 +1,136 @@
+Hoja: Seleccion_Ciclo0
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"Grupo de decision"	"Grupo de decision"	"s"	null
+"B1"	"Codigo elegido (elige de la lista)"	"Codigo elegido (elige de la lista)"	"s"	null
+"C1"	"Opcion / Nivel (auto)"	"Opcion / Nivel (auto)"	"s"	null
+"D1"	"Descripcion (auto)"	"Descripcion (auto)"	"s"	null
+"E1"	"Costo referencial (auto)"	"Costo referencial (auto)"	"s"	null
+"F1"	"Aporte Calidad (auto)"	"Aporte Calidad (auto)"	"s"	null
+"G1"	"Aporte Eficiencia (auto)"	"Aporte Eficiencia (auto)"	"s"	null
+"H1"	"Aporte Reputacion (auto)"	"Aporte Reputacion (auto)"	"s"	null
+"I1"	"Aporte Financiero (auto)"	"Aporte Financiero (auto)"	"s"	null
+"A2"	"Maquina de ensamblado"	"Maquina de ensamblado"	"s"	null
+"C2"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C2"
+"D2"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D2"
+"E2"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E2"
+"F2"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F2"
+"G2"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G2"
+"H2"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H2"
+"I2"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I2"
+"A3"	"Maquina de acabados"	"Maquina de acabados"	"s"	null
+"C3"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C3"
+"D3"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D3"
+"E3"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E3"
+"F3"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F3"
+"G3"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G3"
+"H3"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H3"
+"I3"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I3"
+"A4"	"Molde"	"Molde"	"s"	null
+"C4"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C4"
+"D4"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D4"
+"E4"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E4"
+"F4"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F4"
+"G4"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G4"
+"H4"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H4"
+"I4"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I4"
+"A5"	"Personal de corte"	"Personal de corte"	"s"	null
+"C5"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C5"
+"D5"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D5"
+"E5"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E5"
+"F5"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F5"
+"G5"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G5"
+"H5"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H5"
+"I5"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B5,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I5"
+"A6"	"Personal de ensamble"	"Personal de ensamble"	"s"	null
+"C6"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C6"
+"D6"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D6"
+"E6"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E6"
+"F6"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F6"
+"G6"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G6"
+"H6"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H6"
+"I6"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B6,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I6"
+"A7"	"Personal de acabados"	"Personal de acabados"	"s"	null
+"C7"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C7"
+"D7"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D7"
+"E7"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E7"
+"F7"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F7"
+"G7"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G7"
+"H7"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H7"
+"I7"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B7,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I7"
+"A8"	"Jefatura"	"Jefatura"	"s"	null
+"C8"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C8"
+"D8"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D8"
+"E8"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E8"
+"F8"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F8"
+"G8"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G8"
+"H8"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H8"
+"I8"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B8,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I8"
+"A9"	"Canal de venta"	"Canal de venta"	"s"	null
+"C9"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C9"
+"D9"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D9"
+"E9"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E9"
+"F9"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F9"
+"G9"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G9"
+"H9"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H9"
+"I9"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B9,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I9"
+"A10"	"Acceso a prestamo bancario"	"Acceso a prestamo bancario"	"s"	null
+"C10"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C10"
+"D10"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D10"
+"E10"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E10"
+"F10"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F10"
+"G10"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G10"
+"H10"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H10"
+"I10"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B10,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I10"
+"A11"	"Numero de proveedores"	"Numero de proveedores"	"s"	null
+"C11"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C11"
+"D11"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D11"
+"E11"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E11"
+"F11"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F11"
+"G11"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G11"
+"H11"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H11"
+"I11"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B11,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I11"
+"A12"	"Politica de pago a proveedores"	"Politica de pago a proveedores"	"s"	null
+"C12"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C12"
+"D12"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D12"
+"E12"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E12"
+"F12"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F12"
+"G12"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G12"
+"H12"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H12"
+"I12"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B12,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I12"
+"A13"	"Lead time"	"Lead time"	"s"	null
+"C13"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C13"
+"D13"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D13"
+"E13"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E13"
+"F13"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F13"
+"G13"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G13"
+"H13"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H13"
+"I13"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B13,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I13"
+"A14"	"Inversion en RR.HH."	"Inversion en RR.HH."	"s"	null
+"C14"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C14"
+"D14"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D14"
+"E14"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E14"
+"F14"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F14"
+"G14"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G14"
+"H14"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H14"
+"I14"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B14,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I14"
+"A15"	"Inversion en marketing"	"Inversion en marketing"	"s"	null
+"C15"	"=IFERROR(INDEX(Catalogo_Decisiones!$D$2:$D$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"C15"
+"D15"	"=IFERROR(INDEX(Catalogo_Decisiones!$F$2:$F$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),\"\")"	null	"f"	"D15"
+"E15"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"E15"
+"F15"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"F15"
+"G15"	"=IFERROR(INDEX(Catalogo_Decisiones!$I$2:$I$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"G15"
+"H15"	"=IFERROR(INDEX(Catalogo_Decisiones!$J$2:$J$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H15"
+"I15"	"=IFERROR(INDEX(Catalogo_Decisiones!$K$2:$K$57,MATCH($B15,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I15"
+"A16"	"--- Otras decisiones numericas ---"	"--- Otras decisiones numericas ---"	"s"	null
+"A17"	"PRO-01 - Cantidad inicial a producir (unidades)"	"PRO-01 - Cantidad inicial a producir (unidades)"	"s"	null
+"B17"	0.0	0.0	"n"	null
+"A18"	"COM-02 - N° de tiendas en zona alta (Miraflores)"	"COM-02 - N° de tiendas en zona alta (Miraflores)"	"s"	null
+"B18"	0.0	0.0	"n"	null
+"A19"	"COM-03 - N° de tiendas en zona media (Los Olivos / San Miguel)"	"COM-03 - N° de tiendas en zona media (Los Olivos / San Miguel)"	"s"	null
+"B19"	0.0	0.0	"n"	null
+"A20"	"COM-04 - N° de tiendas en zona baja (SJL / SMP)"	"COM-04 - N° de tiendas en zona baja (SJL / SMP)"	"s"	null
+"B20"	0.0	0.0	"n"	null
+"A21"	"COM-05N - % de ventas a credito (0-100)"	"COM-05N - % de ventas a credito (0-100)"	"s"	null
+"B21"	0.0	0.0	"n"	null
+"A22"	"FIN-01M - Monto de prestamo solicitado (S/)"	"FIN-01M - Monto de prestamo solicitado (S/)"	"s"	null
+"B22"	0.0	0.0	"n"	null

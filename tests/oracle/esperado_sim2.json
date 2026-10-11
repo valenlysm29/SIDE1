@@ -1,0 +1,153 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "sim2",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "consecuencias.CONS-01.activa":  true,
+                    "consecuencias.CONS-01.efecto":  0.65,
+                    "consecuencias.CONS-01.mensaje":  "Posicionaste tu marca como premium, pero tus materiales e insumos no lo respaldan. Los clientes se sienten enganados y las devoluciones aumentan.",
+                    "consecuencias.CONS-02.activa":  false,
+                    "consecuencias.CONS-02.efecto":  1,
+                    "consecuencias.CONS-02.mensaje":  "",
+                    "consecuencias.CONS-03.activa":  true,
+                    "consecuencias.CONS-03.efecto":  0.7,
+                    "consecuencias.CONS-03.mensaje":  "Tu equipo no dio abasto con el volumen que planeaste. Hubo retrasos y entregaste menos de lo prometido.",
+                    "consecuencias.CONS-04.activa":  true,
+                    "consecuencias.CONS-04.efecto":  0.8,
+                    "consecuencias.CONS-04.mensaje":  "Tu marca empieza a perder terreno. Los clientes prefieren a la competencia.",
+                    "consecuencias.CONS-05.activa":  true,
+                    "consecuencias.CONS-05.efecto":  3,
+                    "consecuencias.CONS-05.mensaje":  "Tu situacion financiera es riesgosa. El banco te ofrece condiciones menos favorables la proxima vez.",
+                    "consecuencias.CONS-06.activa":  true,
+                    "consecuencias.CONS-06.efecto":  782.82828282828291,
+                    "consecuencias.CONS-06.mensaje":  "Intentaste producir mas de lo que tu planta soporta. Hubo cuellos de botella y tuviste que pagar horas extra para cumplir.",
+                    "consecuencias.CONS-07.activa":  true,
+                    "consecuencias.CONS-07.efecto":  330,
+                    "consecuencias.CONS-07.mensaje":  "Produjiste mas de lo que el mercado te pidio. Te quedaste con inventario sin vender.",
+                    "consecuencias.CONS-08.activa":  true,
+                    "consecuencias.CONS-08.efecto":  0.95,
+                    "consecuencias.CONS-08.mensaje":  "Sin jefatura que coordine, tu equipo perdio tiempo resolviendo conflictos de tareas.",
+                    "consecuencias.produccion":  263,
+                    "consecuencias.reputacionCambio":  -2,
+                    "consecuencias.precioFactor":  0.65,
+                    "consecuencias.ciclosBajaFinal":  2
+                },
+    "celdas":  {
+                   "consecuencias.CONS-01.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D2"
+                                                    ],
+                   "consecuencias.CONS-01.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E2"
+                                                    ],
+                   "consecuencias.CONS-01.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F2"
+                                                     ],
+                   "consecuencias.CONS-02.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D3"
+                                                    ],
+                   "consecuencias.CONS-02.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E3"
+                                                    ],
+                   "consecuencias.CONS-02.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F3"
+                                                     ],
+                   "consecuencias.CONS-03.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D4"
+                                                    ],
+                   "consecuencias.CONS-03.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E4"
+                                                    ],
+                   "consecuencias.CONS-03.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F4"
+                                                     ],
+                   "consecuencias.CONS-04.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D5"
+                                                    ],
+                   "consecuencias.CONS-04.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E5"
+                                                    ],
+                   "consecuencias.CONS-04.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F5"
+                                                     ],
+                   "consecuencias.CONS-05.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D6"
+                                                    ],
+                   "consecuencias.CONS-05.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E6"
+                                                    ],
+                   "consecuencias.CONS-05.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F6"
+                                                     ],
+                   "consecuencias.CONS-06.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D7"
+                                                    ],
+                   "consecuencias.CONS-06.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E7"
+                                                    ],
+                   "consecuencias.CONS-06.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F7"
+                                                     ],
+                   "consecuencias.CONS-07.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D8"
+                                                    ],
+                   "consecuencias.CONS-07.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E8"
+                                                    ],
+                   "consecuencias.CONS-07.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F8"
+                                                     ],
+                   "consecuencias.CONS-08.activa":  [
+                                                        "Consecuencias_Oracle",
+                                                        "D9"
+                                                    ],
+                   "consecuencias.CONS-08.efecto":  [
+                                                        "Consecuencias_Oracle",
+                                                        "E9"
+                                                    ],
+                   "consecuencias.CONS-08.mensaje":  [
+                                                         "Consecuencias_Oracle",
+                                                         "F9"
+                                                     ],
+                   "consecuencias.produccion":  [
+                                                    "Consecuencias_Oracle",
+                                                    "B14"
+                                                ],
+                   "consecuencias.reputacionCambio":  [
+                                                          "Consecuencias_Oracle",
+                                                          "B15"
+                                                      ],
+                   "consecuencias.precioFactor":  [
+                                                      "Consecuencias_Oracle",
+                                                      "B16"
+                                                  ],
+                   "consecuencias.ciclosBajaFinal":  [
+                                                         "Consecuencias_Oracle",
+                                                         "B17"
+                                                     ]
+               }
+}

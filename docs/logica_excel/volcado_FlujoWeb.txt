@@ -1,0 +1,77 @@
+Hoja: FlujoWeb
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"B3"	"Flujo"	"Flujo"	"s"	null
+"B4"	"Steps"	"Steps"	"s"	null
+"C4"	"Docente"	"Docente"	"s"	null
+"D4"	"Jugadores"	"Jugadores"	"s"	null
+"H4"	"Valeria y Gonzalo"	"Valeria y Gonzalo"	"s"	null
+"B5"	1.0	1.0	"n"	null
+"C5"	"Launcher"	"Launcher"	"s"	null
+"H5"	"Erick y Miguel"	"Erick y Miguel"	"s"	null
+"B6"	2.0	2.0	"n"	null
+"C6"	"Login"	"Login"	"s"	null
+"E6"	"Se valida el codigo de sala y el nombre empresa(usuario)"	"Se valida el codigo de sala y el nombre empresa(usuario)"	"s"	null
+"B7"	3.0	3.0	"n"	null
+"C7"	"Configuracion del juego (incluye Creacion de Sala)"	"Configuracion del juego (incluye Creacion de Sala)"	"s"	null
+"B8"	4.0	4.0	"n"	null
+"D8"	"Launcher"	"Launcher"	"s"	null
+"B9"	5.0	5.0	"n"	null
+"D9"	"Login"	"Login"	"s"	null
+"B10"	6.0	6.0	"n"	null
+"D10"	"Tutorial"	"Tutorial"	"s"	null
+"E10"	"Indicaciones en un carrusel."	"Indicaciones en un carrusel."	"s"	null
+"A11"	"Ciclo 1"	"Ciclo 1"	"s"	null
+"B11"	7.0	7.0	"n"	null
+"D11"	"Decisiones"	"Decisiones"	"s"	null
+"B12"	8.0	8.0	"n"	null
+"D12"	"Espera (Fin de ciclo)"	"Espera (Fin de ciclo)"	"s"	null
+"E12"	"El docente define si se hace automatico o manual"	"El docente define si se hace automatico o manual"	"s"	null
+"B13"	9.0	9.0	"n"	null
+"C13"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"s"	null
+"B14"	10.0	10.0	"n"	null
+"C14"	"Estados financieros Generales"	"Estados financieros Generales"	"s"	null
+"D14"	"Estados financieros Individuales e Informacion del mercado"	"Estados financieros Individuales e Informacion del mercado"	"s"	null
+"E14"	"Descargables en pdf"	"Descargables en pdf"	"s"	null
+"A15"	"Ciclo 2"	"Ciclo 2"	"s"	null
+"B15"	11.0	11.0	"n"	null
+"D15"	"Decisiones"	"Decisiones"	"s"	null
+"G15"	"  "	"  "	"s"	null
+"B16"	12.0	12.0	"n"	null
+"D16"	"Espera (Fin de ciclo)"	"Espera (Fin de ciclo)"	"s"	null
+"B17"	13.0	13.0	"n"	null
+"C17"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"s"	null
+"B18"	14.0	14.0	"n"	null
+"C18"	"Estados financieros Generales"	"Estados financieros Generales"	"s"	null
+"D18"	"Estados financieros Individuales e Informacion del mercado"	"Estados financieros Individuales e Informacion del mercado"	"s"	null
+"E18"	"Descargables en pdf"	"Descargables en pdf"	"s"	null
+"A19"	"Ciclo 3"	"Ciclo 3"	"s"	null
+"B19"	15.0	15.0	"n"	null
+"D19"	"Decisiones"	"Decisiones"	"s"	null
+"B20"	16.0	16.0	"n"	null
+"D20"	"Espera (Fin de ciclo)"	"Espera (Fin de ciclo)"	"s"	null
+"B21"	17.0	17.0	"n"	null
+"C21"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"s"	null
+"B22"	18.0	18.0	"n"	null
+"C22"	"Estados financieros Generales"	"Estados financieros Generales"	"s"	null
+"D22"	"Estados financieros Individuales e Informacion del mercado"	"Estados financieros Individuales e Informacion del mercado"	"s"	null
+"E22"	"Descargables en pdf"	"Descargables en pdf"	"s"	null
+"A23"	"Ciclo N"	"Ciclo N"	"s"	null
+"B23"	15.0	15.0	"n"	null
+"D23"	"Decisiones"	"Decisiones"	"s"	null
+"B24"	16.0	16.0	"n"	null
+"D24"	"Espera (Fin de ciclo)"	"Espera (Fin de ciclo)"	"s"	null
+"B25"	17.0	17.0	"n"	null
+"C25"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"Información en vivo de las decisiones de los jugadores (Manual: Cierra el ciclo)"	"s"	null
+"B26"	18.0	18.0	"n"	null
+"C26"	"Estados financieros Generales"	"Estados financieros Generales"	"s"	null
+"D26"	"Estados financieros Individuales e Informacion del mercado"	"Estados financieros Individuales e Informacion del mercado"	"s"	null
+"B27"	23.0	23.0	"n"	null
+"C27"	"Resumen General - Indicar podio"	"Resumen General - Indicar podio"	"s"	null
+"D27"	"Estados financieros Individuales y Consolidado Final"	"Estados financieros Individuales y Consolidado Final"	"s"	null
+"E27"	"Descargables en pdf"	"Descargables en pdf"	"s"	null
+"B28"	24.0	24.0	"n"	null
+"D28"	"Mostrar Podio"	"Mostrar Podio"	"s"	null
+"E28"	"Agregar disclaimer indicando que los datos se guardaran un maximo de 24 horas"	"Agregar disclaimer indicando que los datos se guardaran un maximo de 24 horas"	"s"	null
+"B37"	"Si el jugador no tomo decision dentro del tiempo establecido y es la primera decisión se le elimina del juego"	"Si el jugador no tomo decision dentro del tiempo establecido y es la primera decisión se le elimina del juego"	"s"	null
+"B38"	"El Docente tiene la opcion de eliminar jugadores en cualquier momento. Sin importar si es manual o automatico"	"El Docente tiene la opcion de eliminar jugadores en cualquier momento. Sin importar si es manual o automatico"	"s"	null
+"B39"	"Si el jugador no tomo decisiones dentro del tiempo establecido y no es la primera decisión el sistema replica las decisiones del ciclo anterior."	"Si el jugador no tomo decisiones dentro del tiempo establecido y no es la primera decisión el sistema replica las decisiones del ciclo anterior."	"s"	null

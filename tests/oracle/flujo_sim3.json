@@ -1,0 +1,12 @@
+{
+  "eliminadas": [
+    "E"
+  ],
+  "replicadas": [
+    {
+      "ciclo": 2,
+      "empresa": "B"
+    }
+  ],
+  "filas": 12
+}

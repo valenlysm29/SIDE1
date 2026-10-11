@@ -1,0 +1,420 @@
+{
+  "id": "SIM-2",
+  "empresas": [
+    "A",
+    "B"
+  ],
+  "overrides": {
+    "MERCADOS": {
+      "SEG-01": {
+        "unidades": 10,
+        "penetracion": 1,
+        "pesos": [
+          0.7,
+          0.2,
+          0.1
+        ]
+      },
+      "SEG-02": {
+        "unidades": 10,
+        "penetracion": 1,
+        "pesos": [
+          0.4,
+          0.35,
+          0.25
+        ],
+        "precioIdeal": 100
+      },
+      "SEG-03": {
+        "unidades": 10,
+        "penetracion": 1,
+        "pesos": [
+          0.1,
+          0.5,
+          0.4
+        ],
+        "precioIdeal": 250
+      }
+    }
+  },
+  "ciclos": [
+    {
+      "decisionesPorEmpresa": {
+        "A": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 1,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-03",
+            "INF-06",
+            "INF-09",
+            "RH-02",
+            "RH-05",
+            "RH-08",
+            "RH-10A",
+            "COM-01C",
+            "FIN-01B",
+            "INS-09B",
+            "INS-10A",
+            "INS-11B",
+            "INV-01B",
+            "INV-02B"
+          ],
+          "compras": {
+            "INS-03": 500,
+            "INS-05": 1000,
+            "INS-08": 15000
+          },
+          "lotes": [
+            {
+              "segmento": "SEG-03",
+              "cantidad": 200,
+              "cuero": "INS-03",
+              "accesorios": "INS-05",
+              "hilo": "INS-08",
+              "molde": "INF-10",
+              "precio": 250
+            }
+          ],
+          "publicidad": 0
+        },
+        "B": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 0,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-02",
+            "INF-05",
+            "INF-08",
+            "RH-01",
+            "RH-04",
+            "RH-07",
+            "RH-10B",
+            "INS-11C",
+            "INF-11A",
+            "INS-12A",
+            "FIN-01A",
+            "INV-02A"
+          ],
+          "compras": {
+            "INS-01": 300,
+            "INS-04": 1000,
+            "INS-06": 6000
+          },
+          "lotes": [
+            {
+              "segmento": "SEG-03",
+              "cantidad": 200,
+              "cuero": "INS-01",
+              "molde": "INF-08",
+              "precio": 250
+            },
+            {
+              "segmento": "SEG-03",
+              "cantidad": 100,
+              "cuero": "INS-01",
+              "accesorios": "INS-04",
+              "hilo": "INS-06",
+              "molde": "INF-08",
+              "precio": 250
+            }
+          ],
+          "publicidad": 0,
+          "montoPrestamo": 5000
+        }
+      }
+    },
+    {
+      "decisionesPorEmpresa": {
+        "A": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 1,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-03",
+            "INF-06",
+            "INF-09",
+            "RH-02",
+            "RH-05",
+            "RH-08",
+            "RH-10A",
+            "COM-01C",
+            "FIN-01B",
+            "INS-09B",
+            "INS-10A",
+            "INS-11B",
+            "INV-01B",
+            "INV-02B"
+          ],
+          "compras": {
+            "INS-03": 500,
+            "INS-05": 1000,
+            "INS-08": 15000
+          },
+          "lotes": [
+            {
+              "segmento": "SEG-03",
+              "cantidad": 200,
+              "cuero": "INS-03",
+              "accesorios": "INS-05",
+              "hilo": "INS-08",
+              "molde": "INF-10",
+              "precio": 250
+            }
+          ],
+          "publicidad": 0
+        },
+        "B": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 0,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-02",
+            "INF-05",
+            "INF-08",
+            "RH-01",
+            "RH-04",
+            "RH-07",
+            "RH-10B",
+            "INS-11C",
+            "INF-11A",
+            "INS-12A",
+            "FIN-01A",
+            "INV-02A"
+          ],
+          "compras": {
+            "INS-01": 300,
+            "INS-04": 1000,
+            "INS-06": 6000
+          },
+          "lotes": [
+            {
+              "segmento": "SEG-03",
+              "cantidad": 200,
+              "cuero": "INS-01",
+              "molde": "INF-08",
+              "precio": 250
+            },
+            {
+              "segmento": "SEG-03",
+              "cantidad": 100,
+              "cuero": "INS-01",
+              "accesorios": "INS-04",
+              "hilo": "INS-06",
+              "molde": "INF-08",
+              "precio": 250
+            }
+          ],
+          "publicidad": 0,
+          "montoPrestamo": 5000
+        }
+      }
+    },
+    {
+      "decisionesPorEmpresa": {
+        "A": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 1,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-03",
+            "INF-06",
+            "INF-09",
+            "RH-02",
+            "RH-05",
+            "RH-08",
+            "RH-10A",
+            "COM-01C",
+            "FIN-01B",
+            "INS-09B",
+            "INS-10A",
+            "INS-11B",
+            "INV-01B",
+            "INV-02B"
+          ],
+          "compras": {
+            "INS-03": 500,
+            "INS-05": 1000,
+            "INS-08": 15000
+          },
+          "lotes": [
+            {
+              "segmento": "SEG-03",
+              "cantidad": 200,
+              "cuero": "INS-03",
+              "accesorios": "INS-05",
+              "hilo": "INS-08",
+              "molde": "INF-10",
+              "precio": 250
+            }
+          ],
+          "publicidad": 0
+        },
+        "B": {
+          "regimen": "MYPE",
+          "personal": {
+            "corte": [
+              1,
+              0,
+              0
+            ],
+            "ensamble": [
+              1,
+              0,
+              0
+            ],
+            "acabado": [
+              1,
+              0,
+              0
+            ]
+          },
+          "jefes": 0,
+          "maquinaria": {
+            "mesa": 1,
+            "INF-02": 1,
+            "INF-05": 1,
+            "INF-08": 1
+          },
+          "seleccion": [
+            "INF-02",
+            "INF-05",
+            "INF-08",
+            "RH-01",
+            "RH-04",
+            "RH-07",
+            "RH-10B",
+            "INS-11C",
+            "INF-11A",
+            "INS-12A",
+            "FIN-01A",
+            "INV-02A"
+          ],
+          "compras": {},
+          "lotes": [
+            {
+              "segmento": "SEG-02",
+              "cantidad": 100,
+              "cuero": "INS-03",
+              "accesorios": "INS-05",
+              "hilo": "INS-08",
+              "molde": "INF-09",
+              "precio": 100
+            }
+          ],
+          "publicidad": 0
+        }
+      }
+    }
+  ]
+}

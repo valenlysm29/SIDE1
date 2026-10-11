@@ -187,6 +187,9 @@ function productionSummaryHtml(review){
     </div>
     <p class="cs-production-method">Modelo de producción: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
   </section>`;
+  if(!history&&decisionState.__excel?.habilitado){
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+  }
 }
 function sectionSummaryHtml(section,{history=false,compact=false}={}){
   const hasSelection=section.items.some(i=>i.rows?.some(r=>r.outflow||r.income||Number(r.quantity)>0));
@@ -227,6 +230,9 @@ function renderCompanySummary(){
     ${!history?`<footer class="cs-main-actions"><span>${decisionsSubmitted()?'Ciclo completo confirmado. Este resumen sigue disponible para consulta.':'Revisa lo elegido y los apartados pendientes antes de confirmar.'}</span><button id="companyReviewAll" type="button" class="cs-primary">${decisionsSubmitted()?'VER REVISI\u00d3N DEL CICLO':'REVISAR Y ENVIAR TODO'}</button></footer>`:''}
   </section>`;
   mount.querySelectorAll('[data-summary-filter]').forEach(b=>b.addEventListener('click',()=>{companySummaryFilter=b.dataset.summaryFilter;renderCompanySummary();}));
+  if(!history&&decisionState.__excel?.habilitado){
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+  }
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
     mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
     mount.querySelector('#companyStartWorld')?.addEventListener('click',requestWorldEntry);
@@ -271,3 +277,4 @@ window.addEventListener('storage',event=>{
     closeCompanyReview();loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory();
   }
 });
+

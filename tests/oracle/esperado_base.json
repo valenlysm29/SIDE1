@@ -1,0 +1,1768 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "base",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "produccion.I8":  21,
+                    "produccion.I14":  31.4,
+                    "produccion.I20":  17.2,
+                    "produccion.K5":  17.2,
+                    "produccion.L5":  412.79999999999995,
+                    "produccion.M5":  0.96000000000000008,
+                    "produccion.N5":  396,
+                    "produccion.L9":  8,
+                    "produccion.L10":  3,
+                    "produccion.M10":  0.375,
+                    "produccion.D37":  250,
+                    "produccion.E37":  190,
+                    "produccion.D38":  180,
+                    "produccion.E38":  137,
+                    "produccion.D39":  90,
+                    "produccion.E39":  68,
+                    "produccion.D56":  190,
+                    "produccion.E56":  190,
+                    "produccion.G56":  57,
+                    "produccion.H56":  190,
+                    "produccion.I56":  1140,
+                    "produccion.D57":  125,
+                    "produccion.E57":  125,
+                    "produccion.G57":  50,
+                    "produccion.H57":  125,
+                    "produccion.I57":  875,
+                    "produccion.D58":  50,
+                    "produccion.E58":  50,
+                    "produccion.G58":  35,
+                    "produccion.H58":  50,
+                    "produccion.I58":  650,
+                    "produccion.D63":  15,
+                    "produccion.E63":  60,
+                    "produccion.F63":  75,
+                    "produccion.G63":  0,
+                    "produccion.D64":  17,
+                    "produccion.E64":  55,
+                    "produccion.F64":  72,
+                    "produccion.G64":  0,
+                    "produccion.D65":  48,
+                    "produccion.E65":  15,
+                    "produccion.F65":  63,
+                    "produccion.G65":  0,
+                    "produccion.D66":  50,
+                    "produccion.E66":  200,
+                    "produccion.F66":  250,
+                    "produccion.G66":  0,
+                    "produccion.D67":  0,
+                    "produccion.E67":  190,
+                    "produccion.F67":  180,
+                    "produccion.G67":  10,
+                    "produccion.D68":  90,
+                    "produccion.E68":  0,
+                    "produccion.F68":  90,
+                    "produccion.G68":  0,
+                    "produccion.D69":  1494,
+                    "produccion.E69":  6,
+                    "produccion.F69":  1500,
+                    "produccion.G69":  0,
+                    "produccion.D70":  1253,
+                    "produccion.E70":  7,
+                    "produccion.F70":  1260,
+                    "produccion.G70":  0,
+                    "produccion.D71":  1170,
+                    "produccion.E71":  0,
+                    "produccion.F71":  1170,
+                    "produccion.G71":  0,
+                    "costos.I8":  14,
+                    "costos.I14":  31.4,
+                    "costos.I20":  24,
+                    "costos.K5":  14,
+                    "costos.L5":  420,
+                    "costos.M5":  0.91,
+                    "costos.N5":  382,
+                    "costos.L9":  7,
+                    "costos.L10":  2,
+                    "costos.M10":  0.2857142857142857,
+                    "costos.G65":  11.187635078564613,
+                    "costos.V95":  27160,
+                    "costos.W95":  24987.2,
+                    "costos.AB96":  24580,
+                    "costos.AC96":  22613.6,
+                    "costos.V100":  2580,
+                    "costos.W100":  2373.6000000000022,
+                    "costos.C65":  2.1195652173913042,
+                    "costos.D65":  2.8571428571428568,
+                    "costos.E65":  3.2109270040304523,
+                    "costos.F65":  3,
+                    "costos.D46":  150,
+                    "costos.E46":  150,
+                    "costos.F46":  0.40760869565217389,
+                    "costos.H46":  45,
+                    "costos.I46":  150,
+                    "costos.J46":  900,
+                    "costos.L46":  45,
+                    "costos.M46":  150,
+                    "costos.N46":  900,
+                    "costos.D47":  140,
+                    "costos.E47":  140,
+                    "costos.F47":  0.38043478260869568,
+                    "costos.H47":  56,
+                    "costos.I47":  140,
+                    "costos.J47":  980,
+                    "costos.L47":  56,
+                    "costos.M47":  140,
+                    "costos.N47":  980,
+                    "costos.D48":  95,
+                    "costos.E48":  78,
+                    "costos.F48":  0.21195652173913043,
+                    "costos.H48":  66.5,
+                    "costos.I48":  95,
+                    "costos.J48":  1235,
+                    "costos.L48":  54.599999999999994,
+                    "costos.M48":  78,
+                    "costos.N48":  1014,
+                    "costos.D49":  385,
+                    "costos.E49":  368,
+                    "costos.F49":  1,
+                    "costos.H49":  167.5,
+                    "costos.I49":  385,
+                    "costos.J49":  3115,
+                    "costos.L49":  155.6,
+                    "costos.M49":  368,
+                    "costos.N49":  2894,
+                    "costos.D54":  0,
+                    "costos.E54":  60,
+                    "costos.F54":  60,
+                    "costos.G54":  0,
+                    "costos.D55":  0,
+                    "costos.E55":  110,
+                    "costos.F55":  107.5,
+                    "costos.G55":  2.5,
+                    "costos.D56":  0,
+                    "costos.E56":  30,
+                    "costos.F56":  0,
+                    "costos.G56":  30,
+                    "costos.D57":  0,
+                    "costos.E57":  200,
+                    "costos.F57":  200,
+                    "costos.G57":  0,
+                    "costos.D58":  0,
+                    "costos.E58":  190,
+                    "costos.F58":  185,
+                    "costos.G58":  5,
+                    "costos.D59":  0,
+                    "costos.E59":  0,
+                    "costos.F59":  0,
+                    "costos.G59":  0,
+                    "costos.D60":  0,
+                    "costos.E60":  1500,
+                    "costos.F60":  1500,
+                    "costos.G60":  0,
+                    "costos.D61":  0,
+                    "costos.E61":  1400,
+                    "costos.F61":  1400,
+                    "costos.G61":  0,
+                    "costos.U11":  1690.8,
+                    "costos.V11":  1856.5384615384614,
+                    "costos.Y11":  1690.8,
+                    "costos.Z11":  1856.5384615384614,
+                    "costos.AC11":  1690.8,
+                    "costos.AD11":  1856.5384615384614,
+                    "costos.U20":  2254.4,
+                    "costos.V20":  2475.3846153846152,
+                    "costos.Y20":  3104.16,
+                    "costos.Z20":  3365.5384615384614,
+                    "costos.AC20":  3104.16,
+                    "costos.AD20":  3365.5384615384614,
+                    "costos.U29":  4191.36,
+                    "costos.V29":  4526.3076923076924,
+                    "costos.Y29":  4952.4,
+                    "costos.Z29":  5338.8461538461543,
+                    "costos.AC29":  4952.4,
+                    "costos.AD29":  5338.8461538461543,
+                    "costos.U38":  41520,
+                    "costos.V38":  46770,
+                    "costos.Y38":  8904,
+                    "costos.Z38":  10554,
+                    "costos.U50":  2512.5,
+                    "costos.V50":  2675,
+                    "costos.Y50":  3517.5,
+                    "costos.Z50":  3745,
+                    "costos.AC50":  1177.5,
+                    "costos.AD50":  1257,
+                    "costos.U57":  261,
+                    "costos.V57":  276,
+                    "costos.Y57":  -712.5,
+                    "costos.Z57":  -675,
+                    "costos.AC57":  -534.375,
+                    "costos.AD57":  -506.25,
+                    "costos.Y58":  7537.5,
+                    "costos.Z58":  8025,
+                    "costos.AC58":  4415.625,
+                    "costos.AD58":  4713.75,
+                    "costos.U64":  1044,
+                    "costos.V64":  1104,
+                    "costos.Y64":  750,
+                    "costos.Z64":  1200,
+                    "costos.AC64":  475,
+                    "costos.AD64":  760,
+                    "costos.Y66":  15075,
+                    "costos.Z66":  16050,
+                    "costos.AC66":  9321.875,
+                    "costos.AD66":  9951.25,
+                    "costos.U71":  3045,
+                    "costos.V71":  3220,
+                    "lotes.H2":  96,
+                    "lotes.I2":  12,
+                    "lotes.J2":  7,
+                    "lotes.K2":  "Coherente",
+                    "lotes.L2":  "Este lote cumple con la calidad esperada para su segmento. Los clientes perciben el valor y el precio se sostiene.",
+                    "lotes.H3":  51,
+                    "lotes.I3":  5,
+                    "lotes.J3":  4,
+                    "lotes.K3":  "Coherente",
+                    "lotes.L3":  "Este lote cumple con la calidad esperada para su segmento. Los clientes perciben el valor y el precio se sostiene.",
+                    "lotes.H4":  31,
+                    "lotes.I4":  4,
+                    "lotes.J4":  7,
+                    "lotes.K4":  "No alcanza el segmento",
+                    "lotes.L4":  "Este lote no alcanza la calidad que su segmento promete. Los clientes se sienten enganados: baja el precio efectivo y la reputacion.",
+                    "lotes.C5":  500,
+                    "lotes.H5":  28000,
+                    "motor.B6":  6.2,
+                    "motor.D6":  "Medio",
+                    "motor.B9":  17,
+                    "motor.D9":  "Alto",
+                    "motor.B10":  8,
+                    "motor.D10":  "Alto",
+                    "motor.B11":  -3,
+                    "motor.D11":  "Bajo",
+                    "ventas_modelo2.E118":  20,
+                    "ventas_modelo2.F118":  100,
+                    "ventas_modelo2.G118":  70,
+                    "ventas_modelo2.H118":  86,
+                    "ventas_modelo2.I118":  0.36909871244635195,
+                    "ventas_modelo2.J118":  1292,
+                    "ventas_modelo2.E119":  24,
+                    "ventas_modelo2.F119":  0,
+                    "ventas_modelo2.G119":  83,
+                    "ventas_modelo2.H119":  19,
+                    "ventas_modelo2.I119":  0.0815450643776824,
+                    "ventas_modelo2.J119":  285,
+                    "ventas_modelo2.E120":  30,
+                    "ventas_modelo2.F120":  40,
+                    "ventas_modelo2.G120":  102,
+                    "ventas_modelo2.H120":  51.400000000000006,
+                    "ventas_modelo2.I120":  0.22060085836909873,
+                    "ventas_modelo2.J120":  772,
+                    "ventas_modelo2.E121":  26,
+                    "ventas_modelo2.F121":  80,
+                    "ventas_modelo2.G121":  90,
+                    "ventas_modelo2.H121":  76.6,
+                    "ventas_modelo2.I121":  0.3287553648068669,
+                    "ventas_modelo2.J121":  1151,
+                    "ventas_modelo2.E131":  20,
+                    "ventas_modelo2.F131":  80,
+                    "ventas_modelo2.G131":  70,
+                    "ventas_modelo2.H131":  61.5,
+                    "ventas_modelo2.I131":  0.30483271375464682,
+                    "ventas_modelo2.J131":  1067,
+                    "ventas_modelo2.E132":  24,
+                    "ventas_modelo2.F132":  50,
+                    "ventas_modelo2.G132":  83,
+                    "ventas_modelo2.H132":  55.05,
+                    "ventas_modelo2.I132":  0.27286245353159849,
+                    "ventas_modelo2.J132":  955,
+                    "ventas_modelo2.E133":  30,
+                    "ventas_modelo2.F133":  10,
+                    "ventas_modelo2.G133":  102,
+                    "ventas_modelo2.H133":  47.199999999999996,
+                    "ventas_modelo2.I133":  0.23395291201982649,
+                    "ventas_modelo2.J133":  819,
+                    "ventas_modelo2.E134":  26,
+                    "ventas_modelo2.F134":  0,
+                    "ventas_modelo2.G134":  90,
+                    "ventas_modelo2.H134":  38,
+                    "ventas_modelo2.I134":  0.18835192069392812,
+                    "ventas_modelo2.J134":  659,
+                    "ventas_modelo2.E144":  20,
+                    "ventas_modelo2.F144":  100,
+                    "ventas_modelo2.G144":  70,
+                    "ventas_modelo2.H144":  53,
+                    "ventas_modelo2.I144":  0.21783806000822031,
+                    "ventas_modelo2.J144":  174,
+                    "ventas_modelo2.E145":  24,
+                    "ventas_modelo2.F145":  80,
+                    "ventas_modelo2.G145":  83,
+                    "ventas_modelo2.H145":  59.1,
+                    "ventas_modelo2.I145":  0.2429099876695438,
+                    "ventas_modelo2.J145":  194,
+                    "ventas_modelo2.E146":  30,
+                    "ventas_modelo2.F146":  88,
+                    "ventas_modelo2.G146":  102,
+                    "ventas_modelo2.H146":  71.8,
+                    "ventas_modelo2.I146":  0.29510891903000414,
+                    "ventas_modelo2.J146":  236,
+                    "ventas_modelo2.E147":  26,
+                    "ventas_modelo2.F147":  40,
+                    "ventas_modelo2.G147":  90,
+                    "ventas_modelo2.H147":  59.4,
+                    "ventas_modelo2.I147":  0.24414303329223183,
+                    "ventas_modelo2.J147":  195,
+                    "ventas_modelo1.E73":  5,
+                    "ventas_modelo1.F73":  12,
+                    "ventas_modelo1.G73":  0.22388059701492538,
+                    "ventas_modelo1.H73":  784,
+                    "ventas_modelo1.E74":  4.5,
+                    "ventas_modelo1.F74":  12.8,
+                    "ventas_modelo1.G74":  0.23880597014925373,
+                    "ventas_modelo1.H74":  836,
+                    "ventas_modelo1.E75":  4.7,
+                    "ventas_modelo1.F75":  14.899999999999999,
+                    "ventas_modelo1.G75":  0.27798507462686561,
+                    "ventas_modelo1.H75":  973,
+                    "ventas_modelo1.E76":  4.9,
+                    "ventas_modelo1.F76":  13.9,
+                    "ventas_modelo1.G76":  0.25932835820895522,
+                    "ventas_modelo1.H76":  908,
+                    "ventas_modelo1.E87":  28,
+                    "ventas_modelo1.F87":  35,
+                    "ventas_modelo1.G87":  0.2723735408560311,
+                    "ventas_modelo1.H87":  953,
+                    "ventas_modelo1.E88":  25,
+                    "ventas_modelo1.F88":  33.3,
+                    "ventas_modelo1.G88":  0.2591439688715953,
+                    "ventas_modelo1.H88":  907,
+                    "ventas_modelo1.E89":  21,
+                    "ventas_modelo1.F89":  31.2,
+                    "ventas_modelo1.G89":  0.24280155642023346,
+                    "ventas_modelo1.H89":  850,
+                    "ventas_modelo1.E90":  20,
+                    "ventas_modelo1.F90":  29,
+                    "ventas_modelo1.G90":  0.22568093385214008,
+                    "ventas_modelo1.H90":  790,
+                    "ventas_modelo1.E101":  55,
+                    "ventas_modelo1.F101":  62,
+                    "ventas_modelo1.G101":  0.26105263157894737,
+                    "ventas_modelo1.H101":  209,
+                    "ventas_modelo1.E102":  50,
+                    "ventas_modelo1.F102":  58.3,
+                    "ventas_modelo1.G102":  0.24547368421052632,
+                    "ventas_modelo1.H102":  196,
+                    "ventas_modelo1.E103":  58,
+                    "ventas_modelo1.F103":  68.2,
+                    "ventas_modelo1.G103":  0.28715789473684211,
+                    "ventas_modelo1.H103":  230,
+                    "ventas_modelo1.E104":  40,
+                    "ventas_modelo1.F104":  49,
+                    "ventas_modelo1.G104":  0.2063157894736842,
+                    "ventas_modelo1.H104":  165
+                },
+    "celdas":  {
+                   "produccion.I8":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "I8"
+                                     ],
+                   "produccion.I14":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "I14"
+                                      ],
+                   "produccion.I20":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "I20"
+                                      ],
+                   "produccion.K5":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "K5"
+                                     ],
+                   "produccion.L5":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "L5"
+                                     ],
+                   "produccion.M5":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "M5"
+                                     ],
+                   "produccion.N5":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "N5"
+                                     ],
+                   "produccion.L9":  [
+                                         "CANTIDAD DE PRODUCCIÓN",
+                                         "L9"
+                                     ],
+                   "produccion.L10":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "L10"
+                                      ],
+                   "produccion.M10":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "M10"
+                                      ],
+                   "produccion.D37":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D37"
+                                      ],
+                   "produccion.E37":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E37"
+                                      ],
+                   "produccion.D38":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D38"
+                                      ],
+                   "produccion.E38":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E38"
+                                      ],
+                   "produccion.D39":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D39"
+                                      ],
+                   "produccion.E39":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E39"
+                                      ],
+                   "produccion.D56":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D56"
+                                      ],
+                   "produccion.E56":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E56"
+                                      ],
+                   "produccion.G56":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G56"
+                                      ],
+                   "produccion.H56":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "H56"
+                                      ],
+                   "produccion.I56":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "I56"
+                                      ],
+                   "produccion.D57":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D57"
+                                      ],
+                   "produccion.E57":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E57"
+                                      ],
+                   "produccion.G57":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G57"
+                                      ],
+                   "produccion.H57":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "H57"
+                                      ],
+                   "produccion.I57":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "I57"
+                                      ],
+                   "produccion.D58":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D58"
+                                      ],
+                   "produccion.E58":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E58"
+                                      ],
+                   "produccion.G58":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G58"
+                                      ],
+                   "produccion.H58":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "H58"
+                                      ],
+                   "produccion.I58":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "I58"
+                                      ],
+                   "produccion.D63":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D63"
+                                      ],
+                   "produccion.E63":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E63"
+                                      ],
+                   "produccion.F63":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F63"
+                                      ],
+                   "produccion.G63":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G63"
+                                      ],
+                   "produccion.D64":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D64"
+                                      ],
+                   "produccion.E64":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E64"
+                                      ],
+                   "produccion.F64":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F64"
+                                      ],
+                   "produccion.G64":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G64"
+                                      ],
+                   "produccion.D65":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D65"
+                                      ],
+                   "produccion.E65":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E65"
+                                      ],
+                   "produccion.F65":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F65"
+                                      ],
+                   "produccion.G65":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G65"
+                                      ],
+                   "produccion.D66":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D66"
+                                      ],
+                   "produccion.E66":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E66"
+                                      ],
+                   "produccion.F66":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F66"
+                                      ],
+                   "produccion.G66":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G66"
+                                      ],
+                   "produccion.D67":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D67"
+                                      ],
+                   "produccion.E67":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E67"
+                                      ],
+                   "produccion.F67":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F67"
+                                      ],
+                   "produccion.G67":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G67"
+                                      ],
+                   "produccion.D68":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D68"
+                                      ],
+                   "produccion.E68":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E68"
+                                      ],
+                   "produccion.F68":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F68"
+                                      ],
+                   "produccion.G68":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G68"
+                                      ],
+                   "produccion.D69":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D69"
+                                      ],
+                   "produccion.E69":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E69"
+                                      ],
+                   "produccion.F69":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F69"
+                                      ],
+                   "produccion.G69":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G69"
+                                      ],
+                   "produccion.D70":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D70"
+                                      ],
+                   "produccion.E70":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E70"
+                                      ],
+                   "produccion.F70":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F70"
+                                      ],
+                   "produccion.G70":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G70"
+                                      ],
+                   "produccion.D71":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "D71"
+                                      ],
+                   "produccion.E71":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "E71"
+                                      ],
+                   "produccion.F71":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "F71"
+                                      ],
+                   "produccion.G71":  [
+                                          "CANTIDAD DE PRODUCCIÓN",
+                                          "G71"
+                                      ],
+                   "costos.I8":  [
+                                     "Costos De Producción",
+                                     "I8"
+                                 ],
+                   "costos.I14":  [
+                                      "Costos De Producción",
+                                      "I14"
+                                  ],
+                   "costos.I20":  [
+                                      "Costos De Producción",
+                                      "I20"
+                                  ],
+                   "costos.K5":  [
+                                     "Costos De Producción",
+                                     "K5"
+                                 ],
+                   "costos.L5":  [
+                                     "Costos De Producción",
+                                     "L5"
+                                 ],
+                   "costos.M5":  [
+                                     "Costos De Producción",
+                                     "M5"
+                                 ],
+                   "costos.N5":  [
+                                     "Costos De Producción",
+                                     "N5"
+                                 ],
+                   "costos.L9":  [
+                                     "Costos De Producción",
+                                     "L9"
+                                 ],
+                   "costos.L10":  [
+                                      "Costos De Producción",
+                                      "L10"
+                                  ],
+                   "costos.M10":  [
+                                      "Costos De Producción",
+                                      "M10"
+                                  ],
+                   "costos.G65":  [
+                                      "Costos De Producción",
+                                      "G65"
+                                  ],
+                   "costos.V95":  [
+                                      "Costos De Producción",
+                                      "V95"
+                                  ],
+                   "costos.W95":  [
+                                      "Costos De Producción",
+                                      "W95"
+                                  ],
+                   "costos.AB96":  [
+                                       "Costos De Producción",
+                                       "AB96"
+                                   ],
+                   "costos.AC96":  [
+                                       "Costos De Producción",
+                                       "AC96"
+                                   ],
+                   "costos.V100":  [
+                                       "Costos De Producción",
+                                       "V100"
+                                   ],
+                   "costos.W100":  [
+                                       "Costos De Producción",
+                                       "W100"
+                                   ],
+                   "costos.C65":  [
+                                      "Costos De Producción",
+                                      "C65"
+                                  ],
+                   "costos.D65":  [
+                                      "Costos De Producción",
+                                      "D65"
+                                  ],
+                   "costos.E65":  [
+                                      "Costos De Producción",
+                                      "E65"
+                                  ],
+                   "costos.F65":  [
+                                      "Costos De Producción",
+                                      "F65"
+                                  ],
+                   "costos.D46":  [
+                                      "Costos De Producción",
+                                      "D46"
+                                  ],
+                   "costos.E46":  [
+                                      "Costos De Producción",
+                                      "E46"
+                                  ],
+                   "costos.F46":  [
+                                      "Costos De Producción",
+                                      "F46"
+                                  ],
+                   "costos.H46":  [
+                                      "Costos De Producción",
+                                      "H46"
+                                  ],
+                   "costos.I46":  [
+                                      "Costos De Producción",
+                                      "I46"
+                                  ],
+                   "costos.J46":  [
+                                      "Costos De Producción",
+                                      "J46"
+                                  ],
+                   "costos.L46":  [
+                                      "Costos De Producción",
+                                      "L46"
+                                  ],
+                   "costos.M46":  [
+                                      "Costos De Producción",
+                                      "M46"
+                                  ],
+                   "costos.N46":  [
+                                      "Costos De Producción",
+                                      "N46"
+                                  ],
+                   "costos.D47":  [
+                                      "Costos De Producción",
+                                      "D47"
+                                  ],
+                   "costos.E47":  [
+                                      "Costos De Producción",
+                                      "E47"
+                                  ],
+                   "costos.F47":  [
+                                      "Costos De Producción",
+                                      "F47"
+                                  ],
+                   "costos.H47":  [
+                                      "Costos De Producción",
+                                      "H47"
+                                  ],
+                   "costos.I47":  [
+                                      "Costos De Producción",
+                                      "I47"
+                                  ],
+                   "costos.J47":  [
+                                      "Costos De Producción",
+                                      "J47"
+                                  ],
+                   "costos.L47":  [
+                                      "Costos De Producción",
+                                      "L47"
+                                  ],
+                   "costos.M47":  [
+                                      "Costos De Producción",
+                                      "M47"
+                                  ],
+                   "costos.N47":  [
+                                      "Costos De Producción",
+                                      "N47"
+                                  ],
+                   "costos.D48":  [
+                                      "Costos De Producción",
+                                      "D48"
+                                  ],
+                   "costos.E48":  [
+                                      "Costos De Producción",
+                                      "E48"
+                                  ],
+                   "costos.F48":  [
+                                      "Costos De Producción",
+                                      "F48"
+                                  ],
+                   "costos.H48":  [
+                                      "Costos De Producción",
+                                      "H48"
+                                  ],
+                   "costos.I48":  [
+                                      "Costos De Producción",
+                                      "I48"
+                                  ],
+                   "costos.J48":  [
+                                      "Costos De Producción",
+                                      "J48"
+                                  ],
+                   "costos.L48":  [
+                                      "Costos De Producción",
+                                      "L48"
+                                  ],
+                   "costos.M48":  [
+                                      "Costos De Producción",
+                                      "M48"
+                                  ],
+                   "costos.N48":  [
+                                      "Costos De Producción",
+                                      "N48"
+                                  ],
+                   "costos.D49":  [
+                                      "Costos De Producción",
+                                      "D49"
+                                  ],
+                   "costos.E49":  [
+                                      "Costos De Producción",
+                                      "E49"
+                                  ],
+                   "costos.F49":  [
+                                      "Costos De Producción",
+                                      "F49"
+                                  ],
+                   "costos.H49":  [
+                                      "Costos De Producción",
+                                      "H49"
+                                  ],
+                   "costos.I49":  [
+                                      "Costos De Producción",
+                                      "I49"
+                                  ],
+                   "costos.J49":  [
+                                      "Costos De Producción",
+                                      "J49"
+                                  ],
+                   "costos.L49":  [
+                                      "Costos De Producción",
+                                      "L49"
+                                  ],
+                   "costos.M49":  [
+                                      "Costos De Producción",
+                                      "M49"
+                                  ],
+                   "costos.N49":  [
+                                      "Costos De Producción",
+                                      "N49"
+                                  ],
+                   "costos.D54":  [
+                                      "Costos De Producción",
+                                      "D54"
+                                  ],
+                   "costos.E54":  [
+                                      "Costos De Producción",
+                                      "E54"
+                                  ],
+                   "costos.F54":  [
+                                      "Costos De Producción",
+                                      "F54"
+                                  ],
+                   "costos.G54":  [
+                                      "Costos De Producción",
+                                      "G54"
+                                  ],
+                   "costos.D55":  [
+                                      "Costos De Producción",
+                                      "D55"
+                                  ],
+                   "costos.E55":  [
+                                      "Costos De Producción",
+                                      "E55"
+                                  ],
+                   "costos.F55":  [
+                                      "Costos De Producción",
+                                      "F55"
+                                  ],
+                   "costos.G55":  [
+                                      "Costos De Producción",
+                                      "G55"
+                                  ],
+                   "costos.D56":  [
+                                      "Costos De Producción",
+                                      "D56"
+                                  ],
+                   "costos.E56":  [
+                                      "Costos De Producción",
+                                      "E56"
+                                  ],
+                   "costos.F56":  [
+                                      "Costos De Producción",
+                                      "F56"
+                                  ],
+                   "costos.G56":  [
+                                      "Costos De Producción",
+                                      "G56"
+                                  ],
+                   "costos.D57":  [
+                                      "Costos De Producción",
+                                      "D57"
+                                  ],
+                   "costos.E57":  [
+                                      "Costos De Producción",
+                                      "E57"
+                                  ],
+                   "costos.F57":  [
+                                      "Costos De Producción",
+                                      "F57"
+                                  ],
+                   "costos.G57":  [
+                                      "Costos De Producción",
+                                      "G57"
+                                  ],
+                   "costos.D58":  [
+                                      "Costos De Producción",
+                                      "D58"
+                                  ],
+                   "costos.E58":  [
+                                      "Costos De Producción",
+                                      "E58"
+                                  ],
+                   "costos.F58":  [
+                                      "Costos De Producción",
+                                      "F58"
+                                  ],
+                   "costos.G58":  [
+                                      "Costos De Producción",
+                                      "G58"
+                                  ],
+                   "costos.D59":  [
+                                      "Costos De Producción",
+                                      "D59"
+                                  ],
+                   "costos.E59":  [
+                                      "Costos De Producción",
+                                      "E59"
+                                  ],
+                   "costos.F59":  [
+                                      "Costos De Producción",
+                                      "F59"
+                                  ],
+                   "costos.G59":  [
+                                      "Costos De Producción",
+                                      "G59"
+                                  ],
+                   "costos.D60":  [
+                                      "Costos De Producción",
+                                      "D60"
+                                  ],
+                   "costos.E60":  [
+                                      "Costos De Producción",
+                                      "E60"
+                                  ],
+                   "costos.F60":  [
+                                      "Costos De Producción",
+                                      "F60"
+                                  ],
+                   "costos.G60":  [
+                                      "Costos De Producción",
+                                      "G60"
+                                  ],
+                   "costos.D61":  [
+                                      "Costos De Producción",
+                                      "D61"
+                                  ],
+                   "costos.E61":  [
+                                      "Costos De Producción",
+                                      "E61"
+                                  ],
+                   "costos.F61":  [
+                                      "Costos De Producción",
+                                      "F61"
+                                  ],
+                   "costos.G61":  [
+                                      "Costos De Producción",
+                                      "G61"
+                                  ],
+                   "costos.U11":  [
+                                      "Costos De Producción",
+                                      "U11"
+                                  ],
+                   "costos.V11":  [
+                                      "Costos De Producción",
+                                      "V11"
+                                  ],
+                   "costos.Y11":  [
+                                      "Costos De Producción",
+                                      "Y11"
+                                  ],
+                   "costos.Z11":  [
+                                      "Costos De Producción",
+                                      "Z11"
+                                  ],
+                   "costos.AC11":  [
+                                       "Costos De Producción",
+                                       "AC11"
+                                   ],
+                   "costos.AD11":  [
+                                       "Costos De Producción",
+                                       "AD11"
+                                   ],
+                   "costos.U20":  [
+                                      "Costos De Producción",
+                                      "U20"
+                                  ],
+                   "costos.V20":  [
+                                      "Costos De Producción",
+                                      "V20"
+                                  ],
+                   "costos.Y20":  [
+                                      "Costos De Producción",
+                                      "Y20"
+                                  ],
+                   "costos.Z20":  [
+                                      "Costos De Producción",
+                                      "Z20"
+                                  ],
+                   "costos.AC20":  [
+                                       "Costos De Producción",
+                                       "AC20"
+                                   ],
+                   "costos.AD20":  [
+                                       "Costos De Producción",
+                                       "AD20"
+                                   ],
+                   "costos.U29":  [
+                                      "Costos De Producción",
+                                      "U29"
+                                  ],
+                   "costos.V29":  [
+                                      "Costos De Producción",
+                                      "V29"
+                                  ],
+                   "costos.Y29":  [
+                                      "Costos De Producción",
+                                      "Y29"
+                                  ],
+                   "costos.Z29":  [
+                                      "Costos De Producción",
+                                      "Z29"
+                                  ],
+                   "costos.AC29":  [
+                                       "Costos De Producción",
+                                       "AC29"
+                                   ],
+                   "costos.AD29":  [
+                                       "Costos De Producción",
+                                       "AD29"
+                                   ],
+                   "costos.U38":  [
+                                      "Costos De Producción",
+                                      "U38"
+                                  ],
+                   "costos.V38":  [
+                                      "Costos De Producción",
+                                      "V38"
+                                  ],
+                   "costos.Y38":  [
+                                      "Costos De Producción",
+                                      "Y38"
+                                  ],
+                   "costos.Z38":  [
+                                      "Costos De Producción",
+                                      "Z38"
+                                  ],
+                   "costos.U50":  [
+                                      "Costos De Producción",
+                                      "U50"
+                                  ],
+                   "costos.V50":  [
+                                      "Costos De Producción",
+                                      "V50"
+                                  ],
+                   "costos.Y50":  [
+                                      "Costos De Producción",
+                                      "Y50"
+                                  ],
+                   "costos.Z50":  [
+                                      "Costos De Producción",
+                                      "Z50"
+                                  ],
+                   "costos.AC50":  [
+                                       "Costos De Producción",
+                                       "AC50"
+                                   ],
+                   "costos.AD50":  [
+                                       "Costos De Producción",
+                                       "AD50"
+                                   ],
+                   "costos.U57":  [
+                                      "Costos De Producción",
+                                      "U57"
+                                  ],
+                   "costos.V57":  [
+                                      "Costos De Producción",
+                                      "V57"
+                                  ],
+                   "costos.Y57":  [
+                                      "Costos De Producción",
+                                      "Y57"
+                                  ],
+                   "costos.Z57":  [
+                                      "Costos De Producción",
+                                      "Z57"
+                                  ],
+                   "costos.AC57":  [
+                                       "Costos De Producción",
+                                       "AC57"
+                                   ],
+                   "costos.AD57":  [
+                                       "Costos De Producción",
+                                       "AD57"
+                                   ],
+                   "costos.Y58":  [
+                                      "Costos De Producción",
+                                      "Y58"
+                                  ],
+                   "costos.Z58":  [
+                                      "Costos De Producción",
+                                      "Z58"
+                                  ],
+                   "costos.AC58":  [
+                                       "Costos De Producción",
+                                       "AC58"
+                                   ],
+                   "costos.AD58":  [
+                                       "Costos De Producción",
+                                       "AD58"
+                                   ],
+                   "costos.U64":  [
+                                      "Costos De Producción",
+                                      "U64"
+                                  ],
+                   "costos.V64":  [
+                                      "Costos De Producción",
+                                      "V64"
+                                  ],
+                   "costos.Y64":  [
+                                      "Costos De Producción",
+                                      "Y64"
+                                  ],
+                   "costos.Z64":  [
+                                      "Costos De Producción",
+                                      "Z64"
+                                  ],
+                   "costos.AC64":  [
+                                       "Costos De Producción",
+                                       "AC64"
+                                   ],
+                   "costos.AD64":  [
+                                       "Costos De Producción",
+                                       "AD64"
+                                   ],
+                   "costos.Y66":  [
+                                      "Costos De Producción",
+                                      "Y66"
+                                  ],
+                   "costos.Z66":  [
+                                      "Costos De Producción",
+                                      "Z66"
+                                  ],
+                   "costos.AC66":  [
+                                       "Costos De Producción",
+                                       "AC66"
+                                   ],
+                   "costos.AD66":  [
+                                       "Costos De Producción",
+                                       "AD66"
+                                   ],
+                   "costos.U71":  [
+                                      "Costos De Producción",
+                                      "U71"
+                                  ],
+                   "costos.V71":  [
+                                      "Costos De Producción",
+                                      "V71"
+                                  ],
+                   "lotes.H2":  [
+                                    "Lotes_Produccion",
+                                    "H2"
+                                ],
+                   "lotes.I2":  [
+                                    "Lotes_Produccion",
+                                    "I2"
+                                ],
+                   "lotes.J2":  [
+                                    "Lotes_Produccion",
+                                    "J2"
+                                ],
+                   "lotes.K2":  [
+                                    "Lotes_Produccion",
+                                    "K2"
+                                ],
+                   "lotes.L2":  [
+                                    "Lotes_Produccion",
+                                    "L2"
+                                ],
+                   "lotes.H3":  [
+                                    "Lotes_Produccion",
+                                    "H3"
+                                ],
+                   "lotes.I3":  [
+                                    "Lotes_Produccion",
+                                    "I3"
+                                ],
+                   "lotes.J3":  [
+                                    "Lotes_Produccion",
+                                    "J3"
+                                ],
+                   "lotes.K3":  [
+                                    "Lotes_Produccion",
+                                    "K3"
+                                ],
+                   "lotes.L3":  [
+                                    "Lotes_Produccion",
+                                    "L3"
+                                ],
+                   "lotes.H4":  [
+                                    "Lotes_Produccion",
+                                    "H4"
+                                ],
+                   "lotes.I4":  [
+                                    "Lotes_Produccion",
+                                    "I4"
+                                ],
+                   "lotes.J4":  [
+                                    "Lotes_Produccion",
+                                    "J4"
+                                ],
+                   "lotes.K4":  [
+                                    "Lotes_Produccion",
+                                    "K4"
+                                ],
+                   "lotes.L4":  [
+                                    "Lotes_Produccion",
+                                    "L4"
+                                ],
+                   "lotes.C5":  [
+                                    "Lotes_Produccion",
+                                    "C5"
+                                ],
+                   "lotes.H5":  [
+                                    "Lotes_Produccion",
+                                    "H5"
+                                ],
+                   "motor.B6":  [
+                                    "Motor_Puntajes",
+                                    "B6"
+                                ],
+                   "motor.D6":  [
+                                    "Motor_Puntajes",
+                                    "D6"
+                                ],
+                   "motor.B9":  [
+                                    "Motor_Puntajes",
+                                    "B9"
+                                ],
+                   "motor.D9":  [
+                                    "Motor_Puntajes",
+                                    "D9"
+                                ],
+                   "motor.B10":  [
+                                     "Motor_Puntajes",
+                                     "B10"
+                                 ],
+                   "motor.D10":  [
+                                     "Motor_Puntajes",
+                                     "D10"
+                                 ],
+                   "motor.B11":  [
+                                     "Motor_Puntajes",
+                                     "B11"
+                                 ],
+                   "motor.D11":  [
+                                     "Motor_Puntajes",
+                                     "D11"
+                                 ],
+                   "ventas_modelo2.E118":  [
+                                               "Costos De Producción",
+                                               "E118"
+                                           ],
+                   "ventas_modelo2.F118":  [
+                                               "Costos De Producción",
+                                               "F118"
+                                           ],
+                   "ventas_modelo2.G118":  [
+                                               "Costos De Producción",
+                                               "G118"
+                                           ],
+                   "ventas_modelo2.H118":  [
+                                               "Costos De Producción",
+                                               "H118"
+                                           ],
+                   "ventas_modelo2.I118":  [
+                                               "Costos De Producción",
+                                               "I118"
+                                           ],
+                   "ventas_modelo2.J118":  [
+                                               "Costos De Producción",
+                                               "J118"
+                                           ],
+                   "ventas_modelo2.E119":  [
+                                               "Costos De Producción",
+                                               "E119"
+                                           ],
+                   "ventas_modelo2.F119":  [
+                                               "Costos De Producción",
+                                               "F119"
+                                           ],
+                   "ventas_modelo2.G119":  [
+                                               "Costos De Producción",
+                                               "G119"
+                                           ],
+                   "ventas_modelo2.H119":  [
+                                               "Costos De Producción",
+                                               "H119"
+                                           ],
+                   "ventas_modelo2.I119":  [
+                                               "Costos De Producción",
+                                               "I119"
+                                           ],
+                   "ventas_modelo2.J119":  [
+                                               "Costos De Producción",
+                                               "J119"
+                                           ],
+                   "ventas_modelo2.E120":  [
+                                               "Costos De Producción",
+                                               "E120"
+                                           ],
+                   "ventas_modelo2.F120":  [
+                                               "Costos De Producción",
+                                               "F120"
+                                           ],
+                   "ventas_modelo2.G120":  [
+                                               "Costos De Producción",
+                                               "G120"
+                                           ],
+                   "ventas_modelo2.H120":  [
+                                               "Costos De Producción",
+                                               "H120"
+                                           ],
+                   "ventas_modelo2.I120":  [
+                                               "Costos De Producción",
+                                               "I120"
+                                           ],
+                   "ventas_modelo2.J120":  [
+                                               "Costos De Producción",
+                                               "J120"
+                                           ],
+                   "ventas_modelo2.E121":  [
+                                               "Costos De Producción",
+                                               "E121"
+                                           ],
+                   "ventas_modelo2.F121":  [
+                                               "Costos De Producción",
+                                               "F121"
+                                           ],
+                   "ventas_modelo2.G121":  [
+                                               "Costos De Producción",
+                                               "G121"
+                                           ],
+                   "ventas_modelo2.H121":  [
+                                               "Costos De Producción",
+                                               "H121"
+                                           ],
+                   "ventas_modelo2.I121":  [
+                                               "Costos De Producción",
+                                               "I121"
+                                           ],
+                   "ventas_modelo2.J121":  [
+                                               "Costos De Producción",
+                                               "J121"
+                                           ],
+                   "ventas_modelo2.E131":  [
+                                               "Costos De Producción",
+                                               "E131"
+                                           ],
+                   "ventas_modelo2.F131":  [
+                                               "Costos De Producción",
+                                               "F131"
+                                           ],
+                   "ventas_modelo2.G131":  [
+                                               "Costos De Producción",
+                                               "G131"
+                                           ],
+                   "ventas_modelo2.H131":  [
+                                               "Costos De Producción",
+                                               "H131"
+                                           ],
+                   "ventas_modelo2.I131":  [
+                                               "Costos De Producción",
+                                               "I131"
+                                           ],
+                   "ventas_modelo2.J131":  [
+                                               "Costos De Producción",
+                                               "J131"
+                                           ],
+                   "ventas_modelo2.E132":  [
+                                               "Costos De Producción",
+                                               "E132"
+                                           ],
+                   "ventas_modelo2.F132":  [
+                                               "Costos De Producción",
+                                               "F132"
+                                           ],
+                   "ventas_modelo2.G132":  [
+                                               "Costos De Producción",
+                                               "G132"
+                                           ],
+                   "ventas_modelo2.H132":  [
+                                               "Costos De Producción",
+                                               "H132"
+                                           ],
+                   "ventas_modelo2.I132":  [
+                                               "Costos De Producción",
+                                               "I132"
+                                           ],
+                   "ventas_modelo2.J132":  [
+                                               "Costos De Producción",
+                                               "J132"
+                                           ],
+                   "ventas_modelo2.E133":  [
+                                               "Costos De Producción",
+                                               "E133"
+                                           ],
+                   "ventas_modelo2.F133":  [
+                                               "Costos De Producción",
+                                               "F133"
+                                           ],
+                   "ventas_modelo2.G133":  [
+                                               "Costos De Producción",
+                                               "G133"
+                                           ],
+                   "ventas_modelo2.H133":  [
+                                               "Costos De Producción",
+                                               "H133"
+                                           ],
+                   "ventas_modelo2.I133":  [
+                                               "Costos De Producción",
+                                               "I133"
+                                           ],
+                   "ventas_modelo2.J133":  [
+                                               "Costos De Producción",
+                                               "J133"
+                                           ],
+                   "ventas_modelo2.E134":  [
+                                               "Costos De Producción",
+                                               "E134"
+                                           ],
+                   "ventas_modelo2.F134":  [
+                                               "Costos De Producción",
+                                               "F134"
+                                           ],
+                   "ventas_modelo2.G134":  [
+                                               "Costos De Producción",
+                                               "G134"
+                                           ],
+                   "ventas_modelo2.H134":  [
+                                               "Costos De Producción",
+                                               "H134"
+                                           ],
+                   "ventas_modelo2.I134":  [
+                                               "Costos De Producción",
+                                               "I134"
+                                           ],
+                   "ventas_modelo2.J134":  [
+                                               "Costos De Producción",
+                                               "J134"
+                                           ],
+                   "ventas_modelo2.E144":  [
+                                               "Costos De Producción",
+                                               "E144"
+                                           ],
+                   "ventas_modelo2.F144":  [
+                                               "Costos De Producción",
+                                               "F144"
+                                           ],
+                   "ventas_modelo2.G144":  [
+                                               "Costos De Producción",
+                                               "G144"
+                                           ],
+                   "ventas_modelo2.H144":  [
+                                               "Costos De Producción",
+                                               "H144"
+                                           ],
+                   "ventas_modelo2.I144":  [
+                                               "Costos De Producción",
+                                               "I144"
+                                           ],
+                   "ventas_modelo2.J144":  [
+                                               "Costos De Producción",
+                                               "J144"
+                                           ],
+                   "ventas_modelo2.E145":  [
+                                               "Costos De Producción",
+                                               "E145"
+                                           ],
+                   "ventas_modelo2.F145":  [
+                                               "Costos De Producción",
+                                               "F145"
+                                           ],
+                   "ventas_modelo2.G145":  [
+                                               "Costos De Producción",
+                                               "G145"
+                                           ],
+                   "ventas_modelo2.H145":  [
+                                               "Costos De Producción",
+                                               "H145"
+                                           ],
+                   "ventas_modelo2.I145":  [
+                                               "Costos De Producción",
+                                               "I145"
+                                           ],
+                   "ventas_modelo2.J145":  [
+                                               "Costos De Producción",
+                                               "J145"
+                                           ],
+                   "ventas_modelo2.E146":  [
+                                               "Costos De Producción",
+                                               "E146"
+                                           ],
+                   "ventas_modelo2.F146":  [
+                                               "Costos De Producción",
+                                               "F146"
+                                           ],
+                   "ventas_modelo2.G146":  [
+                                               "Costos De Producción",
+                                               "G146"
+                                           ],
+                   "ventas_modelo2.H146":  [
+                                               "Costos De Producción",
+                                               "H146"
+                                           ],
+                   "ventas_modelo2.I146":  [
+                                               "Costos De Producción",
+                                               "I146"
+                                           ],
+                   "ventas_modelo2.J146":  [
+                                               "Costos De Producción",
+                                               "J146"
+                                           ],
+                   "ventas_modelo2.E147":  [
+                                               "Costos De Producción",
+                                               "E147"
+                                           ],
+                   "ventas_modelo2.F147":  [
+                                               "Costos De Producción",
+                                               "F147"
+                                           ],
+                   "ventas_modelo2.G147":  [
+                                               "Costos De Producción",
+                                               "G147"
+                                           ],
+                   "ventas_modelo2.H147":  [
+                                               "Costos De Producción",
+                                               "H147"
+                                           ],
+                   "ventas_modelo2.I147":  [
+                                               "Costos De Producción",
+                                               "I147"
+                                           ],
+                   "ventas_modelo2.J147":  [
+                                               "Costos De Producción",
+                                               "J147"
+                                           ],
+                   "ventas_modelo1.E73":  [
+                                              "Costos De Producción",
+                                              "E73"
+                                          ],
+                   "ventas_modelo1.F73":  [
+                                              "Costos De Producción",
+                                              "F73"
+                                          ],
+                   "ventas_modelo1.G73":  [
+                                              "Costos De Producción",
+                                              "G73"
+                                          ],
+                   "ventas_modelo1.H73":  [
+                                              "Costos De Producción",
+                                              "H73"
+                                          ],
+                   "ventas_modelo1.E74":  [
+                                              "Costos De Producción",
+                                              "E74"
+                                          ],
+                   "ventas_modelo1.F74":  [
+                                              "Costos De Producción",
+                                              "F74"
+                                          ],
+                   "ventas_modelo1.G74":  [
+                                              "Costos De Producción",
+                                              "G74"
+                                          ],
+                   "ventas_modelo1.H74":  [
+                                              "Costos De Producción",
+                                              "H74"
+                                          ],
+                   "ventas_modelo1.E75":  [
+                                              "Costos De Producción",
+                                              "E75"
+                                          ],
+                   "ventas_modelo1.F75":  [
+                                              "Costos De Producción",
+                                              "F75"
+                                          ],
+                   "ventas_modelo1.G75":  [
+                                              "Costos De Producción",
+                                              "G75"
+                                          ],
+                   "ventas_modelo1.H75":  [
+                                              "Costos De Producción",
+                                              "H75"
+                                          ],
+                   "ventas_modelo1.E76":  [
+                                              "Costos De Producción",
+                                              "E76"
+                                          ],
+                   "ventas_modelo1.F76":  [
+                                              "Costos De Producción",
+                                              "F76"
+                                          ],
+                   "ventas_modelo1.G76":  [
+                                              "Costos De Producción",
+                                              "G76"
+                                          ],
+                   "ventas_modelo1.H76":  [
+                                              "Costos De Producción",
+                                              "H76"
+                                          ],
+                   "ventas_modelo1.E87":  [
+                                              "Costos De Producción",
+                                              "E87"
+                                          ],
+                   "ventas_modelo1.F87":  [
+                                              "Costos De Producción",
+                                              "F87"
+                                          ],
+                   "ventas_modelo1.G87":  [
+                                              "Costos De Producción",
+                                              "G87"
+                                          ],
+                   "ventas_modelo1.H87":  [
+                                              "Costos De Producción",
+                                              "H87"
+                                          ],
+                   "ventas_modelo1.E88":  [
+                                              "Costos De Producción",
+                                              "E88"
+                                          ],
+                   "ventas_modelo1.F88":  [
+                                              "Costos De Producción",
+                                              "F88"
+                                          ],
+                   "ventas_modelo1.G88":  [
+                                              "Costos De Producción",
+                                              "G88"
+                                          ],
+                   "ventas_modelo1.H88":  [
+                                              "Costos De Producción",
+                                              "H88"
+                                          ],
+                   "ventas_modelo1.E89":  [
+                                              "Costos De Producción",
+                                              "E89"
+                                          ],
+                   "ventas_modelo1.F89":  [
+                                              "Costos De Producción",
+                                              "F89"
+                                          ],
+                   "ventas_modelo1.G89":  [
+                                              "Costos De Producción",
+                                              "G89"
+                                          ],
+                   "ventas_modelo1.H89":  [
+                                              "Costos De Producción",
+                                              "H89"
+                                          ],
+                   "ventas_modelo1.E90":  [
+                                              "Costos De Producción",
+                                              "E90"
+                                          ],
+                   "ventas_modelo1.F90":  [
+                                              "Costos De Producción",
+                                              "F90"
+                                          ],
+                   "ventas_modelo1.G90":  [
+                                              "Costos De Producción",
+                                              "G90"
+                                          ],
+                   "ventas_modelo1.H90":  [
+                                              "Costos De Producción",
+                                              "H90"
+                                          ],
+                   "ventas_modelo1.E101":  [
+                                               "Costos De Producción",
+                                               "E101"
+                                           ],
+                   "ventas_modelo1.F101":  [
+                                               "Costos De Producción",
+                                               "F101"
+                                           ],
+                   "ventas_modelo1.G101":  [
+                                               "Costos De Producción",
+                                               "G101"
+                                           ],
+                   "ventas_modelo1.H101":  [
+                                               "Costos De Producción",
+                                               "H101"
+                                           ],
+                   "ventas_modelo1.E102":  [
+                                               "Costos De Producción",
+                                               "E102"
+                                           ],
+                   "ventas_modelo1.F102":  [
+                                               "Costos De Producción",
+                                               "F102"
+                                           ],
+                   "ventas_modelo1.G102":  [
+                                               "Costos De Producción",
+                                               "G102"
+                                           ],
+                   "ventas_modelo1.H102":  [
+                                               "Costos De Producción",
+                                               "H102"
+                                           ],
+                   "ventas_modelo1.E103":  [
+                                               "Costos De Producción",
+                                               "E103"
+                                           ],
+                   "ventas_modelo1.F103":  [
+                                               "Costos De Producción",
+                                               "F103"
+                                           ],
+                   "ventas_modelo1.G103":  [
+                                               "Costos De Producción",
+                                               "G103"
+                                           ],
+                   "ventas_modelo1.H103":  [
+                                               "Costos De Producción",
+                                               "H103"
+                                           ],
+                   "ventas_modelo1.E104":  [
+                                               "Costos De Producción",
+                                               "E104"
+                                           ],
+                   "ventas_modelo1.F104":  [
+                                               "Costos De Producción",
+                                               "F104"
+                                           ],
+                   "ventas_modelo1.G104":  [
+                                               "Costos De Producción",
+                                               "G104"
+                                           ],
+                   "ventas_modelo1.H104":  [
+                                               "Costos De Producción",
+                                               "H104"
+                                           ]
+               }
+}

@@ -1,0 +1,39 @@
+Hoja: Lotes_Produccion
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"Lote"	"Lote"	"s"	null
+"B1"	"Segmento de venta (elige)"	"Segmento de venta (elige)"	"s"	null
+"C1"	"Cantidad de unidades (input)"	"Cantidad de unidades (input)"	"s"	null
+"D1"	"Codigo Cuero (elige)"	"Codigo Cuero (elige)"	"s"	null
+"E1"	"Codigo Accesorios (elige)"	"Codigo Accesorios (elige)"	"s"	null
+"F1"	"Codigo Hilo (elige)"	"Codigo Hilo (elige)"	"s"	null
+"G1"	"Codigo Molde (elige)"	"Codigo Molde (elige)"	"s"	null
+"H1"	"Costo unitario insumos (auto)"	"Costo unitario insumos (auto)"	"s"	null
+"I1"	"Puntaje Calidad del lote (auto)"	"Puntaje Calidad del lote (auto)"	"s"	null
+"J1"	"Umbral requerido por segmento (auto)"	"Umbral requerido por segmento (auto)"	"s"	null
+"K1"	"Resultado (auto)"	"Resultado (auto)"	"s"	null
+"L1"	"Mensaje para el jugador (auto)"	"Mensaje para el jugador (auto)"	"s"	null
+"A2"	"Lote 1"	"Lote 1"	"s"	null
+"C2"	0.0	0.0	"n"	null
+"H2"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($D2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($E2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($F2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H2"
+"I2"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($D2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($E2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($F2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($G2,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I2"
+"J2"	"=IFS($B2=\"SEG-01\",0,$B2=\"SEG-02\",4,$B2=\"SEG-03\",7,TRUE(),0)"	0	"f"	null
+"K2"	"=IF(B2=\"\",\"\",IF(I2>=J2,\"Coherente\",\"No alcanza el segmento\"))"	null	"f"	null
+"L2"	"=IF(B2=\"\",\"Elige un segmento y los insumos del lote\",IF(K2=\"Coherente\",\"Este lote cumple con la calidad esperada para su segmento. Los clientes perciben el valor y el precio se sostiene.\",\"Este lote no alcanza la calidad que su segmento promete. Los clientes se sienten enganados: baja el precio efectivo y la reputacion.\"))"	"Elige un segmento y los insumos del lote"	"f"	null
+"A3"	"Lote 2"	"Lote 2"	"s"	null
+"C3"	0.0	0.0	"n"	null
+"H3"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($D3,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($E3,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($F3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H3"
+"I3"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($D3,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($E3,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($F3,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($G3,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I3"
+"J3"	"=IFS($B3=\"SEG-01\",0,$B3=\"SEG-02\",4,$B3=\"SEG-03\",7,TRUE(),0)"	0	"f"	null
+"K3"	"=IF(B3=\"\",\"\",IF(I3>=J3,\"Coherente\",\"No alcanza el segmento\"))"	null	"f"	null
+"L3"	"=IF(B3=\"\",\"Elige un segmento y los insumos del lote\",IF(K3=\"Coherente\",\"Este lote cumple con la calidad esperada para su segmento. Los clientes perciben el valor y el precio se sostiene.\",\"Este lote no alcanza la calidad que su segmento promete. Los clientes se sienten enganados: baja el precio efectivo y la reputacion.\"))"	"Elige un segmento y los insumos del lote"	"f"	null
+"A4"	"Lote 3"	"Lote 3"	"s"	null
+"C4"	0.0	0.0	"n"	null
+"H4"	"=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($D4,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($E4,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($F4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"H4"
+"I4"	"=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($D4,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($E4,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($F4,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($G4,Catalogo_Decisiones!$A$2:$A$57,0)),0)"	0	"f"	"I4"
+"J4"	"=IFS($B4=\"SEG-01\",0,$B4=\"SEG-02\",4,$B4=\"SEG-03\",7,TRUE(),0)"	0	"f"	null
+"K4"	"=IF(B4=\"\",\"\",IF(I4>=J4,\"Coherente\",\"No alcanza el segmento\"))"	null	"f"	null
+"L4"	"=IF(B4=\"\",\"Elige un segmento y los insumos del lote\",IF(K4=\"Coherente\",\"Este lote cumple con la calidad esperada para su segmento. Los clientes perciben el valor y el precio se sostiene.\",\"Este lote no alcanza la calidad que su segmento promete. Los clientes se sienten enganados: baja el precio efectivo y la reputacion.\"))"	"Elige un segmento y los insumos del lote"	"f"	null
+"A5"	"TOTAL CICLO"	"TOTAL CICLO"	"s"	null
+"C5"	"=SUM(C2:C4)"	0	"f"	null
+"H5"	"=SUMPRODUCT(C2:C4,H2:H4)"	0	"f"	null
+"A7"	"Nota: cada lote se evalua por separado. El costo unitario de insumos (col H) NO incluye el molde (es inversion fija de Ciclo 0), solo cuero+accesorios+hilo por unidad."	"Nota: cada lote se evalua por separado. El costo unitario de insumos (col H) NO incluye el molde (es inversion fija de Ciclo 0), solo cuero+accesorios+hilo por unidad."	"s"	null

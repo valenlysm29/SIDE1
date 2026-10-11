@@ -1,0 +1,47 @@
+Hoja: Matriz_Consecuencias
+Celda	Contenido/fórmula literal	Valor en caché	Tipo	Rango matricial
+"A1"	"ID"	"ID"	"s"	null
+"B1"	"Puntaje evaluado"	"Puntaje evaluado"	"s"	null
+"C1"	"Condicion"	"Condicion"	"s"	null
+"D1"	"Efecto numerico en el juego"	"Efecto numerico en el juego"	"s"	null
+"E1"	"Mensaje textual para el jugador"	"Mensaje textual para el jugador"	"s"	null
+"A2"	"CONS-01"	"CONS-01"	"s"	null
+"B2"	"Calidad"	"Calidad"	"s"	null
+"C2"	"< 4 y Segmento = Premium"	"< 4 y Segmento = Premium"	"s"	null
+"D2"	"Precio de venta -35%, Reputacion -2"	"Precio de venta -35%, Reputacion -2"	"s"	null
+"E2"	"Posicionaste tu marca como premium, pero tus materiales e insumos no lo respaldan. Los clientes se sienten enganados y las devoluciones aumentan."	"Posicionaste tu marca como premium, pero tus materiales e insumos no lo respaldan. Los clientes se sienten enganados y las devoluciones aumentan."	"s"	null
+"A3"	"CONS-02"	"CONS-02"	"s"	null
+"B3"	"Calidad"	"Calidad"	"s"	null
+"C3"	">= 7 y Segmento = Premium"	">= 7 y Segmento = Premium"	"s"	null
+"D3"	"Precio de venta +40%, Reputacion +2"	"Precio de venta +40%, Reputacion +2"	"s"	null
+"E3"	"Tu producto cumple con los estandares premium. Los clientes perciben el valor y pagan sin problema el precio elevado."	"Tu producto cumple con los estandares premium. Los clientes perciben el valor y pagan sin problema el precio elevado."	"s"	null
+"A4"	"CONS-03"	"CONS-03"	"s"	null
+"B4"	"Eficiencia"	"Eficiencia"	"s"	null
+"C4"	"< 4"	"< 4"	"s"	null
+"D4"	"Produccion real = 70% de lo planeado (retrasos)"	"Produccion real = 70% de lo planeado (retrasos)"	"s"	null
+"E4"	"Tu equipo no dio abasto con el volumen que planeaste. Hubo retrasos y entregaste menos de lo prometido."	"Tu equipo no dio abasto con el volumen que planeaste. Hubo retrasos y entregaste menos de lo prometido."	"s"	null
+"A5"	"CONS-04"	"CONS-04"	"s"	null
+"B5"	"Reputacion"	"Reputacion"	"s"	null
+"C5"	"< 3 durante 2 ciclos seguidos"	"< 3 durante 2 ciclos seguidos"	"s"	null
+"D5"	"Demanda -20%"	"Demanda -20%"	"s"	null
+"E5"	"Tu marca empieza a perder terreno. Los clientes prefieren a la competencia."	"Tu marca empieza a perder terreno. Los clientes prefieren a la competencia."	"s"	null
+"A6"	"CONS-05"	"CONS-05"	"s"	null
+"B6"	"Salud Financiera"	"Salud Financiera"	"s"	null
+"C6"	"< 3"	"< 3"	"s"	null
+"D6"	"El banco sube la tasa de interes del proximo prestamo"	"El banco sube la tasa de interes del proximo prestamo"	"s"	null
+"E6"	"Tu situacion financiera es riesgosa. El banco te ofrece condiciones menos favorables la proxima vez."	"Tu situacion financiera es riesgosa. El banco te ofrece condiciones menos favorables la proxima vez."	"s"	null
+"A7"	"CONS-06"	"CONS-06"	"s"	null
+"B7"	"Produccion vs Capacidad"	"Produccion vs Capacidad"	"s"	null
+"C7"	"Cantidad producida > capacidad instalada"	"Cantidad producida > capacidad instalada"	"s"	null
+"D7"	"Retraso de entrega, costo extra por horas extra"	"Retraso de entrega, costo extra por horas extra"	"s"	null
+"E7"	"Intentaste producir mas de lo que tu planta soporta. Hubo cuellos de botella y tuviste que pagar horas extra para cumplir."	"Intentaste producir mas de lo que tu planta soporta. Hubo cuellos de botella y tuviste que pagar horas extra para cumplir."	"s"	null
+"A8"	"CONS-07"	"CONS-07"	"s"	null
+"B8"	"Produccion vs Demanda"	"Produccion vs Demanda"	"s"	null
+"C8"	"Cantidad producida > demanda real del mercado"	"Cantidad producida > demanda real del mercado"	"s"	null
+"D8"	"Inventario sin vender, costo de almacenaje"	"Inventario sin vender, costo de almacenaje"	"s"	null
+"E8"	"Produjiste mas de lo que el mercado te pidio. Te quedaste con inventario sin vender."	"Produjiste mas de lo que el mercado te pidio. Te quedaste con inventario sin vender."	"s"	null
+"A9"	"CONS-08"	"CONS-08"	"s"	null
+"B9"	"Eficiencia"	"Eficiencia"	"s"	null
+"C9"	"Jefatura = No y Eficiencia < 5"	"Jefatura = No y Eficiencia < 5"	"s"	null
+"D9"	"Riesgo de descoordinacion: -5% produccion adicional"	"Riesgo de descoordinacion: -5% produccion adicional"	"s"	null
+"E9"	"Sin jefatura que coordine, tu equipo perdio tiempo resolviendo conflictos de tareas."	"Sin jefatura que coordine, tu equipo perdio tiempo resolviendo conflictos de tareas."	"s"	null

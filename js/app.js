@@ -803,6 +803,29 @@ function renderDecisionCategory(){
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
+  if(cat.cat==='C'&&window.SIDE_EXCEL_UI)mountExcelProductionEditor();
+}
+function excelCompanyId(){return currentStudent.participantId||('local-'+storageKey());}
+function excelGameCode(){return currentStudent.game?.codigo||'SIDE-000';}
+function excelSavedResult(){return decisionState.__excel?.habilitado?window.SIDE_EXCEL_UI?.resultado(excelGameCode(),currentRound(),excelCompanyId()):null;}
+function importExcelPersonnel(){
+  const personal={},seleccion=[];
+  const machineIndex=id=>{const item=findDecisionItem(id),d=initDraft(item),st=savedEntry(item);return item.options.findIndex(o=>Number(d.quantities?.[o.id]||0)+Number(st?.quantities?.[o.id]||0)>0);};
+  for(const [area,id,machineId] of [['corte','PERS_CORTE',null],['ensamble','PERS_ENSAMBLE','ENSAMBLE'],['acabado','PERS_ACABADO','ACABADOS']]){
+    const item=findDecisionItem(id),d=initDraft(item),st=savedEntry(item),maquina=machineId?machineIndex(machineId):0;
+    personal[area]=item.options.map(o=>{const qty=Number(d.quantities?.[o.id]??st?.quantities?.[o.id]??0);if(qty>0&&o.codigoExcel)seleccion.push(o.codigoExcel);return [0,1,2].map(m=>m===Math.max(0,maquina)?qty:0);});
+    // El Motor admite un nivel de personal por área en su selección: si hay
+    // mezcla, el estudiante elige expresamente qué aporte representa su área.
+    if(seleccion.length>0){const codes=item.options.map(o=>o.codigoExcel);const selected=seleccion.filter(k=>codes.includes(k));if(selected.length>1)selected.forEach(k=>seleccion.splice(seleccion.indexOf(k),1));}
+    if(machineId&&maquina>=0){const code=findDecisionItem(machineId).options[maquina]?.codigoExcel;if(code)seleccion.push(code);}
+  }
+  return {personal,seleccion};
+}
+function mountExcelProductionEditor(){
+  const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
+  window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local:!currentStudent.empresaId,
+    historial:window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),getState:()=>decisionState.__excel,importar:importExcelPersonnel,
+    save:value=>{decisionState.__excel=value;persistGameState();syncStudentReportPreview();}});
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
@@ -1055,12 +1078,14 @@ function openCharacterSelection(){
   return true;
 }
 function requestWorldEntry(){
+  if(decisionState.__excel?.habilitado){toast('Tu plan por lotes se resuelve en el cierre local del docente. Consulta Producción y Resumen.');return false;}
   if(!simulationSubmissionComplete())return openDecisionMenu();
   const admitted=localStorage.getItem(worldAdmissionKey())==='1';
   if((characterSelectionConfirmed||admitted)&&selectedCharacterModel())return startSimulationLoading({selectedCharacter:selectedCharacterModel()});
   return openCharacterSelection();
 }
 async function startSimulationLoading(options={}){
+  if(decisionState.__excel?.habilitado){toast('Esta empresa participa en el cierre por lotes del docente.');return false;}
   if(simulationLoadingActive)return false;
   if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
   const requestedCharacter=CHARACTER_SLUGS[options?.selectedCharacter]?options.selectedCharacter:(selectedCharacterModel()||'chico2');
@@ -1169,10 +1194,13 @@ function syncStudentReportPreview(){
     decisiones:currentDecisionLabels(),apartados:categoryCompletionMap(),progreso:decisionProgressPercent(),enviado:decisionsSubmitted(),
     eventos:events.map(e=>({id:e.id,titulo:e.title,descripcion:e.description,afectados:e.scope==='group'?'Todos':'Empresa individual',ciclos:e.cycles,cicloAfecta:(Number(e.cycleOffset||0)===0?'+0 · mismo ciclo':Number(e.cycleOffset||0)===1?'+1 · siguiente ciclo':`+${Number(e.cycleOffset||0)} · después de ${Number(e.cycleOffset||0)} ciclos`),implicancia:e.implication,ocurrencia:e.probability})),
     estadoResultados:financial.estadoResultados,
+    excelDecisionState:decisionState.__excel?deepClone(decisionState.__excel):null,
     balanceCaja:{...financial.balanceCaja,balanceGeneral:financial.balanceGeneral},
     balanceGeneral:financial.balanceGeneral,flujoCaja:financial.flujoCaja,
     score:Math.max(0,Math.round(utilidad/100+decisionProgressPercent())),estado:'activa',tomandoDecisiones:playerIsDeciding,conectada:studentConnected,integracion:studentAccess().integration,caja:cajaFinal,updatedAt:new Date().toISOString()
   };
+  const excelResult=excelSavedResult();
+  if(excelResult){report.estadoResultados={...report.estadoResultados,excel:excelResult,ingresos:excelResult.ingresos,costos:excelResult.costosTotales,utilidad:excelResult.utilidad};Object.assign(report,{ingresos:excelResult.ingresos,costos:excelResult.costosTotales,utilidad:excelResult.utilidad});}
   let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
   const idx=reports.findIndex(r=>r.id===report.id);if(idx>=0)reports[idx]=report;else reports.push(report);
   localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));renderStudentStatus();

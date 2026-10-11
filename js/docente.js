@@ -156,8 +156,8 @@ function beginTimer(auto=false,referenceStart=null){
   state.timer=setInterval(()=>{state.seconds=Math.max(0,duration-Math.floor((Date.now()-started)/1000));updateTimer();if(state.seconds<=0)finishTime()},1000);
 }
 function startTimer(){if(state.lifecycleVersion===2){controlGame(runtime()?.running?'pausar':'reanudar');return;}if(!gameStatus()?.active){toast('Primero pulsa Iniciar partida.');return}if(state.round===1&&state.integrationMinutes===60){toast('El período de integración dura una hora y no se pausa.');return}if(cycleMode()==='automatic'){toast('El reloj se controla por la programación automática.');return}if(state.timer){stopTimer('paused');$('roundState').textContent='Pausado';return}beginTimer(false)}
-function finishTime(){if(state.timer){clearInterval(state.timer);state.timer=null}state.seconds=0;state.roundClosed=true;writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Tiempo finalizado';addEvent('Tiempo del ciclo agotado.','sistema');if(state.round===1&&state.integrationMinutes===60&&cycleMode()==='manual'){advanceRound(false);if(gameStatus()?.active)beginTimer(false)}else if(cycleMode()==='automatic')advanceRound(true);else toast('Tiempo agotado. El docente puede avanzar cuando quiera.')}
-function cutRound(){if(state.lifecycleVersion===2){controlGame('cerrar');return;}if(!gameStatus()?.active||state.round===1&&state.integrationMinutes===60){toast('El ciclo de integración debe completar una hora.');return}if(cycleMode()!=='manual'){toast('En modo automático el ciclo se controla por programación.');return}if(state.timer){clearInterval(state.timer);state.timer=null}state.seconds=0;state.roundClosed=true;updateTimer();writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Ciclo cortado por docente';addEvent('El docente cerró el ciclo manualmente.','sistema');toast('Ciclo cerrado. Ya puedes avanzar.')}
+function finishTime(){if(state.timer){clearInterval(state.timer);state.timer=null}if(!(state.round===1&&state.integrationMinutes===60))closeExcelLocalRound();state.seconds=0;state.roundClosed=true;writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Tiempo finalizado';addEvent('Tiempo del ciclo agotado.','sistema');if(state.round===1&&state.integrationMinutes===60&&cycleMode()==='manual'){advanceRound(false);if(gameStatus()?.active)beginTimer(false)}else if(cycleMode()==='automatic')advanceRound(true);else toast('Tiempo agotado. El docente puede avanzar cuando quiera.')}
+function cutRound(){if(state.lifecycleVersion===2){controlGame('cerrar');return;}if(!gameStatus()?.active||state.round===1&&state.integrationMinutes===60){toast('El ciclo de integración debe completar una hora.');return}if(cycleMode()!=='manual'){toast('En modo automático el ciclo se controla por programación.');return}closeExcelLocalRound();if(state.timer){clearInterval(state.timer);state.timer=null}state.seconds=0;state.roundClosed=true;updateTimer();writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Ciclo cortado por docente';addEvent('El docente cerró el ciclo manualmente.','sistema');toast('Ciclo cerrado. Ya puedes avanzar.')}
 function refreshAutomaticRuntime(){
   if(state.lifecycleVersion===2){refreshTeacherGame();return;}
 
@@ -386,6 +386,7 @@ async function controlGame(action){
       applyTeacherState(result.data);
     }else{
       const c={...state.authoritative},r={...c.runtime},now=new Date().toISOString(),duration=roundSeconds();
+      if(action==='cerrar'||action==='avanzar'&&r.phase==='decisions')closeExcelLocalRound();
       if(action==='cancelar'){c.cancelledAt=now;Object.assign(r,{phase:'cancelled',status:'simulation-finished',running:false,remaining:0});}
       else if(action==='iniciar'&&r.phase==='integration'&&cycleMode()==='manual'){
         c.gameStartAt=now;c.gameStartedAt=now;Object.assign(r,{phase:'decisions',status:'running',running:true,startedAt:now,duration,remaining:duration});
@@ -493,6 +494,7 @@ function advanceRound(fromAuto=false){
     toast('Espera a que termine la hora de integración.');return;
   }
   if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}
+  closeExcelLocalRound();
   const max=Number($('cycles').value||6);
   if(state.round>=max){
     if(state.timer){clearInterval(state.timer);state.timer=null}
@@ -776,6 +778,14 @@ function renderResults(){
   const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
   $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',[['Ventas netas',er.ventasNetas??er.ingresos??r.ingresos],['Gastos operativos',er.costos??r.costos],['Impacto de eventos',er.impactoEventos],['Otros resultados',Number(er.resultadoVentaActivos||0)+Number(er.otros||0)],['Utilidad',er.utilidad??r.utilidad]])}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Activos fijos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  if(er.excel&&window.SIDE_EXCEL_UI)$('detailReports').insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(er.excel)+'<p class="hint">Piloto local por lotes: los cuadros de caja y balance del flujo anterior se muestran por separado y no incluyen este cierre.</p>');
+}
+function closeExcelLocalRound(){
+  if(state.partidaId||!window.SIDE_EXCEL_UI)return null;
+  let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
+  const closure=window.SIDE_EXCEL_UI.cerrarLocal({game:$('gameCode').value||'SIDE-000',ciclo:state.round,reports});
+  if(closure){state.reports=reports;renderResults();addEvent('Cierre local por lotes calculado para las empresas participantes.','sistema');}
+  return closure;
 }
 function renderWinnerSelect(){renderPodium();
 }

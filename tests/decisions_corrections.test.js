@@ -6,7 +6,7 @@ const rules=require('../js/side_rules');
 const root=path.resolve(__dirname,'..');
 function runtime(){
   const elements=new Map(),inputs=[],storage=new Map(),errors=[];
-  function element(){return {innerHTML:'',textContent:'',dataset:{},style:{setProperty(){}},offsetHeight:82,
+  function element(){return {innerHTML:'',textContent:'',dataset:{},style:{setProperty(){}},offsetHeight:82,getBoundingClientRect(){return {top:0,left:0,right:800,bottom:82,width:800,height:82}},
     classList:{add(){},remove(){},toggle(){},contains(){return false}},handlers:{},
     addEventListener(type,fn){this.handlers[type]=fn},setAttribute(){},querySelector(){return element()},querySelectorAll(){return []},focus(){}};}
   const document={getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id)},
