@@ -1,0 +1,17 @@
+✔ untouched zero production stays pending and a changed target becomes a draft (64.0594ms)
+✔ current store selection normalizes duplicates without mutating legacy data (2.7293ms)
+✔ store checkboxes accumulate districts, keep web, and update prices independently (22.9651ms)
+✔ single-store draft saves and reloads with one charge and one basic seller (16.3023ms)
+✔ multiple stores survive draft restoration and repeated saves with correct charges and sellers (14.3494ms)
+✔ existing contracts prevent closure but allow adding districts in later cycles (14.6335ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (5.1107ms)
+✔ DOP renders once in Production and nowhere in the other categories or summary (13.88ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (10.7762ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 401.9766

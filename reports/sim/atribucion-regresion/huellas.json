@@ -1,0 +1,97 @@
+[
+  {
+    "file": "assets/models/npc/manifest.json",
+    "antes": "e68d30396fbaaedfbd56c9aedec4df29147cc0285f29af2061379f9334bbb4de",
+    "actual": "e68d30396fbaaedfbd56c9aedec4df29147cc0285f29af2061379f9334bbb4de"
+  },
+  {
+    "file": "tests/decision_roster.test.mjs",
+    "antes": "89e2e61acb52ee9cddb0ae1b64a419df97c26d35e1d8dbd680368d1818c86cef",
+    "actual": "89e2e61acb52ee9cddb0ae1b64a419df97c26d35e1d8dbd680368d1818c86cef"
+  },
+  {
+    "file": "tests/decisions_corrections.test.js",
+    "antes": "2e0a7a4bd8607f65778542a1932329ab9d5dc4f92d639c626b5d3f732b113413",
+    "actual": "abb424eb45a128d956b660fcefb26da3a767be63473cc31c7236aba8eb703ba1"
+  },
+  {
+    "file": "tests/mobile_integral_ui.cjs",
+    "antes": "8af1b6d62618fba3d1de4144545c9ec4586cb9acbc7c843eecb8dacdf3c7f254",
+    "actual": "609114bf67c55226a7d2d32cdd56d76a0e39c80b0f89ed43298860332b674378"
+  },
+  {
+    "file": "tests/decisions_cycle_ui.cjs",
+    "antes": "57e66254d2847520e14fe2c1a4ecd77bebd0363bba8b98d696da865d8fd30c97",
+    "actual": "5b7a8f62259019ac6faa92268e055edb64491430fa62ea37acdce89110a83827"
+  },
+  {
+    "file": "css/character-selection.css",
+    "antes": "7871046c4c7dea881fffdddfa717859bfd200d40f7a32d071345e18ed9789343",
+    "actual": "7871046c4c7dea881fffdddfa717859bfd200d40f7a32d071345e18ed9789343"
+  },
+  {
+    "file": "css/company_summary.css",
+    "antes": "a6f6bdd5b6be20be8c3eee66c4563ac473f357a7afc6df261507302884dbb503",
+    "actual": "5f96270ae734b2a3db57a018db7e215e0dcbc1b77e50e6fa2aaddd214ad0973c"
+  },
+  {
+    "file": "css/design-system.css",
+    "antes": "c69bfa1d1535d354a4cf63c1bf54cf999002b7bcf4504067311c6b3cda845ed2",
+    "actual": "c69bfa1d1535d354a4cf63c1bf54cf999002b7bcf4504067311c6b3cda845ed2"
+  },
+  {
+    "file": "css/docente.css",
+    "antes": "83cfd5f04cb0f51f5a203f28cce42cec66126b262dc730fd78b6809c97e5a89f",
+    "actual": "028b1c6b7143740bd353b741eee3b146932947d426bfd146f4e0184e919fd18f"
+  },
+  {
+    "file": "css/excel.css",
+    "antes": null,
+    "actual": "0d3d28d2de2640cb86c414f6cf9ed3b2fc8e8220733f04ca96648c046851dd64"
+  },
+  {
+    "file": "css/hub-world.css",
+    "antes": "35d94d18bd7078399c2dcfaf1cf195bf093d355f6ec6377e41bf17088ac6cd0a",
+    "actual": "35d94d18bd7078399c2dcfaf1cf195bf093d355f6ec6377e41bf17088ac6cd0a"
+  },
+  {
+    "file": "css/production.css",
+    "antes": "0f08bf2daa56ef26851b17d0aeb80f43bb013bc435bab7e534a67f9c264ae1d3",
+    "actual": "0e551a97acbd2f7af2f1be79f12dbe29a8c3c2fd191f19ac9d8dfe4e540f81ec"
+  },
+  {
+    "file": "css/responsive.css",
+    "antes": "d725cd0269ed68c39e6900aae890a3242c2210225d9f641f6f2080aaeb7a76de",
+    "actual": "3dbb65e4145f96266654397c6e49978bf64a8788d39bf47b25a7c6aee52cc686"
+  },
+  {
+    "file": "css/role-selection.css",
+    "antes": "eb86cb14d69d0eaf3d4bad7de734e2b661738014e92ecd1f1e0e40529266f709",
+    "actual": "dfd25b66271ca2ecf1f97633f035e6332867700b164b4bc9e9acbd21b6247122"
+  },
+  {
+    "file": "css/simulator3d.css",
+    "antes": "192bf22da71de544c79163aa2fe752cf38395462af338aee5bb801614ae3c18f",
+    "actual": "d9a2f33dd3acc35830fe72e3fd68dfc17249825d5b0ed583e9aee24c5ff62302"
+  },
+  {
+    "file": "css/student-interface.css",
+    "antes": "44f651b0d2532b11b3f883088eb5c8a3b207c3b32977819cba7a274f68a1d10c",
+    "actual": "36af94d03164e0a55317c534f940b8747619666648e1a30da2b57f680af4a228"
+  },
+  {
+    "file": "css/styles.css",
+    "antes": "94bc9d75fade14c28e85727beff61c6bd5d3cf0df6e435078be59ff8fd57b176",
+    "actual": "15881b68d6a6062ed3f8abb53a69c7a6a2e6222f1e94b31e2fe8ce0d9b76bc4c"
+  },
+  {
+    "file": "css/tablet-return.css",
+    "antes": "d074a766b0730c287c2bb653362bb6b783de1d2d782de0ee6f4e084044364a6a",
+    "actual": "d074a766b0730c287c2bb653362bb6b783de1d2d782de0ee6f4e084044364a6a"
+  },
+  {
+    "file": "css/world_minimap.css",
+    "antes": "df1246b4119ff8282c1b2d3b45bb2a50c813518625e363c3da5098061592ec90",
+    "actual": "cd6419b364db726cbdf88f7723d8b9e13d49f371774c114e5fd283281f48ed10"
+  }
+]

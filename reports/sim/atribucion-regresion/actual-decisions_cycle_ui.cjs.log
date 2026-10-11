@@ -1,0 +1,20 @@
+PASS all tabs layout 1366x768
+PASS all tabs layout 1024x768
+PASS all tabs layout 768x1024
+PASS all tabs layout 390x844
+PASS all tabs layout 320x568
+PASS all tabs layout 844x390
+PASS multiple district checkboxes, keyboard, web, save once, reload and submission lock
+PASS real production record, live target, zero, overachievement and current DOP/summary plan parity
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(await page.evaluate(()=>window.scrollY>0))
+
+    at C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\decisions_cycle_ui.cjs:97:8 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "etiqueta": "antes",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decision_roster.test.mjs",
+    "codigo": 1,
+    "duracionMs": 283,
+    "log": "reports\\sim\\atribucion-regresion\\antes-decision_roster.test.mjs.log"
+  },
+  {
+    "etiqueta": "actual",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decision_roster.test.mjs",
+    "codigo": 1,
+    "duracionMs": 284,
+    "log": "reports\\sim\\atribucion-regresion\\actual-decision_roster.test.mjs.log"
+  },
+  {
+    "etiqueta": "antes",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decisions_corrections.test.js",
+    "codigo": 1,
+    "duracionMs": 551,
+    "log": "reports\\sim\\atribucion-regresion\\antes-decisions_corrections.test.js.log"
+  },
+  {
+    "etiqueta": "actual",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decisions_corrections.test.js",
+    "codigo": 0,
+    "duracionMs": 598,
+    "log": "reports\\sim\\atribucion-regresion\\actual-decisions_corrections.test.js.log"
+  },
+  {
+    "etiqueta": "antes",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "mobile_integral_ui.cjs",
+    "codigo": 1,
+    "duracionMs": 50228,
+    "log": "reports\\sim\\atribucion-regresion\\antes-mobile_integral_ui.cjs.log"
+  },
+  {
+    "etiqueta": "actual",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "mobile_integral_ui.cjs",
+    "codigo": 1,
+    "duracionMs": 55667,
+    "log": "reports\\sim\\atribucion-regresion\\actual-mobile_integral_ui.cjs.log"
+  },
+  {
+    "etiqueta": "antes",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decisions_cycle_ui.cjs",
+    "codigo": 1,
+    "duracionMs": 15736,
+    "log": "reports\\sim\\atribucion-regresion\\antes-decisions_cycle_ui.cjs.log"
+  },
+  {
+    "etiqueta": "actual",
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "suite": "decisions_cycle_ui.cjs",
+    "codigo": 1,
+    "duracionMs": 19228,
+    "log": "reports\\sim\\atribucion-regresion\\actual-decisions_cycle_ui.cjs.log"
+  }
+]

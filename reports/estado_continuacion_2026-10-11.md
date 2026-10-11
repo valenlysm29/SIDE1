@@ -23,3 +23,6 @@ A7 terminó: base351 + consecuencias56 + SIM1 336 + SIM2 306 + SIM3 612 + banco1
 
 ## Hito A6 integración inicial / SQL local
 A6 implementó adaptador de caja, cierre remoto CAS y migración idempotente 2026-10-11_logica_excel.sql. Root validó PostgreSQL local PGlite: aplicar2veces, acceso profesor/denegaciónanon, idempotencia, contexto stale rechazado, reporte y snapshot tardíos protegidos; PASS tests/excel_sql_db.cjs. No se ejecutó SQL en producción. Pendiente ajuste tasa de préstamos existentes, activación sin SQL, oráculo de caja y revisión independiente. A8 inició pruebas de interfaz con igualdad caja/HUD/resumen/reporte y ledger sin doblecargo.
+
+## Hito A0 atribución final
+Comparación exacta HEAD9fbe6ec: NPC17/16, dos botones40px en tabletB800 y assertion scrollY>0 fallan antes y ahora. Cinco errores del dobleDOM eran previos; hoy9/9 pasa. Evidencia de8 ejecuciones y hashes en reports/sim/atribucion-regresion; informe reports/atribucion_regresion_excel.md. No se modificaron NPC/CSS/testsfallidos ajenos. A9nuevoindependiente activo sin historial del desarrollo. Pendiente regresión final de todas las suites y oráculo caja.

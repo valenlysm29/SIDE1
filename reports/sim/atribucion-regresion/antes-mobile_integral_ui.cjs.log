@@ -1,0 +1,31 @@
+PASS mobile panels 360x800
+PASS mobile panels 390x844
+PASS mobile panels 768x1024
+AssertionError [ERR_ASSERTION]: tablet-B 800: targets under44
++ actual - expected
+
++ [
++   {
++     height: 40,
++     id: 'exitDecisions',
++     text: 'Volver a la sala',
++     width: 44
++   },
++   {
++     height: 40,
++     id: 'topSubmitAllDecisions',
++     text: '✓ ENVIAR TODO',
++     width: 140
++   }
++ ]
+- []
+
+    at capture (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\mobile_integral_ui.cjs:30:12)
+    at async C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\mobile_integral_ui.cjs:40:161 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: [Array],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}

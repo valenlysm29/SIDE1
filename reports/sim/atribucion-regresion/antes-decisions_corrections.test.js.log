@@ -1,0 +1,93 @@
+✔ untouched zero production stays pending and a changed target becomes a draft (78.966ms)
+✔ current store selection normalizes duplicates without mutating legacy data (1.2067ms)
+✖ store checkboxes accumulate districts, keep web, and update prices independently (10.0082ms)
+✖ single-store draft saves and reloads with one charge and one basic seller (8.7593ms)
+✖ multiple stores survive draft restoration and repeated saves with correct charges and sellers (7.213ms)
+✖ existing contracts prevent closure but allow adding districts in later cycles (6.7754ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (10.1047ms)
+✖ DOP renders once in Production and nowhere in the other categories or summary (6.9783ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (16.2065ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 4
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 397.1955
+
+✖ failing tests:
+
+test at tests\decisions_corrections.test.js:41:1
+✖ store checkboxes accumulate districts, keep web, and update prices independently (10.0082ms)
+  TypeError: $(...)?.getBoundingClientRect is not a function
+      at js/app.js:729:25
+      at Array.forEach (<anonymous>)
+      at updateDecisionLayout (js/app.js:728:84)
+      at renderDecisionCategory (js/app.js:804:81)
+      at Object.<anonymous> (js/app.js:859:33)
+      at Object.select (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:24:142)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:42:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+
+test at tests\decisions_corrections.test.js:63:1
+✖ single-store draft saves and reloads with one charge and one basic seller (8.7593ms)
+  TypeError: $(...)?.getBoundingClientRect is not a function
+      at js/app.js:729:25
+      at Array.forEach (<anonymous>)
+      at updateDecisionLayout (js/app.js:728:84)
+      at renderDecisionCategory (js/app.js:804:81)
+      at Object.<anonymous> (js/app.js:859:33)
+      at Object.select (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:24:142)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:64:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+
+test at tests\decisions_corrections.test.js:73:1
+✖ multiple stores survive draft restoration and repeated saves with correct charges and sellers (7.213ms)
+  TypeError: $(...)?.getBoundingClientRect is not a function
+      at js/app.js:729:25
+      at Array.forEach (<anonymous>)
+      at updateDecisionLayout (js/app.js:728:84)
+      at renderDecisionCategory (js/app.js:804:81)
+      at Object.<anonymous> (js/app.js:859:33)
+      at Object.select (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:24:142)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:74:66)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+
+test at tests\decisions_corrections.test.js:88:1
+✖ existing contracts prevent closure but allow adding districts in later cycles (6.7754ms)
+  TypeError: $(...)?.getBoundingClientRect is not a function
+      at js/app.js:729:25
+      at Array.forEach (<anonymous>)
+      at updateDecisionLayout (js/app.js:728:84)
+      at renderDecisionCategory (js/app.js:804:81)
+      at Object.<anonymous> (js/app.js:859:33)
+      at Object.select (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:24:142)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:89:23)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+
+test at tests\decisions_corrections.test.js:113:1
+✖ DOP renders once in Production and nowhere in the other categories or summary (6.9783ms)
+  js/app.js:729
+      const height=$(id)?.getBoundingClientRect().height||0;
+                          ^
+  
+  TypeError: $(...)?.getBoundingClientRect is not a function
+      at js/app.js:729:25
+      at Array.forEach (<anonymous>)
+      at updateDecisionLayout (js/app.js:728:84)
+      at renderDecisionCategory (js/app.js:804:81)
+      at evalmachine.<anonymous>:1:21
+      at Script.runInContext (node:vm:149:12)
+      at Object.runInContext (node:vm:301:6)
+      at Object.run (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:19:22)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\atribucion-9fbe6ec\tests\decisions_corrections.test.js:116:7)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
