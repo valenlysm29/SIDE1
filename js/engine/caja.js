@@ -2,6 +2,11 @@
   'use strict';
   const numero=v=>Number.isFinite(Number(v))?Number(v):0;
   const copiar=v=>JSON.parse(JSON.stringify(v));
+  function sembrarTransicion(historial,empresas){
+    const out=copiar(historial||{});
+    for(const empresa of empresas){const id=String(empresa.id),t=empresa.envelope?.transicion;if(!out[id]&&t)out[id]=copiar(t);}
+    return out;
+  }
   /** Único registro monetario del cierre. El ledger anterior queda fuera del
    * modelo una vez activado; baseCaja permite una transición explícita. */
   function adjuntarCaja(cierre,{capitalPorEmpresa={},baseCajaPorEmpresa={},historialAnterior={},overrides={}}={}){
@@ -12,8 +17,8 @@
       const cajaInicial=numero(h.cajaFinal??baseCajaPorEmpresa[id]??capital),c=r.costos;
       const maquinaria=r.decisiones.maquinaria||{},prev=h.maquinariaActivos||{},conservada={...prev};
       for(const [codigo,cantidad] of Object.entries(maquinaria))conservada[codigo]=Math.max(numero(prev[codigo]),numero(cantidad));
-      const comprasActivos=(c.detalles?.maquinaria||[]).reduce((sum,d)=>sum+d.salidaCompra*Math.max(0,numero(maquinaria[d.codigo])-numero(prev[d.codigo])),0);
-      const adquisicionNeta=(c.detalles?.maquinaria||[]).reduce((sum,d)=>sum+d.adquisicion*Math.max(0,numero(maquinaria[d.codigo])-numero(prev[d.codigo])),0);
+      const comprasActivos=(c.detalles?.maquinaria||[]).reduce((sum,d)=>sum+d.salidaCompra*Math.max(0,numero(conservada[d.codigo])-numero(prev[d.codigo])),0);
+      const adquisicionNeta=(c.detalles?.maquinaria||[]).reduce((sum,d)=>sum+d.adquisicion*Math.max(0,numero(conservada[d.codigo])-numero(prev[d.codigo])),0);
       const prestamos=numero(r.financiamiento?.montoPrestamo),depreciacion=numero(c.depreciacion);
       const tasaNuevoPrestamo=Math.pow(1+numero(r.financiamiento?.tasaTEA??cfg.TEA_BASE)/100,1/cfg.MESES_ANIO)-1;
       const tasaPrevia=numero(h.tasaMensualVigente??(Math.pow(1+numero(h.teaVigente??cfg.TEA_BASE)/100,1/cfg.MESES_ANIO)-1));
@@ -38,5 +43,5 @@
     Object.assign(reporte,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral,estadoResultados:{...f.estadoResultados,excel:r}});
     return reporte;
   }
-  return {adjuntarCaja,aplicarReporte};
+  return {adjuntarCaja,aplicarReporte,sembrarTransicion};
 });

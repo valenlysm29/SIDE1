@@ -26,3 +26,6 @@ A6 implementó adaptador de caja, cierre remoto CAS y migración idempotente 202
 
 ## Hito A0 atribución final
 Comparación exacta HEAD9fbe6ec: NPC17/16, dos botones40px en tabletB800 y assertion scrollY>0 fallan antes y ahora. Cinco errores del dobleDOM eran previos; hoy9/9 pasa. Evidencia de8 ejecuciones y hashes en reports/sim/atribucion-regresion; informe reports/atribucion_regresion_excel.md. No se modificaron NPC/CSS/testsfallidos ajenos. A9nuevoindependiente activo sin historial del desarrollo. Pendiente regresión final de todas las suites y oráculo caja.
+
+## Hito A8 / A9 correcciones adicionales
+A8 ejecutó SIM1 336/0(+351componentes), SIM2 306/0 y SIM3 612/0 y comprobó caja/HUD/ER/ledger/animación; detectó recorte móvil523px en390 y se está repitiendo trasCSSfix. A9fresh identificóbalanceGeneralperdido en docente nuevo y omisión gastos activosowned; A6 corrigióambos con14pruebasintegraciónverdes. Rootdetectócierre tardío sinplanes históricos; remoto/local ahora consultanplanesPorCiclo. A9reprodujotransicióndoblecompra y omitnumericshop/credit; A6atiendependientes. A7extiendeoráculoa todasfinancial.*. No push. Cada cifra final y regresión completa pendientes tras estas correcciones.

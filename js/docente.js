@@ -630,7 +630,7 @@ async function supabaseReports(){
       estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
       excelDecisionState:rep?.estado_resultados?.excelDecisionState||local?.excelDecisionState||null,
       balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
-      balanceGeneral:rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
+      balanceGeneral:rep?.estado_resultados?.excel?.financial?.balanceGeneral||rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
       flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),

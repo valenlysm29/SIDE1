@@ -56,8 +56,10 @@
     if(!container)return;
     let stored=context.getState()||{},draft=Object.assign(nuevasDecisiones(),clone(stored.decisiones||{})),enabled=!!stored.habilitado;
     draft.personal=root.SIDE_EXCEL_PRODUCCION.normalizarPersonal(draft.personal);
+    for(const [codigo,owned] of Object.entries(context.historial?.maquinariaActivos||{}))draft.maquinaria[codigo]=Math.max(numero(draft.maquinaria[codigo]),numero(owned));
     let locked=!!context.locked,confirmed=Number(stored.round)===Number(context.round)&&stored.enviado;
     const local=context.local!==false;
+    const remoteReady=local||context.remoteReady!==false;
     function feedback(){
       container.querySelectorAll('[data-calidad-lote]').forEach(el=>{const l=root.SIDE_EXCEL_PUNTAJES.evaluarLote(draft.lotes[Number(el.dataset.calidadLote)]);el.textContent=`Calidad ${format(l.calidad)} · Umbral ${format(l.umbral)} · ${l.resultado||'Elige un segmento'}. ${l.mensaje}`;});
       const preview=container.querySelector('[data-excel-preview]');if(!preview)return;
@@ -67,8 +69,8 @@
       const frozen=locked||confirmed;
       container.innerHTML=`<section class="excel-editor" aria-labelledby="excelEditorTitle"><header><img src="assets/icons/categories/recursos_humanos.svg" alt=""><div><h2 id="excelEditorTitle">Plan de producción por lotes</h2><p>Organiza personal, materiales y segmento para cada lote.</p></div></header>
         <p class="excel-help">El docente cierra las ventas de todas las empresas participantes desde su panel. Caja, costos, compras y préstamos se registran una sola vez al cerrar el ciclo.</p>
-        <label class="excel-toggle"><input type="checkbox" data-excel-enable ${enabled?'checked':''} ${locked||confirmed?'disabled':''}>Usar el modelo por lotes en esta empresa</label>
-        ${!local?'<p>Confirma el plan para sincronizarlo. El docente necesita aplicar la migración del cierre por lotes antes del primer cierre conectado.</p>':''}
+        <label class="excel-toggle"><input type="checkbox" data-excel-enable ${enabled?'checked':''} ${locked||confirmed||!remoteReady?'disabled':''}>Usar el modelo por lotes en esta empresa</label>
+        ${!local?(remoteReady?'<p>Confirma el plan para sincronizarlo con la partida.</p>':'<p>Falta habilitar el cierre por lotes en el servidor. El flujo anterior permanece disponible. El docente debe aplicar supabase/migrations/2026-10-11_logica_excel.sql. También puede iniciar una partida local de prueba.</p>'):''}
         ${enabled?`<div class="excel-grid"><label>Régimen laboral<select data-excel-regimen ${frozen?'disabled':''}><option value="MYPE" ${draft.regimen==='MYPE'?'selected':''}>MYPE</option><option value="NO_MYPE" ${draft.regimen==='NO_MYPE'?'selected':''}>No MYPE</option></select></label><label>Publicidad del ciclo (S/)<input type="number" min="0" max="${cfg().PUBLICIDAD_MAX}" step="1" value="${e(draft.publicidad)}" data-excel-publicidad ${frozen?'disabled':''}></label><label>Préstamo solicitado (S/)<input type="number" min="0" step="0.01" value="${e(draft.montoPrestamo)}" data-excel-prestamo ${frozen?'disabled':''}></label></div>
           <details><summary>Decisiones del ciclo</summary><p>Las opciones sin elegir aportan cero. Un material faltante también aporta cero a la calidad y puede impedir producir.</p><div class="excel-grid">${grupos().map((g,i)=>`<label>${e(g)}<select data-excel-grupo="${i}" ${frozen?'disabled':''}>${opciones(opcionesGrupo(g),draft.seleccion.find(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo===g))}</select></label>`).join('')}</div></details>
           <details><summary>Personal por nivel y máquina</summary><p>La cantidad corresponde a operarios. Corte utiliza la columna manual.</p><button type="button" data-excel-importar class="side-button" ${frozen?'disabled':''}>Importar personal de mis decisiones</button><div class="excel-table-wrap"><table><thead><tr><th>Área y nivel</th>${maquinas.map(m=>`<th>${m}</th>`).join('')}</tr></thead><tbody>${Object.entries(areas).flatMap(([a,label])=>[0,1,2].map(n=>`<tr><th>${label} N${n+1}</th>${[0,1,2].map(m=>`<td><input aria-label="${label} nivel ${n+1} ${maquinas[m]}" data-personal="${a},${n},${m}" type="number" min="0" step="1" value="${draft.personal[a][n][m]}" ${frozen||a==='corte'&&m!==0?'disabled':''}></td>`).join('')}</tr>`)).join('')}</tbody></table></div></details>
@@ -82,7 +84,7 @@
       if(el.dataset.lote!==undefined){const campo=el.dataset.campo;draft.lotes[Number(el.dataset.lote)][campo]=['cantidad','precio'].includes(campo)?numero(el.value):el.value;}
       else if(el.dataset.personal){const [a,n,m]=el.dataset.personal.split(',');draft.personal[a][n][m]=Math.floor(numero(el.value));}
       else if(el.dataset.compra)draft.comprasUnidades[el.dataset.compra]=numero(el.value);
-      else if(el.dataset.activo)draft.maquinaria[el.dataset.activo]=Math.floor(numero(el.value));
+      else if(el.dataset.activo){const owned=numero(context.historial?.maquinariaActivos?.[el.dataset.activo]);draft.maquinaria[el.dataset.activo]=Math.max(owned,Math.floor(numero(el.value)));el.value=draft.maquinaria[el.dataset.activo];}
       else if(el.dataset.excelGrupo!==undefined){const g=grupos()[Number(el.dataset.excelGrupo)];draft.seleccion=draft.seleccion.filter(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo!==g);if(el.value)draft.seleccion.push(el.value);}
       else if(el.matches('[data-excel-regimen]'))draft.regimen=el.value;
       else if(el.matches('[data-excel-prestamo]'))draft.montoPrestamo=numero(el.value);
@@ -113,8 +115,8 @@
     if(!participantes.length)return null;
     const previo=leer(cierreKey(game,ciclo),null);let cierre=previo;
     if(!cierre){
-      const decisionesPorEmpresa={};participantes.forEach(r=>{const d=r.excelDecisionState;if(Number(d.round)===Number(ciclo)&&d.enviado)decisionesPorEmpresa[r.id]=prepararDecisiones(d.decisiones);});
-      const historialAnterior=leer(historiaKey(game),{});
+      const decisionesPorEmpresa={};participantes.forEach(r=>{const d=r.excelDecisionState,plan=d.planesPorCiclo?.[ciclo]||(Number(d.round)===Number(ciclo)&&d.enviado?d.decisiones:null);if(plan)decisionesPorEmpresa[r.id]=prepararDecisiones(plan);});
+      const baseHistoria=leer(historiaKey(game),{}),historialAnterior=root.SIDE_EXCEL_CAJA?root.SIDE_EXCEL_CAJA.sembrarTransicion(baseHistoria,participantes.map(r=>({id:r.id,envelope:r.excelDecisionState}))):baseHistoria;
       cierre=root.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:participantes.map(r=>r.id),decisionesPorEmpresa,historialPorEmpresa:historialAnterior});
       if(root.SIDE_EXCEL_CAJA)cierre=root.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.capital])),baseCajaPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.excelDecisionState.cajaTransicion??r.capital])),historialAnterior});
       localStorage.setItem(cierreKey(game,ciclo),JSON.stringify(cierre));localStorage.setItem(historiaKey(game),JSON.stringify(cierre.historialPorEmpresa));

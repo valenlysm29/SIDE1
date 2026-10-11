@@ -826,11 +826,30 @@ function importExcelPersonnel(){
   }
   return {personal,seleccion};
 }
-function mountExcelProductionEditor(){
+async function mountExcelProductionEditor(){
   const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
-  window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local:!currentStudent.empresaId,
+  const local=!currentStudent.empresaId;let remoteReady=local;
+  if(!local){container.textContent='Comprobando el modelo por lotes…';const status=await window.SIDE?.PartidaService?.excelDisponible?.();remoteReady=!!status?.available;if(!container.isConnected)return;}
+  window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,
     historial:decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),getState:()=>decisionState.__excel,importar:importExcelPersonnel,
-    save:value=>{value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateCashHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+    save:value=>{if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateCashHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+}
+function captureExcelTransition(){
+  const maquinariaActivos={};let activosCosto=0;
+  for(const id of ['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE']){
+    const item=findDecisionItem(id),st=savedEntry(item);
+    for(const option of item.options){let qty=Object.entries(st?.purchases||{}).reduce((sum,[round,row])=>sum+(Number(round)<=currentRound()?Number(row?.[option.id]||0):0),0);
+      if(id==='MOLDE'&&!st?.purchases&&(st?.optionIds||[]).includes(option.id))qty=1;
+      if(qty>0&&option.codigoExcel){maquinariaActivos[id==='MESA_CORTE'?'mesa':option.codigoExcel]=qty;activosCosto+=qty*Number(option.cost||0);}
+    }
+  }
+  const before=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:cashLedger,sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
+  // Solo se importa un inventario físico explícitamente persistido. Compras
+  // anteriores o la proyección de producción no prueban stock remanente.
+  const inventory=decisionState.__inventarioMP||{};
+  const inventarioMP=Object.fromEntries(Object.entries(inventory).filter(([code,qty])=>Object.hasOwn(window.SIDE_EXCEL_CONFIG.CONFIG.PRECIO_MP,code)&&Number.isFinite(Number(qty))).map(([code,qty])=>[code,Math.max(0,Number(qty))]));
+  const tea=Number(teacherConfig().interest??window.SIDE_EXCEL_CONFIG.CONFIG.TEA_BASE),deudaPrincipal=Number(before.balanceGeneral?.deuda||0);
+  return {cajaFinal:initialCapital()+ledgerTotal(),maquinariaActivos,activosCosto,depreciacionAcumulada:0,inventarioMP,deudaPrincipal,teaVigente:tea,tasaMensualVigente:Math.pow(1+tea/100,1/window.SIDE_EXCEL_CONFIG.CONFIG.MESES_ANIO)-1};
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);

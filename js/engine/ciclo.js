@@ -3,6 +3,9 @@
   const copia=v=>JSON.parse(JSON.stringify(v));
   const claveLote=l=>[l.segmento,l.molde,l.cuero||'',l.accesorios||'',l.hilo||'',Number(l.precio||0)].join('|');
   function prepararEmpresa(decisiones,historial={},overrides={}){
+    const maquinaria={...historial.maquinariaActivos};
+    for(const [codigo,cantidad] of Object.entries(decisiones.maquinaria||{}))maquinaria[codigo]=Math.max(Number(maquinaria[codigo]||0),Number(cantidad)||0);
+    decisiones={...decisiones,maquinaria};
     const c=C.configurar(overrides),puntajes=P.calcularPuntajes(decisiones,overrides);
     const produccion=PRO.calcularProduccion({...decisiones,inventarioInicial:historial.inventarioMP||decisiones.inventarioInicial||{}},overrides);
     const pre=CON.evaluarConsecuencias({puntajes,lotes:puntajes.lotes,jefes:decisiones.jefes,planeado:produccion.totalPlaneado,capacidad:produccion.produccionCapacidad},historial,overrides);
