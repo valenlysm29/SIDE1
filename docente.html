@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
-  <link rel="stylesheet" href="css/docente.css?v=20261001-paneles">
+  <link rel="stylesheet" href="css/docente.css?v=20261011-crear">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
 </head>
 <body>
@@ -107,10 +107,12 @@
         <div class="card-title"><div><h3>Eventos habilitados</h3><p>Selecciona los eventos que podrán ocurrir desde el Ciclo 1.</p></div><button id="openEventPicker" class="secondary" type="button" aria-haspopup="dialog">Seleccionar eventos</button></div>
         <div id="enabledEventsSummary" class="enabled-events-summary" aria-live="polite">Sin eventos habilitados.</div>
       </article>
+      <div id="creationFeedback" class="creation-feedback hidden" role="status" aria-live="polite"><p id="creationMessage"></p><button id="retryCreate" class="secondary hidden" type="button">Reintentar</button><button id="resumeRoom" class="secondary hidden" type="button">Reanudar sala anterior</button><button id="replaceRoom" class="danger hidden" type="button">Cerrar sala anterior y crear una nueva</button></div>
       <div class="config-start-footer"><div><strong id="configReadySummary">Revisa la configuración antes de iniciar.</strong><p>Iniciar partida abre la sala de espera. El Ciclo 1 comienza al terminar el tiempo de integración configurado.</p></div><button id="startGame" class="primary" type="button">Iniciar partida</button></div>
     </section>
 
     <section id="tab-rondas" class="tab-panel">
+      <article id="teacherLobby" class="card teacher-lobby hidden" aria-labelledby="lobbyHeading"><h2 id="lobbyHeading">Sala de espera</h2><div class="lobby-identity"><strong id="lobbyCode"></strong><button id="copyLobbyCode" class="secondary" type="button">Copiar código</button><button id="newRoom" class="secondary" type="button">Crear otra sala</button></div><p id="lobbyCountdown" role="timer"></p><p id="lobbyNext"></p><div id="lobbyCompanies" aria-live="polite">Esperando empresas.</div></article>
       <div class="section-head"><div><span class="eyebrow">CONTROL DE CICLO</span><h2>Tiempo, noticias y eventos</h2></div><button id="advanceRound" class="primary">Pasar al siguiente ciclo <img class="button-arrow-icon" src="assets/icons/ui/arrow-right-thick.svg" alt=""></button></div>
       <div class="round-status card">
         <div class="round-number"><span>CICLO</span><strong id="roundDisplay">1 / 6</strong></div>
@@ -193,7 +195,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261009-grades"></script>
+<script src="services/partida_service.js?v=20261011-crear"></script>
 <script src="services/empresa_service.js?v=20261009-waiting"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
@@ -214,6 +216,6 @@
 <script src="js/teacher_podium.js?v=20261009-grades"></script>
 <script src="services/teacher_sync.js?v=20261009-grades"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20261009-grades"></script>
+<script src="js/docente.js?v=20261011-crear"></script>
 </body>
 </html>

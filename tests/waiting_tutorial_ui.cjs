@@ -68,6 +68,9 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   }
   await p.setViewportSize({width:1366,height:900});
   await p.clock.install();
+  // Pausar antes de medir el límite: install() conserva el avance del reloj real.
+  // Sin pausa, el tiempo de las llamadas suma milisegundos a fastForward(6999).
+  await p.clock.pauseAt(new Date(Date.now()+1000));
   await mount.locator('.tutorial-dot').first().click();
   await p.clock.fastForward(6999);assert.equal(await current().innerText(),'1');
   await p.clock.fastForward(1);assert.equal(await current().innerText(),'2','automatic advancement occurs at 7 seconds');

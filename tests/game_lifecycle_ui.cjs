@@ -21,6 +21,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await p.exposeFunction('dbControl',(id,action,c,round)=>rpc(db,'controlar_partida',{p_partida_id:id,p_accion:action,p_config:c,p_expected_round:round}));
   await p.evaluate(()=>{
    SIDE.SupabaseClient.isReady=()=>true;
+   SIDE.PartidaService.obtenerActiva=async()=>({success:true,data:null});
    SIDE.PartidaService.crear=async data=>({success:true,data:await dbCreate(data.configuracion)});
    SIDE.PartidaService.controlar=async(...args)=>{const data=await dbControl(...args);return {success:!data.error,data,error:data.error};};
    SIDE.PartidaService.actualizarConfiguracion=(id,c)=>SIDE.PartidaService.controlar(id,'guardar',c,null);
@@ -85,7 +86,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await s1.evaluate(()=>{localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({lifecycleVersion:2,phase:'decisions'}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,phase:'decisions'}));showScreen('simulator3d');});
   assert.equal(await s1.locator('#simulator3d').isVisible(),false,'cached state cannot bypass authoritative waiting');
   await s1.evaluate(()=>refreshStudentGame());
-  assert.equal(await t.locator('#startGame').isDisabled(),true);
+  assert.equal(await t.locator('#startGame').isDisabled(),false,'ofrece crear otra sala');
   const earlyStart=await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'iniciar',p_config:{},p_expected_round:null});
   assert.equal(earlyStart.configuracion.runtime.phase,'integration','server rejects skipping the configured waiting time');
   assert.equal(earlyStart.configuracion.gameStartAt,waitingDeadline);
@@ -107,7 +108,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await t.locator('#startCycle1Btn').isVisible(),false);
   await t.evaluate(()=>switchTab('configuracion'));
-  assert.equal(await t.locator('#startGame').isDisabled(),true);
+  assert.equal(await t.locator('#startGame').isDisabled(),false,'ofrece crear otra sala');
   await t.locator('#openEventPicker').click();await t.locator('#eventSearch').fill('crisis');
   await t.locator('#eventSelectAll').click();await t.evaluate(()=>publishChain);
   assert.equal(await t.evaluate(()=>state.enabledEvents.size),92);

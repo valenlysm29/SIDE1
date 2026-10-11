@@ -12,7 +12,7 @@ function fixture(name){
  const page=await browser.newPage({viewport:{width:1366,height:768}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>r.abort());
  await page.clock.install();
- // This suite covers the supported unconfigured/local lifecycle; RPC coverage is in game_lifecycle_ui.
+ // Local controls are seeded explicitly; creation without a server must fail visibly.
  const teacher=fixture('docente.html').replace('<script>const cfg=','<script>window.SIDE_CONFIG={};const cfg='),student=fixture('index.html');
  await page.setContent(teacher,{waitUntil:'load'});
  assert.equal(await page.locator('#startGame').innerText(),'Iniciar partida');
@@ -34,11 +34,20 @@ function fixture(name){
  await page.locator('.event-enable').first().check();await page.locator('#closeEventPicker').click();
  assert.match(await page.locator('#enabledEventsSummary').innerText(),/1 habilitados/);
  await page.locator('#startGame').click();
+ assert.equal(await page.locator('#creationFeedback').getAttribute('data-tone'),'error');
+ assert.equal(await page.evaluate(()=>Boolean(gameStatus()?.active)),false);
+ // Seed the legacy local fixture to keep testing controls and podium independently.
+ await page.evaluate(()=>{
+  const c=getConfig(),now=Date.now();
+  c.gameStartAt=new Date(now+c.integrationDurationMinutes*60000).toISOString();c.integrationStartTime=new Date(now).toISOString();
+  c.runtime={round:1,phase:'integration',status:'waiting',running:false,duration:roundSeconds(),remaining:roundSeconds(),mode:cycleMode()};
+  applyTeacherState({configuracion:c,estado:'esperando'});watchTeacherGame();startLiveCompanies();switchTab('rondas');
+ });
  assert.equal(await page.locator('[data-tab="rondas"]').isVisible(),true);
  assert.equal(await page.evaluate(()=>runtime().duration),600);
  assert.equal(await page.evaluate(()=>runtime().phase),'integration');
  assert.equal(await page.locator('#advanceRound').isDisabled(),true);
- assert.equal(await page.locator('#startGame').isDisabled(),true);
+ assert.equal(await page.locator('#startGame').isDisabled(),false);
  const wait=await page.evaluate(()=>({duration:Date.parse(state.authoritative.gameStartAt)-Date.parse(state.authoritative.integrationStartTime),seconds:state.seconds,deadline:state.authoritative.gameStartAt}));
  assert.equal(wait.duration,180000);
  assert.equal(wait.seconds,180);

@@ -1,0 +1,93 @@
+'use strict';
+// App y servicio reales por HTTP localhost; RPC ejecutados en PostgreSQL PGlite.
+// No SDK/CDN, cuenta, secretos ni Supabase remoto. La autenticación es fixture.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
+const {chromium}=require('playwright');
+const {database,rpc,createGame,config,professor}=require('./lifecycle_db_fixture.cjs');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'reports/sim/crear_partida');
+const sdk=`window.SIDE_CONFIG={SUPABASE_URL:'http://localhost',SUPABASE_PUBLISHABLE_KEY:'fixture'};
+window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
+(async()=>{
+ const db=await database(),migration=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-11_fix_crear_partida.sql'),'utf8');await db.exec(migration);await db.exec(migration);
+ const calls=[],pageErrors=[],consoleErrors=[];let fail=null,loseResponse=false,delayCreation=false;
+ const server=http.createServer(async(req,res)=>{
+  try{const url=new URL(req.url,'http://localhost');
+   if(url.pathname==='/mock'){
+    let body='';for await(const chunk of req)body+=chunk;const q=JSON.parse(body);let response;
+    try{
+     if(q.kind==='rpc'){
+      if(q.name==='crear_sala_docente'&&delayCreation)await new Promise(r=>setTimeout(r,150));
+      if(q.name===fail?.name)response={data:null,error:fail.error};
+      else if(q.name==='side_excel_features')response={data:null,error:{code:'PGRST202',message:'Excel fixture no instalada'}};
+      else response={data:await rpc(db,q.name,q.args||{}),error:null};
+      if(q.name==='crear_sala_docente'&&loseResponse){loseResponse=false;response={data:null,error:{code:'08006',message:'Respuesta perdida tras crear la sala'}};}
+     }else if(q.name==='partidas'){
+      const found=(await db.query('select * from partidas where id=$1',[q.filters.find(x=>x[0]==='id')?.[1]])).rows;response={data:q.single?found[0]||null:found,error:null};
+     }else if(q.name==='participantes'){
+      const rows=(await db.query('select p.*,row_to_json(e) as empresas from participantes p left join empresas e on e.id=p.empresa_id where p.partida_id=$1',[q.filters.find(x=>x[0]==='partida_id')?.[1]])).rows;response={data:rows,error:null};
+     }else response={data:[],error:null};
+    }catch(error){response={data:null,error:{code:error.code,message:error.message}};}
+    calls.push({request:q,response});res.setHeader('Content-Type','application/json');res.end(JSON.stringify(response));return;
+   }
+   const file=path.resolve(root,url.pathname==='/'?'docente.html':'.'+url.pathname);if(!file.startsWith(root+path.sep))throw new Error('Ruta fuera del proyecto');
+   let body=fs.readFileSync(file);if(file.endsWith('docente.html'))body=body.toString().replace(/<script src="https:[^>]+><\/script>/g,'').replace(/<script src="js\/config.js[^>]+><\/script>/,'<script>'+sdk+'</script>');
+   const ext=path.extname(file),mime={'.js':'application/javascript','.css':'text/css','.html':'text/html','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.woff2':'font/woff2'};res.setHeader('Content-Type',mime[ext]||'application/octet-stream');res.end(body);
+  }catch(error){res.statusCode=404;res.end(error.message);}
+ });await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin='http://127.0.0.1:'+server.address().port;
+ const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});fs.mkdirSync(output,{recursive:true});
+ const contexts=[];
+ async function page(context){context=context||await browser.newContext({viewport:{width:1366,height:900}});if(!contexts.includes(context)){contexts.push(context);await context.route('**/*',r=>r.request().url().startsWith(origin)?r.continue():r.abort());}
+  const p=await context.newPage();p.on('pageerror',e=>pageErrors.push(e.message));p.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text())});await p.goto(origin+'/docente.html');await p.waitForLoadState('networkidle');await p.evaluate(()=>switchTab('configuracion'));return p;
+ }
+ async function reset(){for(const context of contexts.splice(0))await context.close();await db.exec('truncate partidas cascade');fail=null;loseResponse=false;delayCreation=false;}
+ async function configure(p,automatic=false){await p.locator(automatic?'#cycleModeAutomatic':'#cycleModeManual').check();await p.locator('#integrationDurationMinutes').fill('2');await p.locator('#cycles').fill('3');await p.locator('#roundHours').fill('0');await p.locator('#roundMinutes').fill('5');await p.evaluate(()=>{state.enabledEvents=new Set(['PE01','PE02','PE03','PE04']);renderEventBank();refreshSetupSummary()});}
+ const count=async()=>Number((await db.query('select count(*) as n from partidas')).rows[0].n);
+ const id=p=>p.evaluate(()=>state.partidaId);
+ async function screenshot(p,options){await p.waitForTimeout(300);return p.screenshot({...options,animations:'disabled'});}
+ async function success(p){await p.waitForFunction(()=>state.partidaId&&runtime()?.phase==='integration');await p.waitForFunction(()=>$('creationFeedback').dataset.tone==='success');assert.match(await p.locator('#creationMessage').innerText(),/Sala creada.*Código/);}
+ try{
+  await reset();let p=await page();await configure(p);assert.match(await p.locator('#configReadySummary').innerText(),/3 ciclos operativos de 0 h 5 min/);delayCreation=true;
+  await p.evaluate(()=>{$('startGame').click();$('startGame').click()});await p.waitForFunction(()=>$('startGame').textContent==='Creando sala…');assert.equal(await p.locator('#startGame').isDisabled(),true);await success(p);delayCreation=false;
+  assert.equal(await count(),1);let game=(await db.query('select * from partidas')).rows[0];assert.equal(game.configuracion.integrationDurationMinutes,2);assert.equal(game.configuracion.cycles,3);assert.equal(game.configuracion.roundHours,0);assert.equal(game.configuracion.roundMinutes,5);assert.deepEqual(game.configuracion.enabledEvents,['PE01','PE02','PE03','PE04']);
+  assert.equal(await p.locator('#teacherLobby').isVisible(),true);assert.equal(await p.locator('#lobbyCode').innerText(),game.codigo);const clock=await p.evaluate(()=>({text:$('lobbyCountdown').textContent,seconds:state.seconds,clock:teacherClock,now:teacherNow(),config:state.authoritative,runtime:runtime()}));assert.match(clock.text,/00:0[12]:/,JSON.stringify(clock));assert.match(await p.locator('#lobbyNext').innerText(),/tú controlas el cierre/);
+  await screenshot(p,{path:path.join(output,'after_success_verde.png'),fullPage:true});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'lobby móvil sin desbordamiento horizontal');await screenshot(p,{path:path.join(output,'after_mobile.png'),fullPage:true});await p.setViewportSize({width:1366,height:900});
+  await p.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>window.copied=value}}));await p.locator('#copyLobbyCode').click();assert.equal(await p.evaluate(()=>window.copied),game.codigo);
+  await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa Uno',p_nombre_comercial:'Empresa Uno'});await p.evaluate(()=>loadReports());assert.match(await p.locator('#lobbyCompanies').innerText(),/Empresa Uno/);
+  await screenshot(p,{path:path.join(output,'after_manual.png'),fullPage:true});const deadline=game.configuracion.gameStartAt,roomId=game.id;
+  await p.reload();await p.waitForLoadState('networkidle');assert.equal(await id(p),roomId);assert.equal(await p.evaluate(()=>state.authoritative.gameStartAt),deadline);assert.equal(await p.locator('#integrationDurationMinutes').inputValue(),'2');assert.equal(await p.locator('#roundMinutes').inputValue(),'5');assert.equal(await p.locator('#cycles').inputValue(),'3');await screenshot(p,{path:path.join(output,'after_recarga.png'),fullPage:true});
+  const fresh=await page();assert.equal(await id(fresh),roomId,'sesión sin localStorage recupera la sala del servidor');
+  console.log('PASS Manual: configuración exacta, doble clic, lobby, copiar, empresas y recarga desde servidor');
+  for(const phase of ['integration','decisions','cancelled','finished']){
+   await reset();const previous=await createGame(db,config({integrationDurationMinutes:2,roundMinutes:5,enabledEvents:['PE01','PE02','PE03','PE04']}));await rpc(db,'controlar_partida',{p_partida_id:previous.id,p_accion:'sincronizar'});
+   if(phase==='decisions'){await db.query("update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1",[previous.id]);await rpc(db,'controlar_partida',{p_partida_id:previous.id,p_accion:'sincronizar'});}
+   if(phase==='cancelled')await rpc(db,'controlar_partida',{p_partida_id:previous.id,p_accion:'cancelar'});
+   if(phase==='finished')await db.query("update partidas set estado='finalizada',configuracion=jsonb_set(configuracion,'{runtime,phase}','\"finished\"') where id=$1",[previous.id]);
+   p=await page();if(!['integration','decisions'].includes(phase))await configure(p);await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);
+   if(['integration','decisions'].includes(phase)){
+    assert.equal(await count(),1);assert.equal(await p.locator('#resumeRoom').isVisible(),true);assert.equal(await p.locator('#replaceRoom').isVisible(),true);await p.locator('#resumeRoom').click();await p.waitForFunction(expected=>state.partidaId===expected&&$('creationMessage').textContent.includes('Sala recuperada'),previous.id);assert.equal(await id(p),previous.id);await p.evaluate(()=>switchTab('configuracion'));await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);
+    p.once('dialog',d=>d.dismiss());await p.locator('#replaceRoom').click();assert.equal(await count(),1);
+    p.once('dialog',d=>d.accept());await p.locator('#replaceRoom').click();
+   }
+   await success(p);assert.equal(await count(),2);assert.notEqual(await id(p),previous.id);const old=(await db.query('select * from partidas where id=$1',[previous.id])).rows[0];assert.equal(old.estado,'finalizada');
+   console.log('PASS sala anterior '+phase+': nueva sala y confirmación/reanudación cuando corresponde');
+  }
+  await reset();const stale=await createGame(db,config());await rpc(db,'controlar_partida',{p_partida_id:stale.id,p_accion:'sincronizar'});p=await page();await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await rpc(db,'controlar_partida',{p_partida_id:stale.id,p_accion:'cancelar'});await p.locator('#resumeRoom').click();await p.waitForFunction(()=>$('creationMessage').textContent.includes('ya terminó'));assert.equal(await p.locator('#creationFeedback').getAttribute('data-tone'),'notice');assert.equal(await id(p),null);console.log('PASS reanudar sala cerrada por otra pestaña: aviso claro sin falso éxito');
+  await reset();p=await page();await configure(p);fail={name:'crear_sala_docente',error:{code:'08006',message:'Conexión interrumpida; vuelve a intentarlo'}};await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await p.waitForFunction(()=>$('creationFeedback').dataset.tone==='error');assert.equal(await count(),0);assert.match(await p.locator('#creationMessage').innerText(),/No se pudo crear la sala.*Conexión/);assert.equal(await p.locator('#retryCreate').isVisible(),true);await screenshot(p,{path:path.join(output,'after_error_reintento.png'),fullPage:true});fail=null;await p.waitForFunction(()=>!state.starting);await p.locator('#retryCreate').click();await success(p);assert.equal(await count(),1);
+  await reset();p=await page();await configure(p);fail={name:'crear_sala_docente',error:{code:'PGRST202',message:'RPC inexistente'}};await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await p.waitForFunction(()=>$('creationFeedback').dataset.tone==='error');assert.match(await p.locator('#creationMessage').innerText(),/Falta actualizar.*2026-10-11_fix_crear_partida.sql/);assert.equal(await count(),0);fail=null;await p.waitForFunction(()=>!state.starting);await p.locator('#retryCreate').click();await success(p);
+  console.log('PASS error rojo con reintento y migración ausente específica');
+  await reset();p=await page();await configure(p);loseResponse=true;await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await p.waitForFunction(()=>$('creationFeedback').dataset.tone==='error');assert.equal(await count(),1);await p.waitForFunction(()=>!state.starting);await p.locator('#retryCreate').click();await success(p);assert.equal(await count(),1,'reintento tras respuesta perdida recupera misma fila');
+  await reset();p=await page();await configure(p);loseResponse=true;await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);const lostId=(await db.query('select id from partidas')).rows[0].id;await rpc(db,'controlar_partida',{p_partida_id:lostId,p_accion:'cancelar'});await p.locator('#retryCreate').click();await p.waitForFunction(()=>!state.starting);assert.equal(await p.locator('#creationFeedback').getAttribute('data-tone'),'error');assert.match(await p.locator('#creationMessage').innerText(),/ya terminó/);assert.equal(await p.evaluate(()=>localStorage.getItem('SIDE_CREATION_REQUEST')),null);await p.locator('#retryCreate').click();await success(p);assert.equal(await count(),2,'solicitud cuya sala terminó no produce éxito y reintento crea nueva');
+  await reset();p=await page();await configure(p);const second=await page();await configure(second);delayCreation=true;await Promise.all([p.evaluate(()=>startGame()),second.evaluate(()=>startGame())]);delayCreation=false;assert.equal(await count(),1,'dos pestañas no duplican sala');const tones=await Promise.all([p,second].map(x=>x.locator('#creationFeedback').getAttribute('data-tone')));assert.ok(tones.includes('success'));const conflict=tones[0]==='success'?second:p;assert.equal(await conflict.locator('#resumeRoom').isVisible(),true);await conflict.locator('#resumeRoom').click();await conflict.waitForFunction(()=>$('creationMessage').textContent.includes('Sala recuperada'));assert.equal(await id(p),await id(second));
+  console.log('PASS respuesta perdida idempotente y creación concurrente desde dos pestañas');
+  await reset();await db.query("insert into partidas(profesor_id,nombre,codigo,estado) values($1,'Demo','SIDE-000','finalizada')",[professor]);await db.exec("create sequence side_test_code_seq; create function side_test_code_collision() returns text language sql volatile as $$select case when nextval('side_test_code_seq')=1 then 'SIDE-000' else public.side_next_game_code() end$$; alter table partidas alter column codigo set default side_test_code_collision()");
+  p=await page();await configure(p);await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await success(p);assert.equal(await count(),2);assert.notEqual(await p.locator('#lobbyCode').innerText(),'SIDE-000');await db.exec('alter table partidas alter column codigo set default side_next_game_code(); drop function side_test_code_collision(); drop sequence side_test_code_seq');console.log('PASS código demo repetido: servidor reintenta y asigna otro código');
+  for(const automatic of [false,true]){
+   await reset();p=await page();await configure(p,automatic);await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await success(p);const room=await id(p),other=await page(p.context());await db.query("update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1",[room]);
+   await Promise.all([p,other].map(x=>x.evaluate(()=>refreshTeacherGame())));const first=(await db.query('select configuracion from partidas where id=$1',[room])).rows[0].configuracion;assert.equal(first.runtime.phase,'decisions');assert.equal(first.runtime.round,1);assert.ok(first.gameStartedAt);
+   await Promise.all([p,other].map(x=>x.evaluate(()=>refreshTeacherGame())));const after=(await db.query('select configuracion from partidas where id=$1',[room])).rows[0].configuracion;assert.equal(after.gameStartedAt,first.gameStartedAt);assert.equal(after.runtime.startedAt,first.runtime.startedAt);assert.equal(after.runtime.round,1);await screenshot(p,{path:path.join(output,automatic?'after_automatico_ciclo1.png':'after_manual_ciclo1.png'),fullPage:true});console.log('PASS '+(automatic?'Automático':'Manual')+': deadline inicia Ciclo 1 una vez con dos pestañas');
+  }
+  await reset();p=await page();await configure(p);await p.locator('#integrationDurationMinutes').fill('0');await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);assert.equal(await p.locator('#integrationDurationMinutesError').isVisible(),true);assert.equal(await count(),0);await p.locator('#integrationDurationMinutes').fill('2');await p.locator('#roundMinutes').fill('0');await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);assert.equal(await p.locator('#roundMinutesError').isVisible(),true);assert.equal(await count(),0);console.log('PASS validación visible junto a campos antes de crear');
+  assert.deepEqual(pageErrors,[],'sin errores JavaScript de página');assert.ok(consoleErrors.some(x=>x.includes('creación de sala')||x.includes('crear/recuperar sala')),'errores simulados tienen detalle técnico en consola');
+  console.log('PASS E2E crear sala: todos los casos');
+ }finally{fs.writeFileSync(path.join(output,'after_evidencia.json'),JSON.stringify({backend:'PGlite local; app y PartidaService reales; auth fixture docente; red externa bloqueada',calls,pageErrors,consoleErrors},null,2));for(const c of contexts)await c.close();await browser.close();await new Promise(r=>server.close(r));await db.close();}
+})().catch(error=>{console.error(error);process.exitCode=1});

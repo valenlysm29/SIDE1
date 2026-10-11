@@ -7,7 +7,68 @@ const EVENT_CATALOG=Array.isArray(window.SIDE_EVENT_CATALOG)?window.SIDE_EVENT_C
 const state={reports:[],events:[],round:1,timer:null,scheduleWatcher:null,seconds:600,roundClosed:false,enabledEvents:new Set(),eventSelectionMode:'manual',eventRules:{},partidaId:null,integrationMinutes:0,lifecycleVersion:2,authoritative:null,starting:false,startingCycle1:false};
 try{state.partidaId=localStorage.getItem('SIDE_PARTIDA_ID')||null}catch{state.partidaId=null}
 
-function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2800)}
+function toast(msg,tone='notice'){const t=$('toast');if(!t)return;t.textContent=msg;t.dataset.tone=tone;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2800)}
+let previousRoom=null,creationRequest=null,replacementRoomId=null;
+function newCreationRequest(){
+  if(crypto.randomUUID)return crypto.randomUUID();
+  const bytes=crypto.getRandomValues(new Uint8Array(16));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+  const hex=Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');
+  return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');
+}
+function creationFeedback(message,tone='error',conflict=null){
+  previousRoom=conflict;
+  const box=$('creationFeedback');if(!box)return;
+  box.classList.remove('hidden');box.dataset.tone=tone;$('creationMessage').textContent=message;
+  $('retryCreate').classList.toggle('hidden',tone!=='error'||!!conflict);
+  ['resumeRoom','replaceRoom'].forEach(id=>$(id).classList.toggle('hidden',!conflict));
+  toast(message,tone);
+}
+function creationError(result){
+  if(result.code==='SOLICITUD_FINALIZADA'){creationRequest=null;replacementRoomId=null;localStorage.removeItem('SIDE_CREATION_REQUEST');}
+  const message='No se pudo crear la sala: '+(result.error||'el servidor no confirmó la operación. Reintenta.');
+  console.error('SIDE: creación de sala',result);creationFeedback(message,'error',result.partida||(result.code==='SALA_ACTIVA'?result.data:null));
+}
+function clearRoomLink(){
+  state.partidaId=null;state.authoritative=null;teacherClock=null;state.reports=[];publishedState='';
+  ['SIDE_PARTIDA_ID','SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_EVENT_SCHEDULE'].forEach(k=>localStorage.removeItem(k));
+}
+function renderTeacherLobby(){
+  const r=runtime(),active=!!state.partidaId&&!!gameStatus()?.active;
+  $('teacherLobby')?.classList.toggle('hidden',!active);
+  if(!active)return;
+  $('lobbyHeading').textContent=r?.phase==='integration'?'Sala de espera':'Sala en curso';
+  $('lobbyCode').textContent=$('gameCode').value;
+  $('lobbyCountdown').textContent=r?.phase==='integration'?`El Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:`Ciclo ${state.round} · ${formatStudentTime(state.seconds)}`;
+  $('lobbyNext').textContent=state.authoritative?.cycleCloseMode==='manual'?'El Ciclo 1 inicia automáticamente; tú controlas el cierre de cada ciclo.':'El Ciclo 1 inicia automáticamente; los ciclos avanzan según la programación.';
+  const companies=state.reports.filter(x=>x.fuente==='supabase');
+  $('lobbyCompanies').innerHTML=companies.length?`<strong>${companies.length} ${companies.length===1?'empresa unida':'empresas unidas'}</strong><ul>${companies.map(x=>`<li>${escapeHtml(x.empresa)}</li>`).join('')}</ul>`:'Esperando empresas. Comparte el código para que ingresen.';
+}
+function validateCreation(config){
+  document.querySelectorAll('.creation-field-error').forEach(x=>x.remove());
+  document.querySelectorAll('[aria-invalid="true"]').forEach(x=>x.removeAttribute('aria-invalid'));
+  const errors=[];
+  const invalid=(id,message)=>{const field=$(id);if(!field)return;field.setAttribute('aria-invalid','true');const hint=document.createElement('small');hint.id=id+'Error';hint.className='creation-field-error';hint.textContent=message;field.setAttribute('aria-describedby',hint.id);field.after(hint);errors.push(field);};
+  if(!Number.isInteger(config.integrationDurationMinutes)||config.integrationDurationMinutes<1||config.integrationDurationMinutes>60)invalid('integrationDurationMinutes','Indica un entero entre 1 y 60 minutos.');
+  if(!Number.isInteger(config.cycles)||config.cycles<1||config.cycles>20)invalid('cycles','Indica entre 1 y 20 ciclos completos.');
+  if(!Number.isSafeInteger(config.roundHours)||config.roundHours<0||!Number.isInteger(config.roundMinutes)||config.roundMinutes<0||config.roundMinutes>59||config.roundHours*60+config.roundMinutes<1)invalid('roundMinutes','Indica al menos 1 minuto; horas enteras y minutos entre 0 y 59.');
+  if(config.cycleCloseMode==='automatic'&&config.scheduledStart&&!Number.isFinite(Date.parse(config.scheduledStart)))invalid('scheduledStart','Selecciona una fecha y hora válidas.');
+  if(config.capitalMode==='random'&&config.capitalMax<config.capitalMin)invalid('capitalMax','La caja máxima debe ser mayor o igual a la mínima.');
+  const plan=RULES.cycleSchedule(config);
+  if(plan.error&&!errors.length)invalid(config.cycleCloseMode==='automatic'?'scheduledStart':'roundMinutes',plan.error);
+  if(config.enabledEvents.some(id=>!EVENT_CATALOG.some(e=>e.id===id)||!Number.isInteger(Number(config.eventRules[id]?.firstRound||1))||Number(config.eventRules[id]?.firstRound||1)>config.cycles||Number(config.eventRules[id]?.firstRound||1)<1))invalid('cycles','Revisa los eventos: su primer ciclo debe estar dentro de los ciclos configurados.');
+  if(errors.length){creationFeedback('Revisa los campos indicados antes de crear la sala.');errors[0].focus();return false;}
+  return true;
+}
+async function recoverServerRoom(){
+  const S=window.SIDE||{};
+  if(!S.SupabaseClient?.isReady()||!S.PartidaService?.obtenerActiva)return false;
+  const result=await S.PartidaService.obtenerActiva();
+  if(!result.success){creationError(result);return false;}
+  if(!result.data){clearRoomLink();refreshSetupSummary();return true;}
+  state.partidaId=result.data.id;localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId);applyTeacherState(result.data);loadConfig();paintTeacherClock();
+  watchTeacherGame();startLiveCompanies();await loadReports();refreshSetupSummary();
+  creationFeedback(`Sala anterior recuperada. Código: ${result.data.codigo}. Puedes reanudarla o cerrarla para crear otra.`,'notice',result.data);return true;
+}
 function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -35,6 +96,7 @@ function refreshSetupSummary(){
   $('cancelGame')?.classList.toggle('hidden',!active);
   ['copyGameCode','copyGameLink'].forEach(id=>{if($(id))$(id).disabled=!active;});
   refreshStartButton();
+  renderTeacherLobby();
 }
 let publishedState='',publishChain=Promise.resolve();
 function publishGameState(){
@@ -90,6 +152,7 @@ function getConfig(){return {
 }}
 function saveConfig(silent=false){
   renderAcademicCalendar();const c=getConfig();
+  if(!validateCreation(c))return false;
   const numericPlan=RULES.cycleSchedule({...c,scheduledStart:c.scheduledStart||'2026-01-01T00:00'});
   if(c.lifecycleVersion===2&&(!Number.isInteger(c.integrationDurationMinutes)||c.integrationDurationMinutes<1||c.integrationDurationMinutes>60)){if(!silent)toast('Indica entre 1 y 60 minutos de integración.');return false}
   if(numericPlan.error){if(!silent)toast(numericPlan.error);return false}
@@ -265,43 +328,41 @@ let creatingPartida=null;
 /**
  * Crea o reutiliza la partida en Supabase (Fase C1).
  * Guarda el partidaId y el código real generado por la base de datos.
- * Si Supabase no está disponible, continúa en modo local sin bloquear.
+ * Solo confirma éxito con una fila devuelta por el servidor.
  * Anti-doble-clic: una creación en curso se reutiliza, no se duplica.
  * @param {object} config Configuración del formulario (getConfig()).
- * @returns {Promise<boolean>} true si hay partida usable (online u offline).
+ * @returns {Promise<boolean>} true si hay una partida confirmada en el servidor.
  */
 async function ensureSupabasePartida(config){
   const S=window.SIDE||{};
-  if(!S.PartidaService||!S.SupabaseClient?.isReady()){if(hasConfig){toast('No se pudo cargar Supabase. Recarga la página para crear la partida.');return false;}toast('Modo local: la partida no se sincronizará con Supabase.');return true}
+  if(!S.PartidaService||!S.SupabaseClient?.isReady()){creationError({error:'Supabase no está disponible. Comprueba la conexión y la configuración; luego pulsa Reintentar.'});return false;}
   if(creatingPartida)return creatingPartida;
-  if(state.partidaId){
-    const synced=await S.PartidaService.controlar(state.partidaId,'sincronizar');
-    if(!synced.success){toast(synced.error||'No se pudo consultar la sala de espera.');return false;}
-    try{applyTeacherState(synced.data);return true;}catch(error){toast(error.message);return false;}
-  }
   const btn=$('startGame');
   if(btn)btn.disabled=true;
   creatingPartida=(async()=>{
     try{
       const r=await S.PartidaService.crear({
+        requestId:creationRequest,reemplazarId:replacementRoomId,
         nombre:config.nombre||'SIDE — Simulación Principal',
         curso:config.curso||'',
         configuracion:{...config,scheduledStart:config.scheduledStart?new Date(config.scheduledStart).toISOString():''},
         eventos_habilitados:config.enabledEvents||[]
       });
-      if(!r.success){if(r.data?.id){state.partidaId=r.data.id;localStorage.setItem('SIDE_PARTIDA_ID',r.data.id);}toast('No se pudo iniciar la partida: '+(r.error||'error de conexión')+'. Vuelve a intentarlo.');return false}
+      if(!r.success){creationError(r);return false;}
+      if(!r.data?.id||!r.data?.codigo||!r.data?.configuracion||!Number.isFinite(Date.parse(r.data.serverTime||''))){creationError({error:'El servidor no confirmó una sala utilizable. Falta actualizar la base de datos: ejecuta supabase/migrations/2026-10-11_fix_crear_partida.sql.'});return false;}
   state.partidaId=r.data.id;
   try{localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId)}catch{}
   if(r.data.codigo){$('gameCode').value=r.data.codigo;$('gameCodeBadge').textContent=r.data.codigo;}
   if(config.lifecycleVersion===2){
-    if(r.data.configuracion?.runtime?.phase!=='integration'){toast('Falta aplicar supabase/migrations/supabase_game_lifecycle.sql en Supabase.');return false;}
     applyTeacherState(r.data);
+    loadConfig();
   }else saveConfig(true);
-  // Partida nueva: el contador local vuelve al ciclo 1 (no hereda el anterior).
-  state.round=1;if(!state.authoritative)state.seconds=roundSeconds();state.roundClosed=false;
-  try{localStorage.setItem('SIDE_ACTIVE_ROUND','1')}catch{}
-  updateTimer();updateRoundDisplay();
-      toast('Partida creada en Supabase: '+r.data.codigo);return true;
+  // El contador coincide con la fila, también al recuperar una petición previa.
+  state.round=Number(r.data.configuracion?.runtime?.round||1);if(!state.authoritative)state.seconds=roundSeconds();
+  try{localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round))}catch(error){console.warn('SIDE: no se pudo guardar el ciclo local',error);}
+  paintTeacherClock();updateTimer();updateRoundDisplay();
+      creationRequest=null;replacementRoomId=null;localStorage.removeItem('SIDE_CREATION_REQUEST');
+      creationFeedback('Sala creada. Código: '+r.data.codigo,'success');return true;
     }finally{
       creatingPartida=null;
       if(btn)btn.disabled=false;
@@ -317,6 +378,7 @@ function applyTeacherState(partida){
   const c=partida.configuracion;if(!c)return;
   if(state.partidaId&&!Number.isFinite(Date.parse(partida.serverTime||'')))throw new Error('Falta hora del servidor. Aplica la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.');
   if(partida.serverTime)teacherClock={time:Date.parse(partida.serverTime),at:performance.now()};
+  if(partida.codigo){$('gameCode').value=partida.codigo;$('gameCodeBadge').textContent=partida.codigo;}
   state.authoritative=c;state.lifecycleVersion=c.lifecycleVersion===2?2:1;
   state.integrationMinutes=Number(c.integrationMinutes)||0;
   const r=c.runtime||{};state.round=Number(r.round||1);state.roundClosed=['results','finished'].includes(r.phase);
@@ -334,16 +396,18 @@ function paintTeacherClock(){
   const r=runtime(),c=state.authoritative;if(!c||!r)return;
   state.seconds=r.phase==='integration'&&c.gameStartAt?Math.max(0,Math.ceil((Date.parse(c.gameStartAt)-teacherNow())/1000)):r.running?Math.max(0,Math.ceil((Date.parse(r.startedAt)+r.duration*1000-teacherNow())/1000)):Number(r.remaining||0);
   updateTimer();$('startTimer').textContent=r.running?'Pausar':'Reanudar';
+  renderTeacherLobby();
   if(r.phase==='integration'){
     const label=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
     for(const id of ['gameStatusBanner','roundState'])if($(id)&&$(id).textContent!==label)$(id).textContent=label;
   }
 }
 async function refreshTeacherGame(){
-  if(state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
+  if(state.starting||state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
   if(state.partidaId){
     teacherBusy=true;
-    try{teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(!result.success)return false;const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!await closeExcelRemoteRound(cycle))return false;}applyTeacherState(result.data);return true;}
+    try{teacherRead=window.SIDE.PartidaService.controlar(state.partidaId,'sincronizar');const result=await teacherRead;if(!result.success){console.error('SIDE: sincronización de sala',result);creationFeedback('No se pudo sincronizar la sala: '+(result.error||'comprueba la conexión y reintenta.'),'error');return false;}const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!await closeExcelRemoteRound(cycle))return false;}applyTeacherState(result.data);return true;}
+    catch(error){console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message,'error');return false;}
     finally{teacherBusy=false;}
   }else{
     const c={...state.authoritative,runtime:RULES.resolveRuntime(state.authoritative,teacherNow())};
@@ -358,19 +422,25 @@ function watchTeacherGame(){
   teacherTick=setInterval(()=>{paintTeacherClock();if(!state.partidaId)refreshTeacherGame();},1000);
 }
 async function prepareGame(){
-  if(gameStatus()?.active)return true;
-  state.lifecycleVersion=2;state.integrationMinutes=0;state.authoritative=null;
-  if(!saveConfig(false))return false;
-  if(gameStatus()?.finishedAt){if(state.partidaId&&!await refreshTeacherGame())return false;await finishingPartida;state.partidaId=null;publishedState='';localStorage.removeItem('SIDE_PARTIDA_ID');localStorage.removeItem('SIDE_EVENT_SCHEDULE');}
-  state.round=1;state.roundClosed=false;
-  if(!await ensureSupabasePartida(getConfig()))return false;
-  if(!state.partidaId){
-    const c=getConfig(),now=Date.now();
-    c.gameStartAt=new Date(Math.max(now,c.cycleCloseMode==='automatic'?(Date.parse(c.scheduledStart)||now):now)+c.integrationDurationMinutes*60000).toISOString();
-    c.gameStartedAt=null;c.integrationStartTime=new Date(now).toISOString();c.phase='integration';c.eventSchedule={};
-    c.runtime={round:1,phase:'integration',status:'waiting',running:false,duration:roundSeconds(),remaining:roundSeconds(),mode:cycleMode()};
-    applyTeacherState({configuracion:c,estado:'esperando'});
+  await teacherRead;
+  if(!window.SIDE?.SupabaseClient?.isReady()){creationError({error:'Supabase no está disponible. Comprueba la conexión y pulsa Reintentar.'});return false;}
+  const config={...getConfig(),lifecycleVersion:2,integrationMinutes:0};
+  if(!validateCreation(config))return false;
+  const service=window.SIDE?.PartidaService;
+  if(service?.obtenerActiva&&window.SIDE?.SupabaseClient?.isReady()){
+    const existing=await service.obtenerActiva();
+    if(!existing.success){creationError(existing);return false;}
+    const pendingRequest=creationRequest||localStorage.getItem('SIDE_CREATION_REQUEST');
+    if(existing.data&&existing.data.id!==replacementRoomId&&(!pendingRequest||existing.data.creation_request_id!==pendingRequest)){
+      creationFeedback(`Ya tienes una sala abierta. Código: ${existing.data.codigo}. Reanúdala o ciérrala para crear otra.`,'notice',existing.data);return false;
+    }
   }
+  // La consulta confirmó el estado; ningún indicador local autoriza éxito.
+  clearRoomLink();state.lifecycleVersion=2;state.integrationMinutes=0;
+  if(!creationRequest){creationRequest=localStorage.getItem('SIDE_CREATION_REQUEST')||newCreationRequest();localStorage.setItem('SIDE_CREATION_REQUEST',creationRequest);}
+  state.round=1;state.roundClosed=false;
+  const {runtime:oldRuntime,gameStartAt:oldDeadline,gameStartedAt:oldStarted,cancelledAt:oldCancelled,...fresh}=config;
+  if(!await ensureSupabasePartida({...fresh,eventSchedule:{},phase:'integration',round:1}))return false;
   watchTeacherGame();startLiveCompanies();return true;
 }
 async function controlGame(action){
@@ -411,9 +481,9 @@ async function startGame(){
   state.starting=true;refreshStartButton();
   try{
     if(!await prepareGame())return;
-    toast('Sala de espera configurada. El Ciclo 1 inicia al terminar el tiempo.');
     switchTab('rondas');
-  }finally{state.starting=false;refreshSetupSummary();}
+  }catch(error){creationError({error:error.message});}
+  finally{state.starting=false;refreshSetupSummary();}
 }
 async function startCycle1(){return startGame();}
 /**
@@ -450,7 +520,7 @@ async function purgeForeignProfessorState(){
     let stored=null;
     try{stored=localStorage.getItem('SIDE_PROFESOR_ID')}catch{}
     if(stored&&stored!==uid){
-      ['SIDE_PARTIDA_ID','SIDE_TEACHER_CONFIG','SIDE_ASSIGNED_GAME_CODE','SIDE_GAME_STATUS','SIDE_ACTIVE_ROUND','SIDE_ROUND_RUNTIME','SIDE_EVENT_LOG','SIDE_EVENT_SCHEDULE','SIDE_STUDENT_REPORTS','SIDE_PUBLISHED_PODIUM','SIDE_TEACHER_GRADES'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
+      ['SIDE_PARTIDA_ID','SIDE_CREATION_REQUEST','SIDE_TEACHER_CONFIG','SIDE_ASSIGNED_GAME_CODE','SIDE_GAME_STATUS','SIDE_ACTIVE_ROUND','SIDE_ROUND_RUNTIME','SIDE_EVENT_LOG','SIDE_EVENT_SCHEDULE','SIDE_STUDENT_REPORTS','SIDE_PUBLISHED_PODIUM','SIDE_TEACHER_GRADES'].forEach(k=>{try{localStorage.removeItem(k)}catch{}});
     }
     try{localStorage.setItem('SIDE_PROFESOR_ID',uid)}catch{}
   }catch(error){console.error('SIDE: professor isolation check failed',error)}
@@ -462,10 +532,8 @@ async function purgeForeignProfessorState(){
 function refreshStartButton(){
   const btn=$('startGame');if(!btn)return;
   const active=Boolean(gameStatus()?.active);
-  const waiting=runtime()?.phase==='integration';
-  const canStartWaiting=false;
-  btn.textContent=state.starting?'Iniciando…':canStartWaiting?'Iniciar ciclo 1':active&&waiting?'Sala de espera':active?'Partida iniciada':'Iniciar partida';
-  btn.disabled=state.starting||(active&&!canStartWaiting);
+  btn.textContent=state.starting?'Creando sala…':active?'Crear otra sala':'Iniciar partida';
+  btn.disabled=state.starting;
 }
 /**
  * Cierra la partida en Supabase al finalizar la simulación.
@@ -659,7 +727,7 @@ async function loadReports(){
       for(const r of remote)if(r.fuente==='supabase')presenceStates.set(String(r.empresaId||r.id),presenceTracker.observe(String(r.empresaId||r.id),r.lastSeenAt));
     }
   }catch(error){rosterSyncError=error.message;console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
-  renderCompanies();renderResults();renderWinnerSelect();
+  renderCompanies();renderResults();renderWinnerSelect();renderTeacherLobby();
   }finally{reportsBusy=false;if(reportsAgain){reportsAgain=false;setTimeout(loadReports,100);}}
 }
 function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}">${escapeHtml(k)} ${v.complete?'✓':`${v.done||0}/${v.total||0}`}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
@@ -909,6 +977,22 @@ $('eventSelectAll')?.addEventListener('click',toggleSelectAllEvents);
 $('eventRandomCount')?.addEventListener('change',()=>saveConfig(true));
 $('saveAll')?.addEventListener('click',async()=>{if(state.starting)return;state.starting=true;try{if(gameStatus()?.active){saveConfig(false);await publishGameState();}else await prepareGame();}finally{state.starting=false;refreshStartButton();}});
 $('startGame')?.addEventListener('click',startGame);
+$('retryCreate')?.addEventListener('click',startGame);
+$('newRoom')?.addEventListener('click',()=>{switchTab('configuracion');startGame();});
+$('copyLobbyCode')?.addEventListener('click',()=>$('copyGameCode').click());
+$('resumeRoom')?.addEventListener('click',async()=>{
+  if(state.starting)return;
+  try{if(await recoverServerRoom()){
+    if(state.partidaId){switchTab('rondas');creationFeedback('Sala recuperada. Código: '+$('gameCode').value,'success');}
+    else creationFeedback('La sala anterior ya terminó. Puedes configurar e iniciar una nueva partida.','notice');
+  }}
+  catch(error){creationError({error:error.message});}
+});
+$('replaceRoom')?.addEventListener('click',()=>{
+  if(state.starting||!previousRoom)return;
+  if(!window.confirm(`¿Cerrar la sala ${previousRoom.codigo} y crear una nueva? Los estudiantes de la sala anterior dejarán de operar.`))return;
+  replacementRoomId=previousRoom.id;creationRequest=null;localStorage.removeItem('SIDE_CREATION_REQUEST');startGame();
+});
 $('startCycle1Btn')?.addEventListener('click',startCycle1);
 $('refreshReports')?.addEventListener('click',()=>{loadReports();toast('Información actualizada.');});
 $('advanceRound')?.addEventListener('click',()=>advanceRound(false));
@@ -949,7 +1033,10 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
   const r=runtime();
   if(r){state.round=Number(r.round||state.round);state.seconds=Number(r.remaining??roundSeconds());state.roundClosed=['finished','simulation-finished'].includes(r.status);}
   let game;try{game=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}
-  if(state.lifecycleVersion===2&&(game?.active||state.partidaId)){watchTeacherGame();await refreshTeacherGame();}
+  if(window.SIDE?.SupabaseClient?.isReady()&&window.SIDE?.PartidaService?.obtenerActiva){
+    try{await recoverServerRoom();}catch(error){creationError({error:error.message});}
+  }
+  else if(state.lifecycleVersion===2&&(game?.active||state.partidaId)){watchTeacherGame();await refreshTeacherGame();}
   else if(cycleMode()==='automatic'&&game?.active){scheduleAutomaticStart();}
   else if(game?.active&&r?.running&&r.startedAt){
     state.seconds=Math.max(0,Number(r.duration||roundSeconds())-Math.floor((Date.now()-new Date(r.startedAt).getTime())/1000));
@@ -960,26 +1047,8 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
   updateTimer();updateRoundDisplay();loadReports();renderEvents();renderCycleNews();loadPublished();renderAcademicCalendar();
   refreshSetupSummary();startLiveCompanies();
   updateSelectAllBtn();
-  // Si el partidaId guardado apunta a una partida finalizada/inexistente
-  // (ej. localStorage anterior al fix), se libera para permitir crear nueva.
-  // Solo se limpia con confirmación positiva; errores de red no borran nada.
-  try{
-    const S=window.SIDE||{};
-    if(S.PartidaService&&S.SupabaseClient?.isReady()&&state.partidaId){
-      S.PartidaService.obtener(state.partidaId).then(r=>{
-        if(r.success&&!r.data){
-          state.partidaId=null;
-          try{localStorage.removeItem('SIDE_PARTIDA_ID')}catch{}
-          refreshStartButton();
-        }
-        if(r.success&&r.data?.estado==='finalizada'&&gameStatus()?.active){
-          localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({...gameStatus(),active:false,finishedAt:new Date().toISOString()}));
-          if(state.timer){clearInterval(state.timer);state.timer=null;}
-          refreshSetupSummary();
-        }
-      });
-    }
-  }catch(error){console.error('SIDE: partida check failed',error)}
+  // La recuperación aguardada arriba resuelve también IDs ausentes o finalizados.
+  // No lanzar otra lectura tardía que pueda borrar una sala recién creada.
 })();
 
 window.addEventListener('pagehide',()=>{[teacherPoll,teacherTick,companiesPoll].forEach(clearInterval);teacherPoll=null;teacherTick=null;companiesPoll=null;if(companiesChannel)window.SIDE?.SupabaseClient?.get()?.removeChannel(companiesChannel);companiesChannel=null;companiesChannelId=null;});
