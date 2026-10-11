@@ -11,3 +11,6 @@ Camino remoto y caja unificada; catálogo activo legado; cobertura bancaria de o
 
 ## Siguiente paso
 A7 oráculos/fixtures; A6 integración y caja; A8 navegador después de A7; agente de regresión compara HEAD aislado dentro SIDE1. Actualizar este informe y WIP por hito. Sin push hasta aceptación completa. Excel fuente permanece local; falta decisión del usuario sobre versionarlo.
+
+## Hito A7 / SIM1 inicial
+SIM1 Node: 320 salidas del cierre multilote contra Excel COM, 0 diferencias. SIM1 navegador inicial: flujo normal4empresas, 3segmentos/3lotes, cierre docente1ciclo, 320 salidas0diferencias y351 verificaciones de componentes0diferencias. El doble assert ahora implementa equal con Object.is y ok fatal; no sustituye temporizador: se invoca tickStudentGame real. Falta repetir tras integración A6 y ampliación banca. Log reports/sim/sim_excel_1.log.

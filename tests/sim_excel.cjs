@@ -8,11 +8,11 @@ function html(name){return execFileSync(python,['-c',`import sys;sys.path.insert
 async function comprobarBaseEnBrowser(p){
   await p.addScriptTag({content:fs.readFileSync(path.join(root,'js/engine/inventario.js'),'utf8')});
   const valores=await p.evaluate(({base,costos,fixtures,celdas})=>{
-    const modules={'../js/engine/produccion.js':SIDE_EXCEL_PRODUCCION,'../js/engine/puntajes.js':SIDE_EXCEL_PUNTAJES,'../js/engine/mercado.js':SIDE_EXCEL_MERCADO,'../js/engine/inventario.js':SIDE_EXCEL_INVENTARIO,'../js/engine/costos.js':SIDE_EXCEL_COSTOS,'../js/engine/config_excel.js':SIDE_EXCEL_CONFIG,'../docs/logica_excel/fixtures_excel.json':fixtures,'../docs/logica_excel/celdas_excel.json':celdas,'node:fs':{},'node:path':{},'node:assert/strict':{equal(a,b,msg){if(a!==b)throw new Error(msg)}}};
+    const modules={'../js/engine/produccion.js':SIDE_EXCEL_PRODUCCION,'../js/engine/puntajes.js':SIDE_EXCEL_PUNTAJES,'../js/engine/mercado.js':SIDE_EXCEL_MERCADO,'../js/engine/inventario.js':SIDE_EXCEL_INVENTARIO,'../js/engine/costos.js':SIDE_EXCEL_COSTOS,'../js/engine/config_excel.js':SIDE_EXCEL_CONFIG,'../docs/logica_excel/fixtures_excel.json':fixtures,'../docs/logica_excel/celdas_excel.json':celdas,'node:fs':{},'node:path':{},'node:assert/strict':{equal(a,b,msg){if(!Object.is(a,b))throw new Error(msg||'assert.equal');},ok(value,msg){if(!value)throw new Error(msg||'assert.ok');}}};
     const req=k=>{if(!(k in modules))throw new Error('Módulo de prueba no disponible: '+k);return modules[k];};
     const mb={exports:{}},mc={exports:{}};new Function('require','module','__dirname',base)(req,mb,'tests');new Function('require','module','__dirname',costos)(req,mc,'tests');return {...mb.exports.valoresBase(),...mc.exports.calcularValoresCostos()};
   },{base:fs.readFileSync(path.join(__dirname,'paridad_base.cjs'),'utf8'),costos:fs.readFileSync(path.join(__dirname,'paridad_costos.cjs'),'utf8'),fixtures:require('../docs/logica_excel/fixtures_excel.json'),celdas:require('../docs/logica_excel/celdas_excel.json')});
-  const filas=require('./paridad_base.cjs').comparar(require('./oracle/esperado_base.json').valores,valores);fs.writeFileSync(path.join(out,'sim-1-paridad.json'),JSON.stringify({total:filas.length,diferencias:filas.filter(f=>!f.ok)},null,2));assert.equal(filas.filter(f=>!f.ok).length,0);
+  const filas=require('./paridad_base.cjs').comparar(require('./oracle/esperado_base.json').valores,valores);fs.writeFileSync(path.join(out,'sim-1-componentes-paridad.json'),JSON.stringify({total:filas.length,diferencias:filas.filter(f=>!f.ok)},null,2));assert.equal(filas.filter(f=>!f.ok).length,0);
 }
 async function ejecutar(numero=3){
   const escenario=numero===1?crearSim1():numero===2?crearSim2():crearSim3();
