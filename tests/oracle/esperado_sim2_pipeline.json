@@ -54,6 +54,10 @@
                     "ciclo.1.A.CONS-06":  true,
                     "ciclo.1.A.CONS-07":  true,
                     "ciclo.1.A.CONS-08":  false,
+                    "ciclo.1.A.financiamiento.montoPrestamo":  0,
+                    "ciclo.1.A.financiamiento.tasaTEA":  20,
+                    "ciclo.1.A.financiamiento.deudaPrincipal":  0,
+                    "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.1.B.calidad":  2.6666666666666665,
                     "ciclo.1.B.puntajeEficiencia":  2,
                     "ciclo.1.B.reputacionMatriz":  -1,
@@ -101,6 +105,10 @@
                     "ciclo.1.B.CONS-06":  true,
                     "ciclo.1.B.CONS-07":  true,
                     "ciclo.1.B.CONS-08":  true,
+                    "ciclo.1.B.financiamiento.montoPrestamo":  5000,
+                    "ciclo.1.B.financiamiento.tasaTEA":  20,
+                    "ciclo.1.B.financiamiento.deudaPrincipal":  5000,
+                    "ciclo.1.B.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.2.A.calidad":  12,
                     "ciclo.2.A.puntajeEficiencia":  17,
                     "ciclo.2.A.reputacionMatriz":  10,
@@ -148,6 +156,10 @@
                     "ciclo.2.A.CONS-06":  true,
                     "ciclo.2.A.CONS-07":  true,
                     "ciclo.2.A.CONS-08":  false,
+                    "ciclo.2.A.financiamiento.montoPrestamo":  0,
+                    "ciclo.2.A.financiamiento.tasaTEA":  23,
+                    "ciclo.2.A.financiamiento.deudaPrincipal":  0,
+                    "ciclo.2.A.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.2.B.calidad":  2.6666666666666665,
                     "ciclo.2.B.puntajeEficiencia":  2,
                     "ciclo.2.B.reputacionMatriz":  -1,
@@ -195,6 +207,10 @@
                     "ciclo.2.B.CONS-06":  true,
                     "ciclo.2.B.CONS-07":  true,
                     "ciclo.2.B.CONS-08":  true,
+                    "ciclo.2.B.financiamiento.montoPrestamo":  5000,
+                    "ciclo.2.B.financiamiento.tasaTEA":  23,
+                    "ciclo.2.B.financiamiento.deudaPrincipal":  10000,
+                    "ciclo.2.B.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.3.A.calidad":  12,
                     "ciclo.3.A.puntajeEficiencia":  17,
                     "ciclo.3.A.reputacionMatriz":  10,
@@ -242,6 +258,10 @@
                     "ciclo.3.A.CONS-06":  true,
                     "ciclo.3.A.CONS-07":  true,
                     "ciclo.3.A.CONS-08":  false,
+                    "ciclo.3.A.financiamiento.montoPrestamo":  0,
+                    "ciclo.3.A.financiamiento.tasaTEA":  23,
+                    "ciclo.3.A.financiamiento.deudaPrincipal":  0,
+                    "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo":  3,
                     "ciclo.3.B.calidad":  10,
                     "ciclo.3.B.puntajeEficiencia":  2,
                     "ciclo.3.B.reputacionMatriz":  1,
@@ -288,7 +308,11 @@
                     "ciclo.3.B.CONS-05":  true,
                     "ciclo.3.B.CONS-06":  false,
                     "ciclo.3.B.CONS-07":  false,
-                    "ciclo.3.B.CONS-08":  true
+                    "ciclo.3.B.CONS-08":  true,
+                    "ciclo.3.B.financiamiento.montoPrestamo":  0,
+                    "ciclo.3.B.financiamiento.tasaTEA":  23,
+                    "ciclo.3.B.financiamiento.deudaPrincipal":  10000,
+                    "ciclo.3.B.financiamiento.tasaAdicionalProximoPrestamo":  3
                 },
     "celdas":  {
                    "ciclo.1.A.calidad":  [
@@ -309,103 +333,103 @@
                                                  ],
                    "ciclo.1.A.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX2"
+                                                     "CC2"
                                                  ],
                    "ciclo.1.A.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY2"
+                                                    "CD2"
                                                 ],
                    "ciclo.1.A.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW2"
+                                                      "CB2"
                                                   ],
                    "ciclo.1.A.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ2"
+                                                         "CE2"
                                                      ],
                    "ciclo.1.A.producido":  [
                                                "Pipeline_sim2",
-                                               "CU2"
+                                               "CZ2"
                                            ],
                    "ciclo.1.A.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV2"
+                                                  "DA2"
                                               ],
                    "ciclo.1.A.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC2"
+                                                       "DH2"
                                                    ],
                    "ciclo.1.A.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH2"
+                                                 "DM2"
                                              ],
                    "ciclo.1.A.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO2"
+                                             "DT2"
                                          ],
                    "ciclo.1.A.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP2"
+                                             "DU2"
                                          ],
                    "ciclo.1.A.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ2"
+                                                   "DV2"
                                                ],
                    "ciclo.1.A.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR2"
+                                                  "DW2"
                                               ],
                    "ciclo.1.A.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS2"
+                                                         "DX2"
                                                      ],
                    "ciclo.1.A.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT2"
+                                                       "DY2"
                                                    ],
                    "ciclo.1.A.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC2"
+                                              "EH2"
                                           ],
                    "ciclo.1.A.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED2"
+                                                     "EI2"
                                                  ],
                    "ciclo.1.A.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE2"
+                                             "EJ2"
                                          ],
                    "ciclo.1.A.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF2"
+                                              "EK2"
                                           ],
                    "ciclo.1.A.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX2"
+                                                        "EC2"
                                                     ],
                    "ciclo.1.A.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG2"
+                                                "EL2"
                                             ],
                    "ciclo.1.A.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH2"
+                                                "EM2"
                                             ],
                    "ciclo.1.A.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI2"
+                                                   "EN2"
                                                ],
                    "ciclo.1.A.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ2"
+                                                     "EO2"
                                                  ],
                    "ciclo.1.A.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL2"
+                                                   "EQ2"
                                                ],
                    "ciclo.1.A.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM2"
+                                              "ER2"
                                           ],
                    "ciclo.1.A.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -417,68 +441,84 @@
                                                  ],
                    "ciclo.1.A.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX2"
+                                                    "DC2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ2"
+                                                    "DE2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB2"
+                                                    "DG2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE2"
+                                                    "DJ2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG2"
+                                                    "DL2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ2"
+                                                    "DO2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL2"
+                                                    "DQ2"
                                                 ],
                    "ciclo.1.A.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN2"
+                                                    "DS2"
                                                 ],
                    "ciclo.1.A.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN2"
+                                             "ES2"
                                          ],
                    "ciclo.1.A.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO2"
+                                             "ET2"
                                          ],
                    "ciclo.1.A.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP2"
+                                             "EU2"
                                          ],
                    "ciclo.1.A.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ2"
+                                             "EV2"
                                          ],
                    "ciclo.1.A.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER2"
+                                             "EW2"
                                          ],
                    "ciclo.1.A.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES2"
+                                             "EX2"
                                          ],
                    "ciclo.1.A.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET2"
+                                             "EY2"
                                          ],
                    "ciclo.1.A.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU2"
+                                             "EZ2"
                                          ],
+                   "ciclo.1.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP2"
+                                                              ],
+                   "ciclo.1.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR2"
+                                                        ],
+                   "ciclo.1.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS2"
+                                                               ],
+                   "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT2"
+                                                                             ],
                    "ciclo.1.B.calidad":  [
                                              "Pipeline_sim2",
                                              "AI3"
@@ -497,103 +537,103 @@
                                                  ],
                    "ciclo.1.B.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX3"
+                                                     "CC3"
                                                  ],
                    "ciclo.1.B.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY3"
+                                                    "CD3"
                                                 ],
                    "ciclo.1.B.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW3"
+                                                      "CB3"
                                                   ],
                    "ciclo.1.B.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ3"
+                                                         "CE3"
                                                      ],
                    "ciclo.1.B.producido":  [
                                                "Pipeline_sim2",
-                                               "CU3"
+                                               "CZ3"
                                            ],
                    "ciclo.1.B.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV3"
+                                                  "DA3"
                                               ],
                    "ciclo.1.B.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC3"
+                                                       "DH3"
                                                    ],
                    "ciclo.1.B.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH3"
+                                                 "DM3"
                                              ],
                    "ciclo.1.B.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO3"
+                                             "DT3"
                                          ],
                    "ciclo.1.B.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP3"
+                                             "DU3"
                                          ],
                    "ciclo.1.B.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ3"
+                                                   "DV3"
                                                ],
                    "ciclo.1.B.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR3"
+                                                  "DW3"
                                               ],
                    "ciclo.1.B.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS3"
+                                                         "DX3"
                                                      ],
                    "ciclo.1.B.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT3"
+                                                       "DY3"
                                                    ],
                    "ciclo.1.B.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC3"
+                                              "EH3"
                                           ],
                    "ciclo.1.B.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED3"
+                                                     "EI3"
                                                  ],
                    "ciclo.1.B.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE3"
+                                             "EJ3"
                                          ],
                    "ciclo.1.B.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF3"
+                                              "EK3"
                                           ],
                    "ciclo.1.B.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX3"
+                                                        "EC3"
                                                     ],
                    "ciclo.1.B.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG3"
+                                                "EL3"
                                             ],
                    "ciclo.1.B.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH3"
+                                                "EM3"
                                             ],
                    "ciclo.1.B.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI3"
+                                                   "EN3"
                                                ],
                    "ciclo.1.B.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ3"
+                                                     "EO3"
                                                  ],
                    "ciclo.1.B.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL3"
+                                                   "EQ3"
                                                ],
                    "ciclo.1.B.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM3"
+                                              "ER3"
                                           ],
                    "ciclo.1.B.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -605,68 +645,84 @@
                                                  ],
                    "ciclo.1.B.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX3"
+                                                    "DC3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ3"
+                                                    "DE3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB3"
+                                                    "DG3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE3"
+                                                    "DJ3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG3"
+                                                    "DL3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ3"
+                                                    "DO3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL3"
+                                                    "DQ3"
                                                 ],
                    "ciclo.1.B.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN3"
+                                                    "DS3"
                                                 ],
                    "ciclo.1.B.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN3"
+                                             "ES3"
                                          ],
                    "ciclo.1.B.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO3"
+                                             "ET3"
                                          ],
                    "ciclo.1.B.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP3"
+                                             "EU3"
                                          ],
                    "ciclo.1.B.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ3"
+                                             "EV3"
                                          ],
                    "ciclo.1.B.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER3"
+                                             "EW3"
                                          ],
                    "ciclo.1.B.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES3"
+                                             "EX3"
                                          ],
                    "ciclo.1.B.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET3"
+                                             "EY3"
                                          ],
                    "ciclo.1.B.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU3"
+                                             "EZ3"
                                          ],
+                   "ciclo.1.B.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP3"
+                                                              ],
+                   "ciclo.1.B.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR3"
+                                                        ],
+                   "ciclo.1.B.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS3"
+                                                               ],
+                   "ciclo.1.B.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT3"
+                                                                             ],
                    "ciclo.2.A.calidad":  [
                                              "Pipeline_sim2",
                                              "AI4"
@@ -685,103 +741,103 @@
                                                  ],
                    "ciclo.2.A.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX4"
+                                                     "CC4"
                                                  ],
                    "ciclo.2.A.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY4"
+                                                    "CD4"
                                                 ],
                    "ciclo.2.A.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW4"
+                                                      "CB4"
                                                   ],
                    "ciclo.2.A.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ4"
+                                                         "CE4"
                                                      ],
                    "ciclo.2.A.producido":  [
                                                "Pipeline_sim2",
-                                               "CU4"
+                                               "CZ4"
                                            ],
                    "ciclo.2.A.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV4"
+                                                  "DA4"
                                               ],
                    "ciclo.2.A.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC4"
+                                                       "DH4"
                                                    ],
                    "ciclo.2.A.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH4"
+                                                 "DM4"
                                              ],
                    "ciclo.2.A.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO4"
+                                             "DT4"
                                          ],
                    "ciclo.2.A.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP4"
+                                             "DU4"
                                          ],
                    "ciclo.2.A.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ4"
+                                                   "DV4"
                                                ],
                    "ciclo.2.A.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR4"
+                                                  "DW4"
                                               ],
                    "ciclo.2.A.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS4"
+                                                         "DX4"
                                                      ],
                    "ciclo.2.A.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT4"
+                                                       "DY4"
                                                    ],
                    "ciclo.2.A.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC4"
+                                              "EH4"
                                           ],
                    "ciclo.2.A.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED4"
+                                                     "EI4"
                                                  ],
                    "ciclo.2.A.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE4"
+                                             "EJ4"
                                          ],
                    "ciclo.2.A.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF4"
+                                              "EK4"
                                           ],
                    "ciclo.2.A.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX4"
+                                                        "EC4"
                                                     ],
                    "ciclo.2.A.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG4"
+                                                "EL4"
                                             ],
                    "ciclo.2.A.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH4"
+                                                "EM4"
                                             ],
                    "ciclo.2.A.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI4"
+                                                   "EN4"
                                                ],
                    "ciclo.2.A.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ4"
+                                                     "EO4"
                                                  ],
                    "ciclo.2.A.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL4"
+                                                   "EQ4"
                                                ],
                    "ciclo.2.A.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM4"
+                                              "ER4"
                                           ],
                    "ciclo.2.A.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -793,68 +849,84 @@
                                                  ],
                    "ciclo.2.A.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX4"
+                                                    "DC4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ4"
+                                                    "DE4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB4"
+                                                    "DG4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE4"
+                                                    "DJ4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG4"
+                                                    "DL4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ4"
+                                                    "DO4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL4"
+                                                    "DQ4"
                                                 ],
                    "ciclo.2.A.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN4"
+                                                    "DS4"
                                                 ],
                    "ciclo.2.A.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN4"
+                                             "ES4"
                                          ],
                    "ciclo.2.A.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO4"
+                                             "ET4"
                                          ],
                    "ciclo.2.A.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP4"
+                                             "EU4"
                                          ],
                    "ciclo.2.A.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ4"
+                                             "EV4"
                                          ],
                    "ciclo.2.A.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER4"
+                                             "EW4"
                                          ],
                    "ciclo.2.A.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES4"
+                                             "EX4"
                                          ],
                    "ciclo.2.A.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET4"
+                                             "EY4"
                                          ],
                    "ciclo.2.A.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU4"
+                                             "EZ4"
                                          ],
+                   "ciclo.2.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP4"
+                                                              ],
+                   "ciclo.2.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR4"
+                                                        ],
+                   "ciclo.2.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS4"
+                                                               ],
+                   "ciclo.2.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT4"
+                                                                             ],
                    "ciclo.2.B.calidad":  [
                                              "Pipeline_sim2",
                                              "AI5"
@@ -873,103 +945,103 @@
                                                  ],
                    "ciclo.2.B.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX5"
+                                                     "CC5"
                                                  ],
                    "ciclo.2.B.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY5"
+                                                    "CD5"
                                                 ],
                    "ciclo.2.B.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW5"
+                                                      "CB5"
                                                   ],
                    "ciclo.2.B.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ5"
+                                                         "CE5"
                                                      ],
                    "ciclo.2.B.producido":  [
                                                "Pipeline_sim2",
-                                               "CU5"
+                                               "CZ5"
                                            ],
                    "ciclo.2.B.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV5"
+                                                  "DA5"
                                               ],
                    "ciclo.2.B.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC5"
+                                                       "DH5"
                                                    ],
                    "ciclo.2.B.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH5"
+                                                 "DM5"
                                              ],
                    "ciclo.2.B.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO5"
+                                             "DT5"
                                          ],
                    "ciclo.2.B.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP5"
+                                             "DU5"
                                          ],
                    "ciclo.2.B.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ5"
+                                                   "DV5"
                                                ],
                    "ciclo.2.B.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR5"
+                                                  "DW5"
                                               ],
                    "ciclo.2.B.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS5"
+                                                         "DX5"
                                                      ],
                    "ciclo.2.B.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT5"
+                                                       "DY5"
                                                    ],
                    "ciclo.2.B.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC5"
+                                              "EH5"
                                           ],
                    "ciclo.2.B.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED5"
+                                                     "EI5"
                                                  ],
                    "ciclo.2.B.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE5"
+                                             "EJ5"
                                          ],
                    "ciclo.2.B.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF5"
+                                              "EK5"
                                           ],
                    "ciclo.2.B.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX5"
+                                                        "EC5"
                                                     ],
                    "ciclo.2.B.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG5"
+                                                "EL5"
                                             ],
                    "ciclo.2.B.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH5"
+                                                "EM5"
                                             ],
                    "ciclo.2.B.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI5"
+                                                   "EN5"
                                                ],
                    "ciclo.2.B.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ5"
+                                                     "EO5"
                                                  ],
                    "ciclo.2.B.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL5"
+                                                   "EQ5"
                                                ],
                    "ciclo.2.B.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM5"
+                                              "ER5"
                                           ],
                    "ciclo.2.B.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -981,68 +1053,84 @@
                                                  ],
                    "ciclo.2.B.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX5"
+                                                    "DC5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ5"
+                                                    "DE5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB5"
+                                                    "DG5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE5"
+                                                    "DJ5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG5"
+                                                    "DL5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ5"
+                                                    "DO5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL5"
+                                                    "DQ5"
                                                 ],
                    "ciclo.2.B.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN5"
+                                                    "DS5"
                                                 ],
                    "ciclo.2.B.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN5"
+                                             "ES5"
                                          ],
                    "ciclo.2.B.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO5"
+                                             "ET5"
                                          ],
                    "ciclo.2.B.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP5"
+                                             "EU5"
                                          ],
                    "ciclo.2.B.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ5"
+                                             "EV5"
                                          ],
                    "ciclo.2.B.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER5"
+                                             "EW5"
                                          ],
                    "ciclo.2.B.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES5"
+                                             "EX5"
                                          ],
                    "ciclo.2.B.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET5"
+                                             "EY5"
                                          ],
                    "ciclo.2.B.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU5"
+                                             "EZ5"
                                          ],
+                   "ciclo.2.B.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP5"
+                                                              ],
+                   "ciclo.2.B.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR5"
+                                                        ],
+                   "ciclo.2.B.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS5"
+                                                               ],
+                   "ciclo.2.B.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT5"
+                                                                             ],
                    "ciclo.3.A.calidad":  [
                                              "Pipeline_sim2",
                                              "AI6"
@@ -1061,103 +1149,103 @@
                                                  ],
                    "ciclo.3.A.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX6"
+                                                     "CC6"
                                                  ],
                    "ciclo.3.A.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY6"
+                                                    "CD6"
                                                 ],
                    "ciclo.3.A.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW6"
+                                                      "CB6"
                                                   ],
                    "ciclo.3.A.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ6"
+                                                         "CE6"
                                                      ],
                    "ciclo.3.A.producido":  [
                                                "Pipeline_sim2",
-                                               "CU6"
+                                               "CZ6"
                                            ],
                    "ciclo.3.A.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV6"
+                                                  "DA6"
                                               ],
                    "ciclo.3.A.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC6"
+                                                       "DH6"
                                                    ],
                    "ciclo.3.A.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH6"
+                                                 "DM6"
                                              ],
                    "ciclo.3.A.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO6"
+                                             "DT6"
                                          ],
                    "ciclo.3.A.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP6"
+                                             "DU6"
                                          ],
                    "ciclo.3.A.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ6"
+                                                   "DV6"
                                                ],
                    "ciclo.3.A.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR6"
+                                                  "DW6"
                                               ],
                    "ciclo.3.A.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS6"
+                                                         "DX6"
                                                      ],
                    "ciclo.3.A.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT6"
+                                                       "DY6"
                                                    ],
                    "ciclo.3.A.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC6"
+                                              "EH6"
                                           ],
                    "ciclo.3.A.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED6"
+                                                     "EI6"
                                                  ],
                    "ciclo.3.A.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE6"
+                                             "EJ6"
                                          ],
                    "ciclo.3.A.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF6"
+                                              "EK6"
                                           ],
                    "ciclo.3.A.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX6"
+                                                        "EC6"
                                                     ],
                    "ciclo.3.A.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG6"
+                                                "EL6"
                                             ],
                    "ciclo.3.A.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH6"
+                                                "EM6"
                                             ],
                    "ciclo.3.A.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI6"
+                                                   "EN6"
                                                ],
                    "ciclo.3.A.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ6"
+                                                     "EO6"
                                                  ],
                    "ciclo.3.A.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL6"
+                                                   "EQ6"
                                                ],
                    "ciclo.3.A.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM6"
+                                              "ER6"
                                           ],
                    "ciclo.3.A.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -1169,68 +1257,84 @@
                                                  ],
                    "ciclo.3.A.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX6"
+                                                    "DC6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ6"
+                                                    "DE6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB6"
+                                                    "DG6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE6"
+                                                    "DJ6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG6"
+                                                    "DL6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ6"
+                                                    "DO6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL6"
+                                                    "DQ6"
                                                 ],
                    "ciclo.3.A.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN6"
+                                                    "DS6"
                                                 ],
                    "ciclo.3.A.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN6"
+                                             "ES6"
                                          ],
                    "ciclo.3.A.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO6"
+                                             "ET6"
                                          ],
                    "ciclo.3.A.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP6"
+                                             "EU6"
                                          ],
                    "ciclo.3.A.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ6"
+                                             "EV6"
                                          ],
                    "ciclo.3.A.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER6"
+                                             "EW6"
                                          ],
                    "ciclo.3.A.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES6"
+                                             "EX6"
                                          ],
                    "ciclo.3.A.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET6"
+                                             "EY6"
                                          ],
                    "ciclo.3.A.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU6"
+                                             "EZ6"
                                          ],
+                   "ciclo.3.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP6"
+                                                              ],
+                   "ciclo.3.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR6"
+                                                        ],
+                   "ciclo.3.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS6"
+                                                               ],
+                   "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT6"
+                                                                             ],
                    "ciclo.3.B.calidad":  [
                                              "Pipeline_sim2",
                                              "AI7"
@@ -1249,103 +1353,103 @@
                                                  ],
                    "ciclo.3.B.capacidadDiaria":  [
                                                      "Pipeline_sim2",
-                                                     "BX7"
+                                                     "CC7"
                                                  ],
                    "ciclo.3.B.capacidadCiclo":  [
                                                     "Pipeline_sim2",
-                                                    "BY7"
+                                                    "CD7"
                                                 ],
                    "ciclo.3.B.factorEficiencia":  [
                                                       "Pipeline_sim2",
-                                                      "BW7"
+                                                      "CB7"
                                                   ],
                    "ciclo.3.B.produccionCapacidad":  [
                                                          "Pipeline_sim2",
-                                                         "BZ7"
+                                                         "CE7"
                                                      ],
                    "ciclo.3.B.producido":  [
                                                "Pipeline_sim2",
-                                               "CU7"
+                                               "CZ7"
                                            ],
                    "ciclo.3.B.consumoCuero":  [
                                                   "Pipeline_sim2",
-                                                  "CV7"
+                                                  "DA7"
                                               ],
                    "ciclo.3.B.consumoAccesorios":  [
                                                        "Pipeline_sim2",
-                                                       "DC7"
+                                                       "DH7"
                                                    ],
                    "ciclo.3.B.consumoHilo":  [
                                                  "Pipeline_sim2",
-                                                 "DH7"
+                                                 "DM7"
                                              ],
                    "ciclo.3.B.costoMO":  [
                                              "Pipeline_sim2",
-                                             "DO7"
+                                             "DT7"
                                          ],
                    "ciclo.3.B.costoMP":  [
                                              "Pipeline_sim2",
-                                             "DP7"
+                                             "DU7"
                                          ],
                    "ciclo.3.B.mantenimiento":  [
                                                    "Pipeline_sim2",
-                                                   "DQ7"
+                                                   "DV7"
                                                ],
                    "ciclo.3.B.depreciacion":  [
                                                   "Pipeline_sim2",
-                                                  "DR7"
+                                                  "DW7"
                                               ],
                    "ciclo.3.B.reputacionOperativa":  [
                                                          "Pipeline_sim2",
-                                                         "DS7"
+                                                         "DX7"
                                                      ],
                    "ciclo.3.B.reputacionMercado":  [
                                                        "Pipeline_sim2",
-                                                       "DT7"
+                                                       "DY7"
                                                    ],
                    "ciclo.3.B.asignado":  [
                                               "Pipeline_sim2",
-                                              "EC7"
+                                              "EH7"
                                           ],
                    "ciclo.3.B.demandaAjustada":  [
                                                      "Pipeline_sim2",
-                                                     "ED7"
+                                                     "EI7"
                                                  ],
                    "ciclo.3.B.vendido":  [
                                              "Pipeline_sim2",
-                                             "EE7"
+                                             "EJ7"
                                          ],
                    "ciclo.3.B.ingresos":  [
                                               "Pipeline_sim2",
-                                              "EF7"
+                                              "EK7"
                                           ],
                    "ciclo.3.B.inventarioProducto":  [
                                                         "Pipeline_sim2",
-                                                        "DX7"
+                                                        "EC7"
                                                     ],
                    "ciclo.3.B.almacenaje":  [
                                                 "Pipeline_sim2",
-                                                "EG7"
+                                                "EL7"
                                             ],
                    "ciclo.3.B.horasExtra":  [
                                                 "Pipeline_sim2",
-                                                "EH7"
+                                                "EM7"
                                             ],
                    "ciclo.3.B.costoGarantia":  [
                                                    "Pipeline_sim2",
-                                                   "EI7"
+                                                   "EN7"
                                                ],
                    "ciclo.3.B.costoRecurrente":  [
                                                      "Pipeline_sim2",
-                                                     "EJ7"
+                                                     "EO7"
                                                  ],
                    "ciclo.3.B.costosTotales":  [
                                                    "Pipeline_sim2",
-                                                   "EL7"
+                                                   "EQ7"
                                                ],
                    "ciclo.3.B.utilidad":  [
                                               "Pipeline_sim2",
-                                              "EM7"
+                                              "ER7"
                                           ],
                    "ciclo.3.B.ciclosReputacionBaja":  [
                                                           "Pipeline_sim2",
@@ -1357,67 +1461,83 @@
                                                  ],
                    "ciclo.3.B.stockMP_INS-01":  [
                                                     "Pipeline_sim2",
-                                                    "CX7"
+                                                    "DC7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-02":  [
                                                     "Pipeline_sim2",
-                                                    "CZ7"
+                                                    "DE7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-03":  [
                                                     "Pipeline_sim2",
-                                                    "DB7"
+                                                    "DG7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-04":  [
                                                     "Pipeline_sim2",
-                                                    "DE7"
+                                                    "DJ7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-05":  [
                                                     "Pipeline_sim2",
-                                                    "DG7"
+                                                    "DL7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-06":  [
                                                     "Pipeline_sim2",
-                                                    "DJ7"
+                                                    "DO7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-07":  [
                                                     "Pipeline_sim2",
-                                                    "DL7"
+                                                    "DQ7"
                                                 ],
                    "ciclo.3.B.stockMP_INS-08":  [
                                                     "Pipeline_sim2",
-                                                    "DN7"
+                                                    "DS7"
                                                 ],
                    "ciclo.3.B.CONS-01":  [
                                              "Pipeline_sim2",
-                                             "EN7"
+                                             "ES7"
                                          ],
                    "ciclo.3.B.CONS-02":  [
                                              "Pipeline_sim2",
-                                             "EO7"
+                                             "ET7"
                                          ],
                    "ciclo.3.B.CONS-03":  [
                                              "Pipeline_sim2",
-                                             "EP7"
+                                             "EU7"
                                          ],
                    "ciclo.3.B.CONS-04":  [
                                              "Pipeline_sim2",
-                                             "EQ7"
+                                             "EV7"
                                          ],
                    "ciclo.3.B.CONS-05":  [
                                              "Pipeline_sim2",
-                                             "ER7"
+                                             "EW7"
                                          ],
                    "ciclo.3.B.CONS-06":  [
                                              "Pipeline_sim2",
-                                             "ES7"
+                                             "EX7"
                                          ],
                    "ciclo.3.B.CONS-07":  [
                                              "Pipeline_sim2",
-                                             "ET7"
+                                             "EY7"
                                          ],
                    "ciclo.3.B.CONS-08":  [
                                              "Pipeline_sim2",
-                                             "EU7"
-                                         ]
+                                             "EZ7"
+                                         ],
+                   "ciclo.3.B.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_sim2",
+                                                                  "AP7"
+                                                              ],
+                   "ciclo.3.B.financiamiento.tasaTEA":  [
+                                                            "Pipeline_sim2",
+                                                            "AR7"
+                                                        ],
+                   "ciclo.3.B.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "AS7"
+                                                               ],
+                   "ciclo.3.B.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "AT7"
+                                                                             ]
                }
 }

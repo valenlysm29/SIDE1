@@ -37,3 +37,14 @@ Cobertura: base 351 salidas originales; SIM-2 282 salidas de seis empresa-ciclos
 Los libros conservan cuatro errores heredados en `CANTIDAD DE PRODUCCIÓN!E75/G75/E123/G123`; los originales tienen las mismas divisiones por cero. Ninguna salida comparada usa esas celdas. No se afirma que el libro original completo esté libre de errores. Las fórmulas nuevas han sido inspeccionadas y no tienen errores de Excel.
 
 `ORACULO_SIDE_paridad.xlsx` reúne las hojas originales y la comparación contra SIDE. Las filas pendientes quedan marcadas cuando aún no existe archivo obtenido. El original fuente nunca se sobrescribe; archivos de ejecución y planes temporales permanecen dentro de `.codex-work/oracle/`.
+
+
+Verificación bancaria con recuperación antes del préstamo:
+
+```powershell
+node tests/oracle/banca_recuperacion.cjs --exportar
+python tests/oracle/run_oracle.py banca_pipeline
+node tests/oracle/banca_recuperacion.cjs
+```
+
+La construcción inicial de ORACULO_banca.xlsx usa `construir_pipeline.construir` con escenario/config de entradas_banca_recuperacion.json. Esperados actuales: SIM1 336, SIM2 306, SIM3 612 y banca153, todos con cero diferencias. El libro de comparación consolidado tiene1814 resultados.

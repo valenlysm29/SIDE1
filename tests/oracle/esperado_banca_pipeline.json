@@ -1,0 +1,778 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "banca_pipeline",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "ciclo.1.A.calidad":  4,
+                    "ciclo.1.A.puntajeEficiencia":  0,
+                    "ciclo.1.A.reputacionMatriz":  2,
+                    "ciclo.1.A.saludFinanciera":  -1,
+                    "ciclo.1.A.capacidadDiaria":  5,
+                    "ciclo.1.A.capacidadCiclo":  120,
+                    "ciclo.1.A.factorEficiencia":  0.9,
+                    "ciclo.1.A.produccionCapacidad":  108,
+                    "ciclo.1.A.producido":  71,
+                    "ciclo.1.A.consumoCuero":  21.3,
+                    "ciclo.1.A.consumoAccesorios":  71,
+                    "ciclo.1.A.consumoHilo":  426,
+                    "ciclo.1.A.costoMO":  7784.7199999999993,
+                    "ciclo.1.A.costoMP":  1488.9694,
+                    "ciclo.1.A.mantenimiento":  31.25,
+                    "ciclo.1.A.depreciacion":  64.125,
+                    "ciclo.1.A.reputacionOperativa":  0,
+                    "ciclo.1.A.reputacionMercado":  0,
+                    "ciclo.1.A.asignado":  3500,
+                    "ciclo.1.A.demandaAjustada":  3500,
+                    "ciclo.1.A.vendido":  71,
+                    "ciclo.1.A.ingresos":  2840,
+                    "ciclo.1.A.inventarioProducto":  0,
+                    "ciclo.1.A.almacenaje":  0,
+                    "ciclo.1.A.horasExtra":  1657.8570370370369,
+                    "ciclo.1.A.costoGarantia":  0,
+                    "ciclo.1.A.costoRecurrente":  1500,
+                    "ciclo.1.A.costosTotales":  12526.921437037036,
+                    "ciclo.1.A.utilidad":  -9686.9214370370355,
+                    "ciclo.1.A.ciclosReputacionBaja":  1,
+                    "ciclo.1.A.tasaAdicionalPP":  3,
+                    "ciclo.1.A.stockMP_INS-01":  278.7,
+                    "ciclo.1.A.stockMP_INS-02":  0,
+                    "ciclo.1.A.stockMP_INS-03":  0,
+                    "ciclo.1.A.stockMP_INS-04":  929,
+                    "ciclo.1.A.stockMP_INS-05":  0,
+                    "ciclo.1.A.stockMP_INS-06":  5574,
+                    "ciclo.1.A.stockMP_INS-07":  0,
+                    "ciclo.1.A.stockMP_INS-08":  0,
+                    "ciclo.1.A.CONS-01":  false,
+                    "ciclo.1.A.CONS-02":  false,
+                    "ciclo.1.A.CONS-03":  true,
+                    "ciclo.1.A.CONS-04":  false,
+                    "ciclo.1.A.CONS-05":  true,
+                    "ciclo.1.A.CONS-06":  true,
+                    "ciclo.1.A.CONS-07":  false,
+                    "ciclo.1.A.CONS-08":  true,
+                    "ciclo.1.A.financiamiento.montoPrestamo":  0,
+                    "ciclo.1.A.financiamiento.tasaTEA":  20,
+                    "ciclo.1.A.financiamiento.deudaPrincipal":  0,
+                    "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.2.A.calidad":  4,
+                    "ciclo.2.A.puntajeEficiencia":  -4,
+                    "ciclo.2.A.reputacionMatriz":  0,
+                    "ciclo.2.A.saludFinanciera":  10,
+                    "ciclo.2.A.capacidadDiaria":  5,
+                    "ciclo.2.A.capacidadCiclo":  120,
+                    "ciclo.2.A.factorEficiencia":  0.9,
+                    "ciclo.2.A.produccionCapacidad":  108,
+                    "ciclo.2.A.producido":  71,
+                    "ciclo.2.A.consumoCuero":  21.3,
+                    "ciclo.2.A.consumoAccesorios":  71,
+                    "ciclo.2.A.consumoHilo":  426,
+                    "ciclo.2.A.costoMO":  7784.7199999999993,
+                    "ciclo.2.A.costoMP":  1504.3196,
+                    "ciclo.2.A.mantenimiento":  31.25,
+                    "ciclo.2.A.depreciacion":  5.05875,
+                    "ciclo.2.A.reputacionOperativa":  0,
+                    "ciclo.2.A.reputacionMercado":  0,
+                    "ciclo.2.A.asignado":  3500,
+                    "ciclo.2.A.demandaAjustada":  2800,
+                    "ciclo.2.A.vendido":  71,
+                    "ciclo.2.A.ingresos":  2840,
+                    "ciclo.2.A.inventarioProducto":  0,
+                    "ciclo.2.A.almacenaje":  0,
+                    "ciclo.2.A.horasExtra":  1657.8570370370369,
+                    "ciclo.2.A.costoGarantia":  0,
+                    "ciclo.2.A.costoRecurrente":  0,
+                    "ciclo.2.A.costosTotales":  10983.205387037036,
+                    "ciclo.2.A.utilidad":  -8143.2053870370364,
+                    "ciclo.2.A.ciclosReputacionBaja":  2,
+                    "ciclo.2.A.tasaAdicionalPP":  0,
+                    "ciclo.2.A.stockMP_INS-01":  557.40000000000009,
+                    "ciclo.2.A.stockMP_INS-02":  0,
+                    "ciclo.2.A.stockMP_INS-03":  0,
+                    "ciclo.2.A.stockMP_INS-04":  1858,
+                    "ciclo.2.A.stockMP_INS-05":  0,
+                    "ciclo.2.A.stockMP_INS-06":  11148,
+                    "ciclo.2.A.stockMP_INS-07":  0,
+                    "ciclo.2.A.stockMP_INS-08":  0,
+                    "ciclo.2.A.CONS-01":  false,
+                    "ciclo.2.A.CONS-02":  false,
+                    "ciclo.2.A.CONS-03":  true,
+                    "ciclo.2.A.CONS-04":  true,
+                    "ciclo.2.A.CONS-05":  false,
+                    "ciclo.2.A.CONS-06":  true,
+                    "ciclo.2.A.CONS-07":  false,
+                    "ciclo.2.A.CONS-08":  true,
+                    "ciclo.2.A.financiamiento.montoPrestamo":  0,
+                    "ciclo.2.A.financiamiento.tasaTEA":  23,
+                    "ciclo.2.A.financiamiento.deudaPrincipal":  0,
+                    "ciclo.2.A.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.3.A.calidad":  4,
+                    "ciclo.3.A.puntajeEficiencia":  -4,
+                    "ciclo.3.A.reputacionMatriz":  -1,
+                    "ciclo.3.A.saludFinanciera":  8,
+                    "ciclo.3.A.capacidadDiaria":  5,
+                    "ciclo.3.A.capacidadCiclo":  120,
+                    "ciclo.3.A.factorEficiencia":  0.9,
+                    "ciclo.3.A.produccionCapacidad":  108,
+                    "ciclo.3.A.producido":  71,
+                    "ciclo.3.A.consumoCuero":  21.3,
+                    "ciclo.3.A.consumoAccesorios":  71,
+                    "ciclo.3.A.consumoHilo":  426,
+                    "ciclo.3.A.costoMO":  7784.7199999999993,
+                    "ciclo.3.A.costoMP":  1504.3196,
+                    "ciclo.3.A.mantenimiento":  31.25,
+                    "ciclo.3.A.depreciacion":  5.05875,
+                    "ciclo.3.A.reputacionOperativa":  0,
+                    "ciclo.3.A.reputacionMercado":  0,
+                    "ciclo.3.A.asignado":  3500,
+                    "ciclo.3.A.demandaAjustada":  2800,
+                    "ciclo.3.A.vendido":  71,
+                    "ciclo.3.A.ingresos":  2840,
+                    "ciclo.3.A.inventarioProducto":  0,
+                    "ciclo.3.A.almacenaje":  0,
+                    "ciclo.3.A.horasExtra":  1657.8570370370369,
+                    "ciclo.3.A.costoGarantia":  0,
+                    "ciclo.3.A.costoRecurrente":  0,
+                    "ciclo.3.A.costosTotales":  10983.205387037036,
+                    "ciclo.3.A.utilidad":  -8143.2053870370364,
+                    "ciclo.3.A.ciclosReputacionBaja":  3,
+                    "ciclo.3.A.tasaAdicionalPP":  0,
+                    "ciclo.3.A.stockMP_INS-01":  836.10000000000014,
+                    "ciclo.3.A.stockMP_INS-02":  0,
+                    "ciclo.3.A.stockMP_INS-03":  0,
+                    "ciclo.3.A.stockMP_INS-04":  2787,
+                    "ciclo.3.A.stockMP_INS-05":  0,
+                    "ciclo.3.A.stockMP_INS-06":  16722,
+                    "ciclo.3.A.stockMP_INS-07":  0,
+                    "ciclo.3.A.stockMP_INS-08":  0,
+                    "ciclo.3.A.CONS-01":  false,
+                    "ciclo.3.A.CONS-02":  false,
+                    "ciclo.3.A.CONS-03":  true,
+                    "ciclo.3.A.CONS-04":  true,
+                    "ciclo.3.A.CONS-05":  false,
+                    "ciclo.3.A.CONS-06":  true,
+                    "ciclo.3.A.CONS-07":  false,
+                    "ciclo.3.A.CONS-08":  true,
+                    "ciclo.3.A.financiamiento.montoPrestamo":  5000,
+                    "ciclo.3.A.financiamiento.tasaTEA":  23,
+                    "ciclo.3.A.financiamiento.deudaPrincipal":  5000,
+                    "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo":  0
+                },
+    "celdas":  {
+                   "ciclo.1.A.calidad":  [
+                                             "Pipeline_banca",
+                                             "AI2"
+                                         ],
+                   "ciclo.1.A.puntajeEficiencia":  [
+                                                       "Pipeline_banca",
+                                                       "AF2"
+                                                   ],
+                   "ciclo.1.A.reputacionMatriz":  [
+                                                      "Pipeline_banca",
+                                                      "AL2"
+                                                  ],
+                   "ciclo.1.A.saludFinanciera":  [
+                                                     "Pipeline_banca",
+                                                     "AH2"
+                                                 ],
+                   "ciclo.1.A.capacidadDiaria":  [
+                                                     "Pipeline_banca",
+                                                     "CC2"
+                                                 ],
+                   "ciclo.1.A.capacidadCiclo":  [
+                                                    "Pipeline_banca",
+                                                    "CD2"
+                                                ],
+                   "ciclo.1.A.factorEficiencia":  [
+                                                      "Pipeline_banca",
+                                                      "CB2"
+                                                  ],
+                   "ciclo.1.A.produccionCapacidad":  [
+                                                         "Pipeline_banca",
+                                                         "CE2"
+                                                     ],
+                   "ciclo.1.A.producido":  [
+                                               "Pipeline_banca",
+                                               "CZ2"
+                                           ],
+                   "ciclo.1.A.consumoCuero":  [
+                                                  "Pipeline_banca",
+                                                  "DA2"
+                                              ],
+                   "ciclo.1.A.consumoAccesorios":  [
+                                                       "Pipeline_banca",
+                                                       "DH2"
+                                                   ],
+                   "ciclo.1.A.consumoHilo":  [
+                                                 "Pipeline_banca",
+                                                 "DM2"
+                                             ],
+                   "ciclo.1.A.costoMO":  [
+                                             "Pipeline_banca",
+                                             "DT2"
+                                         ],
+                   "ciclo.1.A.costoMP":  [
+                                             "Pipeline_banca",
+                                             "DU2"
+                                         ],
+                   "ciclo.1.A.mantenimiento":  [
+                                                   "Pipeline_banca",
+                                                   "DV2"
+                                               ],
+                   "ciclo.1.A.depreciacion":  [
+                                                  "Pipeline_banca",
+                                                  "DW2"
+                                              ],
+                   "ciclo.1.A.reputacionOperativa":  [
+                                                         "Pipeline_banca",
+                                                         "DX2"
+                                                     ],
+                   "ciclo.1.A.reputacionMercado":  [
+                                                       "Pipeline_banca",
+                                                       "DY2"
+                                                   ],
+                   "ciclo.1.A.asignado":  [
+                                              "Pipeline_banca",
+                                              "EH2"
+                                          ],
+                   "ciclo.1.A.demandaAjustada":  [
+                                                     "Pipeline_banca",
+                                                     "EI2"
+                                                 ],
+                   "ciclo.1.A.vendido":  [
+                                             "Pipeline_banca",
+                                             "EJ2"
+                                         ],
+                   "ciclo.1.A.ingresos":  [
+                                              "Pipeline_banca",
+                                              "EK2"
+                                          ],
+                   "ciclo.1.A.inventarioProducto":  [
+                                                        "Pipeline_banca",
+                                                        "EC2"
+                                                    ],
+                   "ciclo.1.A.almacenaje":  [
+                                                "Pipeline_banca",
+                                                "EL2"
+                                            ],
+                   "ciclo.1.A.horasExtra":  [
+                                                "Pipeline_banca",
+                                                "EM2"
+                                            ],
+                   "ciclo.1.A.costoGarantia":  [
+                                                   "Pipeline_banca",
+                                                   "EN2"
+                                               ],
+                   "ciclo.1.A.costoRecurrente":  [
+                                                     "Pipeline_banca",
+                                                     "EO2"
+                                                 ],
+                   "ciclo.1.A.costosTotales":  [
+                                                   "Pipeline_banca",
+                                                   "EQ2"
+                                               ],
+                   "ciclo.1.A.utilidad":  [
+                                              "Pipeline_banca",
+                                              "ER2"
+                                          ],
+                   "ciclo.1.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_banca",
+                                                          "AM2"
+                                                      ],
+                   "ciclo.1.A.tasaAdicionalPP":  [
+                                                     "Pipeline_banca",
+                                                     "AO2"
+                                                 ],
+                   "ciclo.1.A.stockMP_INS-01":  [
+                                                    "Pipeline_banca",
+                                                    "DC2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-02":  [
+                                                    "Pipeline_banca",
+                                                    "DE2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-03":  [
+                                                    "Pipeline_banca",
+                                                    "DG2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-04":  [
+                                                    "Pipeline_banca",
+                                                    "DJ2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-05":  [
+                                                    "Pipeline_banca",
+                                                    "DL2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-06":  [
+                                                    "Pipeline_banca",
+                                                    "DO2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-07":  [
+                                                    "Pipeline_banca",
+                                                    "DQ2"
+                                                ],
+                   "ciclo.1.A.stockMP_INS-08":  [
+                                                    "Pipeline_banca",
+                                                    "DS2"
+                                                ],
+                   "ciclo.1.A.CONS-01":  [
+                                             "Pipeline_banca",
+                                             "ES2"
+                                         ],
+                   "ciclo.1.A.CONS-02":  [
+                                             "Pipeline_banca",
+                                             "ET2"
+                                         ],
+                   "ciclo.1.A.CONS-03":  [
+                                             "Pipeline_banca",
+                                             "EU2"
+                                         ],
+                   "ciclo.1.A.CONS-04":  [
+                                             "Pipeline_banca",
+                                             "EV2"
+                                         ],
+                   "ciclo.1.A.CONS-05":  [
+                                             "Pipeline_banca",
+                                             "EW2"
+                                         ],
+                   "ciclo.1.A.CONS-06":  [
+                                             "Pipeline_banca",
+                                             "EX2"
+                                         ],
+                   "ciclo.1.A.CONS-07":  [
+                                             "Pipeline_banca",
+                                             "EY2"
+                                         ],
+                   "ciclo.1.A.CONS-08":  [
+                                             "Pipeline_banca",
+                                             "EZ2"
+                                         ],
+                   "ciclo.1.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_banca",
+                                                                  "AP2"
+                                                              ],
+                   "ciclo.1.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_banca",
+                                                            "AR2"
+                                                        ],
+                   "ciclo.1.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_banca",
+                                                                   "AS2"
+                                                               ],
+                   "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_banca",
+                                                                                 "AT2"
+                                                                             ],
+                   "ciclo.2.A.calidad":  [
+                                             "Pipeline_banca",
+                                             "AI3"
+                                         ],
+                   "ciclo.2.A.puntajeEficiencia":  [
+                                                       "Pipeline_banca",
+                                                       "AF3"
+                                                   ],
+                   "ciclo.2.A.reputacionMatriz":  [
+                                                      "Pipeline_banca",
+                                                      "AL3"
+                                                  ],
+                   "ciclo.2.A.saludFinanciera":  [
+                                                     "Pipeline_banca",
+                                                     "AH3"
+                                                 ],
+                   "ciclo.2.A.capacidadDiaria":  [
+                                                     "Pipeline_banca",
+                                                     "CC3"
+                                                 ],
+                   "ciclo.2.A.capacidadCiclo":  [
+                                                    "Pipeline_banca",
+                                                    "CD3"
+                                                ],
+                   "ciclo.2.A.factorEficiencia":  [
+                                                      "Pipeline_banca",
+                                                      "CB3"
+                                                  ],
+                   "ciclo.2.A.produccionCapacidad":  [
+                                                         "Pipeline_banca",
+                                                         "CE3"
+                                                     ],
+                   "ciclo.2.A.producido":  [
+                                               "Pipeline_banca",
+                                               "CZ3"
+                                           ],
+                   "ciclo.2.A.consumoCuero":  [
+                                                  "Pipeline_banca",
+                                                  "DA3"
+                                              ],
+                   "ciclo.2.A.consumoAccesorios":  [
+                                                       "Pipeline_banca",
+                                                       "DH3"
+                                                   ],
+                   "ciclo.2.A.consumoHilo":  [
+                                                 "Pipeline_banca",
+                                                 "DM3"
+                                             ],
+                   "ciclo.2.A.costoMO":  [
+                                             "Pipeline_banca",
+                                             "DT3"
+                                         ],
+                   "ciclo.2.A.costoMP":  [
+                                             "Pipeline_banca",
+                                             "DU3"
+                                         ],
+                   "ciclo.2.A.mantenimiento":  [
+                                                   "Pipeline_banca",
+                                                   "DV3"
+                                               ],
+                   "ciclo.2.A.depreciacion":  [
+                                                  "Pipeline_banca",
+                                                  "DW3"
+                                              ],
+                   "ciclo.2.A.reputacionOperativa":  [
+                                                         "Pipeline_banca",
+                                                         "DX3"
+                                                     ],
+                   "ciclo.2.A.reputacionMercado":  [
+                                                       "Pipeline_banca",
+                                                       "DY3"
+                                                   ],
+                   "ciclo.2.A.asignado":  [
+                                              "Pipeline_banca",
+                                              "EH3"
+                                          ],
+                   "ciclo.2.A.demandaAjustada":  [
+                                                     "Pipeline_banca",
+                                                     "EI3"
+                                                 ],
+                   "ciclo.2.A.vendido":  [
+                                             "Pipeline_banca",
+                                             "EJ3"
+                                         ],
+                   "ciclo.2.A.ingresos":  [
+                                              "Pipeline_banca",
+                                              "EK3"
+                                          ],
+                   "ciclo.2.A.inventarioProducto":  [
+                                                        "Pipeline_banca",
+                                                        "EC3"
+                                                    ],
+                   "ciclo.2.A.almacenaje":  [
+                                                "Pipeline_banca",
+                                                "EL3"
+                                            ],
+                   "ciclo.2.A.horasExtra":  [
+                                                "Pipeline_banca",
+                                                "EM3"
+                                            ],
+                   "ciclo.2.A.costoGarantia":  [
+                                                   "Pipeline_banca",
+                                                   "EN3"
+                                               ],
+                   "ciclo.2.A.costoRecurrente":  [
+                                                     "Pipeline_banca",
+                                                     "EO3"
+                                                 ],
+                   "ciclo.2.A.costosTotales":  [
+                                                   "Pipeline_banca",
+                                                   "EQ3"
+                                               ],
+                   "ciclo.2.A.utilidad":  [
+                                              "Pipeline_banca",
+                                              "ER3"
+                                          ],
+                   "ciclo.2.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_banca",
+                                                          "AM3"
+                                                      ],
+                   "ciclo.2.A.tasaAdicionalPP":  [
+                                                     "Pipeline_banca",
+                                                     "AO3"
+                                                 ],
+                   "ciclo.2.A.stockMP_INS-01":  [
+                                                    "Pipeline_banca",
+                                                    "DC3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-02":  [
+                                                    "Pipeline_banca",
+                                                    "DE3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-03":  [
+                                                    "Pipeline_banca",
+                                                    "DG3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-04":  [
+                                                    "Pipeline_banca",
+                                                    "DJ3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-05":  [
+                                                    "Pipeline_banca",
+                                                    "DL3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-06":  [
+                                                    "Pipeline_banca",
+                                                    "DO3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-07":  [
+                                                    "Pipeline_banca",
+                                                    "DQ3"
+                                                ],
+                   "ciclo.2.A.stockMP_INS-08":  [
+                                                    "Pipeline_banca",
+                                                    "DS3"
+                                                ],
+                   "ciclo.2.A.CONS-01":  [
+                                             "Pipeline_banca",
+                                             "ES3"
+                                         ],
+                   "ciclo.2.A.CONS-02":  [
+                                             "Pipeline_banca",
+                                             "ET3"
+                                         ],
+                   "ciclo.2.A.CONS-03":  [
+                                             "Pipeline_banca",
+                                             "EU3"
+                                         ],
+                   "ciclo.2.A.CONS-04":  [
+                                             "Pipeline_banca",
+                                             "EV3"
+                                         ],
+                   "ciclo.2.A.CONS-05":  [
+                                             "Pipeline_banca",
+                                             "EW3"
+                                         ],
+                   "ciclo.2.A.CONS-06":  [
+                                             "Pipeline_banca",
+                                             "EX3"
+                                         ],
+                   "ciclo.2.A.CONS-07":  [
+                                             "Pipeline_banca",
+                                             "EY3"
+                                         ],
+                   "ciclo.2.A.CONS-08":  [
+                                             "Pipeline_banca",
+                                             "EZ3"
+                                         ],
+                   "ciclo.2.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_banca",
+                                                                  "AP3"
+                                                              ],
+                   "ciclo.2.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_banca",
+                                                            "AR3"
+                                                        ],
+                   "ciclo.2.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_banca",
+                                                                   "AS3"
+                                                               ],
+                   "ciclo.2.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_banca",
+                                                                                 "AT3"
+                                                                             ],
+                   "ciclo.3.A.calidad":  [
+                                             "Pipeline_banca",
+                                             "AI4"
+                                         ],
+                   "ciclo.3.A.puntajeEficiencia":  [
+                                                       "Pipeline_banca",
+                                                       "AF4"
+                                                   ],
+                   "ciclo.3.A.reputacionMatriz":  [
+                                                      "Pipeline_banca",
+                                                      "AL4"
+                                                  ],
+                   "ciclo.3.A.saludFinanciera":  [
+                                                     "Pipeline_banca",
+                                                     "AH4"
+                                                 ],
+                   "ciclo.3.A.capacidadDiaria":  [
+                                                     "Pipeline_banca",
+                                                     "CC4"
+                                                 ],
+                   "ciclo.3.A.capacidadCiclo":  [
+                                                    "Pipeline_banca",
+                                                    "CD4"
+                                                ],
+                   "ciclo.3.A.factorEficiencia":  [
+                                                      "Pipeline_banca",
+                                                      "CB4"
+                                                  ],
+                   "ciclo.3.A.produccionCapacidad":  [
+                                                         "Pipeline_banca",
+                                                         "CE4"
+                                                     ],
+                   "ciclo.3.A.producido":  [
+                                               "Pipeline_banca",
+                                               "CZ4"
+                                           ],
+                   "ciclo.3.A.consumoCuero":  [
+                                                  "Pipeline_banca",
+                                                  "DA4"
+                                              ],
+                   "ciclo.3.A.consumoAccesorios":  [
+                                                       "Pipeline_banca",
+                                                       "DH4"
+                                                   ],
+                   "ciclo.3.A.consumoHilo":  [
+                                                 "Pipeline_banca",
+                                                 "DM4"
+                                             ],
+                   "ciclo.3.A.costoMO":  [
+                                             "Pipeline_banca",
+                                             "DT4"
+                                         ],
+                   "ciclo.3.A.costoMP":  [
+                                             "Pipeline_banca",
+                                             "DU4"
+                                         ],
+                   "ciclo.3.A.mantenimiento":  [
+                                                   "Pipeline_banca",
+                                                   "DV4"
+                                               ],
+                   "ciclo.3.A.depreciacion":  [
+                                                  "Pipeline_banca",
+                                                  "DW4"
+                                              ],
+                   "ciclo.3.A.reputacionOperativa":  [
+                                                         "Pipeline_banca",
+                                                         "DX4"
+                                                     ],
+                   "ciclo.3.A.reputacionMercado":  [
+                                                       "Pipeline_banca",
+                                                       "DY4"
+                                                   ],
+                   "ciclo.3.A.asignado":  [
+                                              "Pipeline_banca",
+                                              "EH4"
+                                          ],
+                   "ciclo.3.A.demandaAjustada":  [
+                                                     "Pipeline_banca",
+                                                     "EI4"
+                                                 ],
+                   "ciclo.3.A.vendido":  [
+                                             "Pipeline_banca",
+                                             "EJ4"
+                                         ],
+                   "ciclo.3.A.ingresos":  [
+                                              "Pipeline_banca",
+                                              "EK4"
+                                          ],
+                   "ciclo.3.A.inventarioProducto":  [
+                                                        "Pipeline_banca",
+                                                        "EC4"
+                                                    ],
+                   "ciclo.3.A.almacenaje":  [
+                                                "Pipeline_banca",
+                                                "EL4"
+                                            ],
+                   "ciclo.3.A.horasExtra":  [
+                                                "Pipeline_banca",
+                                                "EM4"
+                                            ],
+                   "ciclo.3.A.costoGarantia":  [
+                                                   "Pipeline_banca",
+                                                   "EN4"
+                                               ],
+                   "ciclo.3.A.costoRecurrente":  [
+                                                     "Pipeline_banca",
+                                                     "EO4"
+                                                 ],
+                   "ciclo.3.A.costosTotales":  [
+                                                   "Pipeline_banca",
+                                                   "EQ4"
+                                               ],
+                   "ciclo.3.A.utilidad":  [
+                                              "Pipeline_banca",
+                                              "ER4"
+                                          ],
+                   "ciclo.3.A.ciclosReputacionBaja":  [
+                                                          "Pipeline_banca",
+                                                          "AM4"
+                                                      ],
+                   "ciclo.3.A.tasaAdicionalPP":  [
+                                                     "Pipeline_banca",
+                                                     "AO4"
+                                                 ],
+                   "ciclo.3.A.stockMP_INS-01":  [
+                                                    "Pipeline_banca",
+                                                    "DC4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-02":  [
+                                                    "Pipeline_banca",
+                                                    "DE4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-03":  [
+                                                    "Pipeline_banca",
+                                                    "DG4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-04":  [
+                                                    "Pipeline_banca",
+                                                    "DJ4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-05":  [
+                                                    "Pipeline_banca",
+                                                    "DL4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-06":  [
+                                                    "Pipeline_banca",
+                                                    "DO4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-07":  [
+                                                    "Pipeline_banca",
+                                                    "DQ4"
+                                                ],
+                   "ciclo.3.A.stockMP_INS-08":  [
+                                                    "Pipeline_banca",
+                                                    "DS4"
+                                                ],
+                   "ciclo.3.A.CONS-01":  [
+                                             "Pipeline_banca",
+                                             "ES4"
+                                         ],
+                   "ciclo.3.A.CONS-02":  [
+                                             "Pipeline_banca",
+                                             "ET4"
+                                         ],
+                   "ciclo.3.A.CONS-03":  [
+                                             "Pipeline_banca",
+                                             "EU4"
+                                         ],
+                   "ciclo.3.A.CONS-04":  [
+                                             "Pipeline_banca",
+                                             "EV4"
+                                         ],
+                   "ciclo.3.A.CONS-05":  [
+                                             "Pipeline_banca",
+                                             "EW4"
+                                         ],
+                   "ciclo.3.A.CONS-06":  [
+                                             "Pipeline_banca",
+                                             "EX4"
+                                         ],
+                   "ciclo.3.A.CONS-07":  [
+                                             "Pipeline_banca",
+                                             "EY4"
+                                         ],
+                   "ciclo.3.A.CONS-08":  [
+                                             "Pipeline_banca",
+                                             "EZ4"
+                                         ],
+                   "ciclo.3.A.financiamiento.montoPrestamo":  [
+                                                                  "Pipeline_banca",
+                                                                  "AP4"
+                                                              ],
+                   "ciclo.3.A.financiamiento.tasaTEA":  [
+                                                            "Pipeline_banca",
+                                                            "AR4"
+                                                        ],
+                   "ciclo.3.A.financiamiento.deudaPrincipal":  [
+                                                                   "Pipeline_banca",
+                                                                   "AS4"
+                                                               ],
+                   "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                 "Pipeline_banca",
+                                                                                 "AT4"
+                                                                             ]
+               }
+}

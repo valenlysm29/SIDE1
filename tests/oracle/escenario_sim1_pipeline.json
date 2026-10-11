@@ -1,0 +1,1351 @@
+{
+  "nombre": "sim1_pipeline",
+  "modelo": "ORACULO_sim1.xlsx",
+  "entradas": {},
+  "salidas": {
+    "ciclo.1.A.calidad": [
+      "Pipeline_sim1",
+      "AI2"
+    ],
+    "ciclo.1.A.puntajeEficiencia": [
+      "Pipeline_sim1",
+      "AF2"
+    ],
+    "ciclo.1.A.reputacionMatriz": [
+      "Pipeline_sim1",
+      "AL2"
+    ],
+    "ciclo.1.A.saludFinanciera": [
+      "Pipeline_sim1",
+      "AH2"
+    ],
+    "ciclo.1.A.capacidadDiaria": [
+      "Pipeline_sim1",
+      "CC2"
+    ],
+    "ciclo.1.A.capacidadCiclo": [
+      "Pipeline_sim1",
+      "CD2"
+    ],
+    "ciclo.1.A.factorEficiencia": [
+      "Pipeline_sim1",
+      "CB2"
+    ],
+    "ciclo.1.A.produccionCapacidad": [
+      "Pipeline_sim1",
+      "CE2"
+    ],
+    "ciclo.1.A.producido": [
+      "Pipeline_sim1",
+      "CZ2"
+    ],
+    "ciclo.1.A.consumoCuero": [
+      "Pipeline_sim1",
+      "DA2"
+    ],
+    "ciclo.1.A.consumoAccesorios": [
+      "Pipeline_sim1",
+      "DH2"
+    ],
+    "ciclo.1.A.consumoHilo": [
+      "Pipeline_sim1",
+      "DM2"
+    ],
+    "ciclo.1.A.costoMO": [
+      "Pipeline_sim1",
+      "DT2"
+    ],
+    "ciclo.1.A.costoMP": [
+      "Pipeline_sim1",
+      "DU2"
+    ],
+    "ciclo.1.A.mantenimiento": [
+      "Pipeline_sim1",
+      "DV2"
+    ],
+    "ciclo.1.A.depreciacion": [
+      "Pipeline_sim1",
+      "DW2"
+    ],
+    "ciclo.1.A.reputacionOperativa": [
+      "Pipeline_sim1",
+      "DX2"
+    ],
+    "ciclo.1.A.reputacionMercado": [
+      "Pipeline_sim1",
+      "DY2"
+    ],
+    "ciclo.1.A.asignado": [
+      "Pipeline_sim1",
+      "EG2"
+    ],
+    "ciclo.1.A.demandaAjustada": [
+      "Pipeline_sim1",
+      "EH2"
+    ],
+    "ciclo.1.A.vendido": [
+      "Pipeline_sim1",
+      "EI2"
+    ],
+    "ciclo.1.A.ingresos": [
+      "Pipeline_sim1",
+      "EJ2"
+    ],
+    "ciclo.1.A.inventarioProducto": [
+      "Pipeline_sim1",
+      "EK2"
+    ],
+    "ciclo.1.A.almacenaje": [
+      "Pipeline_sim1",
+      "EL2"
+    ],
+    "ciclo.1.A.horasExtra": [
+      "Pipeline_sim1",
+      "EM2"
+    ],
+    "ciclo.1.A.costoGarantia": [
+      "Pipeline_sim1",
+      "EN2"
+    ],
+    "ciclo.1.A.costoRecurrente": [
+      "Pipeline_sim1",
+      "EO2"
+    ],
+    "ciclo.1.A.costosTotales": [
+      "Pipeline_sim1",
+      "EQ2"
+    ],
+    "ciclo.1.A.utilidad": [
+      "Pipeline_sim1",
+      "ER2"
+    ],
+    "ciclo.1.A.ciclosReputacionBaja": [
+      "Pipeline_sim1",
+      "AM2"
+    ],
+    "ciclo.1.A.tasaAdicionalPP": [
+      "Pipeline_sim1",
+      "AO2"
+    ],
+    "ciclo.1.A.stockMP_INS-01": [
+      "Pipeline_sim1",
+      "DC2"
+    ],
+    "ciclo.1.A.stockMP_INS-02": [
+      "Pipeline_sim1",
+      "DE2"
+    ],
+    "ciclo.1.A.stockMP_INS-03": [
+      "Pipeline_sim1",
+      "DG2"
+    ],
+    "ciclo.1.A.stockMP_INS-04": [
+      "Pipeline_sim1",
+      "DJ2"
+    ],
+    "ciclo.1.A.stockMP_INS-05": [
+      "Pipeline_sim1",
+      "DL2"
+    ],
+    "ciclo.1.A.stockMP_INS-06": [
+      "Pipeline_sim1",
+      "DO2"
+    ],
+    "ciclo.1.A.stockMP_INS-07": [
+      "Pipeline_sim1",
+      "DQ2"
+    ],
+    "ciclo.1.A.stockMP_INS-08": [
+      "Pipeline_sim1",
+      "DS2"
+    ],
+    "ciclo.1.A.CONS-01": [
+      "Pipeline_sim1",
+      "ES2"
+    ],
+    "ciclo.1.A.CONS-02": [
+      "Pipeline_sim1",
+      "ET2"
+    ],
+    "ciclo.1.A.CONS-03": [
+      "Pipeline_sim1",
+      "EU2"
+    ],
+    "ciclo.1.A.CONS-04": [
+      "Pipeline_sim1",
+      "EV2"
+    ],
+    "ciclo.1.A.CONS-05": [
+      "Pipeline_sim1",
+      "EW2"
+    ],
+    "ciclo.1.A.CONS-06": [
+      "Pipeline_sim1",
+      "EX2"
+    ],
+    "ciclo.1.A.CONS-07": [
+      "Pipeline_sim1",
+      "EY2"
+    ],
+    "ciclo.1.A.CONS-08": [
+      "Pipeline_sim1",
+      "EZ2"
+    ],
+    "ciclo.1.A.financiamiento.montoPrestamo": [
+      "Pipeline_sim1",
+      "AP2"
+    ],
+    "ciclo.1.A.financiamiento.tasaTEA": [
+      "Pipeline_sim1",
+      "AR2"
+    ],
+    "ciclo.1.A.financiamiento.deudaPrincipal": [
+      "Pipeline_sim1",
+      "AS2"
+    ],
+    "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_sim1",
+      "AT2"
+    ],
+    "ciclo.1.B.calidad": [
+      "Pipeline_sim1",
+      "AI3"
+    ],
+    "ciclo.1.B.puntajeEficiencia": [
+      "Pipeline_sim1",
+      "AF3"
+    ],
+    "ciclo.1.B.reputacionMatriz": [
+      "Pipeline_sim1",
+      "AL3"
+    ],
+    "ciclo.1.B.saludFinanciera": [
+      "Pipeline_sim1",
+      "AH3"
+    ],
+    "ciclo.1.B.capacidadDiaria": [
+      "Pipeline_sim1",
+      "CC3"
+    ],
+    "ciclo.1.B.capacidadCiclo": [
+      "Pipeline_sim1",
+      "CD3"
+    ],
+    "ciclo.1.B.factorEficiencia": [
+      "Pipeline_sim1",
+      "CB3"
+    ],
+    "ciclo.1.B.produccionCapacidad": [
+      "Pipeline_sim1",
+      "CE3"
+    ],
+    "ciclo.1.B.producido": [
+      "Pipeline_sim1",
+      "CZ3"
+    ],
+    "ciclo.1.B.consumoCuero": [
+      "Pipeline_sim1",
+      "DA3"
+    ],
+    "ciclo.1.B.consumoAccesorios": [
+      "Pipeline_sim1",
+      "DH3"
+    ],
+    "ciclo.1.B.consumoHilo": [
+      "Pipeline_sim1",
+      "DM3"
+    ],
+    "ciclo.1.B.costoMO": [
+      "Pipeline_sim1",
+      "DT3"
+    ],
+    "ciclo.1.B.costoMP": [
+      "Pipeline_sim1",
+      "DU3"
+    ],
+    "ciclo.1.B.mantenimiento": [
+      "Pipeline_sim1",
+      "DV3"
+    ],
+    "ciclo.1.B.depreciacion": [
+      "Pipeline_sim1",
+      "DW3"
+    ],
+    "ciclo.1.B.reputacionOperativa": [
+      "Pipeline_sim1",
+      "DX3"
+    ],
+    "ciclo.1.B.reputacionMercado": [
+      "Pipeline_sim1",
+      "DY3"
+    ],
+    "ciclo.1.B.asignado": [
+      "Pipeline_sim1",
+      "EG3"
+    ],
+    "ciclo.1.B.demandaAjustada": [
+      "Pipeline_sim1",
+      "EH3"
+    ],
+    "ciclo.1.B.vendido": [
+      "Pipeline_sim1",
+      "EI3"
+    ],
+    "ciclo.1.B.ingresos": [
+      "Pipeline_sim1",
+      "EJ3"
+    ],
+    "ciclo.1.B.inventarioProducto": [
+      "Pipeline_sim1",
+      "EK3"
+    ],
+    "ciclo.1.B.almacenaje": [
+      "Pipeline_sim1",
+      "EL3"
+    ],
+    "ciclo.1.B.horasExtra": [
+      "Pipeline_sim1",
+      "EM3"
+    ],
+    "ciclo.1.B.costoGarantia": [
+      "Pipeline_sim1",
+      "EN3"
+    ],
+    "ciclo.1.B.costoRecurrente": [
+      "Pipeline_sim1",
+      "EO3"
+    ],
+    "ciclo.1.B.costosTotales": [
+      "Pipeline_sim1",
+      "EQ3"
+    ],
+    "ciclo.1.B.utilidad": [
+      "Pipeline_sim1",
+      "ER3"
+    ],
+    "ciclo.1.B.ciclosReputacionBaja": [
+      "Pipeline_sim1",
+      "AM3"
+    ],
+    "ciclo.1.B.tasaAdicionalPP": [
+      "Pipeline_sim1",
+      "AO3"
+    ],
+    "ciclo.1.B.stockMP_INS-01": [
+      "Pipeline_sim1",
+      "DC3"
+    ],
+    "ciclo.1.B.stockMP_INS-02": [
+      "Pipeline_sim1",
+      "DE3"
+    ],
+    "ciclo.1.B.stockMP_INS-03": [
+      "Pipeline_sim1",
+      "DG3"
+    ],
+    "ciclo.1.B.stockMP_INS-04": [
+      "Pipeline_sim1",
+      "DJ3"
+    ],
+    "ciclo.1.B.stockMP_INS-05": [
+      "Pipeline_sim1",
+      "DL3"
+    ],
+    "ciclo.1.B.stockMP_INS-06": [
+      "Pipeline_sim1",
+      "DO3"
+    ],
+    "ciclo.1.B.stockMP_INS-07": [
+      "Pipeline_sim1",
+      "DQ3"
+    ],
+    "ciclo.1.B.stockMP_INS-08": [
+      "Pipeline_sim1",
+      "DS3"
+    ],
+    "ciclo.1.B.CONS-01": [
+      "Pipeline_sim1",
+      "ES3"
+    ],
+    "ciclo.1.B.CONS-02": [
+      "Pipeline_sim1",
+      "ET3"
+    ],
+    "ciclo.1.B.CONS-03": [
+      "Pipeline_sim1",
+      "EU3"
+    ],
+    "ciclo.1.B.CONS-04": [
+      "Pipeline_sim1",
+      "EV3"
+    ],
+    "ciclo.1.B.CONS-05": [
+      "Pipeline_sim1",
+      "EW3"
+    ],
+    "ciclo.1.B.CONS-06": [
+      "Pipeline_sim1",
+      "EX3"
+    ],
+    "ciclo.1.B.CONS-07": [
+      "Pipeline_sim1",
+      "EY3"
+    ],
+    "ciclo.1.B.CONS-08": [
+      "Pipeline_sim1",
+      "EZ3"
+    ],
+    "ciclo.1.B.financiamiento.montoPrestamo": [
+      "Pipeline_sim1",
+      "AP3"
+    ],
+    "ciclo.1.B.financiamiento.tasaTEA": [
+      "Pipeline_sim1",
+      "AR3"
+    ],
+    "ciclo.1.B.financiamiento.deudaPrincipal": [
+      "Pipeline_sim1",
+      "AS3"
+    ],
+    "ciclo.1.B.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_sim1",
+      "AT3"
+    ],
+    "ciclo.1.C.calidad": [
+      "Pipeline_sim1",
+      "AI4"
+    ],
+    "ciclo.1.C.puntajeEficiencia": [
+      "Pipeline_sim1",
+      "AF4"
+    ],
+    "ciclo.1.C.reputacionMatriz": [
+      "Pipeline_sim1",
+      "AL4"
+    ],
+    "ciclo.1.C.saludFinanciera": [
+      "Pipeline_sim1",
+      "AH4"
+    ],
+    "ciclo.1.C.capacidadDiaria": [
+      "Pipeline_sim1",
+      "CC4"
+    ],
+    "ciclo.1.C.capacidadCiclo": [
+      "Pipeline_sim1",
+      "CD4"
+    ],
+    "ciclo.1.C.factorEficiencia": [
+      "Pipeline_sim1",
+      "CB4"
+    ],
+    "ciclo.1.C.produccionCapacidad": [
+      "Pipeline_sim1",
+      "CE4"
+    ],
+    "ciclo.1.C.producido": [
+      "Pipeline_sim1",
+      "CZ4"
+    ],
+    "ciclo.1.C.consumoCuero": [
+      "Pipeline_sim1",
+      "DA4"
+    ],
+    "ciclo.1.C.consumoAccesorios": [
+      "Pipeline_sim1",
+      "DH4"
+    ],
+    "ciclo.1.C.consumoHilo": [
+      "Pipeline_sim1",
+      "DM4"
+    ],
+    "ciclo.1.C.costoMO": [
+      "Pipeline_sim1",
+      "DT4"
+    ],
+    "ciclo.1.C.costoMP": [
+      "Pipeline_sim1",
+      "DU4"
+    ],
+    "ciclo.1.C.mantenimiento": [
+      "Pipeline_sim1",
+      "DV4"
+    ],
+    "ciclo.1.C.depreciacion": [
+      "Pipeline_sim1",
+      "DW4"
+    ],
+    "ciclo.1.C.reputacionOperativa": [
+      "Pipeline_sim1",
+      "DX4"
+    ],
+    "ciclo.1.C.reputacionMercado": [
+      "Pipeline_sim1",
+      "DY4"
+    ],
+    "ciclo.1.C.asignado": [
+      "Pipeline_sim1",
+      "EG4"
+    ],
+    "ciclo.1.C.demandaAjustada": [
+      "Pipeline_sim1",
+      "EH4"
+    ],
+    "ciclo.1.C.vendido": [
+      "Pipeline_sim1",
+      "EI4"
+    ],
+    "ciclo.1.C.ingresos": [
+      "Pipeline_sim1",
+      "EJ4"
+    ],
+    "ciclo.1.C.inventarioProducto": [
+      "Pipeline_sim1",
+      "EK4"
+    ],
+    "ciclo.1.C.almacenaje": [
+      "Pipeline_sim1",
+      "EL4"
+    ],
+    "ciclo.1.C.horasExtra": [
+      "Pipeline_sim1",
+      "EM4"
+    ],
+    "ciclo.1.C.costoGarantia": [
+      "Pipeline_sim1",
+      "EN4"
+    ],
+    "ciclo.1.C.costoRecurrente": [
+      "Pipeline_sim1",
+      "EO4"
+    ],
+    "ciclo.1.C.costosTotales": [
+      "Pipeline_sim1",
+      "EQ4"
+    ],
+    "ciclo.1.C.utilidad": [
+      "Pipeline_sim1",
+      "ER4"
+    ],
+    "ciclo.1.C.ciclosReputacionBaja": [
+      "Pipeline_sim1",
+      "AM4"
+    ],
+    "ciclo.1.C.tasaAdicionalPP": [
+      "Pipeline_sim1",
+      "AO4"
+    ],
+    "ciclo.1.C.stockMP_INS-01": [
+      "Pipeline_sim1",
+      "DC4"
+    ],
+    "ciclo.1.C.stockMP_INS-02": [
+      "Pipeline_sim1",
+      "DE4"
+    ],
+    "ciclo.1.C.stockMP_INS-03": [
+      "Pipeline_sim1",
+      "DG4"
+    ],
+    "ciclo.1.C.stockMP_INS-04": [
+      "Pipeline_sim1",
+      "DJ4"
+    ],
+    "ciclo.1.C.stockMP_INS-05": [
+      "Pipeline_sim1",
+      "DL4"
+    ],
+    "ciclo.1.C.stockMP_INS-06": [
+      "Pipeline_sim1",
+      "DO4"
+    ],
+    "ciclo.1.C.stockMP_INS-07": [
+      "Pipeline_sim1",
+      "DQ4"
+    ],
+    "ciclo.1.C.stockMP_INS-08": [
+      "Pipeline_sim1",
+      "DS4"
+    ],
+    "ciclo.1.C.CONS-01": [
+      "Pipeline_sim1",
+      "ES4"
+    ],
+    "ciclo.1.C.CONS-02": [
+      "Pipeline_sim1",
+      "ET4"
+    ],
+    "ciclo.1.C.CONS-03": [
+      "Pipeline_sim1",
+      "EU4"
+    ],
+    "ciclo.1.C.CONS-04": [
+      "Pipeline_sim1",
+      "EV4"
+    ],
+    "ciclo.1.C.CONS-05": [
+      "Pipeline_sim1",
+      "EW4"
+    ],
+    "ciclo.1.C.CONS-06": [
+      "Pipeline_sim1",
+      "EX4"
+    ],
+    "ciclo.1.C.CONS-07": [
+      "Pipeline_sim1",
+      "EY4"
+    ],
+    "ciclo.1.C.CONS-08": [
+      "Pipeline_sim1",
+      "EZ4"
+    ],
+    "ciclo.1.C.financiamiento.montoPrestamo": [
+      "Pipeline_sim1",
+      "AP4"
+    ],
+    "ciclo.1.C.financiamiento.tasaTEA": [
+      "Pipeline_sim1",
+      "AR4"
+    ],
+    "ciclo.1.C.financiamiento.deudaPrincipal": [
+      "Pipeline_sim1",
+      "AS4"
+    ],
+    "ciclo.1.C.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_sim1",
+      "AT4"
+    ],
+    "ciclo.1.D.calidad": [
+      "Pipeline_sim1",
+      "AI5"
+    ],
+    "ciclo.1.D.puntajeEficiencia": [
+      "Pipeline_sim1",
+      "AF5"
+    ],
+    "ciclo.1.D.reputacionMatriz": [
+      "Pipeline_sim1",
+      "AL5"
+    ],
+    "ciclo.1.D.saludFinanciera": [
+      "Pipeline_sim1",
+      "AH5"
+    ],
+    "ciclo.1.D.capacidadDiaria": [
+      "Pipeline_sim1",
+      "CC5"
+    ],
+    "ciclo.1.D.capacidadCiclo": [
+      "Pipeline_sim1",
+      "CD5"
+    ],
+    "ciclo.1.D.factorEficiencia": [
+      "Pipeline_sim1",
+      "CB5"
+    ],
+    "ciclo.1.D.produccionCapacidad": [
+      "Pipeline_sim1",
+      "CE5"
+    ],
+    "ciclo.1.D.producido": [
+      "Pipeline_sim1",
+      "CZ5"
+    ],
+    "ciclo.1.D.consumoCuero": [
+      "Pipeline_sim1",
+      "DA5"
+    ],
+    "ciclo.1.D.consumoAccesorios": [
+      "Pipeline_sim1",
+      "DH5"
+    ],
+    "ciclo.1.D.consumoHilo": [
+      "Pipeline_sim1",
+      "DM5"
+    ],
+    "ciclo.1.D.costoMO": [
+      "Pipeline_sim1",
+      "DT5"
+    ],
+    "ciclo.1.D.costoMP": [
+      "Pipeline_sim1",
+      "DU5"
+    ],
+    "ciclo.1.D.mantenimiento": [
+      "Pipeline_sim1",
+      "DV5"
+    ],
+    "ciclo.1.D.depreciacion": [
+      "Pipeline_sim1",
+      "DW5"
+    ],
+    "ciclo.1.D.reputacionOperativa": [
+      "Pipeline_sim1",
+      "DX5"
+    ],
+    "ciclo.1.D.reputacionMercado": [
+      "Pipeline_sim1",
+      "DY5"
+    ],
+    "ciclo.1.D.asignado": [
+      "Pipeline_sim1",
+      "EG5"
+    ],
+    "ciclo.1.D.demandaAjustada": [
+      "Pipeline_sim1",
+      "EH5"
+    ],
+    "ciclo.1.D.vendido": [
+      "Pipeline_sim1",
+      "EI5"
+    ],
+    "ciclo.1.D.ingresos": [
+      "Pipeline_sim1",
+      "EJ5"
+    ],
+    "ciclo.1.D.inventarioProducto": [
+      "Pipeline_sim1",
+      "EK5"
+    ],
+    "ciclo.1.D.almacenaje": [
+      "Pipeline_sim1",
+      "EL5"
+    ],
+    "ciclo.1.D.horasExtra": [
+      "Pipeline_sim1",
+      "EM5"
+    ],
+    "ciclo.1.D.costoGarantia": [
+      "Pipeline_sim1",
+      "EN5"
+    ],
+    "ciclo.1.D.costoRecurrente": [
+      "Pipeline_sim1",
+      "EO5"
+    ],
+    "ciclo.1.D.costosTotales": [
+      "Pipeline_sim1",
+      "EQ5"
+    ],
+    "ciclo.1.D.utilidad": [
+      "Pipeline_sim1",
+      "ER5"
+    ],
+    "ciclo.1.D.ciclosReputacionBaja": [
+      "Pipeline_sim1",
+      "AM5"
+    ],
+    "ciclo.1.D.tasaAdicionalPP": [
+      "Pipeline_sim1",
+      "AO5"
+    ],
+    "ciclo.1.D.stockMP_INS-01": [
+      "Pipeline_sim1",
+      "DC5"
+    ],
+    "ciclo.1.D.stockMP_INS-02": [
+      "Pipeline_sim1",
+      "DE5"
+    ],
+    "ciclo.1.D.stockMP_INS-03": [
+      "Pipeline_sim1",
+      "DG5"
+    ],
+    "ciclo.1.D.stockMP_INS-04": [
+      "Pipeline_sim1",
+      "DJ5"
+    ],
+    "ciclo.1.D.stockMP_INS-05": [
+      "Pipeline_sim1",
+      "DL5"
+    ],
+    "ciclo.1.D.stockMP_INS-06": [
+      "Pipeline_sim1",
+      "DO5"
+    ],
+    "ciclo.1.D.stockMP_INS-07": [
+      "Pipeline_sim1",
+      "DQ5"
+    ],
+    "ciclo.1.D.stockMP_INS-08": [
+      "Pipeline_sim1",
+      "DS5"
+    ],
+    "ciclo.1.D.CONS-01": [
+      "Pipeline_sim1",
+      "ES5"
+    ],
+    "ciclo.1.D.CONS-02": [
+      "Pipeline_sim1",
+      "ET5"
+    ],
+    "ciclo.1.D.CONS-03": [
+      "Pipeline_sim1",
+      "EU5"
+    ],
+    "ciclo.1.D.CONS-04": [
+      "Pipeline_sim1",
+      "EV5"
+    ],
+    "ciclo.1.D.CONS-05": [
+      "Pipeline_sim1",
+      "EW5"
+    ],
+    "ciclo.1.D.CONS-06": [
+      "Pipeline_sim1",
+      "EX5"
+    ],
+    "ciclo.1.D.CONS-07": [
+      "Pipeline_sim1",
+      "EY5"
+    ],
+    "ciclo.1.D.CONS-08": [
+      "Pipeline_sim1",
+      "EZ5"
+    ],
+    "ciclo.1.D.financiamiento.montoPrestamo": [
+      "Pipeline_sim1",
+      "AP5"
+    ],
+    "ciclo.1.D.financiamiento.tasaTEA": [
+      "Pipeline_sim1",
+      "AR5"
+    ],
+    "ciclo.1.D.financiamiento.deudaPrincipal": [
+      "Pipeline_sim1",
+      "AS5"
+    ],
+    "ciclo.1.D.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_sim1",
+      "AT5"
+    ],
+    "ciclo.1.A.mercado.SEG-01.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H2"
+    ],
+    "ciclo.1.A.mercado.SEG-01.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M2"
+    ],
+    "ciclo.1.A.mercado.SEG-02.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H3"
+    ],
+    "ciclo.1.A.mercado.SEG-02.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M3"
+    ],
+    "ciclo.1.A.mercado.SEG-03.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H4"
+    ],
+    "ciclo.1.A.mercado.SEG-03.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M4"
+    ],
+    "ciclo.1.A.lote.0.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J2"
+    ],
+    "ciclo.1.A.lote.0.producido": [
+      "Lotes_Pipeline_sim1",
+      "U2"
+    ],
+    "ciclo.1.A.lote.0.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S2"
+    ],
+    "ciclo.1.A.lote.0.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU2"
+    ],
+    "ciclo.1.A.lote.1.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J3"
+    ],
+    "ciclo.1.A.lote.1.producido": [
+      "Lotes_Pipeline_sim1",
+      "U3"
+    ],
+    "ciclo.1.A.lote.1.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S3"
+    ],
+    "ciclo.1.A.lote.1.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU3"
+    ],
+    "ciclo.1.A.lote.2.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J4"
+    ],
+    "ciclo.1.A.lote.2.producido": [
+      "Lotes_Pipeline_sim1",
+      "U4"
+    ],
+    "ciclo.1.A.lote.2.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S4"
+    ],
+    "ciclo.1.A.lote.2.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU4"
+    ],
+    "ciclo.1.B.mercado.SEG-01.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H5"
+    ],
+    "ciclo.1.B.mercado.SEG-01.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M5"
+    ],
+    "ciclo.1.B.mercado.SEG-02.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H6"
+    ],
+    "ciclo.1.B.mercado.SEG-02.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M6"
+    ],
+    "ciclo.1.B.mercado.SEG-03.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H7"
+    ],
+    "ciclo.1.B.mercado.SEG-03.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M7"
+    ],
+    "ciclo.1.B.lote.0.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J5"
+    ],
+    "ciclo.1.B.lote.0.producido": [
+      "Lotes_Pipeline_sim1",
+      "U5"
+    ],
+    "ciclo.1.B.lote.0.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S5"
+    ],
+    "ciclo.1.B.lote.0.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU5"
+    ],
+    "ciclo.1.B.lote.1.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J6"
+    ],
+    "ciclo.1.B.lote.1.producido": [
+      "Lotes_Pipeline_sim1",
+      "U6"
+    ],
+    "ciclo.1.B.lote.1.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S6"
+    ],
+    "ciclo.1.B.lote.1.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU6"
+    ],
+    "ciclo.1.B.lote.2.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J7"
+    ],
+    "ciclo.1.B.lote.2.producido": [
+      "Lotes_Pipeline_sim1",
+      "U7"
+    ],
+    "ciclo.1.B.lote.2.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S7"
+    ],
+    "ciclo.1.B.lote.2.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU7"
+    ],
+    "ciclo.1.C.mercado.SEG-01.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H8"
+    ],
+    "ciclo.1.C.mercado.SEG-01.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M8"
+    ],
+    "ciclo.1.C.mercado.SEG-02.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H9"
+    ],
+    "ciclo.1.C.mercado.SEG-02.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M9"
+    ],
+    "ciclo.1.C.mercado.SEG-03.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H10"
+    ],
+    "ciclo.1.C.mercado.SEG-03.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M10"
+    ],
+    "ciclo.1.C.lote.0.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J8"
+    ],
+    "ciclo.1.C.lote.0.producido": [
+      "Lotes_Pipeline_sim1",
+      "U8"
+    ],
+    "ciclo.1.C.lote.0.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S8"
+    ],
+    "ciclo.1.C.lote.0.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU8"
+    ],
+    "ciclo.1.C.lote.1.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J9"
+    ],
+    "ciclo.1.C.lote.1.producido": [
+      "Lotes_Pipeline_sim1",
+      "U9"
+    ],
+    "ciclo.1.C.lote.1.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S9"
+    ],
+    "ciclo.1.C.lote.1.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU9"
+    ],
+    "ciclo.1.C.lote.2.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J10"
+    ],
+    "ciclo.1.C.lote.2.producido": [
+      "Lotes_Pipeline_sim1",
+      "U10"
+    ],
+    "ciclo.1.C.lote.2.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S10"
+    ],
+    "ciclo.1.C.lote.2.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU10"
+    ],
+    "ciclo.1.D.mercado.SEG-01.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H11"
+    ],
+    "ciclo.1.D.mercado.SEG-01.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M11"
+    ],
+    "ciclo.1.D.mercado.SEG-02.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H12"
+    ],
+    "ciclo.1.D.mercado.SEG-02.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M12"
+    ],
+    "ciclo.1.D.mercado.SEG-03.puntajePrecio": [
+      "Mercados_Pipeline_sim1",
+      "K13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.puntajeTotal": [
+      "Mercados_Pipeline_sim1",
+      "L13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.porcentaje": [
+      "Mercados_Pipeline_sim1",
+      "N13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.asignado": [
+      "Mercados_Pipeline_sim1",
+      "J13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.demandaAjustada": [
+      "Mercados_Pipeline_sim1",
+      "I13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.calidadMercado": [
+      "Mercados_Pipeline_sim1",
+      "H13"
+    ],
+    "ciclo.1.D.mercado.SEG-03.reputacionEscalada": [
+      "Mercados_Pipeline_sim1",
+      "M13"
+    ],
+    "ciclo.1.D.lote.0.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J11"
+    ],
+    "ciclo.1.D.lote.0.producido": [
+      "Lotes_Pipeline_sim1",
+      "U11"
+    ],
+    "ciclo.1.D.lote.0.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S11"
+    ],
+    "ciclo.1.D.lote.0.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU11"
+    ],
+    "ciclo.1.D.lote.1.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J12"
+    ],
+    "ciclo.1.D.lote.1.producido": [
+      "Lotes_Pipeline_sim1",
+      "U12"
+    ],
+    "ciclo.1.D.lote.1.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S12"
+    ],
+    "ciclo.1.D.lote.1.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU12"
+    ],
+    "ciclo.1.D.lote.2.calidad": [
+      "Lotes_Pipeline_sim1",
+      "J13"
+    ],
+    "ciclo.1.D.lote.2.producido": [
+      "Lotes_Pipeline_sim1",
+      "U13"
+    ],
+    "ciclo.1.D.lote.2.capacidadAsignada": [
+      "Lotes_Pipeline_sim1",
+      "S13"
+    ],
+    "ciclo.1.D.lote.2.precioEfectivo": [
+      "Lotes_Pipeline_sim1",
+      "AU13"
+    ]
+  }
+}

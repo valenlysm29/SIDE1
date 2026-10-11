@@ -67,6 +67,11 @@ def construir(escenario,config):
             form('ciclosReputacionBaja',r,f'IF({R("reputacionMatriz")}<3,{P("ciclosReputacionBaja")}+1,0)')
             form('factorDemanda',r,f'IF({R("ciclosReputacionBaja")}>={cfg["CONSECUENCIAS"]["CICLOS_REPUTACION"]},0.8,1)')
             form('tasaAdicionalPP',r,f'IF({R("saludFinanciera")}<3,{cfg["TEA_ADICIONAL_PP"]},0)')
+            setv('montoPrestamo',r,max(0,decisions.get('montoPrestamo',0)) if 'FIN-01A' in selection else 0)
+            setv('teaBase',r,decisions.get('teaBase',cfg['TEA_BASE']))
+            form('tasaTEA',r,f'{R("teaBase")}+{P("penalizacionPendiente")}')
+            form('deudaPrincipal',r,f'{P("deudaPrincipal")}+{R("montoPrestamo")}')
+            form('penalizacionPendiente',r,f'IF({R("montoPrestamo")}>0,{R("tasaAdicionalPP")},MAX({P("penalizacionPendiente")},{R("tasaAdicionalPP")}))')
             form('factorConsecuencias',r,f'IF({R("puntajeEficiencia")}<4,0.7,1)*IF(AND({R("jefes")}=0,{R("puntajeEficiencia")}<5),0.95,1)')
             personal=decisions.get('personal',{})
             for area in ['corte','ensamble','acabado']:
@@ -172,6 +177,7 @@ def construir(escenario,config):
             form(f'CONS-{i:02}',r,expr)
         fields=['calidad','puntajeEficiencia','reputacionMatriz','saludFinanciera','capacidadDiaria','capacidadCiclo','factorEficiencia','produccionCapacidad','producido','consumoCuero','consumoAccesorios','consumoHilo','costoMO','costoMP','mantenimiento','depreciacion','reputacionOperativa','reputacionMercado','asignado','demandaAjustada','vendido','ingresos','inventarioProducto','almacenaje','horasExtra','costoGarantia','costoRecurrente','costosTotales','utilidad','ciclosReputacionBaja','tasaAdicionalPP']+[f'stockMP_{c}' for c in codes]+[f'CONS-{i:02}' for i in range(1,9)]
         outputs.update({f'ciclo.{item["cycle"]}.{item["id"]}.{key}':[sh.title,R(key)] for key in fields})
+        outputs.update({f'ciclo.{item["cycle"]}.{item["id"]}.financiamiento.{key}':[sh.title,R(column)] for key,column in [('montoPrestamo','montoPrestamo'),('tasaTEA','tasaTEA'),('deudaPrincipal','deudaPrincipal'),('tasaAdicionalProximoPrestamo','penalizacionPendiente')]})
     sh.freeze_panes='D2'
     for c in range(1,len(headers)+1):sh.column_dimensions[letter(c)].width=20
     book.save(DIR/f'ORACULO_{name}.xlsx')
@@ -181,6 +187,12 @@ def construir(escenario,config):
     return name,plan
 
 if __name__=='__main__':
+    import sys
+    if len(sys.argv)>1 and sys.argv[1]=='banca':
+        data=json.loads((DIR/'entradas_banca_recuperacion.json').read_text(encoding='utf-8-sig'))
+        name,plan=construir(data['escenario'],data['config'])
+        print(name,len(plan['salidas']))
+        raise SystemExit(0)
     data=json.loads((DIR/'entradas_simulaciones.json').read_text(encoding='utf-8-sig'))
     for scenario in data['escenarios']:
         name,plan=construir(scenario,data['config'])

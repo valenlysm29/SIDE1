@@ -17,3 +17,6 @@ SIM1 Node: 320 salidas del cierre multilote contra Excel COM, 0 diferencias. SIM
 
 ## Hito A7 banca y carga común
 Oráculos ampliados: SIM1 336, SIM2 306, SIM3 612 salidas0diferencias Node (importe préstamo, TEA, deuda y penalización pendiente incluidas). Loader tests/fixtures_excel.cjs común lee entradas literales/celdas, no caches esperadas; base, costos y SIM1 lo usan. Todas las opciones del driver deben existir o falla, y confirma préstamo/reputación/lotes del reporte contra la entrada. SIM2 UI3ciclos0diferencias306; SIM3 UI3ciclos0diferencias612 en ejecución inicial. A6 está implementando remoto, caja y SQL idempotente. Pendiente repetición final tras sus cambios.
+
+## Hito A7 final
+A7 terminó: base351 + consecuencias56 + SIM1 336 + SIM2 306 + SIM3 612 + banco153 =1814 comparaciones0diferencias, libro consolidado0pendientes. Banco conserva3pp durante recuperación sinpréstamo y losconsume cuando llega préstamo5000 (deuda5000). A8final delegado; espera A6 para repetir UI y verificar caja. Archivos oracle y entregables derivados guardados en WIP; fuente original no versionada.
