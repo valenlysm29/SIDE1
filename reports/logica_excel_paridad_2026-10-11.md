@@ -2,9 +2,9 @@
 
 ## Estado de entrega
 
-Motor puro Node/navegador, catálogo interno de 68 filas y menú de decisiones congelado, cierre local/remoto e historial, y adaptador de caja común ya implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. Continuación 3: decisiones congeladas según auditoría del menú base y resoluciones explícitas del usuario. Oráculos recalculados con los grupos finales; medición de los dos bloqueos 3D y verificación final en curso.
+Motor puro Node/navegador, catálogo interno de 68 filas y menú de decisiones congelado, cierre local/remoto e historial, y adaptador de caja común implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. La verificación única de continuación 3 confirmó oráculo 3104/3104 sin diferencias, las tres simulaciones y la transición sin doble cobro. Los dos bloqueos 3D pasaron la medición controlada y la corrida final. Continuación 4 mide exclusivamente el caso intermitente de NPC y ejecuta el cierre ligero.
 
-**Publicación:** la entrega anterior sí fue publicada en `459c062`. Esta continuación aún no se publica; depende de la evidencia 3D y del único pase final. WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
+**Publicación:** la entrega anterior fue publicada en `459c062`. Esta continuación aún no se publica; depende de atribuir el caso NPC según el criterio autorizado y completar el cierre ligero. WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
 
 ## Implementación por hoja
 
@@ -103,6 +103,8 @@ Marcados `PENDIENTE_DEFINIR`: horas extra 25%, almacenaje S/2, aumento TEA 3 pp,
 Extensiones explícitas: interés equivalente mensual sobre deuda, sin amortización porque no existe calendario; adquisición de activos solo por incremento, sin liquidación; REP baja se aplica desde el segundo ciclo. La garantía anterior conserva 30/90/180 días sin inventar un costo por venta; 30/90 se mapean a los códigos correspondientes y 180 queda sin equivalente. El catálogo interno conserva la fórmula literal de garantía para contrastes explícitos del Excel. Las tiendas conservan los distritos anteriores; el mapeo a zonas Alta/Media/Baja y sus efectos están PENDIENTE_DEFINIR. El crédito sigue informativo, sin selector nuevo ni calendario de cobros inventado. El balance conserva caja, activos fijos e inventario MP; los productos terminados se registran en unidades, sin un método nuevo de capitalización contable.
 
 ## Supabase
+
+**SQL sin cambios respecto a la continuación anterior.** El SQL exacto, orden y consultas de verificación están copiados más abajo; coinciden con el archivo de migración.
 
 SQL preparado: supabase/migrations/2026-10-11_logica_excel.sql. **No se ejecutó en producción.** Se aplica dos veces y se prueban funciones/triggers con PostgreSQL PGlite en memoria. No modifica public.guardar_puntaje_docente. Resultados, inventarios, personal, decisiones e historial se preservan en el JSON del cierre y del snapshot.
 
@@ -302,3 +304,16 @@ Las simulaciones usan los mismos campos visibles y códigos derivados que el edi
 **SQL sin cambios:** sigue `supabase/migrations/2026-10-11_logica_excel.sql`, versión de capacidad cierreVersion1. El SQL exacto y orden de aplicación anteriores siguen vigentes. No se ejecutó SQL en producción ni se modificó public.guardar_puntaje_docente.
 
 Los resultados de Continuación2 anteriores se conservan como historial; la aceptación y publicación de esta continuación se evaluarán con su medición5baseline/5HEAD por suite y su única corrida final.
+
+## Mapeos que el Excel no define
+
+| Control autorizado | Resolución aplicada | Pendiente explícito |
+|---|---|---|
+| Garantía del producto 30/90/180 días | Se conservan las opciones anteriores. 30/90 se corresponden con COM06B/C para puntajes; no se inventa un cobro por venta en este flujo. | 180 días no tiene equivalente en las opciones 0/30/90 del Excel. |
+| Tiendas Los Olivos/Miraflores/SJL | Se conservan los distritos anteriores y sus cantidades. | Sin equivalencia inventada a zonas Alta/Media/Baja, costo o demanda nuevos. |
+| Mantenimiento preventivo | Se conserva la opción anterior de S/200 al elegirla. | Sin traducirla a opciones Excel de S/1500/3000. |
+| Marketing | Un solo control con niveles S/1500/6000/12000; la inversión se aplica una vez. | Sin inversión libre adicional ni segundo cobro de INV02. |
+| Analista de compras | S/5000 por ciclo y descuento ya existente `max(2,12-2*(ciclo-1))%` solo sobre materiales; resumen usa el ciclo actual. | No se crea fórmula nueva de beneficio. |
+| Garantía del proveedor 0/80/100% | Se conservan las opciones anteriores. | Evento de fallas/devolución no definido; sin costo o ingreso automático inventado. |
+
+El usuario ya autorizó conservar estos controles. La eventual equivalencia o ampliación de efectos exige una definición posterior; no está pendiente volver a aprobar su conservación. La pregunta sobre versionar el Excel original permanece abierta: por defecto continúa local e ignorado, y solo se publican los oráculos derivados.

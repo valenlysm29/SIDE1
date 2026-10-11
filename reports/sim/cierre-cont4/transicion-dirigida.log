@@ -1,0 +1,10 @@
+✔ Transición importa activos y deuda pagados en flujo previo sin duplicar compra ni financiación (17.075ms)
+✔ Activación se bloquea si el ciclo actual ya tiene movimiento monetario legacy (3.5511ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 224.8706

@@ -1,0 +1,43 @@
+✔ Lotes de igual material conservan sus precios distintos al venderse (15.1182ms)
+✔ La penalización bancaria se conserva hasta el préstamo siguiente (8.0332ms)
+✔ SIM-2 dispara las ocho reglas en tres ciclos; no atribuye efectos al lote calidad4 (4.6341ms)
+✔ factores productivos reducen consumo y restauran MP antes de calcular costos (1.604ms)
+✔ redondeo conserva 200×0.70×0.95=133 y depreciación retirada no altera costo (4.7874ms)
+✔ SIM-3 arrastra existencias, replica decisiones y mantiene eliminación inicial (11.6497ms)
+✔ inventario anterior se vende aunque la nueva producción sea cero (1.4435ms)
+✔ costo recurrente se cuenta una vez y garantía base no cobra; préstamo no es ingreso (9.869ms)
+✔ MO conserva fórmulas, CTS manual y divisores de Costos!U5:AD39 (2.5778ms)
+✔ maquinaria y moldes reproducen las veinte sumas anuales MYPE/No MYPE (0.514ms)
+✔ almacén consume en jerarquía según necesidad y usa inventario inicial (0.9563ms)
+✔ tabla de valorización AB88:AC96 usa el fixture propio107, separado de F55=107.5 (1.4818ms)
+✔ reputación operativa conserva C65:G65 y el denominador literal de H61 (0.4742ms)
+✔ los descuentos son multiplicativos, preservan valoración e inventario entre ciclos (1.1088ms)
+✔ costos de ciclo cuentan operarios de toda matriz, mantenimiento y depreciación no caja (0.6493ms)
+✔ métodos de depreciación definidos y pendientes usan parámetros inyectables (0.299ms)
+✔ Depreciación e inventarios retirados no generan efectos por selección antigua; mantenimiento base no se convierte en política Excel (1.7618ms)
+✔ Analista usa la negociación base 12/10/2 por ciclo y cobra su contratación una sola vez (1.0476ms)
+✔ Lotes y Motor: fixture 6.2,17,8,-3 sin normalizar (3.6735ms)
+✔ Catálogo: todas las filas, costos y aportes coinciden con extracción Excel (2.5896ms)
+✔ Menú congelado: diez selectores y seis campos base; marketing se elige una sola vez (0.5314ms)
+✔ Decisiones congeladas: solo garantía y mantenimiento ya existentes suman; catálogo interno intacto (0.4075ms)
+✔ No duplica grupos ni acepta más de tres lotes (1.9054ms)
+✔ Mensajes de consecuencias son literales del libro (0.294ms)
+✔ Premium insuficiente, coherente y rango sin efecto; reputación una vez por regla (0.6348ms)
+✔ Todas las consecuencias: multiplicación, historial, costos y tasa (0.3137ms)
+✔ Resumen del ciclo 2 usa el descuento vigente del analista, igual que la proyección y el cierre (39.9907ms)
+✔ Cierre local por lotes es idempotente y no añade movimientos al ledger 3D (34.0063ms)
+✔ Empresa sin plan confirmado se elimina en ciclo 1; historial replica un ciclo posterior (14.7148ms)
+✔ Validación acepta IFERROR de componentes o decisiones ausentes y exige plan con precio (5.463ms)
+✔ Cierre local tardío conserva plan confirmado previo aunque editor ya avanzó de ciclo (14.4782ms)
+✔ Editor conserva distritos y opciones base; no ofrece ni reactiva decisiones retiradas (29.6825ms)
+✔ Marketing base alto pasa S/12000 al Excel sin doble cobro y analista conserva su negociación por ciclo (7.424ms)
+✔ Garantías 30/90 tienen mapeo exacto de puntaje y conservan costo base cero; mantenimiento opcional cobra S/200 una vez (11.3187ms)
+✔ Activación en ciclo 2 no elimina retroactivamente una empresa durante cierre del ciclo 1 (6.4489ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1236.6992
