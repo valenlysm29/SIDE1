@@ -2,18 +2,18 @@
 
 ## Estado de entrega
 
-Motor puro Node/navegador, editor con las 68 opciones Excel, cierre local/remoto e historial, y adaptador de caja común ya implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. La verificación final única terminó. La integración Excel pasa sus simulaciones y oráculos; la aceptación global queda bloqueada por dos fallos de carga 3D sin resolver.
+Motor puro Node/navegador, catálogo interno de 68 filas y menú de decisiones congelado, cierre local/remoto e historial, y adaptador de caja común ya implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. Continuación 3: decisiones congeladas según auditoría del menú base y resoluciones explícitas del usuario. Oráculos recalculados con los grupos finales; medición de los dos bloqueos 3D y verificación final en curso.
 
-**Push: no realizado.** Motivo: `continuous_world.cjs` y `world_cycle_restart.cjs` no quedaron verdes ni demostrados como preexistentes. WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
+**Publicación:** la entrega anterior sí fue publicada en `459c062`. Esta continuación aún no se publica; depende de la evidencia 3D y del único pase final. WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
 
 ## Implementación por hoja
 
 | Fuente | Implementación y alcance real |
 |---|---|
-| Catalogo_Decisiones / Seleccion_Ciclo0 | `js/engine/catalogo_excel.js` conserva las 68 filas y normaliza costos; `puntajes.js` valida una opción por grupo. En modo por lotes las 68 filas Excel son la fuente activa del editor, incluidos cuatro grupos nuevos. La interfaz anterior mantiene IDs para las empresas que continúan en ese modo; al activar lotes se impide seguir generando cargos desde sus categorías. |
+| Catalogo_Decisiones / Seleccion_Ciclo0 | `js/engine/catalogo_excel.js` conserva las 68 filas y normaliza costos; `puntajes.js` valida una opción por grupo. El catálogo interno conserva las 68 filas. El editor aplica la lista blanca y conserva las opciones del menú base autorizadas por el usuario. La interfaz anterior mantiene IDs para las empresas que continúan en ese modo; al activar lotes se impide seguir generando cargos desde sus categorías. |
 | CANTIDAD DE PRODUCCIÓN | `produccion.js`: matrices de personal, 24 días, cuello de botella, eficiencia literal, reparto truncado, restricciones por insumo/lote, conversiones de compra e inventario. Al activar lotes se deshabilita el cálculo productivo anterior para esa empresa. |
 | Costos De Producción | `costos.js`: cargas laborales literales MYPE/No MYPE, CTS manual, mantenimiento y depreciación, valorización MP, jerarquía de almacén y reputación operativa. El adaptador de caja paga compras netas y adquisiciones/instalación/capacitación una vez; depreciación afecta resultados, no caja. |
-| Lotes_Produccion / Motor_Puntajes | Calidad por lote, umbrales y mensajes; calidad ponderada de empresa; eficiencia, reputación y salud; niveles Alto/Medio/Bajo sin normalizar puntajes. Se incluyen cuatro grupos adicionales conforme al pedido. |
+| Lotes_Produccion / Motor_Puntajes | Calidad por lote, umbrales y mensajes; calidad ponderada de empresa; eficiencia, reputación y salud; niveles Alto/Medio/Bajo sin normalizar puntajes. El Motor admite los 14 grupos originales y solo garantía/mantenimiento de las cuatro extensiones, porque esos temas ya existían en el menú base. |
 | Matriz_Consecuencias | Ocho reglas en `consecuencias.js`; efectos por lote, reputación una vez por regla/ciclo, penalización productiva multiplicativa, historial y tasa futura. La conservación literal de textos incluye errores ortográficos del archivo. |
 | Ventas | `mercado.js`: modelo 2 por segmento y modelo 1 solo de contraste. `ciclo.js` reúne empresas, replica decisiones, elimina al no decidir inicialmente, vende stock anterior y conserva inventarios. |
 | Instrucciones / DECISIONES / FlujoWeb | Editor en ui_excel.js, planes confirmados por ciclo, cierre remoto con el mismo motor y estados financieros comunes. |
@@ -82,19 +82,19 @@ Todos los nombres de configuración se refieren a `js/engine/config_excel.js`. U
 | 22 | Compras se valoran en unidades productivas | `CONVERSION_COMPRA` y `PRECIO_MP`; interpretación de `costos.js` |
 | 23 | Inventario inicial + compras − consumo | Regla generalizada de `consumirAlmacen()` y `produccion.js` |
 | 24 | Descuentos 8%, 2% y 3% multiplicativos | `DESCUENTO_CANTIDAD:0.08`, `DESCUENTO_PROVEEDOR_UNICO:0.02`, `DESCUENTO_CONTADO:0.03` — PENDIENTE_DEFINIR |
-| 25 | Línea recta literal; unidades y suma de dígitos como extensiones | `UNIDADES_VIDA:100000` — PENDIENTE_DEFINIR; método por `FIN-02A/B/C` |
-| 26 | Mantenimiento anual/12 más política del ciclo | `TASAS_ACTIVOS`, `COSTO_POLITICA_MANTENIMIENTO` (**decisión 4**) |
+| 25 | Línea recta calculada por activos; no selector nuevo de depreciación | `GRUPOS_MOTOR` excluye Método de depreciación; extensiones internas no afectan por defecto |
+| 26 | Mantenimiento anual/12 de Costos más opción preventiva anterior S/200, si se elige | `TASAS_ACTIVOS`, `COSTO_MANTENIMIENTO_BASE:200`; no mapeo ficticio a S/1500/3000 |
 | 27 | Fechas K56:K58 ignoradas para calidad | Calidad sale de `evaluarLote()`; sin constante |
 | 28 | Reputación operativa tomada de Costos C65:G65 | `reputacionOperativa()`; no usar CANTIDAD C75 |
 | 29 | Modelo 2 vigente; modelo 1 auxiliar | Llamada `repartoMercado()` en `ciclo.js` (**decisión 5**) |
 | 30 | Redondeo por empresa sin redistribuir sobrantes | `excelRound()` en `mercado.js`; no flag para restos |
 | 31 | Costos texto normalizados; original conservado | `catalogo_excel.json` / `catalogo_excel.js`; regenerar desde fuente |
-| 32 | Catorce grupos más cuatro nuevos; fuera SEG/mesa/materiales | Filtro de grupos en `puntajes.js` (**decisión 6**); cambiar requiere actualizar pruebas |
+| 32 | **Decisiones congeladas**: 14 grupos Motor originales + garantía/mantenimiento existentes =16; no nuevas elecciones de depreciación/inventarios/proveedores/crédito | `GRUPOS_MOTOR`, `DECISIONES_VISIBLES` y `CAMPOS_LEGACY_VISIBLES` en config_excel.js; cambiar lista blanca, no catálogo de68filas |
 | 33 | Un ciclo equivale a un mes económico | `CICLO_EQUIVALE_A_MESES:1`; cronómetro real sigue independiente |
 | 34 | Valorización de ejemplo usa 107; almacén usa 107.5 | `VALORIZACION_MP_MODO:"consumo_real"`; alternativa `"excel_literal"` exige mapa explícito consumoValorizado; fixtures AB89=107 y consumo107.5 se conservan por separado |
 | 35 | H61 excluye hilo N1 del denominador | `REPUTACION_HILO_DENOMINADOR_LITERAL:true` (false incluye todos) |
 
-Las seis decisiones destacadas requieren confirmar: fuente de reputación de mercado; calidad de mercado real; salarios Costos frente a catálogo; mantenimiento doble; modelo 2 de mercado; cuatro grupos adicionales en Motor.
+La decisión destacada6 queda resuelta: no añadir decisiones. El usuario confirmó conservar opciones anteriores de garantía, mantenimiento, tiendas, marketing, analista y garantía de proveedor; proveedores/pago/plazo internos sin selector ni efecto automático. Permanecen explícitos los mapeos no definidos, sin sustituir opciones en silencio.
 
 ## Parámetros no definidos en el Excel
 
@@ -289,3 +289,16 @@ Decisiones del usuario: revisar la tabla#1–#34, especialmente cantidad realmen
 
 ## Publicación autorizada posteriormente
 Tras recibir el informe de fallos pendientes, el usuario pidió explícitamente push a main. Se publica la serie de esta tarea hasta d596779 junto con esta anotación, sin resolver ni ocultar los dos fallos de carga3D documentados. Fetch confirmó main local sin commits remotos pendientes y todos los commits exclusivos corresponden a la integración Excel. Los cambios sin commit ajenos permanecen locales. No se ejecuta SQL en producción.
+
+
+## Continuación 3 — decisiones congeladas
+
+La comparación exacta de9fbe6ec y459c062 está en `reports/auditoria_decisiones_2026-10-11.md`. Se conserva el catálogo interno de68filas; la UI permite10selectores de grupos existentes y6campos base agrupados. `GRUPOS_MOTOR` admite16grupos:14originales más garantía/mantenimiento, existentes antes. No se incorporan nuevas elecciones de método de depreciación, política de inventarios, proveedores, pago, plazo o porcentaje de crédito.
+
+Resoluciones expresas del usuario: garantía30/90/180días sin coste de caja nuevo; mantenimiento preventivo opcionalS/200; tiendas por Los Olivos/Miraflores/SJL; un marketing por nivelesS/1500/6000/12000 sin doble cobro; analistaS/5000porciclo con descuento legado max(2,12−2×(ciclo−1))%; garantía de proveedor0/80/100%. Garantía30/90 mapea exactamente COM06B/C para puntajes;180no recibe mapeo arbitrario. El mantenimientoS/200 no se traduce falsamente aINF11B/C. No se inventa equivalencia distrito↔zona ni evento de material fallado: esos efectos quedan explícitamente pendientes. El porcentaje de ventas a crédito continúa siendo información automática del flujo base, sin selector editable ni calendario nuevo de cobros.
+
+Las simulaciones usan los mismos campos visibles y códigos derivados que el editor. El driver verifica igualdad de selección, garantías, marketing, analista, mantenimiento, publicidad y distritos enviados al oráculo. SIM3D ejerce analista, mantenimiento, garantía180 y proveedor80; el oráculo independiente replica costo y descuento legado. Excel COM recalculó468+585+1140+252+252salidas con0diferencias. La base351 y consecuencias56se mantienen literales: total3104. RevisiónA9 solo del diff de esta continuación: hallazgo descuento analista en resumen corregido y probado;0hallazgos abiertos.
+
+**SQL sin cambios:** sigue `supabase/migrations/2026-10-11_logica_excel.sql`, versión de capacidad cierreVersion1. El SQL exacto y orden de aplicación anteriores siguen vigentes. No se ejecutó SQL en producción ni se modificó public.guardar_puntaje_docente.
+
+Los resultados de Continuación2 anteriores se conservan como historial; la aceptación y publicación de esta continuación se evaluarán con su medición5baseline/5HEAD por suite y su única corrida final.

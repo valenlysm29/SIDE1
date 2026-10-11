@@ -1,7 +1,8 @@
 'use strict';
 // Una única corrida final secuencial; conserva cada resultado aunque una suite falle.
 const fs=require('node:fs'),path=require('node:path'),{spawn,spawnSync}=require('node:child_process');
-const root=path.resolve(__dirname,'..'),out=path.join(root,'reports/sim/final-continuacion-2');
+const continuacion=process.argv.includes('--continuacion=3')?'3':'2';
+const root=path.resolve(__dirname,'..'),out=path.join(root,'reports/sim/final-continuacion-'+continuacion);
 fs.mkdirSync(out,{recursive:true});
 const nodeFiles=fs.readdirSync(__dirname).filter(n=>/\.test\.(js|mjs|cjs)$/.test(n)).sort();
 const inventory=JSON.parse(spawnSync(process.execPath,['tests/run_integral.cjs','--list','--no-fps'],{cwd:root,encoding:'utf8'}).stdout);
@@ -9,7 +10,7 @@ const only=inventory.suites.filter(s=>s.kind!=='node').map(s=>s.name).join(',');
 const jobs=[{name:'node-todos',args:['--test','--test-concurrency=1',...nodeFiles.map(n=>'tests/'+n)]},
  {name:'excel-sql',args:['tests/excel_sql_db.cjs']},
  {name:'excel-sql-activacion',args:['tests/excel_sql_activacion_db.cjs']},
- {name:'regresion-db-navegador',args:['tests/run_integral.cjs','--phase=excel-cont2-final','--no-fps','--only='+only]},
+ {name:'regresion-db-navegador',args:['tests/run_integral.cjs','--phase=excel-cont'+continuacion+'-final','--no-fps','--only='+only]},
  ...[1,2,3].map(n=>({name:'sim-'+n,args:['tests/sim_'+n+'.cjs']})),
  {name:'transicion',args:['tests/transicion_excel_browser.cjs']},
  {name:'base',args:['tests/paridad_base.cjs']},{name:'consecuencias',args:['tests/paridad_consecuencias.cjs']},

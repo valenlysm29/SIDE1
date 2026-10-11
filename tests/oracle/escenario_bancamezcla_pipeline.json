@@ -113,11 +113,11 @@
     ],
     "ciclo.1.A.costosTotales": [
       "Pipeline_bancamezcla",
-      "EQ2"
+      "ER2"
     ],
     "ciclo.1.A.utilidad": [
       "Pipeline_bancamezcla",
-      "ER2"
+      "ES2"
     ],
     "ciclo.1.A.ciclosReputacionBaja": [
       "Pipeline_bancamezcla",
@@ -161,35 +161,35 @@
     ],
     "ciclo.1.A.CONS-01": [
       "Pipeline_bancamezcla",
-      "ES2"
+      "ET2"
     ],
     "ciclo.1.A.CONS-02": [
       "Pipeline_bancamezcla",
-      "ET2"
+      "EU2"
     ],
     "ciclo.1.A.CONS-03": [
       "Pipeline_bancamezcla",
-      "EU2"
+      "EV2"
     ],
     "ciclo.1.A.CONS-04": [
       "Pipeline_bancamezcla",
-      "EV2"
+      "EW2"
     ],
     "ciclo.1.A.CONS-05": [
       "Pipeline_bancamezcla",
-      "EW2"
+      "EX2"
     ],
     "ciclo.1.A.CONS-06": [
       "Pipeline_bancamezcla",
-      "EX2"
+      "EY2"
     ],
     "ciclo.1.A.CONS-07": [
       "Pipeline_bancamezcla",
-      "EY2"
+      "EZ2"
     ],
     "ciclo.1.A.CONS-08": [
       "Pipeline_bancamezcla",
-      "EZ2"
+      "FA2"
     ],
     "ciclo.1.A.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
@@ -317,11 +317,11 @@
     ],
     "ciclo.2.A.costosTotales": [
       "Pipeline_bancamezcla",
-      "EQ3"
+      "ER3"
     ],
     "ciclo.2.A.utilidad": [
       "Pipeline_bancamezcla",
-      "ER3"
+      "ES3"
     ],
     "ciclo.2.A.ciclosReputacionBaja": [
       "Pipeline_bancamezcla",
@@ -365,35 +365,35 @@
     ],
     "ciclo.2.A.CONS-01": [
       "Pipeline_bancamezcla",
-      "ES3"
+      "ET3"
     ],
     "ciclo.2.A.CONS-02": [
       "Pipeline_bancamezcla",
-      "ET3"
+      "EU3"
     ],
     "ciclo.2.A.CONS-03": [
       "Pipeline_bancamezcla",
-      "EU3"
+      "EV3"
     ],
     "ciclo.2.A.CONS-04": [
       "Pipeline_bancamezcla",
-      "EV3"
+      "EW3"
     ],
     "ciclo.2.A.CONS-05": [
       "Pipeline_bancamezcla",
-      "EW3"
+      "EX3"
     ],
     "ciclo.2.A.CONS-06": [
       "Pipeline_bancamezcla",
-      "EX3"
+      "EY3"
     ],
     "ciclo.2.A.CONS-07": [
       "Pipeline_bancamezcla",
-      "EY3"
+      "EZ3"
     ],
     "ciclo.2.A.CONS-08": [
       "Pipeline_bancamezcla",
-      "EZ3"
+      "FA3"
     ],
     "ciclo.2.A.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
@@ -521,11 +521,11 @@
     ],
     "ciclo.3.A.costosTotales": [
       "Pipeline_bancamezcla",
-      "EQ4"
+      "ER4"
     ],
     "ciclo.3.A.utilidad": [
       "Pipeline_bancamezcla",
-      "ER4"
+      "ES4"
     ],
     "ciclo.3.A.ciclosReputacionBaja": [
       "Pipeline_bancamezcla",
@@ -569,35 +569,35 @@
     ],
     "ciclo.3.A.CONS-01": [
       "Pipeline_bancamezcla",
-      "ES4"
+      "ET4"
     ],
     "ciclo.3.A.CONS-02": [
       "Pipeline_bancamezcla",
-      "ET4"
+      "EU4"
     ],
     "ciclo.3.A.CONS-03": [
       "Pipeline_bancamezcla",
-      "EU4"
+      "EV4"
     ],
     "ciclo.3.A.CONS-04": [
       "Pipeline_bancamezcla",
-      "EV4"
+      "EW4"
     ],
     "ciclo.3.A.CONS-05": [
       "Pipeline_bancamezcla",
-      "EW4"
+      "EX4"
     ],
     "ciclo.3.A.CONS-06": [
       "Pipeline_bancamezcla",
-      "EX4"
+      "EY4"
     ],
     "ciclo.3.A.CONS-07": [
       "Pipeline_bancamezcla",
-      "EY4"
+      "EZ4"
     ],
     "ciclo.3.A.CONS-08": [
       "Pipeline_bancamezcla",
-      "EZ4"
+      "FA4"
     ],
     "ciclo.3.A.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
@@ -617,399 +617,399 @@
     ],
     "ciclo.1.A.financial.estadoResultados.ingresos": [
       "Pipeline_bancamezcla",
-      "FP2"
+      "FQ2"
     ],
     "ciclo.1.A.financial.estadoResultados.ventasNetas": [
       "Pipeline_bancamezcla",
-      "FQ2"
+      "FR2"
     ],
     "ciclo.1.A.financial.estadoResultados.costos": [
       "Pipeline_bancamezcla",
-      "FR2"
+      "FS2"
     ],
     "ciclo.1.A.financial.estadoResultados.utilidad": [
       "Pipeline_bancamezcla",
-      "FS2"
+      "FT2"
     ],
     "ciclo.1.A.financial.estadoResultados.depreciacion": [
       "Pipeline_bancamezcla",
-      "FT2"
+      "FU2"
     ],
     "ciclo.1.A.financial.estadoResultados.intereses": [
       "Pipeline_bancamezcla",
-      "FU2"
+      "FV2"
     ],
     "ciclo.1.A.financial.estadoResultados.costosProduccion": [
       "Pipeline_bancamezcla",
-      "FV2"
+      "FW2"
     ],
     "ciclo.1.A.financial.balanceCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "FW2"
+      "FX2"
     ],
     "ciclo.1.A.financial.balanceCaja.entradas": [
       "Pipeline_bancamezcla",
-      "FX2"
+      "FY2"
     ],
     "ciclo.1.A.financial.balanceCaja.salidas": [
       "Pipeline_bancamezcla",
-      "FY2"
+      "FZ2"
     ],
     "ciclo.1.A.financial.balanceCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "FZ2"
+      "GA2"
     ],
     "ciclo.1.A.financial.flujoCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "GA2"
+      "GB2"
     ],
     "ciclo.1.A.financial.flujoCaja.cobrosVentas": [
       "Pipeline_bancamezcla",
-      "GB2"
+      "GC2"
     ],
     "ciclo.1.A.financial.flujoCaja.pagosOperacion": [
       "Pipeline_bancamezcla",
-      "GC2"
+      "GD2"
     ],
     "ciclo.1.A.financial.flujoCaja.compraActivos": [
       "Pipeline_bancamezcla",
-      "GD2"
+      "GE2"
     ],
     "ciclo.1.A.financial.flujoCaja.financiamiento": [
       "Pipeline_bancamezcla",
-      "GE2"
+      "GF2"
     ],
     "ciclo.1.A.financial.flujoCaja.operacion": [
       "Pipeline_bancamezcla",
-      "GF2"
+      "GG2"
     ],
     "ciclo.1.A.financial.flujoCaja.inversion": [
       "Pipeline_bancamezcla",
-      "GG2"
+      "GH2"
     ],
     "ciclo.1.A.financial.flujoCaja.flujoNeto": [
       "Pipeline_bancamezcla",
-      "GH2"
+      "GI2"
     ],
     "ciclo.1.A.financial.flujoCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "GI2"
+      "GJ2"
     ],
     "ciclo.1.A.financial.balanceGeneral.efectivo": [
       "Pipeline_bancamezcla",
-      "GJ2"
+      "GK2"
     ],
     "ciclo.1.A.financial.balanceGeneral.activosFijos": [
       "Pipeline_bancamezcla",
-      "GK2"
+      "GL2"
     ],
     "ciclo.1.A.financial.balanceGeneral.inventarioMP": [
       "Pipeline_bancamezcla",
-      "GL2"
+      "GM2"
     ],
     "ciclo.1.A.financial.balanceGeneral.activos": [
       "Pipeline_bancamezcla",
-      "GM2"
+      "GN2"
     ],
     "ciclo.1.A.financial.balanceGeneral.deuda": [
       "Pipeline_bancamezcla",
-      "GN2"
+      "GO2"
     ],
     "ciclo.1.A.financial.balanceGeneral.patrimonio": [
       "Pipeline_bancamezcla",
-      "GO2"
+      "GP2"
     ],
     "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio": [
       "Pipeline_bancamezcla",
-      "GP2"
+      "GQ2"
     ],
     "ciclo.1.A.financial.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
-      "GQ2"
+      "GR2"
     ],
     "ciclo.1.A.financial.financiamiento.tasaTEA": [
       "Pipeline_bancamezcla",
-      "GR2"
+      "GS2"
     ],
     "ciclo.1.A.financial.financiamiento.deudaPrincipal": [
       "Pipeline_bancamezcla",
-      "GS2"
+      "GT2"
     ],
     "ciclo.1.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
       "Pipeline_bancamezcla",
-      "GT2"
+      "GU2"
     ],
     "ciclo.1.A.financial.financiamiento.tasaMensual": [
       "Pipeline_bancamezcla",
-      "GU2"
+      "GV2"
     ],
     "ciclo.1.A.financial.financiamiento.intereses": [
       "Pipeline_bancamezcla",
-      "GV2"
+      "GW2"
     ],
     "ciclo.2.A.financial.estadoResultados.ingresos": [
       "Pipeline_bancamezcla",
-      "FP3"
+      "FQ3"
     ],
     "ciclo.2.A.financial.estadoResultados.ventasNetas": [
       "Pipeline_bancamezcla",
-      "FQ3"
+      "FR3"
     ],
     "ciclo.2.A.financial.estadoResultados.costos": [
       "Pipeline_bancamezcla",
-      "FR3"
+      "FS3"
     ],
     "ciclo.2.A.financial.estadoResultados.utilidad": [
       "Pipeline_bancamezcla",
-      "FS3"
+      "FT3"
     ],
     "ciclo.2.A.financial.estadoResultados.depreciacion": [
       "Pipeline_bancamezcla",
-      "FT3"
+      "FU3"
     ],
     "ciclo.2.A.financial.estadoResultados.intereses": [
       "Pipeline_bancamezcla",
-      "FU3"
+      "FV3"
     ],
     "ciclo.2.A.financial.estadoResultados.costosProduccion": [
       "Pipeline_bancamezcla",
-      "FV3"
+      "FW3"
     ],
     "ciclo.2.A.financial.balanceCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "FW3"
+      "FX3"
     ],
     "ciclo.2.A.financial.balanceCaja.entradas": [
       "Pipeline_bancamezcla",
-      "FX3"
+      "FY3"
     ],
     "ciclo.2.A.financial.balanceCaja.salidas": [
       "Pipeline_bancamezcla",
-      "FY3"
+      "FZ3"
     ],
     "ciclo.2.A.financial.balanceCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "FZ3"
+      "GA3"
     ],
     "ciclo.2.A.financial.flujoCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "GA3"
+      "GB3"
     ],
     "ciclo.2.A.financial.flujoCaja.cobrosVentas": [
       "Pipeline_bancamezcla",
-      "GB3"
+      "GC3"
     ],
     "ciclo.2.A.financial.flujoCaja.pagosOperacion": [
       "Pipeline_bancamezcla",
-      "GC3"
+      "GD3"
     ],
     "ciclo.2.A.financial.flujoCaja.compraActivos": [
       "Pipeline_bancamezcla",
-      "GD3"
+      "GE3"
     ],
     "ciclo.2.A.financial.flujoCaja.financiamiento": [
       "Pipeline_bancamezcla",
-      "GE3"
+      "GF3"
     ],
     "ciclo.2.A.financial.flujoCaja.operacion": [
       "Pipeline_bancamezcla",
-      "GF3"
+      "GG3"
     ],
     "ciclo.2.A.financial.flujoCaja.inversion": [
       "Pipeline_bancamezcla",
-      "GG3"
+      "GH3"
     ],
     "ciclo.2.A.financial.flujoCaja.flujoNeto": [
       "Pipeline_bancamezcla",
-      "GH3"
+      "GI3"
     ],
     "ciclo.2.A.financial.flujoCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "GI3"
+      "GJ3"
     ],
     "ciclo.2.A.financial.balanceGeneral.efectivo": [
       "Pipeline_bancamezcla",
-      "GJ3"
+      "GK3"
     ],
     "ciclo.2.A.financial.balanceGeneral.activosFijos": [
       "Pipeline_bancamezcla",
-      "GK3"
+      "GL3"
     ],
     "ciclo.2.A.financial.balanceGeneral.inventarioMP": [
       "Pipeline_bancamezcla",
-      "GL3"
+      "GM3"
     ],
     "ciclo.2.A.financial.balanceGeneral.activos": [
       "Pipeline_bancamezcla",
-      "GM3"
+      "GN3"
     ],
     "ciclo.2.A.financial.balanceGeneral.deuda": [
       "Pipeline_bancamezcla",
-      "GN3"
+      "GO3"
     ],
     "ciclo.2.A.financial.balanceGeneral.patrimonio": [
       "Pipeline_bancamezcla",
-      "GO3"
+      "GP3"
     ],
     "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio": [
       "Pipeline_bancamezcla",
-      "GP3"
+      "GQ3"
     ],
     "ciclo.2.A.financial.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
-      "GQ3"
+      "GR3"
     ],
     "ciclo.2.A.financial.financiamiento.tasaTEA": [
       "Pipeline_bancamezcla",
-      "GR3"
+      "GS3"
     ],
     "ciclo.2.A.financial.financiamiento.deudaPrincipal": [
       "Pipeline_bancamezcla",
-      "GS3"
+      "GT3"
     ],
     "ciclo.2.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
       "Pipeline_bancamezcla",
-      "GT3"
+      "GU3"
     ],
     "ciclo.2.A.financial.financiamiento.tasaMensual": [
       "Pipeline_bancamezcla",
-      "GU3"
+      "GV3"
     ],
     "ciclo.2.A.financial.financiamiento.intereses": [
       "Pipeline_bancamezcla",
-      "GV3"
+      "GW3"
     ],
     "ciclo.3.A.financial.estadoResultados.ingresos": [
       "Pipeline_bancamezcla",
-      "FP4"
+      "FQ4"
     ],
     "ciclo.3.A.financial.estadoResultados.ventasNetas": [
       "Pipeline_bancamezcla",
-      "FQ4"
+      "FR4"
     ],
     "ciclo.3.A.financial.estadoResultados.costos": [
       "Pipeline_bancamezcla",
-      "FR4"
+      "FS4"
     ],
     "ciclo.3.A.financial.estadoResultados.utilidad": [
       "Pipeline_bancamezcla",
-      "FS4"
+      "FT4"
     ],
     "ciclo.3.A.financial.estadoResultados.depreciacion": [
       "Pipeline_bancamezcla",
-      "FT4"
+      "FU4"
     ],
     "ciclo.3.A.financial.estadoResultados.intereses": [
       "Pipeline_bancamezcla",
-      "FU4"
+      "FV4"
     ],
     "ciclo.3.A.financial.estadoResultados.costosProduccion": [
       "Pipeline_bancamezcla",
-      "FV4"
+      "FW4"
     ],
     "ciclo.3.A.financial.balanceCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "FW4"
+      "FX4"
     ],
     "ciclo.3.A.financial.balanceCaja.entradas": [
       "Pipeline_bancamezcla",
-      "FX4"
+      "FY4"
     ],
     "ciclo.3.A.financial.balanceCaja.salidas": [
       "Pipeline_bancamezcla",
-      "FY4"
+      "FZ4"
     ],
     "ciclo.3.A.financial.balanceCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "FZ4"
+      "GA4"
     ],
     "ciclo.3.A.financial.flujoCaja.cajaInicial": [
       "Pipeline_bancamezcla",
-      "GA4"
+      "GB4"
     ],
     "ciclo.3.A.financial.flujoCaja.cobrosVentas": [
       "Pipeline_bancamezcla",
-      "GB4"
+      "GC4"
     ],
     "ciclo.3.A.financial.flujoCaja.pagosOperacion": [
       "Pipeline_bancamezcla",
-      "GC4"
+      "GD4"
     ],
     "ciclo.3.A.financial.flujoCaja.compraActivos": [
       "Pipeline_bancamezcla",
-      "GD4"
+      "GE4"
     ],
     "ciclo.3.A.financial.flujoCaja.financiamiento": [
       "Pipeline_bancamezcla",
-      "GE4"
+      "GF4"
     ],
     "ciclo.3.A.financial.flujoCaja.operacion": [
       "Pipeline_bancamezcla",
-      "GF4"
+      "GG4"
     ],
     "ciclo.3.A.financial.flujoCaja.inversion": [
       "Pipeline_bancamezcla",
-      "GG4"
+      "GH4"
     ],
     "ciclo.3.A.financial.flujoCaja.flujoNeto": [
       "Pipeline_bancamezcla",
-      "GH4"
+      "GI4"
     ],
     "ciclo.3.A.financial.flujoCaja.cajaFinal": [
       "Pipeline_bancamezcla",
-      "GI4"
+      "GJ4"
     ],
     "ciclo.3.A.financial.balanceGeneral.efectivo": [
       "Pipeline_bancamezcla",
-      "GJ4"
+      "GK4"
     ],
     "ciclo.3.A.financial.balanceGeneral.activosFijos": [
       "Pipeline_bancamezcla",
-      "GK4"
+      "GL4"
     ],
     "ciclo.3.A.financial.balanceGeneral.inventarioMP": [
       "Pipeline_bancamezcla",
-      "GL4"
+      "GM4"
     ],
     "ciclo.3.A.financial.balanceGeneral.activos": [
       "Pipeline_bancamezcla",
-      "GM4"
+      "GN4"
     ],
     "ciclo.3.A.financial.balanceGeneral.deuda": [
       "Pipeline_bancamezcla",
-      "GN4"
+      "GO4"
     ],
     "ciclo.3.A.financial.balanceGeneral.patrimonio": [
       "Pipeline_bancamezcla",
-      "GO4"
+      "GP4"
     ],
     "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio": [
       "Pipeline_bancamezcla",
-      "GP4"
+      "GQ4"
     ],
     "ciclo.3.A.financial.financiamiento.montoPrestamo": [
       "Pipeline_bancamezcla",
-      "GQ4"
+      "GR4"
     ],
     "ciclo.3.A.financial.financiamiento.tasaTEA": [
       "Pipeline_bancamezcla",
-      "GR4"
+      "GS4"
     ],
     "ciclo.3.A.financial.financiamiento.deudaPrincipal": [
       "Pipeline_bancamezcla",
-      "GS4"
+      "GT4"
     ],
     "ciclo.3.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
       "Pipeline_bancamezcla",
-      "GT4"
+      "GU4"
     ],
     "ciclo.3.A.financial.financiamiento.tasaMensual": [
       "Pipeline_bancamezcla",
-      "GU4"
+      "GV4"
     ],
     "ciclo.3.A.financial.financiamiento.intereses": [
       "Pipeline_bancamezcla",
-      "GV4"
+      "GW4"
     ]
   }
 }

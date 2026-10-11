@@ -3,6 +3,84 @@
     "VERSION": "excel-16",
     "DIAS_CICLO": 24,
     "CICLO_EQUIVALE_A_MESES": 1,
+    "GRUPOS_MOTOR": [
+      "Maquina de ensamblado",
+      "Maquina de acabados",
+      "Molde",
+      "Personal de corte",
+      "Personal de ensamble",
+      "Personal de acabados",
+      "Jefatura",
+      "Canal de venta",
+      "Acceso a prestamo bancario",
+      "Numero de proveedores",
+      "Politica de pago a proveedores",
+      "Lead time",
+      "Inversion en RR.HH.",
+      "Inversion en marketing",
+      "Garantía del producto",
+      "Mantenimiento de maquinaria"
+    ],
+    "DECISIONES_VISIBLES": [
+      "Maquina de ensamblado",
+      "Maquina de acabados",
+      "Molde",
+      "Personal de corte",
+      "Personal de ensamble",
+      "Personal de acabados",
+      "Jefatura",
+      "Canal de venta",
+      "Acceso a prestamo bancario",
+      "Inversion en RR.HH."
+    ],
+    "CAMPOS_LEGACY_VISIBLES": [
+      "garantiaDias",
+      "mantenimientoPreventivo",
+      "tiendasPorDistrito",
+      "marketingNivel",
+      "analistaCompras",
+      "garantiaProveedor"
+    ],
+    "GARANTIA_DIAS_BASE": [
+      30,
+      90,
+      180
+    ],
+    "GARANTIA_MAPEO_EXACTO": {
+      "30": "COM-06B",
+      "90": "COM-06C"
+    },
+    "COSTO_MANTENIMIENTO_BASE": 200,
+    "MARKETING_BASE": {
+      "baja": {
+        "codigo": "INV-02A",
+        "costo": 1500
+      },
+      "media": {
+        "codigo": "INV-02B",
+        "costo": 6000
+      },
+      "alta": {
+        "codigo": "INV-02C",
+        "costo": 12000
+      }
+    },
+    "ANALISTA_BASE": {
+      "costo": 5000,
+      "descuentoInicialPct": 12,
+      "reduccionPorCicloPct": 2,
+      "descuentoMinimoPct": 2
+    },
+    "GARANTIA_PROVEEDOR_BASE": [
+      0,
+      80,
+      100
+    ],
+    "DISTRITOS_TIENDAS": {
+      "los_olivos": "Los Olivos",
+      "miraflores": "Miraflores",
+      "sjl": "San Juan de Lurigancho"
+    },
     "PRODUCTIVIDAD": {
       "corte": [
         5,
@@ -135,10 +213,7 @@
       "INV-01C",
       "INV-02A",
       "INV-02B",
-      "INV-02C",
-      "INS-12A",
-      "INS-12B",
-      "INS-12C"
+      "INV-02C"
     ],
     "PENDIENTE_DEFINIR": [
       "HORAS_EXTRA_PCT",
@@ -383,10 +458,7 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-10A",
-                "INS-11B",
-                "FIN-02A",
-                "INS-09A"
+                "COM-06B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -404,7 +476,17 @@
                   "precio": 40
                 }
               ],
-              "publicidad": 0
+              "publicidad": 0,
+              "garantiaDias": 30,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": null,
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "B": {
               "regimen": "MYPE",
@@ -442,13 +524,9 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02B",
-                "INS-12B"
+                "COM-06B",
+                "INV-02B"
               ],
               "compras": {
                 "INS-02": 300,
@@ -466,7 +544,17 @@
                   "precio": 110
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 30,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media",
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "C": {
               "regimen": "NO_MYPE",
@@ -504,13 +592,9 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02C",
-                "COM-06C"
+                "COM-06C",
+                "INV-02B"
               ],
               "compras": {
                 "INS-03": 300,
@@ -528,7 +612,17 @@
                   "precio": 260
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 90,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media",
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "D": {
               "regimen": "MYPE",
@@ -566,13 +660,8 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02A",
-                "COM-06B"
+                "INV-02B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -590,7 +679,17 @@
                   "precio": 45
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 180,
+              "mantenimientoPreventivo": true,
+              "analistaCompras": true,
+              "garantiaProveedor": 80,
+              "tiendasPorDistrito": {
+                "los_olivos": 1,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media"
             }
           }
         },
@@ -632,10 +731,7 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-10A",
-                "INS-11B",
-                "FIN-02A",
-                "INS-09A"
+                "COM-06B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -653,7 +749,17 @@
                   "precio": 40
                 }
               ],
-              "publicidad": 0
+              "publicidad": 0,
+              "garantiaDias": 30,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": null,
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "C": {
               "regimen": "NO_MYPE",
@@ -691,13 +797,9 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02C",
-                "COM-06C"
+                "COM-06C",
+                "INV-02B"
               ],
               "compras": {
                 "INS-03": 300,
@@ -715,7 +817,17 @@
                   "precio": 260
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 90,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media",
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "D": {
               "regimen": "MYPE",
@@ -753,13 +865,8 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02A",
-                "COM-06B"
+                "INV-02B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -777,7 +884,17 @@
                   "precio": 45
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 180,
+              "mantenimientoPreventivo": true,
+              "analistaCompras": true,
+              "garantiaProveedor": 80,
+              "tiendasPorDistrito": {
+                "los_olivos": 1,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media"
             }
           }
         },
@@ -819,10 +936,7 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-10A",
-                "INS-11B",
-                "FIN-02A",
-                "INS-09A"
+                "COM-06B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -840,7 +954,17 @@
                   "precio": 40
                 }
               ],
-              "publicidad": 0
+              "publicidad": 0,
+              "garantiaDias": 30,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": null,
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "B": {
               "regimen": "MYPE",
@@ -878,13 +1002,9 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02B",
-                "INS-12B"
+                "COM-06B",
+                "INV-02B"
               ],
               "compras": {
                 "INS-02": 300,
@@ -902,7 +1022,17 @@
                   "precio": 110
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 30,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media",
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "C": {
               "regimen": "NO_MYPE",
@@ -940,13 +1070,9 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02C",
-                "COM-06C"
+                "COM-06C",
+                "INV-02B"
               ],
               "compras": {
                 "INS-03": 300,
@@ -964,7 +1090,17 @@
                   "precio": 260
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 90,
+              "mantenimientoPreventivo": false,
+              "tiendasPorDistrito": {
+                "los_olivos": 0,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media",
+              "analistaCompras": false,
+              "garantiaProveedor": 0
             },
             "D": {
               "regimen": "MYPE",
@@ -1002,13 +1138,8 @@
                 "RH-10A",
                 "COM-01C",
                 "FIN-01B",
-                "INS-09B",
-                "INS-10A",
-                "INS-11B",
                 "INV-01B",
-                "INV-02B",
-                "FIN-02A",
-                "COM-06B"
+                "INV-02B"
               ],
               "compras": {
                 "INS-01": 300,
@@ -1026,7 +1157,17 @@
                   "precio": 45
                 }
               ],
-              "publicidad": 0
+              "publicidad": 6000,
+              "garantiaDias": 180,
+              "mantenimientoPreventivo": true,
+              "analistaCompras": true,
+              "garantiaProveedor": 80,
+              "tiendasPorDistrito": {
+                "los_olivos": 1,
+                "miraflores": 0,
+                "sjl": 0
+              },
+              "marketingNivel": "media"
             }
           }
         }

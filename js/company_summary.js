@@ -189,7 +189,7 @@ function productionSummaryHtml(review){
     <p class="cs-production-method">Modelo de producción: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
   </section>`;
   if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
   }
 }
 function sectionSummaryHtml(section,{history=false,compact=false}={}){
@@ -215,7 +215,7 @@ function renderCompanySummary(){
     const result=excelSavedResult(),f=financialReport();
     let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>Caja disponible: <b>${reviewMoney(f.balanceCaja.cajaFinal)}</b></p><p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa y confirma tu plan en Producción.'}</p></section>`;
     if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
-    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
+    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
     mount.innerHTML=html;return;
   }
   const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
@@ -239,7 +239,7 @@ function renderCompanySummary(){
   </section>`;
   mount.querySelectorAll('[data-summary-filter]').forEach(b=>b.addEventListener('click',()=>{companySummaryFilter=b.dataset.summaryFilter;renderCompanySummary();}));
   if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa(decisionState.__excel.decisiones,window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
   }
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
     mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
@@ -286,4 +286,5 @@ window.addEventListener('storage',event=>{
     closeCompanyReview();loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory();
   }
 });
+
 

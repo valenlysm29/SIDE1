@@ -59,3 +59,6 @@ Inicio HEAD/originmain459c062 (pushanteriorrealizado), stash/cambiosajenosconser
 
 ## Continuación 3 — hitos A0/A6
 Auditoría25entradasbase y18grupospreviosentregada; usuarioresolviótodoscasosconsultados: garantías/mantenimiento/tiendasbase, proveedoresinternos,marketingúnico1500/6000/12000,analista5000 ygarproveedor0/80/100. A6terminófiltroCFG16motor/10selectores+6camposlegacy; catálogo68intacto. Depreciación/política/proveedores/créditoeditablenuevosfueraUI; FIN02/INS12noefectodefault. 37dirigidasPASS. OráculosExcelregenerándose coninputs finales; A9freshrevisasóloesta continuación. A8mide20runsalternadosconexclusiónChrome. SQLsincambios.
+
+## Continuación 3 — hito A9/oráculo
+A9freshrevisósolodiffcontinuación: encontróproyeccionesresumensin ciclo paraanalista; rootpasócicloactualen3llamadas ytestVMmotoreal ciclo2PASS; A9verificó0hallazgosabiertos. ExcelCOMregenerófinales468/0,585/0,1140/0,banca252/0,mezcla252/0; libroconsolidado3104/3104,0diff,0pendientes. Esperadosgeneradossólodesdeentradasfinales/config/fórmulasliteral+reglaslegacyautorizadas. FullrunúnicopendienteA8mediciones20runs; sinSQLchanges.
