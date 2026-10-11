@@ -7,11 +7,11 @@ const python=process.env.PYTHON_BIN||'C:/Users/Asus/.cache/codex-runtimes/codex-
 function html(name){return execFileSync(python,['-c',`import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('${name}'))`],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}}).replace('const cfg = window.SIDE_CONFIG || {};','window.SIDE_CONFIG={};const cfg = window.SIDE_CONFIG || {};').replace('const cfg=window.SIDE_CONFIG||{};','window.SIDE_CONFIG={};const cfg=window.SIDE_CONFIG||{};');}
 async function comprobarBaseEnBrowser(p){
   await p.addScriptTag({content:fs.readFileSync(path.join(root,'js/engine/inventario.js'),'utf8')});
-  const valores=await p.evaluate(({base,costos,fixtures,celdas})=>{
+  const valores=await p.evaluate(({base,costos,carga,fixtures,celdas})=>{
     const modules={'../js/engine/produccion.js':SIDE_EXCEL_PRODUCCION,'../js/engine/puntajes.js':SIDE_EXCEL_PUNTAJES,'../js/engine/mercado.js':SIDE_EXCEL_MERCADO,'../js/engine/inventario.js':SIDE_EXCEL_INVENTARIO,'../js/engine/costos.js':SIDE_EXCEL_COSTOS,'../js/engine/config_excel.js':SIDE_EXCEL_CONFIG,'../docs/logica_excel/fixtures_excel.json':fixtures,'../docs/logica_excel/celdas_excel.json':celdas,'node:fs':{},'node:path':{},'node:assert/strict':{equal(a,b,msg){if(!Object.is(a,b))throw new Error(msg||'assert.equal');},ok(value,msg){if(!value)throw new Error(msg||'assert.ok');}}};
     const req=k=>{if(!(k in modules))throw new Error('Módulo de prueba no disponible: '+k);return modules[k];};
-    const mb={exports:{}},mc={exports:{}};new Function('require','module','__dirname',base)(req,mb,'tests');new Function('require','module','__dirname',costos)(req,mc,'tests');return {...mb.exports.valoresBase(),...mc.exports.calcularValoresCostos()};
-  },{base:fs.readFileSync(path.join(__dirname,'paridad_base.cjs'),'utf8'),costos:fs.readFileSync(path.join(__dirname,'paridad_costos.cjs'),'utf8'),fixtures:require('../docs/logica_excel/fixtures_excel.json'),celdas:require('../docs/logica_excel/celdas_excel.json')});
+    const ml={exports:{}};new Function('require','module',carga)(req,ml);modules['./fixtures_excel.cjs']=ml.exports;const mb={exports:{}},mc={exports:{}};new Function('require','module','__dirname',base)(req,mb,'tests');new Function('require','module','__dirname',costos)(req,mc,'tests');return {...mb.exports.valoresBase(),...mc.exports.calcularValoresCostos()};
+  },{carga:fs.readFileSync(path.join(__dirname,'fixtures_excel.cjs'),'utf8'),base:fs.readFileSync(path.join(__dirname,'paridad_base.cjs'),'utf8'),costos:fs.readFileSync(path.join(__dirname,'paridad_costos.cjs'),'utf8'),fixtures:require('../docs/logica_excel/fixtures_excel.json'),celdas:require('../docs/logica_excel/celdas_excel.json')});
   const filas=require('./paridad_base.cjs').comparar(require('./oracle/esperado_base.json').valores,valores);fs.writeFileSync(path.join(out,'sim-1-componentes-paridad.json'),JSON.stringify({total:filas.length,diferencias:filas.filter(f=>!f.ok)},null,2));assert.equal(filas.filter(f=>!f.ok).length,0);
 }
 async function ejecutar(numero=3){
@@ -35,11 +35,11 @@ async function ejecutar(numero=3){
       for(const [k,v] of Object.entries(d.maquinaria||{}))dispatch(`[data-activo="${k}"]`,v);
       for(const [k,v] of Object.entries(d.comprasUnidades||{}))dispatch(`[data-compra="${k}"]`,v);
       for(const [k,v] of Object.entries(d.compras||{}))dispatch(`[data-compra="${k}"]`,v/SIDE_EXCEL_CONFIG.CONFIG.CONVERSION_COMPRA[k]);
-      for(const code of d.seleccion||[]){const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(option)dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
+      for(const code of d.seleccion||[]){const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
       d.lotes.forEach((l,i)=>{for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])dispatch(`[data-lote="${i}"][data-campo="${campo}"]`,l[campo]??'');});
     },d);
     await p.locator('[data-excel-enviar]').click();assert.match(await p.locator('[data-excel-status]').innerText(),/confirmado/);
-    const report=await p.evaluate(()=>syncStudentReportPreview());return report;
+    const report=await p.evaluate(()=>syncStudentReportPreview());const enviadas=report.excelDecisionState?.decisiones;assert.ok(enviadas,'Reporte conserva plan confirmado');assert.equal(enviadas.montoPrestamo,d.montoPrestamo||0,'Préstamo UI igual al escenario');if(d.reputacionLiteral!==undefined)assert.equal(enviadas.reputacionLiteral,d.reputacionLiteral,'Reputación literal igual al escenario');assert.equal(enviadas.lotes.length,d.lotes.length,'Lotes completos');return report;
   }
   try{
     for(const id of escenario.empresas){console.log('Registro',id);const p=await nueva(studentHTML);pages[id]=p;await sync(p,1);await p.evaluate(()=>showModal('studentModal'));await p.locator('#gameCode').fill(game);await p.locator('#companyLegalName').fill('Empresa '+id);await p.locator('#companyBrandName').fill(id);await p.locator('#studentForm button[type=submit]').click();await p.waitForFunction(id=>currentStudent.company===id&&studentConnected,id);const r=await p.evaluate(()=>syncStudentReportPreview());ids[id]=r.id;reports.push(r);}

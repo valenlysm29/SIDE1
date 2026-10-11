@@ -14,3 +14,6 @@ A7 oráculos/fixtures; A6 integración y caja; A8 navegador después de A7; agen
 
 ## Hito A7 / SIM1 inicial
 SIM1 Node: 320 salidas del cierre multilote contra Excel COM, 0 diferencias. SIM1 navegador inicial: flujo normal4empresas, 3segmentos/3lotes, cierre docente1ciclo, 320 salidas0diferencias y351 verificaciones de componentes0diferencias. El doble assert ahora implementa equal con Object.is y ok fatal; no sustituye temporizador: se invoca tickStudentGame real. Falta repetir tras integración A6 y ampliación banca. Log reports/sim/sim_excel_1.log.
+
+## Hito A7 banca y carga común
+Oráculos ampliados: SIM1 336, SIM2 306, SIM3 612 salidas0diferencias Node (importe préstamo, TEA, deuda y penalización pendiente incluidas). Loader tests/fixtures_excel.cjs común lee entradas literales/celdas, no caches esperadas; base, costos y SIM1 lo usan. Todas las opciones del driver deben existir o falla, y confirma préstamo/reputación/lotes del reporte contra la entrada. SIM2 UI3ciclos0diferencias306; SIM3 UI3ciclos0diferencias612 en ejecución inicial. A6 está implementando remoto, caja y SQL idempotente. Pendiente repetición final tras sus cambios.

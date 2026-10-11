@@ -2,11 +2,11 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const COS=require('../js/engine/costos.js'),PRO=require('../js/engine/produccion.js'),{CONFIG}=require('../js/engine/config_excel.js');
 // Solo se leen entradas literales del original, nunca valores esperados/caché.
-const celdas=Object.fromEntries(require('../docs/logica_excel/celdas_excel.json')['Costos De Producción'].map(c=>[c.celda,c.contenido]));
-function literal(celda){const valor=celdas[celda];if(valor===undefined||valor===null)return 0;assert.equal(typeof valor,'number',`${celda} debe ser entrada literal`);return valor;}
+const entradasExcel=require('./fixtures_excel.cjs'),celdas=entradasExcel.contenidos['Costos De Producción'];
+const literal=celda=>entradasExcel.literal('Costos De Producción',celda);
 function calcularValoresCostos(){
   const salida={},put=(celda,valor)=>{salida['costos.'+celda]=valor;};
-  const personal={corte:[5,6,7].map(fila=>[literal('F'+fila),0,0]),ensamble:[11,12,13].map(fila=>['F','G','H'].map(col=>literal(col+fila))),acabado:[17,18,19].map(fila=>['F','G','H'].map(col=>literal(col+fila)))};
+  const personal=entradasExcel.entradaPersonal('Costos De Producción');
   const capacidad=PRO.calcularCapacidad({personal,jefes:literal('F21')},{DIAS_CICLO:30,PRODUCTIVIDAD:{corte:[6,8,12],ensamble:[6,8,12],acabado:[6,8,12]}});
   for(const [celda,valor] of Object.entries({I8:capacidad.capacidadPorArea.corte,I14:capacidad.capacidadPorArea.ensamble,I20:capacidad.capacidadPorArea.acabado,K5:capacidad.capacidadDiaria,L5:capacidad.capacidadCiclo,M5:capacidad.factorEficienciaProduccion,N5:capacidad.produccionCapacidad,L9:capacidad.totalTrabajadores,L10:capacidad.trabajadoresN3,M10:capacidad.proporcionN3}))put(celda,valor);
   // D46:E48 son ejemplos escritos a mano en Excel; son entradas del modelo de costos.
