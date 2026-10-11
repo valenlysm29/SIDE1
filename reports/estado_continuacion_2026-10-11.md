@@ -53,3 +53,6 @@ Corrida única terminó20:36:52UTC: Node361/362 (NPCprevio), sieteBDPASS, SQLExc
 
 ## Publicación autorizada posteriormente
 Tras recibir el informe de fallos pendientes, el usuario pidió explícitamente push a main. Se publica la serie de esta tarea hasta d596779 junto con esta anotación, sin resolver ni ocultar los dos fallos de carga3D documentados. Fetch confirmó main local sin commits remotos pendientes y todos los commits exclusivos corresponden a la integración Excel. Los cambios sin commit ajenos permanecen locales. No se ejecuta SQL en producción.
+
+## Continuación 3 — inicio y decisiones congeladas
+Inicio HEAD/originmain459c062 (pushanteriorrealizado), stash/cambiosajenosconservados. A0audita menúbase9fbe6ec vsactual; A8congelaHEAD ybaseline, mide20corridas secuenciales3D; A6implementalistasblancas. Skillsxlsx/webapp-testing/frontend-designleídas. Usuarioresolviódudas: conservargarantía30/90/180,mantenimientoopcionalS/200,tiendasdistritos; proveedorescantidad/pago/plazointernossinselector/efectoautomático. Depreciación/políticainventariosno nuevasdecisiones; créditoantesinformativo nodecisión. Oráculose regenerará trascontratofinal; verificacióncompletaunasolavez alfinal. NoChromeparaleloa mediciónA8.
