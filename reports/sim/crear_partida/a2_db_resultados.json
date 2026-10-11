@@ -1,0 +1,42 @@
+[
+  {
+    "excel": false,
+    "mode": "manual",
+    "id": "fd02601f-1159-4e34-8313-f98721e635db",
+    "codigo": "SIDE-XX3",
+    "rows": 1,
+    "estado": "esperando",
+    "phase": "integration",
+    "waitMs": 120000
+  },
+  {
+    "excel": false,
+    "mode": "automatic",
+    "id": "8790f515-c82f-44a1-9e09-ef03cc4bae3a",
+    "codigo": "SIDE-YG5",
+    "rows": 1,
+    "estado": "esperando",
+    "phase": "integration",
+    "waitMs": 120000
+  },
+  {
+    "excel": true,
+    "mode": "manual",
+    "id": "00159439-b53d-4963-ad9f-e40e82f96cfa",
+    "codigo": "SIDE-RZ2",
+    "rows": 1,
+    "estado": "esperando",
+    "phase": "integration",
+    "waitMs": 120000
+  },
+  {
+    "excel": true,
+    "mode": "automatic",
+    "id": "50d78453-1d44-4a5b-a47c-bec06c587781",
+    "codigo": "SIDE-TV4",
+    "rows": 1,
+    "estado": "esperando",
+    "phase": "integration",
+    "waitMs": 120000
+  }
+]

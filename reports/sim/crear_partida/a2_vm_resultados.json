@@ -1,0 +1,78 @@
+[
+  {
+    "revision": "9fbe6ec",
+    "scenario": "cached-active-without-row",
+    "created": 0,
+    "toast": [
+      "Sala de espera configurada. El Ciclo 1 inicia al terminar el tiempo."
+    ]
+  },
+  {
+    "revision": "9fbe6ec",
+    "scenario": "fresh-local",
+    "created": 1,
+    "toast": [
+      "Sala de espera configurada. El Ciclo 1 inicia al terminar el tiempo."
+    ]
+  },
+  {
+    "revision": "9fbe6ec",
+    "scenario": "create-excel-present",
+    "success": true,
+    "calls": [
+      "side_admission_features",
+      "side_game_features",
+      "controlar_partida",
+      "controlar_partida"
+    ]
+  },
+  {
+    "revision": "9fbe6ec",
+    "scenario": "create-excel-absent",
+    "success": true,
+    "calls": [
+      "side_admission_features",
+      "side_game_features",
+      "controlar_partida",
+      "controlar_partida"
+    ]
+  },
+  {
+    "revision": "HEAD",
+    "scenario": "cached-active-without-row",
+    "created": 0,
+    "toast": [
+      "Sala de espera configurada. El Ciclo 1 inicia al terminar el tiempo."
+    ]
+  },
+  {
+    "revision": "HEAD",
+    "scenario": "fresh-local",
+    "created": 1,
+    "toast": [
+      "Sala de espera configurada. El Ciclo 1 inicia al terminar el tiempo."
+    ]
+  },
+  {
+    "revision": "HEAD",
+    "scenario": "create-excel-present",
+    "success": true,
+    "calls": [
+      "side_admission_features",
+      "side_game_features",
+      "controlar_partida",
+      "controlar_partida"
+    ]
+  },
+  {
+    "revision": "HEAD",
+    "scenario": "create-excel-absent",
+    "success": true,
+    "calls": [
+      "side_admission_features",
+      "side_game_features",
+      "controlar_partida",
+      "controlar_partida"
+    ]
+  }
+]
