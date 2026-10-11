@@ -48,3 +48,30 @@ node tests/oracle/banca_recuperacion.cjs
 ```
 
 La construcción inicial de ORACULO_banca.xlsx usa `construir_pipeline.construir` con escenario/config de entradas_banca_recuperacion.json. Esperados actuales: SIM1 336, SIM2 306, SIM3 612 y banca153, todos con cero diferencias. El libro de comparación consolidado tiene1814 resultados.
+
+
+Finanzas se generan mediante fórmulas independientes (capital inicial explícito1000000 en los escenarios):
+
+```powershell
+node tests/oracle/exportar_entradas.cjs
+node tests/oracle/banca_recuperacion.cjs --exportar
+python tests/oracle/construir_pipeline.py
+python tests/oracle/construir_sim2.py sim1
+python tests/oracle/construir_sim2.py sim2
+python tests/oracle/construir_pipeline.py banca
+python tests/oracle/construir_pipeline.py bancamezcla
+python tests/oracle/extender_finanzas.py
+python tests/oracle/run_oracle.py sim1_pipeline
+python tests/oracle/run_oracle.py sim2_pipeline
+python tests/oracle/run_oracle.py sim3_pipeline
+python tests/oracle/run_oracle.py banca_pipeline
+python tests/oracle/run_oracle.py bancamezcla_pipeline
+node tests/oracle/comparar_pipeline.cjs sim1
+node tests/oracle/comparar_pipeline.cjs sim2
+node tests/oracle/comparar_pipeline.cjs sim3
+node tests/oracle/banca_recuperacion.cjs
+node tests/oracle/banca_recuperacion.cjs --mezcla
+python tests/oracle/crear_libro_paridad.py
+```
+
+Cobertura final:351base+468SIM1+504SIM2+1008SIM3+252bancarecuperación+252bancamezcla+56consecuencias=2891comparaciones sin diferencias. Cada empresa-ciclo agrega33campos financial: estadoResultados, balanceCaja, flujoCaja, balanceGeneral y financiamiento. Los intereses de deuda antigua conservan su tasa y se mezclan por saldo con nuevos préstamos; penalización afecta solo el préstamo siguiente. El generador no importa caja.js; el comparador de obtenidos sí llama adjuntarCaja, como hace UI.

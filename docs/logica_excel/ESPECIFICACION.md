@@ -274,3 +274,12 @@ Banca se comprueba también en SIM-2 (306 comparaciones) y SIM-3 (612 comparacio
 La hoja SIDE vs Excel reúne 1814 comparaciones y cero diferencias:351base+336SIM1+306SIM2+612SIM3+153banca+56consecuencias. Los escenarios y sus parámetros se exportan antes del cálculo; las columnas esperadas vienen exclusivamente del recálculo Excel COM.
 
 `tests/fixtures_excel.cjs` centraliza entradas de producción, personal, precios y reputaciones de mercados dorados, lotes y selección. Rechaza fórmulas como entradas literales. Las pruebas de base/costos y la UI pueden usar el mismo cargador sin consultar resultados esperados.
+
+
+## Oráculo financiero independiente
+
+La ampliación `tests/oracle/extender_finanzas.py` añade33campos por empresa-ciclo, con fórmulas Excel de cajaInicial/cajaFinal, compras de activos, stock MP valorizado, depreciación acumulada, activosCosto/activosFijos, préstamo/deuda e intereses. EstadoResultados, balanceCaja, flujoCaja, balanceGeneral y financiamiento coinciden íntegramente. Capital inicial1000000 es una entrada explícita del contexto de las simulaciones, no un valor proveniente del Excel fuente.
+
+`PRESTAMO_COBRAR_INTERES_CICLO=true` es PENDIENTE_DEFINIR: Excel no trae calendario de préstamo. La fórmula de interés usa tasa mensual equivalente `(1+TEA/100)^(1/12)-1`, conserva tasa vigente de deuda previa y usa tasa penalizada exclusivamente para el préstamo nuevo. BANCAmezcla confirma saldos5000anterioresTEA20+5000nuevosTEA23 sin retasar la deuda anterior. Después del préstamo se conserva la tasa mensual ponderada por deuda para el ciclo siguiente.
+
+Resultados completos actuales:SIM1 468/0, SIM2 504/0, SIM3 1008/0, recuperación bancaria252/0 y tasas conservadas252/0. Libro consolidado2891comparaciones, cero diferencias y cero pendientes. Los generadores solo leen parámetros y decisiones; resultados financieros esperados provienen del recálculo COM, jamás de caja.js.

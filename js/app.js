@@ -830,9 +830,12 @@ async function mountExcelProductionEditor(){
   const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
   const local=!currentStudent.empresaId;let remoteReady=local;
   if(!local){container.textContent='Comprobando el modelo por lotes…';const status=await window.SIDE?.PartidaService?.excelDisponible?.();remoteReady=!!status?.available;if(!container.isConnected)return;}
-  window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,
-    historial:decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),getState:()=>decisionState.__excel,importar:importExcelPersonnel,
-    save:value=>{if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateCashHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+  const legacyMoved=!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
+  const transition=decisionState.__excel?.transicion||captureExcelTransition();
+  const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
+  window.SIDE_EXCEL_UI?.mountEditor(container,{round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
+    historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,
+    save:value=>{if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateCashHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
 }
 function captureExcelTransition(){
   const maquinariaActivos={};let activosCosto=0;

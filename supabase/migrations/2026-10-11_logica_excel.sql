@@ -8,6 +8,8 @@ create table if not exists public.side_excel_cierres (
 );
 alter table public.side_excel_cierres enable row level security;
 revoke all on public.side_excel_cierres from public,anon,authenticated;
+create or replace function public.side_excel_features() returns jsonb language sql stable as $$select jsonb_build_object('cierreVersion',1)$$;
+grant execute on function public.side_excel_features() to anon,authenticated;
 
 create or replace function public.side_contexto_cierre_excel(p_partida_id uuid,p_ciclo integer)
 returns jsonb language plpgsql security definer set search_path=public as $$

@@ -33,7 +33,7 @@ def construir(escenario,config):
     def form(key,r,expr):setv(key,r,'='+expr)
     def look(code,which):return f'IFERROR(INDEX(\'{catalog.title}\'!${which}$2:${which}$69,MATCH({code},\'{catalog.title}\'!$A$2:$A$69,0)),0)'
     def quoted(value):return '"'+str(value).replace('"','""')+'"'
-    previous={};decisions_last={};eliminated=set();rows=[];outputs={};replicas=[]
+    previous={};decisions_last={};activos_conservados={};eliminated=set();rows=[];outputs={};replicas=[]
     codes=list(cfg['PRECIO_MP']);families=cfg['INSUMOS_POR_FAMILIA']
     cost_sheet=book.sheetnames[6]
     for cycle,phase in enumerate(escenario['ciclos'],1):
@@ -125,7 +125,11 @@ def construir(escenario,config):
             maintenance=[];depreciation=[]
             method=next((c for c in selection if c.startswith('FIN-02')),'FIN-02A')
             rates=cfg['TASAS_ACTIVOS']['NO_MYPE' if decisions.get('regimen')=='NO_MYPE' else 'MYPE']
+            activos_actuales=dict(activos_conservados.get(id,{}))
             for code,count in decisions.get('maquinaria',{}).items():
+                activos_actuales[code]=max(activos_actuales.get(code,0),count)
+            activos_conservados[id]=activos_actuales
+            for code,count in activos_actuales.items():
                 eq=cfg['MAQUINARIA'][code];base=eq['costo']*(1-rates['residual']);life=eq['vida']
                 maintenance.append(f'{count}*{eq["costo"]}*{rates["mantenimiento"]}/{cfg["MESES_ANIO"]}*{cfg["CICLO_EQUIVALE_A_MESES"]}')
                 if method=='FIN-02B':dep=f'{base}*{R("producido")}/{cfg["UNIDADES_VIDA"]}'
@@ -188,8 +192,9 @@ def construir(escenario,config):
 
 if __name__=='__main__':
     import sys
-    if len(sys.argv)>1 and sys.argv[1]=='banca':
-        data=json.loads((DIR/'entradas_banca_recuperacion.json').read_text(encoding='utf-8-sig'))
+    if len(sys.argv)>1 and sys.argv[1] in ['banca','bancamezcla']:
+        input_path='entradas_banca_recuperacion.json' if sys.argv[1]=='banca' else 'entradas_banca_mezcla.json'
+        data=json.loads((DIR/input_path).read_text(encoding='utf-8-sig'))
         name,plan=construir(data['escenario'],data['config'])
         print(name,len(plan['salidas']))
         raise SystemExit(0)

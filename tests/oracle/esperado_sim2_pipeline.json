@@ -312,7 +312,205 @@
                     "ciclo.3.B.financiamiento.montoPrestamo":  0,
                     "ciclo.3.B.financiamiento.tasaTEA":  23,
                     "ciclo.3.B.financiamiento.deudaPrincipal":  10000,
-                    "ciclo.3.B.financiamiento.tasaAdicionalProximoPrestamo":  3
+                    "ciclo.3.B.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.1.A.financial.estadoResultados.ingresos":  3500,
+                    "ciclo.1.A.financial.estadoResultados.ventasNetas":  3500,
+                    "ciclo.1.A.financial.estadoResultados.costos":  43685.042291803278,
+                    "ciclo.1.A.financial.estadoResultados.utilidad":  -40185.042291803278,
+                    "ciclo.1.A.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.1.A.financial.estadoResultados.intereses":  0,
+                    "ciclo.1.A.financial.estadoResultados.costosProduccion":  43685.042291803278,
+                    "ciclo.1.A.financial.balanceCaja.cajaInicial":  1000000,
+                    "ciclo.1.A.financial.balanceCaja.entradas":  3500,
+                    "ciclo.1.A.financial.balanceCaja.salidas":  171929.36049180329,
+                    "ciclo.1.A.financial.balanceCaja.cajaFinal":  831570.63950819673,
+                    "ciclo.1.A.financial.flujoCaja.cajaInicial":  1000000,
+                    "ciclo.1.A.financial.flujoCaja.cobrosVentas":  3500,
+                    "ciclo.1.A.financial.flujoCaja.pagosOperacion":  164066.36049180329,
+                    "ciclo.1.A.financial.flujoCaja.compraActivos":  7863,
+                    "ciclo.1.A.financial.flujoCaja.financiamiento":  0,
+                    "ciclo.1.A.financial.flujoCaja.operacion":  -160566.36049180329,
+                    "ciclo.1.A.financial.flujoCaja.inversion":  -7863,
+                    "ciclo.1.A.financial.flujoCaja.flujoNeto":  -168429.36049180327,
+                    "ciclo.1.A.financial.flujoCaja.cajaFinal":  831570.63950819673,
+                    "ciclo.1.A.financial.balanceGeneral.efectivo":  831570.63950819673,
+                    "ciclo.1.A.financial.balanceGeneral.activosFijos":  7435.875,
+                    "ciclo.1.A.financial.balanceGeneral.inventarioMP":  120445.4432,
+                    "ciclo.1.A.financial.balanceGeneral.activos":  959451.95770819671,
+                    "ciclo.1.A.financial.balanceGeneral.deuda":  0,
+                    "ciclo.1.A.financial.balanceGeneral.patrimonio":  959451.95770819671,
+                    "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio":  959451.95770819671,
+                    "ciclo.1.A.financial.financiamiento.montoPrestamo":  0,
+                    "ciclo.1.A.financial.financiamiento.tasaTEA":  20,
+                    "ciclo.1.A.financial.financiamiento.deudaPrincipal":  0,
+                    "ciclo.1.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.1.A.financial.financiamiento.tasaMensual":  0,
+                    "ciclo.1.A.financial.financiamiento.intereses":  0,
+                    "ciclo.1.B.financial.estadoResultados.ingresos":  162.5,
+                    "ciclo.1.B.financial.estadoResultados.ventasNetas":  162.5,
+                    "ciclo.1.B.financial.estadoResultados.costos":  13054.222352498655,
+                    "ciclo.1.B.financial.estadoResultados.utilidad":  -12891.722352498655,
+                    "ciclo.1.B.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.1.B.financial.estadoResultados.intereses":  76.547352498655968,
+                    "ciclo.1.B.financial.estadoResultados.costosProduccion":  12977.675,
+                    "ciclo.1.B.financial.balanceCaja.cajaInicial":  1000000,
+                    "ciclo.1.B.financial.balanceCaja.entradas":  5162.5,
+                    "ciclo.1.B.financial.balanceCaja.salidas":  40959.697352498661,
+                    "ciclo.1.B.financial.balanceCaja.cajaFinal":  964202.80264750135,
+                    "ciclo.1.B.financial.flujoCaja.cajaInicial":  1000000,
+                    "ciclo.1.B.financial.flujoCaja.cobrosVentas":  162.5,
+                    "ciclo.1.B.financial.flujoCaja.pagosOperacion":  33096.697352498661,
+                    "ciclo.1.B.financial.flujoCaja.compraActivos":  7863,
+                    "ciclo.1.B.financial.flujoCaja.financiamiento":  5000,
+                    "ciclo.1.B.financial.flujoCaja.operacion":  -32934.197352498661,
+                    "ciclo.1.B.financial.flujoCaja.inversion":  -7863,
+                    "ciclo.1.B.financial.flujoCaja.flujoNeto":  -35797.197352498653,
+                    "ciclo.1.B.financial.flujoCaja.cajaFinal":  964202.80264750135,
+                    "ciclo.1.B.financial.balanceGeneral.efectivo":  964202.80264750135,
+                    "ciclo.1.B.financial.balanceGeneral.activosFijos":  7435.875,
+                    "ciclo.1.B.financial.balanceGeneral.inventarioMP":  20106.600000000002,
+                    "ciclo.1.B.financial.balanceGeneral.activos":  991745.27764750132,
+                    "ciclo.1.B.financial.balanceGeneral.deuda":  5000,
+                    "ciclo.1.B.financial.balanceGeneral.patrimonio":  986745.27764750132,
+                    "ciclo.1.B.financial.balanceGeneral.pasivoPatrimonio":  991745.27764750132,
+                    "ciclo.1.B.financial.financiamiento.montoPrestamo":  5000,
+                    "ciclo.1.B.financial.financiamiento.tasaTEA":  20,
+                    "ciclo.1.B.financial.financiamiento.deudaPrincipal":  5000,
+                    "ciclo.1.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.1.B.financial.financiamiento.tasaMensual":  0.015309470499731194,
+                    "ciclo.1.B.financial.financiamiento.intereses":  76.547352498655968,
+                    "ciclo.2.A.financial.estadoResultados.ingresos":  3500,
+                    "ciclo.2.A.financial.estadoResultados.ventasNetas":  3500,
+                    "ciclo.2.A.financial.estadoResultados.costos":  43909.042291803278,
+                    "ciclo.2.A.financial.estadoResultados.utilidad":  -40409.042291803278,
+                    "ciclo.2.A.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.2.A.financial.estadoResultados.intereses":  0,
+                    "ciclo.2.A.financial.estadoResultados.costosProduccion":  43909.042291803278,
+                    "ciclo.2.A.financial.balanceCaja.cajaInicial":  831570.63950819673,
+                    "ciclo.2.A.financial.balanceCaja.entradas":  3500,
+                    "ciclo.2.A.financial.balanceCaja.salidas":  164290.36049180329,
+                    "ciclo.2.A.financial.balanceCaja.cajaFinal":  670780.27901639347,
+                    "ciclo.2.A.financial.flujoCaja.cajaInicial":  831570.63950819673,
+                    "ciclo.2.A.financial.flujoCaja.cobrosVentas":  3500,
+                    "ciclo.2.A.financial.flujoCaja.pagosOperacion":  164290.36049180329,
+                    "ciclo.2.A.financial.flujoCaja.compraActivos":  0,
+                    "ciclo.2.A.financial.flujoCaja.financiamiento":  0,
+                    "ciclo.2.A.financial.flujoCaja.operacion":  -160790.36049180329,
+                    "ciclo.2.A.financial.flujoCaja.inversion":  0,
+                    "ciclo.2.A.financial.flujoCaja.flujoNeto":  -160790.36049180327,
+                    "ciclo.2.A.financial.flujoCaja.cajaFinal":  670780.27901639347,
+                    "ciclo.2.A.financial.balanceGeneral.efectivo":  670780.27901639347,
+                    "ciclo.2.A.financial.balanceGeneral.activosFijos":  7371.75,
+                    "ciclo.2.A.financial.balanceGeneral.inventarioMP":  240890.8864,
+                    "ciclo.2.A.financial.balanceGeneral.activos":  919042.91541639343,
+                    "ciclo.2.A.financial.balanceGeneral.deuda":  0,
+                    "ciclo.2.A.financial.balanceGeneral.patrimonio":  919042.91541639343,
+                    "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio":  919042.91541639343,
+                    "ciclo.2.A.financial.financiamiento.montoPrestamo":  0,
+                    "ciclo.2.A.financial.financiamiento.tasaTEA":  23,
+                    "ciclo.2.A.financial.financiamiento.deudaPrincipal":  0,
+                    "ciclo.2.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.2.A.financial.financiamiento.tasaMensual":  0,
+                    "ciclo.2.A.financial.financiamiento.intereses":  0,
+                    "ciclo.2.B.financial.estadoResultados.ingresos":  0,
+                    "ciclo.2.B.financial.estadoResultados.ventasNetas":  0,
+                    "ciclo.2.B.financial.estadoResultados.costos":  13281.226561359563,
+                    "ciclo.2.B.financial.estadoResultados.utilidad":  -13281.226561359563,
+                    "ciclo.2.B.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.2.B.financial.estadoResultados.intereses":  163.55156135956395,
+                    "ciclo.2.B.financial.estadoResultados.costosProduccion":  13117.675,
+                    "ciclo.2.B.financial.balanceCaja.cajaInicial":  964202.80264750135,
+                    "ciclo.2.B.financial.balanceCaja.entradas":  5000,
+                    "ciclo.2.B.financial.balanceCaja.salidas":  33323.701561359565,
+                    "ciclo.2.B.financial.balanceCaja.cajaFinal":  935879.10108614177,
+                    "ciclo.2.B.financial.flujoCaja.cajaInicial":  964202.80264750135,
+                    "ciclo.2.B.financial.flujoCaja.cobrosVentas":  0,
+                    "ciclo.2.B.financial.flujoCaja.pagosOperacion":  33323.701561359565,
+                    "ciclo.2.B.financial.flujoCaja.compraActivos":  0,
+                    "ciclo.2.B.financial.flujoCaja.financiamiento":  5000,
+                    "ciclo.2.B.financial.flujoCaja.operacion":  -33323.701561359565,
+                    "ciclo.2.B.financial.flujoCaja.inversion":  0,
+                    "ciclo.2.B.financial.flujoCaja.flujoNeto":  -28323.701561359572,
+                    "ciclo.2.B.financial.flujoCaja.cajaFinal":  935879.10108614177,
+                    "ciclo.2.B.financial.balanceGeneral.efectivo":  935879.10108614177,
+                    "ciclo.2.B.financial.balanceGeneral.activosFijos":  7371.75,
+                    "ciclo.2.B.financial.balanceGeneral.inventarioMP":  40213.200000000004,
+                    "ciclo.2.B.financial.balanceGeneral.activos":  983464.05108614173,
+                    "ciclo.2.B.financial.balanceGeneral.deuda":  10000,
+                    "ciclo.2.B.financial.balanceGeneral.patrimonio":  973464.05108614173,
+                    "ciclo.2.B.financial.balanceGeneral.pasivoPatrimonio":  983464.05108614173,
+                    "ciclo.2.B.financial.financiamiento.montoPrestamo":  5000,
+                    "ciclo.2.B.financial.financiamiento.tasaTEA":  23,
+                    "ciclo.2.B.financial.financiamiento.deudaPrincipal":  10000,
+                    "ciclo.2.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.2.B.financial.financiamiento.tasaMensual":  0.016355156135956395,
+                    "ciclo.2.B.financial.financiamiento.intereses":  163.55156135956395,
+                    "ciclo.3.A.financial.estadoResultados.ingresos":  2800,
+                    "ciclo.3.A.financial.estadoResultados.ventasNetas":  2800,
+                    "ciclo.3.A.financial.estadoResultados.costos":  44137.042291803278,
+                    "ciclo.3.A.financial.estadoResultados.utilidad":  -41337.042291803278,
+                    "ciclo.3.A.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.3.A.financial.estadoResultados.intereses":  0,
+                    "ciclo.3.A.financial.estadoResultados.costosProduccion":  44137.042291803278,
+                    "ciclo.3.A.financial.balanceCaja.cajaInicial":  670780.27901639347,
+                    "ciclo.3.A.financial.balanceCaja.entradas":  2800,
+                    "ciclo.3.A.financial.balanceCaja.salidas":  164518.36049180329,
+                    "ciclo.3.A.financial.balanceCaja.cajaFinal":  509061.9185245902,
+                    "ciclo.3.A.financial.flujoCaja.cajaInicial":  670780.27901639347,
+                    "ciclo.3.A.financial.flujoCaja.cobrosVentas":  2800,
+                    "ciclo.3.A.financial.flujoCaja.pagosOperacion":  164518.36049180329,
+                    "ciclo.3.A.financial.flujoCaja.compraActivos":  0,
+                    "ciclo.3.A.financial.flujoCaja.financiamiento":  0,
+                    "ciclo.3.A.financial.flujoCaja.operacion":  -161718.36049180329,
+                    "ciclo.3.A.financial.flujoCaja.inversion":  0,
+                    "ciclo.3.A.financial.flujoCaja.flujoNeto":  -161718.36049180327,
+                    "ciclo.3.A.financial.flujoCaja.cajaFinal":  509061.9185245902,
+                    "ciclo.3.A.financial.balanceGeneral.efectivo":  509061.9185245902,
+                    "ciclo.3.A.financial.balanceGeneral.activosFijos":  7307.625,
+                    "ciclo.3.A.financial.balanceGeneral.inventarioMP":  361336.3296,
+                    "ciclo.3.A.financial.balanceGeneral.activos":  877705.87312459014,
+                    "ciclo.3.A.financial.balanceGeneral.deuda":  0,
+                    "ciclo.3.A.financial.balanceGeneral.patrimonio":  877705.87312459014,
+                    "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio":  877705.87312459014,
+                    "ciclo.3.A.financial.financiamiento.montoPrestamo":  0,
+                    "ciclo.3.A.financial.financiamiento.tasaTEA":  23,
+                    "ciclo.3.A.financial.financiamiento.deudaPrincipal":  0,
+                    "ciclo.3.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.3.A.financial.financiamiento.tasaMensual":  0,
+                    "ciclo.3.A.financial.financiamiento.intereses":  0,
+                    "ciclo.3.B.financial.estadoResultados.ingresos":  162.5,
+                    "ciclo.3.B.financial.estadoResultados.ventasNetas":  162.5,
+                    "ciclo.3.B.financial.estadoResultados.costos":  9819.6465613595628,
+                    "ciclo.3.B.financial.estadoResultados.utilidad":  -9657.1465613595628,
+                    "ciclo.3.B.financial.estadoResultados.depreciacion":  64.125,
+                    "ciclo.3.B.financial.estadoResultados.intereses":  163.55156135956395,
+                    "ciclo.3.B.financial.estadoResultados.costosProduccion":  9656.095,
+                    "ciclo.3.B.financial.balanceCaja.cajaInicial":  935879.10108614177,
+                    "ciclo.3.B.financial.balanceCaja.entradas":  162.5,
+                    "ciclo.3.B.financial.balanceCaja.salidas":  9755.5215613595628,
+                    "ciclo.3.B.financial.balanceCaja.cajaFinal":  926286.07952478225,
+                    "ciclo.3.B.financial.flujoCaja.cajaInicial":  935879.10108614177,
+                    "ciclo.3.B.financial.flujoCaja.cobrosVentas":  162.5,
+                    "ciclo.3.B.financial.flujoCaja.pagosOperacion":  9755.5215613595628,
+                    "ciclo.3.B.financial.flujoCaja.compraActivos":  0,
+                    "ciclo.3.B.financial.flujoCaja.financiamiento":  0,
+                    "ciclo.3.B.financial.flujoCaja.operacion":  -9593.0215613595628,
+                    "ciclo.3.B.financial.flujoCaja.inversion":  0,
+                    "ciclo.3.B.financial.flujoCaja.flujoNeto":  -9593.021561359521,
+                    "ciclo.3.B.financial.flujoCaja.cajaFinal":  926286.07952478225,
+                    "ciclo.3.B.financial.balanceGeneral.efectivo":  926286.07952478225,
+                    "ciclo.3.B.financial.balanceGeneral.activosFijos":  7307.625,
+                    "ciclo.3.B.financial.balanceGeneral.inventarioMP":  40213.200000000004,
+                    "ciclo.3.B.financial.balanceGeneral.activos":  973806.90452478221,
+                    "ciclo.3.B.financial.balanceGeneral.deuda":  10000,
+                    "ciclo.3.B.financial.balanceGeneral.patrimonio":  963806.90452478221,
+                    "ciclo.3.B.financial.balanceGeneral.pasivoPatrimonio":  973806.90452478221,
+                    "ciclo.3.B.financial.financiamiento.montoPrestamo":  0,
+                    "ciclo.3.B.financial.financiamiento.tasaTEA":  23,
+                    "ciclo.3.B.financial.financiamiento.deudaPrincipal":  10000,
+                    "ciclo.3.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  3,
+                    "ciclo.3.B.financial.financiamiento.tasaMensual":  0.016355156135956395,
+                    "ciclo.3.B.financial.financiamiento.intereses":  163.55156135956395
                 },
     "celdas":  {
                    "ciclo.1.A.calidad":  [
@@ -1538,6 +1736,798 @@
                    "ciclo.3.B.financiamiento.tasaAdicionalProximoPrestamo":  [
                                                                                  "Pipeline_sim2",
                                                                                  "AT7"
-                                                                             ]
+                                                                             ],
+                   "ciclo.1.A.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP2"
+                                                                     ],
+                   "ciclo.1.A.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ2"
+                                                                        ],
+                   "ciclo.1.A.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR2"
+                                                                   ],
+                   "ciclo.1.A.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS2"
+                                                                     ],
+                   "ciclo.1.A.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT2"
+                                                                         ],
+                   "ciclo.1.A.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU2"
+                                                                      ],
+                   "ciclo.1.A.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV2"
+                                                                             ],
+                   "ciclo.1.A.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW2"
+                                                                   ],
+                   "ciclo.1.A.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX2"
+                                                                ],
+                   "ciclo.1.A.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY2"
+                                                               ],
+                   "ciclo.1.A.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ2"
+                                                                 ],
+                   "ciclo.1.A.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA2"
+                                                                 ],
+                   "ciclo.1.A.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB2"
+                                                                  ],
+                   "ciclo.1.A.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC2"
+                                                                    ],
+                   "ciclo.1.A.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD2"
+                                                                   ],
+                   "ciclo.1.A.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE2"
+                                                                    ],
+                   "ciclo.1.A.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF2"
+                                                               ],
+                   "ciclo.1.A.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG2"
+                                                               ],
+                   "ciclo.1.A.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH2"
+                                                               ],
+                   "ciclo.1.A.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI2"
+                                                               ],
+                   "ciclo.1.A.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ2"
+                                                                   ],
+                   "ciclo.1.A.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK2"
+                                                                       ],
+                   "ciclo.1.A.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL2"
+                                                                       ],
+                   "ciclo.1.A.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM2"
+                                                                  ],
+                   "ciclo.1.A.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN2"
+                                                                ],
+                   "ciclo.1.A.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO2"
+                                                                     ],
+                   "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP2"
+                                                                           ],
+                   "ciclo.1.A.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ2"
+                                                                        ],
+                   "ciclo.1.A.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR2"
+                                                                  ],
+                   "ciclo.1.A.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS2"
+                                                                         ],
+                   "ciclo.1.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT2"
+                                                                                       ],
+                   "ciclo.1.A.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU2"
+                                                                      ],
+                   "ciclo.1.A.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV2"
+                                                                    ],
+                   "ciclo.1.B.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP3"
+                                                                     ],
+                   "ciclo.1.B.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ3"
+                                                                        ],
+                   "ciclo.1.B.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR3"
+                                                                   ],
+                   "ciclo.1.B.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS3"
+                                                                     ],
+                   "ciclo.1.B.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT3"
+                                                                         ],
+                   "ciclo.1.B.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU3"
+                                                                      ],
+                   "ciclo.1.B.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV3"
+                                                                             ],
+                   "ciclo.1.B.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW3"
+                                                                   ],
+                   "ciclo.1.B.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX3"
+                                                                ],
+                   "ciclo.1.B.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY3"
+                                                               ],
+                   "ciclo.1.B.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ3"
+                                                                 ],
+                   "ciclo.1.B.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA3"
+                                                                 ],
+                   "ciclo.1.B.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB3"
+                                                                  ],
+                   "ciclo.1.B.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC3"
+                                                                    ],
+                   "ciclo.1.B.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD3"
+                                                                   ],
+                   "ciclo.1.B.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE3"
+                                                                    ],
+                   "ciclo.1.B.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF3"
+                                                               ],
+                   "ciclo.1.B.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG3"
+                                                               ],
+                   "ciclo.1.B.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH3"
+                                                               ],
+                   "ciclo.1.B.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI3"
+                                                               ],
+                   "ciclo.1.B.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ3"
+                                                                   ],
+                   "ciclo.1.B.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK3"
+                                                                       ],
+                   "ciclo.1.B.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL3"
+                                                                       ],
+                   "ciclo.1.B.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM3"
+                                                                  ],
+                   "ciclo.1.B.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN3"
+                                                                ],
+                   "ciclo.1.B.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO3"
+                                                                     ],
+                   "ciclo.1.B.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP3"
+                                                                           ],
+                   "ciclo.1.B.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ3"
+                                                                        ],
+                   "ciclo.1.B.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR3"
+                                                                  ],
+                   "ciclo.1.B.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS3"
+                                                                         ],
+                   "ciclo.1.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT3"
+                                                                                       ],
+                   "ciclo.1.B.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU3"
+                                                                      ],
+                   "ciclo.1.B.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV3"
+                                                                    ],
+                   "ciclo.2.A.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP4"
+                                                                     ],
+                   "ciclo.2.A.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ4"
+                                                                        ],
+                   "ciclo.2.A.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR4"
+                                                                   ],
+                   "ciclo.2.A.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS4"
+                                                                     ],
+                   "ciclo.2.A.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT4"
+                                                                         ],
+                   "ciclo.2.A.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU4"
+                                                                      ],
+                   "ciclo.2.A.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV4"
+                                                                             ],
+                   "ciclo.2.A.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW4"
+                                                                   ],
+                   "ciclo.2.A.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX4"
+                                                                ],
+                   "ciclo.2.A.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY4"
+                                                               ],
+                   "ciclo.2.A.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ4"
+                                                                 ],
+                   "ciclo.2.A.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA4"
+                                                                 ],
+                   "ciclo.2.A.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB4"
+                                                                  ],
+                   "ciclo.2.A.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC4"
+                                                                    ],
+                   "ciclo.2.A.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD4"
+                                                                   ],
+                   "ciclo.2.A.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE4"
+                                                                    ],
+                   "ciclo.2.A.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF4"
+                                                               ],
+                   "ciclo.2.A.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG4"
+                                                               ],
+                   "ciclo.2.A.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH4"
+                                                               ],
+                   "ciclo.2.A.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI4"
+                                                               ],
+                   "ciclo.2.A.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ4"
+                                                                   ],
+                   "ciclo.2.A.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK4"
+                                                                       ],
+                   "ciclo.2.A.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL4"
+                                                                       ],
+                   "ciclo.2.A.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM4"
+                                                                  ],
+                   "ciclo.2.A.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN4"
+                                                                ],
+                   "ciclo.2.A.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO4"
+                                                                     ],
+                   "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP4"
+                                                                           ],
+                   "ciclo.2.A.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ4"
+                                                                        ],
+                   "ciclo.2.A.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR4"
+                                                                  ],
+                   "ciclo.2.A.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS4"
+                                                                         ],
+                   "ciclo.2.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT4"
+                                                                                       ],
+                   "ciclo.2.A.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU4"
+                                                                      ],
+                   "ciclo.2.A.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV4"
+                                                                    ],
+                   "ciclo.2.B.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP5"
+                                                                     ],
+                   "ciclo.2.B.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ5"
+                                                                        ],
+                   "ciclo.2.B.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR5"
+                                                                   ],
+                   "ciclo.2.B.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS5"
+                                                                     ],
+                   "ciclo.2.B.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT5"
+                                                                         ],
+                   "ciclo.2.B.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU5"
+                                                                      ],
+                   "ciclo.2.B.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV5"
+                                                                             ],
+                   "ciclo.2.B.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW5"
+                                                                   ],
+                   "ciclo.2.B.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX5"
+                                                                ],
+                   "ciclo.2.B.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY5"
+                                                               ],
+                   "ciclo.2.B.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ5"
+                                                                 ],
+                   "ciclo.2.B.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA5"
+                                                                 ],
+                   "ciclo.2.B.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB5"
+                                                                  ],
+                   "ciclo.2.B.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC5"
+                                                                    ],
+                   "ciclo.2.B.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD5"
+                                                                   ],
+                   "ciclo.2.B.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE5"
+                                                                    ],
+                   "ciclo.2.B.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF5"
+                                                               ],
+                   "ciclo.2.B.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG5"
+                                                               ],
+                   "ciclo.2.B.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH5"
+                                                               ],
+                   "ciclo.2.B.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI5"
+                                                               ],
+                   "ciclo.2.B.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ5"
+                                                                   ],
+                   "ciclo.2.B.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK5"
+                                                                       ],
+                   "ciclo.2.B.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL5"
+                                                                       ],
+                   "ciclo.2.B.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM5"
+                                                                  ],
+                   "ciclo.2.B.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN5"
+                                                                ],
+                   "ciclo.2.B.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO5"
+                                                                     ],
+                   "ciclo.2.B.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP5"
+                                                                           ],
+                   "ciclo.2.B.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ5"
+                                                                        ],
+                   "ciclo.2.B.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR5"
+                                                                  ],
+                   "ciclo.2.B.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS5"
+                                                                         ],
+                   "ciclo.2.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT5"
+                                                                                       ],
+                   "ciclo.2.B.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU5"
+                                                                      ],
+                   "ciclo.2.B.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV5"
+                                                                    ],
+                   "ciclo.3.A.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP6"
+                                                                     ],
+                   "ciclo.3.A.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ6"
+                                                                        ],
+                   "ciclo.3.A.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR6"
+                                                                   ],
+                   "ciclo.3.A.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS6"
+                                                                     ],
+                   "ciclo.3.A.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT6"
+                                                                         ],
+                   "ciclo.3.A.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU6"
+                                                                      ],
+                   "ciclo.3.A.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV6"
+                                                                             ],
+                   "ciclo.3.A.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW6"
+                                                                   ],
+                   "ciclo.3.A.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX6"
+                                                                ],
+                   "ciclo.3.A.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY6"
+                                                               ],
+                   "ciclo.3.A.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ6"
+                                                                 ],
+                   "ciclo.3.A.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA6"
+                                                                 ],
+                   "ciclo.3.A.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB6"
+                                                                  ],
+                   "ciclo.3.A.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC6"
+                                                                    ],
+                   "ciclo.3.A.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD6"
+                                                                   ],
+                   "ciclo.3.A.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE6"
+                                                                    ],
+                   "ciclo.3.A.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF6"
+                                                               ],
+                   "ciclo.3.A.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG6"
+                                                               ],
+                   "ciclo.3.A.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH6"
+                                                               ],
+                   "ciclo.3.A.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI6"
+                                                               ],
+                   "ciclo.3.A.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ6"
+                                                                   ],
+                   "ciclo.3.A.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK6"
+                                                                       ],
+                   "ciclo.3.A.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL6"
+                                                                       ],
+                   "ciclo.3.A.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM6"
+                                                                  ],
+                   "ciclo.3.A.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN6"
+                                                                ],
+                   "ciclo.3.A.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO6"
+                                                                     ],
+                   "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP6"
+                                                                           ],
+                   "ciclo.3.A.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ6"
+                                                                        ],
+                   "ciclo.3.A.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR6"
+                                                                  ],
+                   "ciclo.3.A.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS6"
+                                                                         ],
+                   "ciclo.3.A.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT6"
+                                                                                       ],
+                   "ciclo.3.A.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU6"
+                                                                      ],
+                   "ciclo.3.A.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV6"
+                                                                    ],
+                   "ciclo.3.B.financial.estadoResultados.ingresos":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FP7"
+                                                                     ],
+                   "ciclo.3.B.financial.estadoResultados.ventasNetas":  [
+                                                                            "Pipeline_sim2",
+                                                                            "FQ7"
+                                                                        ],
+                   "ciclo.3.B.financial.estadoResultados.costos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FR7"
+                                                                   ],
+                   "ciclo.3.B.financial.estadoResultados.utilidad":  [
+                                                                         "Pipeline_sim2",
+                                                                         "FS7"
+                                                                     ],
+                   "ciclo.3.B.financial.estadoResultados.depreciacion":  [
+                                                                             "Pipeline_sim2",
+                                                                             "FT7"
+                                                                         ],
+                   "ciclo.3.B.financial.estadoResultados.intereses":  [
+                                                                          "Pipeline_sim2",
+                                                                          "FU7"
+                                                                      ],
+                   "ciclo.3.B.financial.estadoResultados.costosProduccion":  [
+                                                                                 "Pipeline_sim2",
+                                                                                 "FV7"
+                                                                             ],
+                   "ciclo.3.B.financial.balanceCaja.cajaInicial":  [
+                                                                       "Pipeline_sim2",
+                                                                       "FW7"
+                                                                   ],
+                   "ciclo.3.B.financial.balanceCaja.entradas":  [
+                                                                    "Pipeline_sim2",
+                                                                    "FX7"
+                                                                ],
+                   "ciclo.3.B.financial.balanceCaja.salidas":  [
+                                                                   "Pipeline_sim2",
+                                                                   "FY7"
+                                                               ],
+                   "ciclo.3.B.financial.balanceCaja.cajaFinal":  [
+                                                                     "Pipeline_sim2",
+                                                                     "FZ7"
+                                                                 ],
+                   "ciclo.3.B.financial.flujoCaja.cajaInicial":  [
+                                                                     "Pipeline_sim2",
+                                                                     "GA7"
+                                                                 ],
+                   "ciclo.3.B.financial.flujoCaja.cobrosVentas":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GB7"
+                                                                  ],
+                   "ciclo.3.B.financial.flujoCaja.pagosOperacion":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GC7"
+                                                                    ],
+                   "ciclo.3.B.financial.flujoCaja.compraActivos":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GD7"
+                                                                   ],
+                   "ciclo.3.B.financial.flujoCaja.financiamiento":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GE7"
+                                                                    ],
+                   "ciclo.3.B.financial.flujoCaja.operacion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GF7"
+                                                               ],
+                   "ciclo.3.B.financial.flujoCaja.inversion":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GG7"
+                                                               ],
+                   "ciclo.3.B.financial.flujoCaja.flujoNeto":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GH7"
+                                                               ],
+                   "ciclo.3.B.financial.flujoCaja.cajaFinal":  [
+                                                                   "Pipeline_sim2",
+                                                                   "GI7"
+                                                               ],
+                   "ciclo.3.B.financial.balanceGeneral.efectivo":  [
+                                                                       "Pipeline_sim2",
+                                                                       "GJ7"
+                                                                   ],
+                   "ciclo.3.B.financial.balanceGeneral.activosFijos":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GK7"
+                                                                       ],
+                   "ciclo.3.B.financial.balanceGeneral.inventarioMP":  [
+                                                                           "Pipeline_sim2",
+                                                                           "GL7"
+                                                                       ],
+                   "ciclo.3.B.financial.balanceGeneral.activos":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GM7"
+                                                                  ],
+                   "ciclo.3.B.financial.balanceGeneral.deuda":  [
+                                                                    "Pipeline_sim2",
+                                                                    "GN7"
+                                                                ],
+                   "ciclo.3.B.financial.balanceGeneral.patrimonio":  [
+                                                                         "Pipeline_sim2",
+                                                                         "GO7"
+                                                                     ],
+                   "ciclo.3.B.financial.balanceGeneral.pasivoPatrimonio":  [
+                                                                               "Pipeline_sim2",
+                                                                               "GP7"
+                                                                           ],
+                   "ciclo.3.B.financial.financiamiento.montoPrestamo":  [
+                                                                            "Pipeline_sim2",
+                                                                            "GQ7"
+                                                                        ],
+                   "ciclo.3.B.financial.financiamiento.tasaTEA":  [
+                                                                      "Pipeline_sim2",
+                                                                      "GR7"
+                                                                  ],
+                   "ciclo.3.B.financial.financiamiento.deudaPrincipal":  [
+                                                                             "Pipeline_sim2",
+                                                                             "GS7"
+                                                                         ],
+                   "ciclo.3.B.financial.financiamiento.tasaAdicionalProximoPrestamo":  [
+                                                                                           "Pipeline_sim2",
+                                                                                           "GT7"
+                                                                                       ],
+                   "ciclo.3.B.financial.financiamiento.tasaMensual":  [
+                                                                          "Pipeline_sim2",
+                                                                          "GU7"
+                                                                      ],
+                   "ciclo.3.B.financial.financiamiento.intereses":  [
+                                                                        "Pipeline_sim2",
+                                                                        "GV7"
+                                                                    ]
                }
 }

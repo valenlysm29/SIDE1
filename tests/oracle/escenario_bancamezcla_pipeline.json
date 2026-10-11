@@ -1,0 +1,1015 @@
+{
+  "nombre": "bancamezcla_pipeline",
+  "modelo": "ORACULO_bancamezcla.xlsx",
+  "entradas": {},
+  "salidas": {
+    "ciclo.1.A.calidad": [
+      "Pipeline_bancamezcla",
+      "AI2"
+    ],
+    "ciclo.1.A.puntajeEficiencia": [
+      "Pipeline_bancamezcla",
+      "AF2"
+    ],
+    "ciclo.1.A.reputacionMatriz": [
+      "Pipeline_bancamezcla",
+      "AL2"
+    ],
+    "ciclo.1.A.saludFinanciera": [
+      "Pipeline_bancamezcla",
+      "AH2"
+    ],
+    "ciclo.1.A.capacidadDiaria": [
+      "Pipeline_bancamezcla",
+      "CC2"
+    ],
+    "ciclo.1.A.capacidadCiclo": [
+      "Pipeline_bancamezcla",
+      "CD2"
+    ],
+    "ciclo.1.A.factorEficiencia": [
+      "Pipeline_bancamezcla",
+      "CB2"
+    ],
+    "ciclo.1.A.produccionCapacidad": [
+      "Pipeline_bancamezcla",
+      "CE2"
+    ],
+    "ciclo.1.A.producido": [
+      "Pipeline_bancamezcla",
+      "CZ2"
+    ],
+    "ciclo.1.A.consumoCuero": [
+      "Pipeline_bancamezcla",
+      "DA2"
+    ],
+    "ciclo.1.A.consumoAccesorios": [
+      "Pipeline_bancamezcla",
+      "DH2"
+    ],
+    "ciclo.1.A.consumoHilo": [
+      "Pipeline_bancamezcla",
+      "DM2"
+    ],
+    "ciclo.1.A.costoMO": [
+      "Pipeline_bancamezcla",
+      "DT2"
+    ],
+    "ciclo.1.A.costoMP": [
+      "Pipeline_bancamezcla",
+      "DU2"
+    ],
+    "ciclo.1.A.mantenimiento": [
+      "Pipeline_bancamezcla",
+      "DV2"
+    ],
+    "ciclo.1.A.depreciacion": [
+      "Pipeline_bancamezcla",
+      "DW2"
+    ],
+    "ciclo.1.A.reputacionOperativa": [
+      "Pipeline_bancamezcla",
+      "DX2"
+    ],
+    "ciclo.1.A.reputacionMercado": [
+      "Pipeline_bancamezcla",
+      "DY2"
+    ],
+    "ciclo.1.A.asignado": [
+      "Pipeline_bancamezcla",
+      "EH2"
+    ],
+    "ciclo.1.A.demandaAjustada": [
+      "Pipeline_bancamezcla",
+      "EI2"
+    ],
+    "ciclo.1.A.vendido": [
+      "Pipeline_bancamezcla",
+      "EJ2"
+    ],
+    "ciclo.1.A.ingresos": [
+      "Pipeline_bancamezcla",
+      "EK2"
+    ],
+    "ciclo.1.A.inventarioProducto": [
+      "Pipeline_bancamezcla",
+      "EC2"
+    ],
+    "ciclo.1.A.almacenaje": [
+      "Pipeline_bancamezcla",
+      "EL2"
+    ],
+    "ciclo.1.A.horasExtra": [
+      "Pipeline_bancamezcla",
+      "EM2"
+    ],
+    "ciclo.1.A.costoGarantia": [
+      "Pipeline_bancamezcla",
+      "EN2"
+    ],
+    "ciclo.1.A.costoRecurrente": [
+      "Pipeline_bancamezcla",
+      "EO2"
+    ],
+    "ciclo.1.A.costosTotales": [
+      "Pipeline_bancamezcla",
+      "EQ2"
+    ],
+    "ciclo.1.A.utilidad": [
+      "Pipeline_bancamezcla",
+      "ER2"
+    ],
+    "ciclo.1.A.ciclosReputacionBaja": [
+      "Pipeline_bancamezcla",
+      "AM2"
+    ],
+    "ciclo.1.A.tasaAdicionalPP": [
+      "Pipeline_bancamezcla",
+      "AO2"
+    ],
+    "ciclo.1.A.stockMP_INS-01": [
+      "Pipeline_bancamezcla",
+      "DC2"
+    ],
+    "ciclo.1.A.stockMP_INS-02": [
+      "Pipeline_bancamezcla",
+      "DE2"
+    ],
+    "ciclo.1.A.stockMP_INS-03": [
+      "Pipeline_bancamezcla",
+      "DG2"
+    ],
+    "ciclo.1.A.stockMP_INS-04": [
+      "Pipeline_bancamezcla",
+      "DJ2"
+    ],
+    "ciclo.1.A.stockMP_INS-05": [
+      "Pipeline_bancamezcla",
+      "DL2"
+    ],
+    "ciclo.1.A.stockMP_INS-06": [
+      "Pipeline_bancamezcla",
+      "DO2"
+    ],
+    "ciclo.1.A.stockMP_INS-07": [
+      "Pipeline_bancamezcla",
+      "DQ2"
+    ],
+    "ciclo.1.A.stockMP_INS-08": [
+      "Pipeline_bancamezcla",
+      "DS2"
+    ],
+    "ciclo.1.A.CONS-01": [
+      "Pipeline_bancamezcla",
+      "ES2"
+    ],
+    "ciclo.1.A.CONS-02": [
+      "Pipeline_bancamezcla",
+      "ET2"
+    ],
+    "ciclo.1.A.CONS-03": [
+      "Pipeline_bancamezcla",
+      "EU2"
+    ],
+    "ciclo.1.A.CONS-04": [
+      "Pipeline_bancamezcla",
+      "EV2"
+    ],
+    "ciclo.1.A.CONS-05": [
+      "Pipeline_bancamezcla",
+      "EW2"
+    ],
+    "ciclo.1.A.CONS-06": [
+      "Pipeline_bancamezcla",
+      "EX2"
+    ],
+    "ciclo.1.A.CONS-07": [
+      "Pipeline_bancamezcla",
+      "EY2"
+    ],
+    "ciclo.1.A.CONS-08": [
+      "Pipeline_bancamezcla",
+      "EZ2"
+    ],
+    "ciclo.1.A.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AP2"
+    ],
+    "ciclo.1.A.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "AR2"
+    ],
+    "ciclo.1.A.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "AS2"
+    ],
+    "ciclo.1.A.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AT2"
+    ],
+    "ciclo.2.A.calidad": [
+      "Pipeline_bancamezcla",
+      "AI3"
+    ],
+    "ciclo.2.A.puntajeEficiencia": [
+      "Pipeline_bancamezcla",
+      "AF3"
+    ],
+    "ciclo.2.A.reputacionMatriz": [
+      "Pipeline_bancamezcla",
+      "AL3"
+    ],
+    "ciclo.2.A.saludFinanciera": [
+      "Pipeline_bancamezcla",
+      "AH3"
+    ],
+    "ciclo.2.A.capacidadDiaria": [
+      "Pipeline_bancamezcla",
+      "CC3"
+    ],
+    "ciclo.2.A.capacidadCiclo": [
+      "Pipeline_bancamezcla",
+      "CD3"
+    ],
+    "ciclo.2.A.factorEficiencia": [
+      "Pipeline_bancamezcla",
+      "CB3"
+    ],
+    "ciclo.2.A.produccionCapacidad": [
+      "Pipeline_bancamezcla",
+      "CE3"
+    ],
+    "ciclo.2.A.producido": [
+      "Pipeline_bancamezcla",
+      "CZ3"
+    ],
+    "ciclo.2.A.consumoCuero": [
+      "Pipeline_bancamezcla",
+      "DA3"
+    ],
+    "ciclo.2.A.consumoAccesorios": [
+      "Pipeline_bancamezcla",
+      "DH3"
+    ],
+    "ciclo.2.A.consumoHilo": [
+      "Pipeline_bancamezcla",
+      "DM3"
+    ],
+    "ciclo.2.A.costoMO": [
+      "Pipeline_bancamezcla",
+      "DT3"
+    ],
+    "ciclo.2.A.costoMP": [
+      "Pipeline_bancamezcla",
+      "DU3"
+    ],
+    "ciclo.2.A.mantenimiento": [
+      "Pipeline_bancamezcla",
+      "DV3"
+    ],
+    "ciclo.2.A.depreciacion": [
+      "Pipeline_bancamezcla",
+      "DW3"
+    ],
+    "ciclo.2.A.reputacionOperativa": [
+      "Pipeline_bancamezcla",
+      "DX3"
+    ],
+    "ciclo.2.A.reputacionMercado": [
+      "Pipeline_bancamezcla",
+      "DY3"
+    ],
+    "ciclo.2.A.asignado": [
+      "Pipeline_bancamezcla",
+      "EH3"
+    ],
+    "ciclo.2.A.demandaAjustada": [
+      "Pipeline_bancamezcla",
+      "EI3"
+    ],
+    "ciclo.2.A.vendido": [
+      "Pipeline_bancamezcla",
+      "EJ3"
+    ],
+    "ciclo.2.A.ingresos": [
+      "Pipeline_bancamezcla",
+      "EK3"
+    ],
+    "ciclo.2.A.inventarioProducto": [
+      "Pipeline_bancamezcla",
+      "EC3"
+    ],
+    "ciclo.2.A.almacenaje": [
+      "Pipeline_bancamezcla",
+      "EL3"
+    ],
+    "ciclo.2.A.horasExtra": [
+      "Pipeline_bancamezcla",
+      "EM3"
+    ],
+    "ciclo.2.A.costoGarantia": [
+      "Pipeline_bancamezcla",
+      "EN3"
+    ],
+    "ciclo.2.A.costoRecurrente": [
+      "Pipeline_bancamezcla",
+      "EO3"
+    ],
+    "ciclo.2.A.costosTotales": [
+      "Pipeline_bancamezcla",
+      "EQ3"
+    ],
+    "ciclo.2.A.utilidad": [
+      "Pipeline_bancamezcla",
+      "ER3"
+    ],
+    "ciclo.2.A.ciclosReputacionBaja": [
+      "Pipeline_bancamezcla",
+      "AM3"
+    ],
+    "ciclo.2.A.tasaAdicionalPP": [
+      "Pipeline_bancamezcla",
+      "AO3"
+    ],
+    "ciclo.2.A.stockMP_INS-01": [
+      "Pipeline_bancamezcla",
+      "DC3"
+    ],
+    "ciclo.2.A.stockMP_INS-02": [
+      "Pipeline_bancamezcla",
+      "DE3"
+    ],
+    "ciclo.2.A.stockMP_INS-03": [
+      "Pipeline_bancamezcla",
+      "DG3"
+    ],
+    "ciclo.2.A.stockMP_INS-04": [
+      "Pipeline_bancamezcla",
+      "DJ3"
+    ],
+    "ciclo.2.A.stockMP_INS-05": [
+      "Pipeline_bancamezcla",
+      "DL3"
+    ],
+    "ciclo.2.A.stockMP_INS-06": [
+      "Pipeline_bancamezcla",
+      "DO3"
+    ],
+    "ciclo.2.A.stockMP_INS-07": [
+      "Pipeline_bancamezcla",
+      "DQ3"
+    ],
+    "ciclo.2.A.stockMP_INS-08": [
+      "Pipeline_bancamezcla",
+      "DS3"
+    ],
+    "ciclo.2.A.CONS-01": [
+      "Pipeline_bancamezcla",
+      "ES3"
+    ],
+    "ciclo.2.A.CONS-02": [
+      "Pipeline_bancamezcla",
+      "ET3"
+    ],
+    "ciclo.2.A.CONS-03": [
+      "Pipeline_bancamezcla",
+      "EU3"
+    ],
+    "ciclo.2.A.CONS-04": [
+      "Pipeline_bancamezcla",
+      "EV3"
+    ],
+    "ciclo.2.A.CONS-05": [
+      "Pipeline_bancamezcla",
+      "EW3"
+    ],
+    "ciclo.2.A.CONS-06": [
+      "Pipeline_bancamezcla",
+      "EX3"
+    ],
+    "ciclo.2.A.CONS-07": [
+      "Pipeline_bancamezcla",
+      "EY3"
+    ],
+    "ciclo.2.A.CONS-08": [
+      "Pipeline_bancamezcla",
+      "EZ3"
+    ],
+    "ciclo.2.A.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AP3"
+    ],
+    "ciclo.2.A.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "AR3"
+    ],
+    "ciclo.2.A.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "AS3"
+    ],
+    "ciclo.2.A.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AT3"
+    ],
+    "ciclo.3.A.calidad": [
+      "Pipeline_bancamezcla",
+      "AI4"
+    ],
+    "ciclo.3.A.puntajeEficiencia": [
+      "Pipeline_bancamezcla",
+      "AF4"
+    ],
+    "ciclo.3.A.reputacionMatriz": [
+      "Pipeline_bancamezcla",
+      "AL4"
+    ],
+    "ciclo.3.A.saludFinanciera": [
+      "Pipeline_bancamezcla",
+      "AH4"
+    ],
+    "ciclo.3.A.capacidadDiaria": [
+      "Pipeline_bancamezcla",
+      "CC4"
+    ],
+    "ciclo.3.A.capacidadCiclo": [
+      "Pipeline_bancamezcla",
+      "CD4"
+    ],
+    "ciclo.3.A.factorEficiencia": [
+      "Pipeline_bancamezcla",
+      "CB4"
+    ],
+    "ciclo.3.A.produccionCapacidad": [
+      "Pipeline_bancamezcla",
+      "CE4"
+    ],
+    "ciclo.3.A.producido": [
+      "Pipeline_bancamezcla",
+      "CZ4"
+    ],
+    "ciclo.3.A.consumoCuero": [
+      "Pipeline_bancamezcla",
+      "DA4"
+    ],
+    "ciclo.3.A.consumoAccesorios": [
+      "Pipeline_bancamezcla",
+      "DH4"
+    ],
+    "ciclo.3.A.consumoHilo": [
+      "Pipeline_bancamezcla",
+      "DM4"
+    ],
+    "ciclo.3.A.costoMO": [
+      "Pipeline_bancamezcla",
+      "DT4"
+    ],
+    "ciclo.3.A.costoMP": [
+      "Pipeline_bancamezcla",
+      "DU4"
+    ],
+    "ciclo.3.A.mantenimiento": [
+      "Pipeline_bancamezcla",
+      "DV4"
+    ],
+    "ciclo.3.A.depreciacion": [
+      "Pipeline_bancamezcla",
+      "DW4"
+    ],
+    "ciclo.3.A.reputacionOperativa": [
+      "Pipeline_bancamezcla",
+      "DX4"
+    ],
+    "ciclo.3.A.reputacionMercado": [
+      "Pipeline_bancamezcla",
+      "DY4"
+    ],
+    "ciclo.3.A.asignado": [
+      "Pipeline_bancamezcla",
+      "EH4"
+    ],
+    "ciclo.3.A.demandaAjustada": [
+      "Pipeline_bancamezcla",
+      "EI4"
+    ],
+    "ciclo.3.A.vendido": [
+      "Pipeline_bancamezcla",
+      "EJ4"
+    ],
+    "ciclo.3.A.ingresos": [
+      "Pipeline_bancamezcla",
+      "EK4"
+    ],
+    "ciclo.3.A.inventarioProducto": [
+      "Pipeline_bancamezcla",
+      "EC4"
+    ],
+    "ciclo.3.A.almacenaje": [
+      "Pipeline_bancamezcla",
+      "EL4"
+    ],
+    "ciclo.3.A.horasExtra": [
+      "Pipeline_bancamezcla",
+      "EM4"
+    ],
+    "ciclo.3.A.costoGarantia": [
+      "Pipeline_bancamezcla",
+      "EN4"
+    ],
+    "ciclo.3.A.costoRecurrente": [
+      "Pipeline_bancamezcla",
+      "EO4"
+    ],
+    "ciclo.3.A.costosTotales": [
+      "Pipeline_bancamezcla",
+      "EQ4"
+    ],
+    "ciclo.3.A.utilidad": [
+      "Pipeline_bancamezcla",
+      "ER4"
+    ],
+    "ciclo.3.A.ciclosReputacionBaja": [
+      "Pipeline_bancamezcla",
+      "AM4"
+    ],
+    "ciclo.3.A.tasaAdicionalPP": [
+      "Pipeline_bancamezcla",
+      "AO4"
+    ],
+    "ciclo.3.A.stockMP_INS-01": [
+      "Pipeline_bancamezcla",
+      "DC4"
+    ],
+    "ciclo.3.A.stockMP_INS-02": [
+      "Pipeline_bancamezcla",
+      "DE4"
+    ],
+    "ciclo.3.A.stockMP_INS-03": [
+      "Pipeline_bancamezcla",
+      "DG4"
+    ],
+    "ciclo.3.A.stockMP_INS-04": [
+      "Pipeline_bancamezcla",
+      "DJ4"
+    ],
+    "ciclo.3.A.stockMP_INS-05": [
+      "Pipeline_bancamezcla",
+      "DL4"
+    ],
+    "ciclo.3.A.stockMP_INS-06": [
+      "Pipeline_bancamezcla",
+      "DO4"
+    ],
+    "ciclo.3.A.stockMP_INS-07": [
+      "Pipeline_bancamezcla",
+      "DQ4"
+    ],
+    "ciclo.3.A.stockMP_INS-08": [
+      "Pipeline_bancamezcla",
+      "DS4"
+    ],
+    "ciclo.3.A.CONS-01": [
+      "Pipeline_bancamezcla",
+      "ES4"
+    ],
+    "ciclo.3.A.CONS-02": [
+      "Pipeline_bancamezcla",
+      "ET4"
+    ],
+    "ciclo.3.A.CONS-03": [
+      "Pipeline_bancamezcla",
+      "EU4"
+    ],
+    "ciclo.3.A.CONS-04": [
+      "Pipeline_bancamezcla",
+      "EV4"
+    ],
+    "ciclo.3.A.CONS-05": [
+      "Pipeline_bancamezcla",
+      "EW4"
+    ],
+    "ciclo.3.A.CONS-06": [
+      "Pipeline_bancamezcla",
+      "EX4"
+    ],
+    "ciclo.3.A.CONS-07": [
+      "Pipeline_bancamezcla",
+      "EY4"
+    ],
+    "ciclo.3.A.CONS-08": [
+      "Pipeline_bancamezcla",
+      "EZ4"
+    ],
+    "ciclo.3.A.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AP4"
+    ],
+    "ciclo.3.A.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "AR4"
+    ],
+    "ciclo.3.A.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "AS4"
+    ],
+    "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "AT4"
+    ],
+    "ciclo.1.A.financial.estadoResultados.ingresos": [
+      "Pipeline_bancamezcla",
+      "FP2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_bancamezcla",
+      "FQ2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.costos": [
+      "Pipeline_bancamezcla",
+      "FR2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.utilidad": [
+      "Pipeline_bancamezcla",
+      "FS2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_bancamezcla",
+      "FT2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.intereses": [
+      "Pipeline_bancamezcla",
+      "FU2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_bancamezcla",
+      "FV2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "FW2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.entradas": [
+      "Pipeline_bancamezcla",
+      "FX2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.salidas": [
+      "Pipeline_bancamezcla",
+      "FY2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "FZ2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "GA2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_bancamezcla",
+      "GB2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_bancamezcla",
+      "GC2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_bancamezcla",
+      "GD2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_bancamezcla",
+      "GE2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.operacion": [
+      "Pipeline_bancamezcla",
+      "GF2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.inversion": [
+      "Pipeline_bancamezcla",
+      "GG2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_bancamezcla",
+      "GH2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "GI2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_bancamezcla",
+      "GJ2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_bancamezcla",
+      "GK2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_bancamezcla",
+      "GL2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.activos": [
+      "Pipeline_bancamezcla",
+      "GM2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.deuda": [
+      "Pipeline_bancamezcla",
+      "GN2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_bancamezcla",
+      "GO2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_bancamezcla",
+      "GP2"
+    ],
+    "ciclo.1.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GQ2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "GR2"
+    ],
+    "ciclo.1.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "GS2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GT2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_bancamezcla",
+      "GU2"
+    ],
+    "ciclo.1.A.financial.financiamiento.intereses": [
+      "Pipeline_bancamezcla",
+      "GV2"
+    ],
+    "ciclo.2.A.financial.estadoResultados.ingresos": [
+      "Pipeline_bancamezcla",
+      "FP3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_bancamezcla",
+      "FQ3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.costos": [
+      "Pipeline_bancamezcla",
+      "FR3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.utilidad": [
+      "Pipeline_bancamezcla",
+      "FS3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_bancamezcla",
+      "FT3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.intereses": [
+      "Pipeline_bancamezcla",
+      "FU3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_bancamezcla",
+      "FV3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "FW3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.entradas": [
+      "Pipeline_bancamezcla",
+      "FX3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.salidas": [
+      "Pipeline_bancamezcla",
+      "FY3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "FZ3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "GA3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_bancamezcla",
+      "GB3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_bancamezcla",
+      "GC3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_bancamezcla",
+      "GD3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_bancamezcla",
+      "GE3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.operacion": [
+      "Pipeline_bancamezcla",
+      "GF3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.inversion": [
+      "Pipeline_bancamezcla",
+      "GG3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_bancamezcla",
+      "GH3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "GI3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_bancamezcla",
+      "GJ3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_bancamezcla",
+      "GK3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_bancamezcla",
+      "GL3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.activos": [
+      "Pipeline_bancamezcla",
+      "GM3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.deuda": [
+      "Pipeline_bancamezcla",
+      "GN3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_bancamezcla",
+      "GO3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_bancamezcla",
+      "GP3"
+    ],
+    "ciclo.2.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GQ3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "GR3"
+    ],
+    "ciclo.2.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "GS3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GT3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_bancamezcla",
+      "GU3"
+    ],
+    "ciclo.2.A.financial.financiamiento.intereses": [
+      "Pipeline_bancamezcla",
+      "GV3"
+    ],
+    "ciclo.3.A.financial.estadoResultados.ingresos": [
+      "Pipeline_bancamezcla",
+      "FP4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_bancamezcla",
+      "FQ4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.costos": [
+      "Pipeline_bancamezcla",
+      "FR4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.utilidad": [
+      "Pipeline_bancamezcla",
+      "FS4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_bancamezcla",
+      "FT4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.intereses": [
+      "Pipeline_bancamezcla",
+      "FU4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_bancamezcla",
+      "FV4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "FW4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.entradas": [
+      "Pipeline_bancamezcla",
+      "FX4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.salidas": [
+      "Pipeline_bancamezcla",
+      "FY4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "FZ4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_bancamezcla",
+      "GA4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_bancamezcla",
+      "GB4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_bancamezcla",
+      "GC4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_bancamezcla",
+      "GD4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_bancamezcla",
+      "GE4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.operacion": [
+      "Pipeline_bancamezcla",
+      "GF4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.inversion": [
+      "Pipeline_bancamezcla",
+      "GG4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_bancamezcla",
+      "GH4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_bancamezcla",
+      "GI4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_bancamezcla",
+      "GJ4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_bancamezcla",
+      "GK4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_bancamezcla",
+      "GL4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.activos": [
+      "Pipeline_bancamezcla",
+      "GM4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.deuda": [
+      "Pipeline_bancamezcla",
+      "GN4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_bancamezcla",
+      "GO4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_bancamezcla",
+      "GP4"
+    ],
+    "ciclo.3.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GQ4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_bancamezcla",
+      "GR4"
+    ],
+    "ciclo.3.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_bancamezcla",
+      "GS4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_bancamezcla",
+      "GT4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_bancamezcla",
+      "GU4"
+    ],
+    "ciclo.3.A.financial.financiamiento.intereses": [
+      "Pipeline_bancamezcla",
+      "GV4"
+    ]
+  }
+}

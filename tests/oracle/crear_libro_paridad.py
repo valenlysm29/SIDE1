@@ -13,7 +13,7 @@ def main():
     book=openpyxl.load_workbook(TEMP/'oraculo_base.xlsx')
     summary=book.create_sheet('SIDE vs Excel')
     summary.append(['Escenario','Celdas comparadas','OK','Diferencias','Pendientes','Origen esperado'])
-    cases=[('base','Base - 351'),('sim1_pipeline','SIM1 - Pipeline'),('sim2_pipeline','SIM2 - Pipeline'),('sim3_pipeline','SIM3 - Pipeline'),('banca_pipeline','Banca recuperacion'),('sim2','CONS baja'),('sim2_premium','CONS premium')]
+    cases=[('base','Base - 351'),('sim1_pipeline','SIM1 - Pipeline'),('sim2_pipeline','SIM2 - Pipeline'),('sim3_pipeline','SIM3 - Pipeline'),('banca_pipeline','Banca recuperacion'),('bancamezcla_pipeline','Banca tasas conservadas'),('sim2','CONS baja'),('sim2_premium','CONS premium')]
     for summary_row,(name,title) in enumerate(cases,2):
         ep=DIR/f'esperado_{name}.json'
         if not ep.exists():continue

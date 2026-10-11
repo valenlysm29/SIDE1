@@ -2,6 +2,7 @@
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../..');
 const {cerrarCiclo}=require(path.join(root,'js/engine/ciclo.js'));
+const {adjuntarCaja}=require(path.join(root,'js/engine/caja.js'));
 const escenarios=require(path.join(root,'tests/escenarios_excel.cjs'));
 function valoresDesdeResultados(resultados,mapCompanyIds={}){const values={};
 for(let i=0;i<resultados.length;i++){
@@ -12,6 +13,7 @@ for(let i=0;i<resultados.length;i++){
   for(const [code,stock] of Object.entries(p.inventarioFinal))row['stockMP_'+code]=stock;
   for(let n=1;n<=8;n++){const code='CONS-'+String(n).padStart(2,'0');row[code]=con.mensajes.some(m=>m.id===code);}
   for(const field of ['montoPrestamo','tasaTEA','deudaPrincipal','tasaAdicionalProximoPrestamo'])row['financiamiento.'+field]=r.financiamiento[field];
+  for(const [group,fields] of Object.entries(r.financial||{}))for(const [field,val] of Object.entries(fields))if(typeof val==='number')row[`financial.${group}.${field}`]=val;
   // El reparto conserva id pero su segmento pertenece al orden de MERCADOS.
   const segmentos=[...new Set(Object.keys(require(path.join(root,'js/engine/config_excel.js')).CONFIG.MERCADOS))];
   const presentes=segmentos.filter(seg=>r.lotes.some(l=>l.segmento===seg&&l.cantidad>0)||Object.values(r.inventarioProductos).some(l=>l.segmento===seg&&l.cantidad>0)||r.ventas.some(l=>l.segmento===seg));
@@ -29,7 +31,7 @@ const errors=[];for(const [key,excel] of Object.entries(expected.valores)){
 return errors;}
 function ejecutar(name='sim3'){
  const scenario=escenarios['crear'+name[0].toUpperCase()+name.slice(1)]();let history={};const resultados=[];
- for(let i=0;i<scenario.ciclos.length;i++){const out=cerrarCiclo({ciclo:i+1,empresas:scenario.empresas,decisionesPorEmpresa:scenario.ciclos[i].decisionesPorEmpresa,historialPorEmpresa:history},scenario.overrides);history=out.historialPorEmpresa;resultados.push(out);}
+ for(let i=0;i<scenario.ciclos.length;i++){const factory=cerrarCiclo({ciclo:i+1,empresas:scenario.empresas,decisionesPorEmpresa:scenario.ciclos[i].decisionesPorEmpresa,historialPorEmpresa:history},scenario.overrides);const out=adjuntarCaja(factory,{historialAnterior:history,capitalPorEmpresa:Object.fromEntries(scenario.empresas.map(id=>[typeof id==='string'?id:id.id,scenario.capitalInicial??1000000])),overrides:scenario.overrides});history=out.historialPorEmpresa;resultados.push(out);}
  const values=valoresDesdeResultados(resultados),expected=JSON.parse(fs.readFileSync(path.join(__dirname,`esperado_${name}_pipeline.json`),'utf8').replace(/^\uFEFF/,''));
  const errors=comparar(values,expected);
  fs.writeFileSync(path.join(__dirname,`obtenido_${name}_pipeline.json`),JSON.stringify({valores:values},null,2)+'\n');

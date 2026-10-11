@@ -33,3 +33,15 @@ test('Cierre local tardío conserva plan confirmado previo aunque editor ya avan
  const reports=[{id:'A',partida:'DEMO',capital:100000,excelDecisionState:{habilitado:true,round:2,enviado:true,decisiones:nuevo,planesPorCiclo:{1:original}}}];
  const r=api.cerrarLocal({game:'DEMO',ciclo:1,reports});assert.equal(r.resultadosPorEmpresa.A.produccion.totalPlaneado,100);assert.equal(r.eliminadas.length,0);
 });
+test('Editor conserva cantidades de tiendas y porcentaje crédito validado al confirmar',()=>{
+ const {api}=entorno(),d=decision(api);let saved;
+ const status={textContent:''},container={innerHTML:'',querySelectorAll:()=>[],querySelector:selector=>selector==='[data-excel-status]'?status:null};
+ api.mountEditor(container,{round:1,getState:()=>({habilitado:true,decisiones:d}),save:envelope=>{saved=envelope;}});
+ container.oninput({target:{dataset:{excelTienda:'alta'},value:'3',matches:()=>false}});
+ container.oninput({target:{dataset:{excelTienda:'media'},value:'2',matches:()=>false}});
+ container.oninput({target:{dataset:{},value:'120',matches:selector=>selector==='[data-excel-creditopct]'}});
+ const button={disabled:false,dataset:{},hasAttribute:attr=>attr==='data-excel-enviar'};
+ container.onclick({target:{closest:()=>button}});
+ assert.equal(saved.enviado,true);assert.deepEqual(JSON.parse(JSON.stringify(saved.decisiones.tiendasPorZona)),{alta:3,media:2,baja:0});assert.equal(saved.decisiones.porcentajeVentasCredito,100);
+ assert.equal(saved.planesPorCiclo[1].tiendasPorZona.alta,3);
+});

@@ -614,6 +614,402 @@
     "ciclo.3.A.financiamiento.tasaAdicionalProximoPrestamo": [
       "Pipeline_banca",
       "AT4"
+    ],
+    "ciclo.1.A.financial.estadoResultados.ingresos": [
+      "Pipeline_banca",
+      "FP2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_banca",
+      "FQ2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.costos": [
+      "Pipeline_banca",
+      "FR2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.utilidad": [
+      "Pipeline_banca",
+      "FS2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_banca",
+      "FT2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.intereses": [
+      "Pipeline_banca",
+      "FU2"
+    ],
+    "ciclo.1.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_banca",
+      "FV2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_banca",
+      "FW2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.entradas": [
+      "Pipeline_banca",
+      "FX2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.salidas": [
+      "Pipeline_banca",
+      "FY2"
+    ],
+    "ciclo.1.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_banca",
+      "FZ2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_banca",
+      "GA2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_banca",
+      "GB2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_banca",
+      "GC2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_banca",
+      "GD2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_banca",
+      "GE2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.operacion": [
+      "Pipeline_banca",
+      "GF2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.inversion": [
+      "Pipeline_banca",
+      "GG2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_banca",
+      "GH2"
+    ],
+    "ciclo.1.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_banca",
+      "GI2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_banca",
+      "GJ2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_banca",
+      "GK2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_banca",
+      "GL2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.activos": [
+      "Pipeline_banca",
+      "GM2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.deuda": [
+      "Pipeline_banca",
+      "GN2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_banca",
+      "GO2"
+    ],
+    "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_banca",
+      "GP2"
+    ],
+    "ciclo.1.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_banca",
+      "GQ2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_banca",
+      "GR2"
+    ],
+    "ciclo.1.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_banca",
+      "GS2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_banca",
+      "GT2"
+    ],
+    "ciclo.1.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_banca",
+      "GU2"
+    ],
+    "ciclo.1.A.financial.financiamiento.intereses": [
+      "Pipeline_banca",
+      "GV2"
+    ],
+    "ciclo.2.A.financial.estadoResultados.ingresos": [
+      "Pipeline_banca",
+      "FP3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_banca",
+      "FQ3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.costos": [
+      "Pipeline_banca",
+      "FR3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.utilidad": [
+      "Pipeline_banca",
+      "FS3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_banca",
+      "FT3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.intereses": [
+      "Pipeline_banca",
+      "FU3"
+    ],
+    "ciclo.2.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_banca",
+      "FV3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_banca",
+      "FW3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.entradas": [
+      "Pipeline_banca",
+      "FX3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.salidas": [
+      "Pipeline_banca",
+      "FY3"
+    ],
+    "ciclo.2.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_banca",
+      "FZ3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_banca",
+      "GA3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_banca",
+      "GB3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_banca",
+      "GC3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_banca",
+      "GD3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_banca",
+      "GE3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.operacion": [
+      "Pipeline_banca",
+      "GF3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.inversion": [
+      "Pipeline_banca",
+      "GG3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_banca",
+      "GH3"
+    ],
+    "ciclo.2.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_banca",
+      "GI3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_banca",
+      "GJ3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_banca",
+      "GK3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_banca",
+      "GL3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.activos": [
+      "Pipeline_banca",
+      "GM3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.deuda": [
+      "Pipeline_banca",
+      "GN3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_banca",
+      "GO3"
+    ],
+    "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_banca",
+      "GP3"
+    ],
+    "ciclo.2.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_banca",
+      "GQ3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_banca",
+      "GR3"
+    ],
+    "ciclo.2.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_banca",
+      "GS3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_banca",
+      "GT3"
+    ],
+    "ciclo.2.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_banca",
+      "GU3"
+    ],
+    "ciclo.2.A.financial.financiamiento.intereses": [
+      "Pipeline_banca",
+      "GV3"
+    ],
+    "ciclo.3.A.financial.estadoResultados.ingresos": [
+      "Pipeline_banca",
+      "FP4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.ventasNetas": [
+      "Pipeline_banca",
+      "FQ4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.costos": [
+      "Pipeline_banca",
+      "FR4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.utilidad": [
+      "Pipeline_banca",
+      "FS4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.depreciacion": [
+      "Pipeline_banca",
+      "FT4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.intereses": [
+      "Pipeline_banca",
+      "FU4"
+    ],
+    "ciclo.3.A.financial.estadoResultados.costosProduccion": [
+      "Pipeline_banca",
+      "FV4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.cajaInicial": [
+      "Pipeline_banca",
+      "FW4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.entradas": [
+      "Pipeline_banca",
+      "FX4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.salidas": [
+      "Pipeline_banca",
+      "FY4"
+    ],
+    "ciclo.3.A.financial.balanceCaja.cajaFinal": [
+      "Pipeline_banca",
+      "FZ4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cajaInicial": [
+      "Pipeline_banca",
+      "GA4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cobrosVentas": [
+      "Pipeline_banca",
+      "GB4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.pagosOperacion": [
+      "Pipeline_banca",
+      "GC4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.compraActivos": [
+      "Pipeline_banca",
+      "GD4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.financiamiento": [
+      "Pipeline_banca",
+      "GE4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.operacion": [
+      "Pipeline_banca",
+      "GF4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.inversion": [
+      "Pipeline_banca",
+      "GG4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.flujoNeto": [
+      "Pipeline_banca",
+      "GH4"
+    ],
+    "ciclo.3.A.financial.flujoCaja.cajaFinal": [
+      "Pipeline_banca",
+      "GI4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.efectivo": [
+      "Pipeline_banca",
+      "GJ4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.activosFijos": [
+      "Pipeline_banca",
+      "GK4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.inventarioMP": [
+      "Pipeline_banca",
+      "GL4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.activos": [
+      "Pipeline_banca",
+      "GM4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.deuda": [
+      "Pipeline_banca",
+      "GN4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.patrimonio": [
+      "Pipeline_banca",
+      "GO4"
+    ],
+    "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio": [
+      "Pipeline_banca",
+      "GP4"
+    ],
+    "ciclo.3.A.financial.financiamiento.montoPrestamo": [
+      "Pipeline_banca",
+      "GQ4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaTEA": [
+      "Pipeline_banca",
+      "GR4"
+    ],
+    "ciclo.3.A.financial.financiamiento.deudaPrincipal": [
+      "Pipeline_banca",
+      "GS4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaAdicionalProximoPrestamo": [
+      "Pipeline_banca",
+      "GT4"
+    ],
+    "ciclo.3.A.financial.financiamiento.tasaMensual": [
+      "Pipeline_banca",
+      "GU4"
+    ],
+    "ciclo.3.A.financial.financiamiento.intereses": [
+      "Pipeline_banca",
+      "GV4"
     ]
   }
 }
