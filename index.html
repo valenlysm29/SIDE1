@@ -10,12 +10,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
-  <link rel="stylesheet" href="css/styles.css?v=20260924-observations">
+  <link rel="stylesheet" href="css/styles.css?v=20261010-waiting-tutorial">
   <link rel="stylesheet" href="css/student-interface.css?v=20261009">
   <link rel="stylesheet" href="css/simulator3d.css?v=20261009-touch-controls">
   <link rel="stylesheet" href="css/hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="css/company_summary.css?v=20260917-realismo3">
-  <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
+  <link rel="stylesheet" href="css/responsive.css?v=20261010-waiting-tutorial">
   <link rel="stylesheet" href="css/production.css?v=20260922-fixedbar">
   <link rel="stylesheet" href="css/tablet-return.css?v=20260930">
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
@@ -161,14 +161,26 @@
     <div id="studentWaiting" class="student-waiting hidden" role="region" aria-label="Sala de espera">
       <div class="game-loading-bg" aria-hidden="true"></div>
       <div class="game-loading-content student-waiting-content">
-        <img src="assets/side_logo.png" class="game-loading-logo" alt="SIDE">
-        <div class="loading-orbit" aria-hidden="true"><span></span><span></span><span></span></div>
-        <p class="eyebrow">Sala de espera</p>
-        <h1>Preparando la partida…</h1>
-        <p id="waitingGameName"></p>
-        <p id="waitingCompanies" class="waiting-companies" role="status" aria-live="polite">Contando empresas conectadas…</p>
-        <p id="studentIntegrationNotice" class="hint" role="status" aria-live="polite"></p>
-        <button id="waitingBackToProfiles" class="ghost-btn" type="button">Volver al inicio</button>
+        <header class="waiting-header">
+          <div class="waiting-heading">
+            <p class="eyebrow">Sala de espera</p>
+            <h1>Aprende cómo jugar</h1>
+            <p id="waitingGameName"></p>
+          </div>
+          <div class="waiting-status">
+            <div class="waiting-clock" role="timer" aria-label="Tiempo restante en la sala de espera">
+              <span>TIEMPO DE SALA DE ESPERA</span>
+              <strong id="waitingCountdown">--:--</strong>
+              <small id="waitingCountdownNote">Esperando inicio del docente</small>
+            </div>
+            <p id="waitingCompanies" class="waiting-companies" role="status" aria-live="polite">Contando empresas conectadas…</p>
+          </div>
+        </header>
+        <div id="waitingTutorialMount" class="waiting-tutorial-mount" aria-label="Cómo jugar"></div>
+        <footer class="waiting-footer">
+          <p id="studentIntegrationNotice" class="hint" role="status" aria-live="polite"></p>
+          <button id="waitingBackToProfiles" class="ghost-btn" type="button">Volver al inicio</button>
+        </footer>
       </div>
     </div>
     <div class="dashboard-inner lobby">
@@ -597,7 +609,7 @@
 <script src="js/events_catalog.js?v=20260910-2"></script>
 <script src="js/decision_catalog.js?v=20260910-2"></script>
 <script src="services/credits_data.js?v=20260928-production"></script>
-<script src="js/tutorial.js?v=20260910-2"></script>
+<script src="js/tutorial.js?v=20261010-waiting-tutorial"></script>
 <script src="services/character_selection.js?v=20260927-selector"></script>
 <script type="importmap">
   {
@@ -617,7 +629,7 @@
 <script src="js/production_dop.js?v=20260917-visual"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261009-waiting"></script>
+<script src="js/app.js?v=20261010-waiting-tutorial"></script>
 <script src="js/company_summary.js?v=20260922-teacher-final"></script>
 </body>
 </html>

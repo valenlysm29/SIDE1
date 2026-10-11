@@ -1531,3 +1531,57 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 .student-cycle-report{margin:7px 0;border:1px solid #ffffff18;border-radius:10px;background:#091d2c}.student-cycle-report>summary,.student-office-finance summary{cursor:pointer;padding:11px;color:#f4e0a0;font-size:12px;font-weight:800}.student-statement-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;padding:10px}.student-statement{padding:10px;border-radius:9px;background:#0b2639}.student-statement h4{margin:0 0 8px;color:#75c4fc;font-size:12px}.student-statement>div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #ffffff0d;font-size:10px}.student-statement strong{color:#eaf5ff;white-space:nowrap}
 
 .student-sync-status{margin:8px 0;color:#ffe080;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+
+/* La sala usa toda la ventana; el tutorial ocupa el espacio entre el reloj y la salida. */
+#studentWaiting{position:fixed;height:100dvh;min-height:0;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);place-items:stretch;background:#020817;color:#edf5ff}
+#studentWaiting .game-loading-bg{overflow:hidden}
+#studentWaiting .student-waiting-content{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;width:min(1240px,100%);min-width:0;height:100%;max-height:none;margin:auto;padding:18px max(18px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));text-align:left}
+#studentWaiting .waiting-header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex:none}
+#studentWaiting .waiting-heading{min-width:0}
+#studentWaiting .waiting-heading .eyebrow{margin:0 0 4px;color:#ffd329;font-size:12px;letter-spacing:1.5px}
+#studentWaiting .waiting-heading h1{margin:0;font-size:clamp(21px,2.5vw,32px);line-height:1.12;letter-spacing:.3px}
+#studentWaiting #waitingGameName{margin:5px 0 0;font-size:13px;line-height:1.25;color:#9db1c8;overflow-wrap:anywhere}
+#studentWaiting .waiting-status{display:flex;align-items:center;justify-content:flex-end;gap:20px;flex:none}
+#studentWaiting .waiting-clock{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:12px;color:#a9bed5}
+#studentWaiting .waiting-clock>span{max-width:16ch;font-size:11px;font-weight:800;line-height:1.4}
+#studentWaiting #waitingCountdown{font-variant-numeric:tabular-nums;color:#ffd329;font-size:32px;font-weight:900;line-height:1}
+#studentWaiting #waitingCountdownNote{grid-column:1/-1;font-size:11px;line-height:1.35;margin-top:5px}
+#studentWaiting #waitingCompanies{min-width:0;margin:0;padding:9px 12px;font-size:14px;line-height:1.3;text-align:center;max-width:21ch}
+#studentWaiting .waiting-tutorial-mount{flex:1;min-height:0;min-width:0;display:flex}
+#studentWaiting .tutorial-shell{display:flex;flex-direction:column;width:100%;min-width:0;height:100%;min-height:0;margin:0;padding:0}
+#studentWaiting .tutorial-top{flex:none;gap:12px;padding:0}
+#studentWaiting .tutorial-brand{gap:10px}
+#studentWaiting .tutorial-brand img{width:84px;height:34px}
+#studentWaiting .tutorial-brand span{font-size:12px;letter-spacing:1px}
+#studentWaiting .tutorial-required{padding:6px 10px;font-size:10px;letter-spacing:.5px}
+#studentWaiting .tutorial-progress{flex:none;margin:8px 0}
+#studentWaiting .tutorial-progress>div{height:100%;background:linear-gradient(90deg,#1688ff,#ffd329);box-shadow:0 0 18px #ffd32955;transition:width .35s ease}
+#studentWaiting #integrationCountdown,#studentWaiting #integrationWaitSuffix{display:none}
+#studentWaiting .tutorial-carousel{align-items:stretch;gap:10px;min-height:0}
+#studentWaiting .tutorial-viewport{min-width:0;min-height:0;height:100%;animation:none}
+#studentWaiting .tutorial-track{height:100%;min-height:0}
+#studentWaiting .tutorial-slide{min-width:0;min-height:0;height:100%;padding:clamp(16px,3dvh,34px) 36px;grid-template-columns:36% minmax(0,1fr);gap:24px;text-align:left}
+#studentWaiting .tutorial-art-wrap{width:min(280px,100%,36dvh);margin:auto}
+#studentWaiting .tutorial-copy{min-width:0;max-width:660px;padding:0}
+#studentWaiting .tutorial-kicker{font-size:12px;margin:0 0 8px;letter-spacing:1px}
+#studentWaiting .tutorial-copy h2{font-size:clamp(23px,2.8vw,38px);line-height:1.12}
+#studentWaiting .tutorial-copy p{font-size:15px;line-height:1.55;margin:12px 0;max-width:none}
+#studentWaiting .tutorial-question{padding:10px 12px;font-size:13px;line-height:1.45}
+#studentWaiting .tutorial-arrow{position:static;align-self:center;flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px}
+#studentWaiting .tutorial-arrow img{width:26px;height:26px;margin:auto}
+#studentWaiting .tutorial-bottom{flex:none;display:flex;justify-content:center;gap:20px;padding:8px 0 0;min-height:30px}
+#studentWaiting .tutorial-dots{order:0;justify-content:center;gap:3px}
+#studentWaiting .tutorial-dot{width:28px;height:24px;min-height:24px;background:radial-gradient(circle,#526b88 0 3px,transparent 4px);box-shadow:none;border-radius:4px}
+#studentWaiting .tutorial-dot.active{width:28px;background:radial-gradient(circle,#ffd329 0 5px,transparent 6px)}
+#studentWaiting .tutorial-counter{order:0;font-size:12px}
+#studentWaiting .tutorial-intro{grid-template-columns:1fr;gap:0;text-align:center;justify-items:center;align-content:center;padding:20px 48px}
+#studentWaiting .tutorial-intro-glow{display:none}
+#studentWaiting .tutorial-intro-logo{grid-row:auto;width:min(210px,28dvh);max-height:75px;margin:0 0 12px}
+#studentWaiting .tutorial-intro h1{font-size:clamp(25px,3.3vw,44px);line-height:1.05;letter-spacing:.5px}
+#studentWaiting .tutorial-intro p{font-size:15px;line-height:1.5;margin:12px auto;max-width:760px}
+#studentWaiting .tutorial-hints{gap:8px;margin:0}
+#studentWaiting .tutorial-hints span{font-size:12px;padding:7px 10px;letter-spacing:0}
+#studentWaiting .waiting-footer{flex:none;display:flex;align-items:center;justify-content:space-between;gap:18px}
+#studentWaiting #studentIntegrationNotice{max-width:none;margin:0;color:#b3c7dc;font-size:12px;line-height:1.35;overflow-wrap:anywhere}
+#studentWaiting #waitingBackToProfiles{flex:none;margin:0;min-height:40px;padding:8px 14px;font-size:12px}
+#studentWaiting button:focus-visible{outline:2px solid #ffd329;outline-offset:2px}
