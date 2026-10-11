@@ -25,6 +25,16 @@
       "round": 2,
       "decisiones": {
         "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
         "lotes": [
           {
             "segmento": "",
@@ -96,13 +106,7 @@
         "comprasUnidades": {},
         "maquinaria": {
           "INF-02": 1
-        },
-        "tiendasPorZona": {
-          "alta": 0,
-          "media": 0,
-          "baja": 0
-        },
-        "porcentajeVentasCredito": 0
+        }
       },
       "enviado": false,
       "transicion": {

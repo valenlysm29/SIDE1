@@ -12,9 +12,9 @@
       "resultadosPorEmpresa": {
         "A": {
           "puntajes": {
-            "puntajeEficiencia": 17,
-            "reputacionMatriz": 8,
-            "saludFinanciera": -3,
+            "puntajeEficiencia": 16,
+            "reputacionMatriz": 9,
+            "saludFinanciera": -2,
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -415,25 +415,27 @@
             "costoPoliticaMantenimiento": 0,
             "mantenimientoAnual": 375,
             "depreciacion": 64.125,
-            "costoMP": 21204.7626,
+            "costoMP": 21860.58,
             "valorComprado": 106000,
             "valorConsumido": 23761.5,
             "valorInventario": 82238.5,
-            "valorCompradoNeto": 94594.4,
-            "valorConsumidoNeto": 21204.7626,
-            "valorInventarioNeto": 73389.63739999999,
-            "factorDescuento": 0.8924,
-            "costoPublicidad": 0,
+            "valorCompradoNeto": 97520,
+            "valorConsumidoNeto": 21860.58,
+            "valorInventarioNeto": 75659.42,
+            "factorDescuento": 0.92,
+            "costoPublicidad": 6000,
+            "costoAnalistaCompras": 0,
+            "descuentoAnalistaPct": 0,
             "costoAlmacenaje": 0,
             "costoHorasExtra": 0,
             "costoLeadTime": 0,
-            "reputacionOperativa": 8.66659922489098,
+            "reputacionOperativa": 14.66659922489098,
             "reputacion": {
-              "valor": 8.66659922489098,
+              "valor": 14.66659922489098,
               "factorProduccion": 1.7330210772833723,
               "factorMO": 3.75,
               "factorMP": 3.183578147607608,
-              "factorPublicidad": 0,
+              "factorPublicidad": 6,
               "proporciones": {
                 "cuero": 0.30028985507246375,
                 "accesorios": 0.17330210772833723,
@@ -460,7 +462,7 @@
               "INS-07": 4964,
               "INS-08": 5038
             },
-            "totalCostos": 51861.177599999995,
+            "totalCostos": 58516.994999999995,
             "detalles": {
               "manoObra": [
                 {
@@ -798,13 +800,9 @@
               {
                 "codigo": "INV-01B",
                 "costo": 6000
-              },
-              {
-                "codigo": "INV-02B",
-                "costo": 6000
               }
             ],
-            "costoDecisionesRecurrentes": 13500
+            "costoDecisionesRecurrentes": 7500
           },
           "consecuencias": {
             "efectos": {
@@ -814,7 +812,7 @@
                 1.4
               ],
               "reputacionCambio": 2,
-              "reputacionFinal": 10,
+              "reputacionFinal": 11,
               "factorProduccion": 1,
               "factorDemanda": 1,
               "tasaAdicionalPP": 3,
@@ -838,7 +836,7 @@
             ]
           },
           "reputacionMercado": 9,
-          "reputacionMatriz": 10,
+          "reputacionMatriz": 11,
           "lotes": [
             {
               "segmento": "SEG-01",
@@ -1051,12 +1049,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -1141,7 +1147,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -1159,13 +1165,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 7,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 7
           },
           "ciclo": 1,
           "ventas": [
@@ -1438,8 +1438,8 @@
           "unidadesVendidas": 427,
           "ingresos": 51860,
           "inventarioSinVender": 0,
-          "costosTotales": 67003.47647850466,
-          "utilidad": -15143.476478504657,
+          "costosTotales": 67659.29387850466,
+          "utilidad": -15799.293878504657,
           "financiamiento": {
             "montoPrestamo": 0,
             "tasaTEA": 20,
@@ -1450,37 +1450,37 @@
             "estadoResultados": {
               "ingresos": 51860,
               "ventasNetas": 51860,
-              "costos": 67003.47647850466,
-              "utilidad": -15143.476478504657,
+              "costos": 67659.29387850466,
+              "utilidad": -15799.293878504657,
               "depreciacion": 64.125,
               "intereses": 0,
-              "costosProduccion": 67003.47647850466
+              "costosProduccion": 67659.29387850466
             },
             "balanceCaja": {
               "cajaInicial": 1000000,
               "entradas": 51860,
-              "salidas": 148191.98887850466,
-              "cajaFinal": 903668.0111214954
+              "salidas": 151117.58887850464,
+              "cajaFinal": 900742.4111214953
             },
             "flujoCaja": {
               "cajaInicial": 1000000,
               "cobrosVentas": 51860,
-              "pagosOperacion": 140328.98887850466,
+              "pagosOperacion": 143254.58887850464,
               "compraActivos": 7863,
               "financiamiento": 0,
-              "operacion": -88468.98887850466,
+              "operacion": -91394.58887850464,
               "inversion": -7863,
-              "flujoNeto": -96331.9888785046,
-              "cajaFinal": 903668.0111214954
+              "flujoNeto": -99257.5888785047,
+              "cajaFinal": 900742.4111214953
             },
             "balanceGeneral": {
-              "efectivo": 903668.0111214954,
+              "efectivo": 900742.4111214953,
               "activosFijos": 7435.875,
-              "inventarioMP": 73389.63739999999,
-              "activos": 984493.5235214954,
+              "inventarioMP": 75659.42,
+              "activos": 983837.7061214953,
               "deuda": 0,
-              "patrimonio": 984493.5235214954,
-              "pasivoPatrimonio": 984493.5235214954
+              "patrimonio": 983837.7061214953,
+              "pasivoPatrimonio": 983837.7061214953
             },
             "financiamiento": {
               "montoPrestamo": 0,
@@ -1494,9 +1494,9 @@
         },
         "B": {
           "puntajes": {
-            "puntajeEficiencia": 17,
-            "reputacionMatriz": 8,
-            "saludFinanciera": -3,
+            "puntajeEficiencia": 16,
+            "reputacionMatriz": 9,
+            "saludFinanciera": -2,
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -1897,25 +1897,27 @@
             "costoPoliticaMantenimiento": 0,
             "mantenimientoAnual": 375,
             "depreciacion": 64.125,
-            "costoMP": 21204.7626,
+            "costoMP": 21860.58,
             "valorComprado": 106000,
             "valorConsumido": 23761.5,
             "valorInventario": 82238.5,
-            "valorCompradoNeto": 94594.4,
-            "valorConsumidoNeto": 21204.7626,
-            "valorInventarioNeto": 73389.63739999999,
-            "factorDescuento": 0.8924,
-            "costoPublicidad": 0,
+            "valorCompradoNeto": 97520,
+            "valorConsumidoNeto": 21860.58,
+            "valorInventarioNeto": 75659.42,
+            "factorDescuento": 0.92,
+            "costoPublicidad": 6000,
+            "costoAnalistaCompras": 0,
+            "descuentoAnalistaPct": 0,
             "costoAlmacenaje": 0,
             "costoHorasExtra": 0,
             "costoLeadTime": 0,
-            "reputacionOperativa": 8.66659922489098,
+            "reputacionOperativa": 14.66659922489098,
             "reputacion": {
-              "valor": 8.66659922489098,
+              "valor": 14.66659922489098,
               "factorProduccion": 1.7330210772833723,
               "factorMO": 3.75,
               "factorMP": 3.183578147607608,
-              "factorPublicidad": 0,
+              "factorPublicidad": 6,
               "proporciones": {
                 "cuero": 0.30028985507246375,
                 "accesorios": 0.17330210772833723,
@@ -1942,7 +1944,7 @@
               "INS-07": 4964,
               "INS-08": 5038
             },
-            "totalCostos": 51861.177599999995,
+            "totalCostos": 58516.994999999995,
             "detalles": {
               "manoObra": [
                 {
@@ -2280,13 +2282,9 @@
               {
                 "codigo": "INV-01B",
                 "costo": 6000
-              },
-              {
-                "codigo": "INV-02B",
-                "costo": 6000
               }
             ],
-            "costoDecisionesRecurrentes": 13500
+            "costoDecisionesRecurrentes": 7500
           },
           "consecuencias": {
             "efectos": {
@@ -2296,7 +2294,7 @@
                 1.4
               ],
               "reputacionCambio": 2,
-              "reputacionFinal": 10,
+              "reputacionFinal": 11,
               "factorProduccion": 1,
               "factorDemanda": 1,
               "tasaAdicionalPP": 3,
@@ -2320,7 +2318,7 @@
             ]
           },
           "reputacionMercado": 10.3,
-          "reputacionMatriz": 10,
+          "reputacionMatriz": 11,
           "lotes": [
             {
               "segmento": "SEG-01",
@@ -2533,12 +2531,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -2623,7 +2629,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -2641,13 +2647,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 8.3,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 8.3
           },
           "ciclo": 1,
           "ventas": [
@@ -2920,8 +2920,8 @@
           "unidadesVendidas": 427,
           "ingresos": 62505,
           "inventarioSinVender": 0,
-          "costosTotales": 67003.47647850466,
-          "utilidad": -4498.476478504657,
+          "costosTotales": 67659.29387850466,
+          "utilidad": -5154.293878504657,
           "financiamiento": {
             "montoPrestamo": 0,
             "tasaTEA": 20,
@@ -2932,37 +2932,37 @@
             "estadoResultados": {
               "ingresos": 62505,
               "ventasNetas": 62505,
-              "costos": 67003.47647850466,
-              "utilidad": -4498.476478504657,
+              "costos": 67659.29387850466,
+              "utilidad": -5154.293878504657,
               "depreciacion": 64.125,
               "intereses": 0,
-              "costosProduccion": 67003.47647850466
+              "costosProduccion": 67659.29387850466
             },
             "balanceCaja": {
               "cajaInicial": 1000000,
               "entradas": 62505,
-              "salidas": 148191.98887850466,
-              "cajaFinal": 914313.0111214954
+              "salidas": 151117.58887850464,
+              "cajaFinal": 911387.4111214953
             },
             "flujoCaja": {
               "cajaInicial": 1000000,
               "cobrosVentas": 62505,
-              "pagosOperacion": 140328.98887850466,
+              "pagosOperacion": 143254.58887850464,
               "compraActivos": 7863,
               "financiamiento": 0,
-              "operacion": -77823.98887850466,
+              "operacion": -80749.58887850464,
               "inversion": -7863,
-              "flujoNeto": -85686.9888785046,
-              "cajaFinal": 914313.0111214954
+              "flujoNeto": -88612.5888785047,
+              "cajaFinal": 911387.4111214953
             },
             "balanceGeneral": {
-              "efectivo": 914313.0111214954,
+              "efectivo": 911387.4111214953,
               "activosFijos": 7435.875,
-              "inventarioMP": 73389.63739999999,
-              "activos": 995138.5235214954,
+              "inventarioMP": 75659.42,
+              "activos": 994482.7061214953,
               "deuda": 0,
-              "patrimonio": 995138.5235214954,
-              "pasivoPatrimonio": 995138.5235214954
+              "patrimonio": 994482.7061214953,
+              "pasivoPatrimonio": 994482.7061214953
             },
             "financiamiento": {
               "montoPrestamo": 0,
@@ -2976,9 +2976,9 @@
         },
         "C": {
           "puntajes": {
-            "puntajeEficiencia": 17,
-            "reputacionMatriz": 8,
-            "saludFinanciera": -3,
+            "puntajeEficiencia": 16,
+            "reputacionMatriz": 9,
+            "saludFinanciera": -2,
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -3379,25 +3379,27 @@
             "costoPoliticaMantenimiento": 0,
             "mantenimientoAnual": 375,
             "depreciacion": 64.125,
-            "costoMP": 21204.7626,
+            "costoMP": 21860.58,
             "valorComprado": 106000,
             "valorConsumido": 23761.5,
             "valorInventario": 82238.5,
-            "valorCompradoNeto": 94594.4,
-            "valorConsumidoNeto": 21204.7626,
-            "valorInventarioNeto": 73389.63739999999,
-            "factorDescuento": 0.8924,
-            "costoPublicidad": 0,
+            "valorCompradoNeto": 97520,
+            "valorConsumidoNeto": 21860.58,
+            "valorInventarioNeto": 75659.42,
+            "factorDescuento": 0.92,
+            "costoPublicidad": 6000,
+            "costoAnalistaCompras": 0,
+            "descuentoAnalistaPct": 0,
             "costoAlmacenaje": 0,
             "costoHorasExtra": 0,
             "costoLeadTime": 0,
-            "reputacionOperativa": 8.66659922489098,
+            "reputacionOperativa": 14.66659922489098,
             "reputacion": {
-              "valor": 8.66659922489098,
+              "valor": 14.66659922489098,
               "factorProduccion": 1.7330210772833723,
               "factorMO": 3.75,
               "factorMP": 3.183578147607608,
-              "factorPublicidad": 0,
+              "factorPublicidad": 6,
               "proporciones": {
                 "cuero": 0.30028985507246375,
                 "accesorios": 0.17330210772833723,
@@ -3424,7 +3426,7 @@
               "INS-07": 4964,
               "INS-08": 5038
             },
-            "totalCostos": 51861.177599999995,
+            "totalCostos": 58516.994999999995,
             "detalles": {
               "manoObra": [
                 {
@@ -3762,13 +3764,9 @@
               {
                 "codigo": "INV-01B",
                 "costo": 6000
-              },
-              {
-                "codigo": "INV-02B",
-                "costo": 6000
               }
             ],
-            "costoDecisionesRecurrentes": 13500
+            "costoDecisionesRecurrentes": 7500
           },
           "consecuencias": {
             "efectos": {
@@ -3778,7 +3776,7 @@
                 1.4
               ],
               "reputacionCambio": 2,
-              "reputacionFinal": 10,
+              "reputacionFinal": 11,
               "factorProduccion": 1,
               "factorDemanda": 1,
               "tasaAdicionalPP": 3,
@@ -3802,7 +3800,7 @@
             ]
           },
           "reputacionMercado": 12.2,
-          "reputacionMatriz": 10,
+          "reputacionMatriz": 11,
           "lotes": [
             {
               "segmento": "SEG-01",
@@ -4015,12 +4013,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -4105,7 +4111,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -4123,13 +4129,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 10.2,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 10.2
           },
           "ciclo": 1,
           "ventas": [
@@ -4402,8 +4402,8 @@
           "unidadesVendidas": 427,
           "ingresos": 59727,
           "inventarioSinVender": 0,
-          "costosTotales": 67003.47647850466,
-          "utilidad": -7276.476478504657,
+          "costosTotales": 67659.29387850466,
+          "utilidad": -7932.293878504657,
           "financiamiento": {
             "montoPrestamo": 0,
             "tasaTEA": 20,
@@ -4414,37 +4414,37 @@
             "estadoResultados": {
               "ingresos": 59727,
               "ventasNetas": 59727,
-              "costos": 67003.47647850466,
-              "utilidad": -7276.476478504657,
+              "costos": 67659.29387850466,
+              "utilidad": -7932.293878504657,
               "depreciacion": 64.125,
               "intereses": 0,
-              "costosProduccion": 67003.47647850466
+              "costosProduccion": 67659.29387850466
             },
             "balanceCaja": {
               "cajaInicial": 1000000,
               "entradas": 59727,
-              "salidas": 148191.98887850466,
-              "cajaFinal": 911535.0111214954
+              "salidas": 151117.58887850464,
+              "cajaFinal": 908609.4111214953
             },
             "flujoCaja": {
               "cajaInicial": 1000000,
               "cobrosVentas": 59727,
-              "pagosOperacion": 140328.98887850466,
+              "pagosOperacion": 143254.58887850464,
               "compraActivos": 7863,
               "financiamiento": 0,
-              "operacion": -80601.98887850466,
+              "operacion": -83527.58887850464,
               "inversion": -7863,
-              "flujoNeto": -88464.9888785046,
-              "cajaFinal": 911535.0111214954
+              "flujoNeto": -91390.5888785047,
+              "cajaFinal": 908609.4111214953
             },
             "balanceGeneral": {
-              "efectivo": 911535.0111214954,
+              "efectivo": 908609.4111214953,
               "activosFijos": 7435.875,
-              "inventarioMP": 73389.63739999999,
-              "activos": 992360.5235214954,
+              "inventarioMP": 75659.42,
+              "activos": 991704.7061214953,
               "deuda": 0,
-              "patrimonio": 992360.5235214954,
-              "pasivoPatrimonio": 992360.5235214954
+              "patrimonio": 991704.7061214953,
+              "pasivoPatrimonio": 991704.7061214953
             },
             "financiamiento": {
               "montoPrestamo": 0,
@@ -4458,9 +4458,9 @@
         },
         "D": {
           "puntajes": {
-            "puntajeEficiencia": 17,
-            "reputacionMatriz": 8,
-            "saludFinanciera": -3,
+            "puntajeEficiencia": 16,
+            "reputacionMatriz": 9,
+            "saludFinanciera": -2,
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -4861,25 +4861,27 @@
             "costoPoliticaMantenimiento": 0,
             "mantenimientoAnual": 375,
             "depreciacion": 64.125,
-            "costoMP": 21204.7626,
+            "costoMP": 21860.58,
             "valorComprado": 106000,
             "valorConsumido": 23761.5,
             "valorInventario": 82238.5,
-            "valorCompradoNeto": 94594.4,
-            "valorConsumidoNeto": 21204.7626,
-            "valorInventarioNeto": 73389.63739999999,
-            "factorDescuento": 0.8924,
-            "costoPublicidad": 0,
+            "valorCompradoNeto": 97520,
+            "valorConsumidoNeto": 21860.58,
+            "valorInventarioNeto": 75659.42,
+            "factorDescuento": 0.92,
+            "costoPublicidad": 6000,
+            "costoAnalistaCompras": 0,
+            "descuentoAnalistaPct": 0,
             "costoAlmacenaje": 0,
             "costoHorasExtra": 0,
             "costoLeadTime": 0,
-            "reputacionOperativa": 8.66659922489098,
+            "reputacionOperativa": 14.66659922489098,
             "reputacion": {
-              "valor": 8.66659922489098,
+              "valor": 14.66659922489098,
               "factorProduccion": 1.7330210772833723,
               "factorMO": 3.75,
               "factorMP": 3.183578147607608,
-              "factorPublicidad": 0,
+              "factorPublicidad": 6,
               "proporciones": {
                 "cuero": 0.30028985507246375,
                 "accesorios": 0.17330210772833723,
@@ -4906,7 +4908,7 @@
               "INS-07": 4964,
               "INS-08": 5038
             },
-            "totalCostos": 51861.177599999995,
+            "totalCostos": 58516.994999999995,
             "detalles": {
               "manoObra": [
                 {
@@ -5244,13 +5246,9 @@
               {
                 "codigo": "INV-01B",
                 "costo": 6000
-              },
-              {
-                "codigo": "INV-02B",
-                "costo": 6000
               }
             ],
-            "costoDecisionesRecurrentes": 13500
+            "costoDecisionesRecurrentes": 7500
           },
           "consecuencias": {
             "efectos": {
@@ -5260,7 +5258,7 @@
                 1.4
               ],
               "reputacionCambio": 2,
-              "reputacionFinal": 10,
+              "reputacionFinal": 11,
               "factorProduccion": 1,
               "factorDemanda": 1,
               "tasaAdicionalPP": 3,
@@ -5284,7 +5282,7 @@
             ]
           },
           "reputacionMercado": 11,
-          "reputacionMatriz": 10,
+          "reputacionMatriz": 11,
           "lotes": [
             {
               "segmento": "SEG-01",
@@ -5497,12 +5495,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -5587,7 +5593,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -5605,13 +5611,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 9,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 9
           },
           "ciclo": 1,
           "ventas": [
@@ -5884,8 +5884,8 @@
           "unidadesVendidas": 427,
           "ingresos": 79445,
           "inventarioSinVender": 0,
-          "costosTotales": 67003.47647850466,
-          "utilidad": 12441.523521495343,
+          "costosTotales": 67659.29387850466,
+          "utilidad": 11785.706121495343,
           "financiamiento": {
             "montoPrestamo": 0,
             "tasaTEA": 20,
@@ -5896,37 +5896,37 @@
             "estadoResultados": {
               "ingresos": 79445,
               "ventasNetas": 79445,
-              "costos": 67003.47647850466,
-              "utilidad": 12441.523521495343,
+              "costos": 67659.29387850466,
+              "utilidad": 11785.706121495343,
               "depreciacion": 64.125,
               "intereses": 0,
-              "costosProduccion": 67003.47647850466
+              "costosProduccion": 67659.29387850466
             },
             "balanceCaja": {
               "cajaInicial": 1000000,
               "entradas": 79445,
-              "salidas": 148191.98887850466,
-              "cajaFinal": 931253.0111214954
+              "salidas": 151117.58887850464,
+              "cajaFinal": 928327.4111214953
             },
             "flujoCaja": {
               "cajaInicial": 1000000,
               "cobrosVentas": 79445,
-              "pagosOperacion": 140328.98887850466,
+              "pagosOperacion": 143254.58887850464,
               "compraActivos": 7863,
               "financiamiento": 0,
-              "operacion": -60883.988878504664,
+              "operacion": -63809.58887850464,
               "inversion": -7863,
-              "flujoNeto": -68746.9888785046,
-              "cajaFinal": 931253.0111214954
+              "flujoNeto": -71672.5888785047,
+              "cajaFinal": 928327.4111214953
             },
             "balanceGeneral": {
-              "efectivo": 931253.0111214954,
+              "efectivo": 928327.4111214953,
               "activosFijos": 7435.875,
-              "inventarioMP": 73389.63739999999,
-              "activos": 1012078.5235214954,
+              "inventarioMP": 75659.42,
+              "activos": 1011422.7061214953,
               "deuda": 0,
-              "patrimonio": 1012078.5235214954,
-              "pasivoPatrimonio": 1012078.5235214954
+              "patrimonio": 1011422.7061214953,
+              "pasivoPatrimonio": 1011422.7061214953
             },
             "financiamiento": {
               "montoPrestamo": 0,
@@ -5952,12 +5952,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -6042,7 +6050,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -6060,13 +6068,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 7,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 7
           },
           "inventarioMP": {
             "INS-01": 38.5,
@@ -6282,7 +6284,7 @@
           "tasaAdicionalPP": 3,
           "deudaPrincipal": 0,
           "ultimoCiclo": 1,
-          "cajaFinal": 903668.0111214954,
+          "cajaFinal": 900742.4111214953,
           "activosCosto": 7500,
           "depreciacionAcumulada": 64.125,
           "maquinariaActivos": {
@@ -6306,12 +6308,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -6396,7 +6406,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -6414,13 +6424,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 8.3,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 8.3
           },
           "inventarioMP": {
             "INS-01": 38.5,
@@ -6636,7 +6640,7 @@
           "tasaAdicionalPP": 3,
           "deudaPrincipal": 0,
           "ultimoCiclo": 1,
-          "cajaFinal": 914313.0111214954,
+          "cajaFinal": 911387.4111214953,
           "activosCosto": 7500,
           "depreciacionAcumulada": 64.125,
           "maquinariaActivos": {
@@ -6660,12 +6664,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -6750,7 +6762,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -6768,13 +6780,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 10.2,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 10.2
           },
           "inventarioMP": {
             "INS-01": 38.5,
@@ -6990,7 +6996,7 @@
           "tasaAdicionalPP": 3,
           "deudaPrincipal": 0,
           "ultimoCiclo": 1,
-          "cajaFinal": 911535.0111214954,
+          "cajaFinal": 908609.4111214953,
           "activosCosto": 7500,
           "depreciacionAcumulada": 64.125,
           "maquinariaActivos": {
@@ -7014,12 +7020,20 @@
               "RH-10A",
               "COM-01C",
               "FIN-01B",
-              "INS-09B",
-              "INS-10A",
-              "INS-11B",
               "INV-01B",
+              "COM-06B",
               "INV-02B"
             ],
+            "garantiaDias": 30,
+            "mantenimientoPreventivo": false,
+            "marketingNivel": "media",
+            "analistaCompras": false,
+            "garantiaProveedor": 0,
+            "tiendasPorDistrito": {
+              "los_olivos": 0,
+              "miraflores": 0,
+              "sjl": 0
+            },
             "lotes": [
               {
                 "segmento": "SEG-01",
@@ -7104,7 +7118,7 @@
             },
             "jefes": 1,
             "regimen": "MYPE",
-            "publicidad": 0,
+            "publicidad": 6000,
             "montoPrestamo": 0,
             "comprasUnidades": {
               "INS-01": 100,
@@ -7122,13 +7136,7 @@
               "INF-05": 1,
               "INF-08": 1
             },
-            "reputacionLiteral": 9,
-            "tiendasPorZona": {
-              "alta": 0,
-              "media": 0,
-              "baja": 0
-            },
-            "porcentajeVentasCredito": 0
+            "reputacionLiteral": 9
           },
           "inventarioMP": {
             "INS-01": 38.5,
@@ -7344,7 +7352,7 @@
           "tasaAdicionalPP": 3,
           "deudaPrincipal": 0,
           "ultimoCiclo": 1,
-          "cajaFinal": 931253.0111214954,
+          "cajaFinal": 928327.4111214953,
           "activosCosto": 7500,
           "depreciacionAcumulada": 64.125,
           "maquinariaActivos": {

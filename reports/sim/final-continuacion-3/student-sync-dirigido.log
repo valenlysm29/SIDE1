@@ -1,0 +1,19 @@
+▶ student synchronization and session recovery through the delivered UI
+  ✔ saving a draft sends snapshot, report and normalized decisions with the acknowledged revision (2528.5035ms)
+  ✔ online retries failed writes before reading and does not erase the local draft (2567.7913ms)
+  ✔ pending decisions/report survive a reload and recover the latest offline draft (7528.9619ms)
+  ✔ a stale offline write preserves another session and hydrates the newer server state (3011.879ms)
+  ✔ a lost save response still recovers normalized decisions without repeating the committed snapshot (2820.7649ms)
+  ✔ network failure retains the session and retry button restores access without retyping identity (6581.7947ms)
+  ✔ an explicit identity rejection clears the session instead of retrying indefinitely (4112.7072ms)
+  ✔ online automatically restores a session retained after a network failure (6667.3807ms)
+  ✔ configured teacher demo credentials use Supabase Auth and stay on login if rejected (2535.7494ms)
+✔ student synchronization and session recovery through the delivered UI (39097.1059ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40543.3901
