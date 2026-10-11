@@ -724,17 +724,25 @@ function openDecisionMenu(){
 function updateDecisionLayout(){
   const screen=$('decisionMenu');
   if(!screen||screen.classList.contains('hidden'))return;
-  screen.style.setProperty('--decision-top-height',`${$('decisionTopbar').offsetHeight}px`);
-  screen.style.setProperty('--decision-tabs-height',`${$('decisionTabs').offsetHeight}px`);
+  let fixedHeight=0;
+  [['decisionTopbar','top'],['decisionTabs','tabs'],['decisionStickyHead','head']].forEach(([id,name])=>{
+    const height=$(id)?.getBoundingClientRect().height||0;
+    screen.style.setProperty(`--decision-${name}-height`,`${height}px`);fixedHeight+=height;
+  });
+  screen.style.setProperty('--decision-fixed-height',`${fixedHeight}px`);
+  const scroller=$('decisionFormScroll');
+  if(scroller)screen.style.setProperty('--decision-content-top',`${scroller.getBoundingClientRect().top-screen.getBoundingClientRect().top}px`);
 }
 const decisionLayoutObserver=new ResizeObserver(updateDecisionLayout);
-[$('decisionTopbar'),$('decisionTabs')].filter(Boolean).forEach(el=>decisionLayoutObserver.observe(el));
+[$('decisionTopbar'),$('decisionTabs'),$('decisionStickyHead')].filter(Boolean).forEach(el=>decisionLayoutObserver.observe(el));
 window.addEventListener('resize',updateDecisionLayout);
+document.fonts?.ready.then(updateDecisionLayout);
+function scrollDecisionContentToTop(){const scroller=$('decisionFormScroll');if(scroller)scroller.scrollTop=0;}
 function renderTabs(){
   const nav=$('decisionTabs');
   nav.innerHTML=navigationCategories().map(c=>{const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);return `<button class="decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}" data-cat="${c.cat}"><img src="${escapeHtml(c.icon)}" alt=""><span class="tab-label">${escapeHtml(c.short||c.title)}</span>${sent?'<b class="tab-status">✓ ENVIADA</b>':saved?'<b class="tab-status">BORRADOR</b>':''}</button>`}).join('');
   updateDecisionLayout();
-  nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;renderTabs();renderDecisionCategory()}));
+  nav.querySelectorAll('.decision-tab').forEach(b=>b.addEventListener('click',()=>{currentCategory=b.dataset.cat;renderTabs();renderDecisionCategory();scrollDecisionContentToTop();nav.querySelector('.decision-tab.active')?.focus({preventScroll:true});}));
 }
 function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
 function draftItemComplete(item){
@@ -891,6 +899,7 @@ function updateSectionCost(){
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
   $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
+  updateCashHud();
   $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
   // El presupuesto puede impedir confirmar una decisión, pero nunca debe impedir
   // conservar el avance del jugador como borrador.
@@ -1094,9 +1103,16 @@ function animateCash(netMovement){
 function requiredDecisionItems(){return allDecisionItems().filter(i=>i.type!=='info'&&itemRequired(i))}
 function decisionProgressPercent(){const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
 function categoryCompletionMap(){const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
+function updateCashHud(){
+  const cash=typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
+  $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
+}
 function updateHud(){
-  const cash=cashBalance();$('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
-  const pct=decisionProgressPercent();$('decisionProgressText').textContent=pct+'%';$('decisionProgressBar').style.width=pct+'%';
+  updateCashHud();
+  const sections=decisionCategories(),submitted=sections.filter(category=>sectionSubmitted(category.cat)||decisionsSubmitted()).length,submittedPct=sections.length?Math.round(submitted/sections.length*100):0;
+  $('decisionProgressText').textContent=`${submitted}/${sections.length} · ${submittedPct}%`;$('decisionProgressBar').style.width=submittedPct+'%';
+  $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',`${submitted} de ${sections.length} apartados enviados, ${submittedPct}%`);
+  const pct=decisionProgressPercent();
   const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=simulationSubmissionComplete();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);if($('sendDecisionSection')){$('sendDecisionSection').disabled=sectionSubmitted(currentCategory)||submitted||!sectionDraftReady(currentCategory);$('sendDecisionSection').classList.toggle('submitted',sectionSubmitted(currentCategory))}}
 }
 function currentDecisionLabels(){return allDecisionItems().map(i=>savedEntry(i)?.label).filter(Boolean)}

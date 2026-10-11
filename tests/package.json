@@ -8,6 +8,7 @@
     "world:loading": "node world_loading.cjs",
     "lifecycle:db": "node game_lifecycle_db.cjs && node waiting_room_db.cjs",
     "decisions:db": "node decision_options_db.cjs",
+    "decisions:sticky": "node decision_sticky_ui.cjs",
     "admission:db": "node student_admission_db.cjs && node student_admission_matrix_db.cjs && node --test student_admission_contract_gaps.test.js",
     "admission:ui": "node --test student_admission.test.js",
     "lifecycle:ui": "node game_lifecycle_ui.cjs",

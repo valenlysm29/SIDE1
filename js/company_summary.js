@@ -202,7 +202,7 @@ function noticesHtml(problems,warnings){
 }
 function navigateFromSummary(cat){
   closeCompanyReview();persistCurrentDraftOnly();currentCategory=cat;renderTabs();renderDecisionCategory();
-  window.scrollTo(0,0);
+  scrollDecisionContentToTop();
 }
 function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
 function renderCompanySummary(){

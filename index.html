@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="css/simulator3d.css?v=20261009-touch-controls">
   <link rel="stylesheet" href="css/hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="css/company_summary.css?v=20260917-realismo3">
-  <link rel="stylesheet" href="css/responsive.css?v=20261010-waiting-tutorial">
-  <link rel="stylesheet" href="css/production.css?v=20260922-fixedbar">
+  <link rel="stylesheet" href="css/responsive.css?v=20261011-decision-stack">
+  <link rel="stylesheet" href="css/production.css?v=20261011-fixed-decision-stack">
   <link rel="stylesheet" href="css/tablet-return.css?v=20260930">
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
   <link rel="stylesheet" href="css/world_minimap.css?v=20261009-mobile-map">
@@ -569,6 +569,7 @@
             </div>
             <div class="section-balance"><span>SALDO FINAL GUARDADO</span><strong id="projectedCash">S/ 100,000</strong><small>Se actualiza al guardar el borrador</small></div>
           </div>
+          <div id="decisionFormScroll" class="decision-form-scroll" tabindex="0" role="region" aria-label="Contenido de la sección de decisión">
           <div id="decisionCards" class="decision-cards decision-list"></div>
           <div class="section-save-bar">
             <div><span>GASTADO / MOVIMIENTO DE ESTA PESTAÑA</span><strong id="sectionDraftCost">S/ 0</strong><small id="sectionSaveHint">El gasto se actualiza mientras eliges. El saldo cambia recién al guardar.</small></div>
@@ -582,6 +583,7 @@
               <p>Se construirán el local, la zona de producción, maquinaria, personal, stock y flujo de clientes según lo que elegiste.</p>
             </div>
             <div class="simulation-launch-actions"><button id="submitAllDecisionsBtn" class="submit-decisions-btn" type="button"><strong>ENVIAR DECISIONES</strong><small>Confirmar todo; editar en el próximo ciclo</small></button><button id="startSimulationBtn" class="start-simulation-btn hidden" type="button"><span>▶</span><strong>INICIAR JUEGO 3D</strong><small>Decisiones enviadas</small></button></div>
+          </div>
           </div>
         </div>
       </section>
@@ -629,7 +631,7 @@
 <script src="js/production_dop.js?v=20260917-visual"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261011-waiting-footer"></script>
-<script src="js/company_summary.js?v=20260922-teacher-final"></script>
+<script src="js/app.js?v=20261011-decision-stack"></script>
+<script src="js/company_summary.js?v=20261011-decision-stack"></script>
 </body>
 </html>

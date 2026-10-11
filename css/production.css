@@ -408,3 +408,175 @@ body:has(#decisionMenu:not(.hidden)) { overflow-x: clip; }
   #decisionMenu .decision-tab,
   #decisionMenu .choice-pill { transition: none; }
 }
+
+/* The status bar, section tabs and section heading form one stationary stack.
+   Only the form region below them owns vertical scrolling. */
+body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
+#decisionMenu {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+#decisionMenu .decision-topbar,
+#decisionMenu .decision-topbar.compact {
+  position: relative;
+  flex: 0 0 auto;
+  top: auto;
+  z-index: 3;
+}
+#decisionMenu .tabbed-stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+}
+#decisionMenu .decision-window {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+}
+#decisionMenu .decision-tabs,
+#decisionMenu .decision-topbar.compact ~ .decision-game-stage .decision-tabs {
+  flex: 0 0 auto;
+  position: relative;
+  top: auto;
+  z-index: 2;
+}
+#decisionMenu .decision-detail {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+#decisionMenu .sticky-section-head,
+#decisionMenu .decision-topbar.compact ~ .decision-game-stage .sticky-section-head {
+  position: relative;
+  flex: 0 0 auto;
+  top: auto;
+  z-index: 1;
+  background: var(--ui-panel);
+}
+#decisionMenu #decisionFormScroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  gap: var(--ui-space);
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+  scroll-padding: 12px 0;
+  padding-bottom: var(--ui-space);
+}
+#decisionMenu #decisionFormScroll > * { flex: 0 0 auto; }
+#decisionMenu .decision-row { scroll-margin-top: 12px; }
+#decisionMenu #decisionFormScroll:focus-visible {
+  outline: 2px solid var(--ui-yellow);
+  outline-offset: -2px;
+}
+@media (max-width: 1180px) {
+  #decisionMenu .cash-hud small,
+  #decisionMenu .decision-topbar.compact .cash-hud small {
+    display: block;
+    font-size: 9px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  #decisionMenu .decision-tabs,
+  #decisionMenu .decision-topbar.compact ~ .decision-game-stage .decision-tabs {
+    display: flex;
+    align-items: stretch;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 6px;
+    padding: 8px 10px;
+    scrollbar-width: thin;
+    scroll-padding-inline: 10px;
+  }
+  #decisionMenu .decision-tab {
+    flex: 0 0 auto;
+    min-width: 124px;
+    max-width: 185px;
+    min-height: 48px;
+    padding: 8px 10px;
+    font-size: 12px;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 4px 7px;
+  }
+  #decisionMenu .decision-tab img { width: 20px; height: 20px; }
+  #decisionMenu .decision-tab .tab-status { font-size: 10px; padding: 2px 4px; }
+  #decisionMenu .sticky-section-head {
+    grid-template-columns: minmax(0, 1fr) minmax(110px, auto);
+    gap: 10px;
+    padding-block: 10px;
+  }
+  #decisionMenu .detail-heading > img { flex-basis: 32px; width: 32px; height: 32px; }
+  #decisionMenu .detail-heading { gap: 8px; }
+  #decisionMenu .detail-heading h1 { font-size: 20px; line-height: 1.2; }
+  #decisionMenu .detail-heading p { display: block; font-size: 11px; line-height: 1.35; }
+  #decisionMenu .section-balance { text-align: right; border-left: 1px solid var(--ui-line); padding-left: 10px; }
+  #decisionMenu .section-balance span { font-size: 10px; }
+  #decisionMenu .section-balance small { display: block; font-size: 9px; line-height: 1.3; }
+}
+@media (max-width: 700px) {
+  #decisionMenu .detail-heading h1 { font-size: 17px; }
+  #decisionMenu .detail-heading span { font-size: 9px; }
+  #decisionMenu .section-balance strong { font-size: 16px; }
+  #decisionMenu .sticky-section-head { gap: 8px; grid-template-columns: minmax(0, 1fr) 110px; }
+  #decisionMenu .tabbed-stage { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  #decisionMenu .decision-detail { gap: 10px; padding-inline: 10px; }
+  #decisionMenu .cash-hud span { font-size: 10px; }
+  #decisionMenu .mission-label { margin-bottom: 0; }
+  #decisionMenu .mission-track { margin-top: 3px; }
+}
+@media (max-height: 500px) and (max-width: 1180px) {
+  #decisionMenu .decision-topbar,
+  #decisionMenu .decision-topbar.compact {
+    padding-block: 5px;
+    gap: 4px 10px;
+  }
+  #decisionMenu .game-title-mark small { display: block; font-size: 9px; line-height: 1.2; }
+  #decisionMenu .cash-hud span { font-size: 9px; }
+  #decisionMenu .cash-hud strong { font-size: 17px; margin: 0; }
+  #decisionMenu .cash-hud,
+  #decisionMenu .decision-topbar.compact .cash-hud,
+  #decisionMenu .student-top-timer { padding-block: 3px; }
+  #decisionMenu .game-back-btn { height: 34px; min-height: 34px; }
+  #decisionMenu .game-title-mark strong { font-size: 16px; }
+  #decisionMenu .top-submit-all { min-height: 30px; }
+  #decisionMenu .decision-tabs { padding-block: 5px; }
+  #decisionMenu .decision-tab { min-height: 40px; padding-block: 5px; }
+  #decisionMenu .sticky-section-head { padding-block: 6px; }
+  #decisionMenu .detail-heading h1 { font-size: 17px; }
+  #decisionMenu .detail-heading span { font-size: 9px; }
+  #decisionMenu .section-balance strong { font-size: 16px; }
+  #decisionMenu .tabbed-stage { padding-bottom: 5px; }
+  #decisionMenu .decision-detail { gap: 8px; }
+}
+@media (max-height: 500px) and (min-width: 600px) and (max-width: 1180px) {
+  #decisionMenu #decisionTopbar,
+  #decisionMenu #decisionTopbar.compact {
+    grid-template-columns: 44px minmax(0, 1fr) 120px 140px;
+    grid-template-rows: auto auto;
+  }
+  #decisionMenu #exitDecisions,
+  #decisionMenu #exitDecisions.returns-to-world {
+    grid-column: 1;
+    grid-row: 1;
+    width: 44px;
+    min-height: 40px;
+  }
+  #decisionMenu #exitDecisions #decisionReturnLabel { display: none; }
+  #decisionMenu #decisionTopbar .game-title-mark { grid-column: 2; grid-row: 1; }
+  #decisionMenu #decisionTopbar .student-top-timer { grid-column: 3; grid-row: 1; }
+  #decisionMenu #decisionTopbar .top-submit-all { grid-column: 4; grid-row: 1; min-height: 40px; }
+  #decisionMenu #decisionTopbar .cash-hud { grid-column: 1 / 3; grid-row: 2; }
+  #decisionMenu #decisionTopbar .mission-meter { grid-column: 3 / 5; grid-row: 2; }
+}
