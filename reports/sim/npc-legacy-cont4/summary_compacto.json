@@ -1,0 +1,355 @@
+{
+  "evidence": {
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "head": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+    "previewSha256": "45031879db4fab67a77becca495f17593338ec476c9053b681f12380bd7f2690",
+    "files": {
+      "tests/supplied_npcs.cjs": {
+        "baseline": "7ccf4c398338a46185da4add9234748d43af26f3938c7c17b79faae635f58233",
+        "head": "7ccf4c398338a46185da4add9234748d43af26f3938c7c17b79faae635f58233"
+      },
+      "js/simulator3d.js": {
+        "baseline": "610d7892fe6368e85d96900157904a890322c23d6afc54c9ef4be1a718517796",
+        "head": "610d7892fe6368e85d96900157904a890322c23d6afc54c9ef4be1a718517796"
+      },
+      "services/npc_navigation.mjs": {
+        "baseline": "1cfc7559483ec91e2ec8c283cee4260cc2bc936e521557e5468cd5df122e8448",
+        "head": "1cfc7559483ec91e2ec8c283cee4260cc2bc936e521557e5468cd5df122e8448"
+      },
+      "services/npc_optional_navigation.mjs": {
+        "baseline": "70c365bd4df08cf9b6361f000666932da80b42a6a5036445919cd0153dc77957",
+        "head": "70c365bd4df08cf9b6361f000666932da80b42a6a5036445919cd0153dc77957"
+      },
+      "services/interior_navigation.mjs": {
+        "baseline": "02616021be2278d225409e408b091f5eee48ff8b4b97534f8426fca0ae7d0d2c",
+        "head": "02616021be2278d225409e408b091f5eee48ff8b4b97534f8426fca0ae7d0d2c"
+      },
+      "services/business_interiors.mjs": {
+        "baseline": "de9a120f49a5d118c2e7ddcc4acaabe272c2668a83883b3b2adf4ef8c236e4fc",
+        "head": "de9a120f49a5d118c2e7ddcc4acaabe272c2668a83883b3b2adf4ef8c236e4fc"
+      }
+    },
+    "actualBaselineVerifiedBlobs": 699,
+    "actualHeadVerifiedBlobs": 711
+  },
+  "conditions": {
+    "headless": true,
+    "flags": [
+      "--enable-webgl",
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader"
+    ],
+    "concurrentBrowsers": 1,
+    "timeout": 480000,
+    "seededRandom": false,
+    "assertionsChanged": false
+  },
+  "results": [
+    {
+      "label": "baseline-1",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 51861,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-1",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 54769,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-2",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 47315,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-2",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 53123,
+      "logSha256": "1ed75bdcb3b6726a61be7cfd100317ff7540ae2a0993cb3fc6efbe1e16d1e620",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [
+        {
+          "kind": "city:city_woman_green",
+          "state": "LEAVE_STORE",
+          "x": 130.99889164198453,
+          "z": 25.86284121845112,
+          "route": [
+            [
+              131,
+              22.7
+            ],
+            [
+              132.02999999999997,
+              23.53
+            ],
+            [
+              131,
+              25.4
+            ],
+            [
+              131,
+              27.2
+            ]
+          ],
+          "index": 3,
+          "blocked": 0,
+          "routeBlocked": false
+        }
+      ],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-3",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 36774,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-3",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 38561,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-4",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 38940,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-4",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 40147,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-5",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 36308,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-5",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 56377,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-6",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 42484,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-6",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 33465,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-7",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 33764,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-7",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 35227,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "baseline-8",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 33376,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-8",
+      "commit": "c73d8010020b9c037ea03e7c14210b7fa43706ff",
+      "exitCode": 1,
+      "timedOut": false,
+      "durationMs": 32194,
+      "logSha256": "a7ea893b92bdc92e86c0dd1c6377c6f905641af1f0e2cb59bd7eb4b7d0141ce8",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE"
+      ],
+      "details": [
+        {
+          "kind": "city:city_woman_tank",
+          "state": "BROWSE",
+          "x": 127.28641811525435,
+          "z": 22.608433837408512,
+          "route": [
+            [
+              130.75,
+              22.71
+            ],
+            [
+              128.5,
+              22.7
+            ],
+            [
+              132.5,
+              22.7
+            ]
+          ],
+          "index": 1,
+          "blocked": 0,
+          "routeBlocked": false
+        }
+      ],
+      "message": "AssertionError: customers complete a decision"
+    }
+  ]
+}

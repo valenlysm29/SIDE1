@@ -1,0 +1,83 @@
+{
+  "evidence": {
+    "baseline": "9fbe6ec012db7e1440459551f62b40992df261d6",
+    "head": "9447c79a33af5c5896abe285e309fe61149cbae7",
+    "previewSha256": "45031879db4fab67a77becca495f17593338ec476c9053b681f12380bd7f2690",
+    "files": {
+      "tests/supplied_npcs.cjs": {
+        "baseline": "7ccf4c398338a46185da4add9234748d43af26f3938c7c17b79faae635f58233",
+        "head": "7ccf4c398338a46185da4add9234748d43af26f3938c7c17b79faae635f58233"
+      },
+      "js/simulator3d.js": {
+        "baseline": "610d7892fe6368e85d96900157904a890322c23d6afc54c9ef4be1a718517796",
+        "head": "610d7892fe6368e85d96900157904a890322c23d6afc54c9ef4be1a718517796"
+      },
+      "services/npc_navigation.mjs": {
+        "baseline": "1cfc7559483ec91e2ec8c283cee4260cc2bc936e521557e5468cd5df122e8448",
+        "head": "1cfc7559483ec91e2ec8c283cee4260cc2bc936e521557e5468cd5df122e8448"
+      },
+      "services/npc_optional_navigation.mjs": {
+        "baseline": "70c365bd4df08cf9b6361f000666932da80b42a6a5036445919cd0153dc77957",
+        "head": "70c365bd4df08cf9b6361f000666932da80b42a6a5036445919cd0153dc77957"
+      },
+      "services/interior_navigation.mjs": {
+        "baseline": "02616021be2278d225409e408b091f5eee48ff8b4b97534f8426fca0ae7d0d2c",
+        "head": "02616021be2278d225409e408b091f5eee48ff8b4b97534f8426fca0ae7d0d2c"
+      },
+      "services/business_interiors.mjs": {
+        "baseline": "de9a120f49a5d118c2e7ddcc4acaabe272c2668a83883b3b2adf4ef8c236e4fc",
+        "head": "de9a120f49a5d118c2e7ddcc4acaabe272c2668a83883b3b2adf4ef8c236e4fc"
+      }
+    },
+    "actualBaselineVerifiedBlobs": 699,
+    "actualHeadVerifiedBlobs": 711
+  },
+  "conditions": {
+    "headless": true,
+    "flags": [
+      "--enable-webgl",
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader"
+    ],
+    "concurrentBrowsers": 1,
+    "timeout": 480000,
+    "seededRandom": true,
+    "randomConstant": 0.9,
+    "assertionsChanged": false,
+    "seedTiming": "addInitScript before goto"
+  },
+  "results": [
+    {
+      "label": "baseline-constant090",
+      "commit": "9fbe6ec012db7e1440459551f62b40992df261d6",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 35425,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    },
+    {
+      "label": "head-constant090",
+      "commit": "9447c79a33af5c5896abe285e309fe61149cbae7",
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 301286,
+      "logSha256": "4cdd8350598736338f444cbe32b57c63ed4e7fef7e9213e920c5bf83b22ab066",
+      "states": [
+        "ENTER_STORE",
+        "BROWSE",
+        "COMPARE",
+        "LEAVE_STORE"
+      ],
+      "details": [],
+      "message": "PASS NPC world fallback"
+    }
+  ]
+}

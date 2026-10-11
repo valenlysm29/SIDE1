@@ -2,9 +2,9 @@
 
 ## Estado de entrega
 
-Motor puro Node/navegador, catálogo interno de 68 filas y menú de decisiones congelado, cierre local/remoto e historial, y adaptador de caja común implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. La verificación única de continuación 3 confirmó oráculo 3104/3104 sin diferencias, las tres simulaciones y la transición sin doble cobro. Los dos bloqueos 3D pasaron la medición controlada y la corrida final. Continuación 4 mide exclusivamente el caso intermitente de NPC y ejecuta el cierre ligero.
+Motor puro Node/navegador, catálogo interno de 68 filas y menú de decisiones congelado, cierre local/remoto e historial, y adaptador de caja común implementados. El cierre remoto usa contexto autoritativo, token de estado, permisos del docente e idempotencia; se prueba mediante mocks y PostgreSQL PGlite local, sin operaciones de prueba en producción. La verificación única de continuación 3 confirmó oráculo 3104/3104 sin diferencias, las tres simulaciones y la transición sin doble cobro. Los dos bloqueos 3D pasaron la medición controlada y la corrida final. Continuación 4 completó el cierre ligero, pero la medición NPC fue baseline8/8 aprobadas frente a HEAD7/8: una falla sin atribución concluyente impide publicar.
 
-**Publicación:** la entrega anterior fue publicada en `459c062`. Esta continuación aún no se publica; depende de atribuir el caso NPC según el criterio autorizado y completar el cierre ligero. WIP locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
+**Publicación:** no se hizo push de las continuaciones 3/4. El criterio 3 del usuario queda pendiente: NPC falla solo en HEAD dentro de la muestra 8+8. No se halló causa en integración ni una corrección justificada; los diagnósticos con aleatoriedad fijada no reprodujeron la falla del baseline. La entrega anterior sigue publicada en `459c062`; no se confunde con un push nuevo. Commits locales preservan exclusivamente la tarea; cambios ajenos NPC/modelos/reportes quedan sin incorporar. El commit inicial del usuario es 9fbe6ec.
 
 ## Implementación por hoja
 
@@ -317,3 +317,25 @@ Los resultados de Continuación2 anteriores se conservan como historial; la acep
 | Garantía del proveedor 0/80/100% | Se conservan las opciones anteriores. | Evento de fallas/devolución no definido; sin costo o ingreso automático inventado. |
 
 El usuario ya autorizó conservar estos controles. La eventual equivalencia o ampliación de efectos exige una definición posterior; no está pendiente volver a aprobar su conservación. La pregunta sobre versionar el Excel original permanece abierta: por defecto continúa local e ignorado, y solo se publican los oráculos derivados.
+
+## Resultado final de controles — continuaciones 3 y 4
+
+| Control | Resultado verificado |
+|---|---|
+| Node completo (única corrida final) | 365/368 inicialmente: manifiesto NPC 17/16 y timeout de sincronización, más su suite padre. Sincronización dirigida posterior 10/10 PASS sin cambios; no se afirma causa de ese timeout. |
+| Motor/filtro/resumen/transición (cierre ligero) | 35 + 2 = 37/37 PASS. |
+| BD existente y SQL Excel | 7/7 suites BD en la corrida final; 2/2 SQL Excel en final y cierre ligero. |
+| Navegador existente | 21 PASS, 3 FAIL, 1 runner opcional ausente. Scroll y objetivos táctiles 40px preexistentes demostrados; NPC de respaldo en atribución. |
+| Entrada 3D/reinicio | 5/5 baseline y 5/5 snapshot 459c062 por suite; mediana reinicio 3.219/3.406s. Ambas suites también PASS en HEAD final con menú congelado. |
+| SIM-1 / SIM-2 / SIM-3 | PASS en navegador con menú final, cierre docente y caja; 468/585/1140 comparaciones respectivamente, cero diferencias. |
+| Transición | PASS: máquina, préstamo y stock sin cobrar dos veces. |
+| Oráculo completo | 351 + 56 + 468 + 585 + 1140 + 252 + 252 = 3104/3104; cero diferencias. Confirmado otra vez en cierre ligero sin regenerar los libros. |
+| Sintaxis | 54 archivos en cierre ligero más dos arneses diagnósticos finales; 56 archivos, cero errores. |
+| Móvil | Editor y resúmenes dentro de viewport390; captura esencial `auditoria-menu-congelado-movil.png` y tres capturas de resumen. |
+| Revisión independiente | Filtro y corrección de resumen sin incidencias abiertas; arnés NPC simétrico, sin aserciones ni tiempos relajados. |
+
+Fallos preexistentes demostrados, con evidencia en `reports/atribucion_regresion_excel.md`: manifiesto NPC con 17 entradas frente a la expectativa16, desplazamiento `decisions_cycle_ui.cjs:97`, y objetivos táctiles40px en `mobile_integral_ui.cjs`. No se cambió ese código para ocultarlos. El manifiesto sucio del usuario permanece fuera de los commits de esta tarea.
+
+La muestra NPC de continuación4 se conserva separada de los diagnósticos posteriores: baseline8/8 aprobadas; HEAD7/8 aprobadas y una falla `customers complete a decision`, con cliente en BROWSE tras100s simulados. Corresponde al **caso 3 pendiente**, no a una preexistencia demostrada. Las parejas con Math.random fijado a0.5 y0.9 antes de cargar pasaron en ambos snapshots. Una semilla tardía dio baselinePASS/HEADFAIL pero no controlaba los actores iniciales, así que no permite atribución. No se cambiaron aserciones, tiempos ni NPC/3D. Los resultados y límites del diagnóstico se detallan en `reports/diagnostico_npc_cont4.md`.
+
+La navegación, el arnés original y sus assets son idénticos al baseline; los módulos de integración cargados por la página sí cambiaron. La lectura independiente confirmó que el escenario legacy no habilita Excel, las proyecciones nuevas requieren ese flag y el recorrido síncrono de100s no consulta caja ni resultados del motor. Esto no demuestra la causa del episodio ni autoriza afirmar que todos los módulos cargados son idénticos. **Sin push hasta reproducir/atribuir ese caso o encontrar y verificar una causa en integración.**
