@@ -4,11 +4,12 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {database,rpc,createGame,config,professor}=require('./lifecycle_db_fixture.cjs');
-const root=path.resolve(__dirname,'..'),output=path.join(root,'reports/sim/crear_partida');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/salas_codigo/crear_partida');
 const sdk=`window.SIDE_CONFIG={SUPABASE_URL:'http://localhost',SUPABASE_PUBLISHABLE_KEY:'fixture'};
 window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
 (async()=>{
  const db=await database(),migration=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-11_fix_crear_partida.sql'),'utf8');await db.exec(migration);await db.exec(migration);const recovery=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-11_recuperar_salas_compatibles.sql'),'utf8');await db.exec(recovery);await db.exec(recovery);
+ const salasSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_salas_codigo.sql'),'utf8');await db.exec(salasSQL);await db.exec(salasSQL);
  const calls=[],pageErrors=[],consoleErrors=[];let fail=null,loseResponse=false,delayCreation=false;
  const server=http.createServer(async(req,res)=>{
   try{const url=new URL(req.url,'http://localhost');
@@ -68,7 +69,7 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
     await p.locator('#cancelGame').click();assert.equal(await p.locator('#cancelGameDialog').isVisible(),true);await p.locator('#keepGame').click();assert.equal(await count(),1);assert.equal((await db.query('select estado from partidas where id=$1',[previous.id])).rows[0].estado,phase==='integration'?'esperando':'activa');
     await p.locator('#cancelGame').click();await p.locator('#confirmCancelGame').click();await p.waitForFunction(()=>$('cancelGameDialog').open===false);assert.equal(await count(),1,'cancelar partida no crea una sala nueva');assert.equal(await p.locator('#replaceRoom').count(),0);await configure(p);await p.locator('#startGame').click();
    }
-   await success(p);assert.equal(await count(),2);assert.notEqual(await id(p),previous.id);const old=(await db.query('select * from partidas where id=$1',[previous.id])).rows[0];assert.equal(old.estado,'finalizada');
+   await success(p);assert.equal(await count(),2);assert.notEqual(await id(p),previous.id);const old=(await db.query('select * from partidas where id=$1',[previous.id])).rows[0];assert.equal(old.estado,['finished','cancelled'].includes(phase)?'finalizada':'cancelada');
    console.log('PASS sala anterior '+phase+': cancelar con confirmación y crear después explícitamente');
   }
   await reset();const legacy=await createGame(db,config({lifecycleVersion:1,integrationDurationMinutes:60}));p=await page();await p.waitForFunction(expected=>state.partidaId===expected&&runtime()?.phase==='integration',legacy.id);assert.equal(await count(),1);assert.equal(await p.locator('#cancelExistingRoom').count(),0);assert.equal(await p.locator('#creationDetails').count(),0);assert.equal(await p.locator('#copyGameCode').isEnabled(),true);assert.equal(await p.locator('#copyGameLink').isEnabled(),true);assert.equal(await p.locator('#gameCode').inputValue(),legacy.codigo);assert.doesNotMatch(await p.locator('body').innerText(),/Existe una partida anterior con un formato antiguo/);await screenshot(p,{path:path.join(output,'after_legacy_recuperada.png'),fullPage:true});console.log('PASS partida heredada: misma sala recuperada, código/enlace habilitados sin cancelar ni duplicar');

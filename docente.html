@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
-  <link rel="stylesheet" href="css/docente.css?v=20261011-recuperar">
+  <link rel="stylesheet" href="css/docente.css?v=20261012-salas">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
 </head>
 <body>
@@ -38,16 +38,16 @@
         <h1 id="pageTitle">Configuración de la simulación</h1>
       </div>
       <div class="top-actions">
-        <span id="gameCodeBadge" class="code-badge">SIDE-WG2</span>
-        <button id="copyGameCode" class="secondary" type="button">Copiar código</button>
-        <button id="copyGameLink" class="secondary" type="button">Copiar enlace</button>
+        <span id="gameCodeBadge" class="code-badge" tabindex="0" aria-label="Código de sala">Código pendiente</span>
+        <button id="copyGameCode" class="secondary side-button" type="button" aria-live="polite">Copiar código</button>
+        <button id="copyGameLink" class="secondary side-button" type="button" aria-live="polite">Copiar enlace</button>
         <button id="saveAll" class="secondary">Guardar configuración</button>
-        <button id="cancelGame" class="secondary danger hidden" type="button">Cancelar partida</button>
+        <button id="cancelGame" class="secondary side-button danger hidden" type="button">Cancelar partida</button>
 
       </div>
     </header>
 
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
     <div id="gameStatusBanner" class="info-banner" role="status" aria-live="polite">Partida sin iniciar. Configura los apartados; el reloj está detenido.</div>
 
     <section id="tab-configuracion" class="tab-panel active">
@@ -60,7 +60,7 @@
           <div class="card-title"><h3>Identificación</h3><span>Partida</span></div>
           <label>Nombre de la simulación<input id="gameName" value="SIDE — Simulación Principal"></label>
           <label>Curso<input id="gameCourse" value="Finanzas Corporativas"></label>
-          <label>Código de partida<input id="gameCode" class="locked-input" value="SIDE-WG2" maxlength="12" readonly aria-readonly="true"></label>
+          <label>Código de partida<input id="gameCode" class="locked-input" value="" placeholder="Se asigna al crear la sala" maxlength="12" readonly aria-readonly="true"></label>
           <p class="hint">El nombre legal y comercial lo define cada estudiante. El código de partida se genera automáticamente.</p>
         </article>
         <article class="card">
@@ -112,7 +112,7 @@
     </section>
 
     <section id="tab-rondas" class="tab-panel">
-      <article id="teacherLobby" class="card teacher-lobby hidden" aria-labelledby="lobbyHeading"><h2 id="lobbyHeading">Sala de espera</h2><div class="lobby-identity"><strong id="lobbyCode"></strong><button id="copyLobbyCode" class="secondary" type="button">Copiar código</button></div><p id="lobbyCountdown" role="timer"></p><p id="lobbyNext"></p><div id="lobbyCompanies" aria-live="polite">Esperando empresas.</div></article>
+      <article id="teacherLobby" class="card teacher-lobby hidden" aria-labelledby="lobbyHeading"><h2 id="lobbyHeading">Sala de espera</h2><div class="lobby-identity"><strong id="lobbyCode"></strong><button id="copyLobbyCode" class="secondary side-button" type="button" aria-live="polite">Copiar código</button></div><p id="lobbyCountdown" role="timer"></p><p id="lobbyNext"></p><div id="lobbyCompanies" aria-live="polite">Esperando empresas.</div></article>
       <div class="section-head"><div><span class="eyebrow">CONTROL DE CICLO</span><h2>Tiempo, noticias y eventos</h2></div><button id="advanceRound" class="primary">Pasar al siguiente ciclo <img class="button-arrow-icon" src="assets/icons/ui/arrow-right-thick.svg" alt=""></button></div>
       <div class="round-status card">
         <div class="round-number"><span>CICLO</span><strong id="roundDisplay">1 / 6</strong></div>
@@ -195,8 +195,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261012-sesion-codigos"></script>
-<script src="services/empresa_service.js?v=20261012-sesion-codigos"></script>
+<script src="services/partida_service.js?v=20261012-salas"></script>
+<script src="services/empresa_service.js?v=20261012-salas"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
 <script src="js/engine/config_excel.js?v=20261011"></script>
@@ -216,6 +216,6 @@
 <script src="js/teacher_podium.js?v=20261009-grades"></script>
 <script src="services/teacher_sync.js?v=20261009-grades"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20261011-recuperar"></script>
+<script src="js/docente.js?v=20261012-salas"></script>
 </body>
 </html>

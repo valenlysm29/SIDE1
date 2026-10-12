@@ -320,6 +320,26 @@
       return error||data?.error?{success:false,error:error?.message||data.error}:{success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function cancelar(partidaId){
+    const sb=client();if(!sb)return offline();
+    if(!partidaId)return {success:false,error:'No se pudo identificar la partida.'};
+    let timer;
+    try{
+      const response=await Promise.race([
+        sb.rpc('cancelar_partida',{p_partida_id:partidaId}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('La cancelación tardó demasiado. Comprueba la conexión y vuelve a intentarlo.')),15000);})
+      ]);
+      const {data,error}=response;
+      if(error||data?.error){
+        console.error('SIDE: cancelar partida:',error||data);
+        const missing=/PGRST202|42883/.test(error?.code||'');
+        return {success:false,code:error?.code||data?.code,error:missing?'Actualiza Supabase con supabase/migrations/2026-10-12_salas_codigo.sql para cancelar partidas.':error?.message||data.error};
+      }
+      if(data?.id!==partidaId||data?.estado!=='cancelada')return {success:false,error:'Supabase no confirmó la cancelación. Vuelve a consultar la sala antes de reintentar.'};
+      return {success:true,data:normalizeRoom(data)};
+    }catch(error){console.error('SIDE: cancelar partida:',error);return {success:false,error:error.message};}
+    finally{clearTimeout(timer);}
+  }
   async function contextoExcel(partidaId,ciclo){
     const sb=client();if(!sb)return offline();
     try{const {data,error}=await sb.rpc('side_contexto_cierre_excel',{p_partida_id:partidaId,p_ciclo:ciclo});return error||data?.error?{success:false,code:error?.code||data?.code,error:error?.message||data.error,migrationMissing:/PGRST202|42883/.test(error?.code||'')}:{success:true,data};}catch(error){return {success:false,error:error.message};}
@@ -346,5 +366,5 @@
       return {success:true,data:data.cierre,reused:!!data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar,contextoExcel,cerrarExcel,excelDisponible };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible };
 })(window);

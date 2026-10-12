@@ -6,6 +6,8 @@ const root=path.resolve(__dirname,'..');
 function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c',`import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('${name}'))`],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}});}
 (async()=>{
  const db=await database(),browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+ for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql'])await db.exec(fs.readFileSync(path.join(root,'supabase/migrations',filename),'utf8'));
+ const salasSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_salas_codigo.sql'),'utf8');await db.exec(salasSQL);await db.exec(salasSQL);
  const errors=[],teacherHTML=fixture('docente.html'),studentHTML=fixture('index.html').replace('const cfg = window.SIDE_CONFIG || {};',`
  window.worldCalls={preload:0,prepare:0,enter:0,suspend:0};
  window.SIDE3D={preload:async()=>{worldCalls.preload++;return true},prepare:async()=>{worldCalls.prepare++;return !window.rejectWorld},enter:async()=>{worldCalls.enter++;showScreen('simulator3d');return true},suspend:()=>{worldCalls.suspend++},getLastError:()=> 'Carga no disponible'};
@@ -18,9 +20,12 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
     const created=await createGame(db,c);
     return rpc(db,'controlar_partida',{p_partida_id:created.id,p_accion:'sincronizar',p_config:null,p_expected_round:null});
   });
+  await p.exposeFunction('dbCancel',id=>rpc(db,'cancelar_partida',{p_partida_id:id}));
   await p.exposeFunction('dbControl',(id,action,c,round)=>rpc(db,'controlar_partida',{p_partida_id:id,p_accion:action,p_config:c,p_expected_round:round}));
   await p.evaluate(()=>{
    SIDE.SupabaseClient.isReady=()=>true;
+   localStorage.setItem('SIDE_PROFESOR_ID','11111111-1111-1111-1111-111111111111');
+   SIDE.PartidaService.cancelar=async id=>{const data=await dbCancel(id);return {success:!data.error,data,error:data.error};};
    SIDE.PartidaService.obtenerActiva=async()=>({success:true,data:null});
    SIDE.PartidaService.crear=async data=>({success:true,data:await dbCreate(data.configuracion)});
    SIDE.PartidaService.controlar=async(...args)=>{const data=await dbControl(...args);return {success:!data.error,data,error:data.error};};
@@ -43,7 +48,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  }
  try{
   const t=await teacher();
-  assert.match(await t.locator('#gameCode').inputValue(),/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  assert.equal(await t.locator('#gameCode').inputValue(),'');
   // An old unsaved numeric draft upgrades; an existing active game's code stays valid.
   await t.evaluate(()=>{
    localStorage.setItem('SIDE_ASSIGNED_GAME_CODE','SIDE-025');
@@ -51,7 +56,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    loadConfig();
   });
   const draftCode=await t.locator('#gameCode').inputValue();
-  assert.match(draftCode,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  assert.equal(draftCode,'');
   await t.evaluate(()=>loadConfig());assert.equal(await t.locator('#gameCode').inputValue(),draftCode);
   await t.evaluate(()=>{localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true}));loadConfig();});
   assert.equal(await t.locator('#gameCode').inputValue(),'SIDE-025');
@@ -63,7 +68,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await t.locator('#startGame').click();
   await t.waitForFunction(()=>runtime()?.phase==='integration').catch(async error=>{console.error('waiting start diagnostic',await t.evaluate(()=>({toast:$('toast')?.textContent,partidaId:state.partidaId,authoritative:state.authoritative,status:gameStatus()})));throw error;});
   const game=await t.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'Prueba'}));
-  assert.match(game.codigo,/^SIDE-[A-HJ-NP-Z]{2}[2-9]$/);
+  assert.match(game.codigo,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
   const initialWaiting=await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'sincronizar',p_config:{},p_expected_round:null});
   assert.equal(initialWaiting.configuracion.runtime.phase,'integration');
   const waitingDeadline=initialWaiting.configuracion.gameStartAt;
@@ -131,20 +136,20 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await t.locator('#closeEventPicker').click();await t.screenshot({path:path.join(output,'lifecycle-teacher.png')});
   console.log('PASS UI manual: prepare, two live students auto-navigate to decisions before the 3D world; all/individual/random/zero events');
   await t.locator('#cancelGame').click();await t.locator('#keepGame').click();assert.equal(await t.evaluate(()=>gameStatus().active),true);
-  await t.evaluate(()=>{window.originalControl=SIDE.PartidaService.controlar;SIDE.PartidaService.controlar=async()=>({success:false,error:'Fallo simulado de conexión'});});
+  await t.evaluate(()=>{window.originalCancel=SIDE.PartidaService.cancelar;SIDE.PartidaService.cancelar=async()=>({success:false,error:'Fallo simulado de conexión'});});
   await t.locator('#cancelGame').click();await t.locator('#confirmCancelGame').click();
   assert.equal(await t.locator('#cancelGameDialog').isVisible(),true);assert.equal(await t.evaluate(()=>gameStatus().active),true);
-  await t.evaluate(()=>{SIDE.PartidaService.controlar=window.originalControl;});
+  await t.evaluate(()=>{SIDE.PartidaService.cancelar=window.originalCancel;});
   await t.locator('#confirmCancelGame').click();await t.waitForFunction(()=>Boolean(gameStatus()?.cancelledAt));
   await Promise.all([s1,s2].map(p=>p.evaluate(()=>refreshStudentGame())));
   for(const p of [s1,s2]){
-   assert.equal(await p.locator('#studentLobby').isVisible(),true);assert.equal(await p.locator('#enterDecisionsBtn').isDisabled(),true);
-   assert.match(await p.locator('#studentIntegrationNotice').innerText(),/cancelada por el profesor/);
+   assert.equal(await p.locator('#profiles').isVisible(),true);assert.equal(await p.locator('#studentLobby').isVisible(),false);
+   assert.match(await p.locator('#roomCancellationNotice').innerText(),/cancelada por el profesor/);
    assert.equal(await p.evaluate(()=>openDecisionMenu()),false);
    assert.ok(await p.evaluate(()=>worldCalls.suspend)>0);
    assert.equal(await p.evaluate(()=>studentPoll===null&&studentTick===null),true);
   }
-  await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.equal(await s1.locator('#studentTimerNote').innerText(),'Partida cancelada');await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
+  await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.match(await s1.locator('#roomCancellationNotice').innerText(),/cancelada por el profesor/);await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
   await t.evaluate(()=>{clearInterval(teacherPoll);teacherPoll=null;clearInterval(companiesPoll);companiesPoll=null;switchTab('empresas');state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
   await t.setViewportSize({width:390,height:844});await t.evaluate(()=>$('toast').classList.remove('show'));await t.locator('.company-card').screenshot({path:path.join(output,'observations-company-mobile.png')});
   assert.match(await t.locator('.company-status-line').innerText(),/PRESENCIA SIN CONFIRMAR/);

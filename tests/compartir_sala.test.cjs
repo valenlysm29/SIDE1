@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const source=fs.readFileSync(require.resolve('../js/docente.js'),'utf8');
 function fixture({denyClipboard=false,compatible=true}={}){
  const fields={},copies=[],messages=[],temporary=[];
- const ctx={sharedRoom:null,URL,window:{location:{href:'https://side.test/SIDE1/docente.html'}},
+ const ctx={setTimeout,clearTimeout,sharedRoom:null,URL,window:{location:{href:'https://side.test/SIDE1/docente.html'}},
   navigator:{clipboard:{writeText:async text=>{if(denyClipboard)throw new Error('permission');copies.push(text);}}},
   console:{warn(){},error(){}},toast:message=>messages.push(message),
   $:id=>fields[id]||(fields[id]={value:'',textContent:'',disabled:true,focus(){},select(){this.selected=true;}}),
@@ -30,4 +30,16 @@ test('al finalizar la sala confirmada se deshabilita compartir su código',async
 test('si fallan ambos métodos selecciona el código real para copia manual',async()=>{
  const f=fixture({denyClipboard:true,compatible:false});f.ctx.rememberSharedRoom({id:'real',codigo:'SIDE-AA2',estado:'esperando'});f.fields.gameCode.value='SIDE-WG2SIDE';
  await f.ctx.copyInvitation();assert.equal(f.fields.gameCode.value,'SIDE-AA2');assert.equal(f.fields.gameCode.selected,true);assert.equal(f.temporary[0].removed,true);
+});
+
+test('una sala cancelada deja de compartir su código',async()=>{
+ const f=fixture();f.ctx.rememberSharedRoom({id:'real',codigo:'SIDE-ABC234',estado:'esperando'});f.ctx.rememberSharedRoom({id:'real',codigo:'SIDE-ABC234',estado:'cancelada'});
+ assert.equal(f.ctx.sharedRoom,null);await f.ctx.copyInvitation();assert.deepEqual(f.copies,[]);
+});
+
+test('copiar con teclado conserva foco y confirma Copiado',async()=>{
+ const f=fixture({denyClipboard:true});let focusRestored=false;f.ctx.document.activeElement={focus(){focusRestored=true}};
+ f.ctx.rememberSharedRoom({id:'real',codigo:'SIDE-ABC234',estado:'esperando'});
+ const button={textContent:'Copiar codigo',dataset:{}};await f.ctx.copyInvitation(false,button);
+ assert.equal(button.textContent,'Copiado');assert.equal(focusRestored,true);clearTimeout(button.copyTimer);
 });

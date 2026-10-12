@@ -347,3 +347,9 @@ input[aria-invalid="true"]{border-color:var(--red)}
 .lobby-identity strong{font-size:28px;letter-spacing:.08em;color:var(--text)}
 .lobby-identity button{min-height:44px}#lobbyCountdown{font-size:18px;color:var(--green)}
 #lobbyCompanies{border-top:1px solid var(--line);padding-top:14px;line-height:1.6}
+/* El código confirmado se comparte por teclado, selección táctil o portapapeles. */
+.code-badge,#lobbyCode,#gameCode{-webkit-user-select:text;user-select:text;cursor:text;touch-action:auto}
+#gameCode{color:var(--side-text)!important}
+.top-actions{flex-wrap:wrap}
+#copyGameCode,#copyGameLink,#copyLobbyCode,#cancelGame{min-height:var(--side-touch-target)}
+.code-badge:focus-visible,#gameCode:focus-visible,#copyGameCode:focus-visible,#copyGameLink:focus-visible,#copyLobbyCode:focus-visible,#cancelGame:focus-visible{outline:var(--side-focus-width) solid var(--side-blue);outline-offset:var(--side-focus-offset)}

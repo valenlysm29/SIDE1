@@ -8,17 +8,17 @@ function section(start,end){
 }
 function deferred(){let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};}
 function teacher(){
- const elements={},storage=new Map(),calls=[];
+ const elements={},storage=new Map([['SIDE_PROFESOR_ID','owner']]),calls=[];
  const context={console:{error(){}},Promise,clearInterval(){},toast(){},
   state:{partidaId:null,lifecycleVersion:2,starting:false,cancelling:false,round:1},roomGeneration:0,
   teacherRead:Promise.resolve(),publishChain:Promise.resolve(),teacherBusy:false,
   teacherPoll:null,teacherTick:null,teacherClock:null,publishedState:'',
-  creationRequest:null,previousRoom:{id:'old',codigo:'SIDE-AA2'},active:false,
+  creationRequest:null,previousRoom:{id:'old',codigo:'SIDE-AA2',estado:'esperando'},active:false,
   localStorage:{removeItem:k=>storage.delete(k),setItem:(k,v)=>storage.set(k,v),getItem:k=>storage.get(k)||null},
   refreshSetupSummary(){},refreshStartButton(){},gameStatus:()=>({active:context.active}),
   closeExcelRemoteRound:async()=>true,
   applyTeacherState:data=>{context.active=data.estado!=='finalizada';storage.set('SIDE_GAME_STATUS',JSON.stringify({active:context.active}));},
-  window:{SIDE:{PartidaService:{controlar:async(id,action)=>{
+  window:{SIDE:{PartidaService:{cancelar:async id=>({success:true,data:{id,estado:'cancelada'}}),controlar:async(id,action)=>{
    calls.push({id,action});return {success:true,data:{id,estado:action==='cancelar'?'finalizada':'activa',configuracion:{runtime:{round:1,phase:'results'}}}};
   }}}}
  };
@@ -34,8 +34,9 @@ function teacher(){
 }
 test('un fallo de cancelación conserva la identidad heredada para reintentar sin falso éxito',async()=>{
  const t=teacher();let fail=true;
- t.context.window.SIDE.PartidaService.controlar=async(id,action)=>{
-  t.calls.push({id,action});return fail?{success:false,error:'Conexión interrumpida'}:{success:true,data:{id,estado:'finalizada'}};
+ t.context.window.SIDE.PartidaService.cancelar=async id=>{
+  const action='cancelar';
+  t.calls.push({id,action});return fail?{success:false,error:'Conexión interrumpida'}:{success:true,data:{id,estado:'cancelada'}};
  };
  await t.confirm();
  assert.equal(t.context.previousRoom?.id,'old','el fallo debe conservar la partida recuperada');
@@ -56,4 +57,11 @@ test('un poll detenido en cierre Excel no reaplica su sala activa después de ca
  assert.equal(t.context.active,false,'el snapshot activo anterior debe quedar invalidado');
  assert.equal(t.context.state.partidaId,null);
   assert.equal(JSON.parse(t.storage.get('SIDE_GAME_STATUS')).active,false,'el poll antiguo debe conservar el estado terminal local');
+});
+
+test('solo el propietario ve cancelar una sala abierta',()=>{
+ const t=teacher();assert.equal(t.context.canCancelRoom({id:'old',estado:'esperando',profesor_id:'owner'}),true);
+ assert.equal(t.context.canCancelRoom({id:'old',estado:'activa',profesor_id:'another'}),false);
+ assert.equal(t.context.canCancelRoom({id:'old',estado:'cancelada',profesor_id:'owner'}),false);
+ t.storage.delete('SIDE_PROFESOR_ID');assert.equal(t.context.canCancelRoom({id:'old',estado:'esperando',profesor_id:'owner'}),false);
 });
