@@ -38,7 +38,16 @@
     };
   }
 
-  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA']);
+  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA','CODIGO_RETIRADO']);
+  const CODE_MESSAGES={PARTIDA_CANCELADA:'La partida fue cancelada. Solicita el código de la nueva sala al docente.',PARTIDA_FINALIZADA:'La partida ya finalizó. Solicita el código de la nueva sala al docente.',CODIGO_RETIRADO:'Este código pertenece a una sala anterior y ya no puede utilizarse. Solicita el código de la nueva sala.',PARTIDA_NO_ENCONTRADA:'No existe una partida con ese código. Comprueba el código que compartió tu docente.',CODIGO_AMBIGUO:'Este código está duplicado en la base de datos. El docente debe revisar los códigos de las salas.'};
+  async function rejectedCodeStatus(sb,codigo){
+    try{
+      const {data,error}=await sb.rpc('side_estado_codigo_sala',{p_codigo:codigo});
+      if(error){console.warn?.('SIDE: diagnóstico de código no disponible; conserva rechazo original',error);return null;}
+      if(data?.codigo===codigo&&CODE_MESSAGES[data.code])return {success:false,technical:false,code:data.code,error:CODE_MESSAGES[data.code]};
+    }catch(error){console.warn?.('SIDE: no se pudo consultar el estado del código',error);}
+    return null;
+  }
 
   /** Conserva el diagnostico de PostgREST sin convertirlo en un rechazo de identidad. */
   function technicalFailure(error, fallbackCode) {
@@ -111,6 +120,9 @@
       }
       if (data.success === false || data.error) {
         const code = cleanText(data.code || data.codigo_error);
+        if(code==='CREDENCIALES_INVALIDAS'||code==='PARTIDA_INICIADA'){
+          const reason=await rejectedCodeStatus(sb,codigo);if(reason)return reason;
+        }
         return {
           success: false,
           code,
@@ -118,6 +130,10 @@
           technical: !ADMISSION_REJECTION_CODES.has(code)
         };
       }
+      const game=data.partida,config=game?.configuracion||{};
+      const cancelled=config.cancelledAt!=null&&!['','null','false','0'].includes(String(config.cancelledAt).trim().toLowerCase());
+      if(cancelled||config.phase==='cancelled'||config.runtime?.phase==='cancelled')return {success:false,technical:false,code:'PARTIDA_CANCELADA',error:CODE_MESSAGES.PARTIDA_CANCELADA};
+      if(game?.estado==='finalizada'||config.phase==='finished'||config.runtime?.phase==='finished')return {success:false,technical:false,code:'PARTIDA_FINALIZADA',error:CODE_MESSAGES.PARTIDA_FINALIZADA};
       if(!Number.isFinite(Date.parse(data?.partida?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).'};
       return { success: true, data };
     } catch (err) {

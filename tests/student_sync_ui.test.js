@@ -136,7 +136,7 @@ test('student synchronization and session recovery through the delivered UI',asy
       await p.waitForFunction(()=>!studentConnected&&studentSessionRecoveryTask===null);
       assert.equal(await p.evaluate(()=>Boolean(sessionStorage.SIDE_STUDENT_SESSION)),false);
       assert.equal(await p.locator('#studentReconnectBtn').isVisible(),false);
-      assert.match(await p.locator('#studentMessage').innerText(),/datos no coinciden.*mayúsculas y tildes/i);
+      assert.match(await p.locator('#studentMessage').innerText(),/Comprueba el código.*mayúsculas y tildes/i);
       await p.context().close();
     });
     await t.test('online automatically restores a session retained after a network failure',async()=>{

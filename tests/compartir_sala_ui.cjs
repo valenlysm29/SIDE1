@@ -9,7 +9,7 @@ window.SIDE3D={preloadBase:async()=>{}};
 window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
 (async()=>{
  const db=await database();
- for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql']){
+ for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql','2026-10-11_codigos_sala_no_reutilizables.sql','2026-10-11_estado_codigo_sala.sql']){
   const migration=fs.readFileSync(path.join(root,'supabase/migrations',filename),'utf8');await db.exec(migration);await db.exec(migration);
  }
  const calls=[],pageErrors=[],consoleErrors=[];let missingRecovery=false;

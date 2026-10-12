@@ -33,6 +33,7 @@ const LIQUIDATION_RATE_DEFAULT = 0.4;
 const RULES = window.SIDE_RULES;
 const UI_ICONS = {check:'assets/icons/ui/check.svg',play:'assets/icons/ui/play.svg',lock:'assets/icons/ui/lock.svg'};
 let currentStudent = {name:'Jugador',company:COMPANY_NAME,participantId:null,empresaId:null,game:DEMO_GAME};
+let authoritativeStudentState=null,studentConnected=false;
 let decisionState = {};
 let decisionDrafts = {};
 let cashLedger = {};
@@ -84,8 +85,13 @@ function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;',
 function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
 function deepClone(v){return JSON.parse(JSON.stringify(v??{}))}
 
+function scopedStudentState(){
+  const s=typeof authoritativeStudentState==='undefined'?null:authoritativeStudentState;
+  return s&&typeof studentConnected!=='undefined'&&studentConnected&&s.empresaId===currentStudent.empresaId&&s.gameId===currentStudent.game?.id&&s.code===admissionCode(currentStudent.game?.codigo)?s:null;
+}
 function teacherConfig(){
   const defaults={capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000,interest:20,creditPercentStart:20,round:1,cycles:6,demandLosOlivos:1000,demandMiraflores:1250,demandSJL:1100,cycleCloseMode:'manual',roundHours:0,roundMinutes:10,roundSecs:0,scheduledStart:'',enabledEvents:[]};
+  const own=scopedStudentState();if(own)return {...defaults,...own.config};
   try{return {...defaults,...JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')||'{}')}}catch{return defaults}
 }
 function stableHash(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
@@ -127,11 +133,11 @@ function creditApprovedLine(){
 function creditAvailable(){return Math.max(0,creditApprovedLine()-creditOutstanding());}
 function loanMaximum(){return creditAvailable()}
 function loanInitialReference(){return creditApprovedLine()}
-function currentRound(){const config=teacherConfig();const scheduled=config.cycleCloseMode==='automatic'?readRoundRuntime()?.round:null;return Math.max(1,Number(scheduled||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1))}
+function currentRound(){const own=scopedStudentState();if(own)return Math.max(1,Number(own.runtime?.round||own.config?.round||1));const config=teacherConfig();const scheduled=config.cycleCloseMode==='automatic'?readRoundRuntime()?.round:null;return Math.max(1,Number(scheduled||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1))}
 function studentAccess(existing=true){
   let status={},r={};try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'{}')||{};r=JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'{}')||{}}catch{}
   if(currentStudent.empresaId&&studentConnected){
-    if(studentSessionRecovering||!studentProgressHydrated||!authoritativeStudentState||authoritativeStudentState.empresaId!==currentStudent.empresaId)return {canOperate:false,canJoin:false,integration:true,reason:'Verificando el estado de la partida…'};
+    if(studentSessionRecovering||!studentProgressHydrated||!authoritativeStudentState||authoritativeStudentState.empresaId!==currentStudent.empresaId||authoritativeStudentState.gameId!==currentStudent.game?.id||authoritativeStudentState.code!==admissionCode(currentStudent.game?.codigo))return {canOperate:false,canJoin:false,integration:true,reason:'Verificando el estado de la partida…'};
     const s=authoritativeStudentState;
     return RULES.gameAccess(s.config,s.status,s.runtime,existing,studentNow());
   }
@@ -196,8 +202,8 @@ function updateIntegrationUI(){
 
   if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
-let cancellationShown=false,authoritativeStudentState=null;
-let studentConnected=false,remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
+let cancellationShown=false;
+let remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
 function studentNow(){if(currentStudent.empresaId&&!studentClock)return NaN;return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
 function studentIdentityKey(student=currentStudent){return JSON.stringify(studentIdentity(student))}
@@ -209,7 +215,10 @@ function startStudentSync(){
 function stopStudentSync(){clearInterval(studentPoll);clearInterval(studentTick);studentPoll=null;studentTick=null;}
 
 function applyStudentGameState(partida,round=1){
-  const config=partida.configuracion;
+  if(currentStudent.empresaId&&(partida.id!==currentStudent.game?.id||admissionCode(partida.codigo)!==admissionCode(currentStudent.game?.codigo)))throw new Error('La respuesta del servidor corresponde a otra sala. Vuelve a intentar el ingreso con el código del docente.');
+  if(!partida.configuracion||typeof partida.configuracion!=='object'||Array.isArray(partida.configuracion))return;
+  const config={...partida.configuracion};
+  if(config&&'cancelledAt' in config&&!RULES.isCancellationMarker(config.cancelledAt))delete config.cancelledAt;
   if(!config||typeof config!=='object')return;
   if(currentStudent.empresaId&&!Number.isFinite(Date.parse(partida.serverTime||'')))throw new Error('Falta hora del servidor. Aplica la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.');
   if(partida.serverTime)studentClock={time:Date.parse(partida.serverTime),at:performance.now()};
@@ -219,7 +228,7 @@ function applyStudentGameState(partida,round=1){
   else localStorage.removeItem('SIDE_ROUND_RUNTIME');
   localStorage.setItem('SIDE_ACTIVE_ROUND',String(config.runtime?.round||round));
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:config.cancelledAt||null,active:partida.estado!=='finalizada'&&!config.cancelledAt&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
-  if(currentStudent.empresaId)authoritativeStudentState={empresaId:currentStudent.empresaId,config:deepClone(config),status:JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')),runtime:{...(config.runtime||{}),round:config.runtime?.round||round}};
+  if(currentStudent.empresaId)authoritativeStudentState={empresaId:currentStudent.empresaId,gameId:partida.id,code:admissionCode(partida.codigo),config:deepClone(config),status:JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')),runtime:{...(config.runtime||{}),round:config.runtime?.round||round}};
 }
 function remoteSnapshot(data){
   const report=data?.reporte_ciclo||data?.reporteCiclo||null;
@@ -285,10 +294,11 @@ function hydrateRemoteProgress(data){
 }
 async function refreshStudentGame(options={}){
   if(!studentConnected)return false;
+  const refreshEpoch=studentSnapshotEpoch;
   if(remoteStateBusy&&!options.forceHydrate)return false;
   const forceHydrate=Boolean(options.forceHydrate);
   if(!forceHydrate&&currentStudent.empresaId)await retryStudentSync();
-  if(!studentConnected)return false;
+  if(!studentConnected||refreshEpoch!==studentSnapshotEpoch)return false;
   const S=window.SIDE;
   let remoteValid=!currentStudent.empresaId;
   if(currentStudent.empresaId&&S?.EmpresaService){
@@ -306,6 +316,7 @@ async function refreshStudentGame(options={}){
         if(!r?.success||!r.data?.partida||!r.data?.empresa){studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};return false;}
         studentStateFailure=null;
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
+        if(partida.id!==currentStudent.game?.id||admissionCode(partida.codigo)!==admissionCode(identity.codigo))throw new Error('La respuesta del servidor corresponde a otra sala. Vuelve a intentar el ingreso con el código del docente.');
         const joined=Number(data.empresas_unidas);
         if(Number.isSafeInteger(joined)&&joined>=1)studentJoinedCompanies=joined;
         const empresaId=data.empresa_id||empresa.id||currentStudent.empresaId;
@@ -426,7 +437,13 @@ $('openCreditsBtn')?.addEventListener('click',()=>{renderCredits();showModal('cr
 document.querySelector('.modal-backdrop')?.addEventListener('click',closeModal);
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal));
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
-document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>showModal(card.dataset.profile==='teacher'?'teacherLoginModal':'studentModal')));
+function openStudentAdmission(){
+  // Opening a new admission form supersedes a pending recovery of the last room.
+  studentSnapshotEpoch++;studentConnected=false;studentSessionRecovering=false;studentProgressHydrated=false;
+  authoritativeStudentState=null;studentClock=null;studentStateFailure=null;autoEnterDecisions=false;stopStudentSync();
+  $('studentReconnectBtn')?.classList.add('hidden');message('studentMessage','');showModal('studentModal');
+}
+document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>{if(card.dataset.profile==='teacher')showModal('teacherLoginModal');else openStudentAdmission();}));
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&!$('modalRoot')?.classList.contains('hidden')){closeModal();return;}
   if(e.key!=='Escape')return;
@@ -435,11 +452,12 @@ document.addEventListener('keydown',e=>{
   if($('companyReviewDialog')?.open)return;
   e.preventDefault();e.stopImmediatePropagation();closeDecisionMenu();
 });
-function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20260910-2'}
+function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20261012-sesion-codigos'}
 $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(!hasConfig&&email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}$('registerForm')?.reset();if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
   e.preventDefault();studentSessionRecovering=false;studentStateFailure=null;stopStudentSync();studentProgressHydrated=false;studentSnapshotEpoch++; const S=window.SIDE||{},cleanText=S.EmpresaService?.cleanText||(value=>String(value||'').normalize('NFC').trim().replace(/\s+/g,' ')),cleanCode=S.EmpresaService?.cleanCode||(value=>cleanText(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
+  const joinEpoch=studentSnapshotEpoch;
   const code=admissionCode($('gameCode').value);
   showAdmissionCodeError();
   if(!validAdmissionCode(code)){showAdmissionCodeError(JOIN_CODE_MESSAGE);message('studentMessage',JOIN_CODE_MESSAGE,true);$('gameCode').focus();return;}
@@ -461,9 +479,10 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(!S.EmpresaService?.ingresar){const error={code:'SERVICIO_EMPRESA_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     let ingreso;
     try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
-      if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO'].includes(ingreso?.code)){
-        const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
+      if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO','CODIGO_RETIRADO'].includes(ingreso?.code)){
+        const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_RETIRADO'?'Este código pertenece a una sala anterior y ya no se puede utilizar. Pide al docente el código de una sala nueva.':ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
         showAdmissionCodeError(text);message('studentMessage',text,true);return;
       }
       if(['PARTIDA_CANCELADA','PARTIDA_FINALIZADA'].includes(ingreso?.code)){message('studentMessage',ingreso.code==='PARTIDA_CANCELADA'?'Esta partida fue cancelada. Pide al docente el código de una sala nueva.':'Esta partida ya finalizó. Pide al docente el código de una sala nueva.',true);return;}
@@ -474,6 +493,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
       message('studentMessage',JOIN_SERVER_MESSAGE,true);return
     }
     const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
+    if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala',ingreso);message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
     const empresaId=data.empresa_id||empresa.id||null,participantId=data.participante_id||null,returning=Boolean(data.reingreso);
     if(!empresaId||!found.id){console.error('SIDE: respuesta incompleta de ingresar_empresa',ingreso);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     const canonicalBrand=cleanText(empresa.nombre_comercial||data.nombre_comercial||brandName),canonicalLegal=cleanText(empresa.nombre_legal||data.nombre_legal||legalName);
@@ -489,6 +509,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
   startStudentSync();
   loadDecisionState();
   await refreshStudentGame();
+  if(joinEpoch!==studentSnapshotEpoch)return;
   const joinedReport=syncStudentReportPreview();if(currentStudent.empresaId&&studentProgressHydrated)syncReportToSupabase(joinedReport);
   closeModal();startJoinLoading();
 });
@@ -1452,6 +1473,7 @@ $('submitAllDecisionsBtn')?.addEventListener('click',submitAllDecisions);
 $('topSubmitAllDecisions')?.addEventListener('click',submitAllDecisions);
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function readRoundRuntime(){
+  const own=scopedStudentState();if(own)return own.runtime;
   try{
     const r=JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'null');
     const status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'{}')||{},config=teacherConfig();
@@ -1477,7 +1499,7 @@ function syncStudentTimer(){
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
   if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note='Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado';}
-  if(conf.cancelledAt||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
+  if(RULES.isCancellationMarker(conf.cancelledAt)||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
   if($('studentRoundTimer'))$('studentRoundTimer').textContent=text;
   if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;
@@ -1552,6 +1574,9 @@ $('studentReconnectBtn')?.addEventListener('click',resumeStudentSession);
 (async function restoreStudentSession(){
   let saved;try{saved=JSON.parse(sessionStorage.getItem('SIDE_STUDENT_SESSION')||'null');}catch{}
   if(!saved?.game?.codigo||!saved.company)return;
+  const invitedCode=new URLSearchParams(window.location.search).get('partida');
+  // A shared link to another room takes precedence over a previous student session.
+  if(invitedCode&&admissionCode(invitedCode)!==admissionCode(saved.game.codigo))return;
   studentSnapshotEpoch++;currentStudent=saved;studentConnected=true;studentSessionRecovering=Boolean(saved.empresaId);studentProgressHydrated=!saved.empresaId;loadDecisionState();
   await resumeStudentSession();if(studentConnected)startStudentSync();
 })();

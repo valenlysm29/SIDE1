@@ -18,9 +18,9 @@ function loadService(source,rpc,serviceName,logger=console){
 }
 
 test('student service normalizes the three admission fields and preserves server codes',async()=>{
- let call;
+ const calls=[];
  const service=loadService(serviceSource,async(name,args)=>{
-  call={name,args};
+  calls.push({name,args});
   return {data:{success:false,code:'PARTIDA_INICIADA',error:'server detail'},error:null};
  },'EmpresaService');
  const result=await service.ingresar({
@@ -28,7 +28,7 @@ test('student service normalizes the three admission fields and preserves server
   nombreLegal:'  Compañía   Ágil  ',
   nombreComercial:'  Café   Norte '
  });
- assert.deepEqual(JSON.parse(JSON.stringify(call)),{
+ assert.deepEqual(JSON.parse(JSON.stringify(calls.find(call=>call.name==='ingresar_empresa'))),{
   name:'ingresar_empresa',
   args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte'}
  });

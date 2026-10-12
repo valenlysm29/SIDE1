@@ -37,7 +37,12 @@
   const creationMigration = 'supabase/migrations/2026-10-11_fix_crear_partida.sql';
   const recoveryMigration = 'supabase/migrations/2026-10-11_recuperar_salas_compatibles.sql';
   function normalizeRoom(data){
-    if(data?.configuracion?.lifecycleVersion==='2')return {...data,configuracion:{...data.configuracion,lifecycleVersion:2}};
+    if(data?.configuracion){
+      const config={...data.configuracion};
+      if(config.lifecycleVersion==='2')config.lifecycleVersion=2;
+      if('cancelledAt' in config&&(config.cancelledAt==null||['','null','false','0'].includes(String(config.cancelledAt).trim().toLowerCase())))delete config.cancelledAt;
+      return {...data,configuracion:config};
+    }
     return data;
   }
   function roomDetail(data) {

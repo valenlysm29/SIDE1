@@ -43,6 +43,12 @@ test('código inexistente se explica junto al campo y no se atribuye a los nombr
  assert.equal(f.fields.gameCodeError.textContent,f.message);
  assert.equal(f.logs.length,0);
 });
+test('un código retirado se explica junto al campo y exige el código de una sala nueva',async()=>{
+ const f=form({success:false,code:'CODIGO_RETIRADO'});f.fields.gameCode.value='SIDE-RX8';
+ await f.context.submit({preventDefault(){}});
+ assert.equal(f.calls,1);assert.match(f.message,/sala anterior.*ya no se puede utilizar.*sala nueva/);
+ assert.equal(f.fields.gameCodeError.textContent,f.message);assert.equal(f.fields.gameCode.attributes['aria-invalid'],'true');
+});
 
 test('la identidad exacta y la restricción de reingreso tras inicio se conservan',async()=>{
  for(const [code,expected] of [['CREDENCIALES_INVALIDAS',/mayúsculas y tildes/],['PARTIDA_INICIADA',/Solo pueden reingresar/],['PARTIDA_CANCELADA',/fue cancelada/],['PARTIDA_FINALIZADA',/ya finalizó/]]){
