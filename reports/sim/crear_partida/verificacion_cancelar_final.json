@@ -1,0 +1,106 @@
+{
+  "unitarias": 62,
+  "suitesSql": 7,
+  "suitesNavegador": 6,
+  "checks": [
+    {
+      "name": "unitarias",
+      "exitCode": 0,
+      "seconds": 6
+    },
+    {
+      "name": "crear_partida_db.cjs",
+      "exitCode": 0,
+      "seconds": 4
+    },
+    {
+      "name": "game_lifecycle_db.cjs",
+      "exitCode": 0,
+      "seconds": 5
+    },
+    {
+      "name": "waiting_room_db.cjs",
+      "exitCode": 0,
+      "seconds": 9
+    },
+    {
+      "name": "game_observations_db.cjs",
+      "exitCode": 0,
+      "seconds": 10
+    },
+    {
+      "name": "student_admission_db.cjs",
+      "exitCode": 0,
+      "seconds": 28
+    },
+    {
+      "name": "student_admission_matrix_db.cjs",
+      "exitCode": 0,
+      "seconds": 161
+    },
+    {
+      "name": "teacher_history_db.cjs",
+      "exitCode": 0,
+      "seconds": 3
+    },
+    {
+      "name": "crear_partida_ui.cjs",
+      "exitCode": 0,
+      "seconds": 147
+    },
+    {
+      "name": "game_lifecycle_ui.cjs",
+      "exitCode": 0,
+      "seconds": 141
+    },
+    {
+      "name": "teacher_lifecycle_ui.cjs",
+      "exitCode": 0,
+      "seconds": 17
+    },
+    {
+      "name": "waiting_tutorial_ui.cjs",
+      "exitCode": 0,
+      "seconds": 8
+    },
+    {
+      "name": "teacher_history_ui.cjs",
+      "exitCode": 0,
+      "seconds": 7
+    },
+    {
+      "name": "teacher_grades_ui.cjs",
+      "exitCode": 0,
+      "seconds": 13
+    },
+    {
+      "name": "check-docente.js",
+      "exitCode": 0,
+      "seconds": 0
+    },
+    {
+      "name": "check-partida_service.js",
+      "exitCode": 0,
+      "seconds": 0
+    },
+    {
+      "name": "check-cancelar_partida.test.cjs",
+      "exitCode": 0,
+      "seconds": 0
+    },
+    {
+      "name": "check-crear_partida_db.cjs",
+      "exitCode": 0,
+      "seconds": 0
+    },
+    {
+      "name": "check-crear_partida_ui.cjs",
+      "exitCode": 0,
+      "seconds": 0
+    }
+  ],
+  "ultimoE2EDespuesEstadoTerminal": "PASS exit 0",
+  "revisionIndependiente": "APROBADA",
+  "supabaseProduccionEjecutado": false,
+  "sqlAdicionalRequerido": false
+}

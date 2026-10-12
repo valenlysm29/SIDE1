@@ -1,5 +1,7 @@
 # Diagnóstico de creación de partida — 2026-10-11
 
+> Actualización posterior a la captura del usuario: el flujo de reemplazo de este informe queda sustituido por **Cancelar partida → Iniciar partida**. El rechazo de partidas antiguas y la corrección están documentados en [seguimiento_crear_sala_cancelar_2026-10-11.md](seguimiento_crear_sala_cancelar_2026-10-11.md). No hay una nueva migración SQL en ese seguimiento.
+
 ## Causa comprobada antes del parche
 
 En HEAD inicial `92ebb13`, `js/docente.js:361` devuelve éxito desde `prepareGame()` cuando `SIDE_GAME_STATUS.active` está guardado, sin consultar Supabase. `startGame()` en línea 414 anuncia «Sala de espera configurada…» aunque no hubo creación ni comprobación de existencia. Reproducción: guardar `{active:true}` en esa clave y pulsar/invocar Iniciar partida; cero llamadas de creación/control. No se puede atribuir el caso de producción a una migración sin inspeccionar su base: no se accedió a producción.
