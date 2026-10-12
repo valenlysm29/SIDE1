@@ -1,5 +1,7 @@
 # Salas por código — 12 de octubre de 2026
 
+> Actualización vigente: la sección «Código corto» al final cambia la generación nueva de seis a cuatro caracteres. Los apartados iniciales documentan la entrega anterior; sus códigos existentes continúan funcionando.
+
 ## Diagnóstico antes de editar
 
 Se revisaron `supabase/schema.sql`, las migraciones de lifecycle/admisión/identidad exacta y las cuatro correcciones del 11-Oct; `services/partida_service.js`, `services/empresa_service.js`, `js/docente.js`, `js/app.js` y sus formularios. Tres subagentes trabajaron por frente (SQL, docente y estudiante), primero en lectura y después en implementación; integración y revisión final en el agente principal. Skills utilizadas: `.agents/skills/frontend-design/SKILL.md` y `.agents/skills/webapp-testing/SKILL.md`; ninguna faltó.
@@ -71,3 +73,50 @@ Pendiente externo: aplicar migración y repetir el recorrido con cuentas reales 
 Todos los artefactos de esta tarea permanecen dentro de SIDE1. El contenedor del proyecto solo tenía SIDE1 al comenzar y al verificar antes de entrega. Remoto verificado: `https://github.com/valenlysm29/SIDE1.git`.
 
 Entrega organizada en commits SQL, docente, estudiante e integración/informe. Se autoriza el push solicitado a main al pasar todas las pruebas relevantes de salas; el único fallo de la suite general es el mismo fallo previo del manifiesto de NPC documentado arriba. El push no aplica SQL ni confirma que el hosting haya desplegado el JavaScript.
+
+## Código corto — actualización del 12 de octubre de 2026
+
+### Contrato y compatibilidad
+
+Las salas nuevas generan `SIDE-XXXX`; las anteriores conservan su valor exacto, incluidos códigos de seis caracteres, legados de tres y `SIDE-000`. El alfabeto es `ABCDEFGHJKMNPQRSTUVWXYZ23456789`: 31 símbolos, **31^4 = 923521 combinaciones**. No contiene 0/O/1/I/L. No se recomienda reutilizar códigos de partidas finalizadas o canceladas: una invitación antigua podría conducir a otra sala. Se conserva el registro permanente incluso si se borra la partida; ante crecimiento cercano al agotamiento, ampliar el espacio de códigos.
+
+`supabase/migrations/2026-10-12_codigo_corto.sql` sustituye el generador con cuatro elecciones aleatorias, 100 intentos, mutex compartido y comprobación contra partidas y reservas históricas normalizadas. Si no encuentra un código libre devuelve un error explícito, sin crear una sala ficticia. Mantiene el índice UNIQUE funcional insensible a mayúsculas; reconstruye sus claves después de actualizar la función IMMUTABLE. Un índice adicional sobre reservas normalizadas evita escanear todo el historial en cada intento. No cambia códigos ni identidades existentes, RLS, cancelación ni decisiones.
+
+El normalizador SQL/cliente acepta `SIDE-PTV6`, `side-ptv6`, `SIDEPTV6`, `PTV6` y variantes con espacios; códigos de seis caracteres conservan el mismo comportamiento. Los largos inválidos se rechazan antes de Supabase y también en la RPC. Se conserva la compatibilidad de tres caracteres anterior; la palabra incompleta `SIDE` es inválida. Mientras se escribe solo se eliminan espacios y se convierte a mayúsculas: el prefijo se completa al salir del campo o enviar, para no corromper el tecleo de `SIDE-`.
+
+### Archivos de esta actualización
+
+| Archivo | Cambio |
+| --- | --- |
+| `supabase/migrations/2026-10-12_codigo_corto.sql` | Migración incremental e idempotente, generación de cuatro caracteres, normalización sin prefijo, índices y ayuda SQL. |
+| `services/empresa_service.js`, `js/app.js` | Normalización de sufijos solos, textos del formato corto, prefijo diferido al escribir y comparación independiente de nombres en demo. |
+| `index.html` | Placeholder y ayuda accesible de cuatro caracteres; maxlength 64 permite pegar espacios y códigos antiguos sin truncarlos; validación determina el largo efectivo. |
+| `css/docente.css`, `docente.html` | Fuente destacada responsive para cortos y antiguos; versiones de caché actualizadas junto al cliente estudiante. |
+| `tests/salas_codigo_db.cjs`, `tests/codigo_corto_db.cjs` | 1000 INSERT únicos con formato corto, SQL repetido, códigos antiguos, colisiones activas/históricas, agotamiento y permisos. |
+| Tests estudiante y runners compartir/crear/lifecycle/cambio de sala | Normalización, largos inválidos, escritura carácter por carácter y E2E con formato nuevo. |
+
+Tres subagentes trabajaron en SQL, frontend y pruebas; la integración final revisó el contrato común, la longitud real del alfabeto, los índices al cambiar una función IMMUTABLE y la escritura manual. Se aplicaron `frontend-design` y `webapp-testing`; ninguna skill faltó. No se modificó el menú ni se agregaron decisiones.
+
+### Aplicación y comprobación
+
+**Sí, hay que ejecutar el SQL nuevo en Supabase.** Si ya se instaló `2026-10-12_salas_codigo.sql`, ejecutar únicamente `2026-10-12_codigo_corto.sql` completo en SQL Editor. Si falta la migración anterior, aplicarla primero siguiendo sus prerrequisitos documentados arriba y luego el parche corto. No ejecutar la migración anterior después del parche corto: volvería a instalar el generador de seis caracteres hasta reaplicar este parche. El SQL nuevo es repetible y no necesita modificar las salas antiguas.
+
+Después de desplegar el frontend, Ctrl+F5. Crear una sala docente y comprobar un código `SIDE-` seguido de cuatro caracteres; Copiar debe pegar el mismo valor. Entrar desde una ventana privada escribiendo solamente el sufijo en minúsculas, con ambos nombres, y verificar la empresa en docente. Repetir con una sala previa de seis caracteres: debe conservar código, permitir ingreso en espera y reingreso exacto una vez iniciada. Cancelarla debe avisar al estudiante y bloquear posteriores ingresos. Crear otra sala debe dar otro código.
+
+La migración no se ejecutó en producción; las pruebas usan PostgreSQL PGlite y páginas/servicios reales con autenticación de prueba. Los logs y capturas de esta actualización están en `tests/output/short_code/`, dentro de SIDE1.
+
+### Verificación del código corto
+
+- `node tests/salas_codigo_db.cjs`: PASS, migraciones repetidas y 1000 INSERT con códigos distintos de cuatro caracteres, demo preservado, permisos y actualización sobre las migraciones anteriores.
+- `node tests/codigo_corto_db.cjs`: PASS, SQL nuevo dos veces consecutivas y después otras dos, normalización 4/6, largos inválidos, sala antigua de seis caracteres que entra/reingresa/cancela, colisiones deterministas contra AAAA activa y BBBB histórica antes de obtener CCCC, error de agotamiento y no reutilización tras borrar.
+- Pruebas unitarias focales de normalización/admisión: 21/21 PASS (`unit.log`).
+- `compartir_sala_ui.cjs`: PASS, sala previa SIDE-ABC234, nueva SIDE-XXXX, escritura carácter por carácter con/sin prefijo, Copiar, ingreso, cancelación y rechazo posterior.
+- `crear_partida_ui.cjs`, `game_lifecycle_ui.cjs`, `student_change_room_ui.cjs`: PASS completos en ejecución secuencial. Captura móvil revisada: código corto y botón Copiar visibles en la sala de espera.
+- `decision_options_db.cjs` y `student_admission_matrix_db.cjs`: PASS, sin cambios en decisiones.
+- `node --check` de ambos scripts modificados y `git diff --check`: PASS.
+
+Durante integración se actualizaron dos expectativas que todavía usaban la ayuda y maxlength anteriores; estos fallos fueron introducidos por el cambio de contrato, no se clasifican como preexistentes. La ejecución paralela de varios Chromium produjo timeouts de navegación/reloj; los mismos runners se repitieron secuencialmente sin relajar sus verificaciones y pasaron. Los logs de esos intentos quedan separados de `final.tap`.
+
+Suite completa final: `node --test --test-concurrency=1 tests/*.test.js tests/*.test.mjs tests/*.test.cjs`: **423/424 PASS**, un único fallo preexistente en `tests/decision_roster.test.mjs:21`: espera 16 actores y el manifiesto contiene 17. Los fallos nuevos de expectativas y los timeouts no aparecen en esta ejecución final. Resultado exacto en `tests/output/short_code/final.tap`.
+
+**Push retenido:** por la condición de esta solicitud «Si algo falla, no hagas push», los cambios quedan en commits locales aunque todas las pruebas de salas pasan. Falta resolver la discrepancia 16/17 del manifiesto de NPC y repetir la suite completa antes de publicar. No se cambió esa prueba ni el manifiesto para eludir el fallo. Commits por frente: SQL `37a51af`, frontend `4cdcf9e`, pruebas `ceb1d26`, seguidos por este informe. Remoto main permanece en `9d6b773`; no se ejecutó `git push` en esta actualización.
