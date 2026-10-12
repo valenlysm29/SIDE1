@@ -20,7 +20,7 @@ test('respuesta de creación vacía no se anuncia como sala creada',async()=>{co
 test('reintento de solicitud ya cancelada o terminada exige nueva solicitud',async()=>{for(const phase of ['cancelled','finished']){const s=service(async()=>({data:{...sala,estado:'finalizada',configuracion:{runtime:{phase}}}}));const r=await s.api.crear(datos);assert.equal(r.success,false);assert.equal(r.code,'SOLICITUD_FINALIZADA');assert.match(r.error,/Reintentar/);}});
 test('respuesta sin estado usable o runtime coherente no anuncia éxito',async()=>{for(const bad of [{...sala,estado:undefined},{...sala,estado:'activa'},{...sala,configuracion:{runtime:{phase:'decisions'}}}]){const s=service(async()=>({data:bad}));assert.equal((await s.api.crear(datos)).success,false);}});
 
-test('recuperación de partida heredada permite administrarla y cancelarla sin falso error de sala inválida',async()=>{
+test('recuperación heredada conserva identificación para sincronizar el servidor',async()=>{
  for(const estado of ['esperando','activa']){
   const legacy={...sala,estado,configuracion:{lifecycleVersion:1,cycles:3,roundMinutes:5}};
   const s=service(async()=>({data:legacy}));const r=await s.api.obtenerActiva();
@@ -30,6 +30,25 @@ test('recuperación de partida heredada permite administrarla y cancelarla sin f
 test('recuperación moderna sin runtime no se acepta como partida heredada',async()=>{
  const s=service(async()=>({data:{...sala,configuracion:{lifecycleVersion:2}}}));const r=await s.api.obtenerActiva();assert.equal(r.success,false);assert.equal(r.code,'SALA_INCONSISTENTE');assert.equal(r.data.id,'room');
 });
-test('sala moderna en espera sin fecha de inicio exige cancelar y volver a crear',async()=>{
+test('sala moderna sin fecha de inicio conserva identificación para reparar el reloj',async()=>{
  const bad={...sala,configuracion:{lifecycleVersion:2,runtime:{phase:'integration'}}};const s=service(async()=>({data:bad}));const r=await s.api.obtenerActiva();assert.equal(r.success,false);assert.equal(r.code,'SALA_INCONSISTENTE');assert.equal(r.data.id,'room');assert.doesNotMatch(r.error,/sala válida/);assert.equal((await s.api.crear(datos)).success,false);
+});
+
+test('versión 2 guardada como texto conserva sala usable, sin clasificarla antigua',async()=>{
+ const s=service(async()=>({data:{...sala,configuracion:{...sala.configuracion,lifecycleVersion:'2'}}}));
+ assert.equal((await s.api.obtenerActiva()).data.configuracion.lifecycleVersion,2);
+ assert.equal((await s.api.crear(datos)).success,true);
+});
+test('recuperación RPC conserva id y comprueba reloj, estado y código',async()=>{
+ const s=service(async()=>({data:sala}));const result=await s.api.recuperarSala('room',datos.configuracion);
+ assert.equal(result.success,true);assert.equal(result.data.codigo,sala.codigo);
+ assert.equal(s.calls[0].name,'recuperar_sala_docente');assert.equal(s.calls[0].args.p_partida_id,'room');
+});
+test('recuperación ausente pide el SQL específico, sin éxito ficticio',async()=>{
+ const s=service(async()=>({error:{code:'PGRST202',message:'Missing RPC'}}));const result=await s.api.recuperarSala('room');
+ assert.equal(result.success,false);assert.match(result.error,/2026-10-11_recuperar_salas_compatibles.sql/);
+});
+test('recuperación de terminal permite configurar nueva sin reabrir la partida',async()=>{
+ const s=service(async()=>({data:{...sala,estado:'finalizada'}}));const result=await s.api.recuperarSala('room');
+ assert.equal(result.success,true);assert.equal(result.data,null);assert.equal(result.terminal,true);
 });

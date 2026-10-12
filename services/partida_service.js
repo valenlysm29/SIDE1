@@ -35,6 +35,11 @@
   }
 
   const creationMigration = 'supabase/migrations/2026-10-11_fix_crear_partida.sql';
+  const recoveryMigration = 'supabase/migrations/2026-10-11_recuperar_salas_compatibles.sql';
+  function normalizeRoom(data){
+    if(data?.configuracion?.lifecycleVersion==='2')return {...data,configuracion:{...data.configuracion,lifecycleVersion:2}};
+    return data;
+  }
   function roomDetail(data) {
     return JSON.stringify({tipo:Array.isArray(data)?'array':typeof data,id:data?.id||null,codigo:data?.codigo||null,
       estado:data?.estado||null,lifecycleVersion:data?.configuracion?.lifecycleVersion||null,
@@ -45,7 +50,7 @@
     const identity=data?.id&&data.codigo&&['esperando','activa'].includes(data.estado);
     const legacy=identity&&data.configuracion?.lifecycleVersion!==2;
     if(recoverable&&identity){
-      return creationError(null,{error:legacy?'Existe una partida anterior con un formato antiguo. Cancela la partida antes de iniciar una nueva.':'Existe una partida sin un reloj o estado de espera válido. Cancela la partida antes de iniciar una nueva.',
+      return creationError(null,{error:'La partida necesita recuperar su configuración y su reloj del servidor.',
         code:legacy?'SALA_ANTIGUA':'SALA_INCONSISTENTE',partida:data,technicalDetail:roomDetail(data)});
     }
     return creationError(null,{error:'Supabase devolvió una respuesta de sala incompleta. Verifica la instalación de 20261009_sala_espera_identidad_exacta.sql y 2026-10-11_fix_crear_partida.sql.',
@@ -75,11 +80,28 @@
   async function obtenerActiva() {
     const sb=client();if(!sb)return offline();
     try {
-      const {data,error}=await sb.rpc('obtener_sala_docente');
+      const {data:response,error}=await sb.rpc('obtener_sala_docente');
+      const data=normalizeRoom(response);
       if(error||data?.error)return creationError(error,data);
       if(data&&!validRoom(data))return roomContractError(data,true);
       return {success:true,data:data||null};
     } catch(error){return creationError(error);}
+  }
+  async function recuperarSala(partidaId,config=null){
+    const sb=client();if(!sb)return offline();
+    if(!partidaId)return {success:false,error:'No se pudo identificar la partida.'};
+    try{
+      const {data:response,error}=await sb.rpc('recuperar_sala_docente',{p_partida_id:partidaId,p_config:config});
+      if(error||response?.error){
+        if(/PGRST202|42883|42703/.test(error?.code||''))return {success:false,code:'MIGRACION_RECUPERACION_PENDIENTE',error:'Falta actualizar Supabase: ejecuta '+recoveryMigration+'.',technicalDetail:error.message};
+        return creationError(error,response);
+      }
+      const data=normalizeRoom(response);
+      if(data?.id===partidaId&&data.estado==='finalizada')return {success:true,data:null,terminal:true};
+      if(!validRoom(data))return roomContractError(data,false);
+      if(data.id!==partidaId)return {success:false,error:'Supabase devolvió otra partida al recuperar la sala.'};
+      return {success:true,data};
+    }catch(error){return creationError(error);}
   }
 
   /**
@@ -145,10 +167,11 @@
         eventos_habilitados: d.eventos_habilitados || []
       };
       if(d.configuracion?.lifecycleVersion===2){
-        const {data,error}=await sb.rpc('crear_sala_docente',{
+        const {data:response,error}=await sb.rpc('crear_sala_docente',{
           p_config:payload.configuracion,p_nombre:payload.nombre,p_curso:payload.curso||'',p_segmento:payload.segmento,
           p_request_id:d.requestId||requestUuid(),p_reemplazar_id:null
         });
+        const data=normalizeRoom(response);
         if(error||data?.error)return creationError(error,data);
         const phase=data?.configuracion?.runtime?.phase;
         if(data?.estado==='finalizada'||['cancelled','finished'].includes(phase))return creationError(null,{error:'La sala de esa solicitud ya terminó. Pulsa Reintentar para crear una nueva.',code:'SOLICITUD_FINALIZADA',partida:data});
@@ -318,5 +341,5 @@
       return {success:true,data:data.cierre,reused:!!data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar,contextoExcel,cerrarExcel,excelDisponible };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar,contextoExcel,cerrarExcel,excelDisponible };
 })(window);
