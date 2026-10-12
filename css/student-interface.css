@@ -154,3 +154,4 @@
   :is(#landing,#profiles,#studentLoading,#studentLobby) *::before,
   :is(#landing,#profiles,#studentLoading,#studentLobby) *::after { animation: none !important; transition: none !important; }
 }
+.student-podium{width:min(880px,calc(100% - 32px));margin:16px auto;position:relative;z-index:2}.student-podium[hidden]{display:none}.student-podium li{margin:8px 0}.student-podium p{overflow-wrap:anywhere}

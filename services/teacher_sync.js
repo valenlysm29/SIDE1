@@ -6,40 +6,43 @@
     const now = options.now || Date.now;
     const onlineMs = options.onlineMs ?? 90000;
     const offlineMs = options.offlineMs ?? 120000;
-    const confirmations = options.confirmations ?? 2;
+    const idleSustainMs = options.idleSustainMs ?? 15000;
     const entries = new Map();
 
-    function observe(id, lastSeenAt) {
-      let entry = entries.get(id);
-      if (!entry) {
-        entry = { status: 'unconfirmed', candidate: null, count: 0, seen: false };
-        entries.set(id, entry);
-      }
-      const stamp = lastSeenAt ? Date.parse(lastSeenAt) : NaN;
-      if (Number.isFinite(stamp)) entry.seen = true;
-      // A missing heartbeat in one response must not erase an earlier one.
-      if (!Number.isFinite(stamp)) return entry.status;
-
-      const age = Math.max(0, now() - stamp);
-      const candidate = entry.status === 'online'
-        ? (age >= offlineMs ? 'idle' : 'online')
-        : (age <= onlineMs ? 'online' : 'idle');
-      if (candidate === entry.status) {
-        entry.candidate = null;
-        entry.count = 0;
-      } else {
-        entry.count = entry.candidate === candidate ? entry.count + 1 : 1;
-        entry.candidate = candidate;
-        if (entry.count >= confirmations) {
-          entry.status = candidate;
-          entry.candidate = null;
-          entry.count = 0;
-        }
+    function evaluate(entry, time) {
+      if (!entry || !Number.isFinite(time) || !Number.isFinite(entry.lastSeen)) return entry?.status || 'unconfirmed';
+      const age = Math.max(0, time - entry.lastSeen);
+      if (age < offlineMs) entry.idleSince = null;
+      else {
+        // Wall time, rather than callback count: polling and Realtime can both
+        // deliver the same stale snapshot within a single event-loop turn.
+        if (entry.idleSince === null) entry.idleSince = time;
+        if (time - entry.idleSince >= idleSustainMs) entry.status = 'idle';
       }
       return entry.status;
     }
 
-    return { observe, clear(id) { if (id === undefined) entries.clear(); else entries.delete(id); } };
+    function observe(id, lastSeenAt) {
+      let entry = entries.get(id);
+      if (!entry) {
+        entry = { status: 'unconfirmed', lastSeen: null, idleSince: null };
+        entries.set(id, entry);
+      }
+      const time = now(), stamp = lastSeenAt ? Date.parse(lastSeenAt) : NaN;
+      // This is the single presence record, shared by snapshots and events.
+      // Missing/older fields never erase a heartbeat or revive a stale session.
+      if (Number.isFinite(stamp) && (entry.lastSeen === null || stamp > entry.lastSeen)) {
+        entry.lastSeen = stamp;
+        if (Number.isFinite(time) && Math.max(0, time - stamp) <= onlineMs) entry.status = 'online';
+      }
+      // A valid heartbeat may arrive before the initial server-clock response.
+      if (entry.status === 'unconfirmed' && entry.lastSeen !== null && Number.isFinite(time) && Math.max(0, time - entry.lastSeen) <= onlineMs) entry.status = 'online';
+      return evaluate(entry, time);
+    }
+    const get = id => evaluate(entries.get(id), now());
+    return { observe, get, tick: get,
+      lastSeen(id) { const stamp = entries.get(id)?.lastSeen; return Number.isFinite(stamp) ? new Date(stamp).toISOString() : null; },
+      clear(id) { if (id === undefined) entries.clear(); else entries.delete(id); } };
   }
 
   function createGradeQueue(options) {

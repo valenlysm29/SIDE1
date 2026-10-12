@@ -1,0 +1,23 @@
+const assert=require('node:assert/strict'),fs=require('node:fs');
+const {database,createGame,rpc,professor}=require('./lifecycle_db_fixture.cjs');
+(async()=>{const db=await database();try{
+const sql=fs.readFileSync('supabase/migrations/2026-10-12_podio_programado.sql','utf8').replaceAll('collate "es-x-icu"','collate "C"');await db.exec(sql);await db.exec(sql);
+const game=await createGame(db),identity={p_codigo:game.codigo,p_nombre_legal:'Zeta SAC',p_nombre_comercial:'Zeta'};
+const a=await rpc(db,'ingresar_empresa',identity);await rpc(db,'ingresar_empresa',{...identity,p_nombre_legal:'Andina SAC',p_nombre_comercial:'Andina'});
+const action=(p_accion,p_minutos=0)=>rpc(db,'side_podio_docente',{p_partida_id:game.id,p_accion,p_minutos,p_justificacion:'Criterio docente'});
+assert.match((await action('publicar')).error,/Califica/);await db.query('update participantes set puntaje_docente=18 where partida_id=$1',[game.id]);
+let r=await action('publicar');assert.equal(r.publication.visible,true);assert.equal(r.publication.winner,'Andina');assert.equal(r.publication.reason,'Criterio docente');assert.equal(Date.parse(r.publication.expiresAt)-Date.parse(r.publication.publishedAt),86400000);
+assert.ok((await rpc(db,'side_podio_estudiante',identity)).publication);
+for(const min of [-1,4321,null])assert.ok((await action('publicar',min)).error);
+r=await action('publicar',1);assert.equal(r.publication.scheduled,true);assert.equal((await rpc(db,'side_podio_estudiante',identity)).publication,null);
+const first=r.publication.publishedAt;r=await action('publicar',120);assert.ok(Date.parse(r.publication.publishedAt)>Date.parse(first));assert.equal((await action('cancelar')).publication,null);
+await action('publicar',4320);await db.query("update podios_publicados set publicar_en=now()-interval '1 second' where partida_id=$1",[game.id]);assert.ok((await rpc(db,'side_podio_estudiante',identity)).publication);
+assert.ok((await action('cancelar')).publication,'cancel cannot withdraw effective publication');
+await db.query("update podios_publicados set publicar_en=now()-interval '24 hours' where partida_id=$1",[game.id]);assert.equal((await rpc(db,'side_podio_estudiante',identity)).publication,null);
+assert.ok((await rpc(db,'side_podio_estudiante',{...identity,p_nombre_comercial:'Wrong'})).error);
+await db.query("select set_config('test.uid','22222222-2222-2222-2222-222222222222',false)");
+for(const name of ['consultar','publicar','cancelar'])assert.ok((await action(name)).error);
+await db.exec('set role authenticated');assert.equal((await db.query('select * from podios_publicados')).rows.length,0);await assert.rejects(db.query('delete from podios_publicados'));
+await db.exec('reset role;set role anon');await assert.rejects(action('publicar'));await assert.rejects(db.query('select * from podios_publicados'));assert.equal((await rpc(db,'side_podio_estudiante',identity)).publication,null);
+console.log('PASS podium SQL idempotent, now/schedule/cancel/reschedule, bounds, server visibility, 24h, owner and RLS');
+}finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1});

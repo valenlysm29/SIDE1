@@ -201,7 +201,7 @@ function updateIntegrationUI(){
     if($('studentLobby')?.classList.contains('hidden'))showScreen('studentLobby');
     playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
     window.SIDE3D?.suspend?.();syncStudentTimer();stopStudentSync();
-    studentConnected=false;studentSessionRecovering=false;studentSnapshotEpoch++;
+    studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentSnapshotEpoch++;
     try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
     closeModal();showScreen('profiles');
     const cancellationNotice=$('roomCancellationNotice');
@@ -241,6 +241,21 @@ function applyStudentGameState(partida,round=1){
   localStorage.setItem('SIDE_ACTIVE_ROUND',String(config.runtime?.round||round));
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:config.cancelledAt||null,active:partida.estado!=='finalizada'&&!config.cancelledAt&&(config.lifecycleVersion===2||Boolean(config.gameStartedAt)),startedAt:config.gameStartedAt,finishedAt:partida.estado==='finalizada'?'finished':null,code:partida.codigo||currentStudent.game.codigo}));
   if(currentStudent.empresaId)authoritativeStudentState={empresaId:currentStudent.empresaId,gameId:partida.id,code:admissionCode(partida.codigo),config:deepClone(config),status:JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')),runtime:{...(config.runtime||{}),round:config.runtime?.round||round}};
+}
+function renderStudentPodium(publication){
+  for(const id of ['studentLobby','decisionMenu']){
+    const host=$(id);if(!host)continue;
+    let panel=host.querySelector('[data-student-podium]');
+    if(!panel){panel=document.createElement('article');panel.dataset.studentPodium='';panel.className='student-podium side-panel';host.appendChild(panel);}
+    panel.hidden=!publication;
+    if(!publication){panel.replaceChildren();delete panel.dataset.signature;continue;}
+    const signature=JSON.stringify(publication);if(panel.dataset.signature===signature)continue;
+    panel.dataset.signature=signature;panel.replaceChildren();
+    const title=document.createElement('h2');title.textContent='Podio del docente';panel.appendChild(title);
+    const list=document.createElement('ol');
+    for(const row of publication.podium||[]){const item=document.createElement('li');item.textContent=`${row.empresa}: ${row.grade} / 20`;list.appendChild(item);}
+    panel.appendChild(list);const reason=document.createElement('p');reason.textContent=publication.reason||'';panel.appendChild(reason);
+  }
 }
 function remoteSnapshot(data){
   const report=data?.reporte_ciclo||data?.reporteCiclo||null;
@@ -325,7 +340,7 @@ async function refreshStudentGame(options={}){
       try{
         const r=await S.EmpresaService.obtenerEstado(identity);
         if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
-        if(!r?.success||!r.data?.partida||!r.data?.empresa){studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};return false;}
+        if(!r?.success||!r.data?.partida||!r.data?.empresa){renderStudentPodium(null);studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};return false;}
         studentStateFailure=null;
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
         if(partida.id!==currentStudent.game?.id||admissionCode(partida.codigo)!==admissionCode(identity.codigo))throw new Error('La respuesta del servidor corresponde a otra sala. Vuelve a intentar el ingreso con el código del docente.');
@@ -339,6 +354,7 @@ async function refreshStudentGame(options={}){
         currentStudent={...currentStudent,empresaId,participantId:data.participante_id||currentStudent.participantId,company:canonicalCompany,legalName:canonicalLegal,game:{...partida,codigo:S.EmpresaService.cleanCode(partida.codigo||identity.codigo)},snapshotRevision:(!forceHydrate&&studentSyncPending())?previousRevision:serverRevision};
         const round=Number(config?.runtime?.round||data.ciclo_partida||empresa.ciclo_actual||1);
         applyStudentGameState(partida,round);
+        renderStudentPodium(data.podio);
         if(!forceHydrate&&studentSyncPending())studentProgressHydrated=true;
         else if(forceHydrate||!studentProgressHydrated||serverRevision!==previousRevision){studentProgressHydrated=false;if(!hydrateRemoteProgress(data))return false;}
         if(config?.lifecycleVersion===2)localStorage.setItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey(),JSON.stringify(data.individualEvents||{}));
@@ -451,7 +467,7 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('[data-switch]').forEach(b=>b.addEventListener('click',()=>showModal(b.dataset.switch==='register'?'teacherRegisterModal':'teacherLoginModal')));
 function openStudentAdmission(){
   // Opening a new admission form supersedes a pending recovery of the last room.
-  studentSnapshotEpoch++;studentConnected=false;studentSessionRecovering=false;studentProgressHydrated=false;
+  studentSnapshotEpoch++;studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentProgressHydrated=false;
   authoritativeStudentState=null;studentClock=null;studentStateFailure=null;autoEnterDecisions=false;stopStudentSync();
   $('studentReconnectBtn')?.classList.add('hidden');message('studentMessage','');showModal('studentModal');
 }
@@ -582,7 +598,7 @@ $('enterDecisionsBtn')?.addEventListener('click',openDecisionMenu);
 $('cancelledBackToProfiles')?.addEventListener('click',()=>$('backToProfiles').click());
 $('resumeWorldBtn')?.addEventListener('click',requestWorldEntry);
 $('reopenTutorialBtn')?.addEventListener('click',openStudentTutorial);
-$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;studentSessionRecovering=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;studentJoinedCompanies=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
+$('backToProfiles')?.addEventListener('click',()=>{studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentSnapshotEpoch++;playerIsDeciding=false;autoEnterDecisions=false;characterSelectionConfirmed=false;studentClock=null;studentJoinedCompanies=null;stopStudentSync();try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}showScreen('profiles')});
 $('waitingBackToProfiles')?.addEventListener('click',()=>$('backToProfiles')?.click());
 function updateDecisionReturnButton(){
   const button=$('exitDecisions');if(!button)return;
@@ -1329,7 +1345,7 @@ function showStudentSyncStatus(status,error){
   if(error)console.warn('SIDE: sincronización pendiente',error);
 }
 function rejectStudentSession(){
-  studentConnected=false;studentSessionRecovering=false;studentProgressHydrated=false;studentSnapshotEpoch++;stopStudentSync();
+  studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentProgressHydrated=false;studentSnapshotEpoch++;stopStudentSync();
   try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
   showScreen('profiles');showModal('studentModal');$('studentReconnectBtn')?.classList.add('hidden');message('studentMessage',JOIN_INVALID_MESSAGE,true);
 }

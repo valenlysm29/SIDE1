@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
-  <link rel="stylesheet" href="css/docente.css?v=20261012-codigo-corto">
+  <link rel="stylesheet" href="css/docente.css?v=20261012-presencia-podio">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
 </head>
 <body>
@@ -141,12 +141,12 @@
     </section>
 
     <section id="tab-podio" class="tab-panel">
-      <div class="hero-card winner-hero"><div><span class="eyebrow">PODIO</span><h2>Resultados y calificaciones</h2><p>SIDE muestra una sugerencia financiera. El podio final publicado se ordena exclusivamente por las notas del profesor y se muestra durante 24 horas.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
+      <div class="hero-card winner-hero"><div><span class="eyebrow">PODIO</span><h2>Resultados y calificaciones</h2><p>SIDE muestra una sugerencia financiera. El podio final publicado se ordena exclusivamente por las notas del profesor y se muestra durante 24 horas desde la hora efectiva de publicación.</p></div><div class="hero-orb trophy-orb"><img src="assets/icons/teacher/podio.svg" alt=""></div></div>
       <div class="grid two">
         <article class="card"><div class="card-title"><h3>Sugerencia de SIDE</h3><span>Solo informativa</span></div><p class="hint">Puntaje de 0 a 100: margen de utilidad 35 (20% alcanza el máximo), rentabilidad sobre activos 25 (15%), efectivo/activos 25 (30%) y baja deuda/activos 15. Los indicadores sin datos valen cero.</p><div id="sidePodium" class="suggested-podium"></div></article>
         <article class="card"><div class="card-title"><h3>Podio según las notas actuales</h3><span id="podiumState">No publicado</span></div><div id="podiumPreview" class="podium" aria-live="polite"></div></article>
       </div>
-      <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Guarda las notas en Empresas, también después de terminar todos los ciclos. Al finalizar se evalúan todas las empresas participantes, aunque estén desconectadas o inactivas. La vista previa se actualiza con cada nota; pulsa PUBLICAR PODIO para publicar los cambios. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><p id="publishStatus" class="publish-status" role="status"></p></article>
+      <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Guarda las notas en Empresas, también después de terminar todos los ciclos. Al finalizar se evalúan todas las empresas participantes, aunque estén desconectadas o inactivas. La vista previa se actualiza con cada nota; pulsa PUBLICAR PODIO para elegir Ahora o Programar (de 1 minuto a 72 horas). La programación se cumple aunque cierres el panel. Las 24 horas empiezan al publicarse. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><div id="podiumSchedule" class="podium-schedule hidden"><span id="podiumScheduledAt"></span><strong id="podiumCountdown"></strong><div class="podium-actions"><button id="podiumPublishNow" class="primary" type="button">Publicar ahora</button><button id="podiumReschedule" class="secondary" type="button">Reprogramar</button><button id="podiumCancelSchedule" class="secondary" type="button">Cancelar programación</button></div></div><p id="publishStatus" class="publish-status" role="status"></p></article>
     </section>
     <section id="tab-historial" class="tab-panel teacher-workspace" aria-labelledby="historyHeading">
       <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Historial</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
@@ -157,6 +157,19 @@
   </main>
 </div>
 
+<dialog id="podiumDialog" class="podium-dialog" aria-labelledby="podiumDialogTitle">
+  <form id="podiumPublishForm">
+    <h2 id="podiumDialogTitle">Cuándo publicar el podio</h2>
+    <label>Publicación<select id="podiumPublishMode"><option value="now">Ahora</option><option value="schedule">Programar</option></select></label>
+    <div id="podiumDelayFields" class="value-row hidden">
+      <label>Horas<input id="podiumHours" type="number" min="0" max="72" step="1" value="0"></label>
+      <label>Minutos<input id="podiumMinutes" type="number" min="0" max="59" step="1" value="1"></label>
+    </div>
+    <p id="podiumPublishPreview" class="hint" aria-live="polite"></p>
+    <p id="podiumPublishError" role="alert"></p>
+    <div class="podium-actions"><button id="confirmPodiumPublish" class="primary" type="submit">Confirmar publicación</button><button id="cancelPodiumPublish" class="secondary" type="button">Cancelar</button></div>
+  </form>
+</dialog>
 <dialog id="eventPicker" class="event-picker" aria-labelledby="eventPickerTitle"><div class="event-picker-toolbar"><span>Configuración de eventos</span><button id="eventSelectAll" class="secondary" type="button">Seleccionar todos</button><button id="closeEventPicker" class="secondary" type="button">Listo</button></div>      <div class="event-bank-card">
         <div class="card-title"><div><h3 id="eventPickerTitle">Seleccionar eventos</h3><p>Marca los eventos disponibles o genera una selección aleatoria.</p></div><span id="eventSelectionCount">0 seleccionados</span></div>
         <div class="event-mode-panel">
@@ -195,8 +208,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261012-salas"></script>
-<script src="services/empresa_service.js?v=20261012-codigo-corto"></script>
+<script src="services/partida_service.js?v=20261012-presencia-podio"></script>
+<script src="services/empresa_service.js?v=20261012-presencia-podio"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
 <script src="js/engine/config_excel.js?v=20261011"></script>
@@ -214,8 +227,8 @@
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
 <script src="js/teacher_podium.js?v=20261009-grades"></script>
-<script src="services/teacher_sync.js?v=20261009-grades"></script>
+<script src="services/teacher_sync.js?v=20261012-presencia-podio"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20261012-salas"></script>
+<script src="js/docente.js?v=20261012-presencia-podio"></script>
 </body>
 </html>

@@ -6,20 +6,22 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { database, config, createGame, rpc } = require('./lifecycle_db_fixture.cjs');
 
-test('presence needs two readings and a wider timeout before going idle', () => {
+test('presence connects immediately and needs sustained elapsed time before going idle', () => {
   let time = Date.parse('2026-09-29T12:00:00Z');
   const tracker = createPresenceTracker({ now: () => time });
   const seen = new Date(time).toISOString();
-  assert.equal(tracker.observe('a', seen), 'unconfirmed');
+  assert.equal(tracker.observe('a', seen), 'online');
   assert.equal(tracker.observe('a', seen), 'online');
   time += 95000;
   assert.equal(tracker.observe('a', seen), 'online');
   assert.equal(tracker.observe('a', null), 'online');
   time += 26000;
   assert.equal(tracker.observe('a', seen), 'online');
+  assert.equal(tracker.observe('a', seen), 'online');
+  time += 15000;
   assert.equal(tracker.observe('a', seen), 'idle');
   const refreshed = new Date(time).toISOString();
-  assert.equal(tracker.observe('a', refreshed), 'idle');
+  assert.equal(tracker.observe('a', refreshed), 'online');
   assert.equal(tracker.observe('a', refreshed), 'online');
 });
 

@@ -184,6 +184,12 @@
       });
       if (error) return technicalFailure(error, 'RPC_ESTUDIANTE_ERROR');
       if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
+      // Only the server may expose a due, unexpired podium. Fail closed.
+      data.podio=null;
+      try{
+        const podium=await request(sb,'side_podio_estudiante',{p_codigo:codigo,p_nombre_legal:nombreLegal,p_nombre_comercial:nombreComercial});
+        if(!podium.error&&podium.data?.success===true)data.podio=podium.data.publication;
+      }catch(error){console.warn?.('SIDE: podio pendiente de consulta',error);}
       if(!Number.isFinite(Date.parse(data?.partida?.serverTime||'')))return {success:false,code:'MIGRACION_PENDIENTE',error:'Falta aplicar la migración 20261009_sala_espera_identidad_exacta.sql en Supabase (respuesta sin hora del servidor).'};
       return { success: true, data };
     } catch (err) {

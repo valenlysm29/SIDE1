@@ -225,6 +225,7 @@ test('student state service always uses normalized identity and compare-and-swap
  assert.equal((await service.guardarEstado(identity,{decision_state:{}},7)).data.snapshot_revision,8);
  assert.deepEqual(JSON.parse(JSON.stringify(calls)),[
   {name:'obtener_estado_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte'}},
+  {name:'side_podio_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte'}},
   {name:'guardar_estado_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte',p_snapshot:{decision_state:{}},p_expected_revision:7}}
  ]);
 });

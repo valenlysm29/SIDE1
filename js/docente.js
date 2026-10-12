@@ -69,8 +69,25 @@ function renderTeacherLobby(){
   $('lobbyCode').textContent=$('gameCode').value;
   $('lobbyCountdown').textContent=r?.phase==='integration'?`El Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:`Ciclo ${state.round} · ${formatStudentTime(state.seconds)}`;
   $('lobbyNext').textContent=state.authoritative?.cycleCloseMode==='manual'?'El Ciclo 1 inicia automáticamente; tú controlas el cierre de cada ciclo.':'El Ciclo 1 inicia automáticamente; los ciclos avanzan según la programación.';
-  const companies=state.reports.filter(x=>x.fuente==='supabase');
-  $('lobbyCompanies').innerHTML=companies.length?`<strong>${companies.length} ${companies.length===1?'empresa unida':'empresas unidas'}</strong><ul>${companies.map(x=>`<li>${escapeHtml(x.empresa)}</li>`).join('')}</ul>`:'Esperando empresas. Comparte el código para que ingresen.';
+  const companies=state.reports.filter(x=>x.fuente==='supabase'),container=$('lobbyCompanies');
+  if(!companies.length){
+    const empty='Esperando empresas. Comparte el código para que ingresen.';
+    if(container.textContent!==empty)container.textContent=empty;
+    return;
+  }
+  let count=container.querySelector('strong'),list=container.querySelector('ul');
+  if(!list){container.textContent='';count=document.createElement('strong');list=document.createElement('ul');container.append(count,list);}
+  const label=`${companies.length} ${companies.length===1?'empresa unida':'empresas unidas'}`;
+  if(count.textContent!==label)count.textContent=label;
+  const current=new Map([...list.querySelectorAll('[data-company-id]')].map(node=>[node.dataset.companyId,node]));
+  for(const company of companies){
+    const key=companyNodeKey(company);let node=current.get(key);
+    if(!node){node=document.createElement('li');node.dataset.companyId=key;list.appendChild(node);}
+    const presence=companyPresence(company),text=`${company.empresa} · ${companyActivity(company,presence)}`;
+    if(node.textContent!==text)node.textContent=text;
+    node.dataset.presence=presence;current.delete(key);
+  }
+  for(const node of current.values())node.remove();
 }
 function validateCreation(config){
   document.querySelectorAll('.creation-field-error').forEach(x=>x.remove());
@@ -152,7 +169,14 @@ function startLiveCompanies(){
   if(companiesChannel)sb.removeChannel(companiesChannel);
   companiesChannelId=state.partidaId;
   companiesChannel=sb.channel(`side-roster-${state.partidaId}`)
-    .on('postgres_changes',{event:'*',schema:'public',table:'participantes',filter:`partida_id=eq.${state.partidaId}`},()=>loadReports())
+    .on('postgres_changes',{event:'*',schema:'public',table:'participantes',filter:`partida_id=eq.${state.partidaId}`},payload=>{
+      const row=payload?.new;
+      if(row?.empresa_id&&row.partida_id===state.partidaId){
+        presenceTracker.observe(`${state.partidaId}:${row.empresa_id}`,row.last_seen_at);
+        renderCompanies();renderTeacherLobby();
+      }
+      loadReports();
+    })
     .subscribe();
 }
 function generateGameCode(){
@@ -687,23 +711,28 @@ function remoteProgress(cat,rows){
  * lo vivo (actividad, financieros, puntaje) y sirve de respaldo sin filas.
  * @returns {Promise<Array|null>} Reportes fusionados o null si offline/sin partida.
  */
-async function supabaseReports(){
+async function supabaseReports(reportsBase=state.reports){
   const S=window.SIDE||{};
   if(!S.PartidaService||!S.DecisionesService||!S.SupabaseClient?.isReady())return null;
   if(!state.partidaId)return null;
-  const parts=await S.PartidaService.listarParticipantes(state.partidaId);
+  const partidaId=state.partidaId,generation=roomGeneration,code=$('gameCode').value,localBase=reportsBase.slice();
+  const stillCurrent=()=>partidaId===state.partidaId&&generation===roomGeneration;
+  const parts=await S.PartidaService.listarParticipantes(partidaId);
+  if(!stillCurrent())return null;
   if(!parts.success){rosterSyncError=parts.error||'Error de conexión';return null;}
   rosterSyncError='';
   const roster=(parts.data||[]).filter(p=>p.empresa_id).map(p=>({id:'sb-'+p.empresa_id,empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,partida:$('gameCode').value,empresa:p.empresas?.nombre_comercial||p.empresa,legalName:p.empresas?.nombre_legal||null,nombre:p.nombre||'Jugador',ronda:p.empresas?.ciclo_actual||1,caja:p.empresas?.caja_actual||0,fuente:'supabase',estado:'activa'}));
-  const known=new Set(state.reports.map(r=>r.empresa));
-  state.reports.push(...roster.filter(r=>!known.has(r.empresa)));
+  // Reconcile presence immediately, before slow financial report requests.
+  for(const p of parts.data||[])if(p.empresa_id)presenceTracker.observe(`${partidaId}:${p.empresa_id}`,p.last_seen_at);
+  const known=new Set(localBase.map(r=>r.empresaId||r.empresa));
+  localBase.push(...roster.filter(r=>!known.has(r.empresaId||r.empresa)));
   const cat=await supabaseCatalog();
-  const code=$('gameCode').value;
-  const localBase=state.reports||[];
+  if(!stillCurrent())return null;
   const out=[];
   for(const p of (parts.data||[])){
     if(!p.empresa_id)continue;
     const rr=await S.DecisionesService.obtenerReporte(p.empresa_id);
+    if(!stillCurrent())return null;
     const info=rr.success?rr.data:null;
     const emp=info?.empresa||p.empresas||{};
     const cicloActual=Number(emp.ciclo_actual)||1;
@@ -715,7 +744,7 @@ async function supabaseReports(){
       const qty=Number(d.cantidad)||1;
       return op?`${codeName} · ${op.etiqueta}${qty>1?` ×${qty}`:''}`:`${codeName}${qty>1?` ×${qty}`:''}`;
     });
-    const local=localBase.find(x=>x.empresa===(emp.nombre_comercial||p.empresa));
+    const local=localBase.find(x=>x.empresaId===p.empresa_id)||localBase.find(x=>!x.empresaId&&x.empresa===(emp.nombre_comercial||p.empresa));
     const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
     const rep=((info?.reportes)||[]).find(r=>Number(r.ciclo)===cicloActual)||null;
     out.push({
@@ -752,31 +781,35 @@ async function supabaseReports(){
 let rosterSyncError='',reportsBusy=false,reportsAgain=false;
 async function loadReports(){
   if(reportsBusy){reportsAgain=true;return;}reportsBusy=true;
+  const partidaId=state.partidaId,generation=roomGeneration,code=$('gameCode').value;
+  const stillCurrent=()=>partidaId===state.partidaId&&generation===roomGeneration&&code===$('gameCode').value;
   try{
   const cached=state.reports;
-  try{state.reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{state.reports=[]}
-  const names=new Set(state.reports.map(r=>r.empresa));
-  if(state.partidaId)state.reports.push(...cached.filter(r=>r.fuente==='supabase'&&!names.has(r.empresa)));
-  state.reports=state.reports.filter(r=>r.partida===$('gameCode').value);
+  let local=[];try{local=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{}
+  local=local.filter(r=>r.partida===code);
+  const base=partidaId?cached.filter(r=>r.fuente==='supabase'&&r.partida===code):[];
+  const names=new Set(base.map(r=>r.empresa));
+  base.push(...local.filter(r=>!names.has(r.empresa)));
+  // Keep the displayed roster intact until the whole next snapshot is ready.
+  // Replacing it with localStorage while awaiting Supabase made the lobby blink.
   try{
-    const remote=await supabaseReports();
-    if(remote){
-      state.reports=remote;
-      for(const r of remote)if(r.fuente==='supabase')presenceStates.set(String(r.empresaId||r.id),presenceTracker.observe(String(r.empresaId||r.id),r.lastSeenAt));
-    }
-  }catch(error){rosterSyncError=error.message;console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
+    const remote=await supabaseReports(base);
+    if(!stillCurrent())return;
+    state.reports=remote||base;
+  }catch(error){if(!stillCurrent())return;rosterSyncError=error.message;console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
   renderCompanies();renderResults();renderWinnerSelect();renderTeacherLobby();
   }finally{reportsBusy=false;if(reportsAgain){reportsAgain=false;setTimeout(loadReports,100);}}
 }
 function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}">${escapeHtml(k)} ${v.complete?'✓':`${v.done||0}/${v.total||0}`}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
 const presenceTracker=window.SIDE.TeacherSync.createPresenceTracker({now:teacherNow});
-const presenceStates=new Map();
+function companyNodeKey(r){return String(r.empresaId||r.id);}
+function companyPresenceKey(r){return `${state.partidaId||$('gameCode').value}:${companyNodeKey(r)}`;}
 const gradeUiStatus=new Map();
 const gradeUiErrors=new Map();
 const gradeFailureNotified=new Set();
 function companyPresence(r){
   if(r.fuente!=='supabase')return r.conectada?'online':'idle';
-  return presenceStates.get(String(r.empresaId||r.id))||'unconfirmed';
+  return presenceTracker.get(companyPresenceKey(r));
 }
 function companyActivity(r,presence){
   if(podiumOptions().finished)return 'PARTICIPACIÓN FINALIZADA';
@@ -837,18 +870,21 @@ function renderCompanies(force=false){
   if(!state.reports.length){if(grid.textContent!=='Aún no hay empresas reportadas en esta partida.')grid.innerHTML='<div class="card">Aún no hay empresas reportadas en esta partida.</div>';return;}
   grid.querySelector('.card:not([data-company-id])')?.remove();
   for(const [i,r] of state.reports.entries()){
-    let card=current.get(String(r.id));
+    const key=companyNodeKey(r);let card=current.get(key);
     if(!card){
-      card=document.createElement('article');card.className='company-card';card.dataset.companyId=String(r.id);
-      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${i}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${i}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
-      card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>x.id===r.id)));
-      card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=r.id;switchTab('resultados');renderResults();});
+      card=document.createElement('article');card.className='company-card';card.dataset.companyId=key;
+      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${escapeAttr(key)}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${escapeAttr(key)}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
+      card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>companyNodeKey(x)===key)));
+      card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=card.dataset.reportId;switchTab('resultados');renderResults();});
       const form=card.querySelector('[data-grade-form]'),input=form.querySelector('input');
       input.addEventListener('input',()=>{input.dataset.dirty='true';});
-      form.addEventListener('submit',event=>{event.preventDefault();if(saveCompanyGrade(r.id,input.value))input.dataset.dirty='';});
+      form.addEventListener('submit',event=>{event.preventDefault();if(saveCompanyGrade(card.dataset.reportId,input.value))input.dataset.dirty='';});
       grid.appendChild(card);
     }
-    current.delete(String(r.id));
+    card.dataset.reportId=r.id;
+    card.querySelector('[data-grade-form]').dataset.gradeForm=r.id;
+    card.querySelector('[data-view-results]').dataset.viewResults=r.id;
+    current.delete(key);
     const setText=(field,value)=>{const el=card.querySelector(`[data-field="${field}"]`);if(el.textContent!==value)el.textContent=value;};
     const presence=companyPresence(r);
     card.querySelector('.live-dot').classList.toggle('online',presence==='online');
@@ -916,7 +952,12 @@ async function closeExcelRemoteRound(ciclo){
 }
 function renderWinnerSelect(){renderPodium();
 }
-function publishedPodium(){try{return JSON.parse(localStorage.getItem('SIDE_PUBLISHED_PODIUM')||'null')}catch{return null}}
+let remotePodium=null,podiumGame=null,podiumClock=null,podiumBusy=false,podiumRead=0,podiumLoadError='';
+function publishedPodium(){return podiumGame===state.partidaId?remotePodium:null;}
+function podiumNow(){return podiumClock?podiumClock.time+(performance.now()-podiumClock.at):Date.now();}
+function podiumDelay(){const h=Number($('podiumHours').value),m=Number($('podiumMinutes').value);if(!Number.isInteger(h)||!Number.isInteger(m)||h<0||m<0||m>59||h*60+m<1||h*60+m>4320)throw new Error('Elige entre 1 minuto y 72 horas, con minutos de 0 a 59.');return h*60+m;}
+function podiumDate(value){return new Date(value).toLocaleString('es-PE',{timeZoneName:'short'});}
+function updatePodiumPreview(){const scheduled=$('podiumPublishMode').value==='schedule';$('podiumDelayFields').classList.toggle('hidden',!scheduled);try{const minutes=scheduled?podiumDelay():0;$('podiumPublishPreview').textContent=minutes?'Publicación prevista: '+podiumDate(podiumNow()+minutes*60000)+'. El plazo comienza al confirmar.':'Se publicará al confirmar, durante 24 horas.';$('podiumPublishError').textContent='';}catch(error){$('podiumPublishError').textContent=error.message;}}
 function podiumOptions(){return {finished:Boolean(gameStatus()?.finishedAt&&!gameStatus()?.cancelledAt)};}
 function gradingReports(){return window.SIDE_TEACHER_PODIUM.eligibleReports(state.reports,podiumOptions());}
 function gradeSignature(){return JSON.stringify(gradingReports().map(r=>[String(r.empresaId||r.id||r.empresa),gradeValue(r)==null?null:Number(gradeValue(r))]).sort((a,b)=>a[0].localeCompare(b[0])));}
@@ -925,15 +966,17 @@ function podiumCandidates(){
 }
 function renderPodium(){
   const publication=publishedPodium(),sameGame=publication&&(!publication.code||publication.code===$('gameCode').value);
-  const visible=RULES.podiumVisible(publication,$('gameCode').value);
+  const visible=Boolean(sameGame&&publication.visible),scheduled=Boolean(sameGame&&publication.scheduled);
+  $('podiumSchedule').classList.toggle('hidden',!scheduled);
+  if(scheduled){$('podiumScheduledAt').textContent='Publicación: '+podiumDate(publication.publishedAt);const secs=Math.max(0,Math.ceil((Date.parse(publication.publishedAt)-podiumNow())/1000));$('podiumCountdown').textContent=secs?`${Math.floor(secs/3600)} h ${Math.floor(secs%3600/60)} min ${secs%60} s`:'Verificando publicación con el servidor…';}
   // La vista del profesor refleja siempre las notas actuales, incluso al vencer
   // una publicación. El snapshot publicado sólo cambia al volver a publicar.
   const list=podiumCandidates();
   const changed=Boolean(sameGame&&(publication.gradeSignature?publication.gradeSignature!==gradeSignature():JSON.stringify((publication.podium||[]).map(r=>[r.empresa,Number(r.grade)]))!==JSON.stringify(list.map(r=>[r.empresa,Number(r.grade)]))));
   const pending=gradingReports().some(r=>grades()[gradeKey(r)]?.pending||gradeQueue.has(gradeKey(r)));
   const names=['🥇','🥈','🥉'],classes=['first','second','third'];
-  $('podiumState').textContent=visible?(changed?'Notas actualizadas · vista previa':'Publicado · 24 horas'):sameGame?'Publicación vencida · vista previa':'Vista previa';
-  $('publishStatus').textContent=pending?'Hay notas pendientes de sincronizar. Espera a que aparezcan como guardadas antes de publicar.':changed?'Las notas cambiaron. Pulsa PUBLICAR PODIO para publicar las calificaciones actuales.':visible?'Disponible hasta: '+new Date(RULES.podiumExpiry(publication)).toLocaleString('es-PE'):sameGame?'La publicación venció a las 24 horas. Las notas se conservan; puedes volver a publicar.':'El podio será visible durante 24 horas desde su publicación.';
+  $('podiumState').textContent=scheduled?'Publicación programada':visible?(changed?'Notas actualizadas · vista previa':'Publicado · 24 horas'):sameGame?'Publicación vencida · vista previa':'Vista previa';
+  $('publishStatus').textContent=podiumLoadError||(scheduled?'El podio se publicará automáticamente y estará disponible durante 24 horas.':pending?'Hay notas pendientes de sincronizar. Espera a que aparezcan como guardadas antes de publicar.':changed?'Las notas cambiaron. Pulsa PUBLICAR PODIO para publicar las calificaciones actuales.':visible?'Disponible hasta: '+podiumDate(publication.expiresAt):sameGame?'La publicación venció a las 24 horas. Las notas se conservan; puedes volver a publicar.':'El podio será visible durante 24 horas desde su publicación.');
   $('podiumPreview').innerHTML=list.map((r,i)=>`<div class="podium-place ${classes[i]}"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><small>${Number(r.grade).toLocaleString('es-PE')} / 20</small></div>`).join('')||`<p>${gradingReports().length?'Aún no hay notas. Guarda las calificaciones en Empresas para ver el podio.':'Aún no hay empresas participantes.'}</p>`;
   $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports,podiumOptions()).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Aún no hay empresas participantes.</p>';
 }
@@ -943,17 +986,44 @@ function publishPodium(){
   if(participants.some(r=>grades()[gradeKey(r)]?.pending||gradeQueue.has(gradeKey(r)))){toast('Espera a que todas las notas se sincronicen antes de publicar el podio.');return;}
   const podium=podiumCandidates();
   if(!podium.length){toast('No hay calificaciones válidas para publicar.');return;}
-  const publication={code:$('gameCode').value,publishedAt:new Date().toISOString(),winner:podium[0].empresa,reason:$('winnerReason').value,gradeSignature:gradeSignature(),podium:podium.map(r=>({empresa:r.empresa,grade:r.grade}))};
-  publication.expiresAt=new Date(RULES.podiumExpiry(publication)).toISOString();
-  localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(publication));
-  renderPodium();toast('Podio publicado por 24 horas.');
+  $('podiumPublishError').textContent='';updatePodiumPreview();$('podiumDialog').showModal();
 }
-function loadPublished(){
-  const p=publishedPodium();
-  if(RULES.podiumVisible(p,$('gameCode').value))$('winnerReason').value=p.reason||'';
+async function podiumAction(accion,minutos=0){
+  if(podiumBusy)return false;
+  const id=state.partidaId;
+  if(!id){toast('Selecciona una partida guardada en Supabase.');return false;}
+  podiumBusy=true;++podiumRead;
+  ['confirmPodiumPublish','podiumPublishNow','podiumCancelSchedule','publishPodium'].forEach(id=>$(id).disabled=true);
+  try{
+    const result=await window.SIDE.PartidaService.podio(id,accion,minutos,$('winnerReason').value);
+    if(id!==state.partidaId)return false;
+    if(!result.success){$('podiumPublishError').textContent=result.error;toast(result.error);return false;}
+    applyPodiumResponse(id,result.data);$('winnerReason').dataset.dirty='';renderPodium();
+    toast(accion==='cancelar'?'Programación cancelada.':minutos?'Publicación programada.':'Podio publicado por 24 horas.');return true;
+  }finally{podiumBusy=false;['confirmPodiumPublish','podiumPublishNow','podiumCancelSchedule','publishPodium'].forEach(id=>$(id).disabled=false);}
+}
+function applyPodiumResponse(id,data){
+  podiumLoadError='';podiumGame=id;remotePodium=data.publication;podiumClock={time:Date.parse(data.serverTime),at:performance.now()};
+}
+async function loadPublished(){
+  const id=state.partidaId,read=++podiumRead;
+  if(!id){remotePodium=null;podiumLoadError='';renderPodium();return;}
+  const result=await window.SIDE.PartidaService.podio(id);
+  if(id!==state.partidaId||read!==podiumRead||podiumBusy)return;
+  if(!result.success){podiumLoadError=result.error;renderPodium();return;}
+  applyPodiumResponse(id,result.data);
+  if(remotePodium&&!$('winnerReason').dataset.dirty&&document.activeElement!==$('winnerReason'))$('winnerReason').value=remotePodium.reason||'';
   renderPodium();
 }
-setInterval(renderPodium,1000);
+$('podiumPublishForm').addEventListener('submit',async event=>{event.preventDefault();try{const delay=$('podiumPublishMode').value==='schedule'?podiumDelay():0;if(await podiumAction('publicar',delay))$('podiumDialog').close();}catch(error){$('podiumPublishError').textContent=error.message;}});
+$('cancelPodiumPublish').addEventListener('click',()=>$('podiumDialog').close());
+$('winnerReason').addEventListener('input',()=>{$('winnerReason').dataset.dirty='true';});
+['podiumPublishMode','podiumHours','podiumMinutes'].forEach(id=>$(id).addEventListener('input',updatePodiumPreview));
+$('podiumPublishNow').addEventListener('click',()=>podiumAction('publicar'));
+$('podiumCancelSchedule').addEventListener('click',()=>podiumAction('cancelar'));
+$('podiumReschedule').addEventListener('click',()=>{$('podiumPublishMode').value='schedule';publishPodium();});
+setInterval(()=>{if($('tab-podio').classList.contains('active'))renderPodium();},1000);
+setInterval(()=>{if($('tab-podio').classList.contains('active')&&!podiumBusy)loadPublished();},5000);
 const historyController=window.SIDE_TEACHER_HISTORY?.createController({mount:$('historyContent'),status:$('historyStatus'),refresh:$('refreshHistory'),service:window.SIDE?.TeacherHistoryService,catalog:window.SIDE_DECISION_CATALOG||[]});
 function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio',historial:'Historial · última partida'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='historial')historyController?.load()}
 let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
@@ -1006,7 +1076,11 @@ document.querySelectorAll('#tab-configuracion input').forEach(input=>{
 });
 $('openEventPicker')?.addEventListener('click',()=>{$('eventPicker').showModal();renderEventBank()});
 $('closeEventPicker')?.addEventListener('click',()=>$('eventPicker').close());
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&cycleMode()==='automatic')refreshAutomaticRuntime()});
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)return;
+  loadReports();
+  if(cycleMode()==='automatic')refreshAutomaticRuntime();
+});
 document.querySelectorAll('input[name="eventSelectionMode"]').forEach(i=>i.addEventListener('change',()=>{state.eventSelectionMode=i.value;saveConfig(true);updateEventModeUI()}));
 $('eventRandomize')?.addEventListener('click',randomizeEventSelection);
 $('eventClearSelection')?.addEventListener('click',()=>{state.enabledEvents.clear();renderEventBank();saveConfig(true);toast('Selección de eventos limpiada.');});

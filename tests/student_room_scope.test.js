@@ -32,7 +32,7 @@ test('un enlace a otra sala abre ingreso sin recuperar la sesión cancelada ante
 });
 test('abrir ingreso manual invalida una recuperación pendiente y conserva sesión y decisiones anteriores',async()=>{
  const c=state();c.sessionStorage=store();c.sessionStorage.setItem('SIDE_STUDENT_SESSION','saved-old-room');c.localStorage.setItem('SIDE_DECISIONS_SIDE-OLD_demo1','saved-decisions');
- c.studentSnapshotEpoch=4;c.studentSessionRecovering=true;c.studentStateFailure=null;c.autoEnterDecisions=true;c.stopStudentSync=()=>{};c.$=()=>({classList:{add(){}}});c.message=()=>{};c.showModal=()=>{};c.showScreen=()=>{throw new Error('una recuperación vieja no debe cambiar la pantalla')};
+ c.studentSnapshotEpoch=4;c.studentSessionRecovering=true;c.studentStateFailure=null;c.autoEnterDecisions=true;c.stopStudentSync=()=>{};c.$=id=>['studentLobby','decisionMenu'].includes(id)?null:({classList:{add(){}}});c.message=()=>{};c.showModal=()=>{};c.showScreen=()=>{throw new Error('una recuperación vieja no debe cambiar la pantalla')};
  let complete;c.studentSyncPending=()=>false;c.refreshStudentGame=()=>new Promise(resolve=>complete=resolve);c.prepareLobby=()=>{throw new Error('una recuperación vieja no debe abrir lobby')};
  vm.runInContext(block('function openStudentAdmission(','document.querySelectorAll(\'.profile-card\')')+block('function resumeStudentSession(){',"$('studentReconnectBtn')?.addEventListener"),c);c.studentSessionRecoveryTask=null;
  const recovery=c.resumeStudentSession();c.openStudentAdmission();complete(true);assert.equal(await recovery,false);

@@ -9,6 +9,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
  const db=await database();let browser;
  try{
   await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20260929_guardar_puntaje_docente.sql'),'utf8'));
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_podio_programado.sql'),'utf8').replaceAll('collate "es-x-icu"','collate "C"'));
   const game=await createGame(db,config({cycles:2})),players=[];
   for(const name of ['Andina','Costa','Sierra'])players.push(await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:name+' SAC',p_nombre_comercial:name}));
   await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'iniciar'});
@@ -24,6 +25,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
   await page.exposeFunction('gradeRoster',async()=>({success:true,data:(await db.query(`select p.*,to_jsonb(e) as empresas from participantes p join empresas e on e.id=p.empresa_id where p.partida_id=$1 order by e.id`,[game.id])).rows}));
   const load=async(seed={})=>{
    await page.goto('about:blank');
+   await page.reload();
    await page.setContent(html.replace('const fixtureData={};','const fixtureData='+JSON.stringify(seed)+';'),{waitUntil:'load'});
    await page.waitForFunction(()=>!reportsBusy);
    await page.evaluate(async({game,finished})=>{
@@ -49,6 +51,13 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
    await page.waitForFunction(()=>gradeQueue.pending()===0);
    assert.match(await form.locator('[data-grade-status]').innerText(),/Guardado/);
   };
+  const publish=async()=>{
+   await page.locator('#publishPodium').click();
+   await page.locator('#podiumDialog').waitFor({state:'visible'});
+   await page.locator('#podiumPublishMode').selectOption('now');
+   await page.locator('#confirmPodiumPublish').click();
+   await page.waitForFunction(()=>!podiumBusy&&!$('podiumDialog').open);
+  };
   await load();
   assert.equal(await page.locator('[data-grade-form]').count(),3);
   assert.match(await page.locator('[data-field="presence"]').first().innerText(),/finalizada/i);
@@ -57,15 +66,16 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
   await page.locator('[data-tab="podio"]').click();await page.waitForFunction(()=>!reportsBusy);
   assert.deepEqual(await page.locator('#podiumPreview strong').allTextContents(),['Sierra','Andina','Costa']);
   assert.match(await page.locator('#podiumPreview').innerText(),/0 \/ 20/);
-  await page.locator('#publishPodium').click();
+  await publish();
   assert.match(await page.locator('#podiumState').innerText(),/Publicado/i);
   await save(0,20);await page.locator('[data-tab="podio"]').click();await page.waitForFunction(()=>!reportsBusy);
   assert.equal(await page.locator('#podiumPreview strong').first().innerText(),'Andina','editing a grade must refresh the podium even after publication');
   assert.match(await page.locator('#publishStatus').innerText(),/notas cambiaron/i);
   assert.equal(await page.evaluate(()=>publishedPodium().winner),'Sierra','previous publication stays frozen until republished');
-  await page.locator('#publishPodium').click();
+  await publish();
   assert.equal(await page.evaluate(()=>publishedPodium().winner),'Andina');
-  await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400001).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));renderPodium()});
+  await db.query("update podios_publicados set publicar_en=now()-interval '24 hours 1 second' where partida_id=$1",[game.id]);
+  await page.evaluate(()=>loadPublished());
   assert.equal(await page.locator('#podiumPreview .podium-place').count(),3,'publication expiry must not hide current grades');
   assert.match(await page.locator('#podiumState').innerText(),/vencida/i);
   const seed=await page.evaluate(()=>({...fixtureData}));await load(seed);
@@ -73,6 +83,10 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
   // A fresh browser with no grade cache reads the persisted final marks too.
   await load();assert.equal(Number(await page.locator('[data-grade-form] input').first().inputValue()),20);
   assert.match(await page.locator('[data-grade-status]').first().innerText(),/Supabase/,'persisted remote grades must not say ungraded on a fresh browser');
+  await page.evaluate(()=>loadPublished());
+  assert.equal(await page.evaluate(()=>publishedPodium()?.winner),'Andina','fresh browser recovers server publication without local storage');
+  assert.equal(await page.evaluate(()=>publishedPodium()?.visible),false,'server expiration survives a fresh browser');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('SIDE_PUBLISHED_PODIUM')),null,'publication is never persisted as local source of truth');
   await page.evaluate(()=>{window.gradeFailure={code:'PGRST202',message:'guardar_puntaje_docente missing from schema cache'};});
   const form=page.locator('[data-grade-form]').first();await form.locator('input').fill('17');await form.locator('button').click();
   await page.waitForFunction(()=>gradeUiStatus.get(gradeKey(state.reports[0]))==='retrying');
@@ -80,11 +94,12 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
   assert.match(await form.locator('[data-grade-status]').innerText(),/Supabase/);
   await page.locator('[data-tab="podio"]').click();await page.waitForFunction(()=>!reportsBusy);
   await page.locator('#publishPodium').click();
-  assert.equal(await page.evaluate(()=>publishedPodium()),null,'pending remote grades cannot be published');
+  assert.equal(await page.locator('#podiumDialog').isVisible(),false,'pending remote grades cannot open publication confirmation');
+  assert.equal((await rpc(db,'side_podio_docente',{p_partida_id:game.id})).publication.winner,'Andina','pending grade must not change previous server publication');
   assert.match(await page.locator('#toast').innerText(),/sincroni/i);
   await page.evaluate(async()=>{window.gradeFailure=null;await gradeQueue.flush();});
   await page.waitForFunction(()=>gradeQueue.pending()===0);
-  await page.locator('#publishPodium').click();assert.ok(await page.evaluate(()=>publishedPodium()));
+  await publish();assert.ok(await page.evaluate(()=>publishedPodium()?.visible));
   const rows=(await db.query('select puntaje_docente from participantes where partida_id=$1 order by empresa_id',[game.id])).rows;
   assert.deepEqual(rows.map(r=>Number(r.puntaje_docente)),[17,0,19]);
   assert.equal(await page.evaluate(()=>saveCompanyGrade(state.reports[0].id,20.01)),false);

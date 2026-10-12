@@ -356,3 +356,11 @@ input[aria-invalid="true"]{border-color:var(--red)}
 
 /* Longitud variable: código corto destacado, legados íntegros en móvil. */
 .code-badge{font-size:clamp(1rem,3vw,1.25rem);letter-spacing:.03em;max-width:100%;overflow-wrap:anywhere}
+.podium-dialog{width:min(520px,calc(100vw - 32px));max-height:90vh;overflow:auto;padding:var(--side-space-6);background:var(--side-panel);color:var(--side-text);border:1px solid var(--side-line);border-radius:var(--side-radius-modal);box-shadow:var(--side-shadow-modal)}
+.podium-dialog::backdrop{background:rgba(2,7,22,.8)}
+.podium-dialog h2{font-size:var(--side-text-lg);margin-top:0}
+.podium-actions{display:flex;flex-wrap:wrap;gap:var(--side-space-3);margin-top:var(--side-space-4)}
+.podium-actions button{min-height:var(--side-touch-target)}
+#podiumPublishError{color:var(--side-danger)}
+.podium-schedule{border:1px solid var(--side-line);padding:var(--side-space-4);border-radius:var(--side-radius-control);margin-top:var(--side-space-4)}
+#podiumCountdown{display:block;color:var(--side-gold);font-size:var(--side-text-lg);margin:var(--side-space-2) 0;font-variant-numeric:tabular-nums}

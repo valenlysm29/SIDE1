@@ -366,5 +366,19 @@
       return {success:true,data:data.cierre,reused:!!data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible };
+  async function podio(partidaId,accion='consultar',minutos=0,justificacion=''){
+    const sb=client();if(!sb)return offline();
+    let timer;
+    try{
+      const {data,error}=await Promise.race([
+        sb.rpc('side_podio_docente',{p_partida_id:partidaId,p_accion:accion,p_minutos:minutos,p_justificacion:justificacion}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('La publicación tardó demasiado. Consulta su estado antes de reintentar.')),15000);})
+      ]);
+      if(error||data?.error)return {success:false,error:/PGRST202|42883/.test(error?.code||'')?'Aplica supabase/migrations/2026-10-12_podio_programado.sql en Supabase.':error?.message||data.error};
+      if(data?.success!==true)return {success:false,error:'Supabase no confirmó la publicación.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+    finally{clearTimeout(timer);}
+  }
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible,podio };
 })(window);

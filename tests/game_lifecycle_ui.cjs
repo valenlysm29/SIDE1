@@ -151,16 +151,16 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    assert.equal(await p.evaluate(()=>studentPoll===null&&studentTick===null),true);
   }
   await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.match(await s1.locator('#roomCancellationNotice').innerText(),/cancelada por el profesor/);await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
-  await t.evaluate(()=>{clearInterval(teacherPoll);teacherPoll=null;clearInterval(companiesPoll);companiesPoll=null;switchTab('empresas');state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
+  await t.evaluate(()=>{clearInterval(teacherPoll);teacherPoll=null;clearInterval(companiesPoll);companiesPoll=null;switchTab('empresas');});await t.waitForFunction(()=>!reportsBusy);await t.evaluate(()=>{state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
   await t.setViewportSize({width:390,height:844});await t.evaluate(()=>$('toast').classList.remove('show'));await t.locator('.company-card').screenshot({path:path.join(output,'observations-company-mobile.png')});
   assert.match(await t.locator('.company-status-line').innerText(),/PRESENCIA SIN CONFIRMAR/);
-  await t.evaluate(()=>{const r=state.reports[0];presenceTracker.clear(String(r.id));presenceStates.set(String(r.id),presenceTracker.observe(String(r.id),r.lastSeenAt));renderCompanies();});
-  assert.match(await t.locator('.company-status-line').innerText(),/PRESENCIA SIN CONFIRMAR/);
-  await t.evaluate(()=>{const r=state.reports[0];presenceStates.set(String(r.id),presenceTracker.observe(String(r.id),r.lastSeenAt));renderCompanies();});
+  await t.evaluate(()=>{const r=state.reports[0];presenceTracker.clear(companyPresenceKey(r));presenceTracker.observe(companyPresenceKey(r),r.lastSeenAt);renderCompanies();});
   assert.match(await t.locator('.company-status-line').innerText(),/CONECTADA/);
-  await t.evaluate(()=>{const r=state.reports[0];r.lastSeenAt=new Date(teacherNow()-121000).toISOString();presenceStates.set(String(r.id),presenceTracker.observe(String(r.id),r.lastSeenAt));renderCompanies();});
+  await t.evaluate(()=>{const r=state.reports[0];presenceTracker.observe(companyPresenceKey(r),r.lastSeenAt);renderCompanies();});
   assert.match(await t.locator('.company-status-line').innerText(),/CONECTADA/);
-  await t.evaluate(()=>{const r=state.reports[0];presenceStates.set(String(r.id),presenceTracker.observe(String(r.id),r.lastSeenAt));renderCompanies();});
+  await t.evaluate(()=>{const r=state.reports[0];teacherClock={time:teacherNow()+121000,at:performance.now()};presenceTracker.get(companyPresenceKey(r));renderCompanies();});
+  assert.match(await t.locator('.company-status-line').innerText(),/CONECTADA/);
+  await t.evaluate(()=>{teacherClock={time:teacherNow()+15001,at:performance.now()};renderCompanies();});
   assert.match(await t.locator('.company-status-line').innerText(),/SIN ACTIVIDAD RECIENTE/);
   await t.evaluate(()=>{rosterSyncError='Offline';renderCompanies();});assert.match(await t.locator('#companiesLiveStatus').innerText(),/últimos datos/);
   console.log('PASS UI share code/link, invitation, event rules, cancellation failure/retry and feedback on both students, presence and mobile grade layout');
