@@ -50,3 +50,13 @@ separado de las pruebas locales.
 
 El registro de archivos trasladados está en
 [reports/organization/moves_2026-09-30.json](reports/organization/moves_2026-09-30.json).
+
+El podio docente permite publicar ahora o programar entre 1 minuto y 72 horas.
+**Ejecutar en Supabase SQL Editor** el archivo completo
+`supabase/migrations/2026-10-12_podio_programado.sql` después de las migraciones
+existentes de lifecycle, admisión, identidad exacta y
+`supabase/migrations/20260929_guardar_puntaje_docente.sql`.
+Es idempotente y no se instala con un push. La programación y el snapshot de
+notas viven en Supabase; el servidor habilita la lectura estudiantil a la hora
+programada y la cierra 24 horas después, aunque el docente cierre su navegador.
+No requiere cron. La presencia usa el heartbeat existente, sin SQL adicional.

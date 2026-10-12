@@ -1,0 +1,19 @@
+# Presencia — diagnóstico de datos y reconciliación
+
+Fecha: 12/10/2026, Lima. Subagente A. Trabajo limitado a SIDE1.
+
+La frecuencia normal del estudiante es de 3 segundos (`startStudentSync`, `js/app.js`). Cada lectura de `EmpresaService.obtenerEstado` llama a `obtener_estado_estudiante`; la función existente actualiza `participantes.last_seen_at` con `clock_timestamp()` después de validar la identidad. Su lector interno legado también actualiza presencia, con una limitación de 15 segundos. El umbral del docente ya era 120 segundos, por tanto supera ampliamente tres intervalos de heartbeat. No se necesita una columna, política ni función nueva para presencia.
+
+La reconciliación anterior de `services/teacher_sync.js` calculaba cada estado desde el timestamp recibido, sin conservar el máximo observado. Una respuesta antigua podía por tanto sustituir un heartbeat más reciente. Su histéresis contaba callbacks, no tiempo: dos notificaciones seguidas de polling/Realtime podían llevarla a inactiva sin una espera sostenida. Además exigía dos lecturas para conectar o reconectar. El render y la mezcla de identidades son tratados por el subagente B.
+
+El tracker ahora conserva por clave el timestamp máximo, acepta actividad fresca inmediatamente, ignora campos ausentes/antiguos y solo pasa a inactiva tras 120 segundos de edad más 15 segundos de observación sostenida. `get` y `tick` evalúan el registro retenido sin fabricar actividad; `lastSeen` permite reconciliar el roster. La clave de integración debe incluir partida y empresa. El reloj usado por el panel sigue derivándose del servidor.
+
+El subagente C guardó una reproducción anterior al arreglo: `tests/output/presence_regression_before.tap`, tres fallos de cuatro pruebas. Tras el cambio se ejecutaron las cuatro regresiones y `tests/teacher_sync.test.js`: ocho pruebas aprobadas, incluidas las comprobaciones DB de guardado de notas. Sintaxis de servicio y `git diff --check` aprobados. La prueba antigua se actualizó al nuevo contrato de conexión inmediata y tiempo sostenido.
+
+Pendientes en este subalcance: integración de ambas vistas, navegador con dos empresas, suite completa y verificación del despliegue real. Una pestaña que el navegador congele indefinidamente deja de enviar heartbeats; ese caso debe mostrarse como falta de actividad tras la gracia, y se reconecta inmediatamente al recibir un heartbeat fresco.
+
+## Verificación ampliada
+
+Por encargo del coordinador se ejecutaron los 15 runners existentes `tests/*_db.cjs`, en tres procesos con temporales separados dentro de SIDE1: todos terminaron con código 0. También pasó `local_server_test.py`, dos pruebas. Incluye heartbeat servidor (`game_observations_db`), admisión, decisiones, lifecycle, espera, historial, RLS, recuperación, generación/cancelación de códigos y motor Excel. No aparecieron fallos. Evidencia individual en `tests/output/presencia_podio_<runner>.log` y resumen `tests/output/presencia_podio_db_server_summary.json`. Esta comprobación cubre los runners existentes al momento de la ejecución, no reemplaza las regresiones nuevas de podio ni el navegador.
+
+Se leyeron las instrucciones de `.agents/skills/webapp-testing/SKILL.md` y se ejecutaron secuencialmente las pruebas Playwright existentes del resto del panel: `teacher_history_ui.cjs` aprobó escritorio 1366 px y móvil 390 px, sin errores de consola, incluyendo estados financieros, nota cero, XSS, sustitución de partida y navegación. `teacher_report_pdf_ui.cjs` aprobó la descarga y vista previa reales, empresas excluidas, roster vacío, nombres largos, 48 eventos, datos ausentes y nota cero. Ambos runners terminaron con código 0, sin cambios de fixtures. Logs: `tests/output/presencia_podio_teacher_history_ui.log` y `tests/output/presencia_podio_teacher_report_pdf_ui.log`; artefactos de las suites en `tests/output/teacher-history/` y `tests/output/teacher-pdf/`.
