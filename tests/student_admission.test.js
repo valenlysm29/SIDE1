@@ -28,8 +28,8 @@ test('student service normalizes the three admission fields and preserves server
   nombreLegal:'  Compañía   Ágil  ',
   nombreComercial:'  Café   Norte '
  });
- assert.deepEqual(JSON.parse(JSON.stringify(calls.find(call=>call.name==='ingresar_empresa'))),{
-  name:'ingresar_empresa',
+ assert.deepEqual(JSON.parse(JSON.stringify(calls.find(call=>call.name==='unirse_partida_por_codigo'))),{
+  name:'unirse_partida_por_codigo',
   args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte'}
  });
  assert.equal(result.success,false);
@@ -51,7 +51,7 @@ test('student service preserves technical Supabase errors for any game and compa
  const logged=[];
  const service=loadService(serviceSource,async()=>({
   data:null,
-  error:{code:'PGRST202',message:'Could not find the function',details:'Searched for public.ingresar_empresa',hint:'Reload the schema cache',status:404}
+  error:{code:'PGRST202',message:'Could not find the function',details:'Searched for public.unirse_partida_por_codigo',hint:'Reload the schema cache',status:404}
  }),'EmpresaService',{error:(...args)=>logged.push(args)});
  const result=await service.ingresar({codigo:'SIDE-137',nombreLegal:'Grupo Quilla S.A.C.',nombreComercial:'Quilla'});
  assert.deepEqual(JSON.parse(JSON.stringify(result)),{
@@ -59,25 +59,25 @@ test('student service preserves technical Supabase errors for any game and compa
   technical:true,
   code:'PGRST202',
   error:'Could not find the function',
-  details:'Searched for public.ingresar_empresa',
+  details:'Searched for public.unirse_partida_por_codigo',
   hint:'Reload the schema cache',
   status:404
  });
  assert.equal(logged.length,1);
- assert.equal(logged[0][0],'SIDE EmpresaService: fallo tecnico en ingresar_empresa');
+ assert.equal(logged[0][0],'SIDE EmpresaService: fallo tecnico en unirse_partida_por_codigo');
  assert.equal(logged[0][1].code,'PGRST202');
 });
 
 test('student service logs permission and network failures without relabeling them as identity rejection',async()=>{
  const permissionLogs=[];
  const permissionService=loadService(serviceSource,async()=>({
-  data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}
+  data:null,error:{code:'42501',message:'permission denied for function unirse_partida_por_codigo',status:403}
  }),'EmpresaService',{error:(...args)=>permissionLogs.push(args)});
  const permission=await permissionService.ingresar({codigo:'SIDE-208',nombreLegal:'Servicios Misti',nombreComercial:'Misti'});
  assert.equal(permission.success,false);
  assert.equal(permission.technical,true);
  assert.equal(permission.code,'42501');
- assert.equal(permission.error,'permission denied for function ingresar_empresa');
+ assert.equal(permission.error,'permission denied for function unirse_partida_por_codigo');
  assert.equal(permissionLogs[0][1].code,'42501');
 
  const networkLogs=[];
@@ -88,7 +88,7 @@ test('student service logs permission and network failures without relabeling th
  assert.equal(network.technical,true);
  assert.equal(network.code,'RPC_INGRESAR_EMPRESA_EXCEPCION');
  assert.equal(network.error,'Network request failed');
- assert.equal(networkLogs[0][0],'SIDE EmpresaService: excepcion en ingresar_empresa');
+ assert.equal(networkLogs[0][0],'SIDE EmpresaService: excepcion en unirse_partida_por_codigo');
  assert.equal(networkLogs[0][1],networkError);
 });
 
@@ -136,7 +136,7 @@ test('real student form shows the server message for technical failures and busi
   }
 
   const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
-  const invalidCodeMessage='El código debe tener el formato SIDE-ABC o SIDE-ABCD. Copia solo el código que aparece en la sala del docente.';
+  const invalidCodeMessage='El código debe tener el formato SIDE-ABCDEF. También se aceptan los códigos anteriores y SIDE-000. Copia solo el código de la sala del docente.';
   const callsBefore=await page.evaluate(()=>window.__rpcCalls.length);
   await submit({response:{data:{success:false,code:'CREDENCIALES_INVALIDAS'},error:null},identity:{codigo:'SIDE-WG2SIDE',nombreLegal:'demo1',nombreComercial:'demo1'},expected:invalidCodeMessage});
   assert.equal(await page.evaluate(()=>window.__rpcCalls.length),callsBefore);
@@ -150,12 +150,12 @@ test('real student form shows the server message for technical failures and busi
   const genericMessage='No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
   const startedMessage='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
   for(const technical of [
-   {data:null,error:{code:'PGRST202',message:'Could not find public.ingresar_empresa',status:404}},
-   {data:null,error:{code:'42501',message:'permission denied for function ingresar_empresa',status:403}},
+   {data:null,error:{code:'PGRST202',message:'Could not find public.unirse_partida_por_codigo',status:404}},
+   {data:null,error:{code:'42501',message:'permission denied for function unirse_partida_por_codigo',status:403}},
    {data:null,error:{code:'PGRST205',message:'Could not find public.side_student_state',status:404}}
   ]){
-   const result=await submit({response:technical,expected:serverMessage});
-   assert.equal(result.message,serverMessage);
+   const result=await submit({response:technical,expected:technical.error.code==='PGRST202'?'La sala requiere actualizar Supabase. El docente debe ejecutar 2026-10-12_salas_codigo.sql.':technical.error.code==='42501'?'Supabase rechazó el permiso de ingreso. Pide al docente revisar la migración de salas.':serverMessage});
+   assert.match(result.message,/Supabase|No se pudo conectar/);
    assert.notEqual(result.message,genericMessage);
    assert.ok(result.errors.some(args=>args.some(value=>value&&value.code===technical.error.code)),`console.error debe conservar ${technical.error.code}`);
   }
@@ -209,7 +209,7 @@ test('real student form shows the server message for technical failures and busi
    code:$('gameCode').maxLength,
    legal:$('companyLegalName').maxLength,
    brand:$('companyBrandName').maxLength
-  })),{code:12,legal:60,brand:40});
+  })),{code:24,legal:60,brand:40});
  }finally{await browser.close();}
 });
 
@@ -220,7 +220,7 @@ test('student state service always uses normalized identity and compare-and-swap
   if(name==='obtener_estado_estudiante')return {data:{success:true,snapshot_revision:7,partida:{serverTime:'2026-10-09T00:00:00Z'}},error:null};
   return {data:{success:true,snapshot_revision:8},error:null};
  },'EmpresaService');
- const identity={codigo:' síde-000 ',nombreLegal:' Compañía   Ágil ',nombreComercial:' Café   Norte '};
+ const identity={codigo:' side 000 ',nombreLegal:' Compañía   Ágil ',nombreComercial:' Café   Norte '};
  assert.equal((await service.obtenerEstado(identity)).data.snapshot_revision,7);
  assert.equal((await service.guardarEstado(identity,{decision_state:{}},7)).data.snapshot_revision,8);
  assert.deepEqual(JSON.parse(JSON.stringify(calls)),[

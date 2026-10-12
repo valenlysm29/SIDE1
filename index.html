@@ -48,6 +48,7 @@
     <div class="profile-main">
       <img class="profile-side-logo" src="assets/side_logo.png" alt="SIDE">
       <h1 class="profile-title">Elige cómo entrar</h1>
+      <p id="roomCancellationNotice" class="form-message hidden" role="status" aria-live="polite"></p>
 
       <button class="profile-card student-hero" data-profile="student" aria-label="Iniciar sesión como estudiante">
         <img class="student-hero-img" src="assets/estudiante.png" alt="">
@@ -114,7 +115,7 @@
       <form id="studentForm" class="student-join-form" aria-describedby="studentRejoinHelp">
         <div class="join-field join-code-field">
           <label for="gameCode">Código de partida</label>
-          <input id="gameCode" placeholder="Ej. SIDE-WG2" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gameCodeError" required>
+          <input id="gameCode" placeholder="Ej. SIDE-ABCDEF" maxlength="24" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gameCodeError" required>
           <div id="gameCodeError" class="form-message hidden" role="alert"></div>
         </div>
         <div class="join-field">
@@ -604,8 +605,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261009-waiting"></script>
-<script src="services/empresa_service.js?v=20261012-sesion-codigos"></script>
+<script src="services/partida_service.js?v=20261012-salas"></script>
+<script src="services/empresa_service.js?v=20261012-salas"></script>
 <script src="services/decisiones_service.js?v=20260928-secure-cas"></script>
 <script src="services/student_sync.js?v=20260930-sync-retry"></script>
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
@@ -643,7 +644,7 @@
 <script src="js/production_dop.js?v=20260917-visual"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261012-sesion-codigos"></script>
+<script src="js/app.js?v=20261012-salas"></script>
 <script src="js/company_summary.js?v=20261011-decision-stack"></script>
 </body>
 </html>

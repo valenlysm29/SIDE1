@@ -8,7 +8,7 @@ const identity={codigo:'SIDE-RX8',nombreLegal:'demo1',nombreComercial:'demo1'};
 for(const code of ['PARTIDA_CANCELADA','PARTIDA_FINALIZADA','CODIGO_RETIRADO','PARTIDA_NO_ENCONTRADA'])test('rechazo distingue '+code+' sin registrar una empresa nueva',async()=>{
  const s=service({success:false,code:'CREDENCIALES_INVALIDAS'},{data:{codigo:identity.codigo,code}});
  const result=await s.api.ingresar(identity);assert.equal(result.success,false);assert.equal(result.code,code);assert.equal(result.technical,false);
- assert.equal(s.calls.filter(c=>c.name==='ingresar_empresa').length,1);assert.equal(s.calls.at(-1).name,'side_estado_codigo_sala');
+ assert.equal(s.calls.filter(c=>c.name==='unirse_partida_por_codigo').length,1);assert.equal(s.calls.at(-1).name,'side_estado_codigo_sala');
 });
 test('una respuesta de sala cancelada no se convierte en ingreso exitoso',async()=>{
  const s=service({success:true,partida:{estado:'finalizada',configuracion:{cancelledAt:'2026-10-11T12:00:00Z'},serverTime:'2026-10-11T12:00:00Z'}});

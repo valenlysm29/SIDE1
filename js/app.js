@@ -9,9 +9,9 @@ const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulac
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const JOIN_STARTED_MESSAGE = 'La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
 const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
-const JOIN_CODE_MESSAGE = 'El código debe tener el formato SIDE-ABC o SIDE-ABCD. Copia solo el código que aparece en la sala del docente.';
-function admissionCode(value){return String(value||'').trim().toUpperCase();}
-function validAdmissionCode(value){return /^SIDE-[A-Z0-9]{3,4}$/.test(admissionCode(value));}
+const JOIN_CODE_MESSAGE = 'El código debe tener el formato SIDE-ABCDEF. También se aceptan los códigos anteriores y SIDE-000. Copia solo el código de la sala del docente.';
+function admissionCode(value){return String(value||'').replace(/\s+/g,'').toUpperCase().replace(/^SIDE([A-Z0-9]+)$/,'SIDE-$1');}
+function validAdmissionCode(value){return /^SIDE-(?:[A-Z0-9]{3,4}|[A-Z0-9]{6})$/.test(admissionCode(value));}
 function showAdmissionCodeError(text=''){
   const field=$('gameCode'),detail=$('gameCodeError');
   if(field)field.setAttribute('aria-invalid',text?'true':'false');
@@ -196,6 +196,12 @@ function updateIntegrationUI(){
     if($('studentLobby')?.classList.contains('hidden'))showScreen('studentLobby');
     playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
     window.SIDE3D?.suspend?.();syncStudentTimer();stopStudentSync();
+    studentConnected=false;studentSessionRecovering=false;studentSnapshotEpoch++;
+    try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
+    closeModal();showScreen('profiles');
+    const cancellationNotice=$('roomCancellationNotice');
+    if(cancellationNotice){cancellationNotice.textContent='La partida ha sido cancelada por el profesor. Solicita el código de una nueva sala.';cancellationNotice.classList.remove('hidden');}
+    return;
   }
   if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
   if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
@@ -218,6 +224,7 @@ function applyStudentGameState(partida,round=1){
   if(currentStudent.empresaId&&(partida.id!==currentStudent.game?.id||admissionCode(partida.codigo)!==admissionCode(currentStudent.game?.codigo)))throw new Error('La respuesta del servidor corresponde a otra sala. Vuelve a intentar el ingreso con el código del docente.');
   if(!partida.configuracion||typeof partida.configuracion!=='object'||Array.isArray(partida.configuracion))return;
   const config={...partida.configuracion};
+  if(partida.estado==='cancelada'){config.cancelledAt=partida.cancelled_at||partida.serverTime;config.phase='cancelled';config.runtime={...config.runtime,phase:'cancelled',running:false};}
   if(config&&'cancelledAt' in config&&!RULES.isCancellationMarker(config.cancelledAt))delete config.cancelledAt;
   if(!config||typeof config!=='object')return;
   if(currentStudent.empresaId&&!Number.isFinite(Date.parse(partida.serverTime||'')))throw new Error('Falta hora del servidor. Aplica la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.');
@@ -478,7 +485,9 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(!requireSupabase()){const error={code:'CLIENTE_SUPABASE_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}message('studentMessage','Validando ingreso...');
     if(!S.EmpresaService?.ingresar){const error={code:'SERVICIO_EMPRESA_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     let ingreso;
-    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    const joinButton=$('studentForm')?.querySelector?.('[type="submit"]');if(joinButton){joinButton.disabled=true;joinButton.setAttribute('aria-busy','true');}
+    $('studentReconnectBtn')?.classList.add('hidden');
+    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
     if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
       if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO','CODIGO_RETIRADO'].includes(ingreso?.code)){
@@ -488,9 +497,11 @@ $('studentForm')?.addEventListener('submit',async e=>{
       if(['PARTIDA_CANCELADA','PARTIDA_FINALIZADA'].includes(ingreso?.code)){message('studentMessage',ingreso.code==='PARTIDA_CANCELADA'?'Esta partida fue cancelada. Pide al docente el código de una sala nueva.':'Esta partida ya finalizó. Pide al docente el código de una sala nueva.',true);return;}
       if(ingreso?.code==='MIGRACION_PENDIENTE'){message('studentMessage',ingreso.error,true);return}
       if(ingreso?.code==='PARTIDA_INICIADA'){message('studentMessage',JOIN_STARTED_MESSAGE,true);return}
+      if(ingreso?.code==='SALA_LLENA'){message('studentMessage','La sala está llena. Pide al docente que revise su capacidad.',true);return}
       if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
       console.error('SIDE: error técnico al validar el ingreso',ingreso);
-      message('studentMessage',JOIN_SERVER_MESSAGE,true);return
+      $('studentReconnectBtn')?.classList.remove('hidden');
+      message('studentMessage',ingreso?.code==='CONEXION_TIMEOUT'?'La conexión tardó demasiado. Pulsa Reintentar conexión.':/PGRST202|42883/.test(ingreso?.code||'')?'La sala requiere actualizar Supabase. El docente debe ejecutar 2026-10-12_salas_codigo.sql.':ingreso?.code==='42501'?'Supabase rechazó el permiso de ingreso. Pide al docente revisar la migración de salas.':JOIN_SERVER_MESSAGE,true);return
     }
     const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
     if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala',ingreso);message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
@@ -505,6 +516,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     localStorage.setItem('SIDE_REMOTE_GAME_'+code,'1');
   }
   studentConnected=true;studentProgressHydrated=!currentStudent.empresaId||studentProgressHydrated;autoEnterDecisions=false;cancellationShown=false;studentJoinedCompanies=null;
+  $('roomCancellationNotice')?.classList.add('hidden');
   try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
   startStudentSync();
   loadDecisionState();
@@ -1570,7 +1582,7 @@ function resumeStudentSession(){
   })().finally(()=>{studentSessionRecoveryTask=null;});
   return studentSessionRecoveryTask;
 }
-$('studentReconnectBtn')?.addEventListener('click',resumeStudentSession);
+$('studentReconnectBtn')?.addEventListener('click',()=>studentSessionRecovering?resumeStudentSession():$('studentForm')?.requestSubmit());
 (async function restoreStudentSession(){
   let saved;try{saved=JSON.parse(sessionStorage.getItem('SIDE_STUDENT_SESSION')||'null');}catch{}
   if(!saved?.game?.codigo||!saved.company)return;
@@ -1587,6 +1599,6 @@ if(invitationCode){
   $('gameCode').value=admissionCode(invitationCode);showScreen('profiles');showModal('studentModal');
   if(!validAdmissionCode(invitationCode)){showAdmissionCodeError(JOIN_CODE_MESSAGE);message('studentMessage',JOIN_CODE_MESSAGE,true);}
 }
-$('gameCode')?.addEventListener('input',()=>{showAdmissionCodeError();message('studentMessage','');});
+$('gameCode')?.addEventListener('input',()=>{$('gameCode').value=admissionCode($('gameCode').value);showAdmissionCodeError();message('studentMessage','');});
 window.addEventListener('online',()=>{if(studentConnected)pollStudentGame();});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});
