@@ -1,5 +1,7 @@
 # Seguimiento: crear sala y cancelar partida
 
+> Este seguimiento queda actualizado por [recuperar_compartir_ingresar_2026-10-11.md](recuperar_compartir_ingresar_2026-10-11.md): las salas antiguas se recuperan conservando código y empresas, con una nueva migración SQL. Ya no se muestra el bloque de formato antiguo ni se exige cancelar para compartir.
+
 ## Solicitud corregida
 
 Tras la captura posterior al commit `2a92ea2`, el usuario pidió quitar «Cerrar sala anterior y crear una nueva». El flujo vigente es únicamente **Cancelar partida**, con el diálogo existente y confirmación, y después **Iniciar partida** como acción independiente. Cancelar no crea otra sala. También se retiraron los controles añadidos «Reanudar sala anterior» y «Crear otra sala»; la partida actual se consulta en Rondas y eventos.

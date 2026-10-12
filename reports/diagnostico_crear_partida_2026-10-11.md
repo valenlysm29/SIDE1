@@ -1,5 +1,7 @@
 # Diagnóstico de creación de partida — 2026-10-11
 
+> Actualización vigente: [recuperar_compartir_ingresar_2026-10-11.md](recuperar_compartir_ingresar_2026-10-11.md). Incluye recuperación de las salas existentes, copia e ingreso, y el SQL nuevo necesario para registros antiguos. Los apartados de reemplazo/cancelación siguientes documentan etapas anteriores.
+
 > Actualización posterior a la captura del usuario: el flujo de reemplazo de este informe queda sustituido por **Cancelar partida → Iniciar partida**. El rechazo de partidas antiguas y la corrección están documentados en [seguimiento_crear_sala_cancelar_2026-10-11.md](seguimiento_crear_sala_cancelar_2026-10-11.md). No hay una nueva migración SQL en ese seguimiento.
 
 ## Causa comprobada antes del parche

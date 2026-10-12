@@ -1,0 +1,112 @@
+[
+  {
+    "name": "unitarias",
+    "exitCode": 0,
+    "seconds": 2
+  },
+  {
+    "name": "recuperar_sala_db.cjs",
+    "exitCode": 0,
+    "seconds": 2
+  },
+  {
+    "name": "crear_partida_db.cjs",
+    "exitCode": 0,
+    "seconds": 2
+  },
+  {
+    "name": "game_lifecycle_db.cjs",
+    "exitCode": 0,
+    "seconds": 3
+  },
+  {
+    "name": "waiting_room_db.cjs",
+    "exitCode": 0,
+    "seconds": 3
+  },
+  {
+    "name": "game_observations_db.cjs",
+    "exitCode": 0,
+    "seconds": 3
+  },
+  {
+    "name": "student_admission_db.cjs",
+    "exitCode": 0,
+    "seconds": 4
+  },
+  {
+    "name": "student_admission_matrix_db.cjs",
+    "exitCode": 0,
+    "seconds": 7
+  },
+  {
+    "name": "teacher_history_db.cjs",
+    "exitCode": 0,
+    "seconds": 2
+  },
+  {
+    "name": "compartir_sala_ui.cjs",
+    "exitCode": 0,
+    "seconds": 12
+  },
+  {
+    "name": "student_admission.test.js",
+    "exitCode": 0,
+    "seconds": 9
+  },
+  {
+    "name": "crear_partida_ui.cjs",
+    "exitCode": 0,
+    "seconds": 75
+  },
+  {
+    "name": "game_lifecycle_ui.cjs",
+    "exitCode": 0,
+    "seconds": 50
+  },
+  {
+    "name": "teacher_lifecycle_ui.cjs",
+    "exitCode": 0,
+    "seconds": 16
+  },
+  {
+    "name": "waiting_tutorial_ui.cjs",
+    "exitCode": 0,
+    "seconds": 8
+  },
+  {
+    "name": "teacher_history_ui.cjs",
+    "exitCode": 0,
+    "seconds": 8
+  },
+  {
+    "name": "teacher_grades_ui.cjs",
+    "exitCode": 0,
+    "seconds": 13
+  },
+  {
+    "name": "check-docente.js",
+    "exitCode": 0,
+    "seconds": 0
+  },
+  {
+    "name": "check-partida_service.js",
+    "exitCode": 0,
+    "seconds": 0
+  },
+  {
+    "name": "check-compartir_sala.test.cjs",
+    "exitCode": 0,
+    "seconds": 0
+  },
+  {
+    "name": "check-recuperar_sala_db.cjs",
+    "exitCode": 0,
+    "seconds": 0
+  },
+  {
+    "name": "check-compartir_sala_ui.cjs",
+    "exitCode": 0,
+    "seconds": 0
+  }
+]
