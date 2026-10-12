@@ -31,7 +31,7 @@ test('game creation requires the alphanumeric migration before inserting a remot
  let features={observationsVersion:1},inserted=false;
  const client={
   auth:{getUser:async()=>({data:{user:{id:'teacher'}}})},
-  rpc:async name=>({data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:name==='side_game_features'?features:{id:'game',codigo:'SIDE-WG2',estado:'esperando',configuracion:{runtime:{phase:'integration'}},serverTime:'2026-10-09T00:00:00Z'}}),
+  rpc:async name=>({data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:name==='side_game_features'?features:{id:'game',codigo:'SIDE-WG2',estado:'esperando',configuracion:{lifecycleVersion:2,gameStartAt:'2026-10-09T00:02:00Z',runtime:{phase:'integration'}},serverTime:'2026-10-09T00:00:00Z'}}),
   from(){inserted=true;return {insert:()=>({select:()=>({single:async()=>({data:{codigo:'SIDE-WG2'}})})})};}
  };
  const window={crypto:{randomUUID:()=> 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'},SIDE:{SupabaseClient:{get:()=>client}}};
@@ -46,7 +46,7 @@ test('game creation requires the alphanumeric migration before inserting a remot
 
 
 test('game creation returns the RPC server clock instead of a plain inserted row',async()=>{
- const created={id:'game',codigo:'SIDE-WG2',estado:'esperando',configuracion:{lifecycleVersion:2,runtime:{phase:'integration'}}};
+ const created={id:'game',codigo:'SIDE-WG2',estado:'esperando',configuracion:{lifecycleVersion:2,gameStartAt:'2026-10-09T05:02:00Z',runtime:{phase:'integration'}}};
  const calls=[];
  const client={auth:{getUser:async()=>({data:{user:{id:'teacher'}}})},
  rpc:async(name,args)=>{calls.push({name,args});return {data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:name==='side_game_features'?{observationsVersion:1,gameCodeVersion:2}:name==='crear_sala_docente'?{...created,serverTime:'2026-10-09T05:00:00Z'}:{error:'No tienes permiso'}};},

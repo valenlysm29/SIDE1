@@ -35,12 +35,35 @@
   }
 
   const creationMigration = 'supabase/migrations/2026-10-11_fix_crear_partida.sql';
+  function roomDetail(data) {
+    return JSON.stringify({tipo:Array.isArray(data)?'array':typeof data,id:data?.id||null,codigo:data?.codigo||null,
+      estado:data?.estado||null,lifecycleVersion:data?.configuracion?.lifecycleVersion||null,
+      fase:data?.configuracion?.runtime?.phase||null,gameStartAt:data?.configuracion?.gameStartAt||null,
+      serverTime:data?.serverTime||null},null,2);
+  }
+  function roomContractError(data,recoverable=false) {
+    const identity=data?.id&&data.codigo&&['esperando','activa'].includes(data.estado);
+    const legacy=identity&&data.configuracion?.lifecycleVersion!==2;
+    if(recoverable&&identity){
+      return creationError(null,{error:legacy?'Existe una partida anterior con un formato antiguo. Cancela la partida antes de iniciar una nueva.':'Existe una partida sin un reloj o estado de espera válido. Cancela la partida antes de iniciar una nueva.',
+        code:legacy?'SALA_ANTIGUA':'SALA_INCONSISTENTE',partida:data,technicalDetail:roomDetail(data)});
+    }
+    return creationError(null,{error:'Supabase devolvió una respuesta de sala incompleta. Verifica la instalación de 20261009_sala_espera_identidad_exacta.sql y 2026-10-11_fix_crear_partida.sql.',
+      code:'CONTRATO_SALA',technicalDetail:roomDetail(data)});
+  }
+  function validRoom(data) {
+    const phase=data?.configuracion?.runtime?.phase;
+    return !!(data?.id&&data.codigo&&data.configuracion?.lifecycleVersion===2&&
+      Number.isFinite(Date.parse(data.serverTime||''))&&
+      (data.estado==='esperando'?phase==='integration'&&Number.isFinite(Date.parse(data.configuracion.gameStartAt||'')):
+        data.estado==='activa'&&['decisions','results'].includes(phase)));
+  }
   function creationError(error, data) {
     const code=error?.code||data?.code;
     const message=error?.message||data?.error||'El servidor no devolvió una sala válida.';
     const missing=/PGRST202|PGRST204|42883|42703/.test(code||'');
     console.error('SIDE: crear/recuperar sala:', error||data);
-    return {success:false,code:missing?'MIGRACION_PENDIENTE':code,error:missing?'Falta actualizar la base de datos: ejecuta '+creationMigration+'.':message,data:data?.partida||data?.id&&data||undefined,migrationMissing:missing};
+    return {success:false,code:missing?'MIGRACION_PENDIENTE':code,error:missing?'Falta actualizar la base de datos: ejecuta '+creationMigration+'.':message,data:data?.partida||data?.id&&data||undefined,migrationMissing:missing,technicalDetail:data?.technicalDetail};
   }
   function requestUuid() {
     if(global.crypto?.randomUUID)return global.crypto.randomUUID();
@@ -54,9 +77,7 @@
     try {
       const {data,error}=await sb.rpc('obtener_sala_docente');
       if(error||data?.error)return creationError(error,data);
-      if(data&&(!data.id||!data.codigo||!['esperando','activa'].includes(data.estado)||
-        (data.estado==='esperando'?data.configuracion?.runtime?.phase!=='integration':!['decisions','results'].includes(data.configuracion?.runtime?.phase))||
-        !Number.isFinite(Date.parse(data.serverTime||''))))return creationError(null,data);
+      if(data&&!validRoom(data))return roomContractError(data,true);
       return {success:true,data:data||null};
     } catch(error){return creationError(error);}
   }
@@ -126,14 +147,12 @@
       if(d.configuracion?.lifecycleVersion===2){
         const {data,error}=await sb.rpc('crear_sala_docente',{
           p_config:payload.configuracion,p_nombre:payload.nombre,p_curso:payload.curso||'',p_segmento:payload.segmento,
-          p_request_id:d.requestId||requestUuid(),p_reemplazar_id:d.reemplazarId||null
+          p_request_id:d.requestId||requestUuid(),p_reemplazar_id:null
         });
         if(error||data?.error)return creationError(error,data);
         const phase=data?.configuracion?.runtime?.phase;
         if(data?.estado==='finalizada'||['cancelled','finished'].includes(phase))return creationError(null,{error:'La sala de esa solicitud ya terminó. Pulsa Reintentar para crear una nueva.',code:'SOLICITUD_FINALIZADA',partida:data});
-        if(!data?.id||!data.codigo||!['esperando','activa'].includes(data.estado)||
-          (data.estado==='esperando'?phase!=='integration':!['decisions','results'].includes(phase))||
-          !Number.isFinite(Date.parse(data.serverTime||'')))return creationError(null,data);
+        if(!validRoom(data))return roomContractError(data,true);
         return {success:true,data};
       }
       const { data, error } = await sb.from('partidas').insert(payload).select().single();
