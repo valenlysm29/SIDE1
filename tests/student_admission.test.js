@@ -136,7 +136,7 @@ test('real student form shows the server message for technical failures and busi
   }
 
   const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
-  const invalidCodeMessage='El código debe tener el formato SIDE-ABCDEF. También se aceptan los códigos anteriores y SIDE-000. Copia solo el código de la sala del docente.';
+  const invalidCodeMessage='Usa un código como SIDE-PTV6 o PTV6. También se aceptan los códigos anteriores de 6 caracteres y SIDE-000. Copia solo el código de la sala del docente.';
   const callsBefore=await page.evaluate(()=>window.__rpcCalls.length);
   await submit({response:{data:{success:false,code:'CREDENCIALES_INVALIDAS'},error:null},identity:{codigo:'SIDE-WG2SIDE',nombreLegal:'demo1',nombreComercial:'demo1'},expected:invalidCodeMessage});
   assert.equal(await page.evaluate(()=>window.__rpcCalls.length),callsBefore);
@@ -144,7 +144,7 @@ test('real student form shows the server message for technical failures and busi
   assert.equal(await page.locator('#gameCode').getAttribute('aria-invalid'),'true');
   assert.equal(await page.locator('#gameCode').inputValue(),'SIDE-WG2SIDE');
   await page.evaluate(()=>{showScreen('profiles');showModal('studentModal');});
-  const evidenceDir=path.join(root,'reports/sim/crear_partida');
+  const evidenceDir=path.join(root,'tests/output/short_code/admission');
   fs.mkdirSync(evidenceDir,{recursive:true});
   await page.screenshot({path:path.join(evidenceDir,'ingreso_codigo_invalido_despues.png'),fullPage:true});
   const genericMessage='No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
@@ -209,7 +209,7 @@ test('real student form shows the server message for technical failures and busi
    code:$('gameCode').maxLength,
    legal:$('companyLegalName').maxLength,
    brand:$('companyBrandName').maxLength
-  })),{code:24,legal:60,brand:40});
+  })),{code:64,legal:60,brand:40});
  }finally{await browser.close();}
 });
 

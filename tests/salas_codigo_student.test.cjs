@@ -8,7 +8,7 @@ function service(rpc,extra={}){
 const identity={codigo:'SIDE-ABCDEF',nombreLegal:'Empresa Perú',nombreComercial:'Marca Perú'};
 test('normalización acepta código nuevo pegado con/sin guion y whitespace; conserva demo y legados',()=>{
  const api=service(()=>{});
- for(const [input,expected] of [[' sideabcdef ','SIDE-ABCDEF'],['s i d e - a b c d e f','SIDE-ABCDEF'],['side000','SIDE-000'],['SIDE-wg2','SIDE-WG2'],['side-abcd','SIDE-ABCD']])assert.equal(api.cleanCode(input),expected);
+ for(const [input,expected] of [[' sideabcdef ','SIDE-ABCDEF'],['s i d e - a b c d e f','SIDE-ABCDEF'],['side000','SIDE-000'],['SIDE-wg2','SIDE-WG2'],['side-abcd','SIDE-ABCD'],['ptv6','SIDE-PTV6'],[' p t v 6 ','SIDE-PTV6'],['sideptv6','SIDE-PTV6'],['abc234','SIDE-ABC234']])assert.equal(api.cleanCode(input),expected);
  assert.equal(api.cleanCode('SÍDE-ABCDEF'),'SÍDE-ABCDEF','no sustituye acentos ni puntuación ajena');
 });
 test('doble Supabase: ingreso/reingreso exige identidad registrada; cancelación bloquea incluso identidad coincidente',async()=>{
@@ -43,3 +43,10 @@ test('estado cancelada basta para rechazar una respuesta de admisión exitosa an
  const api=service(async name=>({data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:{success:true,partida:{estado:'cancelada',configuracion:{},serverTime:'2026-10-12T12:00:00Z'}}}));
  assert.equal((await api.ingresar(identity)).code,'PARTIDA_CANCELADA');
 });
+
+ test('códigos cortos y antiguos se envían canónicos; largos inválidos no llaman Supabase',async()=>{
+ const calls=[];const api=service(async(name,args)=>{calls.push({name,args});return {data:name==='side_admission_features'?{waitingRoomVersion:3,exactIdentityVersion:2}:{success:false,code:'PARTIDA_NO_ENCONTRADA'}}});
+ for(const codigo of ['PTV6','side-ptv6',' S I D E P T V 6 ','ABC234','side-abc234','SIDE-000']){const expected=api.cleanCode(codigo);await api.ingresar({...identity,codigo});assert.equal(calls.at(-1).args.p_codigo,expected);}
+ calls.length=0;for(const codigo of ['PT','PTV62','SIDE-PTV62','SIDE-PTV6234','SIDE','SIDE-','SIDE-PT!6'])assert.equal((await api.ingresar({...identity,codigo})).code,'CODIGO_INVALIDO');
+ assert.equal(calls.length,0);
+ });

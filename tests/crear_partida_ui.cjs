@@ -4,12 +4,13 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {database,rpc,createGame,config,professor}=require('./lifecycle_db_fixture.cjs');
-const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/salas_codigo/crear_partida');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/short_code/crear_partida');
 const sdk=`window.SIDE_CONFIG={SUPABASE_URL:'http://localhost',SUPABASE_PUBLISHABLE_KEY:'fixture'};
 window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
 (async()=>{
  const db=await database(),migration=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-11_fix_crear_partida.sql'),'utf8');await db.exec(migration);await db.exec(migration);const recovery=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-11_recuperar_salas_compatibles.sql'),'utf8');await db.exec(recovery);await db.exec(recovery);
  const salasSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_salas_codigo.sql'),'utf8');await db.exec(salasSQL);await db.exec(salasSQL);
+ const shortSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_codigo_corto.sql'),'utf8');await db.exec(shortSQL);await db.exec(shortSQL);
  const calls=[],pageErrors=[],consoleErrors=[];let fail=null,loseResponse=false,delayCreation=false;
  const server=http.createServer(async(req,res)=>{
   try{const url=new URL(req.url,'http://localhost');

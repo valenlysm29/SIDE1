@@ -8,11 +8,12 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  const db=await database(),browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
  for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql'])await db.exec(fs.readFileSync(path.join(root,'supabase/migrations',filename),'utf8'));
  const salasSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_salas_codigo.sql'),'utf8');await db.exec(salasSQL);await db.exec(salasSQL);
+ const shortSQL=fs.readFileSync(path.join(root,'supabase/migrations/2026-10-12_codigo_corto.sql'),'utf8');await db.exec(shortSQL);await db.exec(shortSQL);
  const errors=[],teacherHTML=fixture('docente.html'),studentHTML=fixture('index.html').replace('const cfg = window.SIDE_CONFIG || {};',`
  window.worldCalls={preload:0,prepare:0,enter:0,suspend:0};
  window.SIDE3D={preload:async()=>{worldCalls.preload++;return true},prepare:async()=>{worldCalls.prepare++;return !window.rejectWorld},enter:async()=>{worldCalls.enter++;showScreen('simulator3d');return true},suspend:()=>{worldCalls.suspend++},getLastError:()=> 'Carga no disponible'};
  const cfg = window.SIDE_CONFIG || {};`);
- const output=path.join(__dirname,'output');fs.mkdirSync(output,{recursive:true});
+ const output=path.join(__dirname,'output/short_code/lifecycle');fs.mkdirSync(output,{recursive:true});
  async function page(html){const p=await browser.newPage({viewport:{width:1366,height:900}});p.on('pageerror',e=>errors.push(e.message));await p.route('**/*',r=>r.abort());await p.route('http://side.test/**',r=>r.fulfill({contentType:'text/html',body:html}));await p.goto('http://side.test/');return p;}
  async function teacher(){
   const p=await page(teacherHTML);
@@ -68,7 +69,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await t.locator('#startGame').click();
   await t.waitForFunction(()=>runtime()?.phase==='integration').catch(async error=>{console.error('waiting start diagnostic',await t.evaluate(()=>({toast:$('toast')?.textContent,partidaId:state.partidaId,authoritative:state.authoritative,status:gameStatus()})));throw error;});
   const game=await t.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'Prueba'}));
-  assert.match(game.codigo,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);
+  assert.match(game.codigo,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{4}$/);
   const initialWaiting=await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'sincronizar',p_config:{},p_expected_round:null});
   assert.equal(initialWaiting.configuracion.runtime.phase,'integration');
   const waitingDeadline=initialWaiting.configuracion.gameStartAt;

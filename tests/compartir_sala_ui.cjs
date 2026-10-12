@@ -3,13 +3,13 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {database,rpc,createGame,config,professor}=require('./lifecycle_db_fixture.cjs');
-const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/salas_codigo');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/short_code/compartir');
 const sdk=`window.SIDE_CONFIG={SUPABASE_URL:'http://localhost',SUPABASE_PUBLISHABLE_KEY:'fixture'};
 window.SIDE3D={preloadBase:async()=>{}};
 window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
 (async()=>{
  const db=await database();
- for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql','2026-10-11_codigos_sala_no_reutilizables.sql','2026-10-11_estado_codigo_sala.sql','2026-10-12_salas_codigo.sql']){
+ for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql','2026-10-11_codigos_sala_no_reutilizables.sql','2026-10-11_estado_codigo_sala.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql']){
   const migration=fs.readFileSync(path.join(root,'supabase/migrations',filename),'utf8');await db.exec(migration);await db.exec(migration);
  }
  const calls=[],pageErrors=[],consoleErrors=[];let missingRecovery=false;
@@ -57,7 +57,7 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
  async function assertRecovered(page,game){await page.waitForFunction(id=>state.partidaId===id&&runtime()?.phase==='integration',game.id);await page.evaluate(()=>switchTab('rondas'));await page.locator('#teacherLobby').waitFor({state:'visible'});assert.equal(await page.locator('#lobbyCode').innerText(),game.codigo);assert.equal(await page.locator('#cancelExistingRoom').count(),0);assert.equal(await page.locator('#creationDetails').count(),0);assert.doesNotMatch(await page.locator('body').innerText(),/Existe una partida anterior con un formato antiguo/);}
  async function screenshot(page,name){await page.screenshot({path:path.join(output,name),fullPage:true,animations:'disabled'});}
  try{
-  const game=await createGame(db,config({lifecycleVersion:1,integrationDurationMinutes:60,roundMinutes:5,enabledEvents:['PE01','PE02','PE03','PE04']}));
+  const game=(await db.query(`insert into partidas(profesor_id,nombre,codigo,configuracion) values($1,'Anterior seis','SIDE-ABC234',$2) returning *`,[professor,config({lifecycleVersion:1,integrationDurationMinutes:60,roundMinutes:5,enabledEvents:['PE01','PE02','PE03','PE04']})])).rows[0];
   const teacher=await newPage();await teacher.evaluate(()=>switchTab('configuracion'));await assertRecovered(teacher,game);
   const repaired=(await db.query('select * from partidas where id=$1',[game.id])).rows[0];const deadline=repaired.configuracion.gameStartAt;
   assert.equal(repaired.id,game.id);assert.equal(repaired.codigo,game.codigo);assert.equal(repaired.configuracion.lifecycleVersion,2);assert.equal(repaired.configuracion.integrationDurationMinutes,60);assert.ok(deadline);
@@ -86,9 +86,10 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
   await teacher.evaluate(()=>switchTab('configuracion'));
   await teacher.locator('#startGame').click();await teacher.waitForFunction(()=>state.partidaId&&runtime()?.phase==='integration');
   await clipboard(teacher);const newCode=await copy(teacher,'#copyGameCode');
-  assert.match(newCode,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);assert.notEqual(newCode,game.codigo);
+  assert.match(newCode,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{4}$/);assert.notEqual(newCode,game.codigo);
   const entrant=await newPage('/index.html?partida='+newCode);
-  await entrant.locator('#gameCode').fill(newCode.replace('-','').toLowerCase());
+  for(const typed of [newCode.slice(5).toLowerCase(),newCode]){await entrant.locator('#gameCode').fill('');await entrant.locator('#gameCode').pressSequentially(typed);await entrant.locator('#gameCode').blur();assert.equal(await entrant.locator('#gameCode').inputValue(),newCode);}
+  await entrant.locator('#gameCode').fill(newCode.slice(5).toLowerCase());
   await entrant.locator('#companyLegalName').fill('Empresa Nueva');await entrant.locator('#companyBrandName').fill('Marca Nueva');
   await entrant.locator('#studentForm button[type=submit]').click();await entrant.waitForFunction(()=>currentStudent.empresaId&&!$('studentLobby').classList.contains('hidden'));
   await teacher.locator('#cancelGame').click();await teacher.locator('#confirmCancelGame').click();await teacher.waitForFunction(()=>!state.partidaId);

@@ -26,7 +26,7 @@ test('el formulario rechaza el código concatenado de la captura antes de llamar
   f.fields.gameCode.value=code;
   await f.context.submit({preventDefault(){}});
   assert.equal(f.calls,0);
-  assert.match(f.message,/código.*formato/);
+  assert.match(f.message,/código como SIDE-PTV6 o PTV6/);
   assert.equal(f.fields.gameCode.attributes['aria-invalid'],'true');
   assert.equal(f.fields.gameCodeError.textContent,f.message);
   assert.equal(f.fields.gameCode.value,code,'no transforma ni trunca el código a otra sala');

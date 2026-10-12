@@ -2,7 +2,7 @@
 // Delivered HTML and application; isolated backend fixture, no production traffic.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {execFileSync}=require('node:child_process'),{chromium}=require('playwright');
-const root=path.resolve(__dirname,'..'),output=path.join(root,'reports/sim/crear_partida');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/short_code/change_room');
 const python=process.env.PYTHON_BIN||'C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe';
 const html=execFileSync(python,['-c',"import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('index.html'))"],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1'}});
 const mock=`
