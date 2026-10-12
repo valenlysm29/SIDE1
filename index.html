@@ -114,7 +114,8 @@
       <form id="studentForm" class="student-join-form" aria-describedby="studentRejoinHelp">
         <div class="join-field join-code-field">
           <label for="gameCode">Código de partida</label>
-          <input id="gameCode" placeholder="Ej. SIDE-WG2" maxlength="12" autocomplete="off" required>
+          <input id="gameCode" placeholder="Ej. SIDE-WG2" maxlength="12" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gameCodeError" required>
+          <div id="gameCodeError" class="form-message hidden" role="alert"></div>
         </div>
         <div class="join-field">
           <label for="companyLegalName">Nombre de tu empresa</label>

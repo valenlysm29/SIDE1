@@ -24,7 +24,7 @@ test('student service normalizes the three admission fields and preserves server
   return {data:{success:false,code:'PARTIDA_INICIADA',error:'server detail'},error:null};
  },'EmpresaService');
  const result=await service.ingresar({
-  codigo:'  síde-000  ',
+  codigo:'  side-000  ',
   nombreLegal:'  Compañía   Ágil  ',
   nombreComercial:'  Café   Norte '
  });
@@ -100,6 +100,7 @@ test('real student form shows the server message for technical failures and busi
  const bootstrap=`
  window.__rpcResult={data:null,error:null};
  window.__rpcThrow=null;
+ window.__rpcCalls=[];
  window.__consoleErrors=[];
  const __originalConsoleError=console.error.bind(console);
  console.error=(...args)=>{
@@ -107,7 +108,7 @@ test('real student form shows the server message for technical failures and busi
   __originalConsoleError(...args);
  };
  window.supabase={createClient:()=>({
-  rpc:async(name)=>{if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null};if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
+  rpc:async(name)=>{window.__rpcCalls.push(name);if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null};if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
   auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}
  })};
  `;
@@ -135,7 +136,18 @@ test('real student form shows the server message for technical failures and busi
   }
 
   const serverMessage='No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
-  const genericMessage='Los datos no coinciden con el registro. Usa el código y los nombres registrados, respetando mayúsculas y tildes.';
+  const invalidCodeMessage='El código debe tener el formato SIDE-ABC o SIDE-ABCD. Copia solo el código que aparece en la sala del docente.';
+  const callsBefore=await page.evaluate(()=>window.__rpcCalls.length);
+  await submit({response:{data:{success:false,code:'CREDENCIALES_INVALIDAS'},error:null},identity:{codigo:'SIDE-WG2SIDE',nombreLegal:'demo1',nombreComercial:'demo1'},expected:invalidCodeMessage});
+  assert.equal(await page.evaluate(()=>window.__rpcCalls.length),callsBefore);
+  assert.equal(await page.locator('#gameCodeError').textContent(),invalidCodeMessage);
+  assert.equal(await page.locator('#gameCode').getAttribute('aria-invalid'),'true');
+  assert.equal(await page.locator('#gameCode').inputValue(),'SIDE-WG2SIDE');
+  await page.evaluate(()=>{showScreen('profiles');showModal('studentModal');});
+  const evidenceDir=path.join(root,'reports/sim/crear_partida');
+  fs.mkdirSync(evidenceDir,{recursive:true});
+  await page.screenshot({path:path.join(evidenceDir,'ingreso_codigo_invalido_despues.png'),fullPage:true});
+  const genericMessage='No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
   const startedMessage='La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
   for(const technical of [
    {data:null,error:{code:'PGRST202',message:'Could not find public.ingresar_empresa',status:404}},
@@ -241,7 +253,7 @@ test('state reads and writes preserve technical error codes instead of rejecting
 
 test('frontend maps safe errors, hydrates by identity and recovers stale revisions',()=>{
  assert.match(appSource,/JOIN_STARTED_MESSAGE\s*=\s*'La partida ya inició\. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados\.'/);
- assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'Los datos no coinciden con el registro\./);
+ assert.match(appSource,/JOIN_INVALID_MESSAGE\s*=\s*'No se pudo validar el ingreso\./);
  assert.match(appSource,/JOIN_SERVER_MESSAGE\s*=\s*'No se pudo conectar con el servidor\. Intenta nuevamente en unos minutos\.'/);
  assert.match(appSource,/ingreso\?\.code==='PARTIDA_INICIADA'/);
  assert.match(appSource,/ingreso\?\.code==='CREDENCIALES_INVALIDAS'/);

@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
-  <link rel="stylesheet" href="css/docente.css?v=20261011-cancelar">
+  <link rel="stylesheet" href="css/docente.css?v=20261011-recuperar">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
 </head>
 <body>
@@ -107,7 +107,7 @@
         <div class="card-title"><div><h3>Eventos habilitados</h3><p>Selecciona los eventos que podrán ocurrir desde el Ciclo 1.</p></div><button id="openEventPicker" class="secondary" type="button" aria-haspopup="dialog">Seleccionar eventos</button></div>
         <div id="enabledEventsSummary" class="enabled-events-summary" aria-live="polite">Sin eventos habilitados.</div>
       </article>
-      <div id="creationFeedback" class="creation-feedback hidden" role="status" aria-live="polite"><p id="creationMessage"></p><button id="retryCreate" class="secondary hidden" type="button">Reintentar</button><button id="cancelExistingRoom" class="danger hidden" type="button">Cancelar partida</button><details id="creationDetails" class="hidden"><summary>Ver detalle</summary><pre id="creationTechnicalDetail"></pre></details></div>
+      <div id="creationFeedback" class="creation-feedback hidden" role="status" aria-live="polite"><p id="creationMessage"></p><button id="retryCreate" class="secondary hidden" type="button">Reintentar</button></div>
       <div class="config-start-footer"><div><strong id="configReadySummary">Revisa la configuración antes de iniciar.</strong><p>Iniciar partida abre la sala de espera. El Ciclo 1 comienza al terminar el tiempo de integración configurado.</p></div><button id="startGame" class="primary" type="button">Iniciar partida</button></div>
     </section>
 
@@ -195,8 +195,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20260924-observations"></script>
-<script src="services/partida_service.js?v=20261011-cancelar"></script>
-<script src="services/empresa_service.js?v=20261009-waiting"></script>
+<script src="services/partida_service.js?v=20261011-recuperar"></script>
+<script src="services/empresa_service.js?v=20261011-code"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
 <script src="js/engine/config_excel.js?v=20261011"></script>
@@ -216,6 +216,6 @@
 <script src="js/teacher_podium.js?v=20261009-grades"></script>
 <script src="services/teacher_sync.js?v=20261009-grades"></script>
 <script src="js/teacher_report_pdf.js?v=20260930-2"></script>
-<script src="js/docente.js?v=20261011-cancelar"></script>
+<script src="js/docente.js?v=20261011-recuperar"></script>
 </body>
 </html>

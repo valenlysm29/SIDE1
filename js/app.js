@@ -8,7 +8,15 @@ const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const JOIN_STARTED_MESSAGE = 'La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
-const JOIN_INVALID_MESSAGE = 'Los datos no coinciden con el registro. Usa el código y los nombres registrados, respetando mayúsculas y tildes.';
+const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
+const JOIN_CODE_MESSAGE = 'El código debe tener el formato SIDE-ABC o SIDE-ABCD. Copia solo el código que aparece en la sala del docente.';
+function admissionCode(value){return String(value||'').trim().toUpperCase();}
+function validAdmissionCode(value){return /^SIDE-[A-Z0-9]{3,4}$/.test(admissionCode(value));}
+function showAdmissionCodeError(text=''){
+  const field=$('gameCode'),detail=$('gameCodeError');
+  if(field)field.setAttribute('aria-invalid',text?'true':'false');
+  if(detail){detail.textContent=text;message('gameCodeError',text,true);detail.classList.toggle('hidden',!text);}
+}
 const JOIN_SERVER_MESSAGE = 'No se pudo conectar con el servidor. Intenta nuevamente en unos minutos.';
 const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SIDE_DECISION_CATALOG : [];
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
@@ -432,7 +440,10 @@ $('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const ema
 $('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}$('registerForm')?.reset();if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
   e.preventDefault();studentSessionRecovering=false;studentStateFailure=null;stopStudentSync();studentProgressHydrated=false;studentSnapshotEpoch++; const S=window.SIDE||{},cleanText=S.EmpresaService?.cleanText||(value=>String(value||'').normalize('NFC').trim().replace(/\s+/g,' ')),cleanCode=S.EmpresaService?.cleanCode||(value=>cleanText(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
-  const code=cleanCode($('gameCode').value);
+  const code=admissionCode($('gameCode').value);
+  showAdmissionCodeError();
+  if(!validAdmissionCode(code)){showAdmissionCodeError(JOIN_CODE_MESSAGE);message('studentMessage',JOIN_CODE_MESSAGE,true);$('gameCode').focus();return;}
+  $('gameCode').value=code;
   const legalName=cleanText($('companyLegalName')?.value);
   const brandName=cleanText($('companyBrandName')?.value)||legalName||COMPANY_NAME;
   if(!legalName||!brandName){message('studentMessage','Ingresa el nombre y el nombre comercial de tu empresa.',true);return}
@@ -451,6 +462,11 @@ $('studentForm')?.addEventListener('submit',async e=>{
     let ingreso;
     try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     if(!ingreso?.success){
+      if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO'].includes(ingreso?.code)){
+        const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
+        showAdmissionCodeError(text);message('studentMessage',text,true);return;
+      }
+      if(['PARTIDA_CANCELADA','PARTIDA_FINALIZADA'].includes(ingreso?.code)){message('studentMessage',ingreso.code==='PARTIDA_CANCELADA'?'Esta partida fue cancelada. Pide al docente el código de una sala nueva.':'Esta partida ya finalizó. Pide al docente el código de una sala nueva.',true);return;}
       if(ingreso?.code==='MIGRACION_PENDIENTE'){message('studentMessage',ingreso.error,true);return}
       if(ingreso?.code==='PARTIDA_INICIADA'){message('studentMessage',JOIN_STARTED_MESSAGE,true);return}
       if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
@@ -1542,8 +1558,10 @@ $('studentReconnectBtn')?.addEventListener('click',resumeStudentSession);
 
 // Shared links fill the join form; the game code is still verified by the server.
 const invitationCode=new URLSearchParams(window.location.search).get('partida');
-if(invitationCode&&/^SIDE-[A-Z0-9]{3,4}$/i.test(invitationCode)){
-  $('gameCode').value=invitationCode.toUpperCase();showScreen('profiles');showModal('studentModal');
+if(invitationCode){
+  $('gameCode').value=admissionCode(invitationCode);showScreen('profiles');showModal('studentModal');
+  if(!validAdmissionCode(invitationCode)){showAdmissionCodeError(JOIN_CODE_MESSAGE);message('studentMessage',JOIN_CODE_MESSAGE,true);}
 }
+$('gameCode')?.addEventListener('input',()=>{showAdmissionCodeError();message('studentMessage','');});
 window.addEventListener('online',()=>{if(studentConnected)pollStudentGame();});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});

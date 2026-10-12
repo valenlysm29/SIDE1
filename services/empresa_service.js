@@ -38,7 +38,7 @@
     };
   }
 
-  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA']);
+  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA']);
 
   /** Conserva el diagnostico de PostgREST sin convertirlo en un rechazo de identidad. */
   function technicalFailure(error, fallbackCode) {
@@ -81,11 +81,16 @@
     const sb = client();
     if (!sb) return offline();
     const d = datos || {};
-    const codigo = cleanCode(d.codigo);
+    // No eliminar caracteres o tildes que puedan transformar una entrada
+    // inválida en el código de otra sala. Solo normalizar bordes y caja.
+    const codigo = String(d.codigo || '').trim().toUpperCase();
     const nombreLegal = cleanText(d.nombreLegal);
     const nombreComercial = cleanText(d.nombreComercial);
     if (!codigo || !nombreLegal || !nombreComercial) {
       return { success: false, code: 'DATOS_INCOMPLETOS', error: 'Faltan datos de ingreso.' };
+    }
+    if (!/^SIDE-[A-Z0-9]{3,4}$/.test(codigo)) {
+      return { success: false, code: 'CODIGO_INVALIDO', error: 'El código debe tener el formato SIDE-ABC o SIDE-ABCD.' };
     }
     try {
       const readiness=await admissionReady(sb);if(readiness)return readiness;
