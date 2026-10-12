@@ -12,6 +12,7 @@ function fixture(name){
  const page=await browser.newPage({viewport:{width:1366,height:768}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>r.abort());
  await page.clock.install();
+ await page.clock.pauseAt(new Date(Date.now()+1000)); // El tiempo sólo avanza con fastForward.
  // Local controls are seeded explicitly; creation without a server must fail visibly.
  const teacher=fixture('docente.html').replace('<script>const cfg=','<script>window.SIDE_CONFIG={};const cfg='),student=fixture('index.html');
  await page.setContent(teacher,{waitUntil:'load'});
@@ -47,7 +48,7 @@ function fixture(name){
  assert.equal(await page.evaluate(()=>runtime().duration),600);
  assert.equal(await page.evaluate(()=>runtime().phase),'integration');
  assert.equal(await page.locator('#advanceRound').isDisabled(),true);
- assert.equal(await page.locator('#startGame').isDisabled(),false);
+ assert.equal(await page.locator('#startGame').isDisabled(),true);
  const wait=await page.evaluate(()=>({duration:Date.parse(state.authoritative.gameStartAt)-Date.parse(state.authoritative.integrationStartTime),seconds:state.seconds,deadline:state.authoritative.gameStartAt}));
  assert.equal(wait.duration,180000);
  assert.equal(wait.seconds,180);
