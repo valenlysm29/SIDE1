@@ -3,13 +3,13 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {database,rpc,createGame,config,professor}=require('./lifecycle_db_fixture.cjs');
-const root=path.resolve(__dirname,'..'),output=path.join(root,'reports/sim/crear_partida');
+const root=path.resolve(__dirname,'..'),output=path.join(root,'tests/output/salas_codigo');
 const sdk=`window.SIDE_CONFIG={SUPABASE_URL:'http://localhost',SUPABASE_PUBLISHABLE_KEY:'fixture'};
 window.SIDE3D={preloadBase:async()=>{}};
 window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${professor}'}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})},rpc:async(name,args)=>fetch('/mock',{method:'POST',body:JSON.stringify({kind:'rpc',name,args})}).then(r=>r.json()),from:name=>{const q={kind:'table',name,filters:[]};const b={select:()=>b,eq:(k,v)=>{q.filters.push([k,v]);return b},order:()=>b,limit:()=>b,in:()=>b,maybeSingle:()=>{q.single=true;return b},single:()=>{q.single=true;return b},then:(ok,fail)=>fetch('/mock',{method:'POST',body:JSON.stringify(q)}).then(r=>r.json()).then(ok,fail)};return b},channel:()=>({on(){return this},subscribe(){return this}}),removeChannel:()=>{}})};`;
 (async()=>{
  const db=await database();
- for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql','2026-10-11_codigos_sala_no_reutilizables.sql','2026-10-11_estado_codigo_sala.sql']){
+ for(const filename of ['2026-10-11_fix_crear_partida.sql','2026-10-11_recuperar_salas_compatibles.sql','2026-10-11_codigos_sala_no_reutilizables.sql','2026-10-11_estado_codigo_sala.sql','2026-10-12_salas_codigo.sql']){
   const migration=fs.readFileSync(path.join(root,'supabase/migrations',filename),'utf8');await db.exec(migration);await db.exec(migration);
  }
  const calls=[],pageErrors=[],consoleErrors=[];let missingRecovery=false;
@@ -78,6 +78,26 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
   const second=await newPage();await assertRecovered(second,game);assert.equal(await second.evaluate(()=>state.authoritative.gameStartAt),deadline);await clipboard(second);assert.equal(await copy(second,'#copyGameLink'),invitation);
   assert.equal(Number((await db.query('select count(*) n from partidas')).rows[0].n),1);
   console.log('PASS sala heredada: recuperación conserva fila/código/plazo, copiar código/enlace, ingreso real, recarga y segunda pestaña');
+  // Recorrido nuevo completo: creación confirmada, copia, ingreso y cancelación.
+  await teacher.locator('#cancelGame').click();await teacher.locator('#confirmCancelGame').click();
+  await teacher.waitForFunction(()=>!state.partidaId);
+  await student.waitForFunction(()=>$('profiles')&&!$('profiles').classList.contains('hidden'));
+  assert.equal((await db.query('select estado from partidas where id=$1',[game.id])).rows[0].estado,'cancelada');
+  await teacher.evaluate(()=>switchTab('configuracion'));
+  await teacher.locator('#startGame').click();await teacher.waitForFunction(()=>state.partidaId&&runtime()?.phase==='integration');
+  await clipboard(teacher);const newCode=await copy(teacher,'#copyGameCode');
+  assert.match(newCode,/^SIDE-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/);assert.notEqual(newCode,game.codigo);
+  const entrant=await newPage('/index.html?partida='+newCode);
+  await entrant.locator('#gameCode').fill(newCode.replace('-','').toLowerCase());
+  await entrant.locator('#companyLegalName').fill('Empresa Nueva');await entrant.locator('#companyBrandName').fill('Marca Nueva');
+  await entrant.locator('#studentForm button[type=submit]').click();await entrant.waitForFunction(()=>currentStudent.empresaId&&!$('studentLobby').classList.contains('hidden'));
+  await teacher.locator('#cancelGame').click();await teacher.locator('#confirmCancelGame').click();await teacher.waitForFunction(()=>!state.partidaId);
+  await entrant.waitForFunction(()=>$('profiles')&&!$('profiles').classList.contains('hidden'));
+  await screenshot(entrant,'estudiante_cancelacion_inicio.png');
+  await entrant.evaluate(()=>showModal('studentModal'));await entrant.locator('#gameCode').fill(newCode);await entrant.locator('#studentForm button[type=submit]').click();
+  await entrant.waitForFunction(()=>$('studentMessage').textContent.includes('cancelada'));
+  assert.equal(await entrant.locator('#studentForm button[type=submit]').isDisabled(),false);
+  console.log('PASS E2E docente crea → copia → estudiante entra sin guion/minúsculas → docente cancela → estudiante vuelve al inicio → reingreso rechazado');
   for(const context of contexts.splice(0))await context.close();await db.exec('truncate partidas cascade');
   const pending=await createGame(db,config({lifecycleVersion:1,integrationDurationMinutes:60}));missingRecovery=true;
   const blocked=await newPage();await blocked.waitForFunction(()=>$('creationMessage').textContent.includes('2026-10-11_recuperar_salas_compatibles.sql'));
@@ -86,7 +106,7 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
   assert.equal(await blocked.locator('#copyGameCode').isDisabled(),false);assert.equal(await blocked.locator('#copyGameLink').isDisabled(),false);await clipboard(blocked);assert.equal(await copy(blocked,'#copyGameCode'),pending.codigo);assert.equal(new URL(await copy(blocked,'#copyGameLink')).searchParams.get('partida'),pending.codigo);
   await screenshot(blocked,'recuperar_compartir_sql_pendiente.png');
   assert.equal((await db.query('select configuracion from partidas where id=$1',[pending.id])).rows[0].configuracion.lifecycleVersion,1);
-  assert.deepEqual(pageErrors,[]);assert.ok(calls.some(call=>call.request.name==='recuperar_sala_docente'));assert.ok(calls.some(call=>call.request.name==='ingresar_empresa'&&call.response.data?.success));
+  assert.deepEqual(pageErrors,[]);assert.ok(calls.some(call=>call.request.name==='recuperar_sala_docente'));assert.ok(calls.some(call=>call.request.name==='unirse_partida_por_codigo'&&call.response.data?.success));
   console.log('PASS migración pendiente: mensaje SQL específico, compartir código/enlace real sin obligar a cancelar');
  }finally{
   fs.writeFileSync(path.join(output,'recuperar_compartir_evidencia.json'),JSON.stringify({backend:'PGlite local; HTML, PartidaService y EmpresaService reales; auth fixture; red externa bloqueada',calls,pageErrors,consoleErrors},null,2));
