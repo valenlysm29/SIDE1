@@ -344,7 +344,7 @@ button:disabled{cursor:not-allowed;opacity:.6}
 input[aria-invalid="true"]{border-color:var(--red)}
 .teacher-lobby{margin-bottom:20px}.teacher-lobby h2{font-size:20px;margin-top:0}
 .lobby-identity{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.lobby-identity strong{font-size:28px;letter-spacing:.08em;color:var(--text)}
+.lobby-identity strong{font-size:clamp(1.5rem,5vw,2.25rem);letter-spacing:.04em;color:var(--text);max-width:100%;overflow-wrap:anywhere}
 .lobby-identity button{min-height:44px}#lobbyCountdown{font-size:18px;color:var(--green)}
 #lobbyCompanies{border-top:1px solid var(--line);padding-top:14px;line-height:1.6}
 /* El código confirmado se comparte por teclado, selección táctil o portapapeles. */
@@ -353,3 +353,6 @@ input[aria-invalid="true"]{border-color:var(--red)}
 .top-actions{flex-wrap:wrap}
 #copyGameCode,#copyGameLink,#copyLobbyCode,#cancelGame{min-height:var(--side-touch-target)}
 .code-badge:focus-visible,#gameCode:focus-visible,#copyGameCode:focus-visible,#copyGameLink:focus-visible,#copyLobbyCode:focus-visible,#cancelGame:focus-visible{outline:var(--side-focus-width) solid var(--side-blue);outline-offset:var(--side-focus-offset)}
+
+/* Longitud variable: código corto destacado, legados íntegros en móvil. */
+.code-badge{font-size:clamp(1rem,3vw,1.25rem);letter-spacing:.03em;max-width:100%;overflow-wrap:anywhere}

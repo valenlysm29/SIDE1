@@ -9,8 +9,13 @@ const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulac
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
 const JOIN_STARTED_MESSAGE = 'La partida ya inició. Solo pueden reingresar quienes ya estaban registrados; verifica que el código, el nombre de empresa y el nombre comercial sean exactamente los registrados.';
 const JOIN_INVALID_MESSAGE = 'No se pudo validar el ingreso. Comprueba el código de la sala con tu docente. Si ya participaste, usa los nombres registrados, respetando mayúsculas y tildes.';
-const JOIN_CODE_MESSAGE = 'El código debe tener el formato SIDE-ABCDEF. También se aceptan los códigos anteriores y SIDE-000. Copia solo el código de la sala del docente.';
-function admissionCode(value){return String(value||'').replace(/\s+/g,'').toUpperCase().replace(/^SIDE([A-Z0-9]+)$/,'SIDE-$1');}
+const JOIN_CODE_MESSAGE = 'Usa un código como SIDE-PTV6 o PTV6. También se aceptan los códigos anteriores de 6 caracteres y SIDE-000. Copia solo el código de la sala del docente.';
+function admissionCode(value){
+  const code=String(value||'').replace(/\s+/g,'').toUpperCase();
+  if(/^SIDE[A-Z0-9]+$/.test(code))return code.replace(/^SIDE/,'SIDE-');
+  if(code!=='SIDE'&&/^(?:[A-Z0-9]{3,4}|[A-Z0-9]{6})$/.test(code))return 'SIDE-'+code;
+  return code;
+}
 function validAdmissionCode(value){return /^SIDE-(?:[A-Z0-9]{3,4}|[A-Z0-9]{6})$/.test(admissionCode(value));}
 function showAdmissionCodeError(text=''){
   const field=$('gameCode'),detail=$('gameCodeError');
@@ -475,7 +480,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
   const localCfg=teacherConfig(),localCode=String(localCfg.codigo||'SIDE-000').toUpperCase();
   if(!hasConfig&&code===localCode&&!localStorage.getItem('SIDE_REMOTE_GAME_'+code)&&!localStorage.getItem('SIDE_PARTIDA_ID')){
     let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
-    const comparable=value=>cleanCode(value),previous=reports.find(r=>comparable(r.partida)===code&&comparable(r.empresa)===comparable(brandName)&&(!r.legalName||comparable(r.legalName)===comparable(legalName)));
+    const comparable=value=>String(value||'').replace(/\s+/g,'').toUpperCase(),previous=reports.find(r=>admissionCode(r.partida)===code&&comparable(r.empresa)===comparable(brandName)&&(!r.legalName||comparable(r.legalName)===comparable(legalName)));
     const access=studentAccess(Boolean(previous));
     if(!access.canJoin){message('studentMessage',access.reason,true);return;}
 
@@ -1599,6 +1604,8 @@ if(invitationCode){
   $('gameCode').value=admissionCode(invitationCode);showScreen('profiles');showModal('studentModal');
   if(!validAdmissionCode(invitationCode)){showAdmissionCodeError(JOIN_CODE_MESSAGE);message('studentMessage',JOIN_CODE_MESSAGE,true);}
 }
-$('gameCode')?.addEventListener('input',()=>{$('gameCode').value=admissionCode($('gameCode').value);showAdmissionCodeError();message('studentMessage','');});
+// Preserve incomplete input while typing SIDE; canonicalize the full code on blur/submit.
+$('gameCode')?.addEventListener('input',()=>{$('gameCode').value=String($('gameCode').value).replace(/\s+/g,'').toUpperCase();showAdmissionCodeError();message('studentMessage','');});
+$('gameCode')?.addEventListener('blur',()=>{$('gameCode').value=admissionCode($('gameCode').value);});
 window.addEventListener('online',()=>{if(studentConnected)pollStudentGame();});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});

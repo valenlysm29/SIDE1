@@ -77,7 +77,10 @@
   }
 
   function cleanCode(value) {
-    return String(value || '').replace(/\s+/g, '').toUpperCase().replace(/^SIDE([A-Z0-9]+)$/, 'SIDE-$1');
+    const code = String(value || '').replace(/\s+/g, '').toUpperCase();
+    if (/^SIDE[A-Z0-9]+$/.test(code)) return code.replace(/^SIDE/, 'SIDE-');
+    if (code !== 'SIDE' && /^(?:[A-Z0-9]{3,4}|[A-Z0-9]{6})$/.test(code)) return 'SIDE-' + code;
+    return code;
   }
 
   // Bound every network operation, including capability checks and polling.
@@ -115,7 +118,7 @@
       return { success: false, code: 'DATOS_INCOMPLETOS', error: 'Faltan datos de ingreso.' };
     }
     if (!/^SIDE-(?:[A-Z0-9]{3,4}|[A-Z0-9]{6})$/.test(codigo)) {
-      return { success: false, code: 'CODIGO_INVALIDO', error: 'El código debe tener el formato SIDE-ABCDEF. También se aceptan los códigos anteriores y SIDE-000.' };
+      return { success: false, code: 'CODIGO_INVALIDO', error: 'Usa un código como SIDE-PTV6 o PTV6. También se aceptan los códigos anteriores de 6 caracteres y SIDE-000.' };
     }
     try {
       const readiness=await admissionReady(sb);if(readiness)return readiness;
