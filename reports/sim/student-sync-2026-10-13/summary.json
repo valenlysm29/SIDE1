@@ -1,0 +1,71 @@
+{
+  "conditions": {
+    "concurrentTestBrowsers": 1,
+    "headless": true,
+    "timeoutChanged": false,
+    "forcedActions": false,
+    "source": "tests/student_sync_ui.test.js"
+  },
+  "results": [
+    {
+      "run": 1,
+      "exitCode": 0,
+      "durationMs": 8470,
+      "log": "run-1.log"
+    },
+    {
+      "run": 2,
+      "exitCode": 0,
+      "durationMs": 8379,
+      "log": "run-2.log"
+    },
+    {
+      "run": 3,
+      "exitCode": 0,
+      "durationMs": 7813,
+      "log": "run-3.log"
+    },
+    {
+      "run": 4,
+      "exitCode": 0,
+      "durationMs": 8004,
+      "log": "run-4.log"
+    },
+    {
+      "run": 5,
+      "exitCode": 0,
+      "durationMs": 8408,
+      "log": "run-5.log"
+    },
+    {
+      "run": 6,
+      "exitCode": 0,
+      "durationMs": 8062,
+      "log": "run-6.log"
+    },
+    {
+      "run": 7,
+      "exitCode": 0,
+      "durationMs": 7909,
+      "log": "run-7.log"
+    },
+    {
+      "run": 8,
+      "exitCode": 0,
+      "durationMs": 7810,
+      "log": "run-8.log"
+    },
+    {
+      "run": 9,
+      "exitCode": 0,
+      "durationMs": 8238,
+      "log": "run-9.log"
+    },
+    {
+      "run": 10,
+      "exitCode": 0,
+      "durationMs": 8086,
+      "log": "run-10.log"
+    }
+  ]
+}

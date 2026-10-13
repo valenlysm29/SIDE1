@@ -36,6 +36,8 @@ SIDE.SupabaseClient.get=()=>({auth:{onAuthStateChange(){},signInWithPassword:asy
 test('student synchronization and session recovery through the delivered UI',async t=>{
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
   const errors=[];
+  // Una acción fallida no debe dejar una página animada viva durante los demás casos.
+  t.afterEach(async()=>{for(const context of browser.contexts())await context.close();});
   async function page(seed={}){
     const context=await browser.newContext({viewport:{width:1366,height:900}}),p=await context.newPage();
     p.on('pageerror',error=>errors.push(error.message));

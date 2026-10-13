@@ -1,0 +1,29 @@
+✔ failed snapshot survives reload and retries its decisions/report with the original CAS revision (2.7198ms)
+✔ operation retry after an acknowledged snapshot never repeats the snapshot or the completed report (2.2216ms)
+✔ offline edits coalesce by cycle and category without losing other categories (0.5119ms)
+✔ a newer edit made during a failed request survives and merges the unfinished operations (0.4459ms)
+✔ successful writes advance later jobs of the same company across cycles (0.5858ms)
+✔ CAS conflicts stop retries, preserve a local copy and never overwrite the other session (1.0028ms)
+✔ logout or identity change during a request prevents operations and revision changes in the next session (0.5959ms)
+✔ explicit identity rejection clears the outbox; technical failures with the same code keep it (0.8781ms)
+✔ lost snapshot acknowledgment is verified before retrying decisions and never writes the snapshot twice (0.753ms)
+✔ an unavailable conflict check retains the job and does not adopt an unknown server revision (0.4017ms)
+▶ student synchronization and session recovery through the delivered UI
+  ✔ saving a draft sends snapshot, report and normalized decisions with the acknowledged revision (2914.9615ms)
+  ✔ online retries failed writes before reading and does not erase the local draft (3111.7782ms)
+  ✔ pending decisions/report survive a reload and recover the latest offline draft (8184.1463ms)
+  ✔ a stale offline write preserves another session and hydrates the newer server state (3125.1095ms)
+  ✔ a lost save response still recovers normalized decisions without repeating the committed snapshot (3164.7371ms)
+  ✔ network failure retains the session and retry button restores access without retyping identity (6927.0848ms)
+  ✔ an explicit identity rejection clears the session instead of retrying indefinitely (4177.277ms)
+  ✔ online automatically restores a session retained after a network failure (6900.8093ms)
+  ✔ configured teacher demo credentials use Supabase Auth and stay on login if rejected (2596.452ms)
+✔ student synchronization and session recovery through the delivered UI (41870.9858ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 43716.3132

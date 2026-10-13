@@ -86,3 +86,17 @@ Original8+8: baseline8/8PASS, HEAD7/8PASS,1FAIL customers complete a decision (B
 
 ## Continuación 4 — hito A8 terminado y preservación final
 A8 entregó reports/diagnostico_npc_cont4.md, cuatroresúmenescompactos de10.3/3.3/3/3KB y arnesesreproducibles; logs/raw grandeslocales. Medianas37.857sbase/39.354sHEAD. A9 revisión de rutalegacy y restriccionesen reports/revision_continuacion_4.md: sin críticosarnés, sincausaintegraciónhallada, dictamen caso3pendiente/no-publicar. Dosarnesesadicionales node--checkPASS; sintaxis56/0total. Fetchconfirma origin/main459c062 sinmovimientos; diffnoincluye .codex-work, originalExcel,tests/output,assets/modelos,secretos ni trabajoajeno. ContenedorsoloSIDE1, todo localdentrorepo. SINPUSH de esta continuación, por la fallaNPC exclusivaHEAD de muestra original, no atribuida.
+
+## Continuación 5 — sincronización dirigida, 2026-10-13
+
+Estado real al reanudar: HEAD/originmain `914b3ad`, remoto SIDE1 verificado y árbol limpio. Se conservan los avances posteriores a continuación4; no se vuelve a un HEAD antiguo. Se aisló el fallo de `student_sync_ui.test.js` incluido en `verificacion_excel_final.cjs`: el timeout histórico fue en `locator.check` del checkbox CANALES/web, antes del guardado y del evento online, esperando visibilidad/habilitación/estabilidad; no acredita bloqueo de la cola.
+
+Chrome exclusivo entre pruebas: suite UI original 10/10 PASS (online 2.290s); diez parejas de guardado+online instrumentadas 10/10 PASS (online 2.774–3.127s), checkbox visible/habilitado/estable y acceso permitido. **No se reprodujo el timeout original ni se demostró su causa inicial. Permanece pendiente; no se declara corregido ni previo.** El fixture de aproximadamente49MB es una observación, no una atribución causal.
+
+Se corrigió limpieza del arnés mediante `t.afterEach`: un fallo ya no deja el contexto vivo durante los casos siguientes. Se añadió `tests/diagnostico_student_sync.cjs` con frames/geometría/acceso y muestras separadas, y `--only=student-sync` al verificador final para repetir sólo sincronización sin sobrescribir continuación3. Verificación pertinente posterior: **20/20 PASS**, online3.112s, sintaxis3/0; resumen `reports/sim/final-student-sync-2026-10-13/summary.json`. La limpieza corrige contaminación posterior, no explica el primer timeout. Diagnóstico, cambios, límites y comandos en `reports/diagnostico_student_sync_2026-10-13.md`; muestra en `reports/sim/student-sync-2026-10-13/`.
+
+No se rehacen mediciones aprobadas 3D/NPC, oráculos, SIMs ni SQL; pendiente NPC anterior permanece fuera de alcance. Sin cambios de producción, commit, push ni SQL remoto. Contenedor verificado: sólo SIDE1. Siguiente paso causal: capturar una reproducción fallida con el arnés instrumentado; los éxitos dirigidos no equivalen a resolver la intermitencia histórica.
+
+## Continuación 5 — publicación autorizada
+
+El 2026-10-13 el usuario pidió verificar la ubicación y hacer push a main. Se comprobó que el contenedor tiene únicamente SIDE1 y que los archivos de esta tarea están dentro del repositorio. Fetch confirmó main sincronizada con origin/main914b3ad, remoto valenlysm29/SIDE1. Se autoriza publicar el diagnóstico, los ajustes del arnés y las evidencias dirigidas con el timeout histórico todavía sin causa demostrada; no se presenta como resuelto. No se repiten mediciones aprobadas ni se ejecuta SQL remoto.
