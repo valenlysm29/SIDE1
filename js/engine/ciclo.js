@@ -11,6 +11,8 @@
     const d={...decisiones,local:true,limpieza:true,garantiaDias:decisiones.garantiaDias??null,mantenimientoPreventivo:!!decisiones.mantenimientoPreventivo};
     const ocultos=['Numero de proveedores','Politica de pago a proveedores','Lead time','Mantenimiento de maquinaria','Política de inventarios','Método de depreciación'];
     d.seleccion=[...new Set(d.seleccion||[])].filter(k=>!ocultos.includes(P.indice[k]?.grupo));
+    d.montoPrestamo=Math.max(0,Number(d.montoPrestamo)||0);
+    d.seleccion=d.seleccion.filter(k=>!['FIN-01A','FIN-01B'].includes(k)).concat(d.montoPrestamo>0?'FIN-01A':'FIN-01B');
     d.maquinaria={...d.maquinaria};if(d.maquinaria.mesa!==undefined)d.maquinaria.mesa=Math.min(1,Math.max(0,Math.floor(Number(d.maquinaria.mesa)||0)));
     d.tiendasPorDistrito={};d.contratosTiendas={...historial.contratosTiendas};
     for(const distrito of Object.keys(c.COSTOS_TIENDAS)){

@@ -35,7 +35,7 @@
     // pero no inventa maquinaria ni una compra que el estudiante no declaró.
     return out;
   }
-  function opciones(rows,selected,empty='Elegir…'){return `<option value="">${e(empty)}</option>`+rows.map(o=>`<option value="${e(o.codigo)}" ${o.codigo===selected?'selected':''}>${e(o.opcion)}</option>`).join('');}
+  function opciones(rows,selected,empty='Elegir…'){return `<option value="">${e(empty)}</option>`+rows.map(o=>`<option value="${e(o.codigo)}" ${o.codigo===selected?'selected':''}>${e(o.opcion)}${o.grupo==='Inversion en RR.HH.'?' · '+money(o.costo)+' por ciclo':''}</option>`).join('');}
   function loteHtml(l,i,locked){
     const select=(campo,label,rows)=>`<label>${label}<select data-lote="${i}" data-campo="${campo}" ${locked?'disabled':''}>${opciones(rows,l[campo])}</select></label>`;
     return `<fieldset class="excel-lote"><legend>Lote ${i+1}</legend><div class="excel-grid">
@@ -115,9 +115,9 @@
       else if(el.dataset.personal){const [a,n,m]=el.dataset.personal.split(',');draft.personal[a][n][m]=Math.floor(numero(el.value));}
       else if(el.dataset.compra)draft.comprasUnidades[el.dataset.compra]=numero(el.value);
       else if(el.dataset.activo){const owned=numero(context.historial?.maquinariaActivos?.[el.dataset.activo]);draft.maquinaria[el.dataset.activo]=Math.max(owned,Math.floor(numero(el.value)));if(actual&&el.dataset.activo==='mesa')draft.maquinaria.mesa=Math.min(1,draft.maquinaria.mesa);el.value=draft.maquinaria[el.dataset.activo];}
-      else if(el.dataset.excelGrupo!==undefined){const g=grupos()[Number(el.dataset.excelGrupo)];draft.seleccion=draft.seleccion.filter(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo!==g);if(el.value)draft.seleccion.push(el.value);}
+      else if(el.dataset.excelGrupo!==undefined){const g=grupos()[Number(el.dataset.excelGrupo)];draft.seleccion=draft.seleccion.filter(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo!==g);if(el.value)draft.seleccion.push(el.value);if(actual&&g==='Acceso a prestamo bancario'&&el.value!=='FIN-01A'){draft.montoPrestamo=0;const monto=container.querySelector('[data-excel-prestamo]');if(monto)monto.value='0';}}
       else if(el.matches('[data-excel-regimen]')){draft.regimen=el.value;persistDraft();render();return;}
-      else if(el.matches('[data-excel-prestamo]'))draft.montoPrestamo=numero(el.value);
+      else if(el.matches('[data-excel-prestamo]')){draft.montoPrestamo=numero(el.value);if(actual){const codigo=draft.montoPrestamo>0?'FIN-01A':'FIN-01B';draft.seleccion=draft.seleccion.filter(k=>!['FIN-01A','FIN-01B'].includes(k)).concat(codigo);const control=container.querySelector(`[data-excel-grupo="${grupos().indexOf('Acceso a prestamo bancario')}"]`);if(control)control.value=codigo;}}
       else if(el.dataset.excelTienda&&Object.hasOwn(cfg().DISTRITOS_TIENDAS,el.dataset.excelTienda))draft.tiendasPorDistrito[el.dataset.excelTienda]=Math.floor(numero(el.value));
       else if(el.matches('[data-excel-garantia]'))draft.garantiaDias=cfg().GARANTIA_DIAS_BASE.includes(Number(el.value))?Number(el.value):null;
       else if(el.matches('[data-excel-mantenimiento]'))draft.mantenimientoPreventivo=!!el.checked;

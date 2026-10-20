@@ -36,6 +36,10 @@ test('Canales cobran exactamente web y alquiler por distrito, sin segundo cargo 
  assert.equal(cost.total,1800+7000+2200+500);assert.equal(r.costos.detallesRecurrentes.filter(d=>/^COM-01/.test(d.codigo)).length,0);
  cerca(r.costos.costoDecisionesRecurrentes,cost.total+1000+r.ingresos*.01);
 });
+test('Monto de préstamo nuevo nunca queda ignorado por un selector de acceso contradictorio',()=>{
+ const d=plan();d.seleccion=d.seleccion.filter(k=>k!=='FIN-01A').concat('FIN-01B');
+ const r=M.cerrarCiclo({empresas:['A'],borradoresPorEmpresa:{A:d}},actual).resultadosPorEmpresa.A;assert.equal(r.financiamiento.montoPrestamo,d.montoPrestamo);assert.ok(r.decisiones.seleccion.includes('FIN-01A'));assert.ok(!r.decisiones.seleccion.includes('FIN-01B'));
+});
 test('Contrato de tiendas mantiene cantidades hasta el ciclo 12 y permite finalizar luego',()=>{
  const first=M.cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:plan()}},actual),d={...plan(),tiendasPorDistrito:{}};
  for(const ciclo of [2,12])assert.equal(M.cerrarCiclo({ciclo,empresas:['A'],historialPorEmpresa:first.historialPorEmpresa,decisionesPorEmpresa:{A:d}},actual).resultadosPorEmpresa.A.decisiones.tiendasPorDistrito.miraflores,2);
