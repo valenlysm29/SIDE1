@@ -38,7 +38,7 @@
     };
   }
 
-  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA','CODIGO_RETIRADO']);
+  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA','CODIGO_RETIRADO','INGRESO_BLOQUEADO']);
   const CODE_MESSAGES={PARTIDA_CANCELADA:'La partida fue cancelada. Solicita el código de la nueva sala al docente.',PARTIDA_FINALIZADA:'La partida ya finalizó. Solicita el código de la nueva sala al docente.',CODIGO_RETIRADO:'Este código pertenece a una sala anterior y ya no puede utilizarse. Solicita el código de la nueva sala.',PARTIDA_NO_ENCONTRADA:'No existe una partida con ese código. Comprueba el código que compartió tu docente.',CODIGO_AMBIGUO:'Este código está duplicado en la base de datos. El docente debe revisar los códigos de las salas.'};
   async function rejectedCodeStatus(sb,codigo){
     try{

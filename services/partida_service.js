@@ -356,11 +356,17 @@
     if(ctx.data.cierre)return {success:true,data:ctx.data.cierre,reused:true};
     if(!ctx.data.empresas?.length)return {success:true,data:null};
     try{
-      const d=ctx.data,decisionesPorEmpresa={};overrides={...(d.overrides||{}),...overrides};
+      const d=ctx.data,decisionesPorEmpresa={},borradoresPorEmpresa={};
+      const version=d.motor_version||d.motorVersion||d.overrides?.VERSION||'excel-16';
+      overrides={...(global.SIDE_EXCEL_CONFIG.paraMotor?.(version)||{}),...(d.overrides||{}),...overrides,VERSION:version};
       const historia=global.SIDE_EXCEL_CAJA.sembrarTransicion(d.historialPorEmpresa||{},d.empresas);
-      for(const empresa of d.empresas){const s=empresa.envelope,plan=s.planesPorCiclo?.[ciclo]||(s?.enviado&&Number(s.round)===Number(ciclo)?s.decisiones:null);if(plan)decisionesPorEmpresa[empresa.id]=global.SIDE_EXCEL_UI.prepararDecisiones(plan);}
-      let cierre=global.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:d.empresas.map(x=>String(x.id)),decisionesPorEmpresa,historialPorEmpresa:historia},overrides);
-      cierre=global.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.capital])),baseCajaPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.envelope.cajaTransicion??x.capital])),historialAnterior:historia,overrides});
+      for(const empresa of d.empresas){
+        const s=empresa.envelope||{},plan=s.planesPorCiclo?.[ciclo]||(s.enviado&&Number(s.round)===Number(ciclo)?s.decisiones:null);
+        if(plan)decisionesPorEmpresa[empresa.id]=global.SIDE_EXCEL_UI.prepararDecisiones(plan,version);
+        else if(Number(s.round)===Number(ciclo)&&s.decisiones)borradoresPorEmpresa[empresa.id]=global.SIDE_EXCEL_UI.prepararDecisiones(s.decisiones,version);
+      }
+      let cierre=global.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:d.empresas.map(x=>String(x.id)),decisionesPorEmpresa,borradoresPorEmpresa,historialPorEmpresa:historia},overrides);
+      cierre=global.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.capital])),baseCajaPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.envelope?.cajaTransicion??x.capital])),historialAnterior:historia,overrides});
       const {data,error}=await sb.rpc('side_guardar_cierre_excel',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:d.token,p_cierre:cierre});
       if(error||data?.error)return {success:false,code:error?.code||data?.code,error:error?.message||data.error};
       return {success:true,data:data.cierre,reused:!!data.reused};
