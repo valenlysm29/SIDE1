@@ -7,6 +7,7 @@ import json, mimetypes, os, re
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 FALLBACK=Path(os.environ.get('SIDE_ROOT',ROOT))
+ENGINE=Path(os.environ['SIDE_ENGINE_ROOT']) if os.environ.get('SIDE_ENGINE_ROOT') else None
 OUT=ROOT/'tests/output/student-corrections-20261020'
 OUT.mkdir(parents=True,exist_ok=True)
 class Handler(BaseHTTPRequestHandler):
@@ -14,6 +15,7 @@ class Handler(BaseHTTPRequestHandler):
  def do_GET(self):
   relative=unquote(urlsplit(self.path).path).lstrip('/') or 'index.html';file=(ROOT/relative).resolve()
   if not file.is_relative_to(ROOT): self.send_error(403);return
+  if ENGINE and (relative.startswith('js/engine/') or relative=='js/decision_catalog.js'): file=ENGINE/relative
   if not file.is_file(): file=FALLBACK/relative
   if relative=='js/config.js': data=b'window.SIDE_CONFIG={};'
   elif not file.is_file(): self.send_error(404);return
@@ -37,6 +39,9 @@ try:
   assert page.locator('#loadingPercent').inner_text()=='100%'
   assert page.locator('#registerPasswordConfirm').count()==1 and page.locator('#forgotPassword').count()==1
   assert page.locator('#registerName').get_attribute('placeholder').startswith('Escribe')
+  assert page.locator('[data-side-version]').inner_text()=='SIDE · v'+page.evaluate('SIDE_RELEASE.version')
+  assert page.locator('meta[name=side-build]').get_attribute('content')==page.evaluate('SIDE_RELEASE.version')
+  passed([57],'Una misma versión configura pie y metadatos del estudiante.')
   passed([54,55],'DOM preparado activa Empezar; ejemplos explícitos y campos de acceso completos.')
   page.evaluate("""()=>{const startedAt=new Date(Date.now()-42000).toISOString();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,roundHours:0,roundMinutes:10,cycles:6}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,running:true,startedAt,duration:600,remaining:600}));openDecisionMenu();}""")
   page.add_style_tag(content='*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}')
@@ -58,6 +63,11 @@ try:
   page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','1');renderTabs();currentCategory='A';renderDecisionCategory()")
   summary=page.locator('#companySummaryMount').inner_text();assert 'Supabase' not in summary and '24 días productivos' in summary;passed([42],'Resumen claro y días productivos del Excel.')
   assert page.locator('#cashBalance').inner_text()==page.locator('#projectedCash').inner_text();passed([35],'Un mismo valor de caja estimada.')
+  cleaning=page.locator('[data-summary-item=LIMPIEZA]');assert cleaning.inner_text().count('Limpieza y servicios generales')==1 and 'Costo por ciclo' in cleaning.inner_text();passed([43],'Servicio fijo sin duplicación ni referencia por unidad.')
+  page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');cashLedger={'1:SIM_GASTOS':-5000};updateCashHud()")
+  assert '95' in page.locator('#cashMovement').inner_text();passed([45],'Caja inicial del ciclo 2 deriva del cierre anterior.')
+  page.evaluate("cashLedger={};localStorage.setItem('SIDE_ACTIVE_ROUND','1');currentCategory='B';renderTabs();renderDecisionCategory()")
+  assert 'Puedes bajar de 0' not in page.locator('#decisionCards').inner_text();passed([40],'Liquidación explicada como venta de equipos adquiridos.')
   page.evaluate('updateDeadlineWarning(60,true)');assert 'timer-warning' in page.locator('#decisionRoundTimer').get_attribute('class');assert page.locator('[data-cycle-deadline-warning]').last.is_visible()
   page.evaluate('updateDeadlineWarning(15,true)');assert 'timer-urgent' in page.locator('#decisionRoundTimer').get_attribute('class');assert 'automáticamente' in page.locator('[data-cycle-deadline-warning]').last.inner_text()
   page.evaluate('updateDeadlineWarning(120,true)');assert not page.locator('[data-cycle-deadline-warning]').last.is_visible();passed([34],'Avisos accesibles de 60 y 15 segundos.')
@@ -72,6 +82,23 @@ try:
   passed([39],layouts)
   page.evaluate("localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,status:'finished',phase:'results',running:false}));updateIntegrationUI()")
   assert 'REVISA Y REGISTRA' not in page.locator('#lobbySegment').inner_text();passed([56],'Mensaje de cierre coherente.')
+  if page.evaluate('Boolean(window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL)'):
+   page.evaluate("""()=>{localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,running:true,startedAt:new Date().toISOString(),duration:600,remaining:600}));const config=teacherConfig();config.motor_version=SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));currentCategory='B';openDecisionMenu();}""")
+   for category,title in [('B','Infraestructura'),('C','Producción'),('F','Logística'),('D','Ventas'),('E','Finanzas')]:
+    page.locator(f'[data-cat="{category}"]').click();page.locator('#excelEditorTitle').wait_for()
+    assert page.locator('#excelEditorTitle').inner_text()==title
+    assert page.locator('[data-excel-enable]').count()==0
+    assert not page.locator('[data-excel-section]').evaluate_all('(els)=>els.some(el=>el.dataset.excelSection!==currentCategory)')
+    page.screenshot(path=str(OUT/f'canonico-{category}.png'))
+   page.locator('[data-cat="B"]').click();page.locator('#excelProductionMount details').evaluate_all('(els)=>els.forEach(el=>el.open=true)')
+   page.locator('[data-activo="mesa"]').fill('1')
+   page.locator('[data-cat="D"]').click();page.locator('[data-excel-marketing]').select_option('baja')
+   page.locator('[data-cat="B"]').click();page.locator('#excelProductionMount details').evaluate_all('(els)=>els.forEach(el=>el.open=true)')
+   assert page.locator('[data-activo="mesa"]').input_value()=='1'
+   assert page.evaluate('decisionState.__excel.decisiones.marketingNivel')=='baja'
+   passed([41,50],'Cinco secciones canónicas mantienen el mismo borrador; capacitación en Producción y marketing en Ventas.')
+   assert page.evaluate("(()=>{const before=JSON.stringify(cashLedger);decisionState.__excel.enviado=true;return SIDE_GAME_BRIDGE.recordSimulatedSale(75)===false&&SIDE_GAME_BRIDGE.recordOperatingExpense(25)===false&&JSON.stringify(cashLedger)===before&&canStartSimulation();})()")
+   passed([], 'Entrada 3D permitida tras confirmar; operaciones del recorrido no duplican caja del cierre canónico.')
   assert not errors,errors;browser.close()
 finally:
  server.shutdown();(OUT/'results.json').write_text(json.dumps(results,ensure_ascii=False,indent=2),encoding='utf-8')
