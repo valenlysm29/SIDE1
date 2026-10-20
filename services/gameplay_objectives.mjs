@@ -7,6 +7,11 @@ export function deriveObjective(snapshot = {}) {
   const visited = AREAS.filter(id => snapshot.visited?.includes(id));
   const objective = (id, title, instruction, region, interaction = null) =>
     ({id, title, instruction, region, interaction});
+  if (snapshot.guidedTour) {
+    const next = AREAS.find(id => !visited.includes(id));
+    if (next) return objective(`explore-${next}`, `CONOCE TU EMPRESA · ${visited.length}/3`, `Visita ${NAMES[next]}. Ventas y costos se calculan al cierre del ciclo.`, next);
+    return objective('review-plan', 'RECORRIDO COMPLETADO', 'Revisa tu plan en Decisiones. Las ventas y los costos se calculan al cierre del ciclo.', null);
+  }
   if (snapshot.shiftEnded) return objective('results', 'TURNO COMPLETADO', 'Revisa el resumen y los resultados del ciclo', null);
   if (count(snapshot.queue) > 0) return objective('checkout', 'CLIENTES EN CAJA', `Cobra a ${count(snapshot.queue)} cliente(s) · E junto a la caja`, 'store', 'register');
   if (snapshot.stockKnown && count(snapshot.display) === 0) {

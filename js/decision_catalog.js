@@ -151,13 +151,10 @@ window.SIDE_DECISION_CATALOG = [
   });
 }());
 
-// Reubicar los mismos controles conserva las cinco secciones de decisiones.
+// El editor canónico distribuye capacitación/marketing entre Producción/Ventas.
+// El catálogo anterior conserva su estructura para partidas ya iniciadas.
 (function(){
   const catalog=window.SIDE_DECISION_CATALOG,find=cat=>catalog.find(s=>s.cat===cat);
-  for(const [id,destino] of [['INV_RRHH','C'],['INV_MARKETING','D']]){
-    const source=find('E'),index=source.items.findIndex(item=>item.id===id);
-    if(index>=0)find(destino).items.push(source.items.splice(index,1)[0]);
-  }
   const roles={PERS_CORTE:'corte',PERS_ENSAMBLE:'ensamble',PERS_ACABADO:'acabado',LIMPIEZA:'limpieza',JEFATURA:'jefatura'};
   for(const section of catalog)for(const item of section.items||[]){
     if(item.id==='MESA_CORTE'){item.maxQuantityModeloLotes=1;item.obligatoriaModeloLotes=true;}

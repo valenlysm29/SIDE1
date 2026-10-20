@@ -5,7 +5,7 @@ const app=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
 const simulator=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
 function fixture(){
   const store=new Map();let allowed=true,fail=false,clock=1000;
-  const c={window:{},cashLedger:{},decisionState:{},currentRound:()=>1,studentAccess:()=>({canOperate:allowed}),
+  const c={window:{},usesCanonicalMotor:()=>false,cashLedger:{},decisionState:{},currentRound:()=>1,studentAccess:()=>({canOperate:allowed}),
     cashBalance:()=>100000+Object.values(c.cashLedger).reduce((a,b)=>a+b,0),ledgerKey:()=> 'ledger',
     decisionProgressPercent:()=>100,canStartSimulation:()=>true,currentStudent:{},COMPANY_NAME:'QA',
     activeStudentEvents:()=>[],productionPlan:()=>({}),financialReport:()=>({}),RULES:{storeCount:()=>1},

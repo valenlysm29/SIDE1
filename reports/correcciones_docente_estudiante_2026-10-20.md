@@ -119,4 +119,15 @@ El oráculo histórico SIM3 elimina la quinta empresa sin envío. El nuevo compo
 
 ## SQL y despliegue
 
-Pendiente de implementar y validar localmente. No ejecutar aún. Push condicionado a toda la verificación en verde.
+Migración implementada: `supabase/migrations/2026-10-20_correcciones_docente_estudiante.sql`. Validada dos veces en PGlite: dominio y excepciones, identidad exacta, bloqueo tras diez fallos, privacidad del podio, versión permanente por partida, inclusión de empresas sin snapshot, rechazo de cierres incompletos/no reconciliados, persistencia de costos obligatorios y cierre idempotente. No se ejecutó SQL en producción. Push condicionado a toda la verificación en verde.
+
+## Checkpoint de integración (antes de batería final)
+
+Commits locales integrados: `cebba72` estudiante inicial, `33fe68d` docente, `c22702b` acceso/SQL/libro, `f34861f` motor, `e3a5e3f` préstamo coherente, `d2c0396` cinco secciones canónicas.
+
+- Base Node: 437/437. Docente31 comprobaciones navegador; estudiante móvil/desktop sin desborde y área útil >=60%; editor motor cuatro tamaños/cinco secciones.
+- F independiente completó SIM-A/B/C: cinco empresas y tres ciclos cada una, 442 comprobaciones correctas, autoenvío/cobros/estados/HUD. Evidencia `tests/output/correcciones-2026-10-20/independiente/verification.json`.
+- 3D real entró con Three y assets locales, sin stub y sin cambios monetarios. Halló misiones arcade imposibles para motor nuevo: corrección mínima de regresión cambia solo objetivos a recorrido de tres áreas; pendiente revalidación independiente de esa corrección. No se modificaron NPC ni avatares.
+- Compatibilidad: catálogo legacy conserva ubicación original RRHH/marketing para no bloquear guardados de partidas anteriores; editor canónico sí los coloca en Producción/Ventas. Cálculos legacy conservan orden aritmético para exactitud histórica; libro derivado gobierna partidas nuevas.
+- Runner integral histórico falló antes de ejecutar suites al copiar captura antigua de OneDrive (copyfile UNKNOWN); no se atribuye a producto. Se añadió `tests/run_corrections_20261020.cjs`, secuencial y sin copiar históricos; batería en curso.
+- Siguiente paso exacto: esperar `final-node-r2.log` y `integral/summary.json`; corregir fallos actuales; integrar informe F; recalcular/comparar oráculo3104, completar toda batería y entonces decidir push.

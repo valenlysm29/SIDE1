@@ -1,0 +1,30 @@
+'use strict';
+const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/correcciones-2026-10-20');
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});try{
+ const page=await browser.newPage({viewport:{width:1150,height:666}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ let html=fs.readFileSync(path.join(root,'index.html'),'utf8');html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g,'').replace(/<link\b[^>]*>/g,'');
+ await page.route('**/*',route=>route.request().url()==='https://side-access.test/index.html'?route.fulfill({contentType:'text/html',body:html}):route.abort());
+ await page.goto('https://side-access.test/index.html');
+ await page.addScriptTag({content:`window.calls=[];const hasConfig=true,DEMO_TEACHER={};function requireSupabase(){return true}function openTeacherPanel(){calls.push('open')}function showModal(){calls.push('modal')}const supabaseClient={auth:{signInWithPassword:async p=>{calls.push(['login',p]);return {error:null}},signUp:async p=>{calls.push(['register',p]);return {data:{session:null}}},resetPasswordForEmail:async(...p)=>{calls.push(['reset',...p]);return{}},updateUser:async p=>{calls.push(['update',p]);return{}},onAuthStateChange:fn=>window.authChanged=fn}};window.SIDE_CONFIG={TEACHER_EMAIL_EXCEPTIONS:['demo@example.org']};`});
+ await page.addScriptTag({path:path.join(root,'js/teacher_auth.js')});
+ const result=await page.evaluate(async()=>{
+  const by=id=>document.getElementById(id),submit=id=>by(id).dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));
+  const flush=()=>new Promise(r=>setTimeout(r,0));
+  by('registerName').value='Ana';by('registerLastName').value='Prueba';by('registerCourse').value='Curso';
+  by('registerEmail').value='externo@example.org';by('registerPassword').value='Clave123';by('registerPasswordConfirm').value='Clave123';submit('registerForm');await flush();
+  const rejectedDomain=calls.length===0&&by('registerMessage').textContent.includes('@upch.pe');
+  by('registerEmail').value='docente@upch.pe';by('registerPasswordConfirm').value='diferente';submit('registerForm');await flush();
+  const rejectedConfirm=calls.length===0&&by('registerMessage').textContent.includes('no coinciden');
+  by('registerPasswordConfirm').value='Clave123';submit('registerForm');await flush();
+  const registered=calls.some(c=>c[0]==='register'&&c[1].email==='docente@upch.pe');
+  const toggle=document.querySelector('[data-toggle-password="loginPassword"]');toggle.click();const shown=by('loginPassword').type==='text';toggle.click();const hidden=by('loginPassword').type==='password';
+  by('loginEmail').value='docente@upch.pe';by('forgotPassword').click();await flush();
+  const reset=calls.find(c=>c[0]==='reset'),recoverySent=reset?.[1]==='docente@upch.pe'&&reset[2].redirectTo==='https://side-access.test/index.html?recuperar=1'&&by('recoveryMessage').textContent.includes('Si el correo');
+  authChanged('PASSWORD_RECOVERY');by('recoveryPassword').value='Nueva123';by('recoveryPasswordConfirm').value='Nueva123';submit('passwordRecoveryForm');await flush();
+  const recovered=calls.some(c=>c[0]==='update'&&c[1].password==='Nueva123')&&by('loginMessage').textContent.includes('actualizada');
+  return {rejectedDomain,rejectedConfirm,registered,shown,hidden,recoverySent,recovered};
+ });
+ for(const [key,value] of Object.entries(result))assert.equal(value,true,key);
+ assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'access-browser.json'),JSON.stringify(result,null,2));console.log('PASS acceso: dominio, confirmación, registro y mostrar/ocultar en DOM entregado.');
+}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});

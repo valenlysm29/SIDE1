@@ -47,5 +47,16 @@ const sql=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',nam
   assert.equal(context.empresas.length,1);assert.equal(context.empresas[0].id,id);assert.equal(context.motor_version,game.motor_version);
   const empty=await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:context.token,p_cierre:{ciclo:1,resultadosPorEmpresa:{}}});
   assert.equal(empty.code,'CIERRE_INCOMPLETO');
+  const motor=require('../js/engine/config_excel.js'),{cerrarCiclo}=require('../js/engine/ciclo.js'),{adjuntarCaja}=require('../js/engine/caja.js');
+  const overrides=motor.paraMotor(game.motor_version);
+  const closure=adjuntarCaja(cerrarCiclo({ciclo:1,empresas:[id]},overrides),{capitalPorEmpresa:{[id]:100000},overrides});
+  const invalid=JSON.parse(JSON.stringify(closure));invalid.resultadosPorEmpresa[id].financial.balanceCaja.cajaFinal=1;
+  assert.equal((await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:context.token,p_cierre:invalid})).code,'CIERRE_NO_RECONCILIADO');
+  const closed=await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:context.token,p_cierre:closure});assert.ok(closed.cierre);
+  const report=(await db.query('select * from reportes_ciclo where empresa_id=$1 and ciclo=1',[id])).rows[0];
+  assert.equal(Number(report.capital),100000);assert.equal(Number(report.costos),2712.32);assert.equal(Number(report.caja_final),97287.68);
+  const saved=(await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot;
+  assert.ok(saved.decision_state.__excel.resultado.libroMovimientos.movimientos.length,'crea snapshot ausente con libro');
+  assert.equal((await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:context.token,p_cierre:closure})).reused,true);
   console.log('PASS SQL 20/10: doble aplicación, motor permanente, dominio/excepciones servidor, identidad exacta, limitación/bloqueo, RLS, privacidad podio, contexto universal y cierre incompleto rechazado.');
 }finally{await db.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

@@ -433,6 +433,7 @@ window.SIDE_GAME_BRIDGE={
   decisionProgress:()=>decisionProgressPercent(),
   canStartSimulation:()=>canStartSimulation(),
   canExplore:()=>canExploreWorld(),
+  guidedTour:()=>usesCanonicalMotor(),
   canOperate:()=>canOperateWorld(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,

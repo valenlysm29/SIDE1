@@ -59,14 +59,14 @@
       const intereses=cfg.PRESTAMO_COBRAR_INTERES_CICLO?interesMensual*cfg.CICLO_EQUIVALE_A_MESES:0;
       const pagosOperacion=numero(r.costosTotales)-depreciacion-numero(c.valorConsumidoNeto)+numero(c.valorCompradoNeto)+intereses;
       const libro=crearLibro({empresaId:id,ciclo:out.ciclo,cajaInicial,ingresos:numero(r.ingresos),prestamos,pagosOperacion,comprasActivos,costos:c,intereses});
-      const resumen=resumirLibro(libro),cajaFinal=resumen.cajaFinal;
+      const resumen=resumirLibro(libro),cajaFinal=cfg.NUEVO_MODELO?resumen.cajaFinal:cajaInicial+numero(r.ingresos)+prestamos-pagosOperacion-comprasActivos;
       const depAcumulada=numero(h.depreciacionAcumulada)+depreciacion,activosCosto=numero(h.activosCosto)+adquisicionNeta;
       const activosFijos=activosCosto-depAcumulada,deuda=numero(r.financiamiento?.deudaPrincipal??h.deudaPrincipal),inventarioMP=numero(c.valorInventarioNeto);
-      const estadoResultados={ingresos:r.ingresos,ventasNetas:r.ingresos,costos:r.costosTotales+intereses,utilidad:resumen.utilidad,depreciacion,intereses,costosProduccion:r.costosTotales};
-      const flujoCaja={cajaInicial,cobrosVentas:r.ingresos,pagosOperacion,compraActivos:comprasActivos,financiamiento:resumen.financiamiento,operacion:resumen.operacion,inversion:resumen.inversion,flujoNeto:cajaFinal-cajaInicial,cajaFinal};
+      const estadoResultados={ingresos:r.ingresos,ventasNetas:r.ingresos,costos:r.costosTotales+intereses,utilidad:cfg.NUEVO_MODELO?resumen.utilidad:r.utilidad-intereses,depreciacion,intereses,costosProduccion:r.costosTotales};
+      const flujoCaja={cajaInicial,cobrosVentas:r.ingresos,pagosOperacion,compraActivos:comprasActivos,financiamiento:prestamos,operacion:cfg.NUEVO_MODELO?resumen.operacion:r.ingresos-pagosOperacion,inversion:-comprasActivos,flujoNeto:cajaFinal-cajaInicial,cajaFinal};
       const balanceGeneral={efectivo:cajaFinal,activosFijos,inventarioMP,activos:cajaFinal+activosFijos+inventarioMP,deuda,patrimonio:cajaFinal+activosFijos+inventarioMP-deuda,pasivoPatrimonio:cajaFinal+activosFijos+inventarioMP};
       r.libroMovimientos=libro;
-      r.financial={estadoResultados,balanceCaja:{cajaInicial,entradas:resumen.entradas,salidas:resumen.salidas,cajaFinal},flujoCaja,balanceGeneral,financiamiento:{...r.financiamiento,tasaMensual,intereses}};
+      r.financial={estadoResultados,balanceCaja:{cajaInicial,entradas:cfg.NUEVO_MODELO?resumen.entradas:r.ingresos+prestamos,salidas:cfg.NUEVO_MODELO?resumen.salidas:pagosOperacion+comprasActivos,cajaFinal},flujoCaja,balanceGeneral,financiamiento:{...r.financiamiento,tasaMensual,intereses}};
       Object.assign(out.historialPorEmpresa[id],{cajaFinal,activosCosto,depreciacionAcumulada:depAcumulada,maquinariaActivos:conservada,tasaMensualVigente:tasaMensual,teaVigente:(Math.pow(1+tasaMensual,cfg.MESES_ANIO)-1)*100});
     }
     return out;

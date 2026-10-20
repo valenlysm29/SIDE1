@@ -19,7 +19,7 @@
   const allowed = email => institutionalEmail(email, exceptions());
   const domainMessage = 'Usa tu correo institucional @upch.pe. Si tienes una excepción autorizada, consulta al administrador.';
   function readableError(error, fallback) {
-    if (/invalid login credentials/i.test(error?.message || '')) return 'El correo o la contraseña no coinciden. Revisa tus datos.';
+    if (/invalid login credentials|credenciales.*incorrectas/i.test(error?.message || '')) return 'Credenciales incorrectas. Revisa tu correo y contraseña.';
     if (/email not confirmed/i.test(error?.message || '')) return 'Confirma tu correo antes de iniciar sesión.';
     if (/rate limit|too many|over_email_send_rate_limit/i.test(error?.message || error?.code || '')) return 'Has realizado varios intentos. Espera unos minutos y vuelve a intentar.';
     if (/correo institucional|dominio|upch\.pe/i.test(error?.message || '')) return domainMessage;

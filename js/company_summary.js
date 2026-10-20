@@ -216,8 +216,8 @@ function renderCompanySummary(){
     let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>Caja disponible: <b>${reviewMoney(f.balanceCaja.cajaFinal)}</b></p><p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa y confirma tu plan en Producción.'}</p></section>`;
     if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
     else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
-    if(usesCanonicalMotor()&&simulationSubmissionComplete())html+='<p class="excel-help">Ventas y costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.</p><button id="companyStartWorld" type="button" class="cs-primary">Entrar al recorrido 3D</button>';
-    mount.innerHTML=html;mount.querySelector('#companyStartWorld')?.addEventListener('click',requestWorldEntry);return;
+    if(typeof usesCanonicalMotor==='function'&&usesCanonicalMotor()&&simulationSubmissionComplete())html+='<p class="excel-help">Ventas y costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.</p><button id="companyStartWorld" type="button" class="cs-primary">Entrar al recorrido 3D</button>';
+    mount.innerHTML=html;const startWorld=mount.querySelector('#companyStartWorld');if(startWorld)startWorld.addEventListener('click',requestWorldEntry);return;
   }
   const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
   migrateCurrentReceipts();
