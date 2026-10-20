@@ -1,5 +1,6 @@
 /* SIDE V3: Empresa summary, immutable local receipts and explicit final review. */
 const reviewModel=window.SIDE_REVIEW_MODEL;
+function summaryMotorOverrides(){return window.SIDE_EXCEL_CONFIG?.paraMotor?.(typeof teacherConfig==='function'?teacherConfig().motor_version:decisionState.__excel?.motor_version)||{};}
 let companySummaryRound='current',companySummaryFilter='all',summaryOwner='',activeReview=null,reviewCommitBusy=false;
 const reviewMoney=value=>'S/ '+Number(value||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
 function receiptKey(round=currentRound()){return `SIDE_DECISION_RECEIPTS_${storageKey()}_${round}`;}
@@ -189,7 +190,7 @@ function productionSummaryHtml(review){
     <p class="cs-production-method">Modelo de producción: 24 días productivos por ciclo contable, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
   </section>`;
   if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),summaryMotorOverrides());mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
   }
 }
 function sectionSummaryHtml(section,{history=false,compact=false}={}){
@@ -215,7 +216,7 @@ function renderCompanySummary(){
     const result=excelSavedResult(),f=financialReport();
     let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>Caja disponible: <b>${reviewMoney(f.balanceCaja.cajaFinal)}</b></p><p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa y confirma tu plan en Producción.'}</p></section>`;
     if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
-    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
+    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),summaryMotorOverrides()),{preview:true});}catch{}
     if(typeof usesCanonicalMotor==='function'&&usesCanonicalMotor()&&simulationSubmissionComplete())html+='<p class="excel-help">Ventas y costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.</p><button id="companyStartWorld" type="button" class="cs-primary">Entrar al recorrido 3D</button>';
     mount.innerHTML=html;const startWorld=mount.querySelector('#companyStartWorld');if(startWorld)startWorld.addEventListener('click',requestWorldEntry);return;
   }
@@ -240,7 +241,7 @@ function renderCompanySummary(){
   </section>`;
   mount.querySelectorAll('[data-summary-filter]').forEach(b=>b.addEventListener('click',()=>{companySummaryFilter=b.dataset.summaryFilter;renderCompanySummary();}));
   if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
+    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),summaryMotorOverrides());mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
   }
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
     mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
