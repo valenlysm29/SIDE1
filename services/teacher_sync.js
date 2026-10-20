@@ -53,7 +53,14 @@
     try { jobs = JSON.parse(storage.getItem(storageKey) || '{}') || {}; }
     catch { jobs = {}; }
     let busy = false, timer = null;
-    const persist = () => storage.setItem(storageKey, JSON.stringify(jobs));
+    const persist = () => {
+      try { storage.setItem(storageKey, JSON.stringify(jobs)); }
+      catch (error) {
+        // Keep the in-memory queue retryable even when storage is full/blocked.
+        for (const key of Object.keys(jobs)) onStatus(key, 'storage-error', 'No se pudo conservar la nota en este dispositivo. Mantén esta página abierta hasta sincronizar.');
+        console.warn('SIDE: no se pudo conservar la cola de notas', error);
+      }
+    };
     const pending = () => Object.keys(jobs).length;
 
     function plan(delay) {

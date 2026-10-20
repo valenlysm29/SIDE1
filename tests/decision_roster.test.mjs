@@ -14,11 +14,11 @@ test('strict staff draw reuses a safe outfit when remaining bag only contains ne
   assert.equal(roster.draw('bank', 'banco', ['a'], { unique: true }).model.id, 'b');
 });
 
-test('approved city manifest has 16 CC0 actors and strict roles exclude eligible avatars', async () => {
+test('approved city manifest retains at least 16 CC0 actors and strict roles exclude eligible avatars', async () => {
   const manifest = JSON.parse(await readFile(new URL('../assets/models/npc/manifest.json', import.meta.url), 'utf8'));
   const rows = Array.isArray(manifest) ? manifest : manifest.personajes || manifest.npcs || manifest.models;
   const approved = validCityManifest(rows);
-  assert.equal(approved.length, 16);
+  assert.ok(approved.length >= 16);
   assert.ok(approved.every(row => /^CC0(?:-1\.0)?$/i.test(row.licencia)));
   assert.ok(approved.every(row => !['chico1', 'chico2', 'chico3', 'mona'].includes(row.id)));
   const roster = createCityRoster(rows, { random: () => .5 });

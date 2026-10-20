@@ -829,7 +829,7 @@ const gradeQueue=window.SIDE.TeacherSync.createGradeQueue({
     if(status==='saving'||status==='saved')gradeFailureNotified.delete(key);
     if(status==='saved'){
       const latest=grades(),entry=latest[key];
-      if(entry){entry.pending=false;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(latest));}
+      if(entry){entry.pending=false;try{localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(latest));}catch(error){console.warn('SIDE: nota remota guardada; copia local no disponible',error);}}
       const report=state.reports.find(r=>gradeKey(r)===key);
       if(report&&entry)report.teacherScore=entry.value;
     }
@@ -846,6 +846,7 @@ const gradeQueue=window.SIDE.TeacherSync.createGradeQueue({
 });
 function gradeStatus(key){
   const status=gradeUiStatus.get(key);
+  if(status==='storage-error')return gradeUiErrors.get(key)||'Mantén esta página abierta hasta sincronizar la nota.';
   if(status==='retrying'||status==='failed')return (gradeUiErrors.get(key)||'No se pudo sincronizar la nota.')+' · Pendiente de guardar; reintentando…';
   const local=grades()[key],report=state.reports.find(r=>gradeKey(r)===key);
   if(status==='saving'||local?.pending)return 'Guardando…';
@@ -857,7 +858,12 @@ function saveCompanyGrade(id,value){
   if(report.fuente==='supabase'&&(!report.empresaId||!state.partidaId)){toast('No se pudo identificar la partida de esta empresa. Recarga antes de guardar la nota.');return false;}
   if(String(value).trim()===''||!Number.isFinite(Number(value))||Number(value)<0||Number(value)>20){toast('Escribe una nota entre 0 y 20.');return false;}
   const note=Math.round(Number(value)*100)/100,all=grades(),key=gradeKey(report),entry={value:note,pending:Boolean(report.empresaId&&state.partidaId),updatedAt:new Date().toISOString()};
-  all[key]=entry;localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(all));
+  all[key]=entry;
+  try{localStorage.setItem('SIDE_TEACHER_GRADES',JSON.stringify(all));}
+  catch(error){
+    toast('No se pudo conservar la nota en este dispositivo. Mantén esta página abierta hasta sincronizar.');
+    if(!entry.pending)return false;
+  }
   if(entry.pending){
     gradeQueue.enqueue(key,{partidaId:state.partidaId,empresaId:report.empresaId,puntaje:note});
   }else gradeUiStatus.set(key,'saved');
@@ -1078,8 +1084,14 @@ $('openEventPicker')?.addEventListener('click',()=>{$('eventPicker').showModal()
 $('closeEventPicker')?.addEventListener('click',()=>$('eventPicker').close());
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)return;
+  gradeQueue?.flush();
   loadReports();
   if(cycleMode()==='automatic')refreshAutomaticRuntime();
+});
+window.addEventListener('online',()=>{
+  gradeQueue?.flush();
+  loadReports();
+  refreshTeacherGame();
 });
 document.querySelectorAll('input[name="eventSelectionMode"]').forEach(i=>i.addEventListener('change',()=>{state.eventSelectionMode=i.value;saveConfig(true);updateEventModeUI()}));
 $('eventRandomize')?.addEventListener('click',randomizeEventSelection);

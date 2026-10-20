@@ -73,6 +73,26 @@ test('grade queue shows failure only after repeated retries and keeps job locall
   } finally { console.error = prior; }
 });
 
+test('grade queue still saves and retries when local storage is full', async () => {
+  const callbacks = [], statuses = [];
+  let online = false, writes = 0;
+  const queue = createGradeQueue({
+    storage: { getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); } },
+    schedule: callback => { callbacks.push(callback); return callbacks.length; }, clearSchedule: () => {},
+    onStatus: (_key, status) => statuses.push(status),
+    save: async () => { writes++; return { success: online, error: 'offline' }; }
+  });
+  queue.enqueue('room:company', { score: 18 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(queue.pending(), 1);
+  assert.ok(statuses.includes('storage-error'));
+  online = true; callbacks.shift()();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(queue.pending(), 0);
+  assert.equal(writes, 2);
+  assert.equal(statuses.at(-1), 'saved');
+});
+
 test('grade migration persists only for the owner and a company in that game', async () => {
   const db = await database();
   try {

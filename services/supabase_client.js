@@ -18,6 +18,35 @@
   /** @type {object|null} Cliente Supabase (singleton). */
   let client = null;
 
+  // A stalled HTTP response must release polling/queue locks. Do not retry
+  // writes here: a timeout does not prove that the server rejected the write.
+  function boundedFetch(input, options = {}) {
+    const controller = new global.AbortController();
+    const source = options.signal || input?.signal;
+    const abort = () => controller.abort(source.reason);
+    if (source?.aborted) abort();
+    else source?.addEventListener('abort', abort, { once: true });
+    let timer;
+    const timeout = new Promise((_, reject) => {
+      timer = global.setTimeout(() => {
+        const error = Object.assign(new TypeError('La conexión con Supabase tardó demasiado. Vuelve a intentar.'), { code: 'CONEXION_TIMEOUT' });
+        reject(error);
+        controller.abort(error);
+      }, 15000);
+    });
+    const operation = Promise.resolve().then(async () => {
+      const response = await global.fetch(input, { ...options, signal: controller.signal });
+      // Include a stalled response body in the deadline, preserving the original
+      // Response for the SDK (status, headers and normal error handling).
+      await response.clone().arrayBuffer();
+      return response;
+    });
+    return Promise.race([operation, timeout]).finally(() => {
+      global.clearTimeout(timer);
+      source?.removeEventListener('abort', abort);
+    });
+  }
+
   /**
    * Lee la configuración global inyectada por config.js.
    * @returns {{url: string, key: string}|null} Config o null si inválida.
@@ -45,7 +74,9 @@
       return null;
     }
     try {
-      client = global.supabase.createClient(cfg.url, cfg.key);
+      const options = typeof global.fetch === 'function' && typeof global.AbortController === 'function'
+        ? { global: { fetch: boundedFetch } } : {};
+      client = global.supabase.createClient(cfg.url, cfg.key, options);
     } catch (err) {
       console.error('SIDE: no se pudo crear el cliente Supabase', err);
       client = null;
