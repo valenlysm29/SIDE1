@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="side-build" content="2026.09.22.2">
+  <meta name="side-build" content="">
   <meta name="theme-color" content="#020817">
   <title>SIDE — Simulador de Decisiones Financieras</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,12 +12,12 @@
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
   <link rel="stylesheet" href="css/styles.css?v=20261011-waiting-footer">
-  <link rel="stylesheet" href="css/student-interface.css?v=20261012-presencia-podio">
+  <link rel="stylesheet" href="css/student-interface.css?v=20261020-correcciones">
   <link rel="stylesheet" href="css/simulator3d.css?v=20261009-touch-controls">
   <link rel="stylesheet" href="css/hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="css/company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="css/responsive.css?v=20261011-decision-stack">
-  <link rel="stylesheet" href="css/production.css?v=20261011-fixed-decision-stack">
+  <link rel="stylesheet" href="css/production.css?v=20261020-compact">
   <link rel="stylesheet" href="css/tablet-return.css?v=20260930">
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
   <link rel="stylesheet" href="css/world_minimap.css?v=20261009-mobile-map">
@@ -79,11 +79,13 @@
       <p class="modal-lead">Ingresa a tu cuenta para administrar una partida.</p>
       <form id="loginForm">
         <label for="loginEmail">Correo institucional</label>
-        <input id="loginEmail" type="email" placeholder="profesor@upch.pe" autocomplete="email" required>
+        <input id="loginEmail" type="email" placeholder="Escribe tu correo @upch.pe" autocomplete="email" required>
         <label for="loginPassword">Contraseña</label>
-        <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        <div class="password-field"><input id="loginPassword" type="password" placeholder="Escribe tu contraseña" autocomplete="current-password" required><button type="button" data-toggle-password="loginPassword" aria-label="Mostrar contraseña">Mostrar</button></div>
         <button class="primary-gold" type="submit">Iniciar sesión</button>
       </form>
+      <p class="switch-line"><button id="forgotPassword" type="button">¿Olvidaste tu contraseña?</button></p><div id="recoveryMessage" class="form-message" role="status"></div>
+      <form id="passwordRecoveryForm" class="hidden"><h3>Nueva contraseña</h3><label for="recoveryPassword">Nueva contraseña</label><div class="password-field"><input id="recoveryPassword" type="password" minlength="6" autocomplete="new-password" required><button type="button" data-toggle-password="recoveryPassword" aria-label="Mostrar contraseña">Mostrar</button></div><label for="recoveryPasswordConfirm">Confirmar nueva contraseña</label><input id="recoveryPasswordConfirm" type="password" minlength="6" autocomplete="new-password" required><button id="recoverySavePassword" type="submit" class="primary-gold">Guardar contraseña</button><div id="recoveryUpdateMessage" class="form-message" role="status"></div></form>
       <p class="switch-line">¿No tienes cuenta? <button type="button" data-switch="register">Crear cuenta</button></p>
       <div id="loginMessage" class="form-message" role="status"></div>
     </section>
@@ -95,12 +97,12 @@
       <p class="modal-lead">Crea tu cuenta para administrar partidas de SIDE.</p>
       <form id="registerForm">
         <div class="two-cols">
-          <div><label for="registerName">Nombre</label><input id="registerName" placeholder="Ana" autocomplete="off" required></div>
-          <div><label for="registerLastName">Apellido</label><input id="registerLastName" placeholder="Ramírez" autocomplete="off" required></div>
+          <div><label for="registerName">Nombre</label><input id="registerName" placeholder="Escribe tu nombre" autocomplete="off" required></div>
+          <div><label for="registerLastName">Apellido</label><input id="registerLastName" placeholder="Escribe tu apellido" autocomplete="off" required></div>
         </div>
-        <label for="registerCourse">Curso</label><input id="registerCourse" placeholder="Finanzas Corporativas" autocomplete="off" required>
-        <label for="registerEmail">Correo institucional</label><input id="registerEmail" type="email" placeholder="profesor@upch.pe" required>
-        <label for="registerPassword">Contraseña</label><input id="registerPassword" type="password" minlength="6" placeholder="••••••••" required>
+        <label for="registerCourse">Curso</label><input id="registerCourse" placeholder="Escribe el nombre del curso" autocomplete="off" required>
+        <label for="registerEmail">Correo institucional</label><input id="registerEmail" type="email" placeholder="Escribe tu correo @upch.pe" required>
+        <label for="registerPassword">Contraseña</label><div class="password-field"><input id="registerPassword" type="password" minlength="6" placeholder="Crea una contraseña de al menos 6 caracteres" autocomplete="new-password" required><button type="button" data-toggle-password="registerPassword" aria-label="Mostrar contraseña">Mostrar</button></div><label for="registerPasswordConfirm">Confirmar contraseña</label><div class="password-field"><input id="registerPasswordConfirm" type="password" minlength="6" placeholder="Repite la contraseña" autocomplete="new-password" required><button type="button" data-toggle-password="registerPasswordConfirm" aria-label="Mostrar contraseña">Mostrar</button></div>
         <button class="primary-gold" type="submit">Crear cuenta</button>
       </form>
       <p class="switch-line">¿Ya tienes cuenta? <button type="button" data-switch="login">Iniciar sesión</button></p>
@@ -195,7 +197,7 @@
           <h2 id="lobbyGameName">Esperando...</h2>
           <p id="lobbyStudent">TU EMPRESA</p>
           <span id="lobbySegment">EMPRESA LISTA PARA DECIDIR</span>
-          <p data-student-sync-status class="student-sync-status hidden" role="status"></p>
+          <p data-student-sync-status class="student-sync-status hidden" role="status"></p><p data-cycle-deadline-warning class="cycle-deadline-warning hidden" role="status" aria-live="assertive"></p>
           <button id="cancelledBackToProfiles" class="ghost-btn hidden" type="button">VOLVER AL INICIO</button>
           <div class="student-cycle-clock"><span>CICLO ACTUAL</span><strong id="studentCycleLabel">Ciclo 1</strong><b id="studentRoundTimer">--:--:--</b><small id="studentTimerNote">Esperando inicio del docente</small></div>
           <div class="student-news"><span>NOTICIAS DEL CICLO</span><div id="studentNewsList"><p>Sin eventos reportados.</p></div></div>
@@ -221,7 +223,7 @@
             <button id="reopenTutorialBtn" class="tutorial-reopen-btn hidden" type="button"><span class="tutorial-reopen-icon">?</span><span><strong>VER TUTORIAL</strong><small>Repasar las 7 zonas</small></span></button>
             <button id="backToProfiles" class="ghost-btn" type="button">VOLVER</button>
           </div>
-          <small class="lobby-build">SIDE · v2026.09.22.2</small>
+          <small class="lobby-build" data-side-version>SIDE</small>
         </footer>
       </div>
     </div>
@@ -550,7 +552,7 @@
         <div><strong>DECISIONES</strong><small id="roundLabel">CICLO 1 · TU EMPRESA</small></div>
       </div>
       <div class="cash-hud" aria-label="Caja disponible">
-        <span>CAJA / EFECTIVO</span>
+        <span>CAJA ACTUAL ESTIMADA</span>
         <strong id="cashBalance">S/ 100,000</strong>
         <small id="cashMovement">Disponible para decidir</small>
       </div>
@@ -562,7 +564,7 @@
 
     <main class="decision-game-stage tabbed-stage">
       <section class="decision-window" aria-label="Ventana de decisiones">
-        <p data-student-sync-status class="student-sync-status hidden" role="status"></p>
+        <p data-student-sync-status class="student-sync-status hidden" role="status"></p><p data-cycle-deadline-warning class="cycle-deadline-warning hidden" role="status" aria-live="assertive"></p>
         <nav id="decisionTabs" class="decision-tabs" aria-label="Secciones de decisión"></nav>
         <div id="decisionDetail" class="decision-detail">
           <div id="decisionStickyHead" class="decision-detail-head sticky-section-head">
@@ -570,7 +572,7 @@
               <img id="detailCategoryIcon" src="assets/icons/categories/infraestructura.svg" alt="">
               <div><span id="categoryEyebrow">SECCIÓN DE DECISIÓN</span><h1 id="categoryTitle">Infraestructura</h1><p id="categoryDescription">Selecciona tus decisiones.</p></div>
             </div>
-            <div class="section-balance"><span>SALDO FINAL GUARDADO</span><strong id="projectedCash">S/ 100,000</strong><small>Se actualiza al guardar el borrador</small></div>
+            <div class="section-balance" aria-hidden="true"><span>CAJA ACTUAL ESTIMADA</span><strong id="projectedCash">S/ 100,000</strong><small>Incluye las decisiones visibles</small></div>
           </div>
           <div id="decisionFormScroll" class="decision-form-scroll" tabindex="0" role="region" aria-label="Contenido de la sección de decisión">
           <div id="decisionCards" class="decision-cards decision-list"></div>
@@ -644,7 +646,9 @@
 <script src="js/production_dop.js?v=20260917-visual"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261012-presencia-podio"></script>
-<script src="js/company_summary.js?v=20261011-decision-stack"></script>
+<script src="js/release.js"></script>
+<script src="js/app.js?v=20261020-correcciones"></script>
+<script src="js/teacher_auth.js?v=20261020-correcciones"></script>
+<script src="js/company_summary.js?v=20261020-correcciones"></script>
 </body>
 </html>

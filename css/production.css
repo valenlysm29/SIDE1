@@ -580,3 +580,62 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
   #decisionMenu #decisionTopbar .cash-hud { grid-column: 1 / 3; grid-row: 2; }
   #decisionMenu #decisionTopbar .mission-meter { grid-column: 3 / 5; grid-row: 2; }
 }
+
+/* Compact decision shell: the working area keeps at least 60% of a normal
+   desktop/mobile viewport. One visible cash figure, one timer, one action. */
+#decisionMenu .decision-topbar,
+#decisionMenu .decision-topbar.compact { padding: 10px 14px; gap: 8px 12px; }
+#decisionMenu .decision-tabs { padding-block: 6px; }
+#decisionMenu .decision-tab { min-height: 44px; padding-block: 5px; }
+#decisionMenu .sticky-section-head { display: block; padding-block: 8px; }
+#decisionMenu .detail-heading { gap: 8px; }
+#decisionMenu .detail-heading > img { width: 30px; height: 30px; flex-basis: 30px; }
+#decisionMenu .detail-heading h1 { font-size: 20px; line-height: 1.2; margin-block: 2px; }
+#decisionMenu .detail-heading p { font-size: 11px; line-height: 1.35; }
+#decisionMenu .detail-heading > div > span { display: none; }
+#decisionMenu .section-balance { position: absolute; width: 1px; height: 1px; min-width: 0; padding: 0; overflow: hidden; clip-path: inset(50%); }
+#decisionMenu .cycle-deadline-warning { margin: 0; padding: 5px 12px; background: #533b08; color: #ffedb8; font-size: 12px; line-height: 1.3; border-bottom: 1px solid #d9a73b; }
+:is(#decisionMenu,#studentLobby) .timer-warning { color: #ffe083; }
+:is(#decisionMenu,#studentLobby) .timer-urgent { color: #ffb7b7; background: #5b1520; border-radius: 4px; outline: 2px solid #ffb7b7; outline-offset: 2px; }
+@media (min-width: 701px) {
+  #decisionMenu .decision-topbar,
+  #decisionMenu .decision-topbar.compact { grid-template-columns: 40px minmax(110px,1fr) minmax(150px,190px) 110px 130px 130px; grid-template-rows: auto; }
+  #decisionMenu .decision-topbar > * { grid-column: auto; grid-row: auto; }
+  #decisionMenu .mission-meter { position: static; width: auto; }
+  #decisionMenu .game-title-mark strong { font-size: 16px; letter-spacing: .3px; }
+  #decisionMenu .game-title-mark small { font-size: 10px; letter-spacing: 0; }
+  #decisionMenu .cash-hud strong { font-size: 20px; margin-block: 2px; }
+  #decisionMenu .cash-hud small { font-size: 9px; }
+  #decisionMenu .student-top-timer strong { font-size: 18px; }
+}
+@media (max-width: 700px) {
+  #decisionMenu #decisionTopbar,
+  #decisionMenu #decisionTopbar.compact { grid-template-columns: 34px minmax(0,1fr) 112px; grid-template-rows: auto auto auto; padding: 6px 10px; gap: 4px 8px; }
+  #decisionMenu #exitDecisions { grid-column: 1; grid-row: 1; height: 34px; min-height: 34px; }
+  #decisionMenu #decisionTopbar .game-title-mark { grid-column: 2; grid-row: 1; }
+  #decisionMenu #decisionTopbar .student-top-timer { grid-column: 3; grid-row: 1; padding: 3px; }
+  #decisionMenu #decisionTopbar .cash-hud { grid-column: 1/3; grid-row: 2; padding: 2px 6px; }
+  #decisionMenu #decisionTopbar .top-submit-all { grid-column: 3; grid-row: 2; min-height: 36px; font-size: 11px; padding: 4px; }
+  #decisionMenu #decisionTopbar .mission-meter { grid-column: 1/-1; grid-row: 3; position: static; width: auto; }
+  #decisionMenu .mission-label { font-size: 9px; }
+  #decisionMenu .mission-label strong { font-size: 10px; }
+  #decisionMenu .mission-track { height: 4px; margin-top: 2px; }
+  #decisionMenu .game-title-mark strong { font-size: 14px; letter-spacing: 0; }
+  #decisionMenu .game-title-mark small { display: block; font-size: 9px; line-height: 1.2; letter-spacing: 0; }
+  #decisionMenu .cash-hud span { font-size: 9px; }
+  #decisionMenu .cash-hud strong { font-size: 18px; line-height: 1.1; margin: 1px 0; }
+  #decisionMenu .cash-hud small { font-size: 9px; line-height: 1.2; }
+  #decisionMenu .student-top-timer span { font-size: 9px; }
+  #decisionMenu .student-top-timer strong { font-size: 15px; }
+  #decisionMenu .decision-tabs { padding: 5px 8px; }
+  #decisionMenu .decision-tab { min-width: 110px; min-height: 40px; }
+  #decisionMenu .sticky-section-head { padding-block: 6px; }
+  #decisionMenu .detail-heading h1 { font-size: 17px; }
+  #decisionMenu .decision-detail { gap: 6px; }
+  #decisionMenu .detail-heading p { font-size: 10px; line-height: 1.2; }
+}
+#decisionMenu .cash-hud,
+#decisionMenu .decision-topbar.compact .cash-hud { padding: 5px 8px; }
+#decisionMenu .cash-hud > span { font-size: 10px; line-height: 1.2; }
+#decisionMenu .cash-hud > strong { line-height: 1.15; }
+#decisionMenu .cash-hud > small { margin-top: 2px; }

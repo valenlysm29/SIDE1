@@ -22,3 +22,5 @@
 .excel-puntajes>div{border-left:3px solid var(--side-gold);padding-left:var(--side-space-3);display:flex;flex-direction:column}.excel-puntajes strong{font-size:var(--side-text-xl);font-variant-numeric:tabular-nums}.excel-puntajes small{color:var(--side-text-muted)}
 .excel-mensajes{padding-left:var(--side-space-5)}.excel-mensajes li{margin-block:var(--side-space-3)}
 @media(max-width:600px){.excel-editor,.excel-resultados{padding:var(--side-space-3)}.excel-editor header{align-items:flex-start}.excel-actions>*{flex:1 1 100%}}
+
+.excel-table-wrap th small{display:block;white-space:normal;min-width:220px;max-width:36ch;font-weight:400}
