@@ -8,7 +8,7 @@
   const BLUE='#17365D',LIGHT='#D9EAF7',GRAY='#F2F2F2',BORDER='#D9D9D9';
   const numeric=value=>value==null||value===''||!Number.isFinite(Number(value))?null:Number(value);
   const text=value=>String(value??'').replace(/[\u0000-\u001f]/g,' ').trim();
-  const SIDE_NAME='Simulador Interactivo de Decisiones Empresariales';
+  const SIDE_NAME='Simulador de Decisiones Financieras';
   function cycleLabel(report,config={}){
     const current=numeric(report.ronda??config.round),total=numeric(config.cycles);
     return `${current>0?Math.trunc(current):1}/${total>0?Math.trunc(total):'—'}`;

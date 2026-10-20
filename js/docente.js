@@ -118,7 +118,10 @@ async function recoverServerRoom(){
   if(generation!==roomGeneration||result.data.id!==state.partidaId)return false;
   $('creationFeedback')?.classList.add('hidden');previousRoom=null;return true;
 }
-function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
+function money(n){return window.SIDE_TEACHER_PDF.money(n)}
+function configurationLocked(){return Boolean(gameStatus()?.active)}
+function eventCountLabel(){const n=state.enabledEvents.size;return `${n} ${n===1?'seleccionado':'seleccionados'} de ${EVENT_CATALOG.length}`}
+function cycleStateLabel(r=runtime()){if(r?.phase==='finished'||r?.status==='simulation-finished')return 'Simulación finalizada';if(r?.phase==='results'||r?.status==='finished')return 'Ciclo cerrado';if(!r)return 'Reloj detenido';return r.running?`Ciclo ${state.round} en curso`:r.status==='paused'?`Ciclo ${state.round} pausado`:`Ciclo ${state.round} detenido`;}
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function escapeAttr(v){return escapeHtml(v)}
@@ -130,10 +133,17 @@ function renderEnabledEvents(){
 }
 function refreshSetupSummary(){
   const status=gameStatus(),active=Boolean(status?.active),r=runtime();
+  $('configWelcome').textContent=active?'Consulta la configuración de la partida':status?.finishedAt?'Partida finalizada: configura la siguiente simulación':'Configura la simulación antes de iniciar';
+  $('configLockNotice').classList.toggle('hidden',!active);
+  $('eventLockNotice').classList.toggle('hidden',!active);
+  $('saveAll').disabled=active;
+  $('saveAll').title=active?'Bloqueado porque la partida ya inició':'';
+  document.querySelectorAll('#eventPicker input:not([type=search]),#eventPicker button:not(#closeEventPicker)').forEach(control=>control.disabled=active);
+  document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>{input.title=active?'Bloqueado porque la partida ya inició':'';input.setAttribute('aria-describedby',active?'configLockNotice':'');});
   const count=Number($('cycles').value)||1;
   const integration=r?.phase==='integration',modern=state.lifecycleVersion===2;
   $('configCycleCount').textContent=`${state.round} / ${count}`;
-  $('configReadySummary').textContent=`${count} ciclos operativos de ${$('roundHours').value||0} h ${$('roundMinutes').value||0} min. La integración es previa al Ciclo 1.`;
+  $('configReadySummary').textContent=`${count} ciclos operativos de ${$('roundHours').value||0} h ${$('roundMinutes').value||0} min. La sala de espera es previa al Ciclo 1.`;
   const waitingText=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
   $('gameStatusBanner').textContent=integration?waitingText:active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración para abrir el ingreso de estudiantes.';
   document.querySelector('[data-tab="rondas"]')?.classList.toggle('hidden',!active&&!status?.finishedAt);
@@ -141,9 +151,10 @@ function refreshSetupSummary(){
   ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)});
   $('startCycle1Btn')?.classList.toggle('hidden',true);
   if(integration)$('roundState').textContent=waitingText;
-  else if(active&&modern)$('roundState').textContent=r?.phase==='results'?'Ciclo cerrado':`Ciclo ${state.round} en curso`;
+  else if(active)$('roundState').textContent=cycleStateLabel(r);
   $('cancelGame')?.classList.toggle('hidden',!canCancelRoom());
   ['copyGameCode','copyGameLink','copyLobbyCode'].forEach(id=>{if($(id))$(id).disabled=!sharedRoom;});
+  renderAcademicCalendar();
   refreshStartButton();
   renderTeacherLobby();
 }
@@ -193,6 +204,7 @@ function filteredEvents(){const q=String($('eventSearch')?.value||'').trim().toL
 function getConfig(){return {
   ...state.authoritative,lifecycleVersion:state.lifecycleVersion===2?2:undefined,
   integrationDurationMinutes:Number($('integrationDurationMinutes').value),
+  motor_version:state.authoritative?.motor_version||(gameStatus()?.active?undefined:'side-lotes-2026-10-20'),
   integrationMinutes:state.integrationMinutes,gameStartedAt:gameStatus()?.startedAt||null,eventSchedule:eventSchedule(),
   nombre:$('gameName').value.trim(),curso:$('gameCourse').value.trim(),codigo:$('gameCode').value,
   capitalMode:capitalMode(),capital:Number($('capital').value||100000),capitalMin:Number($('capitalMin').value||80000),capitalMax:Number($('capitalMax').value||120000),
@@ -204,6 +216,7 @@ function getConfig(){return {
   eventRules:state.eventRules,enabledEvents:[...state.enabledEvents],eventSelectionMode:eventSelectionMode(),randomEventCount:Math.max(1,Math.min(40,Number($('eventRandomCount')?.value||15))),loanMaxPercent:50,loanInitialPercent:25
 }}
 function saveConfig(silent=false){
+  if(!silent&&configurationLocked()){toast('Configuración bloqueada porque la partida ya inició.');return false;}
   renderAcademicCalendar();const c=getConfig();
   if(!validateCreation(c))return false;
   const numericPlan=RULES.cycleSchedule({...c,scheduledStart:c.scheduledStart||'2026-01-01T00:00'});
@@ -214,7 +227,7 @@ function saveConfig(silent=false){
   if(!silent)toast('Configuración guardada.');return true;
 }
 function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){$('interest').disabled=true;if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
-function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El servidor inicia el Ciclo 1 al terminar la integración desde la fecha programada. Puedes cerrar el navegador.':'El servidor inicia el Ciclo 1 al terminar el tiempo de la sala de espera. El docente controla el cierre y avance de los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
+function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El Ciclo 1 comienza automáticamente al terminar la sala de espera desde la fecha programada. Puedes cerrar el navegador.':'El Ciclo 1 comienza automáticamente al terminar la sala de espera. Después, el docente puede pausar, cerrar y avanzar los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
 
 
 function calendarDuration(milliseconds){
@@ -231,21 +244,28 @@ function renderAcademicCalendar(){
   ['startDate','endDate'].forEach(id=>{$(id).readOnly=automatic;$(id).setAttribute('aria-readonly',String(automatic))});
   $('automaticCalendar').classList.toggle('hidden',!automatic);
   $('calendarModeBadge').textContent=automatic?'Automático':'Referencia';
-  if(!automatic){state.manualDates={start:$('startDate').value,end:$('endDate').value};$('academicCalendarHint').textContent='Las fechas son informativas en modo manual. El docente decide cuándo inicia y termina cada ciclo.';return}
+  if(!automatic){
+    const status=gameStatus(),started=Date.parse(status?.startedAt||state.authoritative?.gameStartedAt||'');
+    if(status?.active&&Number.isFinite(started)){
+      const duration=(Number($('integrationDurationMinutes').value)||0)*60000+(Number($('cycles').value)||1)*roundSeconds()*1000;
+      $('startDate').value=RULES.localDate(started);$('endDate').value=RULES.localDate(started+duration);
+    }else state.manualDates={start:$('startDate').value,end:$('endDate').value};
+    $('academicCalendarHint').textContent='Fechas de referencia: el inicio corresponde a la activación y el fin es una estimación sin pausas. En modo manual, el docente controla las pausas, el cierre y el avance; las fechas no cierran la partida.';return}
+
   const config=getConfig(),plan=RULES.cycleSchedule(config),r=runtime();
   const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'hora local';
   $('academicCalendarHint').textContent=`Fechas calculadas desde el inicio programado, la duración y el número de ciclos. Zona horaria de este navegador: ${tz}.`;
   if(plan.error){$('startDate').value='';$('endDate').value='';$('calendarSummary').textContent=plan.error;$('cycleCalendarList').innerHTML='';return}
   $('startDate').value=RULES.localDate(plan.start);$('endDate').value=RULES.localDate(plan.end);
   const matches=config.lifecycleVersion===2?Boolean(config.gameStartAt&&r):r?.mode==='automatic'&&r?.scheduledStart===config.scheduledStart&&Number(r?.duration)===(plan.cycles[Math.max(0,Number(r?.round||1)-1)]?.end-plan.cycles[Math.max(0,Number(r?.round||1)-1)]?.start)/1000;
-  const current=matches?Number(r.round||1):0,finished=matches&&r.status==='simulation-finished';
+  const current=matches?Number(r.round||1):0,finished=matches&&(r.status==='simulation-finished'||r.phase==='finished');
   const running=matches&&r.running,scheduled=matches&&(r.status==='scheduled'||r.phase==='integration');
   const label=finished?'Simulación finalizada':running?`Ciclo ${current} en curso`:scheduled?'Inicio automático programado':'Vista previa de la programación';
   const summaryHtml=`<strong>${plan.cycles.length} ciclos · ${config.integrationMinutes===60?'Ciclo 1: integración de 1 h · ':''}Total ${calendarDuration(plan.total)}</strong><span>${escapeHtml(label)}<br>Inicio: ${calendarDateTime(plan.start)}<br>Fin de simulación: ${calendarDateTime(plan.end)}</span>${!matches?`<small class="calendar-warning">Pulsa Iniciar partida para activar este horario.${plan.start<Date.now()?' El inicio está en el pasado: se retomará el ciclo correspondiente al horario, o se finalizará si ya transcurrió todo el plazo.':''}</small>`:''}`;
   if($('calendarSummary').innerHTML!==summaryHtml)$('calendarSummary').innerHTML=summaryHtml;
   const listHtml=plan.cycles.map(c=>{
     const ended=finished||(matches&&c.round<current),active=running&&c.round===current;
-    return `<li class="cycle-calendar-row ${ended?'is-finished':active?'is-current':''}" data-cycle="${c.round}"><div class="cycle-calendar-title"><strong>Ciclo ${c.round}${c.round===1&&config.integrationMinutes===60?' · Integración':''}</strong><span class="cycle-calendar-state">${ended?'Finalizado':active?'En curso':'Programado'}</span></div><div class="cycle-calendar-times"><span><small>Inicio</small><time datetime="${new Date(c.start).toISOString()}">${calendarDateTime(c.start)}</time></span><span><small>Cierre</small><time datetime="${new Date(c.end).toISOString()}">${calendarDateTime(c.end)}</time></span></div><p class="cycle-calendar-action">${c.round===plan.cycles.length?'Al cerrar: fin de la simulación.':`Al cerrar: fin del ciclo e inicio automático del ciclo ${c.round+1}.`}</p></li>`;
+    return `<li class="cycle-calendar-row ${ended?'is-finished':active?'is-current':''}" data-cycle="${c.round}"><div class="cycle-calendar-title"><strong>Ciclo ${c.round}${c.round===1&&config.integrationMinutes===60?' · Integración':''}</strong><span class="cycle-calendar-state">${ended?'Finalizado':active?'En curso':matches&&c.round===current?'Pausado':'Programado'}</span></div><div class="cycle-calendar-times"><span><small>Inicio</small><time datetime="${new Date(c.start).toISOString()}">${calendarDateTime(c.start)}</time></span><span><small>Cierre</small><time datetime="${new Date(c.end).toISOString()}">${calendarDateTime(c.end)}</time></span></div><p class="cycle-calendar-action">${c.round===plan.cycles.length?'Al cerrar: fin de la simulación.':`Al cerrar: fin del ciclo e inicio automático del ciclo ${c.round+1}.`}</p></li>`;
   }).join('');
   const list=$('cycleCalendarList');if(list.innerHTML!==listHtml){const scroll=list.scrollTop;list.innerHTML=listHtml;list.scrollTop=scroll}
 }
@@ -328,13 +348,13 @@ function triggerGroupEvents(round){
 function eventsImpactingRound(round){const schedule=eventSchedule(),out=[];Object.entries(schedule).forEach(([trigger,data])=>(data?.group||[]).forEach(id=>{const e=EVENT_CATALOG.find(x=>x.id===id);if(!e||!state.enabledEvents.has(id))return;const start=Number(trigger)+Number(e.cycleOffset||0),end=start+Math.max(1,Number(e.cycles||1));if(round>=start&&round<end)out.push({...e,triggerRound:Number(trigger),impactRound:start})}));return out}
 function renderCycleNews(){const els=eventsImpactingRound(state.round);$('cycleNews').innerHTML=els.length?els.map(e=>`<div class="news-entry"><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>GRUPAL · ${escapeHtml(cycleOffsetLabel(e))} · ocurre ${e.probability}% · impacto en ciclo ${e.impactRound}</small></div>`).join(''):'<p class="hint">Sin noticia grupal activa en este ciclo. Los eventos individuales se evalúan por empresa según su probabilidad.</p>'}
 function updateEventModeUI(){state.eventSelectionMode=eventSelectionMode();const panel=document.querySelector('.event-mode-panel');panel?.classList.toggle('random-mode',state.eventSelectionMode==='random');panel?.classList.toggle('manual-mode',state.eventSelectionMode==='manual');renderEventBank()}
-function randomizeEventSelection(){const candidates=filteredEvents().filter(e=>state.enabledEvents.has(e.id));if(!candidates.length){toast('No hay eventos habilitados con los filtros actuales.');return}const count=Math.max(1,Math.min(candidates.length,Math.min(40,Number($('eventRandomCount')?.value||15))));const shuffled=candidates.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}state.enabledEvents=new Set(shuffled.slice(0,count).map(e=>e.id));state.eventSelectionMode='random';const radio=document.querySelector('input[name="eventSelectionMode"][value="random"]');if(radio)radio.checked=true;saveConfig(true);updateEventModeUI();toast(`${count} eventos fueron seleccionados aleatoriamente.`)}
+function randomizeEventSelection(){if(configurationLocked()){toast('Eventos bloqueados porque la partida ya inició.');return;}const candidates=filteredEvents();if(!candidates.length){toast('No hay eventos con los filtros actuales.');return}const count=Math.max(1,Math.min(candidates.length,Math.min(40,Number($('eventRandomCount')?.value||15))));const shuffled=candidates.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}state.enabledEvents=new Set(shuffled.slice(0,count).map(e=>e.id));state.eventSelectionMode='random';const radio=document.querySelector('input[name="eventSelectionMode"][value="random"]');if(radio)radio.checked=true;saveConfig(true);updateEventModeUI();toast(`${count} eventos fueron seleccionados aleatoriamente.`)}
 function renderEventBank(){
   renderEnabledEvents();
   const body=$('eventBankBody');if(!body)return;
   if(body.contains(document.activeElement)&&document.activeElement.matches('.event-first-round'))return;
-  const events=filteredEvents(),random=eventSelectionMode()==='random';
-  body.innerHTML=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
+  const events=filteredEvents(),random=eventSelectionMode()==='random',locked=configurationLocked();
+  body.innerHTML=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" ${locked?'disabled':''} data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" ${locked?'disabled':''} min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" ${locked?'disabled':''} data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
   body.querySelectorAll('.event-first-round,.event-repeat').forEach(input=>input.addEventListener('change',()=>{
     const id=input.dataset.event,rule={firstRound:1,repeat:true,...state.eventRules[id]};
     if(input.classList.contains('event-repeat'))rule.repeat=input.checked;
@@ -343,10 +363,10 @@ function renderEventBank(){
   }));
   body.querySelectorAll('.event-enable').forEach(i=>i.addEventListener('change',()=>{
     i.checked?state.enabledEvents.add(i.dataset.event):state.enabledEvents.delete(i.dataset.event);
-    $('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados`;
+    $('eventSelectionCount').textContent=`${eventCountLabel()}`;
     updateSelectAllBtn();renderEnabledEvents();saveConfig(true);
   }));
-  $('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados de ${EVENT_CATALOG.length}`;
+  $('eventSelectionCount').textContent=`${eventCountLabel()}`;
   if($('eventVisibleCount'))$('eventVisibleCount').textContent=`Mostrando ${events.length} de ${EVENT_CATALOG.length}`;
   updateSelectAllBtn();
 }
@@ -358,6 +378,7 @@ function updateSelectAllBtn(){
   btn.dataset.allSelected=allSelected?'1':'';
 }
 function toggleSelectAllEvents(){
+  if(configurationLocked()){toast('Eventos bloqueados porque la partida ya inició.');return;}
   const btn=$('eventSelectAll');if(!btn)return;
   const all=EVENT_CATALOG;
   if(!all.length){toast('No hay eventos visibles con los filtros actuales.');return;}
@@ -454,6 +475,7 @@ function paintTeacherClock(){
   const r=runtime(),c=state.authoritative;if(!c||!r)return;
   state.seconds=r.phase==='integration'&&c.gameStartAt?Math.max(0,Math.ceil((Date.parse(c.gameStartAt)-teacherNow())/1000)):r.running?Math.max(0,Math.ceil((Date.parse(r.startedAt)+r.duration*1000-teacherNow())/1000)):Number(r.remaining||0);
   updateTimer();$('startTimer').textContent=r.running?'Pausar':'Reanudar';
+  if(r.phase!=='integration')$('roundState').textContent=cycleStateLabel(r);
   renderTeacherLobby();
   if(r.phase==='integration'){
     const label=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
@@ -747,6 +769,7 @@ async function supabaseReports(reportsBase=state.reports){
     const local=localBase.find(x=>x.empresaId===p.empresa_id)||localBase.find(x=>!x.empresaId&&x.empresa===(emp.nombre_comercial||p.empresa));
     const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
     const rep=((info?.reportes)||[]).find(r=>Number(r.ciclo)===cicloActual)||null;
+    const financial=rep?.estado_resultados?.excel?.financial;
     out.push({
       id:local?.id||('sb-'+p.empresa_id),empresaId:p.empresa_id,teacherScore:p.puntaje_docente??null,
       nombre:p.nombre||local?.nombre||'Jugador',
@@ -754,19 +777,19 @@ async function supabaseReports(reportsBase=state.reports){
       legalName:emp.nombre_legal||p.empresas?.nombre_legal||local?.legalName||null,
       partida:code,
       ronda:cicloActual,rondasActivas:cicloActual,
-      capital:rep?Number(rep.capital):(emp.caja_inicial??local?.capital??0),
-      caja:rep?Number(rep.caja_final):(emp.caja_actual??local?.caja??0),
-      ingresos:rep?Number(rep.ingresos):(local?.ingresos??0),
-      costos:rep?Number(rep.costos):(local?.costos??0),
-      utilidad:rep?Number(rep.utilidad):(local?.utilidad??0),
+      capital:financial?.balanceCaja?.cajaInicial??(rep?(rep.balance_caja?.cajaInicial??rep.capital):(emp.caja_inicial??local?.capital)),
+      caja:financial?.balanceCaja?.cajaFinal??(rep?rep.caja_final:(emp.caja_actual??local?.caja)),
+      ingresos:financial?.estadoResultados?.ingresos??(rep?rep.ingresos:local?.ingresos),
+      costos:financial?.estadoResultados?.costos??(rep?rep.costos:local?.costos),
+      utilidad:financial?.estadoResultados?.utilidad??(rep?rep.utilidad:local?.utilidad),
       decisiones:labels.length?labels:(local?.decisiones||[]),
       enviado:rows.some(d=>d.enviada)||!!local?.enviado,
       eventos:local?.eventos||[],
-      estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
+      estadoResultados:financial?{...rep.estado_resultados,...financial.estadoResultados}:rep?.estado_resultados||local?.estadoResultados||{},
       excelDecisionState:rep?.estado_resultados?.excelDecisionState||local?.excelDecisionState||null,
-      balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
-      balanceGeneral:rep?.estado_resultados?.excel?.financial?.balanceGeneral||rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
-      flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
+      balanceCaja:financial?.balanceCaja||rep?.balance_caja||(!rep?local?.balanceCaja:null)||{},
+      balanceGeneral:financial?.balanceGeneral||rep?.balance_caja?.balanceGeneral||(!rep?local?.balanceGeneral:null)||{},
+      flujoCaja:financial?.flujoCaja||rep?.flujo_caja||(!rep?local?.flujoCaja:null)||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),
       estado:local?.estado||'activa',tomandoDecisiones:!!local?.tomandoDecisiones,
@@ -800,7 +823,8 @@ async function loadReports(){
   renderCompanies();renderResults();renderWinnerSelect();renderTeacherLobby();
   }finally{reportsBusy=false;if(reportsAgain){reportsAgain=false;setTimeout(loadReports,100);}}
 }
-function sectionBadges(r){const a=r.apartados||{};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}">${escapeHtml(k)} ${v.complete?'✓':`${v.done||0}/${v.total||0}`}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
+function sectionBadges(r){const a=r.apartados||{},names={B:'Infraestructura',C:'Producción',D:'Ventas',E:'Finanzas',F:'Logística'};return Object.entries(a).map(([k,v])=>`<span class="section-status ${v.complete?'done':'pending'}" title="${Number(v.done)||0} de ${Number(v.total)||0} decisiones obligatorias completadas">${escapeHtml(names[k]||k)}: ${Number(v.done)||0}/${Number(v.total)||0}${v.complete?' ✓':''}</span>`).join('')||'<span class="section-status pending">Sin datos</span>'}
+
 const presenceTracker=window.SIDE.TeacherSync.createPresenceTracker({now:teacherNow});
 function companyNodeKey(r){return String(r.empresaId||r.id);}
 function companyPresenceKey(r){return `${state.partidaId||$('gameCode').value}:${companyNodeKey(r)}`;}
@@ -850,7 +874,7 @@ function gradeStatus(key){
   if(status==='retrying'||status==='failed')return (gradeUiErrors.get(key)||'No se pudo sincronizar la nota.')+' · Pendiente de guardar; reintentando…';
   const local=grades()[key],report=state.reports.find(r=>gradeKey(r)===key);
   if(status==='saving'||local?.pending)return 'Guardando…';
-  if(status==='saved'||local||report?.teacherScore!=null)return 'Guardado ✓'+(report?.empresaId?' · Supabase':' · en este navegador');
+  if(status==='saved'||local||report?.teacherScore!=null)return 'Guardado ✓'+(report?.empresaId?' · confirmado':' · en este navegador');
   return 'Sin calificar';
 }
 function saveCompanyGrade(id,value){
@@ -883,7 +907,14 @@ function renderCompanies(force=false){
       card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>companyNodeKey(x)===key)));
       card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=card.dataset.reportId;switchTab('resultados');renderResults();});
       const form=card.querySelector('[data-grade-form]'),input=form.querySelector('input');
-      input.addEventListener('input',()=>{input.dataset.dirty='true';});
+      input.addEventListener('input',()=>{
+        input.dataset.dirty='true';
+        const outside=input.value!==''&&(Number(input.value)<0||Number(input.value)>20);
+        input.setCustomValidity(outside?'Escribe una nota entre 0 y 20.':'');
+        input.setAttribute('aria-invalid',String(outside));
+        form.querySelector('[data-grade-status]').textContent=outside?'La nota debe estar entre 0 y 20.':'Nota pendiente de guardar.';
+      });
+      input.addEventListener('change',()=>{if(input.value!==''&&Number.isFinite(Number(input.value))){const original=Number(input.value);input.value=Math.max(0,Math.min(20,original));input.setCustomValidity('');input.setAttribute('aria-invalid','false');if(original!==Number(input.value)){form.querySelector('[data-grade-status]').textContent='Nota ajustada al rango de 0 a 20. Guarda para confirmar.';toast('La nota se ajustó al rango de 0 a 20.');}}});
       form.addEventListener('submit',event=>{event.preventDefault();if(saveCompanyGrade(card.dataset.reportId,input.value))input.dataset.dirty='';});
       grid.appendChild(card);
     }
@@ -927,15 +958,15 @@ function renderResults(){
   if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}
   state.resultCompanyId=selected.id;
   sel.innerHTML=state.reports.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
-  const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
-  const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
-  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',[['Ventas netas',er.ventasNetas??er.ingresos??r.ingresos],['Gastos operativos',er.costos??r.costos],['Impacto de eventos',er.impactoEventos],['Otros resultados',Number(er.resultadoVentaActivos||0)+Number(er.otros||0)],['Utilidad',er.utilidad??r.utilidad]])}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Activos fijos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  const r=selected,er=r.estadoResultados||{},data=window.SIDE_TEACHER_PDF.reportData(r,gradeValue(r));
+  const section=(title,entries)=>`<section class="financial-section"><h4>${escapeHtml(title.replace(/^\d+\. /,''))}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${escapeHtml(label)}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
+  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${data.statements.map(([title,entries])=>section(title,entries)).join('')}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
   if(er.excel&&window.SIDE_EXCEL_UI)$('detailReports').insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(er.excel));
 }
 function closeExcelLocalRound(){
   if(state.partidaId||!window.SIDE_EXCEL_UI)return null;
   let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
-  const closure=window.SIDE_EXCEL_UI.cerrarLocal({game:$('gameCode').value||'SIDE-000',ciclo:state.round,reports});
+  const closure=window.SIDE_EXCEL_UI.cerrarLocal({game:$('gameCode').value||'SIDE-000',ciclo:state.round,reports,motorVersion:state.authoritative?.motor_version||getConfig().motor_version});
   if(closure){state.reports=reports;renderResults();addEvent('Cierre local por lotes calculado para las empresas participantes.','sistema');}
   return closure;
 }
@@ -982,9 +1013,10 @@ function renderPodium(){
   const pending=gradingReports().some(r=>grades()[gradeKey(r)]?.pending||gradeQueue.has(gradeKey(r)));
   const names=['🥇','🥈','🥉'],classes=['first','second','third'];
   $('podiumState').textContent=scheduled?'Publicación programada':visible?(changed?'Notas actualizadas · vista previa':'Publicado · 24 horas'):sameGame?'Publicación vencida · vista previa':'Vista previa';
+  $('publishPodium').disabled=!gradingReports().length||gradingReports().some(r=>gradeValue(r)==null)||pending||podiumBusy;
   $('publishStatus').textContent=podiumLoadError||(scheduled?'El podio se publicará automáticamente y estará disponible durante 24 horas.':pending?'Hay notas pendientes de sincronizar. Espera a que aparezcan como guardadas antes de publicar.':changed?'Las notas cambiaron. Pulsa PUBLICAR PODIO para publicar las calificaciones actuales.':visible?'Disponible hasta: '+podiumDate(publication.expiresAt):sameGame?'La publicación venció a las 24 horas. Las notas se conservan; puedes volver a publicar.':'El podio será visible durante 24 horas desde su publicación.');
   $('podiumPreview').innerHTML=list.map((r,i)=>`<div class="podium-place ${classes[i]}"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><small>${Number(r.grade).toLocaleString('es-PE')} / 20</small></div>`).join('')||`<p>${gradingReports().length?'Aún no hay notas. Guarda las calificaciones en Empresas para ver el podio.':'Aún no hay empresas participantes.'}</p>`;
-  $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports,podiumOptions()).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Aún no hay empresas participantes.</p>';
+  $('sidePodium').innerHTML=window.SIDE_TEACHER_PODIUM.suggestedPodium(state.reports,podiumOptions()).map((r,i)=>`<div class="suggestion-row"><span>${names[i]}</span><strong>${escapeHtml(r.empresa)}</strong><b>${r.sideScore.toLocaleString('es-PE')} / 100</b></div>`).join('')||'<p class="hint">Sin datos suficientes para sugerir un podio financiero.</p>';
 }
 function publishPodium(){
   const participants=gradingReports();
@@ -1031,7 +1063,7 @@ $('podiumReschedule').addEventListener('click',()=>{$('podiumPublishMode').value
 setInterval(()=>{if($('tab-podio').classList.contains('active'))renderPodium();},1000);
 setInterval(()=>{if($('tab-podio').classList.contains('active')&&!podiumBusy)loadPublished();},5000);
 const historyController=window.SIDE_TEACHER_HISTORY?.createController({mount:$('historyContent'),status:$('historyStatus'),refresh:$('refreshHistory'),service:window.SIDE?.TeacherHistoryService,catalog:window.SIDE_DECISION_CATALOG||[]});
-function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio',historial:'Historial · última partida'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='historial')historyController?.load()}
+function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Rondas y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio',historial:'Historial · última partida'};$('pageTitle').textContent=titles[tab];window.scrollTo({top:0,left:0,behavior:'instant'});document.querySelector('.content').scrollTop=0;document.getElementById('tab-'+tab).scrollTop=0;if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='historial')historyController?.load()}
 let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
 function pdfLogo(){
   if(!pdfLogoPromise)pdfLogoPromise=new Promise(resolve=>{
@@ -1049,7 +1081,9 @@ async function makePdf(){
 }
 async function exportPdf(preview){
   if(pdfBusy)return;pdfBusy=true;
-  ['viewPdf','downloadPdf'].forEach(id=>$(id).disabled=true);
+  ['viewPdf','downloadPdf'].forEach(id=>{$(id).disabled=true;$(id).setAttribute('aria-busy','true');$(id).dataset.originalLabel=$(id).textContent;$(id).textContent='Preparando PDF…';});
+  $('pdfLoading').classList.remove('hidden');
+  if(preview)$('pdfModal').classList.remove('hidden');
   try{
     const filename=($('gameCode').value||'SIDE')+'-resultados.pdf';
     const doc=await makePdf();
@@ -1059,7 +1093,7 @@ async function exportPdf(preview){
       pdfPreviewUrl=url;$('pdfFrame').src=url;$('pdfModal').classList.remove('hidden');
     }else doc.save(filename);
   }catch(error){console.error('SIDE: PDF export failed',error);toast(error.message||'No se pudo generar el PDF. Inténtalo de nuevo.');}
-  finally{pdfBusy=false;['viewPdf','downloadPdf'].forEach(id=>$(id).disabled=false);}
+  finally{pdfBusy=false;$('pdfLoading').classList.add('hidden');['viewPdf','downloadPdf'].forEach(id=>{$(id).disabled=false;$(id).removeAttribute('aria-busy');$(id).textContent=$(id).dataset.originalLabel;});}
 }
 function showPdf(){return exportPdf(true)}
 function downloadPdf(){return exportPdf(false)}
@@ -1080,7 +1114,7 @@ document.querySelectorAll('#tab-configuracion input').forEach(input=>{
     state.round=1;state.seconds=roundSeconds();updateTimer();updateRoundDisplay();refreshSetupSummary();saveConfig(true);
   });
 });
-$('openEventPicker')?.addEventListener('click',()=>{$('eventPicker').showModal();renderEventBank()});
+$('openEventPicker')?.addEventListener('click',()=>{refreshSetupSummary();$('eventPicker').showModal();renderEventBank()});
 $('closeEventPicker')?.addEventListener('click',()=>$('eventPicker').close());
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)return;
@@ -1095,7 +1129,7 @@ window.addEventListener('online',()=>{
 });
 document.querySelectorAll('input[name="eventSelectionMode"]').forEach(i=>i.addEventListener('change',()=>{state.eventSelectionMode=i.value;saveConfig(true);updateEventModeUI()}));
 $('eventRandomize')?.addEventListener('click',randomizeEventSelection);
-$('eventClearSelection')?.addEventListener('click',()=>{state.enabledEvents.clear();renderEventBank();saveConfig(true);toast('Selección de eventos limpiada.');});
+$('eventClearSelection')?.addEventListener('click',()=>{if(configurationLocked())return;state.enabledEvents.clear();renderEventBank();saveConfig(true);toast('Selección de eventos limpiada.');});
 $('eventSelectAll')?.addEventListener('click',toggleSelectAllEvents);
 ['eventSearch','eventCategoryFilter','eventScopeFilter'].forEach(id=>$(id)?.addEventListener(id==='eventSearch'?'input':'change',()=>{renderEventBank();updateSelectAllBtn();}));
 $('eventRandomCount')?.addEventListener('change',()=>saveConfig(true));
@@ -1157,6 +1191,7 @@ $('confirmCancelGame')?.addEventListener('click',async()=>{
 $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
 
 (async function init(){
+  if($('teacherRelease'))$('teacherRelease').textContent=window.SIDE_RELEASE?.version||'';
   await purgeForeignProfessorState();
   loadConfig();updateEventModeUI();
   try{state.events=JSON.parse(localStorage.getItem('SIDE_EVENT_LOG')||'[]')||[]}catch{}
