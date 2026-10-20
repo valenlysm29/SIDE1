@@ -1,6 +1,7 @@
 /* Parámetros contrastados con DECISIONES SIDE (16).xlsx y decisiones explícitas del pedido. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_EXCEL_CONFIG=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
+  const MOTOR_ACTUAL='side-lotes-2026-10-20';
   const CONFIG={
     VERSION:'excel-16',DIAS_CICLO:24,CICLO_EQUIVALE_A_MESES:1,
     // Decisiones congeladas: 14 grupos de Seleccion_Ciclo0 y los dos temas ya presentes en 9fbe6ec.
@@ -11,6 +12,10 @@
     MARKETING_BASE:{baja:{codigo:'INV-02A',costo:1500},media:{codigo:'INV-02B',costo:6000},alta:{codigo:'INV-02C',costo:12000}},
     ANALISTA_BASE:{costo:5000,descuentoInicialPct:12,reduccionPorCicloPct:2,descuentoMinimoPct:2},GARANTIA_PROVEEDOR_BASE:[0,80,100],
     DISTRITOS_TIENDAS:{los_olivos:'Los Olivos',miraflores:'Miraflores',sjl:'San Juan de Lurigancho'},
+    COSTOS_TIENDAS:{los_olivos:1800,miraflores:3500,sjl:2200},COSTO_WEB:500,CONTRATO_TIENDA_CICLOS:12,COMISION_VENTAS_TIENDA:0.01,
+    // Prevalece Costos De Producción (oráculo), no los 2500/4000 del catálogo.
+    FUENTE_SUELDO_CORTE:'Costos De Producción!U5:U29; pendiente de confirmación docente',
+    NUEVO_MODELO:false,
     PRODUCTIVIDAD:{corte:[5,7,9],ensamble:[6,8,12],acabado:[6,7,10]},
     MULTIPLICADORES_MAQUINA:[1,1.2,1.5],EFICIENCIA_BASE:0.9,BONO_N3:0.01,BONO_JEFATURA:0.04,
     EFICIENCIA_N3_LITERAL:true,ESSALUD_ANUAL_LITERAL:true,CONS08_MODO:'multiplicativo',
@@ -45,6 +50,7 @@
   };
   function excelRound(value,digits=0){if(!Number.isFinite(value))throw new TypeError('Valor no finito');const factor=10**digits,scaled=Math.abs(value)*factor;return Math.sign(value)*Math.floor(scaled+0.5+Number.EPSILON*scaled)/factor;}
   function excelRoundDown(value,digits=0){if(!Number.isFinite(value))throw new TypeError('Valor no finito');const factor=10**digits;return Math.trunc(value*factor)/factor;}
-  function configurar(overrides={}){return {...CONFIG,...overrides};}
-  return {CONFIG,excelRound,excelRoundDown,configurar};
+  function paraMotor(version){return version===MOTOR_ACTUAL?{VERSION:MOTOR_ACTUAL,NUEVO_MODELO:true}:{};}
+  function configurar(overrides={}){return {...CONFIG,...paraMotor(overrides.VERSION||overrides.motor_version),...overrides};}
+  return {CONFIG,MOTOR_ACTUAL,paraMotor,excelRound,excelRoundDown,configurar};
 });

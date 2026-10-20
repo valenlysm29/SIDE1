@@ -101,14 +101,14 @@ window.SIDE_DECISION_CATALOG = [
     ]
   },
   {
-    cat:'D', title:'Canales y ventas', short:'Ventas', icon:'assets/icons/categories/canales_ventas.svg',
+    cat:'D', title:'Ventas', short:'Ventas', icon:'assets/icons/categories/canales_ventas.svg',
     desc:'Elige dónde vender. La demanda cambia por distrito y el equipo comercial se activa cuando existe una tienda física.',
     items:[
       {id:'CANALES',name:'Canales de venta',type:'multi-choice',recurring:true,required:true,minSelections:1,options:[
         {id:'web',label:'Página web',desc:'Canal digital con cobertura amplia.',cost:500,channel:'web'},
-        {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00,minCommitCycles:12},
-        {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:3500,channel:'store',district:'Miraflores',demand:1.25,minCommitCycles:12},
-        {id:'sjl',label:'Tienda · San Juan de Lurigancho',desc:'Punto físico con alta base poblacional y demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.',cost:2200,channel:'store',district:'San Juan de Lurigancho',demand:1.10,minCommitCycles:12}
+        {id:'los_olivos',label:'Tienda · Los Olivos',desc:'Punto físico con demanda distrital propia. Compromiso de 12 ciclos mensuales (24 días productivos por ciclo). No se cancela durante ese plazo; al terminar la partida no se cobran ciclos adicionales.',cost:1800,channel:'store',district:'Los Olivos',demand:1.00,minCommitCycles:12},
+        {id:'miraflores',label:'Tienda · Miraflores',desc:'Punto físico con mayor demanda potencial y mayor costo. Compromiso de 12 ciclos mensuales (24 días productivos por ciclo). No se cancela durante ese plazo; al terminar la partida no se cobran ciclos adicionales.',cost:3500,channel:'store',district:'Miraflores',demand:1.25,minCommitCycles:12},
+        {id:'sjl',label:'Tienda · San Juan de Lurigancho',desc:'Punto físico con alta base poblacional y demanda distrital propia. Compromiso de 12 ciclos mensuales (24 días productivos por ciclo). No se cancela durante ese plazo; al terminar la partida no se cobran ciclos adicionales.',cost:2200,channel:'store',district:'San Juan de Lurigancho',demand:1.10,minCommitCycles:12}
       ]},
       {id:'PERSONAL_VENTAS',name:'Personal básico de ventas',type:'info',desc:'Cada tienda física incluye automáticamente 1 vendedor básico. Su remuneración variable equivale al 1% de las ventas realizadas en el simulador.'},
       {id:'CREDITO_VENTAS',name:'Ventas a crédito',type:'info',desc:'El porcentaje inicia fijo y aumenta según avanzan los ciclos. No es una decisión del jugador.'},
@@ -116,7 +116,7 @@ window.SIDE_DECISION_CATALOG = [
     ]
   },
   {
-    cat:'E', title:'Inversiones y finanzas', short:'Finanzas', icon:'assets/icons/categories/finanzas.svg',
+    cat:'E', title:'Finanzas', short:'Finanzas', icon:'assets/icons/categories/finanzas.svg',
     desc:'Decide inversiones de crecimiento y, si lo necesitas, solicita financiamiento bancario.',
     items:[
       {id:'INV_RRHH',name:'Capacitación del equipo',type:'choice',recurring:true,required:false,options:[
@@ -149,4 +149,22 @@ window.SIDE_DECISION_CATALOG = [
     const codigo=mappings[item.id]?.[index],row=indice[codigo];if(!row)return;
     Object.assign(option,{codigoExcel:codigo,costoReferencialExcel:row.costo,aportesExcel:{calidad:row.calidad,eficiencia:row.eficiencia,reputacion:row.reputacion,financiero:row.financiero}});
   });
+}());
+
+// Reubicar los mismos controles conserva las cinco secciones de decisiones.
+(function(){
+  const catalog=window.SIDE_DECISION_CATALOG,find=cat=>catalog.find(s=>s.cat===cat);
+  for(const [id,destino] of [['INV_RRHH','C'],['INV_MARKETING','D']]){
+    const source=find('E'),index=source.items.findIndex(item=>item.id===id);
+    if(index>=0)find(destino).items.push(source.items.splice(index,1)[0]);
+  }
+  const roles={PERS_CORTE:'corte',PERS_ENSAMBLE:'ensamble',PERS_ACABADO:'acabado',LIMPIEZA:'limpieza',JEFATURA:'jefatura'};
+  for(const section of catalog)for(const item of section.items||[]){
+    if(item.id==='MESA_CORTE'){item.maxQuantityModeloLotes=1;item.obligatoriaModeloLotes=true;}
+    (item.options||[]).forEach((option,index)=>{
+      const role=roles[item.id];if(!role||!option.cost||!window.SIDE_EXCEL_COSTOS)return;
+      const detail=window.SIDE_EXCEL_COSTOS.costoLaboral(role,['limpieza','jefatura'].includes(role)?1:index+1);
+      Object.assign(option,{sueldoBase:detail.base,costoMensualReal:detail.pagoMensual,desgloseLaboral:detail});
+    });
+  }
 }());
