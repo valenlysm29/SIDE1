@@ -52,3 +52,14 @@ test('recuperación de terminal permite configurar nueva sin reabrir la partida'
  const s=service(async()=>({data:{...sala,estado:'finalizada'}}));const result=await s.api.recuperarSala('room');
  assert.equal(result.success,true);assert.equal(result.data,null);assert.equal(result.terminal,true);
 });
+
+test('partida nueva no se crea sobre un servidor que todavía anuncia el motor anterior',async()=>{
+ const s=service(async name=>name==='side_excel_features'?{data:{cierreVersion:1}}:{data:sala});
+ const r=await s.api.crear({...datos,configuracion:{...datos.configuracion,motor_version:'side-lotes-2026-10-20'}});
+ assert.equal(r.code,'MIGRACION_PENDIENTE');assert.equal(s.calls.some(c=>c.name==='crear_sala_docente'),false);
+});
+test('partida nueva se crea cuando el servidor anuncia el motor requerido',async()=>{
+ const s=service(async name=>name==='side_excel_features'?{data:{cierreVersion:1,motorVersion:'side-lotes-2026-10-20'}}:{data:sala});
+ const r=await s.api.crear({...datos,configuracion:{...datos.configuracion,motor_version:'side-lotes-2026-10-20'}});
+ assert.equal(r.success,true);assert.equal(s.calls.at(-1).name,'crear_sala_docente');
+});

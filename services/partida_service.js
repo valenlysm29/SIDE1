@@ -147,6 +147,11 @@
         if(userError)console.error('SIDE: sesión al crear sala:',userError);
         return { success: false, error: 'Debes iniciar sesión como profesor.' };
       }
+      const motorActual=global.SIDE_EXCEL_CONFIG?.MOTOR_ACTUAL||'side-lotes-2026-10-20';
+      if(d.configuracion?.motor_version===motorActual){
+        const ready=await excelDisponible();
+        if(!ready.available||ready.motorVersion!==motorActual)return {success:false,code:'MIGRACION_PENDIENTE',error:'Actualiza la plataforma antes de crear partidas con las reglas nuevas. Consulta la guía de actualización.'};
+      }
       if(d.configuracion?.lifecycleVersion===2){
       const {data:admissionFeatures,error:admissionFeatureError}=await sb.rpc('side_admission_features');
       if(admissionFeatureError)console.error('SIDE: comprobar admisión:',admissionFeatureError);
