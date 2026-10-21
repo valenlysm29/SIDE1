@@ -120,3 +120,17 @@ Evidencia: `tests/output/correcciones-2026-10-20/independiente/{verification,tea
 ## Último punto de control
 
 El runtime3D real, el recorrido corregido, las tres misiones por marca de visita y el Resumen con alquiler se completaron en verde antes del ajuste final de intro colapsada. La última repetición de captura de esa intro se interrumpió por contención general de OneDrive/Chromium, a petición del orquestador. **Pendiente solamente repetir esa captura/altura sobre css/excel.css y ui_excel.js finales**; no se extrapola el resultado visual anterior a ese ajuste. Las simulaciones completas no se repitieron porque este ajuste es exclusivamente de presentación.
+
+## Revisión independiente del bloqueo de despliegue
+
+Se revisó `ba76695` sin navegador y se encontró un bypass funcional: ante RPC de cierre faltante y ausencia de snapshots, el panel permitía continuar incluso una partida del motor nuevo. La reproducción independiente extrajo `closeExcelRemoteRound()` real en VM y obtuvo `true` donde correspondía `false`.
+
+Corrección `3d8a675` validada por inspección y cinco casos independientes en VM, sin editar producto:
+
+- Motor nuevo + RPC faltante + cero reportes: **false**, cierre bloqueado.
+- Motor heredado explícito + RPC faltante + cero reportes: **true**, compatibilidad conservada.
+- Partida heredada sin versión + RPC faltante + cero reportes: **true**.
+- Motor heredado con empresa ya habilitada por lotes + RPC faltante: **false**.
+- Error de cierre distinto de migración, aun heredado sin reportes: **false**.
+
+El gate de características bloquea los controles canónicos remotos si el servidor no anuncia el motor correspondiente. La migración anuncia características dentro de una transacción: un fallo de prerrequisitos revierte también ese anuncio. Recuperar un cierre ya persistido sigue siendo idempotente. La validación visual final de la intro colapsada permanece a cargo de la ejecución secuencial del orquestador; esta revisión no ejecutó Chromium ni repitió simulaciones.
