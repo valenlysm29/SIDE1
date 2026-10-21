@@ -3,21 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#020509">
+  <meta name="theme-color" content="#081a34">
   <title>SIDE — Panel Docente</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
   <link rel="stylesheet" href="css/docente.css?v=20261020-correcciones">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
+  <link rel="stylesheet" href="css/faculty-theme.css?v=20261021-refinado">
 </head>
 <body>
 <div class="app-shell">
   <div class="docente-bg" aria-hidden="true"></div>
   <aside class="sidebar">
-    <div class="brand"><img src="assets/side_logo.png" alt="SIDE"><span>PANEL DOCENTE</span></div>
+    <div class="brand"><span class="faculty-wordmark" aria-label="SIDE">SIDE</span></div>
     <nav aria-label="Secciones del panel docente">
       <button type="button" class="nav-btn active" data-tab="configuracion"><span class="nav-icon"><img src="assets/icons/teacher/configuracion.svg" alt=""></span><span>Configuración</span></button>
       <button type="button" class="nav-btn hidden" data-tab="rondas"><span class="nav-icon"><img src="assets/icons/teacher/rondas.svg" alt=""></span><span>Rondas y eventos</span></button>
@@ -27,7 +25,7 @@
       <button type="button" class="nav-btn" data-tab="historial"><span class="nav-icon"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><span>Historial</span></button>
     </nav>
     <div class="sidebar-bottom">
-      <button type="button" id="backHome" class="sidebar-link"><img class="button-arrow-icon left" src="assets/icons/ui/arrow-left-thick.svg" alt=""> Volver a inicio</button>
+      <button type="button" id="backHome" class="sidebar-link"><span class="faculty-back-arrow" aria-hidden="true"></span> Volver al inicio</button>
     </div>
   </aside>
 
@@ -54,7 +52,7 @@
     <section id="tab-configuracion" class="tab-panel active">
       <div class="hero-card">
         <div><span class="eyebrow">PARTIDA ÚNICA ACTIVA</span><h2 id="configWelcome">Configura la simulación antes de iniciar</h2><p>El docente solo puede mantener una partida activa. El código es asignado por el sistema y no puede editarse.</p></div>
-        <div class="hero-orb">SIDE</div>
+        <div class="faculty-wordmark faculty-wordmark-small" aria-hidden="true">SIDE</div>
       </div>
       <div class="grid two">
         <article class="card">
