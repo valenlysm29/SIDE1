@@ -6,7 +6,7 @@ Solicitud: texto pegado «MEGA PROMPT». Los dos DOCX se usan como evidencia, no
 
 Base original: `66dc38a`. Había cambios previos sin commit de conexión Supabase; se conservaron completos en `d1c83f3`, antes de las correcciones. No se ejecutó SQL en producción. No se modificaron NPC ni avatares; se ajustaron únicamente las misiones de recorrido que quedaron imposibles con el motor nuevo, y se revalidó la regresión en el runtime 3D real.
 
-La batería base se registra en `tests/output/correcciones-2026-10-20/baseline-node.log`. La clasificación inicial se conserva en la matriz, pero la columna final refleja la verificación local completada el 21/10/2026. Publicación en curso: la comprobación de la versión pública y el hash final los incorpora el orquestador al terminar el despliegue.
+La batería base se registra en `tests/output/correcciones-2026-10-20/baseline-node.log`. La clasificación inicial se conserva en la matriz, pero la columna final refleja la verificación local completada el 21/10/2026. Publicado en main: 61abfc37b5b791834aab3a9163be84bac0ffb438. GitHub Pages completó correctamente el despliegue 39647973483. Comprobación pública del 21/10/2026 18:01 UTC: index.html y docente.html responden 200, cargan SIDE_RELEASE 2026.10.20.1 y sus textos de versión coinciden; sin errores JavaScript. Evidencia local: tests/output/correcciones-2026-10-20/published-final.json.
 
 ## Responsabilidad
 
@@ -20,63 +20,63 @@ La batería base se registra en `tests/output/correcciones-2026-10-20/baseline-n
 
 | ID | Severidad | Clasificación inicial | Responsable / archivo | Estado final / siguiente paso |
 |---|---|---|---|---|
-| 1 | A | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 2 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 3 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 4 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 5 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 6 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 7 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 8 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 9 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 10 | A | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 11 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 12 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 13 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 14 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 15 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 16 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 17 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
+| 1 | A | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 2 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 3 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 4 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 5 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 6 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 7 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 8 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 9 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 10 | A | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 11 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 12 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 13 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 14 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 15 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 16 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 17 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
 | 18 | M | ya corregido en repo; despliegue pendiente de comprobar | B / docente.html, js/docente.js | ya corregido en el repo: regresión verificada; publicación en curso |
-| 19 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 20 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 21 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 22 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 23 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 24 | M | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 25 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 26 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 27 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 28 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 29 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 30 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 31 | A | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 32 | A | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
+| 19 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 20 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 21 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 22 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 23 | A | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 24 | M | por reproducir | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 25 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 26 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 27 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 28 | M | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 29 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 30 | B | vigente o parcial por inspección | B / docente.html, js/docente.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 31 | A | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 32 | A | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
 | 33 | A | ya corregido en repo; despliegue pendiente de comprobar | C / index.html, js/app.js | ya corregido en el repo: regresión verificada; publicación en curso |
-| 34 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 35 | M | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
+| 34 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 35 | M | vigente o parcial por inspección | D / caja.js, partida_service.js, SQL; C/B render | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
 | 36 | M | ya corregido en repo; despliegue pendiente de comprobar | C / index.html, js/app.js | ya corregido en el repo: regresión verificada; publicación en curso |
-| 37 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 38 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 39 | M | por reproducir | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 40 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 41 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 42 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 43 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 44 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 45 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 46 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 47 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 48 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 49 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 50 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 51 | A | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 52 | M | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 53 | M | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 54 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 55 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 56 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
-| 57 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado en entrega local: comprobado por F y regresiones; publicación en curso; activar SQL manual cuando corresponda |
+| 37 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 38 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 39 | M | por reproducir | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 40 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 41 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 42 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 43 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 44 | M | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 45 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 46 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 47 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 48 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 49 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 50 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 51 | A | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 52 | M | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 53 | M | vigente o parcial por inspección | D / teacher_auth.js, SQL; C HTML | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 54 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 55 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 56 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
+| 57 | B | vigente o parcial por inspección | C / index.html, js/app.js | cerrado: comprobado por F y regresiones; publicado; activar SQL manual cuando corresponda |
 
 
 ## Catálogo (21 filas)
@@ -150,7 +150,7 @@ El resultado integral se obtiene conservando para cada nombre de runner el últi
 
 ## Historial de integración y reparaciones
 
-Commits de integración conservados como referencia: `cebba72` estudiante inicial, `33fe68d` docente, `c22702b` acceso/SQL/libro, `f34861f` motor, `e3a5e3f` préstamo coherente, `d2c0396` cinco secciones canónicas y `a516423` verificación independiente. El hash final de publicación lo agrega el orquestador.
+Commits de integración conservados como referencia: `cebba72` estudiante inicial, `33fe68d` docente, `c22702b` acceso/SQL/libro, `f34861f` motor, `e3a5e3f` préstamo coherente, `d2c0396` cinco secciones canónicas y `a516423` verificación independiente. Código publicado en 61abfc3; este cierre documental no altera el producto.
 
 El verificador detectó dos regresiones y se devolvieron a sus responsables: misiones arcade imposibles en motor nuevo y Resumen que calculaba alquiler con un preview histórico. Ambas se corrigieron y el runtime real, el recorrido y la cifra de costos se revalidaron. La intro colapsada final, cuyo primer intento se interrumpió por contención de OneDrive/Chromium, quedó comprobada por la ejecución visual final citada arriba; no sigue pendiente. La economía del recorrido nuevo se calcula al cierre, sin una segunda caja arcade; la lógica de NPC y avatares permanece intacta.
 
@@ -160,7 +160,7 @@ También se cerró el bypass detectado por F en el gate de migración: `closeExc
 
 **SQL de Supabase: sí, Joe debe ejecutarlo manualmente; Codex nunca lo ejecutó en producción.** Archivo completo: `supabase/migrations/2026-10-20_correcciones_docente_estudiante.sql`.
 
-1. Esperar a que se publique esta entrega y comprobar **2026.10.20.1 en estudiante y docente**. Publicación en curso; hash y verificación pública final pendientes de anotación por el orquestador. El registro anterior al push (`published-before.json`) mostraba estudiante 2026.09.22.2 y `release.js` 404; es evidencia histórica, no el estado público final.
+1. Esperar a que se publique esta entrega y comprobar **2026.10.20.1 en estudiante y docente**. Publicación y comprobación pública completadas: 61abfc3, despliegue 39647973483 correcto, ambas páginas con 2026.10.20.1. El registro anterior al push (`published-before.json`) mostraba estudiante 2026.09.22.2 y `release.js` 404; es evidencia histórica, no el estado público final.
 2. Con respaldo de la base, comprobar prerrequisitos y ejecutar el archivo nuevo completo, después de las migraciones previas indicadas en `docs/ACTUALIZACION_2026-10-20.md`. No reinstalar migraciones antiguas encima de esta entrega. La migración nueva es idempotente.
 3. Verificar `select public.side_excel_features();`: `correccionesVersion: 20261020`, `motorVersion: side-lotes-2026-10-20` y `cierreVersion: 1`. Comprobar que partidas anteriores conservan `excel-16` y una partida nueva usa el motor nuevo; comprobar además que `anon` no puede ejecutar directamente `ingresar_empresa(text,text,text)`.
 4. Crear una partida de prueba nueva: una empresa que inicia con S/ 100.000 y no opera debe cerrar con costos obligatorios MYPE **S/ 2.712,32** y caja **S/ 97.287,68**; un borrador guardado debe registrar autoenvío al corte. Verificar estados conciliados en Resultados y PDF.

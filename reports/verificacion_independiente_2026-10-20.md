@@ -211,3 +211,8 @@ El antiguo fallo de `teacher_lifecycle_ui.cjs` también se reprodujo en la base 
 - **Simulaciones nuevas:**442checks, tres SIM × tres ciclos × cinco empresas =45resultados empresariales; reporter39y estudiante19 permanecen completos.
 
 **Dictamen:** apto para push conforme a la excepción autorizada para el fallo NPC preexistente demostrado. No quedan fallos nuevos ni pendientes de ejecución local en esta consolidación. El dictamen no aplica SQL remoto ni confirma todavía la versión publicada: publicación, comprobación de release compartida y ejecución manual de SQL siguen siendo pasos de despliegue del orquestador/usuario.
+
+
+### Cierre de publicación del orquestador
+
+Push a main completado en 61abfc37b5b791834aab3a9163be84bac0ffb438. GitHub Pages 39647973483 terminó con success. Comprobación pública con navegador: ambas páginas HTTP200, SIDE_RELEASE2026.10.20.1, textos de versión coincidentes y errores JS vacíos (published-final.json). No se ejecutó SQL en producción; la activación manual sigue a cargo del usuario.
