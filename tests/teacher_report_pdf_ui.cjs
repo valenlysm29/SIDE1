@@ -49,7 +49,7 @@ async function main(){
       return execFileSync(python,['-c',"from pypdf import PdfReader; import sys; print(' '.join(p.extract_text() for p in PdfReader(sys.argv[1]).pages))",file],{encoding:'utf8',env:{...process.env,PYTHONUTF8:'1'}});
     }
     const downloadedText=pdfText(path.join(out,'button-download.pdf'));
-    for(const value of ['Nombre comercial','Razón social','Comercial Andina S.A.C.','3/6','Proyecto Side','Simulador Interactivo de Decisiones Empresariales'])assert.ok(downloadedText.includes(value),value);
+    for(const value of ['Nombre comercial','Razón social','Comercial Andina S.A.C.','3/6','Proyecto Side','Simulador de Decisiones Financieras'])assert.ok(downloadedText.includes(value),value);
     for(const value of ['Estudiante / equipo','Equipo Horizonte Empresarial','Institución','Importes en soles peruanos','Simulador empresarial educativo','EMPRESA ELIMINADA'])assert.ok(!downloadedText.includes(value),value);
     await page.locator('#viewPdf').click();await page.waitForFunction(()=>$('pdfFrame').src.startsWith('blob:')&&!pdfBusy);
     assert.equal(await page.locator('#pdfModal').isVisible(),true);
