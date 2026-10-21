@@ -6,6 +6,7 @@ const {spawn,spawnSync}=require('node:child_process');
 const label=process.argv.find(x=>x.startsWith('--label='))?.slice(8)||'integral';
 if(!/^[a-z0-9-]+$/.test(label))throw new Error('Etiqueta de ejecución inválida');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/correcciones-2026-10-20',label);
+const tmp=path.join(root,'.codex-work/correcciones-20261020/tmp');fs.mkdirSync(tmp,{recursive:true});
 const baseline=process.argv.includes('--baseline')?path.join(root,'.codex-work/correcciones-base-d1c83f3'):null;
 fs.mkdirSync(out,{recursive:true});
 const inventory=JSON.parse(spawnSync(process.execPath,['tests/run_integral.cjs','--list','--no-fps'],{cwd:root,encoding:'utf8'}).stdout);
@@ -29,7 +30,7 @@ const save=()=>fs.writeFileSync(path.join(out,'summary.json'),JSON.stringify(sta
   const python='C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe';
   const command=job.name.endsWith('.py')?python:process.execPath;
   const args=baseline?job.args.map(arg=>fs.existsSync(path.join(baseline,arg))?path.join(baseline,arg):arg):job.args;
-  const child=spawn(command,args,{cwd:root,windowsHide:true,env:{...process.env,NODE_PATH:path.join(__dirname,'node_modules'),PYTHON_BIN:python,PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1',SIDE_TEST_URL:`http://127.0.0.1:${server.address().port}/`},stdio:['ignore','pipe','pipe']});
+  const child=spawn(command,args,{cwd:root,windowsHide:true,env:{...process.env,TEMP:tmp,TMP:tmp,TMPDIR:tmp,NODE_PATH:path.join(__dirname,'node_modules'),PYTHON_BIN:python,PYTHONUTF8:'1',PYTHONDONTWRITEBYTECODE:'1',SIDE_TEST_URL:`http://127.0.0.1:${server.address().port}/`},stdio:['ignore','pipe','pipe']});
   child.stdout.pipe(log,{end:false});child.stderr.pipe(log,{end:false});let timedOut=false;
   const timer=setTimeout(()=>{timedOut=true;spawnSync('taskkill',['/PID',String(child.pid),'/T','/F'],{windowsHide:true});},job.timeout||180000);
   const code=await new Promise(r=>{child.once('error',e=>{log.write(String(e));r(-1);});child.once('close',r);});clearTimeout(timer);await new Promise(r=>log.end(r));
