@@ -232,9 +232,12 @@
     try {
       let { data, error } = await sb
         .from('participantes')
-        .select('id, nombre, empresa, empresa_id, puntaje_docente, last_seen_at, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
+        .select('id, nombre, empresa, empresa_id, puntaje_docente, last_seen_at, expulsada_at, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)')
         .eq('partida_id', partidaId)
         .order('created_at', { ascending: true });
+      if(error&&/expulsada_at/.test(error.message||'')){
+        ({data,error}=await sb.from('participantes').select('id, nombre, empresa, empresa_id, puntaje_docente, last_seen_at, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)').eq('partida_id',partidaId).order('created_at',{ascending:true}));
+      }
       if(error&&/last_seen_at/.test(error.message||'')){
         ({data,error}=await sb.from('participantes').select('id, nombre, empresa, empresa_id, puntaje_docente, empresas(id, nombre_legal, nombre_comercial, caja_actual, ciclo_actual, reputacion)').eq('partida_id',partidaId).order('created_at',{ascending:true}));
       }
@@ -246,6 +249,17 @@
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };
     }
+  }
+
+  async function expulsarEmpresa(partidaId,empresaId,expulsar=true) {
+    const sb=client();if(!sb)return offline();
+    if(!partidaId||!empresaId)return {success:false,error:'No se pudo identificar la empresa de esta partida.'};
+    try {
+      const {data,error}=await sb.rpc('side_expulsar_empresa',{p_partida_id:partidaId,p_empresa_id:empresaId,p_expulsar:expulsar});
+      if(error){const missing=/PGRST202|42883|42703/.test(error.code||'');return {success:false,migrationMissing:missing,error:missing?'Aplica supabase/migrations/2026-10-21_expulsion_empresa.sql en Supabase para eliminar empresas de la partida.':error.message};}
+      if(!data?.success)return {success:false,code:data?.code,error:data?.error||'No se pudo confirmar la expulsión de la empresa.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error?.message||'No se pudo conectar con el servidor.'};}
   }
 
   /**
@@ -392,5 +406,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible,podio };
 })(window);

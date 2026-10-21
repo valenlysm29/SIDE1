@@ -3,7 +3,7 @@ const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') 
 const supabaseClient = window.SIDE?.SupabaseClient?.get() || null;
 const $ = id => document.getElementById(id);
 const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','characterSelection','simulationLoading','simulator3d','decisionMenu'];
-const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','creditsModal'];
+const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','creditsModal','studentExpelledModal'];
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
@@ -142,6 +142,7 @@ function loanMaximum(){return creditAvailable()}
 function loanInitialReference(){return creditApprovedLine()}
 function currentRound(){const own=scopedStudentState();if(own)return Math.max(1,Number(own.runtime?.round||own.config?.round||1));const config=teacherConfig();const scheduled=config.cycleCloseMode==='automatic'?readRoundRuntime()?.round:null;return Math.max(1,Number(scheduled||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1))}
 function studentAccess(existing=true){
+  if(currentStudent.expulsada||(!currentStudent.empresaId&&localStudentExpelled()))return {canOperate:false,canJoin:false,expelled:true,reason:STUDENT_EXPULSION_MESSAGE};
   let status={},r={};try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'{}')||{};r=JSON.parse(localStorage.getItem('SIDE_ROUND_RUNTIME')||'{}')||{}}catch{}
   if(currentStudent.empresaId&&studentConnected){
     if(studentSessionRecovering||!studentProgressHydrated||!authoritativeStudentState||authoritativeStudentState.empresaId!==currentStudent.empresaId||authoritativeStudentState.gameId!==currentStudent.game?.id||authoritativeStudentState.code!==admissionCode(currentStudent.game?.codigo))return {canOperate:false,canJoin:false,integration:true,reason:'Verificando el estado de la partida…'};
@@ -152,6 +153,7 @@ function studentAccess(existing=true){
 }
 function updateIntegrationUI(){
   const access=studentAccess(),button=$('enterDecisionsBtn'),notice=$('studentIntegrationNotice');
+  if(access.expelled){if(studentConnected)showStudentExpulsion();return;}
   const decisionsComplete=simulationSubmissionComplete();
   const waiting=Boolean(access.integration&&!access.cancelled),waitingScreen=$('studentWaiting');
   waitingScreen?.classList.toggle('hidden',!waiting);
@@ -217,6 +219,23 @@ function updateIntegrationUI(){
   if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
 let cancellationShown=false;
+const STUDENT_EXPULSION_MESSAGE='Tu empresa fue eliminada de la partida por inactividad. Contacta a tu profesor si necesitas volver a participar.';
+function localStudentExpelled(){
+  if(currentStudent.empresaId||!currentStudent.game?.codigo||!currentStudent.company)return false;
+  try{return JSON.parse(localStorage.getItem('SIDE_COMPANY_EXCLUSIONS')||'{}')[storageKey()]===true;}catch{return false;}
+}
+function showStudentExpulsion(){
+  const identityKey=studentIdentityKey();
+  studentOutbox?.discard(identityKey,true);
+  currentStudent.expulsada=true;studentConnected=false;studentProgressHydrated=false;studentSessionRecovering=false;
+  studentSnapshotEpoch++;stopStudentSync();autoEnterDecisions=false;playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
+  clearTimeout(financialSyncTimer);financialSyncTimer=null;
+  window.SIDE3D?.suspend?.();if(typeof closeCompanyReview==='function')closeCompanyReview();renderStudentPodium(null);
+  try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
+  closeModal();showScreen('profiles');
+  const notice=$('roomCancellationNotice');if(notice){notice.textContent=STUDENT_EXPULSION_MESSAGE;notice.classList.remove('hidden');}
+  showModal('studentExpelledModal');
+}
 let remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
 function studentNow(){if(currentStudent.empresaId&&!studentClock)return NaN;return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
@@ -343,6 +362,7 @@ async function refreshStudentGame(options={}){
       try{
         const r=await S.EmpresaService.obtenerEstado(identity);
         if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
+        if(r?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return false;}
         if(!r?.success||!r.data?.partida||!r.data?.empresa){renderStudentPodium(null);studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};return false;}
         studentStateFailure=null;
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
@@ -379,7 +399,7 @@ async function refreshStudentGame(options={}){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&studentConnected)pollStudentGame();});
 window.addEventListener('pagehide',stopStudentSync);
 window.addEventListener('pageshow',()=>{if(studentConnected){startStudentSync();pollStudentGame();}});
-window.addEventListener('storage',event=>{if(['SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_ACTIVE_ROUND'].includes(event.key)&&studentConnected)updateIntegrationUI()});
+window.addEventListener('storage',event=>{if(['SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_ACTIVE_ROUND','SIDE_COMPANY_EXCLUSIONS'].includes(event.key)&&studentConnected)updateIntegrationUI()});
 function storageKey(){return `${currentStudent.game?.codigo||'SIDE-000'}_${currentStudent.company}`}
 function decisionKey(){return 'SIDE_DECISIONS_'+storageKey()}
 function ledgerKey(){return 'SIDE_CASH_LEDGER_'+storageKey()}
@@ -512,7 +532,9 @@ $('studentForm')?.addEventListener('submit',async e=>{
   if(!hasConfig&&code===localCode&&!localStorage.getItem('SIDE_REMOTE_GAME_'+code)&&!localStorage.getItem('SIDE_PARTIDA_ID')){
     let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')}catch{}
     const comparable=value=>String(value||'').replace(/\s+/g,'').toUpperCase(),previous=reports.find(r=>admissionCode(r.partida)===code&&comparable(r.empresa)===comparable(brandName)&&(!r.legalName||comparable(r.legalName)===comparable(legalName)));
-    const access=studentAccess(Boolean(previous));
+    let excluded={};try{excluded=JSON.parse(localStorage.getItem('SIDE_COMPANY_EXCLUSIONS')||'{}');}catch{}
+    if(excluded[`${code}_${previous?.empresa||brandName}`]){showStudentExpulsion();return;}
+    const access=RULES.gameAccess(teacherConfig(),JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'{}'),readRoundRuntime()||{},Boolean(previous),studentNow());
     if(!access.canJoin){message('studentMessage',access.reason,true);return;}
 
     const localGame={...DEMO_GAME,codigo:code,nombre:localCfg.nombre||DEMO_GAME.nombre,curso:localCfg.curso||DEMO_GAME.curso,estado:'activa'};
@@ -526,6 +548,7 @@ $('studentForm')?.addEventListener('submit',async e=>{
     try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
     if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
+      if(ingreso?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return;}
       if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO','CODIGO_RETIRADO'].includes(ingreso?.code)){
         const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_RETIRADO'?'Este código pertenece a una sala anterior y ya no se puede utilizar. Pide al docente el código de una sala nueva.':ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
         showAdmissionCodeError(text);message('studentMessage',text,true);return;
@@ -681,7 +704,17 @@ function ownedMolds(){
   if(!owned.length&&e&&Number(e.round)<currentRound())for(const id of e.optionIds||[])if(item.options.some(option=>option.id===id))owned.push({id,round:Number(e.round)});
   return owned;
 }
-function initDraft(item){
+function nonnegativeDecisionNumber(value){const number=Number(value);return Number.isFinite(number)?Math.max(0,number):0;}
+function normalizeDecisionDraft(item,draft){
+  const mapValues=values=>Object.fromEntries(Object.entries(values||{}).map(([key,value])=>[key,value===''?'':nonnegativeDecisionNumber(value)]));
+  if(draft.quantities)draft.quantities=mapValues(draft.quantities);
+  if(draft.moldTargets)draft.moldTargets=mapValues(draft.moldTargets);
+  if(draft.staff)draft.staff=mapValues(draft.staff);
+  for(const key of ['value','amount'])if(Object.hasOwn(draft,key)&&draft[key]!=='')draft[key]=nonnegativeDecisionNumber(draft[key]);
+  return draft;
+}
+function initDraft(item){return normalizeDecisionDraft(item,createDecisionDraft(item));}
+function createDecisionDraft(item){
   if(decisionDrafts[item.id]){
     return decisionDrafts[item.id];
   }
@@ -958,7 +991,7 @@ function renderDecisionRow(item){
     const multi=item.type==='multi-choice';
     body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${laborCostDetail(o)}${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
-    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=item.asset?-owned:0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} ${item.recurring&&!item.material?'/ persona al mes':'c/u'}${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${laborCostDetail(o)}${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Puedes vender únicamente equipos que ya tengas de ciclos anteriores. La cantidad mínima indica cuántos puedes retirar y recibes el valor de liquidación mostrado.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} ${item.recurring&&!item.material?'/ persona al mes':'c/u'}${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${laborCostDetail(o)}${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='production-plan'){
     const plan=productionPlan();
     body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
@@ -976,6 +1009,23 @@ function renderDecisionRow(item){
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${item.type==='info'?'REGLA AUTOMÁTICA':sent?'ENVIADA · BLOQUEADA':locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
 document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty], [data-mold-target]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
+// Captura antes de los editores: el valor visible y el borrador reciben lo mismo.
+function studentNumberInput(input){return input?.matches?.('#decisionMenu input[type="number"], #simulator3d input[type="number"]');}
+function normalizeStudentNumberInput(input,final=false){
+  if(!studentNumberInput(input))return;
+  if(!input.hasAttribute('min')||Number(input.min)<0)input.min='0';
+  if(input.value===''&&!input.validity.badInput){if(final)input.value=String(Math.max(0,Number(input.min)||0));return;}
+  if(input.validity.badInput||!Number.isFinite(input.valueAsNumber)||input.valueAsNumber<0)input.value='0';
+}
+document.addEventListener('keydown',event=>{if(studentNumberInput(event.target)&&['-','−'].includes(event.key))event.preventDefault();},true);
+document.addEventListener('beforeinput',event=>{if(studentNumberInput(event.target)&&/[-−]/.test(event.data||''))event.preventDefault();},true);
+document.addEventListener('paste',event=>{
+  if(!studentNumberInput(event.target))return;
+  const text=event.clipboardData?.getData('text')?.trim().replace(/−/g,'-');
+  if(text?.startsWith('-')){event.preventDefault();event.target.value='0';event.target.dispatchEvent(new Event('input',{bubbles:true}));}
+},true);
+document.addEventListener('input',event=>normalizeStudentNumberInput(event.target),true);
+document.addEventListener('change',event=>normalizeStudentNumberInput(event.target,true),true);
 function bindDecisionControls(){
   document.querySelectorAll('[data-choice]').forEach(input=>{
     input.addEventListener('click',event=>{
@@ -1004,7 +1054,7 @@ function bindDecisionControls(){
     });
   });
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
-  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item),floor=item.asset?-getOwned(item,i.dataset.option):0;d.quantities[i.dataset.option]=Math.max(floor,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
+  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item);d.quantities[i.dataset.option]=nonnegativeDecisionNumber(i.value);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
   document.querySelectorAll('[data-mold-step]').forEach(button=>button.addEventListener('click',()=>{
     if(decisionEditingBlocked())return;const item=findDecisionItem('PRODUCCION_META'),d=initDraft(item),id=button.dataset.moldStep;
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
@@ -1032,7 +1082,7 @@ function bindDecisionControls(){
     if(range)range.value=amount;if(label)label.textContent=money(amount);updateSectionCost();
   }));
 }
-function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item),floor=item.asset?-getOwned(item,optId):0;d.quantities[optId]=Math.max(floor,(Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
+function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.quantities[optId]=nonnegativeDecisionNumber((Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
 function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.staff[store]=Math.max(0,(Number(d.staff[store])||0)+delta);renderDecisionCategory()}
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
 function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(!row)return;const cost=computeItemCost(item);row.textContent=cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja'}
@@ -1075,6 +1125,7 @@ function validateRequiredSection(cat){
 }
 // Build entries before changing state so totals and severance are stable on re-save.
 function prepareSectionSave(cat,context=decisionModelContext()){
+  for(const item of cat.items)if(context.drafts[item.id])normalizeDecisionDraft(item,context.drafts[item.id]);
   const entries={},round=context.round,model=window.SIDE_REVIEW_MODEL.section(cat,context);
   cat.items.forEach(item=>{
     if(item.type==='info')return;
@@ -1317,6 +1368,7 @@ function queueFinancialSync(){
   financialSyncTimer=setTimeout(()=>{financialSyncTimer=null;syncReportToSupabase(syncStudentReportPreview());},1500);
 }
 function syncStudentReportPreview(){
+  if(currentStudent.expulsada||localStudentExpelled())return null;
   applyEventCashEffects();
   const entries=allDecisionItems().filter(i=>savedEntry(i));
   const financial=financialReport(),er=financial.estadoResultados;
@@ -1368,7 +1420,8 @@ function showStudentSyncStatus(status,error){
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
   if(error)console.warn('SIDE: sincronización pendiente',error);
 }
-function rejectStudentSession(){
+function rejectStudentSession(error){
+  if(error?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return;}
   studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentProgressHydrated=false;studentSnapshotEpoch++;stopStudentSync();
   try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
   showScreen('profiles');showModal('studentModal');$('studentReconnectBtn')?.classList.add('hidden');message('studentMessage',JOIN_INVALID_MESSAGE,true);

@@ -24,8 +24,15 @@
     return `<small>Compra: ${money(d.salidaCompra)} = precio ${money(d.adquisicion)} + instalación ${money(d.instalacion)} + capacitación ${money(d.capacitacion)}. Mantenimiento mensual: ${money(d.mantenimientoCiclo)}. Depreciación contable mensual: ${money(d.depreciacionCiclo)}.</small>`;
   }
   function nuevasDecisiones(){return {seleccion:[],garantiaDias:null,mantenimientoPreventivo:false,marketingNivel:null,analistaCompras:false,garantiaProveedor:0,tiendasPorDistrito:{los_olivos:0,miraflores:0,sjl:0},lotes:[nuevoLote()],personal:{corte:[[0,0,0],[0,0,0],[0,0,0]],ensamble:[[0,0,0],[0,0,0],[0,0,0]],acabado:[[0,0,0],[0,0,0],[0,0,0]]},jefes:0,regimen:'MYPE',publicidad:0,montoPrestamo:0,comprasUnidades:{},maquinaria:{}};}
+  function normalizarNumeros(d){
+    const cantidades=value=>Array.isArray(value)?value.map(cantidades):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).map(([key,n])=>[key,cantidades(n)])):numero(value);
+    for(const key of ['personal','comprasUnidades','maquinaria','tiendasPorDistrito'])if(d[key])d[key]=cantidades(d[key]);
+    for(const key of ['montoPrestamo','publicidad','jefes','garantiaDias','garantiaProveedor'])if(d[key]!=null)d[key]=numero(d[key]);
+    for(const lote of d.lotes||[]){lote.cantidad=numero(lote.cantidad);lote.precio=numero(lote.precio);}
+    return d;
+  }
   function prepararDecisiones(d){
-    const out=clone(d);
+    const out=normalizarNumeros(clone(d));
     // Los planes guardados antes de congelar decisiones no reactivan campos retirados.
     out.seleccion=out.seleccion.filter(k=>cfg().DECISIONES_VISIBLES.includes(root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo));
     if(cfg().GARANTIA_MAPEO_EXACTO[out.garantiaDias])out.seleccion.push(cfg().GARANTIA_MAPEO_EXACTO[out.garantiaDias]);
@@ -79,6 +86,7 @@
     let stored=context.getState()||{},draft=Object.assign(nuevasDecisiones(),clone(stored.decisiones||{})),enabled=actual||!!stored.habilitado;
     draft.personal=root.SIDE_EXCEL_PRODUCCION.normalizarPersonal(draft.personal);
     draft.tiendasPorDistrito={los_olivos:0,miraflores:0,sjl:0,...draft.tiendasPorDistrito};
+    normalizarNumeros(draft);
     for(const [codigo,owned] of Object.entries(context.historial?.maquinariaActivos||{}))draft.maquinaria[codigo]=Math.max(numero(draft.maquinaria[codigo]),numero(owned));
     let locked=!!context.locked,confirmed=Number(stored.round)===Number(context.round)&&stored.enviado;
     const local=context.local!==false;
@@ -150,7 +158,7 @@
   function cerrarLocal({game,ciclo,reports,motorVersion}){
     motorVersion=motorVersion||reports.find(r=>r.partida===game&&r.excelDecisionState?.motor_version)?.excelDecisionState.motor_version;
     const actual=motorVersion===root.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,overrides=motorOverrides(motorVersion);
-    const participantes=reports.filter(r=>r.partida===game&&(actual||r.excelDecisionState?.habilitado)&&Number(r.excelDecisionState?.cicloActivacion??1)<=Number(ciclo));
+    const participantes=reports.filter(r=>r.partida===game&&r.estado!=='eliminada'&&(actual||r.excelDecisionState?.habilitado)&&Number(r.excelDecisionState?.cicloActivacion??1)<=Number(ciclo));
     if(!participantes.length)return null;
     const previo=leer(cierreKey(game,ciclo),null);let cierre=previo;
     if(!cierre){

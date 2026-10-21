@@ -72,6 +72,12 @@
   <div id="modalRoot" class="modal-root hidden">
     <div class="modal-backdrop"></div>
 
+    <section id="studentExpelledModal" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="studentExpelledTitle" aria-describedby="studentExpelledMessage">
+      <h2 id="studentExpelledTitle">Tu empresa fue eliminada de la partida</h2>
+      <p id="studentExpelledMessage" class="modal-lead">El profesor eliminó tu empresa por inactividad. Ya no puedes participar ni enviar decisiones en esta partida. Contacta a tu profesor si necesitas volver a participar.</p>
+      <button type="button" class="primary-gold" data-close>Volver al inicio</button>
+    </section>
+
     <section id="teacherLoginModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherLoginTitle">
       <button class="close-btn" data-close aria-label="Cerrar">×</button>
       <img src="assets/side_logo.png" class="modal-side-logo" alt="SIDE">
@@ -607,10 +613,10 @@
 <script src="vendor/supabase-js/supabase.js?v=2.117.3"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20261013-connection"></script>
-<script src="services/partida_service.js?v=20261012-presencia-podio"></script>
-<script src="services/empresa_service.js?v=20261012-presencia-podio"></script>
+<script src="services/partida_service.js?v=20261021-expulsion"></script>
+<script src="services/empresa_service.js?v=20261021-expulsion"></script>
 <script src="services/decisiones_service.js?v=20260928-secure-cas"></script>
-<script src="services/student_sync.js?v=20260930-sync-retry"></script>
+<script src="services/student_sync.js?v=20261021-expulsion"></script>
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
 <script src="js/icon_bank.js?v=20260910-2"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
@@ -623,7 +629,7 @@
 <script src="js/engine/mercado.js?v=20261011"></script>
 <script src="js/engine/ciclo.js?v=20261011"></script>
 <script src="js/engine/caja.js?v=20261011"></script>
-<script src="js/engine/ui_excel.js?v=20261011"></script>
+<script src="js/engine/ui_excel.js?v=20261021-no-negativos"></script>
 <script src="js/decision_catalog.js?v=20261011-excel"></script>
 <script src="services/credits_data.js?v=20260928-production"></script>
 <script src="js/tutorial.js?v=20261010-waiting-tutorial"></script>
@@ -647,7 +653,7 @@
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
 <script src="js/release.js"></script>
-<script src="js/app.js?v=20261020-correcciones"></script>
+<script src="js/app.js?v=20261021-no-negativos"></script>
 <script src="js/teacher_auth.js?v=20261020-correcciones"></script>
 <script src="js/company_summary.js?v=20261020-correcciones"></script>
 </body>

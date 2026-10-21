@@ -26,6 +26,11 @@ entrada siguen siendo `index.html` y `docente.html`.
 Consulta la [documentación del simulador](docs/README.md), los
 [créditos](CREDITS.md) y las [reglas de ubicación](AGENTS.md).
 
+Para que **Eliminar por inactividad** expulse a la empresa del servidor y
+notifique al estudiante, ejecuta en Supabase SQL Editor la migración
+`supabase/migrations/2026-10-21_expulsion_empresa.sql` después de la de
+correcciones del 20 de octubre. Consulta [instalación y comportamiento](docs/expulsion-empresa.md).
+
 Los archivos `output/entregas/SIDE_corregido.zip` y `.sha256` son una entrega
 anterior conservada; el ZIP no se regeneró con esta reorganización.
 

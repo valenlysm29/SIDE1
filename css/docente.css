@@ -378,4 +378,8 @@ input[aria-invalid="true"]{border-color:var(--red)}
 .pdf-loading{padding:12px;color:var(--side-text);border-left:4px solid var(--side-gold);background:var(--side-panel-raised)}
 #pdfModal .pdf-loading:not(.hidden)+iframe{height:calc(100% - 120px)}
 .teacher-release{margin-top:24px;color:var(--side-text-muted);font-size:var(--side-text-xs)}
+.expelled-company-list{margin-top:24px;padding:16px;border:1px solid var(--side-line-control);border-radius:var(--side-radius-card);background:var(--side-panel)}
+.expelled-company-list>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;font-weight:600;color:var(--side-text)}
+.expelled-company-list>summary:focus-visible{outline:3px solid var(--side-blue);outline-offset:3px}
+.company-expelled .company-status-line b{color:var(--side-danger)!important}
 @media(max-width:680px){.event-picker{padding:16px}.event-picker-toolbar{align-items:flex-start;flex-wrap:wrap}.event-picker .card-title{flex-direction:column}.event-picker .event-filter-row{grid-template-columns:1fr}.event-picker .event-mode-panel{grid-template-columns:1fr}.event-table-wrap{max-width:100%}}

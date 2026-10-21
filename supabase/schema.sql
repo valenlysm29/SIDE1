@@ -73,6 +73,7 @@ create table if not exists public.participantes (
   partida_id uuid not null references public.partidas(id) on delete cascade,
   nombre text not null,
   empresa text not null,
+  expulsada_at timestamptz,
   created_at timestamptz not null default now()
 );
 

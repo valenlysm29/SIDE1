@@ -7,7 +7,7 @@
   <title>SIDE — Panel Docente</title>
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/excel.css?v=20261011">
-  <link rel="stylesheet" href="css/docente.css?v=20261020-correcciones">
+  <link rel="stylesheet" href="css/docente.css?v=20261021-expulsion">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
   <link rel="stylesheet" href="css/faculty-theme.css?v=20261021-refinado">
 </head>
@@ -130,6 +130,11 @@
       <div class="info-banner teacher-guide">Las empresas aparecen al ingresar. La presencia y el avance se actualizan automáticamente; puedes guardar una nota o abrir sus resultados desde cada tarjeta.</div>
       <p id="companiesLiveStatus" role="status" aria-live="polite">Esperando empresas.</p>
       <div id="companiesGrid" class="company-grid"></div>
+      <details id="expelledCompanies" class="expelled-company-list hidden">
+        <summary>Empresas eliminadas (<span id="expelledCompaniesCount">0</span>)</summary>
+        <p class="hint">Estas empresas están fuera de la partida. Puedes consultar sus resultados o reactivarlas para que vuelvan a ingresar.</p>
+        <div id="companiesExpelledGrid" class="company-grid"></div>
+      </details>
     </section>
 
     <section id="tab-resultados" class="tab-panel teacher-workspace" aria-labelledby="resultsHeading">
@@ -208,8 +213,8 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20260910-2"></script>
 <script src="services/supabase_client.js?v=20261013-connection"></script>
-<script src="services/partida_service.js?v=20261012-presencia-podio"></script>
-<script src="services/empresa_service.js?v=20261012-presencia-podio"></script>
+<script src="services/partida_service.js?v=20261021-expulsion"></script>
+<script src="services/empresa_service.js?v=20261021-expulsion"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
 <script src="js/engine/config_excel.js?v=20261011"></script>
@@ -221,15 +226,15 @@
 <script src="js/engine/mercado.js?v=20261011"></script>
 <script src="js/engine/ciclo.js?v=20261011"></script>
 <script src="js/engine/caja.js?v=20261011"></script>
-<script src="js/engine/ui_excel.js?v=20261011"></script>
+<script src="js/engine/ui_excel.js?v=20261021-no-negativos"></script>
 <script src="js/decision_catalog.js?v=20261011-excel"></script>
 <script src="js/teacher_history.js?v=20260930-2"></script>
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
-<script src="js/teacher_podium.js?v=20261020-correcciones"></script>
+<script src="js/teacher_podium.js?v=20261021-expulsion"></script>
 <script src="services/teacher_sync.js?v=20261013-connection"></script>
 <script src="js/teacher_report_pdf.js?v=20261020-correcciones"></script>
 <script src="js/release.js?v=20261020"></script>
-<script src="js/docente.js?v=20261020-correcciones"></script>
+<script src="js/docente.js?v=20261021-expulsion"></script>
 </body>
 </html>

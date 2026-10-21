@@ -69,7 +69,7 @@ function renderTeacherLobby(){
   $('lobbyCode').textContent=$('gameCode').value;
   $('lobbyCountdown').textContent=r?.phase==='integration'?`El Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:`Ciclo ${state.round} · ${formatStudentTime(state.seconds)}`;
   $('lobbyNext').textContent=state.authoritative?.cycleCloseMode==='manual'?'El Ciclo 1 inicia automáticamente; tú controlas el cierre de cada ciclo.':'El Ciclo 1 inicia automáticamente; los ciclos avanzan según la programación.';
-  const companies=state.reports.filter(x=>x.fuente==='supabase'),container=$('lobbyCompanies');
+  const companies=state.reports.filter(x=>x.fuente==='supabase'&&x.estado!=='eliminada'),container=$('lobbyCompanies');
   if(!companies.length){
     const empty='Esperando empresas. Comparte el código para que ingresen.';
     if(container.textContent!==empty)container.textContent=empty;
@@ -792,7 +792,7 @@ async function supabaseReports(reportsBase=state.reports){
       flujoCaja:financial?.flujoCaja||rep?.flujo_caja||(!rep?local?.flujoCaja:null)||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),
-      estado:local?.estado||'activa',tomandoDecisiones:!!local?.tomandoDecisiones,
+      estado:p.expulsada_at?'eliminada':'activa',expulsadaAt:p.expulsada_at||null,tomandoDecisiones:!p.expulsada_at&&!!local?.tomandoDecisiones,
       conectada:Boolean(p.last_seen_at),lastSeenAt:p.last_seen_at||null,integracion:runtime()?.phase==='integration',
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
@@ -836,6 +836,7 @@ function companyPresence(r){
   return presenceTracker.get(companyPresenceKey(r));
 }
 function companyActivity(r,presence){
+  if(r.estado==='eliminada')return 'ELIMINADA POR INACTIVIDAD · FUERA DE LA PARTIDA';
   if(podiumOptions().finished)return 'PARTICIPACIÓN FINALIZADA';
   if(presence==='online')return r.integracion?'CONECTADA · EN SALA DE ESPERA':r.tomandoDecisiones?'CONECTADA · TOMANDO DECISIONES':'CONECTADA · EN PARTIDA';
   return presence==='idle'?'SIN ACTIVIDAD RECIENTE':'REGISTRADA · PRESENCIA SIN CONFIRMAR';
@@ -894,10 +895,13 @@ function saveCompanyGrade(id,value){
   renderCompanies();renderResults();renderWinnerSelect();return true;
 }
 function renderCompanies(force=false){
-  if($('companiesLiveStatus'))$('companiesLiveStatus').textContent=`${state.reports.length} empresa(s) registrada(s) · ${rosterSyncError?'Sincronización pendiente; mostrando los últimos datos. Reintentando…':'actualización automática cada 3 segundos'}`;
+  if($('companiesLiveStatus'))$('companiesLiveStatus').textContent=`${state.reports.filter(r=>r.estado!=='eliminada').length} empresa(s) en partida · ${state.reports.filter(r=>r.estado==='eliminada').length} eliminada(s) · ${rosterSyncError?'Sincronización pendiente; mostrando los últimos datos. Reintentando…':'actualización automática cada 3 segundos'}`;
   const grid=$('companiesGrid');
-  const current=new Map([...grid.querySelectorAll('[data-company-id]')].map(card=>[card.dataset.companyId,card]));
-  if(!state.reports.length){if(grid.textContent!=='Aún no hay empresas reportadas en esta partida.')grid.innerHTML='<div class="card">Aún no hay empresas reportadas en esta partida.</div>';return;}
+  const expelledGrid=$('companiesExpelledGrid'),expelledCount=state.reports.filter(r=>r.estado==='eliminada').length;
+  $('expelledCompanies')?.classList.toggle('hidden',!expelledCount);
+  if($('expelledCompaniesCount'))$('expelledCompaniesCount').textContent=expelledCount;
+  const current=new Map([...grid.querySelectorAll('[data-company-id]'),...(expelledGrid?.querySelectorAll('[data-company-id]')||[])].map(card=>[card.dataset.companyId,card]));
+  if(!state.reports.length){if(grid.textContent!=='Aún no hay empresas reportadas en esta partida.')grid.innerHTML='<div class="card">Aún no hay empresas reportadas en esta partida.</div>';expelledGrid?.replaceChildren();return;}
   grid.querySelector('.card:not([data-company-id])')?.remove();
   for(const [i,r] of state.reports.entries()){
     const key=companyNodeKey(r);let card=current.get(key);
@@ -916,14 +920,16 @@ function renderCompanies(force=false){
       });
       input.addEventListener('change',()=>{if(input.value!==''&&Number.isFinite(Number(input.value))){const original=Number(input.value);input.value=Math.max(0,Math.min(20,original));input.setCustomValidity('');input.setAttribute('aria-invalid','false');if(original!==Number(input.value)){form.querySelector('[data-grade-status]').textContent='Nota ajustada al rango de 0 a 20. Guarda para confirmar.';toast('La nota se ajustó al rango de 0 a 20.');}}});
       form.addEventListener('submit',event=>{event.preventDefault();if(saveCompanyGrade(card.dataset.reportId,input.value))input.dataset.dirty='';});
-      grid.appendChild(card);
     }
+    const destination=r.estado==='eliminada'&&expelledGrid?expelledGrid:grid;
+    if(card.parentElement!==destination)destination.appendChild(card);
     card.dataset.reportId=r.id;
     card.querySelector('[data-grade-form]').dataset.gradeForm=r.id;
     card.querySelector('[data-view-results]').dataset.viewResults=r.id;
     current.delete(key);
     const setText=(field,value)=>{const el=card.querySelector(`[data-field="${field}"]`);if(el.textContent!==value)el.textContent=value;};
-    const presence=companyPresence(r);
+    const presence=r.estado==='eliminada'?'idle':companyPresence(r);
+    card.classList.toggle('company-expelled',r.estado==='eliminada');
     card.querySelector('.live-dot').classList.toggle('online',presence==='online');
     card.querySelector('.live-dot').classList.toggle('idle',presence!=='online');
     setText('presence',companyActivity(r,presence));
@@ -935,12 +941,43 @@ function renderCompanies(force=false){
     const input=card.querySelector('[data-grade]'),value=gradeValue(r);
     if(document.activeElement!==input&&input.dataset.dirty!=='true'&&input.value!==String(value??''))input.value=value??'';
     const status=gradeStatus(gradeKey(r)),statusEl=card.querySelector('[data-grade-status]');if(statusEl.textContent!==status)statusEl.textContent=status;
-    const eliminate=card.querySelector('[data-eliminate]'),label=r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad';if(eliminate.textContent!==label)eliminate.textContent=label;
+    const busy=eliminationPending.has(`${state.partidaId||$('gameCode').value}:${key}`);
+    const eliminate=card.querySelector('[data-eliminate]'),label=busy?'Confirmando…':r.estado==='eliminada'?'Reactivar empresa':'Eliminar por inactividad';if(eliminate.textContent!==label)eliminate.textContent=label;
+    eliminate.disabled=busy;eliminate.setAttribute('aria-busy',String(busy));
     eliminate.classList.toggle('hidden',podiumOptions().finished);
   }
   for(const card of current.values())card.remove();
+  if(!state.reports.some(r=>r.estado!=='eliminada'))grid.innerHTML='<div class="card">No hay empresas activas en la partida.</div>';
 }
-function toggleElimination(i){const r=state.reports[i];if(!r)return;r.estado=r.estado==='eliminada'?'activa':'eliminada';persistReports();renderCompanies();renderResults();renderWinnerSelect();toast(r.empresa+(r.estado==='eliminada'?' fue marcada como eliminada.':' fue reactivada.'))}
+const eliminationPending=new Set();
+async function toggleElimination(i){
+  const r=state.reports[i];if(!r||podiumOptions().finished)return false;
+  const partidaId=state.partidaId,generation=roomGeneration,key=companyNodeKey(r),code=$('gameCode').value;
+  const pendingKey=`${partidaId||code}:${key}`,expulsar=r.estado!=='eliminada';
+  if(eliminationPending.has(pendingKey))return false;
+  eliminationPending.add(pendingKey);renderCompanies();
+  try{
+    let expulsadaAt=expulsar?new Date().toISOString():null;
+    if(partidaId||r.empresaId||r.fuente==='supabase'){
+      const response=await window.SIDE.PartidaService.expulsarEmpresa(partidaId,r.empresaId,expulsar);
+      if(generation!==roomGeneration||partidaId!==state.partidaId)return false;
+      if(!response?.success){toast(response?.error||'No se pudo confirmar el cambio de participación.','error');return false;}
+      expulsadaAt=response.data.expulsada_at;
+    }else{
+      const exclusions=JSON.parse(localStorage.getItem('SIDE_COMPANY_EXCLUSIONS')||'{}');
+      if(expulsar)exclusions[`${code}_${r.empresa}`]=true;else delete exclusions[`${code}_${r.empresa}`];
+      localStorage.setItem('SIDE_COMPANY_EXCLUSIONS',JSON.stringify(exclusions));
+    }
+    // Una actualización en vivo puede haber reemplazado el objeto del reporte.
+    const current=state.reports.find(x=>companyNodeKey(x)===key);
+    if(current){current.estado=expulsadaAt?'eliminada':'activa';current.expulsadaAt=expulsadaAt;if(expulsadaAt)current.tomandoDecisiones=false;}
+    persistReports();renderResults();renderWinnerSelect();renderTeacherLobby();
+    if(expulsadaAt&&$('expelledCompanies'))$('expelledCompanies').open=true;
+    toast(r.empresa+(expulsadaAt?' fue eliminada de la partida.':' fue reactivada.'));
+    return true;
+  }catch(error){toast(error?.message||'No se pudo confirmar el cambio de participación.','error');return false;}
+  finally{eliminationPending.delete(pendingKey);if(generation===roomGeneration)renderCompanies();}
+}
 function persistReports(){localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(state.reports))}
 
 function eventReportTable(r){const events=r.eventos||[];if(!events.length)return '<p class="hint">Sin eventos reportados.</p>';return `<div class="mini-event-report"><div class="mini-event-head"><span>Descripción</span><span>Afectados</span><span>Ciclos</span><span>Implicancia</span><span>Ocurrencia</span></div>${events.map(e=>`<div><span><b>${escapeHtml(e.titulo||'Evento')}</b><small>${escapeHtml(e.descripcion||'')}</small></span><span>${escapeHtml(e.afectados||'')}</span><span>${escapeHtml(e.cicloAfecta||String(e.ciclos||1))}</span><span>${escapeHtml(e.implicancia||'')}</span><span>${Number(e.ocurrencia||0)}%</span></div>`).join('')}</div>`}
@@ -952,7 +989,7 @@ function teacherFinancialDetail(r){
 }
 function renderResults(){
   const active=state.reports.filter(r=>r.estado!=='eliminada'),totalProfit=active.reduce((s,r)=>s+Number(r.utilidad||0),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
-  $('resultStats').innerHTML=[['Empresas',state.reports.length],['Calificadas',graded.length],['Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+  $('resultStats').innerHTML=[['Empresas en partida',active.length],['Calificadas',graded.length],['Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
   const sel=$('resultCompanySelect');
   const selected=state.reports.find(r=>r.id===state.resultCompanyId)||state.reports[0];
   if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}

@@ -78,7 +78,10 @@
                 let remote;
                 try{remote=await readSnapshot(copy(job.identity));}catch(readError){remote={success:false,error:readError};}
                 if(!active())return false;
-                if(!remote?.success){mergeNewer(job);onStatus('pending',remote);return false;}
+                if(!remote?.success){
+                  if(remote?.code==='EMPRESA_EXPULSADA'&&!remote.technical){discard(c.identityKey,true);onStatus('rejected',remote);onRejected(remote);return false;}
+                  mergeNewer(job);onStatus('pending',remote);return false;
+                }
                 const revision=Number(remote.data?.snapshot_revision);
                 if(revision===job.expectedRevision+1&&remote.data?.snapshot&&snapshotSignature(remote.data.snapshot)===snapshotSignature(job.snapshot)){
                   job.snapshotSaved=true;job.expectedRevision=revision;
@@ -87,8 +90,8 @@
                 }
               }
               discard(c.identityKey,true);onStatus('conflict',error);await onConflict();
-            }else if(error?.code==='CREDENCIALES_INVALIDAS'&&!error.technical){
-              discard(c.identityKey,true);onStatus('rejected',error);onRejected();
+            }else if(['CREDENCIALES_INVALIDAS','EMPRESA_EXPULSADA'].includes(error?.code)&&!error.technical){
+              discard(c.identityKey,true);onStatus('rejected',error);onRejected(error);
             }else{mergeNewer(job);onStatus('pending',error);}
             return false;
           }
