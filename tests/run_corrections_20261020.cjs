@@ -10,7 +10,7 @@ const baseline=process.argv.includes('--baseline')?path.join(root,'.codex-work/c
 fs.mkdirSync(out,{recursive:true});
 const inventory=JSON.parse(spawnSync(process.execPath,['tests/run_integral.cjs','--list','--no-fps'],{cwd:root,encoding:'utf8'}).stdout);
 const jobs=inventory.suites.filter(s=>s.kind!=='node'&&!s.optional).map(s=>({name:s.name,args:['tests/'+s.name],timeout:s.timeout}));
-for(const name of ['access_corrections_20261020_db','excel_sql_db','excel_sql_activacion_db','sim_1','sim_2','sim_3','transicion_excel_browser','engine_corrections_20261020_browser'])jobs.push({name:name+'.cjs',args:['tests/'+name+'.cjs'],timeout:480000});
+for(const name of ['access_corrections_20261020_db','access_corrections_20261020_browser','podio_programado_db','podio_programado_ui','excel_sql_db','excel_sql_activacion_db','sim_1','sim_2','sim_3','transicion_excel_browser','engine_corrections_20261020_browser'])jobs.push({name:name+'.cjs',args:['tests/'+name+'.cjs'],timeout:480000});
 const only=process.argv.find(x=>x.startsWith('--only='))?.slice(7).split(',');
 const mime={'.html':'text/html','.js':'application/javascript','.mjs':'application/javascript','.css':'text/css','.json':'application/json','.wasm':'application/wasm','.glb':'model/gltf-binary','.png':'image/png','.svg':'image/svg+xml','.jpg':'image/jpeg','.webp':'image/webp'};
 const server=http.createServer((req,res)=>{
