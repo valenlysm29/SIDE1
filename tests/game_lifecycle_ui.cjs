@@ -18,7 +18,9 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  async function teacher(){
   const p=await page(teacherHTML);
   await p.exposeFunction('dbCreate',async c=>{
-    const created=await createGame(db,c);
+    // Este escenario prueba el ciclo heredado; el motor nuevo dispone de las
+    // simulaciones canónicas independientes y necesita confirmar su plan.
+    const created=await createGame(db,{...c,motor_version:'excel-16'});
     return rpc(db,'controlar_partida',{p_partida_id:created.id,p_accion:'sincronizar',p_config:null,p_expected_round:null});
   });
   await p.exposeFunction('dbCancel',id=>rpc(db,'cancelar_partida',{p_partida_id:id}));

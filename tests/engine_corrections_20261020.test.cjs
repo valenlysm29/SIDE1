@@ -69,6 +69,14 @@ test('Editor nuevo no contiene casilla optativa y valida compras obligatorias',(
  assert.doesNotMatch(container.innerHTML,/data-excel-enable/);assert.match(container.innerHTML,/24 días productivos/);assert.match(container.innerHTML,/12 ciclos mensuales/);assert.match(container.innerHTML,/1,800/);
  const d=plan();assert.equal(b.SIDE_EXCEL_UI.validar(d,C.MOTOR_ACTUAL),'');delete d.maquinaria.mesa;assert.match(b.SIDE_EXCEL_UI.validar(d,C.MOTOR_ACTUAL),/mesa/);d.maquinaria.mesa=1;delete d.maquinaria['INF-08'];assert.match(b.SIDE_EXCEL_UI.validar(d,C.MOTOR_ACTUAL),/molde/);
 });
+
+test('Editor remoto nuevo bloquea confirmación hasta que el servidor sea compatible',()=>{
+ const b=browser(),container={innerHTML:'',querySelectorAll:()=>[],querySelector:()=>null};
+ b.SIDE_EXCEL_UI.mountEditor(container,{round:1,motorVersion:C.MOTOR_ACTUAL,local:false,remoteReady:false,getState:()=>({}),save:()=>{}});
+ assert.match(container.innerHTML,/data-excel-enviar[^>]*disabled/);
+ assert.match(container.innerHTML,/Consulta a tu docente/);
+ assert.doesNotMatch(container.innerHTML,/supabase\/migrations/);
+});
 test('Cierre local nuevo incluye empresas sin estado, autoenvía y es idempotente',()=>{
  const b=browser(),reports=[{id:'A',partida:'TEST',capital:100000},{id:'B',partida:'TEST',capital:100000,excelDecisionState:{habilitado:true,round:1,enviado:false,decisiones:plan()}}];
  const first=b.SIDE_EXCEL_UI.cerrarLocal({game:'TEST',ciclo:1,reports,motorVersion:C.MOTOR_ACTUAL});assert.equal(Object.keys(first.resultadosPorEmpresa).length,2);assert.equal(reports[1].excelDecisionState.enviosAutomaticos[1],true);

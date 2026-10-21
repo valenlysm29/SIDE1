@@ -975,7 +975,7 @@ async function closeExcelRemoteRound(ciclo){
   const service=window.SIDE?.PartidaService;if(!service?.cerrarExcel)return false;
   const response=await service.cerrarExcel(state.partidaId,ciclo,state.authoritative?.motor_version?{VERSION:state.authoritative.motor_version}:{});
   if(!response.success){
-    if(response.migrationMissing&&!state.reports.some(r=>r.excelDecisionState?.habilitado||r.estadoResultados?.excel))return true;
+    if(response.migrationMissing&&state.authoritative?.motor_version!==window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL&&!state.reports.some(r=>r.excelDecisionState?.habilitado||r.estadoResultados?.excel))return true;
     toast(response.migrationMissing?'Aplica supabase/migrations/2026-10-11_logica_excel.sql para cerrar las empresas por lotes.':response.error||'No se pudo guardar el cierre.');
     const status=$('roundState');if(status){status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;let retry=$('retryExcelClosure');if(!retry){retry=document.createElement('button');retry.id='retryExcelClosure';retry.type='button';retry.className='side-button';retry.textContent='Reintentar cierre';status.insertAdjacentElement('afterend',retry);}retry.onclick=async()=>{retry.disabled=true;try{await refreshTeacherGame();}finally{retry.disabled=false;}};}
     return false;
