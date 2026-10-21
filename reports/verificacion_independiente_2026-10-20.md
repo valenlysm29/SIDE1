@@ -43,7 +43,7 @@ Evidencia: `tests/output/correcciones-2026-10-20/independiente/{verification,tea
 | 22 | Verificado | 45 identidades de reconciliación de caja. |
 | 23 | Verificado | 45 balances con efectivo y activo/deuda/patrimonio reconciliados. |
 | 24 | Verificado | Operación/inversión/financiamiento suman variación de caja. |
-| 25 | Verificado | Carga PDF con indicador/aria-busy; controles recuperados al terminar. Generación real PDF se cubre en runner existente de raíz. |
+| 25 | Verificado | Carga PDF con indicador/aria-busy; controles recuperados al terminar. Generación real PDF verificada en recheck/teacher_report_pdf_ui.cjs.log (descarga y visor reales). |
 | 26 | Verificado | Ausencia conserva Sin datos en panel y mapeo PDF; cero explícito no se pierde. |
 | 27 | Inspección + DOM | Nombre común Simulador de Decisiones Financieras. |
 | 28 | Verificado | Sin datos suficientes cuando puntajes están en cero. |
@@ -119,7 +119,7 @@ Evidencia: `tests/output/correcciones-2026-10-20/independiente/{verification,tea
 
 ## Último punto de control
 
-El runtime3D real, el recorrido corregido, las tres misiones por marca de visita y el Resumen con alquiler se completaron en verde antes del ajuste final de intro colapsada. La última repetición de captura de esa intro se interrumpió por contención general de OneDrive/Chromium, a petición del orquestador. **Pendiente solamente repetir esa captura/altura sobre css/excel.css y ui_excel.js finales**; no se extrapola el resultado visual anterior a ese ajuste. Las simulaciones completas no se repitieron porque este ajuste es exclusivamente de presentación.
+La repetición secuencial final completó **22/22 comprobaciones**: cinco tamaños sin desborde y área útil ≥60%, Resumen usando motor actual con alquiler de Los Olivos S/1.800, entrada real 3D, recorrido explícito sin cargos duplicados y tres misiones de visita alcanzables. `visual-runtime.json` terminó el 20/10 a las 19:25:48 de Lima, sin errores JavaScript ni failure. La ayuda Cómo se cierra el ciclo está colapsada por defecto en el HTML generado; el runner abre los details para inspeccionar los controles en las capturas. **La pendiente visual anterior queda cerrada.**
 
 ## Revisión independiente del bloqueo de despliegue
 
@@ -133,4 +133,81 @@ Corrección `3d8a675` validada por inspección y cinco casos independientes en V
 - Motor heredado con empresa ya habilitada por lotes + RPC faltante: **false**.
 - Error de cierre distinto de migración, aun heredado sin reportes: **false**.
 
-El gate de características bloquea los controles canónicos remotos si el servidor no anuncia el motor correspondiente. La migración anuncia características dentro de una transacción: un fallo de prerrequisitos revierte también ese anuncio. Recuperar un cierre ya persistido sigue siendo idempotente. La validación visual final de la intro colapsada permanece a cargo de la ejecución secuencial del orquestador; esta revisión no ejecutó Chromium ni repitió simulaciones.
+El gate de características bloquea los controles canónicos remotos si el servidor no anuncia el motor correspondiente. La migración anuncia características dentro de una transacción: un fallo de prerrequisitos revierte también ese anuncio. Recuperar un cierre ya persistido sigue siendo idempotente. La ejecución visual secuencial final quedó posteriormente completada, como registra el punto de control anterior. La revisión del gate no ejecutó Chromium ni repitió simulaciones.
+
+
+## Auditoría final consolidada — lectura de evidencia
+
+No se repitieron pruebas ni se abrió navegador en esta auditoría. Se consolidó por nombre de suite, usando la última ejecución de integral → recheck → final-repaired, sin sumar reintentos como pruebas diferentes.
+
+| Ejecución | Suites | Pasan | Fallan |
+|---|---:|---:|---:|
+| integral | 38 | 30 | 8 |
+| recheck | 11 | 7 | 4 |
+| final-repaired | 3 | 3 | 0 |
+| Consolidado por nombre | **41** | **40** | **1 preexistente** |
+
+La batería Node final en `final-node-sequential.log` contiene **465 pruebas, 465 pasan, 0 fallan, 0 canceladas, 0 omitidas**. La paridad Excel conserva **3104 comparaciones**, descompuestas en 351 + 468 + 585 + 1140 + 252 + 252 + 28 + 28. Las cinco salidas paridad pipeline registran cero diferencias; las tablas base/consecuencias son concordantes.
+
+### Última ejecución por suite
+
+| Suite | Última ejecución | Resultado |
+|---|---|---|
+| `local_server_test.py` | integral | PASS |
+| `decision_options_db.cjs` | integral | PASS |
+| `student_admission_db.cjs` | integral | PASS |
+| `student_admission_matrix_db.cjs` | integral | PASS |
+| `teacher_history_db.cjs` | integral | PASS |
+| `game_lifecycle_db.cjs` | integral | PASS |
+| `game_observations_db.cjs` | integral | PASS |
+| `waiting_room_db.cjs` | integral | PASS |
+| `playable_hub.cjs` | integral | PASS |
+| `continuous_world.cjs` | integral | PASS |
+| `gameplay_hud.cjs` | integral | PASS |
+| `world_business_ui.cjs` | integral | PASS |
+| `world_cycle_restart.cjs` | recheck | PASS |
+| `world_startup.cjs` | final-repaired | PASS |
+| `world_loading.cjs` | integral | PASS |
+| `world_entry_assets.cjs` | recheck | PASS |
+| `supplied_npcs.cjs` | recheck | FALLO PREEXISTENTE DEMOSTRADO |
+| `mona_npc.cjs` | integral | PASS |
+| `npc_locomotion.cjs` | integral | PASS |
+| `game_lifecycle_ui.cjs` | final-repaired | PASS |
+| `decisions_cycle_ui.cjs` | final-repaired | PASS |
+| `teacher_lifecycle_ui.cjs` | recheck | PASS |
+| `tablet_return_browser.cjs` | integral | PASS |
+| `npc_world_fixes_browser.cjs` | integral | PASS |
+| `world_orientation_mobile.cjs` | integral | PASS |
+| `teacher_history_ui.cjs` | integral | PASS |
+| `teacher_report_pdf_ui.cjs` | recheck | PASS |
+| `character_selection_ui.cjs` | integral | PASS |
+| `decision_interiors_browser.cjs` | integral | PASS |
+| `npc_navmesh_browser.cjs` | integral | PASS |
+| `access_corrections_20261020_db.cjs` | integral | PASS |
+| `excel_sql_db.cjs` | integral | PASS |
+| `excel_sql_activacion_db.cjs` | integral | PASS |
+| `sim_1.cjs` | integral | PASS |
+| `sim_2.cjs` | integral | PASS |
+| `sim_3.cjs` | integral | PASS |
+| `transicion_excel_browser.cjs` | integral | PASS |
+| `engine_corrections_20261020_browser.cjs` | integral | PASS |
+| `access_corrections_20261020_browser.cjs` | recheck | PASS |
+| `podio_programado_db.cjs` | recheck | PASS |
+| `podio_programado_ui.cjs` | recheck | PASS |
+
+### Excepción preexistente demostrada
+
+`supplied_npcs.cjs` falla tanto en el código actual (recheck) como en la base aislada **d1c83f3** (base-proof), con el mismo mensaje y línea: **AssertionError: customers complete a decision**, línea **136**, actual=false/expected=true, después de PASS NPC world supplied player assets with procedural city NPCs. Ninguna de las dos ejecuciones agotó el timeout del runner. No se presenta esta suite como verde ni se atribuye su fallo a las correcciones.
+
+El antiguo fallo de `teacher_lifecycle_ui.cjs` también se reprodujo en la base (esperaba /24 horas/i y recibió VISTA PREVIA); su runner actualizado ya pasa en recheck. El único fallo vigente del consolidado es supplied_npcs.
+
+### Evidencia adicional comprobada
+
+- **Automático:** final-repaired/game_lifecycle_ui.cjs.log confirma cuenta regresiva de servidor, recarga, desfase de reloj, varios clientes, rechazo tardío y reingreso exacto en otro dispositivo; sin errores JS.
+- **Móvil:** ese mismo log cubre calificaciones/presencia móviles; recheck/teacher_lifecycle_ui.cjs.log confirma estado fijo en cinco tamaños. La verificación visual independiente conserva sus cinco tamaños de escritorio/móvil.
+- **Podio programado:** recheck/podio_programado_ui.cjs.log registra publicación automática real de **1 minuto**, con navegador docente cerrado; límites inválidos, cancelar, reprogramar, publicar ahora y caducidad de24h pasan.
+- **3D:** independiente/visual-runtime.json conserva **22 checks**, entered=true, guided=true, hasArcadeMission=false, ledgerBefore=ledgerAfter={}, errores JS=[] y cierre temporal final.
+- **PDF real:** recheck/teacher_report_pdf_ui.cjs.log confirma descarga/visor reales, exclusión de eliminadas, limpieza URL, lista vacía, ausencia de SDK, nombres largos,48eventos, datos faltantes y nota0. Existen button-download.pdf y stress.pdf con páginas renderizadas en tests/output/teacher-pdf/.
+- **Simulaciones nuevas:**442checks, tres SIM × tres ciclos × cinco empresas =45resultados empresariales; reporter39y estudiante19 permanecen completos.
+
+**Dictamen:** apto para push conforme a la excepción autorizada para el fallo NPC preexistente demostrado. No quedan fallos nuevos ni pendientes de ejecución local en esta consolidación. El dictamen no aplica SQL remoto ni confirma todavía la versión publicada: publicación, comprobación de release compartida y ejecución manual de SQL siguen siendo pasos de despliegue del orquestador/usuario.
