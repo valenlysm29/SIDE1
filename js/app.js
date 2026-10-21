@@ -921,7 +921,7 @@ function importExcelPersonnel(){
 async function mountExcelProductionEditor(){
   const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
   const canonical=usesCanonicalMotor(),local=!currentStudent.empresaId;let remoteReady=local;
-  if(!local){container.textContent='Comprobando el modelo por lotes…';const status=await window.SIDE?.PartidaService?.excelDisponible?.();remoteReady=!!status?.available;if(!container.isConnected)return;}
+  if(!local){container.textContent='Comprobando la disponibilidad de la partida…';const status=await window.SIDE?.PartidaService?.excelDisponible?.();remoteReady=!!status?.available&&(!canonical||status.motorVersion===window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL);if(!container.isConnected)return;}
   const legacyMoved=!canonical&&!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());

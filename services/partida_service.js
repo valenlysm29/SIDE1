@@ -346,7 +346,7 @@
   }
   async function excelDisponible(){
     const sb=client();if(!sb)return {success:false,available:false,offline:true};
-    try{const {data,error}=await sb.rpc('side_excel_features');return {success:!error,available:!error&&data?.cierreVersion===1,error:error?.message,migrationMissing:/PGRST202|42883/.test(error?.code||'')};}catch(error){return {success:false,available:false,error:error.message};}
+    try{const {data,error}=await sb.rpc('side_excel_features');return {success:!error,available:!error&&data?.cierreVersion===1,motorVersion:data?.motorVersion,error:error?.message,migrationMissing:/PGRST202|42883/.test(error?.code||'')};}catch(error){return {success:false,available:false,error:error.message};}
   }
   /** Calcula con el mismo motor puro que el cierre local. El CAS de contexto
    * evita persistir si un estudiante confirmó o modificó su plan entre lecturas. */
@@ -354,6 +354,7 @@
     const sb=client();if(!sb)return offline();
     const ctx=await contextoExcel(partidaId,ciclo);if(!ctx.success)return ctx;
     if(ctx.data.cierre)return {success:true,data:ctx.data.cierre,reused:true};
+    if(overrides.VERSION===global.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL&&ctx.data.motor_version!==overrides.VERSION)return {success:false,code:'MIGRACION_PENDIENTE',error:'La partida requiere una actualización antes de cerrar con las reglas nuevas. Consulta la guía de actualización.'};
     if(!ctx.data.empresas?.length)return {success:true,data:null};
     try{
       const d=ctx.data,decisionesPorEmpresa={},borradoresPorEmpresa={};

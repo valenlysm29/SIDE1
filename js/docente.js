@@ -973,7 +973,7 @@ function closeExcelLocalRound(){
 async function closeExcelRemoteRound(ciclo){
   if(!state.partidaId)return true;
   const service=window.SIDE?.PartidaService;if(!service?.cerrarExcel)return false;
-  const response=await service.cerrarExcel(state.partidaId,ciclo);
+  const response=await service.cerrarExcel(state.partidaId,ciclo,state.authoritative?.motor_version?{VERSION:state.authoritative.motor_version}:{});
   if(!response.success){
     if(response.migrationMissing&&!state.reports.some(r=>r.excelDecisionState?.habilitado||r.estadoResultados?.excel))return true;
     toast(response.migrationMissing?'Aplica supabase/migrations/2026-10-11_logica_excel.sql para cerrar las empresas por lotes.':response.error||'No se pudo guardar el cierre.');

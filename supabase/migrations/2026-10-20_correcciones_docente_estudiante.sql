@@ -5,6 +5,10 @@
 -- 2026-10-11_logica_excel; 2026-10-12_podio_programado.
 -- Repetible. Preserva motor, identidades, capital e historial de partidas existentes.
 begin;
+create or replace function public.side_excel_features() returns jsonb language sql stable as $$
+ select jsonb_build_object('cierreVersion',1,'motorVersion','side-lotes-2026-10-20','correccionesVersion',20261020);
+$$;
+grant execute on function public.side_excel_features() to anon,authenticated;
 do $$ begin
  if to_regprocedure('public.unirse_partida_por_codigo(text,text,text)') is null
  or to_regprocedure('public.side_contexto_cierre_excel(uuid,integer)') is null
