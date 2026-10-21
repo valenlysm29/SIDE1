@@ -3,7 +3,9 @@
 // conserva su log; no se oculta un fallo aunque una suite posterior pase.
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {spawn,spawnSync}=require('node:child_process');
-const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/correcciones-2026-10-20/integral');
+const label=process.argv.find(x=>x.startsWith('--label='))?.slice(8)||'integral';
+if(!/^[a-z0-9-]+$/.test(label))throw new Error('Etiqueta de ejecución inválida');
+const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/correcciones-2026-10-20',label);
 fs.mkdirSync(out,{recursive:true});
 const inventory=JSON.parse(spawnSync(process.execPath,['tests/run_integral.cjs','--list','--no-fps'],{cwd:root,encoding:'utf8'}).stdout);
 const jobs=inventory.suites.filter(s=>s.kind!=='node'&&!s.optional).map(s=>({name:s.name,args:['tests/'+s.name],timeout:s.timeout}));
