@@ -6,6 +6,13 @@ Codex no ejecutó SQL en producción. El archivo de esta entrega es
 `supabase/migrations/2026-10-20_correcciones_docente_estudiante.sql`.
 Es idempotente y se comprobó dos veces en PostgreSQL local con PGlite.
 
+**Orden de activación:** publica primero esta entrega del sitio y comprueba
+la versión `2026.10.20.1` en ambas páginas; después aplica el SQL. Hasta ese
+momento el cliente nuevo bloquea las reglas nuevas sin alterar las partidas
+anteriores. No apliques esta migración de manera aislada con el sitio anterior
+todavía publicado. Si la entrega permanece solo en commits locales, espera
+al despliegue para ejecutar el SQL de producción.
+
 1. Guarda un respaldo de la base y confirma que están instaladas las migraciones anteriores de ciclo de partida e ingreso, `20261009_sala_espera_identidad_exacta.sql`, `2026-10-11_fix_crear_partida.sql`, `2026-10-12_salas_codigo.sql`, `2026-10-12_codigo_corto.sql`, `2026-10-11_logica_excel.sql` y `2026-10-12_podio_programado.sql`. No repitas migraciones antiguas encima de esta entrega; podrían reemplazar las protecciones nuevas. Si falta alguna, instálala en el orden indicado antes de esta entrega.
 2. Ejecuta **una sola vez el archivo completo de esta entrega**, como administrador en el editor SQL. Contiene una transacción y comprueba prerrequisitos antes de aplicar cambios. Puede reejecutarse de manera segura.
 3. Comprueba:
