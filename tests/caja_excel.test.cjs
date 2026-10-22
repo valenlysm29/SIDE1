@@ -5,6 +5,17 @@ const {cerrarCiclo}=require('../js/engine/ciclo.js');
 const {decision}=require('./escenarios_excel.cjs');
 const cerca=(a,b)=>assert.ok(Math.abs(a-b)<1e-9*Math.max(1,Math.abs(b)),`${a} != ${b}`);
 function ejecutar(d,h={},base=100000){const c=cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:d},historialPorEmpresa:h,ciclo:(h.A?.ultimoCiclo||0)+1});return adjuntarCaja(c,{capitalPorEmpresa:{A:100000},baseCajaPorEmpresa:{A:base},historialAnterior:h});}
+
+test('Cierres conservan ingresos y estados de cada ciclo sin anidar el historial',()=>{
+ const first=ejecutar(decision()),second=ejecutar(decision(),first.historialPorEmpresa);
+ const history=second.historialPorEmpresa.A.financialHistory;
+ assert.deepEqual(history.map(row=>row.round),[1,2]);
+ assert.ok(history.every(row=>row.estadoResultados.ingresos>0));
+ assert.ok(history.every(row=>!row.history));
+ assert.equal(history[0].balanceCaja.cajaFinal,history[1].balanceCaja.cajaInicial);
+ assert.deepEqual(second.resultadosPorEmpresa.A.financial.history,history);
+ assert.equal(first.historialPorEmpresa.A.financialHistory.length,1);
+});
 test('Caja paga compra MP una vez, no vuelve a cobrar consumo ni depreciación',()=>{
  const d=decision({maquinaria:{mesa:1,'INF-02':1}}),one=ejecutar(d),r=one.resultadosPorEmpresa.A,f=r.financial;
  const compraActivos=r.costos.detalles.maquinaria.reduce((sum,x)=>sum+x.salidaCompra*x.cantidad,0);

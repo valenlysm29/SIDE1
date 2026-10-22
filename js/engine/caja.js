@@ -67,7 +67,10 @@
       const balanceGeneral={efectivo:cajaFinal,activosFijos,inventarioMP,activos:cajaFinal+activosFijos+inventarioMP,deuda,patrimonio:cajaFinal+activosFijos+inventarioMP-deuda,pasivoPatrimonio:cajaFinal+activosFijos+inventarioMP};
       r.libroMovimientos=libro;
       r.financial={estadoResultados,balanceCaja:{cajaInicial,entradas:cfg.NUEVO_MODELO?resumen.entradas:r.ingresos+prestamos,salidas:cfg.NUEVO_MODELO?resumen.salidas:pagosOperacion+comprasActivos,cajaFinal},flujoCaja,balanceGeneral,financiamiento:{...r.financiamiento,tasaMensual,intereses}};
-      Object.assign(out.historialPorEmpresa[id],{cajaFinal,activosCosto,depreciacionAcumulada:depAcumulada,maquinariaActivos:conservada,tasaMensualVigente:tasaMensual,teaVigente:(Math.pow(1+tasaMensual,cfg.MESES_ANIO)-1)*100});
+      r.financial.round=out.ciclo;
+      const history=[...(h.financialHistory||[]).filter(row=>Number(row.round)!==Number(out.ciclo)),copiar(r.financial)].sort((a,b)=>a.round-b.round);
+      r.financial.history=history;
+      Object.assign(out.historialPorEmpresa[id],{financialHistory:history,cajaFinal,activosCosto,depreciacionAcumulada:depAcumulada,maquinariaActivos:conservada,tasaMensualVigente:tasaMensual,teaVigente:(Math.pow(1+tasaMensual,cfg.MESES_ANIO)-1)*100});
     }
     return out;
   }
