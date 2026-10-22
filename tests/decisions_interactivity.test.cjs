@@ -39,3 +39,14 @@ test('Confirmation rejects unfunded or overcapacity plans while keeping a draft 
  const over=editor(c,{cash:10000000,getState:()=>({decisiones:large})});confirm(over);assert.match(over.status.textContent,/capacidad o los materiales/);assert.equal(over.saved(),undefined);
  const funded=editor(c,{cash:100000,getState:()=>({decisiones:d})});confirm(funded);assert.equal(funded.saved().enviado,true);
 });
+
+
+test('Material purchases preserve fractional conversions required by the Excel oracle',()=>{
+ const c=load(),e=editor(c,{motorVersion:c.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL});
+ assert.match(e.container.innerHTML,/step="any" data-compra=/);
+ const converted=2000/c.SIDE_EXCEL_CONFIG.CONFIG.CONVERSION_COMPRA['INS-06'];
+ const input={type:'number',step:'any',max:'',value:String(converted),dataset:{compra:'INS-06'},matches:()=>false};
+ e.container.oninput({target:input});
+ assert.equal(e.saved().decisiones.comprasUnidades['INS-06'],converted);
+ input.value='-1';e.container.oninput({target:input});assert.equal(e.saved().decisiones.comprasUnidades['INS-06'],0);
+});

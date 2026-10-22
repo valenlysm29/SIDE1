@@ -17,6 +17,15 @@
 }
 #decisionMenu #exitDecisions.returns-to-world img { flex: 0 0 24px; margin: 0; }
 #decisionMenu .returns-to-world #decisionReturnLabel { display: inline; }
+/* The grouped decision header keeps the world return explicit too. */
+#decisionMenu #decisionTopbar #exitDecisions.returns-to-world {
+  flex: 0 0 110px;
+  width: 110px;
+  min-width: 110px;
+  padding: 8px;
+  font-size: 10px;
+}
+#decisionMenu #decisionTopbar #exitDecisions.returns-to-world #decisionReturnLabel { display: inline; }
 @media (max-width: 1180px) {
   #decisionMenu .decision-topbar:has(.returns-to-world) {
     grid-template-columns: 110px minmax(0, 1fr) 120px;
