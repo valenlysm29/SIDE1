@@ -49,6 +49,23 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    studentConnected=true;loadDecisionState();startStudentSync();await refreshStudentGame();await prepareLobby();
   },{game,joined,name});return p;
  }
+ async function assertDraftSave(p,label){
+  const before=Number((await db.query('select count(*) as n from partidas')).rows[0].n);
+  await p.locator('#saveAll').click();
+  const saved=await p.evaluate(()=>localStorage.getItem('SIDE_TEACHER_CONFIG'));
+  assert.ok(saved,`${label}: guardar persiste el borrador`);
+  assert.equal(await p.evaluate(()=>Boolean(state.partidaId||gameStatus()?.active||runtime())),false,`${label}: guardar no crea sala ni inicia reloj`);
+  assert.equal(Number((await db.query('select count(*) as n from partidas')).rows[0].n),before,`${label}: guardar no publica partida`);
+  assert.equal(await p.locator('#startGame').isEnabled(),true);
+  assert.match(await p.locator('#toast').textContent(),/Pulsa Iniciar partida/);
+  await p.locator('#integrationDurationMinutes').fill('0');
+  await p.locator('#saveAll').click();
+  assert.equal(await p.evaluate(()=>localStorage.getItem('SIDE_TEACHER_CONFIG')),saved,`${label}: datos inválidos no reemplazan el borrador`);
+  assert.equal(Number((await db.query('select count(*) as n from partidas')).rows[0].n),before,`${label}: datos inválidos no publican partida`);
+  assert.equal(await p.locator('#integrationDurationMinutes').getAttribute('aria-invalid'),'true');
+  await p.locator('#integrationDurationMinutes').fill(String(JSON.parse(saved).integrationDurationMinutes));
+  console.log(`PASS UI ${label}: guardar válido/inválido separado de crear/iniciar sala`);
+ }
  try{
   const t=await teacher();
   assert.equal(await t.locator('#gameCode').inputValue(),'');
@@ -68,6 +85,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.locator('#copyGameCode').isDisabled(),true);
   await t.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.copiedText=value;}}}));
   await t.locator('#integrationDurationMinutes').fill('3');
+  await assertDraftSave(t,'manual');
   await t.locator('#startGame').click();
   await t.waitForFunction(()=>runtime()?.phase==='integration').catch(async error=>{console.error('waiting start diagnostic',await t.evaluate(()=>({toast:$('toast')?.textContent,partidaId:state.partidaId,authoritative:state.authoritative,status:gameStatus()})));throw error;});
   const game=await t.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'Prueba'}));
@@ -158,7 +176,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await autoTeacher.locator('#integrationDurationMinutes').isVisible(),true);
   await autoTeacher.locator('#integrationDurationMinutes').fill('0');
   await autoTeacher.locator('#startGame').click();assert.equal(await autoTeacher.evaluate(()=>gameStatus()?.active||false),false);
-  await autoTeacher.locator('#integrationDurationMinutes').fill('2');await autoTeacher.locator('#startGame').click();await autoTeacher.waitForFunction(()=>runtime()?.phase==='integration');
+  await autoTeacher.locator('#integrationDurationMinutes').fill('2');await assertDraftSave(autoTeacher,'automático');await autoTeacher.locator('#startGame').click();await autoTeacher.waitForFunction(()=>runtime()?.phase==='integration');
   const autoGame=await autoTeacher.evaluate(()=>({id:state.partidaId,codigo:$('gameCode').value,nombre:'AutomÃ¡tico'}));
   const auto=await student(autoGame,'Auto UI');
   assert.match(await auto.locator('#integrationCountdown').innerText(),/0[12]:/);

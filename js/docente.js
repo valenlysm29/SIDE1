@@ -145,7 +145,7 @@ function refreshSetupSummary(){
   $('configCycleCount').textContent=`${state.round} / ${count}`;
   $('configReadySummary').textContent=`${count} ciclos operativos de ${$('roundHours').value||0} h ${$('roundMinutes').value||0} min. La sala de espera es previa al Ciclo 1.`;
   const waitingText=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
-  $('gameStatusBanner').textContent=integration?waitingText:active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración para abrir el ingreso de estudiantes.';
+  $('gameStatusBanner').textContent=integration?waitingText:active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración y pulsa Iniciar partida para abrir la sala de espera.';
   document.querySelector('[data-tab="rondas"]')?.classList.toggle('hidden',!active&&!status?.finishedAt);
   document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>input.disabled=active);
   ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)});
@@ -224,7 +224,7 @@ function saveConfig(silent=false){
   if(numericPlan.error){if(!silent)toast(numericPlan.error);return false}
   if(c.capitalMode==='random'&&c.capitalMax<c.capitalMin){toast('El rango máximo de caja debe ser mayor o igual al mínimo.');return false}
   localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));$('gameCodeBadge').textContent=c.codigo;updateRoundDisplay();refreshSetupSummary();publishGameState();
-  if(!silent)toast('Configuración guardada.');return true;
+  if(!silent)toast('Configuración guardada. Pulsa Iniciar partida para abrir la sala de espera.');return true;
 }
 function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){$('interest').disabled=true;if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
 function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El Ciclo 1 comienza automáticamente al terminar la sala de espera desde la fecha programada. Puedes cerrar el navegador.':'El Ciclo 1 comienza automáticamente al terminar la sala de espera. Después, el docente puede pausar, cerrar y avanzar los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
@@ -501,7 +501,7 @@ async function refreshTeacherGame(){
 function watchTeacherGame(){
   if(teacherPoll)clearInterval(teacherPoll);if(teacherTick)clearInterval(teacherTick);
   teacherPoll=setInterval(refreshTeacherGame,3000);
-  teacherTick=setInterval(()=>{paintTeacherClock();if(!state.partidaId)refreshTeacherGame();},1000);
+  teacherTick=setInterval(()=>{paintTeacherClock();if($('tab-empresas')?.classList.contains('active'))renderCompanies();if(!state.partidaId)refreshTeacherGame();},1000);
 }
 async function prepareGame(){
   await teacherRead;
@@ -792,7 +792,7 @@ async function supabaseReports(reportsBase=state.reports){
       flujoCaja:financial?.flujoCaja||rep?.flujo_caja||(!rep?local?.flujoCaja:null)||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),
-      estado:p.expulsada_at?'eliminada':'activa',expulsadaAt:p.expulsada_at||null,tomandoDecisiones:!p.expulsada_at&&!!local?.tomandoDecisiones,
+      estado:p.expulsada_at||emp.estado==='eliminada'||rep?.estado_resultados?.excelDecisionState?.eliminada||rep?.estado_resultados?.excelDecisionState?.historial?.eliminada?'eliminada':'activa',expulsadaAt:p.expulsada_at||null,tomandoDecisiones:!p.expulsada_at&&!!local?.tomandoDecisiones,
       conectada:Boolean(p.last_seen_at),lastSeenAt:p.last_seen_at||null,integracion:runtime()?.phase==='integration',
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
@@ -832,11 +832,11 @@ const gradeUiStatus=new Map();
 const gradeUiErrors=new Map();
 const gradeFailureNotified=new Set();
 function companyPresence(r){
-  if(r.fuente!=='supabase')return r.conectada?'online':'idle';
+  if(r.fuente!=='supabase'){if(!r.conectada)return 'idle';presenceTracker.observe(companyPresenceKey(r),r.lastSeenAt||r.updatedAt);}
   return presenceTracker.get(companyPresenceKey(r));
 }
 function companyActivity(r,presence){
-  if(r.estado==='eliminada')return 'ELIMINADA POR INACTIVIDAD · FUERA DE LA PARTIDA';
+  if(r.estado==='eliminada')return r.expulsadaAt?'ELIMINADA POR INACTIVIDAD · FUERA DE LA PARTIDA':'ELIMINADA SEGÚN REGLAS DEL MODELO · FUERA DE LA PARTIDA';
   if(podiumOptions().finished)return 'PARTICIPACIÓN FINALIZADA';
   if(presence==='online')return r.integracion?'CONECTADA · EN SALA DE ESPERA':r.tomandoDecisiones?'CONECTADA · TOMANDO DECISIONES':'CONECTADA · EN PARTIDA';
   return presence==='idle'?'SIN ACTIVIDAD RECIENTE':'REGISTRADA · PRESENCIA SIN CONFIRMAR';
@@ -1170,7 +1170,7 @@ $('eventClearSelection')?.addEventListener('click',()=>{if(configurationLocked()
 $('eventSelectAll')?.addEventListener('click',toggleSelectAllEvents);
 ['eventSearch','eventCategoryFilter','eventScopeFilter'].forEach(id=>$(id)?.addEventListener(id==='eventSearch'?'input':'change',()=>{renderEventBank();updateSelectAllBtn();}));
 $('eventRandomCount')?.addEventListener('change',()=>saveConfig(true));
-$('saveAll')?.addEventListener('click',async()=>{if(state.starting||state.cancelling)return;state.starting=true;try{if(gameStatus()?.active){saveConfig(false);await publishGameState();}else await prepareGame();}finally{state.starting=false;refreshStartButton();}});
+$('saveAll')?.addEventListener('click',()=>{if(state.starting||state.cancelling)return;saveConfig(false);refreshStartButton();});
 $('startGame')?.addEventListener('click',startGame);
 $('retryCreate')?.addEventListener('click',startGame);
 $('copyLobbyCode')?.addEventListener('click',event=>copyInvitation(false,event.currentTarget));

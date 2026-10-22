@@ -17,7 +17,8 @@ with sync_playwright() as p:
     page = context.new_page()
     page.on('pageerror', lambda e: errors.append(str(e)))
     load(page, 'docente.html')
-    page.wait_for_load_state('networkidle')
+    # The roster polls continuously; wait for delivered DOM instead of network quiescence.
+    page.wait_for_function('typeof state==="object"')
     page.wait_for_function('!reportsBusy')
     page.evaluate('''()=>{
       [teacherPoll,teacherTick,companiesPoll].forEach(clearInterval);
