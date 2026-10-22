@@ -9,7 +9,7 @@
   const money=value=>'S/ '+Number(value||0).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
   const areas={corte:'Corte',ensamble:'Ensamble',acabado:'Acabado'};
   const maquinas=['Manual','Semiindustrial','Industrial'];
-  const grupoSeccion=g=>({'Maquina de ensamblado':'B','Maquina de acabados':'B','Molde':'B','Canal de venta':'D','Acceso a prestamo bancario':'E'}[g]||'C');
+  const grupoSeccion=g=>({'Inversion en RR.HH.':'A','Maquina de ensamblado':'B','Maquina de acabados':'B','Molde':'B','Canal de venta':'D','Acceso a prestamo bancario':'E'}[g]||'C');
   const grupos=()=>cfg().DECISIONES_VISIBLES.filter(g=>cat().some(o=>o.grupo===g));
   const opcionesGrupo=grupo=>cat().filter(o=>o.grupo===grupo);
   const filasFamilia=familia=>cfg().INSUMOS_POR_FAMILIA[familia].map(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]);
@@ -117,12 +117,128 @@
     let remoteReady=local||context.remoteReady!==false;
     const sectioned=!!context.category;
     let renderedReason='';
+    let saved=Object.assign(nuevasDecisiones(),clone(stored.decisionesGuardadas||stored.decisiones||{}));
+    saved.personal=root.SIDE_EXCEL_PRODUCCION.normalizarPersonal(saved.personal);
+    saved.tiendasPorDistrito={los_olivos:0,miraflores:0,sjl:0,...saved.tiendasPorDistrito};
+    normalizarNumeros(saved);
+    stored={...stored,decisionesGuardadas:prepararDecisiones(saved)};
+    if(!Number.isFinite(Number(stored.saldoFinalGuardado))||Number(stored.round)!==Number(context.round))savedBalance();
+
+    function savedBalance(){
+      try{stored.saldoFinalGuardado=proyectarPlan(saved,context).cashAfter;}catch(_){stored.saldoFinalGuardado=Number(context.cash)||0;}
+      stored.decisionesGuardadas=prepararDecisiones(saved);
+    }
+    function saveControl(control){
+      if(control.dataset.excelGrupo!==undefined){const group=grupos()[Number(control.dataset.excelGrupo)];saved.seleccion=saved.seleccion.filter(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo!==group).concat(draft.seleccion.filter(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo===group));}
+      else if(control.dataset.lote!==undefined){const i=Number(control.dataset.lote);saved.lotes[i]=saved.lotes[i]||nuevoLote();saved.lotes[i][control.dataset.campo]=draft.lotes[i][control.dataset.campo];}
+      else if(control.dataset.personal){const [a,n,m]=control.dataset.personal.split(',');saved.personal[a][n][m]=draft.personal[a][n][m];}
+      else if(control.dataset.compra)saved.comprasUnidades[control.dataset.compra]=draft.comprasUnidades[control.dataset.compra];
+      else if(control.dataset.activo)saved.maquinaria[control.dataset.activo]=draft.maquinaria[control.dataset.activo];
+      else if(control.dataset.excelTienda)saved.tiendasPorDistrito[control.dataset.excelTienda]=draft.tiendasPorDistrito[control.dataset.excelTienda];
+      else for(const [attribute,key] of Object.entries({'data-excel-regimen':'regimen','data-excel-prestamo':'montoPrestamo','data-excel-marketing':'marketingNivel','data-excel-garantia':'garantiaDias','data-excel-mantenimiento':'mantenimientoPreventivo','data-excel-analista':'analistaCompras','data-excel-garantia-proveedor':'garantiaProveedor'}))if(control.hasAttribute(attribute))saved[key]=draft[key];
+      // Loan eligibility and its amount are one decision.
+      if(control.hasAttribute('data-excel-prestamo')||control.dataset.excelGrupo!==undefined&&grupos()[Number(control.dataset.excelGrupo)]==='Acceso a prestamo bancario'){
+        saved.montoPrestamo=draft.montoPrestamo;saved.seleccion=saved.seleccion.filter(k=>!['FIN-01A','FIN-01B'].includes(k)).concat(draft.seleccion.filter(k=>['FIN-01A','FIN-01B'].includes(k)));
+      }
+      savedBalance();persistDraft();context.savedBalanceChanged?.();context.refreshSavedBalance?.(stored.saldoFinalGuardado);
+    }
+    function decorateDecisions(){
+      let serial=0;
+      for(const table of container.querySelectorAll('table:has([data-personal])')){
+        const grid=document.createElement('div');grid.className='excel-personal-cards';
+        for(const row of table.querySelectorAll('tbody tr')){
+          const controls=Array.from(row.querySelectorAll('[data-personal]')).filter(control=>{const [area,,machine]=control.dataset.personal.split(',');return area!=='corte'||machine==='0';});if(!controls.length)continue;
+          const [area,level]=controls[0].dataset.personal.split(','),card=document.createElement('fieldset');card.className='excel-decision-card';
+          card.innerHTML=`<legend>Personal de ${e(areas[area].toLowerCase())} · Nivel ${Number(level)+1}</legend><div class="excel-decision-card__meta"><span class="excel-decision-badge">Opcional</span><span class="excel-decision-impact" data-card-impact></span></div><p class="excel-help">${money(root.SIDE_EXCEL_COSTOS.costoLaboral(area,Number(level)+1,draft.regimen).pagoMensual)} por persona y ciclo. Elige cuántas personas operan cada tipo de máquina.</p><div class="excel-personal-quantities"></div>`;
+          for(const control of controls){const label=document.createElement('label');label.textContent=maquinas[Number(control.dataset.personal.split(',')[2])];label.appendChild(control);card.querySelector('.excel-personal-quantities').appendChild(label);}
+          const save=document.createElement('button');save.type='button';save.className='side-button excel-decision-save';save.dataset.excelGuardarItem='';save.textContent='Guardar decisión';save.disabled=controls.every(control=>control.disabled);save._decisionControls=controls;card.appendChild(save);grid.appendChild(card);
+        }
+        table.parentNode.replaceChild(grid,table);
+      }
+      for(const control of container.querySelectorAll('select,input[type="number"],input[type="checkbox"]:not([data-excel-enable])')){
+        if(control.closest('.excel-decision-card'))continue;
+        const label=control.closest('label'),cell=control.closest('td');if(!label&&!cell)continue;
+        if(control.dataset.excelGrupo!==undefined&&grupos()[Number(control.dataset.excelGrupo)]==='Acceso a prestamo bancario'){label.hidden=true;continue;}
+        const host=label||control,card=document.createElement('fieldset');card.className='excel-decision-card';
+        if(host.dataset.excelSection)card.dataset.excelSection=host.dataset.excelSection;
+        let title=label?Array.from(label.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim():control.getAttribute('aria-label');
+        if(title==='Inversion en RR.HH.')title='Capacitación del equipo';
+        const mandatory=control.dataset.campo&&['segmento','cantidad','molde','precio'].includes(control.dataset.campo)||control.dataset.activo==='mesa';
+        card.innerHTML=`<legend>${e(title||'Cantidad')}</legend><div class="excel-decision-card__meta"><span class="excel-decision-badge ${mandatory?'is-required':''}">${mandatory?'Obligatoria':'Opcional'}</span><span class="excel-decision-impact" data-card-impact>Según tu elección</span></div>`;
+        host.parentNode.insertBefore(card,host);card.appendChild(host);if(label)for(const n of Array.from(label.childNodes))if(n.nodeType===3)n.remove();
+        if(control.tagName==='SELECT'||control.type==='checkbox'){
+          const id='excel-choice-'+(++serial),choices=document.createElement('div');choices.className='excel-decision-options';
+          const entries=control.tagName==='SELECT'?Array.from(control.options).map(o=>({value:o.value,label:o.textContent,selected:o.selected})): [{value:'0',label:control.hasAttribute('data-excel-mantenimiento')?'No realizar mantenimiento':'No contratar',selected:!control.checked},{value:'1',label:control.hasAttribute('data-excel-mantenimiento')?'Realizar mantenimiento':'Contratar analista',selected:control.checked}];
+          for(const option of entries){
+            if(option.value===''&&!control.hasAttribute('data-excel-marketing')&&!(control.dataset.excelGrupo!==undefined&&grupos()[Number(control.dataset.excelGrupo)]==='Inversion en RR.HH.'))continue;
+            const row=cat().find(o=>o.codigo===option.value),marketing=control.hasAttribute('data-excel-marketing')?cfg().MARKETING_BASE[option.value]:null;
+            const amount=row?.costo??marketing?.costo??(control.hasAttribute('data-excel-mantenimiento')&&option.value==='1'?cfg().COSTO_MANTENIMIENTO_BASE:control.hasAttribute('data-excel-analista')&&option.value==='1'?cfg().ANALISTA_BASE.costo:0);
+            const optionLabel=row?.opcion||(option.value===''?(control.hasAttribute('data-excel-marketing')?'No invertir':control.dataset.excelGrupo!==undefined&&grupos()[Number(control.dataset.excelGrupo)]==='Inversion en RR.HH.'?'No capacitar':'Sin seleccionar'):option.label.replace(/ · S\/.*$/,''));
+            const item=document.createElement('label');item.className='excel-decision-option';
+            item.innerHTML=`<input type="radio" name="${id}" value="${e(option.value)}" ${option.selected?'checked':''} ${control.disabled?'disabled':''} data-excel-choice><span><strong>${e(optionLabel)}</strong><b>${money(amount)}</b><small>${e(row?.descripcion||(control.hasAttribute('data-excel-garantia')?'Cobertura comercial sin salida de caja.':control.hasAttribute('data-excel-marketing')?'Inversión por ciclo para dar a conocer tu empresa.':control.hasAttribute('data-excel-regimen')?'Define el régimen de los costos laborales.':'Elige esta alternativa para el ciclo.'))}</small></span>`;
+            item.querySelector('input').addEventListener('input',event=>{event.stopPropagation();if(control.type==='checkbox')control.checked=option.value==='1';else control.value=option.value;control.dispatchEvent(new Event('input',{bubbles:true}));});
+            item.querySelector('input').addEventListener('change',event=>event.stopPropagation());choices.appendChild(item);
+          }
+          control.hidden=true;control.tabIndex=-1;card.appendChild(choices);const help=document.createElement('p');help.className='excel-help';help.textContent='Botón de opción: solo puedes seleccionar una alternativa.';card.appendChild(help);
+        }
+        const save=document.createElement('button');save.type='button';save.className='side-button excel-decision-save';save.dataset.excelGuardarItem='';save.textContent='Guardar decisión';save.disabled=control.disabled;save._decisionControl=control;card.appendChild(save);
+      }
+      function groupCards(cards,title,description){
+        if(!cards.length)return;const group=document.createElement('fieldset');group.className='excel-decision-card excel-decision-group';
+        group.innerHTML=`<legend>${e(title)}</legend><div class="excel-decision-card__meta"><span class="excel-decision-badge ${title.startsWith('Lote')?'is-required':''}">${title.startsWith('Lote')?'Obligatoria':'Opcional'}</span><span>El saldo se actualiza al guardar</span></div><p class="excel-help">${e(description)}</p>`;
+        cards[0].parentNode.insertBefore(group,cards[0]);const controls=[];
+        for(const card of cards){
+          controls.push(...card.querySelectorAll('select,input:not([data-excel-choice])'));
+          card.querySelectorAll('[data-excel-guardar-item]').forEach(button=>button.remove());
+          card.querySelectorAll('.excel-help').forEach(help=>{if(help.textContent.startsWith('Botón de opción'))help.remove();});
+          card.classList.remove('excel-decision-card');card.classList.add('excel-decision-subcontrol');
+          if(card.querySelector('.excel-decision-options')){
+            const details=document.createElement('details');details.className='excel-choice-disclosure';
+            const summary=document.createElement('summary'),source=card.querySelector('select'),selected=source?.selectedOptions[0]?.textContent||'Elegir alternativa';
+            summary._decisionTitle=card.querySelector('legend')?.textContent||'Opción';summary.textContent=summary._decisionTitle+': '+selected;details.appendChild(summary);details.appendChild(card);group.appendChild(details);
+          }else group.appendChild(card);
+        }
+        const button=document.createElement('button');button.type='button';button.className='side-button excel-decision-save';button.dataset.excelGuardarItem='';button.textContent='Guardar decisión';button.disabled=controls.every(control=>control.disabled);button._decisionControls=controls;group.appendChild(button);
+      }
+      for(const [area,label] of Object.entries(areas))groupCards(Array.from(container.querySelectorAll('.excel-personal-cards>.excel-decision-card')).filter(card=>card.querySelector(`[data-personal^="${area},"]`)),`Personal de ${label.toLowerCase()}`,'Define la cantidad de personas de cada nivel y el tipo de máquina que operarán.');
+      for(const [family,label] of Object.entries({cuero:'Compra de cuero',accesorios:'Compra de accesorios',hilo:'Compra de hilo'}))groupCards(Array.from(container.querySelectorAll('.excel-decision-card')).filter(card=>Array.from(card.querySelectorAll('[data-compra]')).some(control=>cfg().INSUMOS_POR_FAMILIA[family].includes(control.dataset.compra))),label,'Indica cuántas unidades de compra necesitas de cada material. El inventario sobrante se conserva.');
+      for(const lot of container.querySelectorAll('.excel-lote'))groupCards(Array.from(lot.querySelectorAll('.excel-decision-card')),lot.querySelector('legend')?.textContent||'Plan de producción','Define cuánto producir y a qué precio. Abre cada alternativa para elegir segmento, molde y materiales.');
+    }
 
     function canSave(){return !context.canSave||context.canSave();}
     function blockedReason(){return confirmed?'El plan ya fue confirmado para este ciclo. Podrás editar al comenzar el siguiente.':locked?(context.lockReason?.()||'El ciclo está cerrado; no se pueden modificar sus decisiones.'):!canSave()?(context.lockReason?.()||'La edición está en pausa o el tiempo del ciclo terminó.') : '';}
     function canEdit(){const reason=blockedReason();if(reason){render();const status=container.querySelector('[data-excel-status]');if(status)status.textContent=reason;return false;}return true;}
     function persistDraft(){if(!enabled||!canSave())return;stored={...stored,habilitado:true,motor_version:context.motorVersion,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:false};context.save(stored);}
     function feedback(){
+      function controlValue(plan,control){
+        if(control.dataset.excelGrupo!==undefined){const group=grupos()[Number(control.dataset.excelGrupo)];return plan.seleccion.find(k=>root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo===group)||'';}
+        if(control.dataset.lote!==undefined)return plan.lotes?.[Number(control.dataset.lote)]?.[control.dataset.campo]??'';
+        if(control.dataset.personal){const [a,n,m]=control.dataset.personal.split(',');return plan.personal?.[a]?.[n]?.[m]||0;}
+        if(control.dataset.compra)return plan.comprasUnidades?.[control.dataset.compra]||0;
+        if(control.dataset.activo)return plan.maquinaria?.[control.dataset.activo]||0;
+        if(control.dataset.excelTienda)return plan.tiendasPorDistrito?.[control.dataset.excelTienda]||0;
+        for(const [attribute,key] of Object.entries({'data-excel-regimen':'regimen','data-excel-prestamo':'montoPrestamo','data-excel-marketing':'marketingNivel','data-excel-garantia':'garantiaDias','data-excel-mantenimiento':'mantenimientoPreventivo','data-excel-analista':'analistaCompras','data-excel-garantia-proveedor':'garantiaProveedor'}))if(control.hasAttribute(attribute))return plan[key];
+      }
+      container.querySelectorAll('[data-excel-guardar-item]').forEach(button=>{
+        const controls=button._decisionControls||[button._decisionControl],dirty=controls.some(control=>JSON.stringify(controlValue(draft,control))!==JSON.stringify(controlValue(saved,control)));
+        const card=button.closest('.excel-decision-card');card.dataset.pending=String(dirty);
+        button.textContent=dirty?'Guardar decisión':button.dataset.justSaved?'Decisión guardada':'Guardar decisión';
+        let note=card.querySelector(':scope > .excel-decision-dirty');if(dirty&&!note){note=document.createElement('p');note.className='excel-decision-dirty';note.setAttribute('role','status');card.insertBefore(note,button);}if(note){note.textContent=dirty?'Cambios pendientes de guardar':'';note.hidden=!dirty;}
+      });
+      container.querySelectorAll('.excel-decision-card:not(.excel-decision-group),.excel-decision-subcontrol').forEach(card=>{
+        const control=card.querySelector('select,input:not([data-excel-choice])'),impact=card.querySelector('[data-card-impact]');if(!control||!impact)return;
+        const row=cat().find(o=>o.codigo===control.value);let amount=row?.costo||0;
+        if(control.hasAttribute('data-excel-marketing'))amount=cfg().MARKETING_BASE[control.value]?.costo||0;
+        if(control.hasAttribute('data-excel-mantenimiento'))amount=control.checked?cfg().COSTO_MANTENIMIENTO_BASE:0;
+        if(control.hasAttribute('data-excel-analista'))amount=control.checked?cfg().ANALISTA_BASE.costo:0;
+        if(control.dataset.compra)amount=numero(control.value)*cfg().CONVERSION_COMPRA[control.dataset.compra]*cfg().PRECIO_MP[control.dataset.compra];
+        if(control.dataset.activo){const cost=root.SIDE_EXCEL_COSTOS.costoMaquinaria(control.dataset.activo,draft.regimen);amount=Math.max(0,numero(control.value)-numero(context.historial?.maquinariaActivos?.[control.dataset.activo]))*cost.salidaCompra;}
+        if(control.dataset.excelTienda)amount=numero(control.value)*cfg().COSTOS_TIENDAS[control.dataset.excelTienda];
+        if(control.dataset.personal){const [area,n]=control.dataset.personal.split(',');amount=Array.from(card.querySelectorAll('[data-personal]')).reduce((sum,input)=>sum+numero(input.value),0)*root.SIDE_EXCEL_COSTOS.costoLaboral(area,Number(n)+1,draft.regimen).pagoMensual;}
+        impact.textContent=control.hasAttribute('data-excel-prestamo')?`Ingreso de caja: ${money(control.value)}`:amount?`Salida de caja: ${money(amount)}`:'Sin salida de caja';
+        const disclosure=card.closest('.excel-choice-disclosure'),summary=disclosure?.querySelector('summary');if(summary&&control.tagName==='SELECT')summary.textContent=summary._decisionTitle+': '+(control.value?control.selectedOptions[0]?.textContent:'Elige una alternativa');
+        card.querySelectorAll('[data-excel-choice]').forEach(radio=>radio.checked=control.type==='checkbox'?radio.value===(control.checked?'1':'0'):radio.value===control.value);
+      });
       const credit=container.querySelector('[data-excel-credit-after]');if(credit&&Number.isFinite(Number(context.creditAvailable)))credit.textContent='Después de esta solicitud: '+money(Math.max(0,Number(context.creditAvailable)-numero(draft.montoPrestamo)));
       container.querySelectorAll('[data-calidad-lote]').forEach(el=>{const l=root.SIDE_EXCEL_PUNTAJES.evaluarLote(draft.lotes[Number(el.dataset.calidadLote)]);el.textContent=`Calidad ${format(l.calidad)} · Umbral ${format(l.umbral)} · ${l.resultado||'Elige un segmento'}. ${l.mensaje}`;});
       const preview=container.querySelector('[data-excel-preview]');if(!preview)return;
@@ -161,8 +277,9 @@
           <details data-excel-section="F"><summary>Compras de materiales</summary><p>Declara cantidades de compra: rollos, pieles completas, juegos y carretes. La materia prima sobrante se conserva. Los precios se aplican a unidades de producción; cada compra se convierte según su rendimiento. Se aplica el descuento general de materiales de ${format(cfg().DESCUENTO_CANTIDAD*100)}%; el analista añade su descuento cuando se contrata.</p><div class="excel-grid"><label><input type="checkbox" data-excel-analista ${draft.analistaCompras?'checked':''} ${frozen?'disabled':''}> Contratar analista de compras (${money(cfg().ANALISTA_BASE.costo)} por ciclo)</label><label>Garantía de proveedores<select data-excel-garantia-proveedor ${frozen?'disabled':''}>${cfg().GARANTIA_PROVEEDOR_BASE.map(p=>`<option value="${p}" ${Number(draft.garantiaProveedor)===p?'selected':''}>${p?p+'% de devolución':'Sin garantía'}</option>`).join('')}</select></label></div><p>El analista negocia ${format(root.SIDE_EXCEL_COSTOS.descuentoAnalista(context.round))}% en materiales este ciclo. La garantía se conserva; las devoluciones requieren un evento de falla cubierto, que el Excel no define.</p><div class="excel-grid">${Object.keys(cfg().CONVERSION_COMPRA).map(k=>`<label>${e(root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)} · ${money(cfg().PRECIO_MP[k])} por unidad de producción<input type="number" min="0" step="1" data-compra="${k}" value="${e(draft.comprasUnidades[k]||0)}" ${frozen?'disabled':''}><small>Costo bruto de 1 compra: ${money(cfg().CONVERSION_COMPRA[k]*cfg().PRECIO_MP[k])}. 1 compra = ${cfg().CONVERSION_COMPRA[k]} ${k.startsWith('INS-0')&&['INS-01','INS-02','INS-03'].includes(k)?'m²':['INS-04','INS-05'].includes(k)?'u':'m'}</small></label>`).join('')}</div></details><details data-excel-section="B"><summary>Activos disponibles en el ciclo</summary><p>Compra una única mesa y al menos un molde para fabricar. Los activos se conservan entre ciclos.</p><div class="excel-grid">${Object.keys(cfg().MAQUINARIA).map(k=>`<label>${e(k==='mesa'?'Mesa de corte':root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)}<input type="number" min="0" ${actual&&k==='mesa'?'max="1"':''} step="1" data-activo="${k}" value="${e(draft.maquinaria[k]||0)}" ${frozen?'disabled':''}>${costoActivoHtml(k,draft.regimen)}</label>`).join('')}</div></details>
           <div data-excel-section="C" data-excel-lotes>${draft.lotes.map((l,i)=>loteHtml(l,i,frozen)).join('')}</div><button type="button" data-excel-section="C" class="side-button" data-agregar-lote ${frozen||draft.lotes.length>=cfg().MAX_LOTES?'disabled':''}>Agregar lote</button>
           <div data-excel-preview></div><p class="excel-help">Guardar conserva avances; confirmar envía el plan completo de las cinco secciones. Finanzas sin préstamo equivale a S/ 0 y no exige guardar antes.</p><div class="excel-actions"><button type="button" data-excel-guardar class="side-button" ${frozen?'disabled':''}>Guardar borrador de lotes</button><button type="button" data-excel-enviar class="side-button side-button--primary" ${frozen||!remoteReady?'disabled':''}>Confirmar plan del ciclo</button></div><p data-excel-status role="status">${confirmed?'Plan del ciclo confirmado.':stored.round?'Último guardado: ciclo '+e(stored.round):'Completa y confirma el plan para participar en el cierre.'}</p>`:''}</section>`;
-      if(sectioned){for(const el of container.querySelectorAll('[data-excel-section]'))if(el.dataset.excelSection!==context.category)el.remove();for(const el of container.querySelectorAll('.excel-grid'))if(!el.querySelector('input,select,button'))el.remove();for(const el of container.querySelectorAll('details'))if(el.querySelector('summary')?.textContent==='Decisiones del ciclo'&&!el.querySelector('input,select,button'))el.remove();}
+      if(sectioned){for(const el of container.querySelectorAll('[data-excel-section]'))if(el.dataset.excelSection!==context.category&&!(context.category==='C'&&el.dataset.excelSection==='F'))el.remove();for(const el of container.querySelectorAll('.excel-grid'))if(!el.querySelector('input,select,button'))el.remove();for(const el of container.querySelectorAll('details'))if(el.querySelector('summary')?.textContent==='Decisiones del ciclo'&&!el.querySelector('input,select,button'))el.remove();}
       for(const el of container.querySelectorAll('details'))if(opened.includes(el.querySelector('summary')?.textContent)||((actual||sectioned)&&el.querySelector('input,select,button')))el.open=true;
+      decorateDecisions();
       feedback();
     }
     container.oninput=event=>{
@@ -185,6 +302,7 @@
     container.onchange=event=>{if(!canEdit())return;if(event.target.matches('[data-excel-enable]')){enabled=event.target.checked;stored={...stored,habilitado:enabled,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:false};context.save(stored);render();}else container.oninput(event);};
     container.onclick=event=>{
       const el=event.target.closest('button');if(!el||el.disabled||!canEdit())return;
+      if(el.hasAttribute('data-excel-guardar-item')){for(const control of el._decisionControls||[el._decisionControl])saveControl(control);el.dataset.justSaved='true';feedback();container.querySelector('[data-excel-status]').textContent='Decisión guardada. El saldo final guardado se actualizó.';return;}
       if(el.hasAttribute('data-agregar-lote')){draft.lotes.push(nuevoLote());persistDraft();render();}
       if(el.dataset.quitarLote!==undefined){draft.lotes.splice(Number(el.dataset.quitarLote),1);persistDraft();render();}
       if(el.hasAttribute('data-excel-importar')){const imported=context.importar?.();if(imported){draft.personal=imported.personal;draft.seleccion=[...draft.seleccion.filter(k=>!imported.seleccion.some(v=>root.SIDE_EXCEL_PUNTAJES.indice[v]?.grupo===root.SIDE_EXCEL_PUNTAJES.indice[k]?.grupo)),...imported.seleccion];}persistDraft();render();}
@@ -197,7 +315,7 @@
           const issue=!remoteReady?'Recupera la conexión o actualiza la partida antes de confirmar.':Number.isFinite(context.cash)&&projection.cashAfter<0?'El plan supera la caja disponible. Reduce compras o gastos, o solicita financiamiento.':(projection.plan.target>projection.prepared.produccion.produccionCapacidad||projection.plan.materials.some(material=>material.shortfall>0))?'La cantidad planeada supera la capacidad o los materiales disponibles. Ajusta producción, personal, activos y compras.':'';
           if(issue){container.querySelector('[data-excel-status]').textContent=issue;return;}
         }
-        stored={...stored,habilitado:true,motor_version:context.motorVersion||stored.motor_version,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};if(enviar)stored.planesPorCiclo={...stored.planesPorCiclo,[context.round]:clone(stored.decisiones)};context.save(stored);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.':'Borrador guardado.';
+        saved=clone(draft);savedBalance();stored={...stored,habilitado:true,motor_version:context.motorVersion||stored.motor_version,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};if(enviar)stored.planesPorCiclo={...stored.planesPorCiclo,[context.round]:clone(stored.decisiones)};context.save(stored);context.savedBalanceChanged?.();context.refreshSavedBalance?.(stored.saldoFinalGuardado);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.':'Borrador guardado.';
       }
     };
     render();
