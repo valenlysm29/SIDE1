@@ -114,12 +114,14 @@
     for(const [codigo,owned] of Object.entries(context.historial?.maquinariaActivos||{}))draft.maquinaria[codigo]=Math.max(numero(draft.maquinaria[codigo]),numero(owned));
     let locked=!!context.locked,confirmed=Number(stored.round)===Number(context.round)&&stored.enviado,disposeDop=()=>{};
     const local=context.local!==false;
-    const remoteReady=local||context.remoteReady!==false;
+    let remoteReady=local||context.remoteReady!==false;
+    const sectioned=!!context.category;
+    let renderedReason='';
 
     function canSave(){return !context.canSave||context.canSave();}
     function blockedReason(){return confirmed?'El plan ya fue confirmado para este ciclo. Podrás editar al comenzar el siguiente.':locked?(context.lockReason?.()||'El ciclo está cerrado; no se pueden modificar sus decisiones.'):!canSave()?(context.lockReason?.()||'La edición está en pausa o el tiempo del ciclo terminó.') : '';}
     function canEdit(){const reason=blockedReason();if(reason){render();const status=container.querySelector('[data-excel-status]');if(status)status.textContent=reason;return false;}return true;}
-    function persistDraft(){if(!actual||!canSave())return;stored={...stored,habilitado:true,motor_version:context.motorVersion,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:false};context.save(stored);}
+    function persistDraft(){if(!enabled||!canSave())return;stored={...stored,habilitado:true,motor_version:context.motorVersion,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:false};context.save(stored);}
     function feedback(){
       const credit=container.querySelector('[data-excel-credit-after]');if(credit&&Number.isFinite(Number(context.creditAvailable)))credit.textContent='Después de esta solicitud: '+money(Math.max(0,Number(context.creditAvailable)-numero(draft.montoPrestamo)));
       container.querySelectorAll('[data-calidad-lote]').forEach(el=>{const l=root.SIDE_EXCEL_PUNTAJES.evaluarLote(draft.lotes[Number(el.dataset.calidadLote)]);el.textContent=`Calidad ${format(l.calidad)} · Umbral ${format(l.umbral)} · ${l.resultado||'Elige un segmento'}. ${l.mensaje}`;});
@@ -141,14 +143,15 @@
       }catch(error){preview.textContent='Completa los moldes y las decisiones para ver la proyección.';}
     }
     function render(){
-      const frozen=!!blockedReason();
+      renderedReason=blockedReason();
+      const frozen=!!renderedReason;
       const opened=Array.from(container.querySelectorAll('details[open]')).map(el=>el.querySelector('summary')?.textContent);
-      container.innerHTML=`<section class="excel-editor${actual&&context.category?' excel-editor--section':''}" aria-labelledby="excelEditorTitle"><header><img src="assets/icons/categories/recursos_humanos.svg" alt=""><div><h2 id="excelEditorTitle">${actual&&context.category?({B:'Infraestructura',C:'Producción',D:'Ventas',E:'Finanzas',F:'Logística'}[context.category]||'Plan de producción por lotes'):'Plan de producción por lotes'}</h2><p>Las cinco secciones forman un único plan para el ciclo.</p></div></header>
-        ${actual&&context.category?'<details class="excel-cycle-help"><summary>Cómo se cierra el ciclo</summary>':''}<p class="excel-help">El docente cierra las ventas de todas las empresas participantes desde su panel. Caja, costos, compras y préstamos se registran una sola vez al cerrar el ciclo.</p>
+      container.innerHTML=`<section class="excel-editor${sectioned?' excel-editor--section':''}" aria-labelledby="excelEditorTitle"><header><img src="assets/icons/categories/recursos_humanos.svg" alt=""><div><h2 id="excelEditorTitle">${sectioned?({B:'Infraestructura',C:'Producción',D:'Ventas',E:'Finanzas',F:'Logística'}[context.category]||'Plan de producción por lotes'):'Plan de producción por lotes'}</h2><p>Las cinco secciones forman un único plan para el ciclo.</p></div></header>
+        ${sectioned?'<details class="excel-cycle-help"><summary>Cómo se cierra el ciclo</summary>':''}<p class="excel-help">El docente cierra las ventas de todas las empresas participantes desde su panel. Caja, costos, compras y préstamos se registran una sola vez al cerrar el ciclo.</p>
         ${actual?'<p class="excel-help">Todas las empresas de esta partida usan el mismo plan por lotes. Un ciclo equivale a un mes con 24 días productivos. Al cerrar se enviará automáticamente el último borrador guardado; local y limpieza se cobran aunque no envíes.</p>':`<label class="excel-toggle"><input type="checkbox" data-excel-enable ${enabled?'checked':''} ${locked||confirmed||!remoteReady||context.activationBlocked?'disabled':''}>Usar el modelo por lotes en esta empresa</label>`}
-        ${actual&&context.category?'</details>':''}
+        ${sectioned?'</details>':''}
         ${blockedReason()?`<p class="excel-feedback" role="status">${e(blockedReason())}</p>`:''}
-        ${actual&&!remoteReady?'<p class="excel-feedback" role="status">Puedes editar y guardar tu borrador. La confirmación requiere recuperar la conexión o actualizar la partida; vuelve a abrir esta pestaña para comprobarla.</p>':''}
+        <p data-excel-connection class="excel-feedback" role="status" ${remoteReady?'hidden':''}>Puedes editar y guardar tu borrador mientras se comprueba la conexión. La confirmación requiere que la partida esté disponible.</p>
         ${context.activationBlocked?'<p>Este ciclo ya tiene compras o pagos confirmados. Activa el plan por lotes al comenzar el próximo ciclo, antes de registrar operaciones. Se conservarán caja, activos y deuda anteriores.</p>':''}
         ${!local?(remoteReady?'<p>Confirma el plan para sincronizarlo con la partida.</p>':'<p>La partida necesita una actualización antes de registrar este plan. Consulta a tu docente. Tus datos guardados se conservan.</p>'):''}
         ${enabled?`<div data-excel-compulsory></div><div class="excel-grid"><label data-excel-section="C">Régimen laboral<select data-excel-regimen ${frozen?'disabled':''}><option value="MYPE" ${draft.regimen==='MYPE'?'selected':''}>MYPE</option><option value="NO_MYPE" ${draft.regimen==='NO_MYPE'?'selected':''}>No MYPE</option></select></label><label data-excel-section="D">Inversión en marketing<select data-excel-marketing ${frozen?'disabled':''}><option value="">Elegir…</option>${Object.entries(cfg().MARKETING_BASE).map(([key,m])=>`<option value="${key}" ${draft.marketingNivel===key?'selected':''}>${e(key[0].toUpperCase()+key.slice(1))} · ${money(m.costo)}</option>`).join('')}</select></label><label data-excel-section="E">Préstamo solicitado (S/)<input type="number" min="0" step="0.01" value="${e(draft.montoPrestamo)}" data-excel-prestamo ${Number.isFinite(Number(context.creditAvailable))?'max="'+Number(context.creditAvailable)+'"':''} ${frozen?'disabled':''}>${Number.isFinite(Number(context.creditAvailable))?'<small>Línea disponible: '+money(context.creditAvailable)+'</small><small data-excel-credit-after></small>':''}</label></div>
@@ -158,8 +161,8 @@
           <details data-excel-section="F"><summary>Compras de materiales</summary><p>Declara cantidades de compra: rollos, pieles completas, juegos y carretes. La materia prima sobrante se conserva. Los precios se aplican a unidades de producción; cada compra se convierte según su rendimiento. Se aplica el descuento general de materiales de ${format(cfg().DESCUENTO_CANTIDAD*100)}%; el analista añade su descuento cuando se contrata.</p><div class="excel-grid"><label><input type="checkbox" data-excel-analista ${draft.analistaCompras?'checked':''} ${frozen?'disabled':''}> Contratar analista de compras (${money(cfg().ANALISTA_BASE.costo)} por ciclo)</label><label>Garantía de proveedores<select data-excel-garantia-proveedor ${frozen?'disabled':''}>${cfg().GARANTIA_PROVEEDOR_BASE.map(p=>`<option value="${p}" ${Number(draft.garantiaProveedor)===p?'selected':''}>${p?p+'% de devolución':'Sin garantía'}</option>`).join('')}</select></label></div><p>El analista negocia ${format(root.SIDE_EXCEL_COSTOS.descuentoAnalista(context.round))}% en materiales este ciclo. La garantía se conserva; las devoluciones requieren un evento de falla cubierto, que el Excel no define.</p><div class="excel-grid">${Object.keys(cfg().CONVERSION_COMPRA).map(k=>`<label>${e(root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)} · ${money(cfg().PRECIO_MP[k])} por unidad de producción<input type="number" min="0" step="1" data-compra="${k}" value="${e(draft.comprasUnidades[k]||0)}" ${frozen?'disabled':''}><small>Costo bruto de 1 compra: ${money(cfg().CONVERSION_COMPRA[k]*cfg().PRECIO_MP[k])}. 1 compra = ${cfg().CONVERSION_COMPRA[k]} ${k.startsWith('INS-0')&&['INS-01','INS-02','INS-03'].includes(k)?'m²':['INS-04','INS-05'].includes(k)?'u':'m'}</small></label>`).join('')}</div></details><details data-excel-section="B"><summary>Activos disponibles en el ciclo</summary><p>Compra una única mesa y al menos un molde para fabricar. Los activos se conservan entre ciclos.</p><div class="excel-grid">${Object.keys(cfg().MAQUINARIA).map(k=>`<label>${e(k==='mesa'?'Mesa de corte':root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion)}<input type="number" min="0" ${actual&&k==='mesa'?'max="1"':''} step="1" data-activo="${k}" value="${e(draft.maquinaria[k]||0)}" ${frozen?'disabled':''}>${costoActivoHtml(k,draft.regimen)}</label>`).join('')}</div></details>
           <div data-excel-section="C" data-excel-lotes>${draft.lotes.map((l,i)=>loteHtml(l,i,frozen)).join('')}</div><button type="button" data-excel-section="C" class="side-button" data-agregar-lote ${frozen||draft.lotes.length>=cfg().MAX_LOTES?'disabled':''}>Agregar lote</button>
           <div data-excel-preview></div><p class="excel-help">Guardar conserva avances; confirmar envía el plan completo de las cinco secciones. Finanzas sin préstamo equivale a S/ 0 y no exige guardar antes.</p><div class="excel-actions"><button type="button" data-excel-guardar class="side-button" ${frozen?'disabled':''}>Guardar borrador de lotes</button><button type="button" data-excel-enviar class="side-button side-button--primary" ${frozen||!remoteReady?'disabled':''}>Confirmar plan del ciclo</button></div><p data-excel-status role="status">${confirmed?'Plan del ciclo confirmado.':stored.round?'Último guardado: ciclo '+e(stored.round):'Completa y confirma el plan para participar en el cierre.'}</p>`:''}</section>`;
-      if(actual&&context.category){for(const el of container.querySelectorAll('[data-excel-section]'))if(el.dataset.excelSection!==context.category)el.remove();for(const el of container.querySelectorAll('.excel-grid'))if(!el.querySelector('input,select,button'))el.remove();for(const el of container.querySelectorAll('details'))if(el.querySelector('summary')?.textContent==='Decisiones del ciclo'&&!el.querySelector('input,select,button'))el.remove();}
-      for(const el of container.querySelectorAll('details'))if(opened.includes(el.querySelector('summary')?.textContent)||(actual&&el.querySelector('input,select,button')))el.open=true;
+      if(sectioned){for(const el of container.querySelectorAll('[data-excel-section]'))if(el.dataset.excelSection!==context.category)el.remove();for(const el of container.querySelectorAll('.excel-grid'))if(!el.querySelector('input,select,button'))el.remove();for(const el of container.querySelectorAll('details'))if(el.querySelector('summary')?.textContent==='Decisiones del ciclo'&&!el.querySelector('input,select,button'))el.remove();}
+      for(const el of container.querySelectorAll('details'))if(opened.includes(el.querySelector('summary')?.textContent)||((actual||sectioned)&&el.querySelector('input,select,button')))el.open=true;
       feedback();
     }
     container.oninput=event=>{
@@ -198,7 +201,17 @@
       }
     };
     render();
-    return ()=>disposeDop();
+    return Object.assign(()=>disposeDop(),{refreshAccess(){
+      if(renderedReason!==blockedReason())render();
+    },setRemoteReady(value){
+      remoteReady=local||!!value;
+      const confirm=container.querySelector('[data-excel-enviar]');
+      if(confirm)confirm.disabled=!!blockedReason()||!remoteReady;
+      const toggle=container.querySelector('[data-excel-enable]');
+      if(toggle)toggle.disabled=!!blockedReason()||!remoteReady||!!context.activationBlocked;
+      const notice=container.querySelector('[data-excel-connection]');
+      if(notice)notice.hidden=remoteReady;
+    }});
   }
   const cierreKey=(game,ciclo)=>`SIDE_EXCEL_CIERRE_${game}_${ciclo}`;
   const historiaKey=game=>`SIDE_EXCEL_HISTORIAL_${game}`;

@@ -190,6 +190,7 @@ function updateIntegrationUI(){
     banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj y la actividad del mundo 3D están detenidos. Puedes revisar y preparar tus decisiones.':'';
   }
   renderCyclePause(paused);
+  if(document.querySelector('#excelProductionMount'))disposeProductionDop?.refreshAccess?.();
   if(paused&&['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){window.SIDE3D?.suspend?.();showScreen('studentLobby');}
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · '+(cycleRuntime?.status==='simulation-finished'||cycleRuntime?.phase==='finished'?'SIMULACIÓN FINALIZADA':cycleClosed?'CICLO CERRADO · CONSULTA TUS RESULTADOS':access.canOperate?'REVISA Y REGISTRA TUS DECISIONES':'ESPERANDO EL SIGUIENTE CICLO'));
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
@@ -969,10 +970,9 @@ function renderDecisionCategory(){
   const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   if(decisionState.__excel?.habilitado&&cat.cat!=='A'){
-    const canonical=usesCanonicalMotor();
-    $('decisionCards').innerHTML=canonical||cat.cat==='C'?'':'<p class="excel-help">Esta empresa usa el plan por lotes. Define todos los materiales, activos y decisiones del ciclo en Producción.</p>';
+    $('decisionCards').innerHTML='';
     document.querySelector('.section-save-bar')?.classList.add('hidden');
-    if(canonical||cat.cat==='C')mountExcelProductionEditor();updateHud();syncStudentTimer();updateDecisionLayout();return;
+    mountExcelProductionEditor();updateHud();syncStudentTimer();updateDecisionLayout();return;
   }
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
@@ -997,14 +997,22 @@ function importExcelPersonnel(){
 }
 async function mountExcelProductionEditor(){
   const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
-  const canonical=usesCanonicalMotor(),local=!currentStudent.empresaId;let remoteReady=local;
-  if(!local){container.textContent='Comprobando la disponibilidad de la partida…';const status=await window.SIDE?.PartidaService?.excelDisponible?.();remoteReady=!!status?.available&&(!canonical||status.motorVersion===window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL);if(!container.isConnected)return;}
+  const canonical=usesCanonicalMotor(),local=!currentStudent.empresaId;
   const legacyMoved=!canonical&&!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:canonical?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
+  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:canonical||decisionState.__excel?.habilitado?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady:local,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,
     save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(canonical){value.motor_version=window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;value.cicloActivacion=1;value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+  const editor=disposeProductionDop;
+  if(!local){
+    try{
+      const status=await window.SIDE?.PartidaService?.excelDisponible?.();
+      if(container.isConnected)editor?.setRemoteReady?.(!!status?.available&&(!canonical||status.motorVersion===window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL));
+    }catch{
+      if(container.isConnected)editor?.setRemoteReady?.(false);
+    }
+  }
 }
 function captureExcelTransition(){
   const maquinariaActivos={};let activosCosto=0;
