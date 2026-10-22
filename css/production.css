@@ -610,7 +610,7 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 }
 @media (max-width: 700px) {
   #decisionMenu #decisionTopbar,
-  #decisionMenu #decisionTopbar.compact { grid-template-columns: 34px minmax(0,1fr) 112px; grid-template-rows: auto auto auto; padding: 6px 10px; gap: 4px 8px; }
+  #decisionMenu #decisionTopbar.compact { grid-template-columns: 44px minmax(0,1fr) 112px; grid-template-rows: auto auto auto; padding: 6px 10px; gap: 4px 8px; }
   #decisionMenu #exitDecisions { grid-column: 1; grid-row: 1; height: 34px; min-height: 34px; }
   #decisionMenu #decisionTopbar .game-title-mark { grid-column: 2; grid-row: 1; }
   #decisionMenu #decisionTopbar .student-top-timer { grid-column: 3; grid-row: 1; padding: 3px; }
@@ -639,3 +639,8 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 #decisionMenu .cash-hud > span { font-size: 10px; line-height: 1.2; }
 #decisionMenu .cash-hud > strong { line-height: 1.15; }
 #decisionMenu .cash-hud > small { margin-top: 2px; }
+/* Compact styling must retain usable touch targets after responsive.css. */
+@media (pointer: coarse) {
+  #decisionMenu #exitDecisions,
+  #decisionMenu #decisionTopbar .top-submit-all { min-width: 44px; min-height: 44px; }
+}

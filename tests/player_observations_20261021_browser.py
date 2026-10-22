@@ -76,11 +76,14 @@ with sync_playwright() as p:
       const c=teacherConfig();c.runtime={round:2,phase:'decisions',status:'running',running:true};
       localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(c.runtime));
       renderStudentStatus();
-      return {produced:result.produccion.totalProducido,sold:result.unidadesVendidas,income:result.ingresos,history:financialReport().history.length};
+      const pending=financialReport();
+      return {produced:result.produccion.totalProducido,sold:result.unidadesVendidas,income:result.ingresos,history:pending.history.length,closedBalance:result.financial.balanceGeneral,pendingBalance:pending.balanceGeneral};
     }""")
     ok('Cierre genera producción, ventas e ingresos reales', metrics['produced'] > 0 and metrics['sold'] > 0 and metrics['income'] > 0)
     ok('Ciclo siguiente conserva resultados anteriores', metrics['history'] == 1)
     expect(page.locator('#studentCycleHistory')).to_contain_text('Ciclo 1')
+    expect(page.locator('#studentFinancialDetail')).to_contain_text('ÚLTIMO CIERRE: CICLO 1')
+    ok('Balance pendiente conserva activos y patrimonio del cierre', metrics['closedBalance'] == metrics['pendingBalance'])
     page.evaluate("""() => {
       const c=teacherConfig();c.runtime.status='paused';c.runtime.running=false;
       localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(c.runtime));
