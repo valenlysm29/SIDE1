@@ -1408,7 +1408,9 @@ function financialReport(){
     const result=excelSavedResult();if(result?.financial)return result.financial;
     const envelope=decisionState.__excel,caja=cashBalance(),history=[...(envelope.historial?.financialHistory||[])];
     const last=envelope.resultado;if(last?.financial&&!history.some(row=>Number(row.round)===Number(last.ciclo)))history.push({...last.financial,round:last.ciclo});
-    return {round:currentRound(),history,estadoResultados:{ingresos:0,costos:0,utilidad:0},balanceCaja:{cajaInicial:caja,entradas:0,salidas:0,cajaFinal:caja},flujoCaja:{cajaInicial:caja,cajaFinal:caja,flujoNeto:0},balanceGeneral:{efectivo:caja,activos:caja,deuda:envelope.historial?.deudaPrincipal||0,patrimonio:caja,pasivoPatrimonio:caja},pendiente:true};
+    const closed=history.filter(row=>row.balanceGeneral&&Number(row.round)<currentRound()).sort((a,b)=>Number(a.round)-Number(b.round)).at(-1);
+    const deuda=Number(envelope.historial?.deudaPrincipal||0),balanceGeneral=closed?{...closed.balanceGeneral}:{efectivo:caja,activosFijos:0,activos:caja,deuda,capital:initialCapital(),resultadosAcumulados:caja-deuda-initialCapital(),patrimonio:caja-deuda,pasivoPatrimonio:caja};
+    return {round:currentRound(),history,estadoResultados:{ingresos:0,costos:0,utilidad:0},balanceCaja:{cajaInicial:caja,entradas:0,salidas:0,cajaFinal:caja},flujoCaja:{cajaInicial:caja,cajaFinal:caja,flujoNeto:0},balanceGeneral,balanceGeneralRound:closed?.round||0,pendiente:true};
   }
   return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:cashLedger,sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
 }
@@ -1712,7 +1714,7 @@ function renderOfficeFinances(){
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;
   return `<details class="financial-details"><summary>Flujo de caja detallado · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
-  <div class="financial-details"><strong>BALANCE GENERAL · AL CICLO ${f.round}</strong>${row('Efectivo',bg.efectivo)}${row('Equipos, moldes y mejoras',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
+  <div class="financial-details"><strong>BALANCE GENERAL · ${f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Equipos, moldes y mejoras',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
 }
 let lastObservedRound=currentRound();
 let lastDeadlineRefresh='';
