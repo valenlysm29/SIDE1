@@ -63,6 +63,9 @@ button, .nav-btn, .sidebar-link, .primary, .secondary, .mini { font-family: var(
 .code-badge:empty { display: none; }
 .primary { background: #023863; color: var(--side-text); border: 1px solid var(--side-blue); box-shadow: none; }
 .primary:hover, .secondary:hover, .randomize:hover, .mini:hover { background: #023863; border-color: var(--side-blue); transform: none; }
+.secondary.danger { background: #b42332; border-color: #ff8b9a; color: #fff; }
+.secondary.danger:not(:disabled):hover { background: #941c29; border-color: #ffadb8; }
+.secondary.danger:focus-visible, #cancelGame:focus-visible { outline: 3px solid #ffadb8; outline-offset: 3px; }
 .card, .hero-card, .company-card, .stat, .config-start-footer, .event-picker, .modal-panel, .timer-box { background: var(--side-panel); border: 1px solid var(--faculty-line); box-shadow: none; }
 .card, .hero-card { padding: 20px; border-radius: 20px; }
 .card:hover, .company-card:hover { transform: none; border-color: var(--side-blue); }
