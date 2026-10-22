@@ -47,7 +47,7 @@ let playerIsDeciding = false;
 let tutorialMarkupPromise=null,waitingTutorialCleanup=null,waitingTutorialRequest=0,waitingTutorialPending=false;
 
 function showScreen(id){
-  if(['decisionMenu','characterSelection','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld())id='studentLobby';
+  if(['decisionMenu','characterSelection','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld()&&!(id==='decisionMenu'&&studentAccess().canReview))id='studentLobby';
   screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
   if(id!=='tutorial')window.stopSIDETutorial?.($('tutorialMount')?.querySelector('.tutorial-shell'));
   syncWaitingTutorial();
@@ -152,6 +152,7 @@ function studentAccess(existing=true){
   return RULES.gameAccess(teacherConfig(),status,{...r,round:currentRound()},existing,studentNow());
 }
 function updateIntegrationUI(){
+  renderStudentConnection();
   const access=studentAccess(),button=$('enterDecisionsBtn'),notice=$('studentIntegrationNotice');
   if(access.expelled){if(studentConnected)showStudentExpulsion();return;}
   const decisionsComplete=simulationSubmissionComplete();
@@ -181,9 +182,18 @@ function updateIntegrationUI(){
   $('studentLobby')?.classList.toggle('game-cancelled',Boolean(access.cancelled));
   $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
   const cycleRuntime=readRoundRuntime(),cycleClosed=['finished','simulation-finished'].includes(cycleRuntime?.status)||['results','finished'].includes(cycleRuntime?.phase);
+  const paused=cycleRuntime?.status==='paused';
+  for(const id of ['studentLobby','decisionMenu']){
+    const host=$(id);if(!host)continue;
+    let banner=host.querySelector('[data-cycle-paused]');
+    if(!banner){banner=document.createElement('p');banner.dataset.cyclePaused='';banner.className='student-sync-status';banner.setAttribute('role','status');host.prepend(banner);}
+    banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj y la actividad del mundo 3D están detenidos. Puedes revisar y preparar tus decisiones.':'';
+  }
+  renderCyclePause(paused);
+  if(paused&&['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){window.SIDE3D?.suspend?.();showScreen('studentLobby');}
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · '+(cycleRuntime?.status==='simulation-finished'||cycleRuntime?.phase==='finished'?'SIMULACIÓN FINALIZADA':cycleClosed?'CICLO CERRADO · CONSULTA TUS RESULTADOS':access.canOperate?'REVISA Y REGISTRA TUS DECISIONES':'ESPERANDO EL SIGUIENTE CICLO'));
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
-  if(button){button.disabled=!access.canOperate;button.classList.toggle('hidden',!access.canOperate||decisionsComplete);}
+  if(button){button.disabled=!access.canOperate&&!access.canReview;button.classList.toggle('hidden',(!access.canOperate&&!access.canReview)||decisionsComplete);button.textContent=paused?'Revisar decisiones':'Entrar a decisiones';}
   if(notice){
     notice.classList.toggle('hidden',access.canOperate||(waiting&&Number.isFinite(access.remaining)));
     const reason=access.reason||'';
@@ -216,15 +226,39 @@ function updateIntegrationUI(){
   if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
   if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
 
-  if(!access.canOperate&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
+  if(!access.canOperate&&!access.canReview&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
+}
+let lastPauseState=null,pauseDismissed=false;
+function renderCyclePause(paused){
+  let overlay=$('studentCyclePause');
+  if(!overlay){
+    overlay=document.createElement('section');overlay.id='studentCyclePause';overlay.className='cycle-pause-overlay';overlay.hidden=true;
+    overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','cyclePauseTitle');
+    overlay.innerHTML='<div class="side-panel"><h2 id="cyclePauseTitle">Ciclo en pausa</h2><p>El docente detuvo el ciclo. El temporizador está congelado y no puedes guardar ni enviar decisiones.</p><p>Puedes revisar y preparar tu plan mientras esperas.</p><button type="button" class="primary-gold">Revisar mis decisiones</button></div>';
+    overlay.querySelector('button').addEventListener('click',()=>{pauseDismissed=true;overlay.hidden=true;openDecisionMenu();});document.body.appendChild(overlay);
+  }
+  if(paused!==lastPauseState){
+    if(!paused&&lastPauseState===true&&studentAccess().canOperate)toast('Ciclo reanudado. El reloj continúa; ya puedes guardar y enviar decisiones.');
+    pauseDismissed=false;lastPauseState=paused;
+    if(paused)setTimeout(()=>overlay.querySelector('button')?.focus(),0);
+  }
+  overlay.hidden=!paused||pauseDismissed;
 }
 let cancellationShown=false;
 const STUDENT_EXPULSION_MESSAGE='Tu empresa fue eliminada de la partida por inactividad. Contacta a tu profesor si necesitas volver a participar.';
 function localStudentExpelled(){
   if(currentStudent.empresaId||!currentStudent.game?.codigo||!currentStudent.company)return false;
-  try{return JSON.parse(localStorage.getItem('SIDE_COMPANY_EXCLUSIONS')||'{}')[storageKey()]===true;}catch{return false;}
+  try{
+    if(JSON.parse(localStorage.getItem('SIDE_COMPANY_EXCLUSIONS')||'{}')[storageKey()]===true)return true;
+    return (JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')).some(r=>r.partida===currentStudent.game.codigo&&r.empresa===currentStudent.company&&(r.estado==='eliminada'||r.excelDecisionState?.eliminada));
+  }catch{return false;}
 }
-function showStudentExpulsion(){
+function showStudentExpulsion(options={}){
+  clearTimeout(window.__sideToast);$('toast')?.classList.remove('show');
+  const legacy=options.legacy||decisionState.__excel?.historial?.eliminada||decisionState.__excel?.eliminada;
+  const explanation=legacy?'Tu empresa fue eliminada según las reglas de participación del modelo Excel anterior (sin envío inicial). No puedes enviar nuevas decisiones.':'El profesor eliminó tu empresa por inactividad. Ya no puedes participar ni enviar decisiones en esta partida. Contacta a tu profesor si necesitas volver a participar.';
+  let summary;try{summary=financialReport();}catch{}
+  $('studentCyclePause')?.setAttribute('hidden','');
   const identityKey=studentIdentityKey();
   studentOutbox?.discard(identityKey,true);
   currentStudent.expulsada=true;studentConnected=false;studentProgressHydrated=false;studentSessionRecovering=false;
@@ -234,6 +268,10 @@ function showStudentExpulsion(){
   try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
   closeModal();showScreen('profiles');
   const notice=$('roomCancellationNotice');if(notice){notice.textContent=STUDENT_EXPULSION_MESSAGE;notice.classList.remove('hidden');}
+  const modal=$('studentExpelledModal'),detail=$('studentExpelledMessage');if(detail)detail.textContent=explanation;
+  let result=modal?.querySelector('[data-expelled-summary]');
+  if(modal&&!result){result=document.createElement('div');result.dataset.expelledSummary='';result.className='financial-details';modal.querySelector('button')?.before(result);}
+  if(result){const er=summary?.estadoResultados||{},cash=summary?.balanceCaja?.cajaFinal??cashBalance();result.innerHTML=`<strong>Resumen de ${escapeHtml(currentStudent.company)}</strong><p>Último estado disponible · ciclo ${summary?.round||currentRound()}</p><p>Caja: ${money(cash)} · Ingresos: ${money(er.ingresos)} · Utilidad: ${money(er.utilidad)}</p>${summary?.pendiente?'<p>El ciclo actual no tiene cierre. Estas cifras no constituyen un resultado definitivo.</p>':''}`;}
   showModal('studentExpelledModal');
 }
 let remoteStateBusy=false,remoteStateTask=null,studentProgressHydrated=false,studentSnapshotQueue=Promise.resolve(),studentSnapshotEpoch=0,autoEnterDecisions=false,studentClock=null,studentPoll=null,studentTick=null,zeroSyncDeadline=null,studentJoinedCompanies=null;
@@ -315,6 +353,7 @@ function legacyRemoteDecisionState(data){
 function hydrateRemoteProgress(data){
   const snapshot=remoteSnapshot(data);
   if(!data?.partida||!data?.empresa||!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot))return false;
+  if((snapshot.decision_state?.__excel?.eliminada||snapshot.decision_state?.__excel?.historial?.eliminada)||data.expulsada_at||data.empresa.expulsada_at||data.empresa.estado==='eliminada'){showStudentExpulsion({legacy:!!(snapshot.decision_state?.__excel?.eliminada||snapshot.decision_state?.__excel?.historial?.eliminada)});return false;}
   const round=Math.max(1,Number(snapshot?.round||snapshot?.ciclo||data?.ciclo_partida||data?.empresa?.ciclo_actual||currentRound()));
   const rawDecisionSnapshot=snapshot?.decision_state||snapshot?.decisionState,rawLedgerSnapshot=snapshot?.cash_ledger||snapshot?.cashLedger,rawSectionsSnapshot=snapshot?.financial_sections||snapshot?.financialSections;
   let decisionSnapshot=rawDecisionSnapshot;
@@ -364,8 +403,9 @@ async function refreshStudentGame(options={}){
         if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
         if(r?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return false;}
         if(!r?.success||!r.data?.partida||!r.data?.empresa){renderStudentPodium(null);studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};return false;}
-        studentStateFailure=null;
+        studentStateFailure=null;studentConnectionConfirmedAt=performance.now();
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
+        if(data.expulsada_at||data.participante?.expulsada_at||empresa.expulsada_at||empresa.estado==='eliminada'||remoteSnapshot(data)?.decision_state?.__excel?.eliminada||remoteSnapshot(data)?.decision_state?.__excel?.historial?.eliminada){showStudentExpulsion({legacy:!!(remoteSnapshot(data)?.decision_state?.__excel?.eliminada||remoteSnapshot(data)?.decision_state?.__excel?.historial?.eliminada)});return false;}
         if(partida.id!==currentStudent.game?.id||admissionCode(partida.codigo)!==admissionCode(identity.codigo))throw new Error('La respuesta del servidor corresponde a otra sala. Vuelve a intentar el ingreso con el código del docente.');
         const joined=Number(data.empresas_unidas);
         if(Number.isSafeInteger(joined)&&joined>=1)studentJoinedCompanies=joined;
@@ -397,7 +437,7 @@ async function refreshStudentGame(options={}){
   return remoteValid;
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&studentConnected)pollStudentGame();});
-window.addEventListener('pagehide',stopStudentSync);
+window.addEventListener('pagehide',()=>{stopStudentSync();try{const reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');const r=reports.find(row=>row.id===(currentStudent.participantId||('local-'+storageKey())));if(r){r.conectada=false;localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));}}catch{}});
 window.addEventListener('pageshow',()=>{if(studentConnected){startStudentSync();pollStudentGame();}});
 window.addEventListener('storage',event=>{if(['SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_ACTIVE_ROUND','SIDE_COMPANY_EXCLUSIONS'].includes(event.key)&&studentConnected)updateIntegrationUI()});
 function storageKey(){return `${currentStudent.game?.codigo||'SIDE-000'}_${currentStudent.company}`}
@@ -838,7 +878,7 @@ function categoryDraftNet(cat){
 function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0);return initialCapital()+ledgerTotal()-old+categoryDraftNet(currentCategory)}
 
 function openDecisionMenu(){
-  const access=studentAccess();if(!access.canOperate){showScreen('studentLobby');updateIntegrationUI();toast(access.reason);return false;}
+  const access=studentAccess();if(!access.canOperate&&!access.canReview){showScreen('studentLobby');updateIntegrationUI();toast(access.reason);return false;}
 
   loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
   updateDecisionReturnButton();
@@ -920,6 +960,10 @@ function renderDecisionCategory(){
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
   let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
+  if(!decisionState.__excel?.habilitado){
+    const fixed=allDecisionItems().filter(item=>item.mandatoryFixed);
+    lead+=`<aside class="event-clue" aria-label="Costos obligatorios previstos"><span>COSTOS OBLIGATORIOS PREVISTOS</span><strong>${fixed.map(item=>`${escapeHtml(item.name)}: − ${money(computeItemCost(item))}`).join(' · ')}</strong><small>Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}. La caja estimada incluye estos costos; el movimiento se registra al guardar o enviar la sección.</small></aside>`;
+  }
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
@@ -958,9 +1002,9 @@ async function mountExcelProductionEditor(){
   const legacyMoved=!canonical&&!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-  window.SIDE_EXCEL_UI?.mountEditor(container,{category:canonical?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
+  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,cash:cashBalance(),category:canonical?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,
-    save:value=>{if(canonical){value.motor_version=window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;value.cicloActivacion=1;value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+    save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(canonical){value.motor_version=window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;value.cicloActivacion=1;value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
 }
 function captureExcelTransition(){
   const maquinariaActivos={};let activosCosto=0;
@@ -1293,8 +1337,8 @@ async function startSimulationLoading(options={}){
 }
 $('retryWorldBtn')?.addEventListener('click',startSimulationLoading);
 $('startSimulationBtn')?.addEventListener('click',requestWorldEntry);
-function animateCash(netMovement){
-  const fx=$('cashFx');if(!fx||!netMovement)return;fx.querySelector('span').textContent=(netMovement>0?'+ ':'− ')+money(Math.abs(netMovement));fx.classList.remove('gain','spend','play');fx.classList.add(netMovement>0?'gain':'spend');void fx.offsetWidth;fx.classList.add('play');setTimeout(()=>fx.classList.remove('play'),1150);
+function animateCash(netMovement,mandatoryCost=0){
+  const fx=$('cashFx');if(!fx||!netMovement&&!mandatoryCost)return;fx.querySelector('span').textContent=(netMovement>0?'+ ':'− ')+money(Math.abs(netMovement))+(mandatoryCost?' · Incluye − '+money(mandatoryCost)+' obligatorios':'');fx.classList.remove('gain','spend','play');fx.classList.add(netMovement>0?'gain':'spend');void fx.offsetWidth;fx.classList.add('play');setTimeout(()=>fx.classList.remove('play'),1150);
   const cash=$('cashBalance');cash.classList.remove('cash-pulse');void cash.offsetWidth;cash.classList.add('cash-pulse');
 }
 function requiredDecisionItems(){return allDecisionItems().filter(i=>i.type!=='info'&&itemRequired(i))}
@@ -1305,7 +1349,7 @@ function updateCashHud(){
   const cash=decisionState.__excel?.habilitado?cashBalance():typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
   $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}`;
   if($('projectedCash'))$('projectedCash').textContent=money(cash);
-  if(decisionState.__excel?.habilitado){const owner=storageKey();if(excelCashDisplayed.owner===owner&&excelCashDisplayed.value!==null&&cash!==excelCashDisplayed.value)animateCash(cash-excelCashDisplayed.value);excelCashDisplayed={owner,value:cash};}
+  if(decisionState.__excel?.habilitado){const owner=storageKey();if(excelCashDisplayed.owner===owner&&excelCashDisplayed.value!==null&&cash!==excelCashDisplayed.value){const mandatory=(decisionState.__excel.resultado?.costos?.detalles?.manoObra||[]).filter(row=>['local','limpieza'].includes(row.rol)).reduce((sum,row)=>sum+Number(row.costo||0),0);animateCash(cash-excelCashDisplayed.value,mandatory);}excelCashDisplayed={owner,value:cash};}
 }
 function updateHud(){
   updateCashHud();
@@ -1319,6 +1363,7 @@ function updateHud(){
     return;
   }
   const top=$('topSubmitAllDecisions');if(top){top.disabled=false;top.innerHTML='<span>✓</span> ENVIAR TODO';}
+  $('sendDecisionSection')?.classList.remove('hidden');
   const sections=decisionCategories(),submitted=sections.filter(category=>sectionSubmitted(category.cat)||decisionsSubmitted()).length,submittedPct=sections.length?Math.round(submitted/sections.length*100):0;
   $('decisionProgressText').textContent=`${submitted}/${sections.length} · ${submittedPct}%`;$('decisionProgressBar').style.width=submittedPct+'%';
   $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',`${submitted} de ${sections.length} apartados enviados, ${submittedPct}%`);
@@ -1359,7 +1404,12 @@ function recordedFinancialSections(){
   return sections;
 }
 function financialReport(){
-  if(decisionState.__excel?.habilitado){const result=excelSavedResult();if(result?.financial)return result.financial;const caja=cashBalance();return {estadoResultados:{ingresos:0,costos:0,utilidad:0},balanceCaja:{cajaInicial:caja,entradas:0,salidas:0,cajaFinal:caja},flujoCaja:{cajaInicial:caja,cajaFinal:caja,flujoNeto:0},balanceGeneral:{efectivo:caja,activos:caja,deuda:0,patrimonio:caja,pasivoPatrimonio:caja},pendiente:true};}
+  if(decisionState.__excel?.habilitado){
+    const result=excelSavedResult();if(result?.financial)return result.financial;
+    const envelope=decisionState.__excel,caja=cashBalance(),history=[...(envelope.historial?.financialHistory||[])];
+    const last=envelope.resultado;if(last?.financial&&!history.some(row=>Number(row.round)===Number(last.ciclo)))history.push({...last.financial,round:last.ciclo});
+    return {round:currentRound(),history,estadoResultados:{ingresos:0,costos:0,utilidad:0},balanceCaja:{cajaInicial:caja,entradas:0,salidas:0,cajaFinal:caja},flujoCaja:{cajaInicial:caja,cajaFinal:caja,flujoNeto:0},balanceGeneral:{efectivo:caja,activos:caja,deuda:envelope.historial?.deudaPrincipal||0,patrimonio:caja,pasivoPatrimonio:caja},pendiente:true};
+  }
   return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:cashLedger,sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
 }
 let financialSyncTimer=null;
@@ -1387,7 +1437,7 @@ function syncStudentReportPreview(){
     excelDecisionState:decisionState.__excel?deepClone(decisionState.__excel):null,
     balanceCaja:{...financial.balanceCaja,balanceGeneral:financial.balanceGeneral},
     balanceGeneral:financial.balanceGeneral,flujoCaja:financial.flujoCaja,
-    score:Math.max(0,Math.round(utilidad/100+decisionProgressPercent())),estado:'activa',tomandoDecisiones:playerIsDeciding,conectada:studentConnected,integracion:studentAccess().integration,caja:cajaFinal,updatedAt:new Date().toISOString()
+    score:Math.max(0,Math.round(utilidad/100+decisionProgressPercent())),estado:'activa',tomandoDecisiones:playerIsDeciding,conectada:studentConnected,integracion:studentAccess().integration,caja:cajaFinal,updatedAt:new Date().toISOString(),lastSeenAt:studentConnected?new Date().toISOString():null
   };
   const excelResult=excelSavedResult();
   if(decisionState.__excel?.habilitado)report.estadoResultados={...report.estadoResultados,excelDecisionState:deepClone(decisionState.__excel)};
@@ -1415,6 +1465,11 @@ async function recoverStaleStudentState(){
   return false;
 }
 function studentSyncPending(){return Boolean(studentOutbox?.pending(studentIdentityKey())||getStudentOutbox()?.pending(studentIdentityKey()))}
+let studentConnectionConfirmedAt=null;
+function renderStudentConnection(){
+  const el=$('studentConnectionStatus');if(!el)return;
+  el.textContent=!studentConnected?'Sin conexión con la partida.':!currentStudent.empresaId?'Modo local · sin conexión a una sala remota.':navigator.onLine===false?'Sin conexión a internet. Tus avances guardados se conservan en este dispositivo.':studentStateFailure?'No se pudo confirmar la conexión con el servidor. Reintentando…':studentSessionRecovering||studentConnectionConfirmedAt===null?'Verificando conexión con la partida…':performance.now()-studentConnectionConfirmedAt>15000?'Conexión con el servidor sin confirmar. Reintentando…':'Conexión con el servidor confirmada. Al iniciar la partida entrarás al menú de decisiones.';
+}
 function showStudentSyncStatus(status,error){
   const labels={synced:'Cambios guardados y sincronizados.',saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
@@ -1608,6 +1663,7 @@ function syncStudentTimer(){
     note=wait>0?`Inicio automático en ${formatStudentTime(wait)}`:'Inicio automático pendiente';
   }else if(r?.status==='finished')note='Tiempo finalizado';
   else if(r?.status==='simulation-finished')note='Simulación finalizada';
+  else if(r?.status==='paused')note='Ciclo en pausa · reloj congelado';
   if(conf.lifecycleVersion===2&&r?.phase==='integration'){const access=studentAccess();remain=access.remaining||0;note='Sala de espera · el Ciclo 1 comenzará al terminar el tiempo configurado';}
   if(RULES.isCancellationMarker(conf.cancelledAt)||r?.phase==='cancelled'){remain=0;note='Partida cancelada';}
   const text=formatStudentTime(remain);
@@ -1644,7 +1700,7 @@ function renderStudentStatus(){
     if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
   }
   const events=activeStudentEvents();
-  if($('studentEventImpactText'))$('studentEventImpactText').textContent=`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
+  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:usesCanonicalMotor()?`Ciclo ${currentRound()} cerrado: ventas, costos y caja registrados. Consulta el desglose y los ciclos anteriores.`:`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
   const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>';
 }
 function renderOfficeFinances(){
@@ -1714,5 +1770,6 @@ if(invitationCode){
 // Preserve incomplete input while typing SIDE; canonicalize the full code on blur/submit.
 $('gameCode')?.addEventListener('input',()=>{$('gameCode').value=String($('gameCode').value).replace(/\s+/g,'').toUpperCase();showAdmissionCodeError();message('studentMessage','');});
 $('gameCode')?.addEventListener('blur',()=>{$('gameCode').value=admissionCode($('gameCode').value);});
-window.addEventListener('online',()=>{if(studentConnected)pollStudentGame();});
+window.addEventListener('online',()=>{renderStudentConnection();if(studentConnected)pollStudentGame();});
+window.addEventListener('offline',()=>{renderStudentConnection();showStudentSyncStatus('pending');});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});

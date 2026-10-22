@@ -125,7 +125,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'cap_media',label:'Media',desc:'Programa de capacitación técnica intermedia.',cost:6000},
         {id:'cap_alta',label:'Alta',desc:'Capacitación avanzada y especializada.',cost:12000}
       ]},
-      {id:'INV_MARKETING',name:'Inversión en marketing',type:'choice',recurring:true,required:true,options:[
+      {id:'INV_MARKETING',name:'Inversión en marketing',type:'choice',recurring:true,required:false,options:[
         {id:'mkt_baja',label:'Baja',desc:'Presencia básica de marca.',cost:1500},
         {id:'mkt_media',label:'Media',desc:'Mayor alcance y frecuencia comercial.',cost:6000},
         {id:'mkt_alta',label:'Alta',desc:'Campaña intensiva para acelerar visibilidad y demanda.',cost:12000}

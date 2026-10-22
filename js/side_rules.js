@@ -44,6 +44,7 @@
   function isCancellationMarker(value){return value!=null&&!['','null','false','0'].includes(String(value).trim().toLowerCase());}
   function gameAccess(config={}, status={}, runtime={}, existing=false, now=Date.now()) {
     if(isCancellationMarker(config.cancelledAt)||isCancellationMarker(status.cancelledAt)||config.phase==='cancelled'||runtime.phase==='cancelled')return {round:Number(runtime.round||1),phase:'cancelled',cancelled:true,integration:false,canJoin:false,canOperate:false,reason:'La partida ha sido cancelada por el profesor. No se pueden enviar más decisiones. Puedes volver al inicio para ingresar a otra partida.'};
+    if(runtime.status==='paused'&&!['results','finished','cancelled'].includes(runtime.phase))return {round:Number(runtime.round||config.round||1),phase:runtime.phase||'decisions',paused:true,canReview:true,integration:false,canJoin:existing,canOperate:false,remaining:Number(runtime.remaining)||0,reason:'Ciclo en pausa. Puedes revisar y preparar tus decisiones; guardar y enviar estará disponible cuando el docente reanude.'};
     if(config.lifecycleVersion===2){
       const phase=runtime.phase||config.phase||'integration',round=Number(runtime.round||config.round||1);
       const finished=phase==='finished'||Boolean(status.finishedAt);
