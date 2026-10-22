@@ -35,7 +35,7 @@ with sync_playwright() as p:
     ok('Motor nuevo queda versionado',page.evaluate("getConfig().motor_version==='side-lotes-2026-10-20'"))
     page.locator('#capitalModeRandom').check()
     expect(page.locator('#randomCapitalFields')).to_be_visible()
-    ok('1-2: modo aleatorio seleccionable antes de iniciar',page.evaluate("getComputedStyle($('capitalModeRandom').parentElement).borderTopColor==='rgb(255, 211, 41)'"))
+    ok('1-2: modo aleatorio seleccionable antes de iniciar',page.evaluate("$('capitalModeRandom').checked && getComputedStyle($('capitalModeRandom').parentElement).borderTopColor==='rgb(57, 208, 255)'"))
     page.locator('#openEventPicker').click()
     page.locator('input[name=eventSelectionMode][value=random]').check()
     page.locator('#eventRandomize').click()

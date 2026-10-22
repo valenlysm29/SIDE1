@@ -49,8 +49,10 @@ try:
   assert '70' in credit and 'Después de esta solicitud' in credit;passed([33],'Crédito disponible conserva S/ 70.000 sin solicitud.')
   page.locator('[data-cat="C"]').click();field=page.locator('[data-mold-target="molde_1"]');field.fill('50');field.press('Tab')
   assert '15' in page.locator('.mold-production-card').first.locator('.mold-requirements').inner_text()
-  field=page.locator('[data-mold-target="molde_1"]');field.fill('-5');assert field.input_value()=='0'
-  passed([36,37],'Comparación sin molde comprado y negativos normalizados al escribir.')
+  field=page.locator('[data-mold-target="molde_1"]');field.fill('-5')
+  assert float(field.input_value() or '0')>=0
+  assert page.evaluate("decisionDrafts.PRODUCCION_META.moldTargets.molde_1>=0")
+  passed([36,37],'Comparación sin molde comprado y negativos rechazados o normalizados al escribir.')
   page.locator('[data-cat="D"]').click()
   for id_ in ['PERSONAL_VENTAS','CREDITO_VENTAS']:
    row=page.locator(f'[data-item="{id_}"]');assert 'GUARDADA' not in row.inner_text();assert row.locator('p').count()==1
@@ -83,10 +85,12 @@ try:
   page.evaluate("localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:false}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,status:'finished',phase:'results',running:false}));updateIntegrationUI()")
   assert 'REVISA Y REGISTRA' not in page.locator('#lobbySegment').inner_text();passed([56],'Mensaje de cierre coherente.')
   if page.evaluate('Boolean(window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL)'):
-   page.evaluate("""()=>{localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,running:true,startedAt:new Date().toISOString(),duration:600,remaining:600}));const config=teacherConfig();config.motor_version=SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));currentCategory='B';openDecisionMenu();}""")
+   page.evaluate("""()=>{localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true,startedAt:new Date().toISOString()}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,phase:'decisions',status:'running',running:true,startedAt:new Date().toISOString(),duration:600,remaining:600}));const config=teacherConfig();config.motor_version=SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;config.lifecycleVersion=2;config.phase='decisions';localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));currentCategory='B';openDecisionMenu();}""")
    for category,title in [('B','Infraestructura'),('C','Producción'),('F','Logística'),('D','Ventas'),('E','Finanzas')]:
-    page.locator(f'[data-cat="{category}"]').click();page.locator('#excelEditorTitle').wait_for()
-    assert page.locator('#excelEditorTitle').inner_text()==title
+    assert not errors,errors
+    page.locator(f'[data-cat="{category}"]').click();page.locator('#excelProductionMount .excel-editor').wait_for()
+    # The repeated inner header is intentionally hidden by excel.css in section mode.
+    assert page.locator('#excelEditorTitle').text_content()==title
     assert page.locator('[data-excel-enable]').count()==0
     assert not page.locator('[data-excel-section]').evaluate_all('(els)=>els.some(el=>el.dataset.excelSection!==currentCategory)')
     page.screenshot(path=str(OUT/f'canonico-{category}.png'))

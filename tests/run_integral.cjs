@@ -33,7 +33,7 @@ const optional = ['tablet_item_draft_ui.cjs','mobile_integral_ui.cjs','side_full
 const extra = process.argv.find(arg => arg.startsWith('--extra='))?.slice(8).split(',').filter(Boolean) || [];
 for (const name of extra) if(!/^[a-zA-Z0-9_-]+\.cjs$/.test(name)) throw new Error('Runner adicional inválido: ' + name);
 const python = process.env.PYTHON_BIN || (fs.existsSync('C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe') ? 'C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe' : 'python');
-const nodeFiles = fs.readdirSync(__dirname).filter(name => /\.test\.(?:js|mjs)$/.test(name) || name === 'world_finance.test.cjs').sort();
+const nodeFiles = fs.readdirSync(__dirname).filter(name => /\.test\.(?:js|mjs|cjs)$/.test(name)).sort();
 const browserNames = [...new Set([...defaults,...additions,...optional,...extra])];
 const suites = [{name:'local_server_test.py',kind:'server',command:python,args:[path.join(__dirname,'local_server_test.py')],timeout:60000}, { name:'node-completa',kind:'node',args:['--test', '--test-concurrency=1', ...nodeFiles.map(name => path.join(__dirname,name))], timeout:600000 }, ...db.map(name => ({name,kind:'db',args:[path.join(__dirname,name)],timeout:180000})), ...browserNames.map(name => ({name,kind:'browser',args:[path.join(__dirname,name)],timeout:480000,optional:optional.includes(name)})), ...(process.argv.includes('--no-fps')?[]:[{name:'npc_fps_benchmark.cjs',kind:'benchmark',args:[path.join(__dirname,'npc_fps_benchmark.cjs')],timeout:480000}])];
 const only = process.argv.find(arg => arg.startsWith('--only='))?.slice(7).split(',');
