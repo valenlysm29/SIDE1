@@ -47,6 +47,9 @@
     if(runtime.status==='paused'&&!['results','finished','cancelled'].includes(runtime.phase))return {round:Number(runtime.round||config.round||1),phase:runtime.phase||'decisions',paused:true,canReview:true,integration:false,canJoin:existing,canOperate:false,remaining:Number(runtime.remaining)||0,reason:'Ciclo en pausa. Puedes revisar y preparar tus decisiones; guardar y enviar estará disponible cuando el docente reanude.'};
     if(config.lifecycleVersion===2){
       const phase=runtime.phase||config.phase||'integration',round=Number(runtime.round||config.round||1);
+      const deadline=Date.parse(runtime.startedAt||'')+Number(runtime.duration)*1000;
+      const expired=phase==='decisions'&&runtime.running&&((Number.isFinite(deadline)&&Number(runtime.duration)>0&&now>=deadline)||(!Number.isFinite(deadline)&&runtime.remaining!=null&&Number(runtime.remaining)===0));
+      if(expired)return {round,phase,remaining:0,canReview:true,integration:false,canJoin:existing,canOperate:false,reason:'El tiempo del ciclo terminó. Tus decisiones guardadas se conservan; espera el cierre o el siguiente ciclo.'};
       const finished=phase==='finished'||Boolean(status.finishedAt);
       const integration=!finished&&phase==='integration';
       const remaining=integration&&config.gameStartAt?Math.max(0,Math.ceil((Date.parse(config.gameStartAt)-now)/1000)):null;

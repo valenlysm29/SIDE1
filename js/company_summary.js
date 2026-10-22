@@ -213,8 +213,8 @@ function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').for
 function renderCompanySummary(){
   const mount=$('companySummaryMount');if(!mount)return;
   if(decisionState.__excel?.habilitado){
-    const result=excelSavedResult(),f=financialReport();
-    let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>Caja disponible: <b>${reviewMoney(f.balanceCaja.cajaFinal)}</b></p><p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa y confirma tu plan en Producción.'}</p></section>`;
+    const result=excelSavedResult(),f=financialReport(),projection=!result&&typeof excelDraftProjection==='function'?excelDraftProjection():null;
+    let html=`<section class="excel-resultados"><h2>Resumen del ciclo por lotes</h2><p>${projection?'Caja estimada con el plan':'Caja disponible'}: <b>${reviewMoney(projection?.cashAfter??f.balanceCaja.cajaFinal)}</b></p>${projection?`<p>Gastos previstos: <b>${reviewMoney(projection.spending)}</b>. Incluye costos obligatorios; las ventas se calculan al cierre.</p>`:''}<p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa tus decisiones en las cinco pestañas y usa Revisar plan para confirmar.'}</p></section>`;
     if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
     else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()),summaryMotorOverrides()),{preview:true});}catch{}
     if(typeof usesCanonicalMotor==='function'&&usesCanonicalMotor()&&simulationSubmissionComplete())html+='<p class="excel-help">Ventas y costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.</p><button id="companyStartWorld" type="button" class="cs-primary">Entrar al recorrido 3D</button>';

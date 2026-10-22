@@ -644,3 +644,122 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
   #decisionMenu #exitDecisions,
   #decisionMenu #decisionTopbar .top-submit-all { min-width: 44px; min-height: 44px; }
 }
+
+/* Three independent zones keep cycle figures readable at every viewport.
+   Reset legacy grid placement on nested children when the shell compacts. */
+#decisionMenu #decisionTopbar,
+#decisionMenu #decisionTopbar.compact {
+  display: grid;
+  grid-template-columns: minmax(210px, 1fr) minmax(340px, 420px) minmax(290px, 1fr);
+  grid-template-rows: auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+}
+#decisionMenu #decisionTopbar > div { min-width: 0; grid-column: auto; grid-row: auto; }
+#decisionMenu #decisionTopbar .decision-topbar-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+#decisionMenu #decisionTopbar #exitDecisions {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 10px;
+}
+#decisionMenu #decisionTopbar #decisionReturnLabel { display: none; }
+#decisionMenu #decisionTopbar .game-title-mark { min-width: 0; gap: 8px; }
+#decisionMenu #decisionTopbar .game-title-mark strong { font-size: 17px; letter-spacing: .3px; }
+#decisionMenu #decisionTopbar .game-title-mark small { display: block; font-size: 11px; line-height: 1.35; letter-spacing: 0; }
+#decisionMenu #decisionTopbar .decision-topbar-metrics {
+  display: grid;
+  grid-template-columns: minmax(175px, 1.35fr) minmax(145px, 1fr);
+  gap: 12px;
+  align-items: stretch;
+}
+#decisionMenu #decisionTopbar .cash-hud,
+#decisionMenu #decisionTopbar .student-top-timer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  grid-column: auto;
+  grid-row: auto;
+  width: auto;
+  min-width: 0;
+  min-height: 70px;
+  height: auto;
+  padding: 9px 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: 10px;
+  background: var(--ui-panel);
+}
+#decisionMenu #decisionTopbar .cash-hud > span,
+#decisionMenu #decisionTopbar .student-top-timer > span { font-size: 10px; line-height: 1.3; letter-spacing: .3px; }
+#decisionMenu #decisionTopbar .cash-hud strong { font-size: 21px; margin-block: 3px; overflow-wrap: normal; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#decisionMenu #decisionTopbar .cash-hud small { display: block; font-size: 10px; line-height: 1.3; }
+#decisionMenu #decisionTopbar #decisionRoundTimer {
+  display: block;
+  min-width: 8ch;
+  width: max-content;
+  max-width: none;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-size: 22px;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+#decisionMenu #decisionTopbar .decision-topbar-actions { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(130px, auto); align-items: center; justify-self: end; width: min(100%, 350px); gap: 16px; }
+#decisionMenu #decisionTopbar .mission-meter { position: static; display: block; grid-column: auto; grid-row: auto; width: 100%; min-width: 0; }
+#decisionMenu #decisionTopbar .mission-label { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; justify-content: space-between; margin-bottom: 7px; font-size: 10px; letter-spacing: .3px; }
+#decisionMenu #decisionTopbar .mission-label strong { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#decisionMenu #decisionTopbar .mission-track { width: 100%; height: 8px; margin: 0; background: #1b354c; border-color: #42617a; }
+#decisionMenu #decisionTopbar #decisionProgressHint { display: block; margin-top: 5px; color: var(--ui-muted); font-size: 10px; line-height: 1.3; }
+#decisionMenu #decisionTopbar .top-submit-all { grid-column: auto; grid-row: auto; min-width: 130px; min-height: 44px; padding: 10px 14px; font-size: 12px; white-space: nowrap; }
+@media (max-width: 1080px) {
+  #decisionMenu #decisionTopbar,
+  #decisionMenu #decisionTopbar.compact { grid-template-columns: minmax(180px, 1fr) minmax(290px, 350px); gap: 12px 20px; padding: 10px 16px; }
+  #decisionMenu #decisionTopbar .decision-topbar-metrics { grid-column: 1 / -1; grid-row: 2; grid-template-columns: minmax(175px, 1fr) minmax(145px, 1fr); }
+  #decisionMenu #decisionTopbar .decision-topbar-actions { grid-column: 2; grid-row: 1; }
+  #decisionMenu #decisionTopbar .cash-hud,
+  #decisionMenu #decisionTopbar .student-top-timer { min-height: 64px; }
+}
+@media (max-width: 600px) {
+  #decisionMenu #decisionTopbar,
+  #decisionMenu #decisionTopbar.compact { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 8px 10px; }
+  #decisionMenu #decisionTopbar .decision-topbar-metrics { grid-column: 1; grid-row: 2; grid-template-columns: minmax(0, 1.2fr) minmax(120px, 1fr); gap: 8px; }
+  #decisionMenu #decisionTopbar .decision-topbar-actions { grid-column: 1; grid-row: 3; width: 100%; gap: 12px; }
+  #decisionMenu #decisionTopbar .cash-hud,
+  #decisionMenu #decisionTopbar .student-top-timer { min-height: 62px; padding: 6px 8px; }
+  #decisionMenu #decisionTopbar .game-title-mark strong { font-size: 15px; }
+  #decisionMenu #decisionTopbar .game-title-mark small { font-size: 10px; }
+  #decisionMenu #decisionTopbar .cash-hud > span,
+  #decisionMenu #decisionTopbar .student-top-timer > span { font-size: 9px; }
+  #decisionMenu #decisionTopbar .cash-hud strong { font-size: 18px; margin-block: 1px; }
+  #decisionMenu #decisionTopbar .cash-hud small { font-size: 9px; }
+  #decisionMenu #decisionTopbar #decisionRoundTimer { font-size: 18px; }
+}
+@media (max-height: 500px) and (min-width: 601px) {
+  #decisionMenu #decisionTopbar,
+  #decisionMenu #decisionTopbar.compact { grid-template-columns: minmax(130px, 1fr) minmax(260px, 1.5fr) minmax(220px, 1.2fr); gap: 8px; padding: 6px 10px; }
+  #decisionMenu #decisionTopbar .decision-topbar-identity { gap: 6px; }
+  #decisionMenu #decisionTopbar .game-title-mark .mark-dot { display: none; }
+  #decisionMenu #decisionTopbar .game-title-mark strong { font-size: 13px; }
+  #decisionMenu #decisionTopbar .game-title-mark small { font-size: 9px; }
+  #decisionMenu #decisionTopbar .decision-topbar-metrics { grid-column: auto; grid-row: auto; grid-template-columns: minmax(145px, 1.2fr) minmax(105px, 1fr); gap: 6px; }
+  #decisionMenu #decisionTopbar .cash-hud,
+  #decisionMenu #decisionTopbar .student-top-timer { padding: 6px; min-height: 64px; }
+  #decisionMenu #decisionTopbar .cash-hud > span,
+  #decisionMenu #decisionTopbar .student-top-timer > span { font-size: 8px; }
+  #decisionMenu #decisionTopbar .cash-hud strong { font-size: 18px; }
+  #decisionMenu #decisionTopbar .cash-hud small { font-size: 9px; }
+  #decisionMenu #decisionTopbar #decisionRoundTimer { font-size: 18px; }
+  #decisionMenu #decisionTopbar .decision-topbar-actions { grid-column: auto; grid-row: auto; grid-template-columns: minmax(94px, 1fr) 118px; gap: 8px; }
+  #decisionMenu #decisionTopbar .mission-label strong { font-size: 12px; }
+  #decisionMenu #decisionTopbar .top-submit-all { min-width: 118px; padding: 8px; font-size: 11px; }
+}

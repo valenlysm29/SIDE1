@@ -1002,7 +1002,7 @@ async function mountExcelProductionEditor(){
   const legacyMoved=!canonical&&!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,cash:cashBalance(),category:canonical?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
+  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:canonical?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,
     save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(canonical){value.motor_version=window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;value.cicloActivacion=1;value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
 }
@@ -1342,11 +1342,33 @@ function animateCash(netMovement,mandatoryCost=0){
   const cash=$('cashBalance');cash.classList.remove('cash-pulse');void cash.offsetWidth;cash.classList.add('cash-pulse');
 }
 function requiredDecisionItems(){return allDecisionItems().filter(i=>i.type!=='info'&&itemRequired(i))}
-function decisionProgressPercent(){if(decisionState.__excel?.habilitado)return decisionsSubmitted()?100:0;const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
+function excelDraftProgress(){
+  const draft=decisionState.__excel?.decisiones;
+  if(!draft)return 0;
+  const positive=value=>Number.isFinite(Number(value))&&Number(value)>0;
+  const lots=(draft.lotes||[]).filter(l=>positive(l.cantidad));
+  const infrastructure=Number(draft.maquinaria?.mesa)===1&&['INF-08','INF-09','INF-10'].some(code=>positive(draft.maquinaria?.[code]));
+  const production=lots.length>0&&lots.every(l=>l.segmento&&l.molde&&positive(l.precio))&&['corte','ensamble','acabado'].every(area=>(draft.personal?.[area]||[]).flat().some(positive));
+  const logistics=lots.length>0&&lots.every(l=>['cuero','accesorios','hilo'].every(field=>!!l[field]));
+  const sales=(draft.seleccion||[]).some(code=>/^COM-01/.test(code));
+  const started=infrastructure||production||logistics||sales;
+  const finance=started&&Number(draft.montoPrestamo||0)>=0&&Number(draft.montoPrestamo||0)<=creditAvailable()&&(excelDraftProjection()?.cashAfter??-1)>=0;
+  return [infrastructure,production,logistics,sales,finance].filter(Boolean).length*20;
+}
+function excelDraftProjection(){
+  if(!decisionState.__excel?.decisiones||!window.SIDE_EXCEL_UI?.proyectarPlan)return null;
+  const result=excelSavedResult();
+  if(Number(result?.financial?.round)===currentRound())return null;
+  try{
+    const history=decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
+    return window.SIDE_EXCEL_UI.proyectarPlan(decisionState.__excel.decisiones,{cash:cashBalance(),historial:history,round:currentRound(),motorVersion:teacherConfig().motor_version||'excel-16'});
+  }catch{return null;}
+}
+function decisionProgressPercent(){if(decisionState.__excel?.habilitado)return decisionsSubmitted()?100:decisionState.__excel.decisiones?excelDraftProgress():0;const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
 function categoryCompletionMap(){if(decisionState.__excel?.habilitado){const complete=decisionsSubmitted();return {C:{title:'Plan por lotes',done:complete?1:0,total:1,complete}};}const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
 let excelCashDisplayed={owner:null,value:null};
 function updateCashHud(){
-  const cash=decisionState.__excel?.habilitado?cashBalance():typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
+  const cash=decisionState.__excel?.habilitado?(excelDraftProjection()?.cashAfter??cashBalance()):typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
   $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}`;
   if($('projectedCash'))$('projectedCash').textContent=money(cash);
   if(decisionState.__excel?.habilitado){const owner=storageKey();if(excelCashDisplayed.owner===owner&&excelCashDisplayed.value!==null&&cash!==excelCashDisplayed.value){const mandatory=(decisionState.__excel.resultado?.costos?.detalles?.manoObra||[]).filter(row=>['local','limpieza'].includes(row.rol)).reduce((sum,row)=>sum+Number(row.costo||0),0);animateCash(cash-excelCashDisplayed.value,mandatory);}excelCashDisplayed={owner,value:cash};}
@@ -1354,9 +1376,10 @@ function updateCashHud(){
 function updateHud(){
   updateCashHud();
   if(decisionState.__excel?.habilitado){
-    const submitted=decisionsSubmitted(),pct=submitted?100:0;
+    const submitted=decisionsSubmitted(),pct=decisionProgressPercent();
     $('decisionProgressText').textContent=`${submitted?1:0}/1 · ${pct}%`;$('decisionProgressBar').style.width=pct+'%';
-    $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',submitted?'Plan por lotes confirmado':'Plan por lotes pendiente');
+    $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',submitted?'Plan por lotes confirmado':`0 de 1 planes confirmados. Borrador preparado al ${pct} por ciento`);
+    if($('decisionProgressHint'))$('decisionProgressHint').textContent=submitted?'Plan confirmado':pct?'Preparación del borrador · falta confirmar':'Plan pendiente de confirmar';
     for(const id of ['startSimulationBtn','submitAllDecisionsBtn','sendDecisionSection']){$(id)?.classList.add('hidden');if($(id))$(id).disabled=true;}
     $('simulationLaunch')?.classList.add('hidden');
     const top=$('topSubmitAllDecisions');if(top){top.disabled=submitted;top.textContent=submitted?'Plan confirmado':'Revisar plan';}

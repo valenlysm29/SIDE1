@@ -552,19 +552,28 @@
     <div class="game-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
     <header id="decisionTopbar" class="decision-topbar">
+      <div class="decision-topbar-identity">
       <button id="exitDecisions" class="game-back-btn" type="button" aria-label="Volver a la sala" title="Volver a la sala (Esc)"><img src="assets/icons/ui/back.svg" alt=""><span id="decisionReturnLabel">Volver a la sala</span></button>
       <div class="game-title-mark">
         <span class="mark-dot"></span>
         <div><strong>DECISIONES</strong><small id="roundLabel">CICLO 1 · TU EMPRESA</small></div>
       </div>
+      </div>
+      <div class="decision-topbar-metrics">
       <div class="cash-hud" aria-label="Caja disponible">
         <span>CAJA ACTUAL ESTIMADA</span>
         <strong id="cashBalance">S/ 100,000</strong>
         <small id="cashMovement">Disponible para decidir</small>
       </div>
-      <div class="student-top-timer"><span>TIEMPO DEL CICLO</span><strong id="decisionRoundTimer">--:--:--</strong></div><button id="topSubmitAllDecisions" class="top-submit-all" type="button"><span>✓</span> ENVIAR TODO</button><div class="mission-meter" aria-label="Progreso de decisiones">
+      <div class="student-top-timer"><span>TIEMPO DEL CICLO</span><strong id="decisionRoundTimer">--:--:--</strong></div>
+      </div>
+      <div class="decision-topbar-actions">
+      <div class="mission-meter" aria-label="Progreso de decisiones">
         <div class="mission-label"><span>PROGRESO</span><strong id="decisionProgressText">0%</strong></div>
         <div class="mission-track"><div id="decisionProgressBar"></div></div>
+        <small id="decisionProgressHint">Plan pendiente de confirmar</small>
+      </div>
+      <button id="topSubmitAllDecisions" class="top-submit-all" type="button"><span>✓</span> ENVIAR TODO</button>
       </div>
     </header>
 
