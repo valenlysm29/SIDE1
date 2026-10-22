@@ -31,6 +31,11 @@ notifique al estudiante, ejecuta en Supabase SQL Editor la migración
 `supabase/migrations/2026-10-21_expulsion_empresa.sql` después de la de
 correcciones del 20 de octubre. Consulta [instalación y comportamiento](docs/expulsion-empresa.md).
 
+Para bloquear también en el servidor los envíos durante una pausa, ejecuta después
+`supabase/migrations/2026-10-21_pausa_escrituras_estudiante.sql`.
+El [informe de observaciones](reports/observaciones-jugador-2026-10-21.md)
+detalla el orden, las decisiones de diseño y la verificación de tres ciclos.
+
 Los archivos `output/entregas/SIDE_corregido.zip` y `.sha256` son una entrega
 anterior conservada; el ZIP no se regeneró con esta reorganización.
 
@@ -41,7 +46,7 @@ con tareas anteriores; las nuevas entregas deben guardarse en `output/`.
 Pruebas automatizadas, desde esta carpeta:
 
 ```powershell
-node --test tests/*.test.js tests/*.test.mjs tests/world_finance.test.cjs
+node --test tests/*.test.js tests/*.test.mjs tests/*.test.cjs
 python tests/local_server_test.py
 node tests/decision_options_db.cjs
 ```
