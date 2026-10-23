@@ -39,6 +39,7 @@ function newCreationRequest(){
 function creationFeedback(message,tone='error',conflict=null){
   previousRoom=conflict;
   const box=$('creationFeedback');if(!box)return;
+  delete box.dataset.source;
   box.classList.remove('hidden');box.dataset.tone=tone;$('creationMessage').textContent=message;
   $('retryCreate').classList.toggle('hidden',tone!=='error'||!!conflict);
   $('cancelGame')?.classList.toggle('hidden',!canCancelRoom());
@@ -99,10 +100,13 @@ function validateCreation(config){
   if(!Number.isSafeInteger(config.roundHours)||config.roundHours<0||!Number.isInteger(config.roundMinutes)||config.roundMinutes<0||config.roundMinutes>59||config.roundHours*60+config.roundMinutes<1)invalid('roundMinutes','Indica al menos 1 minuto; horas enteras y minutos entre 0 y 59.');
   if(config.cycleCloseMode==='automatic'&&config.scheduledStart&&!Number.isFinite(Date.parse(config.scheduledStart)))invalid('scheduledStart','Selecciona una fecha y hora válidas.');
   if(config.capitalMode==='random'&&config.capitalMax<config.capitalMin)invalid('capitalMax','La caja máxima debe ser mayor o igual a la mínima.');
+  for(const field of ['interest',...(config.capitalMode==='random'?['capitalMin','capitalMax']:['capital'])]){
+    if(!Number.isFinite(config[field])||config[field]<0||$(field)?.value.trim()==='')invalid(field,'Indica un monto o tasa válido, mayor o igual a cero.');
+  }
   const plan=RULES.cycleSchedule(config);
   if(plan.error&&!errors.length)invalid(config.cycleCloseMode==='automatic'?'scheduledStart':'roundMinutes',plan.error);
   if(config.enabledEvents.some(id=>!EVENT_CATALOG.some(e=>e.id===id)||!Number.isInteger(Number(config.eventRules[id]?.firstRound||1))||Number(config.eventRules[id]?.firstRound||1)>config.cycles||Number(config.eventRules[id]?.firstRound||1)<1))invalid('cycles','Revisa los eventos: su primer ciclo debe estar dentro de los ciclos configurados.');
-  if(errors.length){creationFeedback('Revisa los campos indicados antes de crear la sala.');errors[0].focus();return false;}
+  if(errors.length){creationFeedback(gameStatus()?.active?'Revisa los campos indicados antes de guardar la configuración.':'Revisa los campos indicados antes de crear la sala.');if($('creationFeedback'))$('creationFeedback').dataset.source='validation';errors[0].focus();return false;}
   return true;
 }
 async function recoverServerRoom(){
@@ -136,8 +140,10 @@ function refreshSetupSummary(){
   $('configReadySummary').textContent=`${count} ciclos operativos de ${$('roundHours').value||0} h ${$('roundMinutes').value||0} min. La integración es previa al Ciclo 1.`;
   const waitingText=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
   $('gameStatusBanner').textContent=integration?waitingText:active?`Partida iniciada · Ciclo ${state.round} de ${count}.`:status?.cancelledAt?'Partida cancelada. Puedes configurar otra partida.':status?.finishedAt?'Partida finalizada. Puedes configurar otra partida.':'Guarda la configuración y pulsa Iniciar partida para abrir la sala de espera.';
+  const financeHelp=$('financeConfigHelp');
+  if(financeHelp)financeHelp.textContent=!active?'La TEA y la caja se aplican desde el Ciclo 1.':state.round<count?`Guarda la TEA y la caja para aplicarlas desde el Ciclo ${state.round+1}. La caja se ajusta por la diferencia como aporte o retiro de capital; los ciclos actuales y cerrados conservan sus resultados.`:'Estás en el último ciclo. Los cambios financieros requieren un siguiente ciclo; puedes seguir gestionando los eventos.';
   document.querySelector('[data-tab="rondas"]')?.classList.toggle('hidden',!active&&!status?.finishedAt);
-  document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>input.disabled=active);
+  document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>input.disabled=active&&!editableFinancialInput(input));
   ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)});
   $('startCycle1Btn')?.classList.toggle('hidden',true);
   if(integration)$('roundState').textContent=waitingText;
@@ -148,15 +154,32 @@ function refreshSetupSummary(){
   renderTeacherLobby();
 }
 let publishedState='',publishChain=Promise.resolve();
-function publishGameState(){
+function publishGameState(savedConfig=null){
   const service=window.SIDE?.PartidaService;
-  if(!state.partidaId||!service?.actualizarConfiguracion||!gameStatus()?.active)return Promise.resolve();
-  const r=runtime(),config={...getConfig(),runtime:r?{...r,remaining:r.running?r.duration:r.remaining}:null};
+  if(!state.partidaId||!gameStatus()?.active)return Promise.resolve(true);
+  if(!service?.actualizarConfiguracion){toast('No se pudo guardar: el servicio de la partida no está disponible.','error');return Promise.resolve(false);}
+  const r=runtime(),config={...(savedConfig||getConfig()),runtime:r?{...r,remaining:r.running?r.duration:r.remaining}:null};
+  if(!savedConfig&&state.authoritative){
+    for(const key of ['interest','capitalMode','capital','capitalMin','capitalMax','financialSchedule'])config[key]=state.authoritative[key];
+  }
   const signature=JSON.stringify(config),id=state.partidaId;
   publishChain=publishChain.catch(()=>{}).then(async()=>{
-    if(signature===publishedState)return;
-    const result=await service.actualizarConfiguracion(id,config);
-    if(result.success){publishedState=signature;if(result.data?.configuracion)applyTeacherState(result.data);}else toast('No se guardó la configuración remota: '+result.error);
+    if(signature===publishedState)return true;
+    try{
+      const result=await service.actualizarConfiguracion(id,config);
+      if(result.success){
+        const received=result.data?.configuracion;
+        if(savedConfig?.financialSchedule?.length){
+          const finance=window.SIDE_FINANCE_CONFIG,round=savedConfig.financialSchedule.at(-1).effectiveRound;
+          const wanted=finance.resolve(savedConfig,round),actual=finance.resolve(received||{},round);
+          const confirmed=received?.financialSchedule?.length&&Object.keys(wanted).every(key=>key==='capitalMode'?wanted[key]===actual[key]:Number(wanted[key])===Number(actual[key]));
+          if(!confirmed){creationFeedback('El servidor no confirmó los cambios de TEA y caja. Aplica la migración supabase/migrations/2026-10-23_configuracion_financiera.sql y vuelve a guardar.','notice');return false;}
+        }
+        publishedState=signature;if(received)applyTeacherState(result.data);return true;
+      }
+      toast('No se guardó la configuración remota: '+result.error,'error');
+    }catch(error){toast('No se guardó la configuración remota: '+error.message,'error');}
+    return false;
   });
   return publishChain;
 }
@@ -187,6 +210,7 @@ function setDefaultDates(){const now=new Date(),end=new Date(now);end.setMonth(e
 function roundSeconds(){if(state.round===1&&state.integrationMinutes===60)return 3600;if(state.integrationMinutes===0&&state.round===1)return Math.max(60,Number($('roundHours').value||0)*3600+Number($('roundMinutes').value||0)*60);return Math.max(60,Number($('roundHours').value||0)*3600+Number($('roundMinutes').value||0)*60)}
 function cycleMode(){return document.querySelector('input[name="cycleMode"]:checked')?.value||'manual'}
 function capitalMode(){return document.querySelector('input[name="capitalMode"]:checked')?.value||'fixed'}
+function editableFinancialInput(input){return ['interest','capital','capitalMin','capitalMax'].includes(input.id)||input.name==='capitalMode'}
 function eventSelectionMode(){return document.querySelector('input[name="eventSelectionMode"]:checked')?.value||state.eventSelectionMode||'manual'}
 function cycleOffsetLabel(e){const n=Math.max(0,Number(e?.cycleOffset||0));return n===0?'+0 · mismo ciclo':n===1?'+1 · siguiente ciclo':`+${n} · después de ${n} ciclos`}
 function filteredEvents(){const q=String($('eventSearch')?.value||'').trim().toLowerCase(),cat=$('eventCategoryFilter')?.value||'all',scope=$('eventScopeFilter')?.value||'all';return EVENT_CATALOG.filter(e=>(!q||`${e.title} ${e.description} ${e.implication} ${e.category||''}`.toLowerCase().includes(q))&&(cat==='all'||e.category===cat)&&(scope==='all'||e.scope===scope))}
@@ -203,17 +227,34 @@ function getConfig(){return {
   manualStartDate:state.manualDates?.start||'',manualEndDate:state.manualDates?.end||'',
   eventRules:state.eventRules,enabledEvents:[...state.enabledEvents],eventSelectionMode:eventSelectionMode(),randomEventCount:Math.max(1,Math.min(40,Number($('eventRandomCount')?.value||15))),loanMaxPercent:50,loanInitialPercent:25
 }}
-function saveConfig(silent=false){
-  renderAcademicCalendar();const c=getConfig();
+async function saveConfig(silent=false){
+  renderAcademicCalendar();let c=getConfig();
+  const active=!!gameStatus()?.active,base=state.authoritative||c;
+  const financeFields=['interest','capitalMode','capital','capitalMin','capitalMax'];
+  if(active){
+    const values=Object.fromEntries(financeFields.map(key=>[key,silent?base[key]:c[key]]));
+    const changed=financeFields.some(key=>values[key]!==base[key]);
+    const effectiveRound=state.round+1;
+    if(changed&&effectiveRound>Number(c.cycles)){toast('La partida está en su último ciclo. No hay un siguiente ciclo para aplicar la TEA y la caja.');return false;}
+    const baseline={...c,...Object.fromEntries(financeFields.map(key=>[key,base[key]])),financialSchedule:base.financialSchedule};
+    c=changed?window.SIDE_FINANCE_CONFIG.schedule(baseline,values,effectiveRound):baseline;
+  }
   if(!validateCreation(c))return false;
   const numericPlan=RULES.cycleSchedule({...c,scheduledStart:c.scheduledStart||'2026-01-01T00:00'});
   if(c.lifecycleVersion===2&&(!Number.isInteger(c.integrationDurationMinutes)||c.integrationDurationMinutes<1||c.integrationDurationMinutes>60)){if(!silent)toast('Indica entre 1 y 60 minutos de integración.');return false}
   if(numericPlan.error){if(!silent)toast(numericPlan.error);return false}
   if(c.capitalMode==='random'&&c.capitalMax<c.capitalMin){toast('El rango máximo de caja debe ser mayor o igual al mínimo.');return false}
-  localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));$('gameCodeBadge').textContent=c.codigo;updateRoundDisplay();refreshSetupSummary();publishGameState();
-  if(!silent)toast('Configuración guardada. Pulsa Iniciar partida para abrir la sala de espera.');return true;
+  if(state.partidaId&&gameStatus()?.active){
+    if(!await publishGameState(c))return false;
+  }else{
+    localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(c));
+    if(gameStatus()?.active)state.authoritative=c;
+  }
+  $('gameCodeBadge').textContent=c.codigo;updateRoundDisplay();refreshSetupSummary();
+  const feedback=$('creationFeedback');if(feedback?.dataset.source==='validation'){feedback.classList.add('hidden');delete feedback.dataset.source;}
+  if(!silent)toast(gameStatus()?.active?'Configuración guardada.':'Configuración guardada. Pulsa Iniciar partida para abrir la sala de espera.');return true;
 }
-function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){$('interest').disabled=true;if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
+function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
 function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El servidor inicia el Ciclo 1 al terminar la integración desde la fecha programada. Puedes cerrar el navegador.':'El servidor inicia el Ciclo 1 al terminar el tiempo de la sala de espera. El docente controla el cierre y avance de los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
 
 
@@ -1111,7 +1152,10 @@ window.addEventListener('storage',e=>{if(e.key==='SIDE_STUDENT_REPORTS'){loadRep
 document.querySelectorAll('.nav-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 document.querySelectorAll('#tab-configuracion input').forEach(input=>{
   input.addEventListener(input.type==='radio'?'change':'input',()=>{
-    if(gameStatus()?.active)return;
+    if(gameStatus()?.active){
+      if(editableFinancialInput(input)){if(input.name==='capitalMode')syncModeUI();}
+      return;
+    }
     if(['capitalMode','cycleMode'].includes(input.name))syncModeUI();
     if(['startDate','endDate'].includes(input.id)&&cycleMode()==='manual')state.manualDates={start:$('startDate').value,end:$('endDate').value};
     state.round=1;state.seconds=roundSeconds();updateTimer();updateRoundDisplay();refreshSetupSummary();saveConfig(true);
@@ -1136,7 +1180,7 @@ $('eventClearSelection')?.addEventListener('click',()=>{state.enabledEvents.clea
 $('eventSelectAll')?.addEventListener('click',toggleSelectAllEvents);
 ['eventSearch','eventCategoryFilter','eventScopeFilter'].forEach(id=>$(id)?.addEventListener(id==='eventSearch'?'input':'change',()=>{renderEventBank();updateSelectAllBtn();}));
 $('eventRandomCount')?.addEventListener('change',()=>saveConfig(true));
-$('saveAll')?.addEventListener('click',()=>{if(state.starting||state.cancelling)return;saveConfig(false);refreshStartButton();});
+$('saveAll')?.addEventListener('click',async()=>{if(state.starting||state.cancelling||$('saveAll').disabled)return;$('saveAll').disabled=true;try{await saveConfig(false);}catch(error){toast('No se pudo guardar la configuración: '+error.message,'error');}finally{$('saveAll').disabled=false;refreshStartButton();}});
 $('startGame')?.addEventListener('click',startGame);
 $('retryCreate')?.addEventListener('click',startGame);
 $('copyLobbyCode')?.addEventListener('click',event=>copyInvitation(false,event.currentTarget));

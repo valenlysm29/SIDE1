@@ -5,6 +5,24 @@ const model=require('../js/financial_model.js');
 const view=require('../js/student_financial_view.js');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 
+test('teacher cash adjustments preserve closed cycles and enter equity, never profit or debt',()=>{
+  const original={'1:SIM_VENTAS':2000,'2:SIM_GASTOS':-500};
+  const before=model.calculate({capital:100000,ledger:original,round:2});
+  const ledger={...original,'3:CAPITAL_ADJUSTMENT':40000,'4:CAPITAL_ADJUSTMENT':-20000};
+  const after=model.calculate({capital:100000,ledger,round:4});
+  assert.deepEqual(after.history.slice(0,2),before.history);
+  const added=after.history[2];
+  assert.equal(added.balanceCaja.cajaFinal,141500);
+  assert.equal(added.estadoResultados.utilidad,0);
+  assert.equal(added.flujoCaja.financiamiento,40000);
+  assert.equal(added.balanceGeneral.capital,140000);
+  assert.equal(after.balanceCaja.salidas,20000);
+  assert.equal(after.balanceGeneral.capital,120000);
+  assert.equal(after.balanceGeneral.deuda,0);
+  assert.equal(after.balanceGeneral.resultadosAcumulados,1500);
+  assert.equal(after.balanceGeneral.activos,after.balanceGeneral.pasivoPatrimonio);
+});
+
 test('summary retains every cycle, including quiet cycles, and reports cumulative values',()=>{
   const report=model.calculate({capital:1000,round:3,ledger:{'1:SIM_VENTAS':200,'3:SIM_GASTOS':-50}});
   assert.deepEqual(report.history.map(row=>row.round),[1,2,3]);

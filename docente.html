@@ -50,9 +50,10 @@
 
     <section id="tab-configuracion" class="tab-panel active">
       <div class="hero-card">
-        <div><span class="eyebrow">PARTIDA ÚNICA ACTIVA</span><h2>Configura la simulación antes de iniciar</h2><p>El docente solo puede mantener una partida activa. El código es asignado por el sistema y no puede editarse.</p></div>
+        <div><span class="eyebrow">PARTIDA ÚNICA ACTIVA</span><h2>Configuración de la simulación</h2><p>El docente solo puede mantener una partida activa. El código es asignado por el sistema y no puede editarse. La TEA y la caja pueden actualizarse para los próximos ciclos.</p></div>
         <div class="faculty-wordmark faculty-wordmark-small" aria-hidden="true">SIDE</div>
       </div>
+      <p id="financeConfigHelp" class="info-banner" role="status">La TEA y la caja se aplican desde el Ciclo 1.</p>
       <div class="grid two">
         <article class="card">
           <div class="card-title"><h3>Identificación</h3><span>Partida</span></div>
@@ -211,7 +212,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20261022-reversion"></script>
 <script src="services/supabase_client.js?v=20261013-connection"></script>
-<script src="services/partida_service.js?v=20261022-reversion"></script>
+<script src="services/partida_service.js?v=20261023-finance"></script>
 <script src="services/empresa_service.js?v=20261022-reversion"></script>
 <script src="services/decisiones_service.js?v=20260924-lifecycle"></script>
 <script src="services/teacher_history_service.js?v=20260930-2"></script>
@@ -223,8 +224,8 @@
 <script src="js/engine/consecuencias.js?v=20261023-auditoria"></script>
 <script src="js/engine/mercado.js?v=20261023-auditoria"></script>
 <script src="js/engine/ciclo.js?v=20261023-auditoria"></script>
-<script src="js/engine/caja.js?v=20261022-reversion"></script>
-<script src="js/engine/ui_excel.js?v=20261022-dop-requirements"></script>
+<script src="js/engine/caja.js?v=20261023-finance"></script>
+<script src="js/engine/ui_excel.js?v=20261023-finance"></script>
 <script src="js/decision_catalog.js?v=20261022-dop-cantidad"></script>
 <script src="js/teacher_history.js?v=20260930-2"></script>
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
@@ -232,6 +233,7 @@
 <script src="js/teacher_podium.js?v=20261022-reversion"></script>
 <script src="services/teacher_sync.js?v=20261013-connection"></script>
 <script src="js/teacher_report_pdf.js?v=20261022-reversion"></script>
-<script src="js/docente.js?v=20261022-reversion"></script>
+<script src="services/finance_config.js?v=20261023-finance"></script>
+<script src="js/docente.js?v=20261023-finance"></script>
 </body>
 </html>

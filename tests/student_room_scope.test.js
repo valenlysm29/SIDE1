@@ -4,7 +4,8 @@ const RULES=require('../js/side_rules.js');
 function block(start,end){return source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));}
 function store(){const map=new Map();return {getItem:key=>map.get(key)||null,setItem:(key,value)=>map.set(key,String(value)),removeItem:key=>map.delete(key)};}
 function state(){
- const context={RULES,localStorage:store(),currentStudent:{empresaId:7,game:{id:'room-b',codigo:'SIDE-NEW'}},studentConnected:true,studentSessionRecovering:false,studentProgressHydrated:true,authoritativeStudentState:null,studentClock:null,performance:{now:()=>0},studentNow:()=>Date.parse('2026-10-11T12:00:00Z'),currentRound:()=>1,teacherConfig:()=>({}),deepClone:value=>JSON.parse(JSON.stringify(value))};
+ const window={SIDE_FINANCE_CONFIG:require('../services/finance_config.js')};
+ const context={window,RULES,localStorage:store(),currentStudent:{empresaId:7,game:{id:'room-b',codigo:'SIDE-NEW'}},studentConnected:true,studentSessionRecovering:false,studentProgressHydrated:true,authoritativeStudentState:null,studentClock:null,performance:{now:()=>0},studentNow:()=>Date.parse('2026-10-11T12:00:00Z'),currentRound:()=>1,teacherConfig:()=>({}),deepClone:value=>JSON.parse(JSON.stringify(value))};
  vm.createContext(context);vm.runInContext("function admissionCode(value){return String(value||'').trim().toUpperCase();}\n"+block('function studentAccess(','function updateIntegrationUI(')+block('function applyStudentGameState(','function remoteSnapshot('),context);return context;
 }
 test('una cancelación antigua no se atribuye a otra sala aunque tenga el mismo empresaId',()=>{

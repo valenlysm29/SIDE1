@@ -310,3 +310,16 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 --   "loanMaxPercent":50,
 --   "loanInitialPercent":25
 -- }
+
+-- Programación financiera por ciclo (2026-10-23): desplegar
+-- supabase/migrations/2026-10-23_configuracion_financiera.sql después de las
+-- migraciones de sala y cierre Excel. Guardar tras crear la sala programa para
+-- el ciclo siguiente; capital inicial y cierres anteriores permanecen iguales.
+-- configuracion.financialSchedule = [
+--   {"effectiveRound":1,"interest":20,"capitalMode":"fixed","capital":100000,
+--    "capitalMin":80000,"capitalMax":120000},
+--   {"effectiveRound":3,"interest":30,"capitalMode":"fixed","capital":125000,
+--    "capitalMin":80000,"capitalMax":120000}
+-- ]
+-- La diferencia de capital se registra como aporte/retiro (financiamiento),
+-- nunca como ingreso operativo ni como sustitución del efectivo acumulado.

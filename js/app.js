@@ -97,11 +97,19 @@ function scopedStudentState(){
 }
 function teacherConfig(){
   const defaults={capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000,interest:20,creditPercentStart:20,round:1,cycles:6,demandLosOlivos:1000,demandMiraflores:1250,demandSJL:1100,cycleCloseMode:'manual',roundHours:0,roundMinutes:10,roundSecs:0,scheduledStart:'',enabledEvents:[]};
-  const own=scopedStudentState();if(own)return {...defaults,...own.config};
-  try{return {...defaults,...JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')||'{}')}}catch{return defaults}
+  const own=scopedStudentState();let config={...defaults};
+  try{config={...defaults,...(own?own.config:JSON.parse(localStorage.getItem('SIDE_TEACHER_CONFIG')||'{}'))}}catch{}
+  const round=own?.runtime?.round||config.runtime?.round||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1;
+  return {...config,...(window.SIDE_FINANCE_CONFIG?.resolve(config,round)||{})};
 }
 function stableHash(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-function initialCapital(){const source=currentStudent?.initialCapital,remote=Number(source);if(source!==null&&source!==undefined&&source!==''&&Number.isFinite(remote)&&remote>=0)return remote;const c=teacherConfig();if(c.capitalMode!=='random')return Math.max(0,Number(c.capital||100000));let min=Math.max(0,Number(c.capitalMin||80000)),max=Math.max(min,Number(c.capitalMax||120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
+function initialCapital(){const source=currentStudent?.initialCapital,remote=Number(source);if(source!==null&&source!==undefined&&source!==''&&Number.isFinite(remote)&&remote>=0)return remote;const config=teacherConfig(),c=window.SIDE_FINANCE_CONFIG?.resolve(config,1)||config;if(c.capitalMode!=='random')return Math.max(0,Number(c.capital??100000));let min=Math.max(0,Number(c.capitalMin??80000)),max=Math.max(min,Number(c.capitalMax??120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
+function financialAdjustment(round=currentRound()){return window.SIDE_FINANCE_CONFIG?.adjustment(teacherConfig(),round,currentStudent.empresaId||excelCompanyId(),initialCapital())||0;}
+function financialLedger(){
+  const ledger={...cashLedger};let previous=0;
+  for(let round=1;round<=currentRound();round++){const adjustment=financialAdjustment(round);if(adjustment!==previous)ledger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;previous=adjustment;}
+  return ledger;
+}
 function creditOutstanding(){
   const prefix=`SIDE_DECISION_RECEIPTS_${storageKey()}_`;
   let total=0;
@@ -453,7 +461,7 @@ function loadDecisionState(){
   decisionDrafts={};
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
-function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)}
+function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)+financialAdjustment()}
 function ensureCycleFixedCosts(){
   if(decisionState.__excel?.habilitado||!studentAccess().canOperate)return null;
   const round=currentRound(),previous=decisionState.__cycleCosts?.[round];
@@ -500,7 +508,7 @@ function ensureCycleFixedCosts(){
   try{queueStudentSnapshot(buildStudentSnapshot(round));}catch(error){console.warn('SIDE: costos del ciclo guardados; sincronización pendiente',error);}
   return receipt;
 }
-function cashBalance(){if(decisionState.__excel?.habilitado)return excelSavedResult()?.financial?.balanceCaja.cajaFinal??decisionState.__excel.historial?.cajaFinal??decisionState.__excel.cajaTransicion??initialCapital();return initialCapital()+ledgerTotal()}
+function cashBalance(){if(decisionState.__excel?.habilitado){const result=excelSavedResult();if(result?.financial)return result.financial.balanceCaja.cajaFinal;const envelope=decisionState.__excel,history=envelope.historial?.cajaFinal!=null?envelope.historial:(envelope.transicion||envelope.historial||{});return (history.cajaFinal??envelope.cajaTransicion??initialCapital())+financialAdjustment()-Number(history.financialAdjustment||0);}return initialCapital()+ledgerTotal()}
 function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${currentRound()}`}
 function decisionsSubmitted(){if(decisionState.__excel?.habilitado)return !!decisionState.__excel.enviado&&Number(decisionState.__excel.round)===Number(currentRound());return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
@@ -898,7 +906,7 @@ function historicalQuantities(){
 function decisionModelContext(){
   const drafts={};allDecisionItems().forEach(item=>{drafts[item.id]=deepClone(initDraft(item))});
   return {catalog:DECISION_CATALOG,state:decisionState,drafts: drafts,round:currentRound(),config:teacherConfig(),rules:RULES,
-    capital:initialCapital(),ledger:cashLedger,workingDays:WORKING_DAYS_PER_MONTH,severanceRate:SEVERANCE_RATE,liquidationRate:LIQUIDATION_RATE_DEFAULT,
+    capital:initialCapital(),ledger:financialLedger(),workingDays:WORKING_DAYS_PER_MONTH,severanceRate:SEVERANCE_RATE,liquidationRate:LIQUIDATION_RATE_DEFAULT,
     creditOutstanding:creditOutstanding(),creditApprovedLine:creditApprovedLine(),creditAvailable:creditAvailable(),historyQuantities:historicalQuantities()};
 }
 function computeItemCost(item){
@@ -1056,7 +1064,7 @@ async function mountExcelProductionEditor(){
   const legacyMoved=!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:decisionState.__excel?.habilitado?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady:local,activationBlocked:legacyMoved,
+  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:decisionState.__excel?.habilitado?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:'excel-16',config:teacherConfig(),capital:initialCapital(),financeIdentity:currentStudent.empresaId||excelCompanyId(),financialAdjustment:financialAdjustment(),round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady:local,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,refreshSavedBalance:()=>{updateCashHud();if($('companySummaryMount')&&typeof renderCompanySummary==='function')renderCompanySummary();},
     save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
   const editor=disposeProductionDop;
@@ -1078,13 +1086,13 @@ function captureExcelTransition(){
       if(qty>0&&option.codigoExcel){maquinariaActivos[id==='MESA_CORTE'?'mesa':option.codigoExcel]=qty;activosCosto+=qty*Number(option.cost||0);}
     }
   }
-  const before=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:cashLedger,sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
+  const before=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
   // Solo se importa un inventario físico explícitamente persistido. Compras
   // anteriores o la proyección de producción no prueban stock remanente.
   const inventory=decisionState.__inventarioMP||{};
   const inventarioMP=Object.fromEntries(Object.entries(inventory).filter(([code,qty])=>Object.hasOwn(window.SIDE_EXCEL_CONFIG.CONFIG.PRECIO_MP,code)&&Number.isFinite(Number(qty))).map(([code,qty])=>[code,Math.max(0,Number(qty))]));
   const tea=Number(teacherConfig().interest??window.SIDE_EXCEL_CONFIG.CONFIG.TEA_BASE),deudaPrincipal=Number(before.balanceGeneral?.deuda||0);
-  return {cajaFinal:initialCapital()+ledgerTotal(),maquinariaActivos,activosCosto,depreciacionAcumulada:0,inventarioMP,deudaPrincipal,teaVigente:tea,tasaMensualVigente:Math.pow(1+tea/100,1/window.SIDE_EXCEL_CONFIG.CONFIG.MESES_ANIO)-1};
+  return {financialAdjustment:financialAdjustment(),cajaFinal:initialCapital()+ledgerTotal(),maquinariaActivos,activosCosto,depreciacionAcumulada:0,inventarioMP,deudaPrincipal,teaVigente:tea,tasaMensualVigente:Math.pow(1+tea/100,1/window.SIDE_EXCEL_CONFIG.CONFIG.MESES_ANIO)-1};
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
@@ -1428,7 +1436,7 @@ function excelDraftProjection(){
   if(Number(result?.financial?.round)===currentRound())return null;
   try{
     const history=decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-    return window.SIDE_EXCEL_UI.proyectarPlan(decisionState.__excel.decisiones,{cash:cashBalance(),historial:history,round:currentRound(),motorVersion:teacherConfig().motor_version||'excel-16'});
+    return window.SIDE_EXCEL_UI.proyectarPlan(decisionState.__excel.decisiones,{cash:cashBalance(),historial:history,round:currentRound(),config:teacherConfig(),capital:initialCapital(),financeIdentity:currentStudent.empresaId||excelCompanyId(),motorVersion:teacherConfig().motor_version||'excel-16'});
   }catch{return null;}
 }
 // Keep the committed budget separate from the automatically preserved working plan.
@@ -1441,7 +1449,7 @@ function excelSavedCashBalance(){
   if(Number.isFinite(envelope.saldoFinalGuardado))return envelope.saldoFinalGuardado;
   try{
     const history=envelope.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-    return window.SIDE_EXCEL_UI.proyectarPlan(envelope.decisionesGuardadas||envelope.decisiones,{cash:cashBalance(),historial:history,round:currentRound(),motorVersion:teacherConfig().motor_version||'excel-16'}).cashAfter;
+    return window.SIDE_EXCEL_UI.proyectarPlan(envelope.decisionesGuardadas||envelope.decisiones,{cash:cashBalance(),historial:history,round:currentRound(),config:teacherConfig(),capital:initialCapital(),financeIdentity:currentStudent.empresaId||excelCompanyId(),motorVersion:teacherConfig().motor_version||'excel-16'}).cashAfter;
   }catch{return cashBalance();}
 }
 function decisionProgressPercent(){if(decisionState.__excel?.habilitado)return decisionsSubmitted()?100:decisionState.__excel.decisiones?excelDraftProgress():0;const actionable=requiredDecisionItems();const done=actionable.filter(itemComplete).length;return actionable.length?Math.round(done/actionable.length*100):100}
@@ -1516,7 +1524,7 @@ function financialReport(){
     const deuda=Number(envelope.historial?.deudaPrincipal||0),balanceGeneral=closed?{...closed.balanceGeneral}:{efectivo:caja,activosFijos:0,activos:caja,deuda,capital:initialCapital(),resultadosAcumulados:caja-deuda-initialCapital(),patrimonio:caja-deuda,pasivoPatrimonio:caja};
     return {round:currentRound(),history,estadoResultados:{ingresos:0,costos:0,utilidad:0},balanceCaja:{cajaInicial:caja,entradas:0,salidas:0,cajaFinal:caja},flujoCaja:{cajaInicial:caja,cajaFinal:caja,flujoNeto:0},balanceGeneral,balanceGeneralRound:closed?.round||0,pendiente:true};
   }
-  return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:cashLedger,sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
+  return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound()});
 }
 let financialSyncTimer=null;
 function queueFinancialSync(){

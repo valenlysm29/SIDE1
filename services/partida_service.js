@@ -371,10 +371,11 @@
     if(!ctx.data.empresas?.length)return {success:true,data:null};
     try{
       const d=ctx.data,decisionesPorEmpresa={};overrides={...(d.overrides||{}),...overrides};
+      const financial=d.financialConfig&&global.SIDE_FINANCE_CONFIG?.resolve(d.financialConfig,ciclo);if(financial)overrides.TEA_BASE=Number(financial.interest);
       const historia=global.SIDE_EXCEL_CAJA.sembrarTransicion(d.historialPorEmpresa||{},d.empresas);
-      for(const empresa of d.empresas){const s=empresa.envelope,plan=s.planesPorCiclo?.[ciclo]||(s?.enviado&&Number(s.round)===Number(ciclo)?s.decisiones:null);if(plan)decisionesPorEmpresa[empresa.id]=global.SIDE_EXCEL_UI.prepararDecisiones(plan);}
+      for(const empresa of d.empresas){const s=empresa.envelope,plan=s.planesPorCiclo?.[ciclo]||(s?.enviado&&Number(s.round)===Number(ciclo)?s.decisiones:null);if(plan)decisionesPorEmpresa[empresa.id]={...global.SIDE_EXCEL_UI.prepararDecisiones(plan),...(financial?{teaBase:Number(financial.interest)}:{})};}
       let cierre=global.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:d.empresas.map(x=>String(x.id)),decisionesPorEmpresa,historialPorEmpresa:historia},overrides);
-      cierre=global.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.capital])),baseCajaPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.envelope.cajaTransicion??x.capital])),historialAnterior:historia,overrides});
+      cierre=global.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.capital])),baseCajaPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.envelope.cajaTransicion??x.capital])),historialAnterior:historia,overrides,ajustesCapitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,global.SIDE_FINANCE_CONFIG?.adjustment(d.financialConfig||{},ciclo,x.id,x.capital)||0]))});
       const {data,error}=await sb.rpc('side_guardar_cierre_excel',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:d.token,p_cierre:cierre});
       if(error||data?.error)return {success:false,code:error?.code||data?.code,error:error?.message||data.error};
       return {success:true,data:data.cierre,reused:!!data.reused};

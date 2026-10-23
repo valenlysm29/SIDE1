@@ -123,9 +123,9 @@
     return `<div class="excel-table-wrap"><table><caption>Comparación por material elegido</caption><thead><tr><th>Material</th><th>Necesario</th><th>Disponible con tus compras</th><th>Equivalencia del faltante en compras</th></tr></thead><tbody>${rows.length?rows.join(''):'<tr><td colspan="4">Elige molde, cantidad y materiales del lote para calcular las compras.</td></tr>'}</tbody></table><p class="excel-help">La equivalencia descuenta el inventario inicial y las compras del borrador y divide por la conversión de Costos De Producción!D32:K33. El Excel no define cómo redondear compras; se muestra la división sin imponer unidades enteras. No compra ni descuenta caja automáticamente.</p></div>`;
   }
   // A preview reserves the plan's cash without recording a movement or guessing sales.
-  function proyectarPlan(d,{cash=0,historial={},round=1,motorVersion}={}){
-    const overrides={},config=root.SIDE_EXCEL_CONFIG.configurar();
-    const decisions=prepararDecisiones(d),prepared=root.SIDE_EXCEL_CICLO.prepararEmpresa({...decisions,lotes:decisions.lotes.filter(lote=>config.CONSUMO_MOLDE[lote.molde]),ciclo:round},historial,overrides),costs=prepared.costos;
+  function proyectarPlan(d,{cash=0,historial={},round=1,motorVersion,config:teacherConfig}={}){
+    const financial=teacherConfig&&root.SIDE_FINANCE_CONFIG?.resolve(teacherConfig,round),overrides=financial?{TEA_BASE:Number(financial.interest)}:{},config=root.SIDE_EXCEL_CONFIG.configurar(overrides);
+    const decisions={...prepararDecisiones(d),...(financial?{teaBase:Number(financial.interest)}:{})},prepared=root.SIDE_EXCEL_CICLO.prepararEmpresa({...decisions,lotes:decisions.lotes.filter(lote=>config.CONSUMO_MOLDE[lote.molde]),ciclo:round},historial,overrides),costs=prepared.costos;
     const assets=(costs.detalles?.maquinaria||[]).reduce((sum,row)=>sum+row.salidaCompra*Math.max(0,numero(decisions.maquinaria?.[row.codigo])-numero(historial.maquinariaActivos?.[row.codigo])),0);
     const loan=decisions.seleccion.includes('FIN-01A')?numero(decisions.montoPrestamo):0,rate=Math.pow(1+(numero(config.TEA_BASE)+numero(historial.tasaAdicionalPP))/100,1/config.MESES_ANIO)-1;
     const priorRate=historial.tasaMensualVigente??(Math.pow(1+numero(historial.teaVigente??config.TEA_BASE)/100,1/config.MESES_ANIO)-1);
@@ -142,7 +142,8 @@
     normalizarNumeros(draft);
     for(const [codigo,owned] of Object.entries(context.historial?.maquinariaActivos||{}))draft.maquinaria[codigo]=Math.max(numero(draft.maquinaria[codigo]),numero(owned));
     let locked=!!context.locked,confirmed=Number(stored.round)===Number(context.round)&&stored.enviado,disposeDop=()=>{};
-    const local=context.local!==false,overrides={};
+    const local=context.local!==false,financial=context.config&&root.SIDE_FINANCE_CONFIG?.resolve(context.config,context.round),overrides=financial?{TEA_BASE:Number(financial.interest)}:{};
+    if(financial)draft.teaBase=Number(financial.interest);
     let remoteReady=local||context.remoteReady!==false;
     const sectioned=!!context.category;
     let renderedReason='';
@@ -384,15 +385,17 @@
   function leer(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback;}catch{return fallback;}}
   function historial(game,id){return leer(historiaKey(game),{})[id]||{};}
   function resultado(game,ciclo,id){return leer(cierreKey(game,ciclo),{}).resultadosPorEmpresa?.[id]||null;}
-  function cerrarLocal({game,ciclo,reports}){
+  function cerrarLocal({game,ciclo,reports,config:teacherConfig}){
+    if(!teacherConfig)teacherConfig=leer("SIDE_TEACHER_CONFIG",{});
+    const financial=Object.keys(teacherConfig).length&&root.SIDE_FINANCE_CONFIG?.resolve(teacherConfig,ciclo),overrides=financial?{TEA_BASE:Number(financial.interest)}:{};
     const participantes=reports.filter(r=>r.partida===game&&r.estado!=='eliminada'&&r.excelDecisionState?.habilitado&&Number(r.excelDecisionState.cicloActivacion??1)<=Number(ciclo));
     if(!participantes.length)return null;
     const previo=leer(cierreKey(game,ciclo),null);let cierre=previo;
     if(!cierre){
-      const decisionesPorEmpresa={};participantes.forEach(r=>{const d=r.excelDecisionState,plan=d.planesPorCiclo?.[ciclo]||(Number(d.round)===Number(ciclo)&&d.enviado?d.decisiones:null);if(plan)decisionesPorEmpresa[r.id]=prepararDecisiones(plan);});
+      const decisionesPorEmpresa={};participantes.forEach(r=>{const d=r.excelDecisionState,plan=d.planesPorCiclo?.[ciclo]||(Number(d.round)===Number(ciclo)&&d.enviado?d.decisiones:null);if(plan)decisionesPorEmpresa[r.id]={...prepararDecisiones(plan),...(financial?{teaBase:Number(financial.interest)}:{})};});
       const baseHistoria=leer(historiaKey(game),{}),historialAnterior=root.SIDE_EXCEL_CAJA?root.SIDE_EXCEL_CAJA.sembrarTransicion(baseHistoria,participantes.map(r=>({id:r.id,envelope:r.excelDecisionState}))):baseHistoria;
-      cierre=root.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:participantes.map(r=>r.id),decisionesPorEmpresa,historialPorEmpresa:historialAnterior});
-      if(root.SIDE_EXCEL_CAJA)cierre=root.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.capital])),baseCajaPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.excelDecisionState.cajaTransicion??r.capital])),historialAnterior});
+      cierre=root.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:participantes.map(r=>r.id),decisionesPorEmpresa,historialPorEmpresa:historialAnterior},overrides);
+      if(root.SIDE_EXCEL_CAJA)cierre=root.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.capital])),baseCajaPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,r.excelDecisionState.cajaTransicion??r.capital])),historialAnterior,overrides,ajustesCapitalPorEmpresa:Object.fromEntries(participantes.map(r=>[r.id,root.SIDE_FINANCE_CONFIG?.adjustment(teacherConfig,ciclo,r.id,r.capital)||0]))});
       localStorage.setItem(cierreKey(game,ciclo),JSON.stringify(cierre));localStorage.setItem(historiaKey(game),JSON.stringify(cierre.historialPorEmpresa));
     }
     participantes.forEach(r=>{const value=cierre.resultadosPorEmpresa[r.id];if(value){r.estadoResultados={...r.estadoResultados,excel:value,ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad};Object.assign(r,{ingresos:value.ingresos,costos:value.costosTotales,utilidad:value.utilidad,ronda:ciclo,updatedAt:new Date().toISOString()});root.SIDE_EXCEL_CAJA?.aplicarReporte(r,value);}if(cierre.eliminadas.includes(r.id))r.estado='eliminada';});
