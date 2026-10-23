@@ -64,7 +64,7 @@ try:
   passed([44],'Orden estable de pestañas entre ciclos.')
   page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','1');renderTabs();currentCategory='A';renderDecisionCategory()")
   summary=page.locator('#companySummaryMount').inner_text();assert 'Supabase' not in summary and '24 días productivos' in summary;passed([42],'Resumen claro y días productivos del Excel.')
-  assert page.locator('#cashBalance').inner_text()==page.locator('#projectedCash').inner_text();passed([35],'Un mismo valor de caja estimada.')
+  assert page.locator('#cashBalance').is_visible() and page.locator('#projectedCash').count()==0;passed([35],'Caja visible sin saldo duplicado.')
   cleaning=page.locator('[data-summary-item=LIMPIEZA]');assert cleaning.inner_text().count('Limpieza y servicios generales')==1 and 'Costo por ciclo' in cleaning.inner_text();passed([43],'Servicio fijo sin duplicación ni referencia por unidad.')
   page.evaluate("localStorage.setItem('SIDE_ACTIVE_ROUND','2');cashLedger={'1:SIM_GASTOS':-5000};updateCashHud()")
   assert '95' in page.locator('#cashMovement').inner_text();passed([45],'Caja inicial del ciclo 2 deriva del cierre anterior.')

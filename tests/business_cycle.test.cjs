@@ -25,7 +25,7 @@ test('three complete restored cycles buy, produce, sell, persist and reconcile c
 test('missing materials or workers never invent production or revenue',()=>{
  for(const missing of ['CUERO','ACCESORIOS','HILO','PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO']){const state=decisions(1);state[missing].quantities={};const r=cycle.close({state,catalog,round:1});assert.equal(r.receipt.produced,0);assert.equal(r.receipt.revenue,0);}
 });
-test('POS sales subtract the actual product and settle exactly once',()=>{
+test('legacy POS counts do not change the demand-based settlement',()=>{
  const production={producibleUnits:20,productLines:[{plannedUnits:10},{plannedUnits:0},{plannedUnits:10}],materials:[]},state={CANALES:{optionIds:['web']}};
  const r=cycle.close({state,ledger:{'1:SIM_VENTAS':1250},catalog,production,soldUnits:10,soldByProduct:{premium:10}});
  assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],2000);assert.equal(r.receipt.goods.premium,0);

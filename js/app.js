@@ -454,6 +454,11 @@ function loadDecisionState(){
   try{cashLedger=JSON.parse(localStorage.getItem(ledgerKey())||'{}')||{}}catch{cashLedger={}}
   const migrated=window.SIDE_CYCLE_MODEL?.migrate({state:decisionState,ledger:cashLedger,catalog:DECISION_CATALOG,capital:initialCapital(),round:currentRound()});
   if(migrated?.migrated){localStorage.setItem('SIDE_PREVIOUS_MODEL_BACKUP_'+storageKey(),JSON.stringify(migrated.archive));decisionState=migrated.state;cashLedger=migrated.ledger;if(migrated.closedRound===currentRound()){localStorage.setItem(submissionKey(),'1');for(const category of decisionCategories())localStorage.setItem(sectionSubmissionKey(category.cat),'1');}persistGameState();}
+  const cleanLedger=window.SIDE_CYCLE_MODEL?.economicLedger?.(cashLedger,decisionState);
+  if(cleanLedger&&JSON.stringify(cleanLedger)!==JSON.stringify(cashLedger)){
+    localStorage.setItem('SIDE_WORLD_LEDGER_BACKUP_'+storageKey(),JSON.stringify(cashLedger));
+    cashLedger=cleanLedger;persistGameState();
+  }
   decisionDrafts={};
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
@@ -531,8 +536,7 @@ function canStartSimulation(){return canExploreWorld()}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 window.SIDE_GAME_BRIDGE={
-  get decisions(){return decisionState},
-  get ledger(){return cashLedger},
+  get decisions(){return deepClone(decisionState)},
   openDecisionCategory(cat){
     if(!['B','C','D','E','F'].includes(cat))return false;
     currentCategory=cat;
@@ -553,26 +557,6 @@ window.SIDE_GAME_BRIDGE={
   productionPlan:()=>productionPlan(),
   financialReport:()=>financialReport(),
   financialOfficeHtml:()=>window.SIDE_STUDENT_FINANCIAL_VIEW?.officeHtml(financialReport())||'',
-  recordOperatingExpense(amount,kind='SIM_GASTOS',storageWrites={}){
-    if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
-    const key=`${currentRound()}:${['SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES'].includes(kind)?kind:'SIM_GASTOS'}`;
-    const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)-Number(amount)};
-    if(!writeDecisionBatch({...storageWrites,[ledgerKey()]:JSON.stringify(ledger)}))return false;
-    cashLedger=ledger;
-    try{syncStudentReportPreview();queueFinancialSync();}catch(error){console.error('SIDE: gasto guardado; actualización visual pendiente',error);}
-    return true;
-  },
-  recordSimulatedSale(amount=75,storageWrites={}){
-    if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
-    const sale=Math.max(0,Number(amount)||0),key=`${currentRound()}:SIM_VENTAS`;
-    const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)+sale};
-    const physicalStores=RULES.storeCount(savedEntry(findDecisionItem('CANALES')));
-    if(physicalStores>0){const commissionKey=`${currentRound()}:COMISION_VENTAS`;ledger[commissionKey]=Number(ledger[commissionKey]||0)-sale*0.01}
-    if(!writeDecisionBatch({...storageWrites,[ledgerKey()]:JSON.stringify(ledger)}))return false;
-    cashLedger=ledger;
-    try{syncStudentReportPreview();renderStudentStatus();queueFinancialSync();}catch(error){console.error('SIDE: venta guardada; actualización visual pendiente',error);}
-    return cashLedger[key];
-  }
 };
 
 // Landing / acceso
@@ -1138,7 +1122,6 @@ function updateSectionCost(){
   const locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
-  $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
   updateCashHud();
   $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
   // El presupuesto puede impedir confirmar una decisión, pero nunca debe impedir
@@ -1347,8 +1330,6 @@ function categoryCompletionMap(){const out={};decisionCategories().forEach(cat=>
 function updateCashHud(){
   const cash=cashBalance();
   $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
-  if($('projectedCash'))$('projectedCash').textContent=money(cash);
-  for(const node of document.querySelectorAll('[data-saved-final-balance]'))node.textContent=money(cash);
 }
 function updateHud(){
   updateCashHud();
@@ -1402,10 +1383,8 @@ function queueFinancialSync(){
   financialSyncTimer=setTimeout(()=>{financialSyncTimer=null;syncReportToSupabase(syncStudentReportPreview());},1500);
 }
 function cycleBusinessData(round=currentRound()){
-  const code=($('lobbyCode')?.textContent||'SIDE').replace(/\s+/g,'_'),company=String(currentStudent.company||'MI EMPRESA').trim().replace(/[^a-z0-9_-]+/gi,'_').slice(0,36)||'EMPRESA',context=`${code}_${company}_${round}`;
-  let inventory={},business={};try{inventory=JSON.parse(localStorage.getItem('side3d_inventory_'+context)||'{}');business=JSON.parse(localStorage.getItem('side3d_business_'+context)||'{}');}catch{}
   const events=round===currentRound()?activeStudentEvents():decisionState.__cycleBusiness?.[round]?.events||[];
-  return {events:deepClone(events),prices:business.prices||{},soldByProduct:inventory.sold||{},soldUnits:Object.values(inventory.sold||{}).reduce((sum,value)=>sum+Number(value||0),0)};
+  return {events:deepClone(events)};
 }
 function captureCyclePlan(){
   const round=currentRound(),state=deepClone(decisionState);delete state.__cyclePlans;
@@ -1420,7 +1399,7 @@ function settleCycle(round=currentRound()){
   const live=decisionState,ctx=cycleBusinessData(round),id=currentStudent.participantId||('local-'+storageKey()),game=currentStudent.game?.codigo||'SIDE-000';
   let peers=[];try{peers=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
   const inputs=peers.filter(r=>r.id!==id&&r.partida===game&&r.estado!=='eliminada'&&r.enviado&&r.gameState?.__cyclePlans?.[round]).map(r=>{
-    const plan=r.gameState.__cyclePlans[round];return {id:r.id,state:plan.state,production:plan.production,round,...r.gameState.__cycleBusiness?.[round],prices:r.gameState.__cycleBusiness?.[round]?.prices||r.productPrices};
+    const plan=r.gameState.__cyclePlans[round];return {id:r.id,state:plan.state,production:plan.production,round,events:r.gameState.__cycleBusiness?.[round]?.events||[]};
   });
   inputs.push({id,state:window.SIDE_CYCLE_MODEL.restoreState(saved.state,live),ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig(),...ctx});
   const result=window.SIDE_CYCLE_MODEL.closeMany(inputs)[id];
@@ -1446,7 +1425,7 @@ function syncStudentReportPreview(){
     decisiones:currentDecisionLabels(),apartados:categoryCompletionMap(),progreso:decisionProgressPercent(),enviado:decisionsSubmitted(),
     eventos:events.map(e=>({id:e.id,titulo:e.title,descripcion:e.description,afectados:e.scope==='group'?'Todos':'Empresa individual',ciclos:e.cycles,cicloAfecta:(Number(e.cycleOffset||0)===0?'+0 · mismo ciclo':Number(e.cycleOffset||0)===1?'+1 · siguiente ciclo':`+${Number(e.cycleOffset||0)} · después de ${Number(e.cycleOffset||0)} ciclos`),implicancia:e.implication,ocurrencia:e.probability})),
     estadoResultados:financial.estadoResultados,
-    gameState:deepClone(decisionState),cashLedger:deepClone(cashLedger),financialSections:recordedFinancialSections(),productPrices:cycleBusinessData().prices,soldUnits:cycleBusinessData().soldUnits,soldByProduct:cycleBusinessData().soldByProduct,
+    gameState:deepClone(decisionState),cashLedger:deepClone(cashLedger),financialSections:recordedFinancialSections(),
     balanceCaja:{...financial.balanceCaja,balanceGeneral:financial.balanceGeneral},
     balanceGeneral:financial.balanceGeneral,flujoCaja:financial.flujoCaja,
     score:Math.max(0,Math.round(utilidad/100+decisionProgressPercent())),estado:'activa',tomandoDecisiones:playerIsDeciding,conectada:studentConnected,integracion:studentAccess().integration,caja:cajaFinal,updatedAt:new Date().toISOString(),lastSeenAt:studentConnected?new Date().toISOString():null
@@ -1458,6 +1437,8 @@ function syncStudentReportPreview(){
 }
 function persistStudentSession(){try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}}
 function buildStudentSnapshot(round=currentRound()){
+  // Recover a confirmation interrupted before its plan reached the durable outbox.
+  if(round===currentRound()&&simulationSubmissionComplete()&&!decisionState.__cyclePlans?.[round])captureCyclePlan();
   decisionState.__cycleBusiness={...decisionState.__cycleBusiness,[round]:cycleBusinessData(round)};
   return {
     version:1,round,updated_at:new Date().toISOString(),

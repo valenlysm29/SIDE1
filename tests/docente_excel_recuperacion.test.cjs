@@ -10,4 +10,6 @@ test('Profesor en navegador nuevo reconstruye balance financiero desde reporte p
  vm.createContext(context);vm.runInContext(source.slice(inicio,fin),context);
  const out=await context.supabaseReports();assert.deepEqual(JSON.parse(JSON.stringify(out[0].balanceGeneral)),financial.balanceGeneral);
  assert.equal(out[0].caja,financial.balanceCaja.cajaFinal);assert.equal(out[0].costos,financial.estadoResultados.costos);assert.equal(out[0].utilidad,financial.estadoResultados.utilidad);
+ report.estado_resultados={...financial.estadoResultados,balanceGeneral:financial.balanceGeneral};
+ const current=await context.supabaseReports();assert.deepEqual(JSON.parse(JSON.stringify(current[0].balanceGeneral)),financial.balanceGeneral,'current business closure restores its persisted balance sheet');
 });

@@ -104,7 +104,12 @@ function commitReviewedSections(cats,finalize){
     if(!writeDecisionBatch(writes))return false;
     const delta=Object.values(ledger).reduce((a,b)=>a+Number(b||0),0)-ledgerTotal();
     decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
-    if(simulationSubmissionComplete())captureCyclePlan();
+    if(simulationSubmissionComplete()){
+      captureCyclePlan();
+      // Queue the confirmed plan before optional report rendering can fail.
+      try{if(currentStudent.empresaId)queueStudentSnapshot(buildStudentSnapshot(currentRound()));}
+      catch(error){console.error('SIDE: plan confirmado localmente; sincronización pendiente',error);}
+    }
     if(finalize){currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';closeCompanyReview();}
     try{syncReportToSupabase(syncStudentReportPreview());}catch(error){console.error('SIDE: preview report refresh failed',error);}
     // Fase B-fix: el envío también sincroniza con Supabase (no solo el borrador).

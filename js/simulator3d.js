@@ -127,8 +127,8 @@
   const owned = (id) => allPurchases(saved(id));
   const currentRoundSafe = () => bridge().currentRound?.() || (typeof window.currentRound === 'function' ? window.currentRound() : 1);
   const decisionCash = () => bridge().cash?.() ?? (typeof window.cashBalance === 'function' ? window.cashBalance() : 100000);
-  const simLedgerKey = () => `${currentRoundSafe()}:SIM_VENTAS`;
-  const salesLedger = () => Number(bridge().ledger?.[simLedgerKey()] || 0);
+  // Entertainment receipts are stored only in the world's own local state.
+  const salesLedger = () => Number(businessState?.revenue || 0);
 
   function companyStorageContext() {
     const code = ($3('lobbyCode')?.textContent || 'SIDE').replace(/\s+/g, '_');
@@ -170,10 +170,6 @@
   function loadBusinessState() {
     try { businessState = JSON.parse(localStorage.getItem(businessKey()) || 'null'); } catch { businessState = null; }
     if (!businessState) businessState = createBusinessState();
-    if(!businessState.economicLedgerVersion&&bridge().recordOperatingExpense){
-      if(Number(businessState.expenses)>0)bridge().recordOperatingExpense(Number(businessState.expenses));
-      businessState.economicLedgerVersion=1;
-    }
     businessState.prices ||= { esencial: 75, urbano: 95, premium: 125 };
     businessState.upgrades ||= { display: 0, checkout: 0, warehouse: 0 };
     businessState.production ||= { producedToday: 0, stage: 0 };
@@ -195,7 +191,7 @@
   }
 
   function operationalCash() {
-    return decisionCash() - (bridge().recordOperatingExpense ? 0 : Number(businessState?.expenses || 0));
+    return decisionCash() + salesLedger() - Number(businessState?.expenses || 0);
   }
 
   function applyExpense(amount, reason, kind='SIM_GASTOS',businessPatch={}) {
@@ -203,7 +199,6 @@
     if(bridge().canOperate?.()===false)return false;
     const a = Math.max(0, Number(amount) || 0);
     const next={...businessState,...businessPatch,expenses:Number(businessState.expenses||0)+a};
-    if(bridge().recordOperatingExpense?.(a,kind,{[businessKey()]:JSON.stringify(next)})===false)return false;
     businessState=next;
     saveBusinessState();
     showCashFx(`− ${fmt(a)}`);
@@ -2788,8 +2783,8 @@
     const salePrice = Math.max(0, Number(price || product.price));
     const nextInventory=inventory?{...inventory,sold:{...inventory.sold,[product.id]:Number(inventory.sold?.[product.id]||0)+1}}:null;
     const writes={[salesCountKey()]:String(simSales+1),...(nextInventory?{[inventoryKey()]:JSON.stringify(nextInventory)}:{})};
-    if(bridge().recordSimulatedSale?.(salePrice,writes)===false)return false;
-    if(!bridge().recordSimulatedSale)for(const [key,value] of Object.entries(writes))localStorage.setItem(key,value);
+    for(const [key,value] of Object.entries(writes))localStorage.setItem(key,value);
+    businessState.revenue=Number(businessState.revenue||0)+salePrice;saveBusinessState();
     simSales++;if(nextInventory)inventory=nextInventory;
     try{
     if (gameSession) {
@@ -2865,9 +2860,8 @@
       const refund=Number(npc.productPrice||product.price);
       const nextInventory={...inventory,reserve:{...inventory.reserve,[product.id]:Number(inventory.reserve[product.id]||0)+1}};
       const nextBusiness={...businessState,returns:Number(businessState.returns||0)+1,expenses:Number(businessState.expenses||0)+refund};
-      if(bridge().recordOperatingExpense?.(refund,'SIM_DEVOLUCIONES',{[inventoryKey()]:JSON.stringify(nextInventory),[businessKey()]:JSON.stringify(nextBusiness)})===false)return false;
       inventory=nextInventory;businessState=nextBusiness;
-      if(!bridge().recordOperatingExpense){saveInventory();saveBusinessState();}renderInventoryDisplays();
+      saveInventory();saveBusinessState();renderInventoryDisplays();
       updateReputation(-2,'Devolución procesada'); showCashFx(`− ${fmt(refund)}`); playSfx('lost');
       message(`Reembolso procesado: ${product.name} · ${fmt(refund)}.`);
       addBusinessLog(`Devolución de ${product.name}: −${fmt(refund)}.`);

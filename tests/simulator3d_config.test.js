@@ -39,10 +39,11 @@ test('the local human avatar is a valid GLB with idle and walk clips',()=>{
   assert.ok(names.includes('Character_Walk'));
 });
 
-test('simulator source connects events, production and financial sales',()=>{
+test('simulator visualizes decisions while entertainment sales stay local',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
   assert.match(source,/activeEvents\?\.\(\)/);
   assert.match(source,/productionPlan\?\.\(\)/);
-  assert.match(source,/recordSimulatedSale\?\.\(salePrice,/);
+  assert.doesNotMatch(source,/recordSimulatedSale/);
+  assert.match(source,/businessState.revenue=Number\(businessState.revenue\|\|0\)\+salePrice/);
   assert.match(source,/trafficLight==='pedestrians'/);
 });

@@ -69,8 +69,22 @@ function fixture(name){
  await page.evaluate(()=>{switchTab('podio');const report=state.reports.find(r=>r.empresa==='Empresa A');saveCompanyGrade(report.id,18);});
  await page.waitForFunction(()=>document.querySelector('#podiumPreview')?.textContent.includes('Empresa A'));
  await page.locator('#publishPodium').click();
+ assert.equal(await page.locator('#podiumDialog').isVisible(),true,'publication requires reviewing and confirming the dialog');
+ assert.equal(await page.evaluate(()=>publishedPodium()),null,'opening the dialog does not publish');
+ await page.evaluate(()=>{
+   state.partidaId='test-game-id';
+   window.__podiumFixture=null;window.__podiumCalls=[];
+   window.SIDE.PartidaService.podio=async(id,action='consultar')=>{
+     window.__podiumCalls.push({id,action});
+     if(action==='publicar')window.__podiumFixture={code:$('gameCode').value,publishedAt:new Date().toISOString(),expiresAt:new Date(Date.now()+86400000).toISOString(),visible:true,scheduled:false,podium:podiumCandidates(),gradeSignature:gradeSignature()};
+     return {success:true,data:{publication:window.__podiumFixture,serverTime:new Date().toISOString()}};
+   };
+ });
+ await page.locator('#confirmPodiumPublish').click();
+ await page.waitForFunction(()=>!document.querySelector('#podiumDialog').open);
  assert.match(await page.locator('#podiumState').innerText(),/24 horas/i);
- await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400000).toISOString();p.expiresAt=new Date(Date.now()-1000).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));loadPublished();});
+ assert.equal(await page.evaluate(()=>window.__podiumCalls.filter(c=>c.action==='publicar').length),1,'confirmation publishes once through the service');
+ await page.evaluate(async()=>{window.__podiumFixture={...window.__podiumFixture,publishedAt:new Date(Date.now()-86400000).toISOString(),expiresAt:new Date(Date.now()-1000).toISOString(),visible:false};await loadPublished();});
  assert.equal(await page.locator('#podiumPreview .podium-place').count(),1,'expiry hides the publication, not the teacher grade preview');
  assert.match(await page.locator('#podiumState').innerText(),/vencida/i);
  await page.evaluate(async()=>{

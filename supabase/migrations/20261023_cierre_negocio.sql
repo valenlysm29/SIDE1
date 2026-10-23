@@ -23,8 +23,18 @@ begin
  select coalesce(jsonb_agg(jsonb_build_object('id',e.id::text,'capital',e.caja_inicial,'revision',s.revision,'snapshot',s.snapshot) order by e.id),'[]')
  into empresas from public.empresas e join public.participantes t on t.empresa_id=e.id
  join public.side_student_state s on s.empresa_id=e.id
- where t.partida_id=p.id and t.expulsada_at is null and e.estado is distinct from 'eliminada'
+ where t.partida_id=p.id and t.expulsada_at is null
  and s.snapshot#>array['decision_state','__cyclePlans',p_ciclo::text] is not null;
+ -- An empty context can mean confirmations have not reached the server yet.
+ -- Keep it retryable instead of freezing an empty, irreversible market closure.
+ if jsonb_array_length(empresas)=0 and exists(
+  select 1 from public.participantes t where t.partida_id=p.id
+  and t.empresa_id is not null and t.expulsada_at is null
+ ) then return jsonb_build_object('error','No hay planes del ciclo sincronizados todavía. Reintenta cuando se confirmen.','code','SIN_PLANES_CONFIRMADOS'); end if;
+ if exists(select 1 from jsonb_array_elements(empresas) x where
+  jsonb_typeof(x#>array['snapshot','decision_state','__cyclePlans',p_ciclo::text]) is distinct from 'object'
+  or jsonb_typeof(x#>array['snapshot','decision_state','__cyclePlans',p_ciclo::text,'state']) is distinct from 'object'
+ ) then return jsonb_build_object('error','Hay planes de ciclo incompletos. Deben sincronizarse antes del cierre.','code','PLANES_PENDIENTES'); end if;
  return jsonb_build_object('empresas',empresas,'financialConfig',p.configuracion,'token',md5(empresas::text||p_ciclo::text||p.configuracion::text));
 end $$;
 

@@ -12,6 +12,7 @@ function tableInputs(){return [7,8.3,10.2,9].map((rep,i)=>({id:String(i),round:1
 },production:{productLines:productIds.map(()=>({target:5000,plannedUnits:0})),materials:[]}}));}
 test('current revenue adapter reproduces all twelve Excel market allocations',()=>{
   const inputs=tableInputs(),allocations=REVENUE.allocate(inputs);
+  const economic=CYCLE.closeMany(inputs.map(({prices,...input})=>({...input,ledger:{'1:C':-1000}})));
   inputs.forEach((input,i)=>{
     near(REVENUE.profile(input).reputacionMercado,[7,8.3,10.2,9][i]);
     productIds.forEach((id,j)=>assert.equal(allocations[input.id].products[id].asignado,expected[j][i]));
@@ -30,14 +31,14 @@ test('operational reputation maps actual staff, material consumption, premium ou
   near(profile.reputation.factorProduccion,2);near(profile.reputation.factorMO,5);
   near(profile.reputation.factorMP,(.75+.5+.5)/3*10);near(profile.reputation.factorPublicidad,6);
 });
-test('shared closure competes across companies, caps sales at stock and reconciles POS once',()=>{
+test('shared closure competes across companies, caps sales at stock and ignores POS activity',()=>{
   const inputs=[40,45,43,41].map((price,i)=>({id:String(i),round:1,capital:100000,prices:{esencial:price},
     state:{CANALES:{optionIds:['web']},PERS_CORTE:{round:1,quantities:{corte_maestro:[70,83,87,90][i],corte_basico:[30,17,13,10][i]}},...(i===2?{INV_MARKETING:{optionIds:['mkt_baja']}}:{})},
     production:{producibleUnits:2000,productLines:[{target:2000,plannedUnits:2000}],materials:[]},ledger:{'1:SIM_VENTAS':999999,'1:C':-2000},soldUnits:500,soldByProduct:{esencial:500}}));
   const results=CYCLE.closeMany(inputs);
   for(const [i,input] of inputs.entries()){
-    const r=results[input.id];assert.equal(r.receipt.sold,Math.max(500,expected[0][i]));
-    assert.equal(r.receipt.revenue,Math.max(500,expected[0][i])*prices[0][i]);
+    const r=results[input.id];assert.equal(r.receipt.sold,expected[0][i]);
+    assert.equal(r.receipt.revenue,expected[0][i]*prices[0][i]);
     assert.equal(r.ledger['1:SIM_VENTAS'],r.receipt.revenue);
     assert.equal(r.ledger['1:C'],-2000);assert.equal(r.state.__finishedGoods.esencial,2000-r.receipt.sold);
     assert.equal(r.financial.balanceCaja.cajaFinal,98000+r.receipt.revenue+r.ledger['1:COMISION_VENTAS']);
@@ -63,7 +64,7 @@ test('browser pages load the same revenue dependencies as Node',()=>{
     assert.deepEqual(JSON.parse(JSON.stringify(actual)),REVENUE.allocate(tableInputs()));
   }
 });
-test('remote service settles the entire population together and preserves prices and expenses',async()=>{
+test('remote service ignores world prices and preserves decision expenses',async()=>{
   const inputs=tableInputs().map(input=>({...input,production:{producibleUnits:2000,productLines:[{plannedUnits:2000,target:2000}],materials:[]}}));
   const companies=inputs.map(input=>({id:input.id,capital:100000,snapshot:{decision_state:{...input.state,__cyclePlans:{1:{state:input.state,production:input.production}},__cycleBusiness:{1:{prices:input.prices}}},cash_ledger:{'1:C':-1000}}}));
   let payload;
@@ -74,9 +75,10 @@ test('remote service settles the entire population together and preserves prices
   vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../services/partida_service.js'),'utf8'),{window,console,setTimeout,clearTimeout});
   const response=await window.SIDE.PartidaService.cerrarNegocio('game',1);
   assert.equal(response.success,true,JSON.stringify(response));
+  const economic=CYCLE.closeMany(inputs.map(({prices,...input})=>({...input,ledger:{'1:C':-1000}})));
   inputs.forEach((input,i)=>{
     const result=payload.resultadosPorEmpresa[input.id];
-    assert.equal(result.receipt.sold,expected[0][i]);assert.equal(result.financial.estadoResultados.ingresos,expected[0][i]*prices[0][i]);
+    assert.equal(result.receipt.sold,economic[input.id].receipt.sold);assert.equal(result.financial.estadoResultados.ingresos,economic[input.id].receipt.revenue);
     assert.equal(result.ledger['1:C'],-1000);
   });
 });

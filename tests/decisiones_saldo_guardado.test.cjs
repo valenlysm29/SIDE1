@@ -31,10 +31,10 @@ test('Guardar un ítem conserva el otro cambio como borrador, incluso al cambiar
 });
 test('HUD muestra la caja guardada y no cobra borradores',()=>{
  let cash=85000;const nodes={};const node=id=>nodes[id]||(nodes[id]={textContent:'',classList:{toggle(){}}});
- const saved=node('saved');const ctx={cashBalance:()=>cash,initialCapital:()=>100000,money:v=>'S/ '+v,$:node,document:{querySelectorAll:()=>[saved]}};vm.createContext(ctx);appFunction('updateCashHud',ctx);
- ctx.updateCashHud();assert.equal(nodes.cashBalance.textContent,'S/ 85000');assert.equal(saved.textContent,'S/ 85000');
- ctx.pendingDraft={amount:12000};ctx.updateCashHud();assert.equal(saved.textContent,'S/ 85000');
- cash=73000;ctx.updateCashHud();assert.equal(saved.textContent,'S/ 73000');assert.equal(nodes.projectedCash.textContent,'S/ 73000');
+ const ctx={cashBalance:()=>cash,initialCapital:()=>100000,money:v=>'S/ '+v,$:node,document:{querySelectorAll:()=>[]}};vm.createContext(ctx);appFunction('updateCashHud',ctx);
+ ctx.updateCashHud();assert.equal(nodes.cashBalance.textContent,'S/ 85000');
+ ctx.pendingDraft={amount:12000};ctx.updateCashHud();assert.equal(nodes.cashBalance.textContent,'S/ 85000');
+ cash=73000;ctx.updateCashHud();assert.equal(nodes.cashBalance.textContent,'S/ 73000');
 });
 test('Navegación conserva cinco decisiones y el resumen según ciclo',()=>{
  let round=1;const catalog=['A','B','C','D','E','F'].map(cat=>({cat,items:[],summaryOnly:cat==='A'}));
@@ -45,4 +45,11 @@ test('Navegación conserva cinco decisiones y el resumen según ciclo',()=>{
 test('Enviar todo desde cualquier pestaña abre revisión validada antes de cobrar',()=>{
  let reviews=0;const ctx={openCompanyReview(){reviews++;}};vm.createContext(ctx);
  const start=source.indexOf('function submitAllDecisions('),end=source.indexOf('\n',start);vm.runInContext(source.slice(start,end),ctx);ctx.submitAllDecisions();assert.equal(reviews,1);
+});
+
+test('Cabecera compartida conserva caja superior sin saldo duplicado',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
+ assert.match(html,/id="cashBalance"/);
+ assert.doesNotMatch(html,/section-balance|data-saved-final-balance|id="projectedCash"/);
+ assert.doesNotMatch(source,/\$\('projectedCash'\)|data-saved-final-balance/);
 });

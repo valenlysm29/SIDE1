@@ -1,22 +1,23 @@
+
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
-const {adjuntarCaja,sembrarTransicion}=require('../js/engine/caja.js'),{cerrarCiclo}=require('../js/engine/ciclo.js'),{decision}=require('./escenarios_excel.cjs');
-test('Transición importa activos y deuda pagados en flujo previo sin duplicar compra ni financiación',()=>{
- const source=fs.readFileSync(require.resolve('../js/app.js'),'utf8'),start=source.indexOf('function captureExcelTransition(){'),end=source.indexOf('\nfunction renderDecisionRow',start);
- const definitions={MESA_CORTE:{id:'MESA_CORTE',options:[]},ENSAMBLE:{id:'ENSAMBLE',options:[{id:'ens_basica',codigoExcel:'INF-02',cost:3500}]},ACABADOS:{id:'ACABADOS',options:[]},MOLDE:{id:'MOLDE',options:[]}};
- const state={ENSAMBLE:{purchases:{1:{ens_basica:1}}},__inventarioMP:{'INS-01':12}};
- const context={decisionState:state,currentRound:()=>2,findDecisionItem:id=>definitions[id],savedEntry:item=>state[item.id],initialCapital:()=>100000,financialAdjustment:()=>0,financialLedger:()=>({}),ledgerTotal:()=>1500,recordedFinancialSections:()=>({}),DECISION_CATALOG:[],cashLedger:{'1:B':-3500,'1:PRESTAMO':5000},teacherConfig:()=>({interest:20}),window:{SIDE_FINANCIAL_MODEL:{calculate:()=>({balanceGeneral:{deuda:5000}})},SIDE_EXCEL_CONFIG:require('../js/engine/config_excel.js')}};
- vm.createContext(context);vm.runInContext(source.slice(start,end),context);const transicion=JSON.parse(JSON.stringify(context.captureExcelTransition()));
- assert.deepEqual(transicion.maquinariaActivos,{'INF-02':1});assert.equal(transicion.activosCosto,3500);assert.equal(transicion.cajaFinal,101500);assert.equal(transicion.deudaPrincipal,5000);assert.equal(transicion.inventarioMP['INS-01'],12);
- const h=sembrarTransicion({},[{id:'A',envelope:{transicion}}]),d=decision({maquinaria:{'INF-02':1},compras:{},seleccion:['FIN-01A'],montoPrestamo:0});
- const cierre=adjuntarCaja(cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:d},historialPorEmpresa:h}),{historialAnterior:h,capitalPorEmpresa:{A:100000}}),r=cierre.resultadosPorEmpresa.A;
- assert.equal(r.financial.flujoCaja.compraActivos,0);assert.equal(r.financial.flujoCaja.financiamiento,0);assert.equal(r.financial.balanceCaja.cajaInicial,101500);assert.equal(r.financial.balanceGeneral.deuda,5000);assert.equal(r.financial.balanceGeneral.activosFijos,3500-r.costos.depreciacion);
- assert.deepEqual(sembrarTransicion({A:{cajaFinal:42}},[{id:'A',envelope:{transicion}}]),{A:{cajaFinal:42}},'La transición no puede sustituir un historial establecido');
+const cycle=require('../js/cycle_model.js'),finance=require('../js/financial_model.js');
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(require.resolve('../js/decision_catalog.js'),'utf8'),sandbox);const catalog=sandbox.window.SIDE_DECISION_CATALOG;
+function transition(){
+ const prior={habilitado:true,round:2,decisiones:{maquinaria:{'INF-02':1},compras:{},lotes:[],seleccion:[]},transicion:{maquinariaActivos:{'INF-02':1},activosCosto:3500,cajaFinal:101500,deudaPrincipal:5000,inventarioMP:{'INS-01':12}}};
+ const input={state:{__excel:prior},ledger:{'1:B':-3500,'1:PRESTAMO':5000},capital:100000,round:2,catalog};return {input,prior,result:cycle.migrate(input)};
+}
+test('Autonomous migration retains paid assets, cash, debt and materials without duplicating purchase or financing',()=>{
+ const {input,prior,result:r}=transition();assert.equal(r.migrated,true);assert.deepEqual(r.archive,prior);assert.deepEqual(input.state,{__excel:prior},'migration never mutates the archived source');
+ assert.equal(r.state.ENSAMBLE.purchases[2].ens_basica,1);assert.equal(r.state.__inventarioMP.cuero_sint,12);assert.equal(r.state.__openingBalance.cash,101500);assert.equal(r.state.__openingBalance.balanceGeneral.deuda,5000);assert.equal(r.state.__openingBalance.balanceGeneral.activosFijos,3500);
+ assert.equal(100000+Object.values(r.ledger).reduce((a,b)=>a+b,0),101500);
+ const f=finance.calculate({state:r.state,ledger:r.ledger,catalog,capital:100000,round:2,openingBalance:r.state.__openingBalance});
+ assert.equal(f.balanceCaja.cajaInicial,101500);assert.equal(f.balanceCaja.cajaFinal,101500);assert.equal(f.balanceGeneral.deuda,5000);assert.equal(f.balanceGeneral.activosFijos,3500);
+ const closed=cycle.close({state:r.state,ledger:r.ledger,catalog,capital:100000,round:2,production:{producibleUnits:0,productLines:[],materials:[]}});
+ assert.equal(closed.ledger['1:B'],-3500);assert.equal(closed.ledger['1:PRESTAMO'],5000);assert.equal(closed.ledger['2:B'],undefined);assert.equal(closed.ledger['2:PRESTAMO'],undefined);
 });
-test('Activación se bloquea si el ciclo actual ya tiene movimiento monetario legacy',async()=>{
- const source=fs.readFileSync(require.resolve('../js/app.js'),'utf8'),start=source.indexOf('async function mountExcelProductionEditor(){'),end=source.indexOf('\nfunction captureExcelTransition',start);
- let mounted;
- const container={id:'',isConnected:true},context={usesCanonicalMotor:()=>false,initialCapital:()=>100000,financialAdjustment:()=>0,cashBalance:()=>96500,studentAccess:()=>({canOperate:true}),teacherConfig:()=>({}),creditAvailable:()=>70000,document:{createElement:()=>container,querySelector:()=>null},$:()=>({prepend(){}}),currentStudent:{empresaId:null},decisionState:{},cashLedger:{'1:B':-3500},currentRound:()=>1,cycleDecisionsLocked:()=>false,excelGameCode:()=> 'DEMO',excelCompanyId:()=> 'A',captureExcelTransition:()=>({cajaFinal:96500,maquinariaActivos:{'INF-02':1}}),importExcelPersonnel:()=>({}),window:{SIDE_EXCEL_UI:{historial:()=>({}),mountEditor:(_,ctx)=>{mounted=ctx;}}}};
- vm.createContext(context);vm.runInContext(source.slice(start,end),context);await context.mountExcelProductionEditor();assert.equal(mounted.activationBlocked,true);
- context.currentRound=()=>2;await context.mountExcelProductionEditor();assert.equal(mounted.activationBlocked,false);assert.equal(mounted.historial.maquinariaActivos['INF-02'],1);
+test('A paid current-cycle decision remains canonical and migration is idempotent across reloads',()=>{
+ const canonical={ENSAMBLE:{purchases:{1:{ens_basica:1}}}},ledger={'1:B':-3500};
+ const untouched=cycle.migrate({state:canonical,ledger,catalog,capital:100000,round:1});assert.equal(untouched.migrated,false);assert.deepEqual(untouched.state,canonical);assert.deepEqual(untouched.ledger,ledger);
+ const {result:r}=transition(),again=cycle.migrate({state:r.state,ledger:r.ledger,catalog,capital:100000,round:2});assert.equal(again.migrated,false);assert.deepEqual(again.state,r.state);assert.deepEqual(again.ledger,r.ledger);assert.equal(100000+Object.values(again.ledger).reduce((a,b)=>a+b,0),101500);
 });

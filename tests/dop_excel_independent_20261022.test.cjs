@@ -10,34 +10,35 @@ for(const row of oracle.direct)test('actual Excel requirements: '+row.name,()=>{
  const moldTargets=Object.fromEntries(row.inputs.map((entry,index)=>['molde_'+(index+1),entry.set_to]));
  const materialDefs=[['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']];
  const context={round:1,drafts:{PRODUCCION_META:{moldTargets}},catalog:[{items:materialDefs.map(([id,option])=>({id,type:'quantity',options:[{id:option}]}))}]};
- const empty=model.calculate(context),before=JSON.stringify(context),req=empty.requirements;
- close(req.target,row.values.D36,'D36 target');
+ const empty=model.calculate(context),before=JSON.stringify(context);
+ close(empty.target,row.values.D36,'D36 target');
  const cells=[['D42','G42','J42'],['E43','H43','K43'],['F44','I44','L44']];
- req.lots.forEach((lot,index)=>lot.materials.forEach((material,m)=>close(material.needs,row.values[cells[index][m]],cells[index][m])));
- assert.deepEqual(req.dop.map(step=>step.units),[req.target,req.target,req.target,req.target,req.target]);
- assert.equal(req.maximumQuantity,null);
- if(req.target){assert.equal(req.costs.total,null);assert.ok(req.processes.every(process=>process.workersNeeded===null&&process.machinesNeeded===null&&process.laborDays===null));}
+ empty.productLines.forEach((line,index)=>materialDefs.forEach(([id],m)=>close(line.requirements[id],row.values[cells[index][m]],cells[index][m])));
+ assert.deepEqual(empty.dop.map(step=>step.units),[0,0,0,0,0],'without staff or equipment no target becomes actual production');
+ assert.equal(empty.producibleUnits,0);
+ assert.ok(empty.processes.every(process=>process.staff===0&&process.machines===0&&process.cycleCapacity===0));
  // Deliberately change only available stock, not target or material quality.
  const stockedContext={...context,drafts:{...context.drafts,...Object.fromEntries(materialDefs.map(([id,option])=>[id,{quantities:{[option]:100000}}]))}};
  const stocked=model.calculate(stockedContext);
  assert.ok(stocked.materials.every(material=>material.available>0),'fixture really changes stock');
  assert.ok(empty.materials.every(material=>material.available===0),'empty fixture really has no stock');
- assert.deepEqual(stocked.requirements,req,'stock cannot change target requirements');
+ assert.deepEqual(stocked.productLines.map(line=>line.requirements),empty.productLines.map(line=>line.requirements),'stock cannot change target requirements');
+ assert.deepEqual(stocked.materials.map(row=>row.neededForTarget),empty.materials.map(row=>row.neededForTarget));
  const html=dop.render(empty,{round:1});
  assert.doesNotMatch(html,/NaN|Infinity|undefined/);
  assert.equal(JSON.stringify(context),before,'view calculations cannot mutate inputs');
- if(!req.target){assert.equal(row.values.E37,'#DIV/0!','Excel zero allocation is inherited; do not compare its HRESULT with UI zero guard');}
+ if(!empty.target){assert.equal(row.values.E37,'#DIV/0!','Excel zero allocation is inherited; do not compare its HRESULT with UI zero guard');}
 });
 
 const {cerrarCiclo}=require('../js/engine/ciclo.js'),{adjuntarCaja}=require('../js/engine/caja.js');
 test('explicit persisted stock is physical and combines only with current purchases',()=>{
  const materials=[['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']];
- const ctx={round:2,catalog:[{items:materials.map(([id,option])=>({id,type:'quantity',options:[{id:option}]}))}],state:{__inventarioMP:{'INS-01':1.5,'INS-04':7,'INS-06':12},CUERO:{round:1,quantities:{cuero_sint:1000}}},drafts:{PRODUCCION_META:{moldTargets:{molde_1:10}}}};
+ const ctx={round:2,catalog:[{items:materials.map(([id,option])=>({id,type:'quantity',options:[{id:option}]}))}],state:{__inventarioMP:{cuero_sint:1.5,acc_eco:7,hilo_std:12},CUERO:{round:1,quantities:{cuero_sint:1000}}},drafts:{PRODUCCION_META:{moldTargets:{molde_1:10}}}};
  const before=JSON.stringify(ctx),plan=model.calculate(ctx);
- for(const [id,available,missing] of [['CUERO',1.5,1.5],['ACCESORIOS',7,3],['HILO',12,48]]){const row=plan.comparison.items.find(row=>row.id===id);close(row.available,available,id+' physical');close(row.missing,missing,id+' missing');}
+ for(const [id,available,missing] of [['CUERO',1.5,1.5],['ACCESORIOS',7,3],['HILO',12,48]]){const row=plan.materials.find(row=>row.id===id);close(row.available,available,id+' physical');close(row.shortfall,missing,id+' missing');}
  const replenished=model.calculate({...ctx,drafts:{...ctx.drafts,CUERO:{quantities:{cuero_sint:1}},ACCESORIOS:{quantities:{acc_eco:2}},HILO:{quantities:{hilo_std:1}}}});
- assert.deepEqual(plan.requirements,replenished.requirements);
- for(const [id,available] of [['CUERO',2.5],['ACCESORIOS',9],['HILO',282]])close(replenished.comparison.items.find(row=>row.id===id).available,available,id+' replenished');
+ assert.deepEqual(plan.productLines.map(line=>line.requirements),replenished.productLines.map(line=>line.requirements));
+ for(const [id,available] of [['CUERO',2.5],['ACCESORIOS',9],['HILO',13]])close(replenished.materials.find(row=>row.id===id).available,available,id+' replenished');
  assert.equal(JSON.stringify(ctx),before);
 });
 const pipeline=require('./oracle/comparar_pipeline.cjs'),scenarios=require('./escenarios_excel.cjs');

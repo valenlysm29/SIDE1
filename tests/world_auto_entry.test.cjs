@@ -17,6 +17,16 @@ function fixture({failedWrite=false,explorable=true}={}){
   vm.createContext(ctx);vm.runInContext(commit,ctx);
   return {ctx,events,async drain(){tasks.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();}};
 }
+test('confirmed remote plan enters the durable snapshot queue even if report rendering fails',()=>{
+  const f=fixture();f.ctx.currentStudent.empresaId=42;
+  f.ctx.captureCyclePlan=()=>{f.ctx.decisionState.__cyclePlans={1:{state:{confirmed:true},production:{producibleUnits:10}}};};
+  f.ctx.buildStudentSnapshot=()=>({decision_state:structuredClone(f.ctx.decisionState)});
+  let queued;f.ctx.queueStudentSnapshot=snapshot=>{queued=snapshot;};
+  f.ctx.syncStudentReportPreview=()=>{throw Error('optional report failed');};
+  f.ctx.console={error(){}};
+  assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);
+  assert.equal(queued.decision_state.__cyclePlans[1].production.producibleUnits,10);
+});
 test('the final individual section enters the world after the whole batch is saved',async()=>{
   const f=fixture();assert.equal(f.ctx.commitReviewedSections(['B'],false),true);await f.drain();assert.deepEqual(f.events,['persist']);
   assert.equal(f.ctx.commitReviewedSections(['C'],false),true);await f.drain();assert.deepEqual(f.events,['persist','persist','close','world']);assert.equal(f.ctx.playerIsDeciding,false);

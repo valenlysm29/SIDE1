@@ -679,10 +679,6 @@ small {
     font-size: 15px;
   }
 
-  #decisionMenu .section-balance {
-    min-width: 88px;
-  }
-
   .cs-section > summary {
     grid-template-columns: 26px minmax(0, 1fr) 18px;
   }

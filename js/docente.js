@@ -804,7 +804,7 @@ async function supabaseReports(reportsBase=state.reports){
       eventos:local?.eventos||[],
       estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
       balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
-      balanceGeneral:rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
+      balanceGeneral:rep?.estado_resultados?.balanceGeneral||rep?.balance_caja?.balanceGeneral||rep?.estado_resultados?.excel?.financial?.balanceGeneral||local?.balanceGeneral||{},
       flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),
@@ -1021,6 +1021,10 @@ async function closeBusinessRemoteRound(ciclo){
     toast(response.migrationMissing?'Aplica la migración 20261023_cierre_negocio.sql para habilitar el cierre de ciclos.':response.error||'No se pudo guardar el cierre del ciclo.');
     const status=$('roundState');if(status)status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;
     return false;
+  }
+  if(response.pending){
+    const status=$('roundState');if(status)status.textContent=`Ciclo ${ciclo} sin planes confirmados sincronizados; cierre pendiente. Puedes continuar.`;
+    return true;
   }
   for(const report of state.reports){const result=response.data?.resultadosPorEmpresa?.[String(report.empresaId)];if(!result)continue;const f=result.financial;Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});}
   persistReports();renderResults();return true;

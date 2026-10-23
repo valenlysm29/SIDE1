@@ -32,11 +32,11 @@ test('shared closing keeps company stock and cash isolated',()=>{
  const result=CYCLE.closeMany([{id:'A',round:1,state:channel,production:plan(10)},{id:'B',round:1,state:{CANALES:{optionIds:[]},__finishedGoods:{esencial:15}},production:plan(5)}]);
  assert.equal(result.A.receipt.sold,10);assert.equal(result.B.receipt.sold,0);assert.equal(result.B.state.__finishedGoods.esencial,20);assert.equal(result.B.ledger['1:SIM_VENTAS'],0);
 });
-test('POS receipts remain actual sales when assigned demand is lower and never exceed stock',()=>{
+test('POS receipts never alter assigned demand or stock',()=>{
  const result=CYCLE.close({state:channel,production:plan(10),soldByProduct:{esencial:8},allocation:{products:{esencial:{asignado:2}}}});
- assert.equal(result.receipt.sold,8);assert.equal(result.state.__finishedGoods.esencial,2);assert.equal(result.ledger['1:SIM_VENTAS'],600);
+ assert.equal(result.receipt.sold,2);assert.equal(result.state.__finishedGoods.esencial,8);assert.equal(result.ledger['1:SIM_VENTAS'],150);
  const capped=CYCLE.close({state:channel,production:plan(10),soldByProduct:{esencial:30},allocation:{products:{esencial:{asignado:2}}}});
- assert.equal(capped.receipt.sold,10);
+ assert.equal(capped.receipt.sold,2);
 });
 test('restoring a submitted plan preserves live material inventories and accounting seed',()=>{
  const live={CUERO:{round:3,quantities:{cuero_sint:999}},__inventarioMP:{cuero_sint:15},__openingBalance:{round:1,cash:500},__financialSnapshots:{1:{profit:100}}};

@@ -3,9 +3,15 @@
   'use strict';
   const clone=v=>JSON.parse(JSON.stringify(v)),n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0,money=v=>Math.round(v*100)/100;
   function restoreState(saved={},live={}){return {...saved,...Object.fromEntries(Object.entries(live).filter(([key])=>key.startsWith('__')))};}
+  function economicLedger(ledger={},state={}){
+    return Object.fromEntries(Object.entries(ledger).filter(([key])=>{
+      const [round,kind]=key.split(':');
+      return !['SIM_VENTAS','SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES','COMISION_VENTAS'].includes(kind)||state.__cycleSettlements?.[round]||state.__financialSnapshots?.[round]||Number(round)<=Number(state.__openingBalance?.round||0);
+    }));
+  }
   const productIds=['esencial','urbano','premium'],defaultPrices=[75,95,125];
-  function close({state={},ledger={},catalog=[],round=1,capital=0,sectionsByRound={},production,prices={},soldUnits=0,soldByProduct={},allocation,financialPolicy={},events=[]}={}){
-    state=clone(state);ledger={...ledger};
+  function close({state={},ledger={},catalog=[],round=1,capital=0,sectionsByRound={},production,prices={},allocation,financialPolicy={},events=[]}={}){
+    state=clone(state);ledger=economicLedger(ledger,state);
     const previous=state.__cycleSettlements?.[round];
     if(previous)return {state,ledger,receipt:previous,reused:true,financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
     const plan=production||PRO.calculate({state,drafts:{},catalog,round});
@@ -15,12 +21,12 @@
     const oldGoods=state.__finishedGoods||{},goods={},sales=[];
     for(const [i,id] of productIds.entries()){
       const produced=n(plan.productLines?.[i]?.plannedUnits),available=produced+n(oldGoods[id]);
-      const price=n(prices[id])||defaultPrices[i],demand=hasChannel?Math.floor(n(assigned.products[id]?.asignado)*demandFactor):0,sold=Math.floor(Math.min(available,hasChannel?Math.max(demand,n(soldByProduct[id])):0));
-      goods[id]=available-sold;sales.push({id,produced,available,alreadySold:n(soldByProduct[id]),sold,price,revenue:money(sold*price)});
+      const price=n(prices[id])||defaultPrices[i],demand=hasChannel?Math.floor(n(assigned.products[id]?.asignado)*demandFactor):0,sold=Math.floor(Math.min(available,hasChannel?demand:0));
+      goods[id]=available-sold;sales.push({id,produced,available,alreadySold:0,sold,price,revenue:money(sold*price)});
     }
     const market=Object.values(assigned.products).reduce((sum,row)=>sum+n(row.asignado),0);
     const revenue=money(sales.reduce((sum,row)=>sum+row.revenue,0));
-    // POS receipts are advances on these sales, never additional market demand.
+    // Only the decision model can record economic sales; world receipts are ignored.
     ledger[`${round}:SIM_VENTAS`]=revenue;
     ledger[`${round}:COMISION_VENTAS`]=revenue?-money(revenue*.01):0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
@@ -46,7 +52,7 @@
     const active=reports.filter(report=>report.partida===game&&report.estado!=='eliminada'&&report.enviado&&report.gameState);
     const results=closeMany(active.map(report=>{
       const saved=report.gameState.__cyclePlans?.[round];
-      const business=report.gameState.__cycleBusiness?.[round]||{prices:report.productPrices,soldUnits:report.soldUnits,soldByProduct:report.soldByProduct};
+      const business={events:report.gameState.__cycleBusiness?.[round]?.events||[]};
       return {id:report.id,state:saved?restoreState(saved.state,report.gameState):report.gameState,ledger:report.cashLedger,catalog,round,capital:report.capital,sectionsByRound:report.financialSections,production:saved?.production||report.produccion,financialPolicy,...business};
     }));
     for(const report of active){
@@ -90,5 +96,5 @@
     if(closedRound){state.__cycleSettlements={...state.__cycleSettlements,[closedRound]:{round:closedRound,produced:n(result.produccion?.totalProducido),revenue:n(result.ingresos),migrated:true}};state.__cycleCosts={...state.__cycleCosts,[closedRound]:{round:closedRound,total:0,acknowledged:true}};}
     delete state[key];state.__migrationVersion=1;return {state,ledger,migrated:true,archive:old,closedRound};
   }
-  return {close,closeMany,closeReports,migrate,restoreState};
+  return {economicLedger,close,closeMany,closeReports,migrate,restoreState};
 });

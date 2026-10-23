@@ -2,16 +2,16 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const CYCLE=require('../js/cycle_model.js');
 const vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
-test('closing respects the product already sold at the POS',()=>{
+test('closing ignores entertainment POS counters for every product',()=>{
   const result=CYCLE.close({round:1,capital:200000,state:{CANALES:{round:1,optionIds:['web']}},ledger:{'1:SIM_VENTAS':1250},
     production:{producibleUnits:20,productLines:[{plannedUnits:10},{plannedUnits:0},{plannedUnits:10}],materials:[]},
     soldUnits:10,soldByProduct:{esencial:0,urbano:0,premium:10}});
   const essential=result.receipt.sales.find(row=>row.id==='esencial'),premium=result.receipt.sales.find(row=>row.id==='premium');
   assert.equal(essential.alreadySold,0,'premium sales must never consume essential stock');
-  assert.equal(premium.alreadySold,10);
-  assert.equal(premium.sold,10,'closing records total market sales including the POS advance');
+  assert.equal(premium.alreadySold,0);
+  assert.equal(premium.sold,10,'closing uses market demand only');
   assert.equal(result.state.__finishedGoods.premium,0,'premium stock is consumed once');
-  assert.equal(result.ledger['1:SIM_VENTAS'],2000,'1250 POS + 750 essential close sales');
+  assert.equal(result.ledger['1:SIM_VENTAS'],2000,'market revenue only, without an additive POS receipt');
 });
 test('the last automatic cycle settles when its runtime reaches simulation-finished',()=>{
   const app=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');

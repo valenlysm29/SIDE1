@@ -48,7 +48,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
     const layout=await p.evaluate(()=>{
      const nodes=['decisionTopbar','decisionTabs','decisionStickyHead'].map(id=>{const r=$(id).getBoundingClientRect();return {id,top:r.top,bottom:r.bottom,height:r.height};});
      const headerBottom=Math.max(...nodes.map(r=>r.bottom)),body=$('decisionFormScroll'),b=body.getBoundingClientRect();
-     return {nodes,headerBottom,body:{top:b.top,bottom:b.bottom,height:b.height,scrollTop:body.scrollTop,scrollHeight:body.scrollHeight,clientHeight:body.clientHeight},windowScroll:scrollY,wide:document.documentElement.scrollWidth>innerWidth+1,height:innerHeight,hiddenControls:['#cashBalance','#cashMovement','#categoryDescription','#roundLabel','#decisionStickyHead .section-balance small','#decisionRoundTimer','#decisionProgressText','#topSubmitAllDecisions'].filter(selector=>{const el=document.querySelector(selector),r=el.getBoundingClientRect();return !el.getClientRects().length||r.top<-.5||r.bottom>innerHeight+.5||r.left<-.5||r.right>innerWidth+.5;})};
+     return {nodes,headerBottom,body:{top:b.top,bottom:b.bottom,height:b.height,scrollTop:body.scrollTop,scrollHeight:body.scrollHeight,clientHeight:body.clientHeight},windowScroll:scrollY,wide:document.documentElement.scrollWidth>innerWidth+1,height:innerHeight,hiddenControls:['#cashBalance','#cashMovement','#categoryDescription','#roundLabel','#decisionRoundTimer','#decisionProgressText','#topSubmitAllDecisions'].filter(selector=>{const el=document.querySelector(selector),r=el.getBoundingClientRect();return !el.getClientRects().length||r.top<-.5||r.bottom>innerHeight+.5||r.left<-.5||r.right>innerWidth+.5;})};
     });
     assert.deepEqual(layout.nodes,before,`stationary header ${width}/${cat}`);
     assert.equal(layout.windowScroll,0,`only body scrolls ${width}/${cat}`);assert.equal(layout.wide,false,`horizontal overflow ${width}/${cat}`);
@@ -68,24 +68,30 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
    }
    await tab('B');assert.equal(await scroller().evaluate(el=>el.scrollTop),0,`tab switch resets content scroll ${width}`);
   }
+  if(process.argv.includes('--layout-only')){
+   assert.equal(await p.locator('.section-balance,[data-saved-final-balance],#projectedCash').count(),0);
+   assert.equal(await p.locator('#cashBalance').isVisible(),true);
+   await tab('A');assert.equal(await p.locator('.cs-unit-cost').count(),1,'production unit cost remains');
+   assert.deepEqual(errors,[]);
+   console.log('PASS 36 responsive tab layouts; no duplicate balance; top cash and unit cost retained; no browser errors');return;
+  }
   await p.setViewportSize({width:1366,height:900});await tab('B');
   const initial=await p.evaluate(()=>cashBalance());
   const readMoney=async selector=>Number((await p.locator(selector).innerText()).replace(/[^\d.-]/g,''));
-  const hudBefore=await readMoney('#cashBalance'),saldoBefore=await readMoney('#projectedCash');
+  const hudBefore=await readMoney('#cashBalance');
+  assert.equal(await p.locator('.section-balance,[data-saved-final-balance],#projectedCash').count(),0,'duplicate saved balance removed from shared section header');
   await number('[data-qty="MESA_CORTE"][data-option="mesa"]',1);await choice('MOLDE','molde_1');
   assert.equal(await p.evaluate(()=>cashBalance()),initial,'choosing draft does not charge before saving');
-  const hudDraft=await readMoney('#cashBalance');assert.equal(hudDraft,hudBefore-2800,'cash DOM immediately reflects desk and mold draft');
-  assert.equal(await readMoney('#projectedCash'),saldoBefore,'saved balance DOM stays unchanged while editing');
+  const hudDraft=await readMoney('#cashBalance');assert.equal(hudDraft,hudBefore,'cash HUD preserves saved cash while editing draft');
   await tab('C');assert.equal(await readMoney('#cashBalance'),hudDraft,'cash projection persists across tabs');await tab('B');assert.equal(await readMoney('#cashBalance'),hudDraft);
   await p.clock.install();await p.evaluate(()=>syncStudentTimer());
   const seconds=text=>text.trim().split(':').reduce((total,part)=>total*60+Number(part),0),timerBefore=seconds(await p.locator('#decisionRoundTimer').innerText());
   await p.clock.fastForward(2100);await p.evaluate(()=>syncStudentTimer());
   assert.ok(seconds(await p.locator('#decisionRoundTimer').innerText())<=timerBefore-2,'visible cycle timer keeps counting down');
   await p.locator('#saveDecisionSection').click();
-  assert.equal(await p.evaluate(()=>cashBalance()),initial-4800,'saved desk, mold and required production premises charge once');
-  assert.equal(await p.locator('#cashBalance').innerText(),await p.evaluate(()=>money(liveCompanyReview().financial.projectedCash)));
-  assert.equal(await p.locator('#projectedCash').innerText(),await p.evaluate(()=>money(cashBalance())));
-  await p.locator('#saveDecisionSection').click();assert.equal(await p.evaluate(()=>cashBalance()),initial-4800,'saving twice does not charge twice');
+  assert.equal(await p.evaluate(()=>cashBalance()),initial-2800,'saved desk and mold charge once; initial already includes required premises');
+  assert.equal(await p.locator('#cashBalance').innerText(),await p.evaluate(()=>money(cashBalance())));
+  await p.locator('#saveDecisionSection').click();assert.equal(await p.evaluate(()=>cashBalance()),initial-2800,'saving twice does not charge twice');
   await tab('C');await number('[data-mold-target="molde_1"]',1);await choice('GARANTIA_PT','pt_30');await p.locator('#saveDecisionSection').click();
   await tab('F');for(const [id,option] of [['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']])await number(`[data-qty="${id}"][data-option="${option}"]`,1);await p.locator('#saveDecisionSection').click();
   await tab('D');await choice('CANALES','web');await p.locator('#saveDecisionSection').click();
@@ -100,6 +106,8 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   await p.locator('#sendDecisionSection').click();assert.match(await p.locator('#decisionProgressText').innerText(),/^1\/5/);
   await tab('A');await p.locator('[data-summary-filter="sent"]').click();assert.equal(await p.locator('#companySummaryMount [data-summary-section]').count(),1);
   await p.locator('#topSubmitAllDecisions').click();await p.locator('#confirmCompanyReview').click();
+  // Confirmation returns to the lobby/world; reopen the read-only decision summary.
+  await p.evaluate(()=>openDecisionMenu());
   assert.match(await p.locator('#decisionProgressText').innerText(),/^5\/5/);assert.equal(await p.evaluate(()=>simulationSubmissionComplete()),true);assert.equal(await p.evaluate(()=>cashBalance()),savedCash,'final confirmation does not duplicate saved charges');
   assert.equal(await p.locator('#decisionTabs .section-sent').count(),5);
   await tab('A');await p.locator('[data-summary-filter="sent"]').click();assert.equal(await p.locator('#companySummaryMount [data-summary-section]').count(),5);

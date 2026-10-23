@@ -81,10 +81,10 @@ async function scenario(browser,origin,width,height){
   await page.locator('[data-cat="F"]').click();
   for(const [id,option] of [['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']])await page.locator('[data-qty="'+id+'"][data-option="'+option+'"]').fill('1000');
   await page.locator('[data-cat="C"]').click();
-  const stocked=await page.evaluate(()=>({req:productionPlan().requirements,comparison:productionPlan().comparison,cash:cashBalance(),ledger:JSON.stringify(cashLedger),hud:document.querySelector('#cashBalance').textContent,projection:document.querySelector('#projectedCash').textContent}));
+  const stocked=await page.evaluate(()=>({req:productionPlan().requirements,comparison:productionPlan().comparison,cash:cashBalance(),ledger:JSON.stringify(cashLedger),hud:document.querySelector('#cashBalance').textContent}));
   check(width+' sufficient stock really available',stocked.comparison.items.filter(row=>row.kind==='material').every(row=>row.surplus>0&&row.missing===0));
   check(width+' requirements invariant with available stock',JSON.stringify(empty.req)===JSON.stringify(stocked.req));
-  near(stocked.cash,baseline.cash,width+' unsaved material scenarios no charge');near(amount(stocked.hud),baseline.cash,width+' HUD actual cash');near(amount(stocked.projection),baseline.cash,width+' shown cash actual while comparing');check(width+' no fictitious purchases in ledger',stocked.ledger===baseline.ledger);
+  near(stocked.cash,baseline.cash,width+' unsaved material scenarios no charge');near(amount(stocked.hud),baseline.cash,width+' HUD actual cash');check(width+' no fictitious purchases in ledger',stocked.ledger===baseline.ledger);
   await checkDopWidths(page,width);
   await page.clock.runFor(100);await page.screenshot({path:path.join(OUT,'dop-stocked-'+width+'.png'),fullPage:true});
   await captureDop(page,width);
