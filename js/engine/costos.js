@@ -8,6 +8,13 @@
   const cfg=overrides=>configApi.configurar(overrides);
   const regimenValido=regimen=>regimen==='NO_MYPE'?'NO_MYPE':'MYPE';
   function descuentoAnalista(ciclo=1,overrides={}){const a=cfg(overrides).ANALISTA_BASE;return Math.max(a.descuentoMinimoPct,a.descuentoInicialPct-(Math.max(1,n(ciclo))-1)*a.reduccionPorCicloPct);}
+  // Costos!D32:K33 converts purchase presentations to productive units;
+  // V76:W83 prices those units and applies the literal 8% discount.
+  function precioCompraMateriaPrima(codigo,{analistaCompras=false,ciclo=1}={},overrides={}){
+    const c=cfg(overrides);
+    if(!Object.hasOwn(c.PRECIO_MP,codigo))throw new RangeError('Materia prima desconocida: '+codigo);
+    return c.PRECIO_MP[codigo]*c.CONVERSION_COMPRA[codigo]*(1-c.DESCUENTO_CANTIDAD)*(1-(analistaCompras?descuentoAnalista(ciclo,c):0)/100);
+  }
 
   function costoLaboral(rol,nivel=1,regimen='MYPE',overrides={}){
     if(typeof rol==='object'){const entrada=rol;return costoLaboral(entrada.rol,entrada.nivel,entrada.regimen,nivel&&typeof nivel==='object'?nivel:overrides);}
@@ -112,5 +119,5 @@
       totalCostos:costoMOciclo+costoMantenimiento+depreciacion+costoMP+costoPublicidad+costoAnalistaCompras+costoAlmacenaje+costoHorasExtra+costoLeadTime,
       detalles:{manoObra:detallesMO,maquinaria:detallesMaquinaria,materiaPrima:detallesMP}};
   }
-  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa,descuentoAnalista};
+  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa,descuentoAnalista,precioCompraMateriaPrima};
 });

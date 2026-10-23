@@ -1,10 +1,11 @@
 /* SIDE V3: pure, read-only decision breakdowns. No storage or DOM side effects. */
 (function(root,factory){
   const productionModel=typeof module==='object'&&module.exports?require('./production_model'):root.SIDE_PRODUCTION_MODEL;
-  const api=factory(productionModel);
+  const excelCosts=typeof module==='object'&&module.exports?require('./engine/costos'):root.SIDE_EXCEL_COSTOS;
+  const api=factory(productionModel,excelCosts);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_REVIEW_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(productionModel){
+})(typeof globalThis!=='undefined'?globalThis:this,function(productionModel,excelCosts){
   'use strict';
   const n=value=>Number.isFinite(Number(value))?Number(value):0;
   const sum=values=>values.reduce((a,b)=>a+n(b),0);
@@ -26,8 +27,19 @@
   }
   function owned(item,id,ctx){return sum(Object.entries(ctx.state?.[item.id]?.purchases||{}).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
-  function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
-  function unitCost(item,option,ctx){return n(option.cost)*(item.material?1-discount(ctx)/100:1);}
+  function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?excelCosts.descuentoAnalista(ctx.round):0;}
+  const LABOR_ROLES={PERS_CORTE:'corte',PERS_ENSAMBLE:'ensamble',PERS_ACABADO:'acabado',JEFATURA:'jefatura',LIMPIEZA:'limpieza',LOCAL_PROD:'local'};
+  const MATERIAL_CODES={CUERO:['INS-01','INS-02','INS-03'],ACCESORIOS:['INS-04','INS-05'],HILO:['INS-06','INS-07','INS-08']};
+  const ASSET_CODES={MESA_CORTE:['mesa'],ENSAMBLE:['INF-02','INF-03','INF-04'],ACABADOS:['INF-05','INF-06','INF-07'],MOLDE:['INF-08','INF-09','INF-10']};
+  function unitCost(item,option,ctx){
+    const level=(item.options||[]).findIndex(row=>row.id===option.id)+1,role=LABOR_ROLES[item.id];
+    if(role&&n(option.cost)>0)return excelCosts.costoLaboral(role,level,'MYPE').pagoMensual;
+    const code=MATERIAL_CODES[item.id]?.[level-1];
+    if(code)return excelCosts.precioCompraMateriaPrima(code,{analistaCompras:discount(ctx)>0,ciclo:ctx.round});
+    const asset=ASSET_CODES[item.id]?.[level-1];
+    if(asset)return excelCosts.costoMaquinaria(asset,'MYPE').salidaCompra;
+    return n(option.cost);
+  }
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
@@ -62,7 +74,7 @@
     }else if(item.id==='MOLDE'){
       const ownedIds=[];for(const [round,row] of Object.entries(e?.purchases||{}))if(n(round)<ctx.round)for(const [id,q] of Object.entries(row||{}))if(n(q)>0&&!ownedIds.includes(id))ownedIds.push(id);if(!ownedIds.length&&e&&n(e.round)<ctx.round)for(const id of e.optionIds||[])if(!ownedIds.includes(id))ownedIds.push(id);
       const chosen=(d.optionIds||[])[0],opt=(item.options||[]).find(o=>o.id===chosen);
-      if(opt&&!ownedIds.includes(chosen))add(opt.label,1,n(opt.cost),n(opt.cost),0,'Compra nueva. Este tipo de molde queda disponible para los siguientes ciclos.');
+      if(opt&&!ownedIds.includes(chosen)){const purchasePrice=unitCost(item,opt,ctx);add(opt.label,1,purchasePrice,purchasePrice,0,'Compra nueva, incluida la capacitación según el Excel. Este tipo de molde queda disponible para los siguientes ciclos.');}
       if(ownedIds.length)add('Moldes disponibles',ownedIds.length,null,0,0,ownedIds.map(id=>(item.options||[]).find(o=>o.id===id)?.label||id).join(', '));
     }else if(item.asset||item.type==='quantity'||item.type==='quantity-choice'){
       for(const opt of item.options||[]){
@@ -71,9 +83,11 @@
         let detail=item.material?`Insumos de este ciclo${discount(ctx)?`; descuento de compras: ${discount(ctx)}%`:''}.`:item.recurring?'Cantidad contratada para este ciclo.':'';
         let cost=Math.max(0,q)*price,income=0;
         if(item.asset){
-          income=q<0?-q*price*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
-          if(q<0)out.bookValueDisposed+=-q*price;
-          detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
+          // Liquidation retains the game's acquisition-price policy. Installation
+          // and training are paid on purchase, never paid back on disposal.
+          income=q<0?-q*n(opt.cost)*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
+          if(q<0)out.bookValueDisposed+=-q*n(opt.cost);
+          detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva, incluida instalación y capacitación':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
         }
         const historical=item.asset?have:sum(Object.entries(ctx.state?.[item.id]?.quantities||{}).filter(()=>false).map(()=>0));
         const cumulative=item.asset?have+q:q+sum(Object.entries(ctx.historyQuantities?.[item.id]?.[opt.id]||{}).map(([,v])=>n(v)));

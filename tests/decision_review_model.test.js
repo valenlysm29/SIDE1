@@ -8,7 +8,7 @@ const item=id=>catalog.flatMap(c=>c.items).find(i=>i.id===id);
 function context(patch={}){return {catalog,state:{},drafts:{},round:1,config:{interest:20,cycles:6},rules,capital:100000,ledger:{},...patch};}
 test('empty scenario includes mandatory local and cleaning only',()=>{
  const ctx=context(),sections=catalog.map(c=>model.section(c,ctx));
- assert.equal(model.finances(sections,ctx).outflow,2600);assert.equal(model.finances(sections,ctx).projectedCash,97400);
+ assert.equal(model.finances(sections,ctx).outflow,2712.32);assert.equal(model.finances(sections,ctx).projectedCash,97287.68);
 });
 test('all three districts retain their quantities and cost',()=>{
  const ctx=context({drafts:{CANALES:{optionIds:['web','los_olivos','miraflores','sjl'],quantities:{los_olivos:2,miraflores:3,sjl:4}}}});
@@ -18,21 +18,47 @@ test('all three districts retain their quantities and cost',()=>{
 });
 test('asset acquisitions and disposals have separate gross flows',()=>{
  const ctx=context({round:2,state:{ENSAMBLE:{purchases:{1:{ens_basica:2}}}},drafts:{ENSAMBLE:{quantities:{ens_basica:-1,ens_semi:1}}}});
- const result=model.breakdown(item('ENSAMBLE'),ctx);assert.equal(result.outflow,7500);assert.equal(result.assetIncome,1400);assert.equal(result.net,-6100);
+ const result=model.breakdown(item('ENSAMBLE'),ctx);assert.equal(result.outflow,7875);assert.equal(result.assetIncome,1400);assert.equal(result.net,-6475);
  assert.match(result.rows[0].detail,/Total disponible: 1/);
 });
 test('same-round submitted mold still costs money; later cycles do not charge again',()=>{
  const state={MOLDE:{optionIds:['molde_2'],round:1}};
- assert.equal(model.breakdown(item('MOLDE'),context({state})).outflow,1200);
+ assert.equal(model.breakdown(item('MOLDE'),context({state})).outflow,1212);
  assert.equal(model.breakdown(item('MOLDE'),context({state,round:2})).outflow,0);
 });
 test('staff severance survives repeated saves in the same round',()=>{
  const ctx=context({round:2,state:{PERS_CORTE:{round:2,quantities:{corte_basico:1},previousQuantities:{corte_basico:3}}},drafts:{PERS_CORTE:{quantities:{corte_basico:1}}}});
- const result=model.breakdown(item('PERS_CORTE'),ctx);assert.equal(result.outflow,3000);assert.equal(result.recurring,1500);
+ const result=model.breakdown(item('PERS_CORTE'),ctx);assert.equal(result.outflow,3381.6);assert.equal(result.recurring,1690.8);
 });
 test('analyst discount affects material prices, not wages',()=>{
  const ctx=context({drafts:{ANALISTA_COMPRAS:{optionIds:['si_analista']},CUERO:{quantities:{cuero_std:100}},PERS_CORTE:{quantities:{corte_basico:2}}}});
- assert.equal(model.breakdown(item('CUERO'),ctx).outflow,3960);assert.equal(model.breakdown(item('PERS_CORTE'),ctx).outflow,3000);
+ assert.ok(Math.abs(model.breakdown(item('CUERO'),ctx).outflow-7286.4)<1e-9);assert.equal(model.breakdown(item('PERS_CORTE'),ctx).outflow,3381.6);
+});
+
+test('legacy purchase presentations reproduce the actual Excel net-purchase fixture',()=>{
+ // Costos!D31:K33 -> V88:V96: 60/55/15 skins, 200/190 accessories,
+ // 0/6/7 reels become 60/110/30 m² and 0/1500/1400 m. W76:W83: 8%.
+ const ctx=context({drafts:{CUERO:{quantities:{cuero_sint:60,cuero_std:55,cuero_prem:15}},ACCESORIOS:{quantities:{acc_eco:200,acc_prem:190}},HILO:{quantities:{hilo_ref:6,hilo_prem:7}}}});
+ const total=['CUERO','ACCESORIOS','HILO'].reduce((sum,id)=>sum+model.breakdown(item(id),ctx).outflow,0);
+ assert.ok(Math.abs(total-24987.2)<1e-9);
+});
+
+test('review uses all nine payroll amounts from the Excel MYPE monthly rows',()=>{
+ const expected={PERS_CORTE:[1690.8,2254.4,4191.36],PERS_ENSAMBLE:[1690.8,3104.16,4952.4],PERS_ACABADO:[1690.8,3104.16,4952.4]};
+ for(const [id,monthly] of Object.entries(expected))for(const [index,amount] of monthly.entries())assert.equal(model.unitCost(item(id),item(id).options[index],context()),amount);
+ assert.equal(model.unitCost(item('JEFATURA'),item('JEFATURA').options[1],context()),3321.6);
+ assert.equal(model.unitCost(item('JEFATURA'),item('JEFATURA').options[0],context()),0);
+});
+
+test('purchase cash includes Excel installation and training while later cycles retain assets',()=>{
+ // Costos!U45:U47, Y45:Y47, AC45:AC47 and U53:U54.
+ const drafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_basica:1}},ACABADOS:{quantities:{aca_basica:1}},MOLDE:{optionIds:['molde_1']}};
+ const ctx=context({drafts});
+ assert.equal(model.breakdown(item('MESA_CORTE'),ctx).outflow,2625);
+ assert.equal(model.breakdown(item('ENSAMBLE'),ctx).outflow,3675);
+ assert.equal(model.breakdown(item('ACABADOS'),ctx).outflow,1260);
+ assert.equal(model.breakdown(item('MOLDE'),ctx).outflow,303);
+ assert.equal(model.breakdown(item('MESA_CORTE'),context({round:2,state:{MESA_CORTE:{purchases:{1:{mesa:1}}}}})).outflow,0);
 });
 test('loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved',()=>{
  const ctx=context({config:{interest:0,cycles:6},drafts:{PRESTAMO:{amount:15000}}});
