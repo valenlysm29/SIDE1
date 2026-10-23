@@ -788,3 +788,14 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 @media(max-width:600px){.excel-personal-cards{grid-template-columns:1fr}.excel-personal-quantities{gap:8px}}
 .excel-editor .excel-decision-subcontrol{min-width:0;border:0;border-top:1px solid var(--side-line);padding:12px 0;margin:0}.excel-editor .excel-decision-subcontrol legend{font-size:.875rem;font-weight:700;padding:0 6px;color:var(--side-text)}.excel-editor .excel-decision-subcontrol .excel-decision-badge{display:none}.excel-editor .excel-decision-subcontrol .excel-decision-card__meta{justify-content:flex-end;margin-bottom:8px}.excel-editor .excel-decision-group .excel-choice-disclosure{padding:6px 0}.excel-editor .excel-choice-disclosure summary{font-size:.875rem}.excel-editor .excel-personal-cards{grid-template-columns:1fr}.excel-editor .excel-decision-group .excel-decision-subcontrol small{font-weight:400;color:var(--side-text-muted)}
 .excel-decision-dirty{color:var(--side-gold);font-size:.8rem;font-weight:700;margin-bottom:4px}.excel-decision-dirty[hidden]{display:none}
+
+/* Restore the saved-balance heading; compact legacy rules had clipped it away. */
+#decisionMenu .sticky-section-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,auto);align-items:center;gap:16px}
+#decisionMenu .detail-heading>div>span{display:block}
+#decisionMenu .section-balance{position:static;width:auto;height:auto;min-width:0;padding:0 0 0 16px;overflow:visible;clip-path:none;text-align:right}
+#decisionMenu .section-balance span,#decisionMenu .section-balance small{display:block;font-size:10px;line-height:1.4}
+#decisionMenu .section-balance strong{font-size:20px;white-space:nowrap;overflow-wrap:normal}
+#decisionMenu .excel-editor--section>header{display:none}
+#decisionMenu .excel-compulsory-details{padding-block:8px}
+#decisionMenu .excel-compulsory-details>summary{font-size:12px;color:var(--side-gold);min-height:32px}
+@media(max-width:600px){#decisionMenu .sticky-section-head{grid-template-columns:1fr;gap:8px}#decisionMenu .section-balance{text-align:left;border-left:0;padding:0;display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center}#decisionMenu .section-balance small{grid-column:1/-1}#decisionMenu .section-balance strong{font-size:18px}}
