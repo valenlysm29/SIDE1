@@ -38,7 +38,7 @@ Los costos teóricos de material usan `Costos De Producción!V76:W83`: requerimi
 
 ## Cambios integrados
 
-- `js/production_model.js`: contrato puro `requirementsFor()`, necesidades independientes de stock y comparación posterior. La producción posible sigue siendo una comparación operativa, no una recomendación de meta.
+- `js/production_model.js`: contrato puro `requirementsFor()`, necesidades independientes de stock y comparación posterior. La producción posible sigue siendo una comparación operativa, no una recomendación de meta. La disponibilidad suma únicamente `__inventarioMP` físico explícito y compras elegidas del ciclo; las presenta separadas, sin reconvertir stock ni cobrarlo otra vez.
 - `js/production_dop.js`, `js/app.js`, `css/production.css`: cantidad como primer control, selector de molde, actualización en vivo, necesidades y costos antes de existencias; faltantes/sobrantes al final. Se conservan las pestañas y el menú.
 - `js/engine/costos.js`, `js/decision_review_model.js`: precios de compra, nómina MYPE y adquisición con instalación/capacitación reutilizados entre pantalla y cargo real. HUD conserva centavos; editar una meta no compra recursos ni mueve el ledger.
 - Se preservan el aviso de costos iniciales, su confirmación por ciclo y el guardado del estudiante. El costo inicial con local y limpieza es ahora S/ 2712,32 según la fórmula MYPE, no S/ 2600 de los sueldos base.
@@ -63,6 +63,14 @@ No se afirma paridad de todas las reglas de la UI histórica con el libro: empar
 
 Estas limitaciones no alteran los requerimientos físicos por cantidad, que sí tienen fórmula directa y se verifican contra el libro real.
 
+## Bloqueo preexistente encontrado en SIM
+
+El editor de lotes rechazaba confirmar metas superiores a capacidad o materiales (`ui_excel.js`, guardia de confirmación). Esto impedía SIM-1 con meta 520 y capacidad 396 y contradice la separación entre cantidad deseada y producción ejecutable del libro. Se sustituyó ese rechazo por una advertencia, conservando la meta; el motor sigue limitando ejecución/consumo y aplicando consecuencias. Caja insuficiente, pausa, desconexión y campos inválidos siguen bloqueando.
+
+El arnés SIM también se corrigió para ingresar en modo Excel antes del registro, sin descontar costos del flujo histórico y trasladarlos después a la caja del escenario. No se alteraron los importes esperados.
+
+La prueba nueva `tests/dop_confirmation_capacity.test.cjs` ejecutada contra el archivo del commit base `7cb8e98` falla en los dos casos de capacidad/materiales y pasa la guardia de caja/acceso (1/3). Sobre el código corregido pasa 3/3. Evidencia local: `tests/output/dop-20261022/confirmation_base.log`; no se usó la preexistencia para omitir la corrección.
+
 ## Supabase
 
 **No hay SQL pendiente ni se debe actualizar Supabase para este cambio.** Se conservan el esquema y el contrato de snapshot; la cantidad usa el campo existente `PRODUCCION_META.moldTargets`. No se ejecutó SQL en producción.
@@ -70,7 +78,16 @@ Estas limitaciones no alteran los requerimientos físicos por cantidad, que sí 
 ## Verificación y punto de control
 
 - Fuente original preservada y hash verificado antes/después del recálculo.
-- 14 casos nuevos: recalculados con Microsoft Excel 16.0 en copias; comparación independiente en curso.
-- Ocho escenarios históricos / 3104 salidas: recálculo independiente en curso.
+- 14 casos nuevos: recalculados con Microsoft Excel 16.0 en copias; 126 requerimientos físicos sin diferencias.
+- Ocho escenarios históricos / 3104 salidas: recálculo independiente completado, cero diferencias frente al motor y los resultados históricos.
 - Pruebas dirigidas de modelo/DOP/UI: 20/20; costos/revisión: 27/27; aviso/caja: 8/8.
-- Siguiente paso exacto: terminar navegador independiente, correr Node completo y SIM-1/2/3 secuencialmente, registrar resultados, publicar y comprobar GitHub Pages.
+- Verificación independiente Node: 23/23; repetición con fixture versionado y sin depender de resultados ignorados: 23/23.
+- Navegador previo a la ampliación de stock persistido: 635 comprobaciones, cero errores JS, 1150×666 / 1440×900 / 390×844, tres ciclos automáticos por tamaño. Se detectó y corrigió recorte de un párrafo móvil; revalidación visual y acceso a la última columna correctos. Nueva corrida con inventario explícito en curso.
+- Primera batería completa Node: 507/508; único fallo: contrato estático que aún exigía textos del DOP anterior. Se actualizó a las etiquetas de meta/comparación; sus 7 pruebas dirigidas pasan. No se atribuyó este fallo a NPC ni a una regresión de cálculo.
+- SIM-1 UI: 1 ciclo × 4 empresas, 468 salidas, cero diferencias; resultados y caja docente/estudiante coinciden, móvil sin desborde.
+- SIM-2 UI: 3 ciclos × 2 empresas, 585 salidas, cero diferencias; faltantes y sobrecapacidad conservan metas y limitan ejecución.
+- SIM-3 UI: 3 ciclos × 5 empresas, 1140 salidas, cero diferencias; guardado, cierre docente, caja e informes del estudiante y móvil correctos.
+- Navegador final con inventario físico persistido: 743 comprobaciones, cero errores JavaScript, nueve ciclos automáticos; cantidades, requisitos, faltantes, costos por calidad, guardado, snapshot, reingreso y caja correctos. Revisión visual de capturas realizada en escritorio y móvil.
+- Runner de aviso/calculadora anterior: 153 comprobaciones, cero errores, tres ciclos y persistencia de confirmación.
+- `decision_options_db.cjs`: contrato de múltiples opciones, importes, reintentos, permisos privados y revisiones correcto en PostgreSQL local; no producción.
+- Siguiente paso exacto: terminar Node final, registrar resultado, publicar y comprobar GitHub Pages.

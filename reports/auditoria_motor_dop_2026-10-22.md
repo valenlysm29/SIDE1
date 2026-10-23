@@ -60,3 +60,10 @@ Las opciones conservan su costo referencial para metadatos históricos; los carg
 - Los nuevos escenarios del DOP y el oráculo recalculado, las simulaciones y la batería completa corresponden a la integración final; sus resultados se registran en el informe principal. Este documento no sustituye una corrida pendiente por una afirmación de éxito.
 
 No se ejecutó SQL ni se modificaron Supabase, avatares o mundo 3D desde esta área.
+
+
+## Integración posterior: cantidad deseada y stock real
+
+Se corrigió la omisión del inventario físico explícito `decisionState.__inventarioMP` en la comparación histórica: se suma en unidades físicas a las compras actuales, con desglose, sin inferir remanentes de compras antiguas ni duplicar su costo. Los requisitos del DOP permanecen idénticos al cambiar ese stock.
+
+SIM-1 detectó además una validación preexistente en `js/engine/ui_excel.js` que rechazaba confirmar metas mayores a capacidad/materiales. El reparto literal de CANTIDAD E37:E39 y el consumo D56:E58 limitan ejecución, sin rechazar la cantidad deseada. Ahora se confirma la meta con advertencia; las guardias de caja, conexión, pausa y campos obligatorios permanecen. La regresión nueva falla dos casos al cargar el archivo del base `7cb8e98` (1/3 pasa), y pasa 3/3 sobre la corrección; evidencia `tests/output/dop-20261022/confirmation_base.log`. No se modifica el cálculo de producción ni las consecuencias.

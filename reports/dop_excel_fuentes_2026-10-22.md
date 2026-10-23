@@ -106,4 +106,4 @@ Los 14 casos JSON cubren cero; una y diez unidades de cada molde; 396 y 397 con 
 
 El caso de cero conserva `#DIV/0!` para las asignaciones literales, mientras sus necesidades brutas son cero. Todos los casos dejan en `null` mix requerido de personal, mix de máquinas, duración, máximo global, paquetes redondeados y costo total, porque el libro no los determina de forma única. Los insumos jamás se reducen por faltantes de almacén.
 
-Pendiente exclusivamente para auditoría: recalcular copias de esos escenarios en Excel COM y contrastar las salidas con este JSON. El original permanece intacto. La auditoría puede usar el listado `inputs` para aplicar cambios y las coordenadas de salidas para leer el resultado, sin reinterpretar los casos ni añadir inversas.
+Verificación completada: las 14 copias se recalcularon con Excel COM 16.0 y se contrastaron 126 requerimientos físicos sin diferencias. El fixture independiente `tests/oracle/dop_cantidad_20261022.json` conserva los valores auténticos del recálculo, separados de la evaluación aritmética inicial de este informe. El original permanece intacto; no se añadieron inversas.

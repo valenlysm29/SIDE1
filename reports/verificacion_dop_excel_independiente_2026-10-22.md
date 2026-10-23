@@ -28,10 +28,10 @@ Los errores se conservan en las salidas de auditoría: COM devuelve HRESULT num�
 | Históricos recalculados | 3104/3104 salidas coinciden con el expected versionado, y con el motor actual |
 | Node independiente | 23/23 pruebas, cero fallos |
 | Node solo fixture versionado | 23/23 pruebas, cero fallos; no requiere resultados locales ignorados |
-| Navegador real | 631 comprobaciones, cero errores JavaScript, 3 tamaños × 3 ciclos |
+| Navegador real final | 635 comprobaciones, cero errores JavaScript, 3 tamaños × 3 ciclos |
 | Integridad | hash original intacto; ningún cambio en `esperado_*.json` ni en libros `ORACULO_*` |
 
-Los ocho históricos aportan respectivamente 351, 28, 28, 468, 585, 1140, 252 y 252 salidas. Evidencia: `tests/output/dop-20261022/independent/summary.json`, `independent_excel_run.log`, `independent_node.log`, `independent_node_fixture_only.log` y `browser/summary.json`. La ejecución de navegador terminó el 2026-10-23 a las 04:21:47 UTC, todavía 22 de octubre en Lima.
+Los ocho históricos aportan respectivamente 351, 28, 28, 468, 585, 1140, 252 y 252 salidas. Evidencia: `tests/output/dop-20261022/independent/summary.json`, `independent_excel_run.log`, `independent_node.log`, `independent_node_fixture_only.log`, `independent_browser_recheck.log` y `browser/summary.json`. La ejecución final de navegador terminó el 2026-10-23 a las 04:25:32 UTC, todavía 22 de octubre en Lima. La primera ejecución completa, de 631 comprobaciones, se preserva en `browser/summary-before-mobile-fix.json`.
 
 El fixture versionable compacto `tests/oracle/dop_cantidad_20261022.json` contiene procedencia, timestamp UTC, hash, las 14 variantes y las 3104 salidas de Excel real. El test usa el recálculo local si existe y este fixture como alternativa en un checkout limpio. `SIDE_ORACLE_FIXTURE_ONLY=1` fuerza esta alternativa; se ejecutó correctamente. El runner Excel conserva una copia del fixture anterior en la salida ignorada antes de refrescarlo.
 
@@ -39,8 +39,15 @@ Las primeras ejecuciones del arnés de navegador se corrigieron por dos cuestion
 
 ## Revisión visual y límites
 
-Se generaron capturas adicionales de las secciones visibles, desplazando el contenedor interno, bajo `browser/visible-*.png`. Se inspeccionaron directamente el diagrama de 1150, los requerimientos de 1440, los costos de 390 y la comparación de 390. En escritorio se leen la meta 397, los datos inversos indefinidos y los requerimientos 119,1 m², 397 accesorios y 2382 m. En móvil, las tablas extensas requieren desplazamiento horizontal interno; no hay desbordamiento horizontal global en las comprobaciones.
+Se generaron capturas adicionales de las secciones visibles, desplazando el contenedor interno, bajo `browser/visible-*.png`. Se inspeccionaron directamente el diagrama de 1150, los requerimientos de 1440, los costos de 390 y la comparación de 390. En la primera inspección de escritorio se leyeron la meta 397, los datos inversos indefinidos y los requerimientos 119,1 m², 397 accesorios y 2382 m. La ejecución final captura meta 10 con existencias sobrantes: necesita 3 m², 10 accesorios y 60 m de hilo; compara correctamente 997 m², 990 accesorios y 269940 m sobrantes. En móvil, las tablas extensas requieren desplazamiento horizontal interno; no hay desbordamiento horizontal global en las comprobaciones.
 
-Observación visual comunicada a integración: en la captura móvil de costos, el párrafo introductorio parece cortarse a la derecha. La captura de comparación centró filas intermedias porque la sección supera el alto visible. Se ajustó el helper para futuras capturas con alineación al inicio, pero no se repitió navegador mientras integración ejecutaba Node. Esta observación no se presenta como revisión visual cerrada de todas las celdas móviles.
+La primera inspección detectó un párrafo introductorio recortado en móvil. Integración corrigió los tracks de grid y el ancho de los contenedores. Se repitió el navegador completo, agregando comprobaciones de límites de párrafos y contenedores de tabla para los tres tamaños y una prueba de acceso a la última columna mediante desplazamiento horizontal móvil: las cuatro comprobaciones nuevas pasan. Se inspeccionaron las capturas finales `visible-costs-390.png`, `visible-comparison-right-390.png` y `visible-comparison-1150.png`: el párrafo ya ajusta líneas sin recorte, el encabezado de comparación es visible y las columnas finales son alcanzables. La observación visual queda resuelta.
 
 El resultado prueba los requerimientos directos y la compatibilidad histórica señalada. No demuestra una fórmula inversa para personal, maquinaria, tiempo ni costo total: el libro no las define, y la interfaz lo indica. Las reglas adicionales del juego y las discrepancias entre hojas se documentan en `reports/auditoria_motor_dop_2026-10-22.md`; no se atribuye igualdad total del juego con cada fórmula del libro original.
+
+
+## Revalidación de integración con inventario físico
+
+Después de la verificación independiente, se añadieron casos de inventario físico explícito `__inventarioMP`, sin inferir compras históricas. La ejecución final ampliada del runner mantiene las 14 metas Excel y los nueve ciclos automáticos y pasa **743 comprobaciones**, sin errores JavaScript. Se comprueban 1,5 m² / 7 accesorios / 12 m de hilo persistidos, faltantes 1,5 / 3 / 48, conservación en snapshot y reingreso, suma con reposición actual y ausencia de cargos ficticios. La presentación separa almacén y compras del ciclo; se volvió a inspeccionar la captura móvil `physical-inventory-390.png`.
+
+El runner previo de aviso/calculadora se repitió con los importes MYPE correctos: **153 comprobaciones**, cero errores. El contrato de decisiones en PostgreSQL local también pasó. SIM-1/2/3 y la batería completa final se registran en el informe de integración; no se ejecutó SQL en producción.
