@@ -199,7 +199,7 @@
           card.querySelectorAll('.excel-help').forEach(help=>{if(help.textContent.startsWith('Botón de opción'))help.remove();});
           card.classList.remove('excel-decision-card');card.classList.add('excel-decision-subcontrol');
           if(card.querySelector('.excel-decision-options')){
-            const details=document.createElement('details');details.className='excel-choice-disclosure';
+            const details=document.createElement('details');details.className='excel-choice-disclosure';details.open=!title.startsWith('Lote');
             const summary=document.createElement('summary'),source=card.querySelector('select'),selected=source?.selectedOptions[0]?.textContent||'Elegir alternativa';
             summary._decisionTitle=card.querySelector('legend')?.textContent||'Opción';summary.textContent=summary._decisionTitle+': '+selected;details.appendChild(summary);details.appendChild(card);group.appendChild(details);
           }else group.appendChild(card);

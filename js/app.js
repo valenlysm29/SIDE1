@@ -190,7 +190,11 @@ function updateIntegrationUI(){
     banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj y la actividad del mundo 3D están detenidos. Puedes revisar y preparar tus decisiones.':'';
   }
   renderCyclePause(paused);
-  if(document.querySelector('#excelProductionMount'))disposeProductionDop?.refreshAccess?.();
+  if(document.querySelector('#excelProductionMount')){
+    disposeProductionDop?.refreshAccess?.();
+    const send=$('topSubmitAllDecisions');
+    if(decisionState.__excel?.habilitado&&send)send.disabled=decisionsSubmitted()||!access.canOperate||!excelEditorRemoteReady;
+  }
   if(paused&&['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){window.SIDE3D?.suspend?.();showScreen('studentLobby');}
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · '+(cycleRuntime?.status==='simulation-finished'||cycleRuntime?.phase==='finished'?'SIMULACIÓN FINALIZADA':cycleClosed?'CICLO CERRADO · CONSULTA TUS RESULTADOS':access.canOperate?'REVISA Y REGISTRA TUS DECISIONES':'ESPERANDO EL SIGUIENTE CICLO'));
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);

@@ -3,7 +3,7 @@ const {chromium}=require('playwright'),fs=require('node:fs'),path=require('node:
 const {crearSim1,crearSim2,crearSim3,decision}=require('./escenarios_excel.cjs');
 const {CONFIG}=require('../js/engine/config_excel.js');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/logica_excel');fs.mkdirSync(out,{recursive:true});
-const evidence=path.join(root,'reports/sim');fs.mkdirSync(evidence,{recursive:true});
+const evidence=path.join(root,'tests/output/restaurar-decisiones/sim');fs.mkdirSync(evidence,{recursive:true});
 const python=process.env.PYTHON_BIN||'C:/Users/Asus/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe';
 function html(name){return execFileSync(python,['-c',`import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('${name}'))`],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}}).replace('const cfg = window.SIDE_CONFIG || {};','window.SIDE_CONFIG={};const cfg = window.SIDE_CONFIG || {};').replace('const cfg=window.SIDE_CONFIG||{};','window.SIDE_CONFIG={};const cfg=window.SIDE_CONFIG||{};');}
 async function comprobarBaseEnBrowser(p){
@@ -31,17 +31,18 @@ async function ejecutar(numero=3){
     for(let i=1;i<d.lotes.length;i++)await p.locator('[data-agregar-lote]').click();
     if(!await p.locator('[data-excel-regimen]').count())console.log('DIAGNOSTICO',await p.evaluate(()=>({round:currentRound(),cat:currentCategory,excel:decisionState.__excel,dom:document.querySelector('#excelProductionMount')?.innerHTML,access:studentAccess()})));
     await p.evaluate(d=>{
-      const dispatch=(selector,value)=>{const el=document.querySelector(selector);if(!el)throw new Error('Falta control '+selector);el.value=String(value??'');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
+      const assertZeroUnusedCut=value=>{if(Number(value)!==0)throw Error('Corte solo admite maquina manual');};
+      const dispatch=(selector,value)=>{let el=document.querySelector(selector);if(!el){let cat=selector.includes('prestamo')?'E':selector.includes('marketing')||selector.includes('tienda')?'D':selector.includes('activo')||selector.includes('mantenimiento')?'B':'C';if(selector.includes('grupo')){const g=SIDE_EXCEL_PUNTAJES.indice[value]?.grupo;cat=({'Inversion en RR.HH.':'A','Maquina de ensamblado':'B','Maquina de acabados':'B','Molde':'B','Canal de venta':'D','Acceso a prestamo bancario':'E'})[g]||'C';}currentCategory=cat;renderTabs();renderDecisionCategory();el=document.querySelector(selector);}if(!el&&/data-personal="corte,[0-2],[1-2]"/.test(selector)){assertZeroUnusedCut(value);return;}if(!el)throw new Error('Falta control '+selector);el.value=String(value??'');el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};
       dispatch('[data-excel-regimen]',d.regimen||'MYPE');dispatch('[data-excel-prestamo]',d.montoPrestamo||0);
       dispatch('[data-excel-garantia]',d.garantiaDias??'');dispatch('[data-excel-marketing]',d.marketingNivel??'');dispatch('[data-excel-garantia-proveedor]',d.garantiaProveedor??0);
-      for(const [selector,checked] of [['[data-excel-mantenimiento]',d.mantenimientoPreventivo],['[data-excel-analista]',d.analistaCompras]]){const el=document.querySelector(selector);if(!el)throw new Error('Falta control '+selector);el.checked=!!checked;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}
+      for(const [selector,checked] of [['[data-excel-mantenimiento]',d.mantenimientoPreventivo],['[data-excel-analista]',d.analistaCompras]]){currentCategory=selector.includes('mantenimiento')?'B':'C';renderTabs();renderDecisionCategory();const el=document.querySelector(selector);if(!el)throw new Error('Falta control '+selector);el.checked=!!checked;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}
       for(const [district,count] of Object.entries(d.tiendasPorDistrito||{}))dispatch(`[data-excel-tienda="${district}"]`,count);
       const normal=SIDE_EXCEL_PRODUCCION.normalizarPersonal(d.personal||{});for(const [area,filas] of Object.entries(normal))filas.forEach((fila,n)=>fila.forEach((v,m)=>dispatch(`[data-personal="${area},${n},${m}"]`,v)));
       for(const [k,v] of Object.entries(d.maquinaria||{}))dispatch(`[data-activo="${k}"]`,v);
       for(const [k,v] of Object.entries(d.comprasUnidades||{}))dispatch(`[data-compra="${k}"]`,v);
       for(const [k,v] of Object.entries(d.compras||{}))dispatch(`[data-compra="${k}"]`,v/SIDE_EXCEL_CONFIG.CONFIG.CONVERSION_COMPRA[k]);
       const derivados=[...Object.values(SIDE_EXCEL_CONFIG.CONFIG.GARANTIA_MAPEO_EXACTO),...Object.values(SIDE_EXCEL_CONFIG.CONFIG.MARKETING_BASE).map(row=>row.codigo)];
-      for(const code of d.seleccion||[]){if(derivados.includes(code))continue;const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
+      for(const code of d.seleccion||[]){if(derivados.includes(code))continue;const cat=({'Inversion en RR.HH.':'A','Maquina de ensamblado':'B','Maquina de acabados':'B','Molde':'B','Canal de venta':'D','Acceso a prestamo bancario':'E'})[SIDE_EXCEL_PUNTAJES.indice[code]?.grupo]||'C';currentCategory=cat;renderTabs();renderDecisionCategory();const option=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===code);if(!option)throw new Error('Opción Excel ausente: '+code);dispatch(`[data-excel-grupo="${option.parentElement.dataset.excelGrupo}"]`,code);}
       d.lotes.forEach((l,i)=>{for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])dispatch(`[data-lote="${i}"][data-campo="${campo}"]`,l[campo]??'');});
     },d);
     if(numero===3&&ciclo===1&&d.garantiaDias===180){
@@ -50,14 +51,14 @@ async function ejecutar(numero=3){
       await p.screenshot({path:path.join(evidence,'auditoria-menu-congelado-movil.png'),fullPage:true});
       const menu=await p.evaluate(()=>({ancho:document.documentElement.scrollWidth,viewport:innerWidth,
         grupos:[...document.querySelectorAll('[data-excel-grupo]')].map(el=>({grupo:el.parentElement.firstChild.textContent,opciones:[...el.options].map(o=>o.value)})),
-        garantia:[...document.querySelector('[data-excel-garantia]').options].map(o=>o.value),marketing:[...document.querySelector('[data-excel-marketing]').options].map(o=>o.textContent),
+        garantia:[...document.querySelector('[data-excel-garantia]').options].map(o=>o.value),marketing:(()=>{currentCategory='D';renderTabs();renderDecisionCategory();const result=[...document.querySelector('[data-excel-marketing]').options].map(o=>o.textContent);currentCategory='C';renderTabs();renderDecisionCategory();return result;})(),
         creditoEditable:!!document.querySelector('[data-excel-credito]'),publicidadLibre:!!document.querySelector('[data-excel-publicidad]')}));
       assert.ok(menu.ancho<=menu.viewport+1,'Editor congelado sin desborde móvil');assert.equal(menu.creditoEditable,false);assert.equal(menu.publicidadLibre,false);
       fs.writeFileSync(path.join(evidence,'auditoria-menu-congelado.json'),JSON.stringify(menu,null,2));
       await p.setViewportSize({width:1366,height:900});
     }
     await p.locator('[data-excel-enviar]').click();assert.match(await p.locator('[data-excel-status]').innerText(),/confirmado/);
-    await p.evaluate(()=>updateHud());assert.equal(await p.evaluate(()=>decisionProgressPercent()),100,'Confirmar lotes completa progreso');assert.match(await p.locator('#decisionProgressText').innerText(),/1\/1.*100%/);assert.equal(await p.locator('#topSubmitAllDecisions').isDisabled(),true,'Plan confirmado no reabre revisión antigua');
+    await p.evaluate(()=>updateHud());assert.equal(await p.evaluate(()=>decisionProgressPercent()),100,'Confirmar lotes completa progreso');assert.match(await p.locator('#decisionProgressText').innerText(),/5\/5.*100%/);assert.equal(await p.locator('#topSubmitAllDecisions').isDisabled(),true,'Plan confirmado no reabre revisión antigua');
     assert.equal(await p.evaluate(()=>JSON.stringify(cashLedger)),ledgerAntes,'Confirmar Excel no vuelve a descontar el ledger anterior');
     const report=await p.evaluate(()=>syncStudentReportPreview());const enviadas=report.excelDecisionState?.decisiones;assert.ok(enviadas,'Reporte conserva plan confirmado');assert.equal(enviadas.montoPrestamo,d.montoPrestamo||0,'Préstamo UI igual al escenario');if(d.reputacionLiteral!==undefined)assert.equal(enviadas.reputacionLiteral,d.reputacionLiteral,'Reputación literal igual al escenario');assert.equal(enviadas.lotes.length,d.lotes.length,'Lotes completos');
     for(const [i,lote] of d.lotes.entries())for(const campo of ['segmento','cantidad','cuero','accesorios','hilo','molde','precio'])assert.equal(enviadas.lotes[i][campo]??'',lote[campo]??'',`Lote ${i} ${campo}: UI conserva entrada`);

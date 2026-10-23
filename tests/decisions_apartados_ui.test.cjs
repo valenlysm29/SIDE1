@@ -32,7 +32,7 @@ for(const version of ['excel-16','side-lotes-2026-10-20'])test('Student edits ev
  }
  await change('B','[data-activo="mesa"]','1');
  await change('C','[data-personal="corte,0,0"]','2');
- await change('F','[data-compra="INS-01"]','3');
+ await change('C','[data-compra="INS-01"]','3');
  await change('D','[data-excel-tienda="los_olivos"]','1');
  await change('E','[data-excel-prestamo]','125');
  assert.deepEqual(await page.evaluate(()=>{

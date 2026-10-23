@@ -32,7 +32,7 @@ async function newPage(browser,origin,name,teacher=false){
 async function category(page,cat){await page.locator(`[data-cat="${cat}"]`).click();await page.waitForSelector('#excelProductionMount .excel-editor');await page.locator('#excelProductionMount details').evaluateAll(items=>items.forEach(el=>el.open=true));}
 async function change(page,selector,value){
  const input=page.locator(selector);assert.equal(await input.count(),1,'Unique canonical field '+selector);
- const tag=await input.evaluate(el=>el.tagName);if(tag==='SELECT')await input.selectOption(String(value));else if(await input.getAttribute('type')==='checkbox')await input.setChecked(!!value);else await input.fill(String(value));
+ const tag=await input.evaluate(el=>el.tagName);if(tag==='SELECT'||await input.getAttribute('type')==='checkbox'){const card=input.locator('xpath=ancestor::fieldset[1]');const wanted=tag==='SELECT'?String(value):(value?'1':'0');await card.locator('[data-excel-choice]').evaluateAll((items,wanted)=>{const target=items.find(el=>el.value===wanted);if(!target)throw Error('Missing visible alternative '+wanted);target.click();},wanted);}else await input.fill(String(value));
 }
 async function group(page,codigo){const selector=await page.evaluate(codigo=>{const o=[...document.querySelectorAll('[data-excel-grupo] option')].find(o=>o.value===codigo);return o?'[data-excel-grupo="'+o.parentElement.dataset.excelGrupo+'"]':null;},codigo);assert.ok(selector,'Visible group for '+codigo);await change(page,selector,codigo);}
 async function fillPlan(page,{cycle,borrow,auto,variant,physical=false}){
@@ -43,8 +43,8 @@ async function fillPlan(page,{cycle,borrow,auto,variant,physical=false}){
  await change(page,'[data-excel-garantia]',30);
  for(const [field,value] of Object.entries({segmento:variant&&cycle>1?'SEG-02':'SEG-01',cantidad:40,cuero:variant&&cycle>1?'INS-02':'INS-01',accesorios:'INS-04',hilo:variant&&cycle>1?'INS-07':'INS-06',molde:variant&&cycle>1?'INF-09':'INF-08',precio:variant&&cycle>1?100:45}))await change(page,`[data-lote="0"][data-campo="${field}"]`,value);
  await category(page,'D');await group(page,physical?'COM-01C':'COM-01B');if(physical)await change(page,'[data-excel-tienda="los_olivos"]',1);await change(page,'[data-excel-marketing]','baja');
- await category(page,'E');await group(page,borrow&&cycle===1?'FIN-01A':'FIN-01B');await change(page,'[data-excel-prestamo]',borrow&&cycle===1?5000:0);
- await category(page,'F');for(const [code,qty] of Object.entries({'INS-01':30,'INS-02':30,'INS-04':100,'INS-06':3,'INS-07':3}))await change(page,`[data-compra="${code}"]`,qty);
+ await category(page,'E');await change(page,'[data-excel-prestamo]',borrow&&cycle===1?5000:0);
+ await category(page,'C');for(const [code,qty] of Object.entries({'INS-01':30,'INS-02':30,'INS-04':100,'INS-06':3,'INS-07':3}))await change(page,`[data-compra="${code}"]`,qty);
  if(auto){await page.locator('[data-excel-guardar]').click();check('Saved draft remains unsubmitted',!await page.evaluate(()=>decisionState.__excel.enviado));}
  else {await page.locator('[data-excel-enviar]').click();check('Confirmed plan through delivered UI',await page.evaluate(()=>decisionState.__excel.enviado));}
  const saved=await page.evaluate(()=>syncStudentReportPreview());assert.ok(saved.excelDecisionState?.decisiones);return saved;
