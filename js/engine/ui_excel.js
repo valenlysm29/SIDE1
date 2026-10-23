@@ -310,12 +310,16 @@
         if(!canSave()){container.querySelector('[data-excel-status]').textContent='No se puede guardar ni confirmar mientras el ciclo está en pausa o fuera de la fase de decisiones.';return;}
         const enviar=el.hasAttribute('data-excel-enviar'),error=enviar?validar(draft,context.motorVersion):'';
         if(error){container.querySelector('[data-excel-status]').textContent=error;return;}
+        let resourceWarning='';
         if(enviar&&enabled){
           const projection=proyectarPlan(draft,context);
-          const issue=!remoteReady?'Recupera la conexión o actualiza la partida antes de confirmar.':Number.isFinite(context.cash)&&projection.cashAfter<0?'El plan supera la caja disponible. Reduce compras o gastos, o solicita financiamiento.':(projection.plan.target>projection.prepared.produccion.produccionCapacidad||projection.plan.materials.some(material=>material.shortfall>0))?'La cantidad planeada supera la capacidad o los materiales disponibles. Ajusta producción, personal, activos y compras.':'';
+          const issue=!remoteReady?'Recupera la conexión o actualiza la partida antes de confirmar.':Number.isFinite(context.cash)&&projection.cashAfter<0?'El plan supera la caja disponible. Reduce compras o gastos, o solicita financiamiento.':'';
           if(issue){container.querySelector('[data-excel-status]').textContent=issue;return;}
+          // Desired quantities remain inputs even when resources are insufficient.
+          // Excel E37:E39 and D56:E58 limit execution; they do not reject the plan.
+          if(projection.plan.target>projection.prepared.produccion.produccionCapacidad||projection.plan.materials.some(material=>material.shortfall>0))resourceWarning=' La meta supera la capacidad o los materiales disponibles: la producción real se limitará a los recursos disponibles y se aplicarán las consecuencias del ciclo.';
         }
-        saved=clone(draft);savedBalance();stored={...stored,habilitado:true,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};if(enviar)stored.planesPorCiclo={...stored.planesPorCiclo,[context.round]:clone(stored.decisiones)};context.save(stored);context.savedBalanceChanged?.();context.refreshSavedBalance?.(stored.saldoFinalGuardado);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.':'Borrador guardado.';
+        saved=clone(draft);savedBalance();stored={...stored,habilitado:true,version:1,round:context.round,decisiones:prepararDecisiones(draft),enviado:enviar};if(enviar)stored.planesPorCiclo={...stored.planesPorCiclo,[context.round]:clone(stored.decisiones)};context.save(stored);context.savedBalanceChanged?.();context.refreshSavedBalance?.(stored.saldoFinalGuardado);confirmed=enviar;render();container.querySelector('[data-excel-status]').textContent=enviar?'Plan del ciclo confirmado.'+resourceWarning:'Borrador guardado.';
       }
     };
     render();

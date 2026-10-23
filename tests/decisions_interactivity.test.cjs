@@ -28,7 +28,7 @@ test('Plan projection reserves costs once, preserves owned assets, and matches a
  assert.equal(JSON.stringify(history),before);assert.ok(projection.cashAfter<100000);
  d.maquinaria['INF-08']=2;assert.ok(api.proyectarPlan(d,{cash:100000,historial:history,motorVersion:version}).cashAfter<projection.cashAfter);
 });
-test('Confirmation rejects unfunded or overcapacity plans while keeping a draft editable',()=>{
+test('Confirmation rejects unfunded plans but preserves desired quantities above capacity',()=>{
  const c=load(),api=c.SIDE_EXCEL_UI,d=api.nuevasDecisiones();
  d.maquinaria={mesa:1,'INF-08':1};d.personal={corte:[1,0,0],ensamble:[1,0,0],acabado:[1,0,0]};d.comprasUnidades={'INS-01':10,'INS-04':10,'INS-06':1};
  d.lotes=[{segmento:'SEG-01',molde:'INF-08',cuero:'INS-01',accesorios:'INS-04',hilo:'INS-06',cantidad:10,precio:100}];
@@ -36,7 +36,7 @@ test('Confirmation rejects unfunded or overcapacity plans while keeping a draft 
  const confirm=e=>e.container.onclick({target:{closest:()=>button}});
  const poor=editor(c,{cash:1,getState:()=>({decisiones:d})});confirm(poor);assert.match(poor.status.textContent,/caja disponible/);assert.equal(poor.saved(),undefined);
  const large=JSON.parse(JSON.stringify(d));large.lotes[0].cantidad=100000;
- const over=editor(c,{cash:10000000,getState:()=>({decisiones:large})});confirm(over);assert.match(over.status.textContent,/capacidad o los materiales/);assert.equal(over.saved(),undefined);
+ const over=editor(c,{cash:10000000,getState:()=>({decisiones:large})});confirm(over);assert.match(over.status.textContent,/capacidad o los materiales/);assert.equal(over.saved().enviado,true);assert.equal(over.saved().planesPorCiclo[1].lotes[0].cantidad,100000);
  const funded=editor(c,{cash:100000,getState:()=>({decisiones:d})});confirm(funded);assert.equal(funded.saved().enviado,true);
 });
 
