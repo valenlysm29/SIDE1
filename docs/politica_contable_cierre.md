@@ -1,0 +1,11 @@
+# Política contable del cierre integrado SIDE
+
+El cierre reconoce ingresos sólo del recibo de ventas; los préstamos y compras de activos no pasan a ingresos/gastos. La comisión es 1% de ventas efectivas.
+
+Las compras de MP confirmadas en el ledger y su desglose alimentan promedio ponderado por opción. El consumo se obtiene del inventario final del recibo. Los costos materiales se distribuyen por requerimientos físicos de cada producto; MOD y depreciación por unidades producidas. El promedio del producto terminado incluye existencias anteriores y sólo las unidades vendidas salen a costo de ventas. MOD/depreciación ociosas se reconocen como gasto administrativo.
+
+Depreciación lineal: se reutiliza config_excel.MAQUINARIA (mesas y ensamble 10 años, acabados 8, moldes 5) y residual MYPE 5%. financialPolicy permite usefulLives, residualRate y cycleMonths. Un ciclo equivale a un mes contable (no a 24 días laborables); año de 12 meses. TEA porcentual de configuración docente resuelta para cada ciclo: (1 + TEA/100)^(meses/12)-1. No se presupone rendimiento de caja. Intereses e impuesto se devengan como pasivos hasta pagos registrados; no se inventan cuotas ni pagos. Impuesto 29.5% de utilidad positiva, redondeado a céntimos; pérdidas no tributan.
+
+Garantías: catálogo Excel COM-06B establece S/5 por unidad vendida para 30 días y COM-06C S/10 para 90 días. Se provisionan una sola vez en gastos comerciales. Para 180 días no existe tarifa fuente: debe configurarse financialPolicy.warrantyUnitCosts[180]; el estado emite policyWarnings y no inventa importe. Devoluciones de ventas son contraingreso; no son pagos de garantía.
+
+El cierre conserva recibo, decisiones, política, inventario valorizado y snapshot financiero por ciclo. Lecturas posteriores reutilizan snapshots y no contabilizan nuevamente. Los registros nuevos separan unidades MP iniciales/finales. En saldos migrados que sólo traen valor agregado MP, se asigna explícitamente ese valor entre cantidades iniciales según sus costos relativos del catálogo, conservando íntegro el saldo importado. Si tampoco hay cantidades iniciales, el valor histórico permanece como saldo no desglosado y requiere una corrección contable explícita para atribuir consumo. No se reescriben resultados históricos anteriores a la migración.

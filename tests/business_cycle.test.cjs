@@ -47,5 +47,5 @@ test('accounting opening seed preserves debt, assets, equity and visible past re
  const openingBalance={round:2,cash:175000,balanceGeneral,history:[previous]};
  const result=finance.calculate({capital:150000,round:3,openingBalance,ledger:{'2:CAPITAL_ADJUSTMENT':25000,'3:SIM_VENTAS':7500,'3:SIM_GASTOS':-1000}});
  assert.equal(result.history[0].estadoResultados.ingresos,12000);assert.equal(result.balanceCaja.cajaInicial,175000);assert.equal(result.balanceCaja.cajaFinal,181500);
- assert.equal(result.balanceGeneral.activosFijos,20000);assert.equal(result.balanceGeneral.deuda,30000);assert.equal(result.balanceGeneral.capital,150000);assert.equal(result.balanceGeneral.resultadosAcumulados,26500);assert.equal(result.balanceGeneral.activos,result.balanceGeneral.pasivoPatrimonio);
+ assert.equal(result.balanceGeneral.activosFijos,20000);assert.equal(result.balanceGeneral.deuda,30000);assert.equal(result.balanceGeneral.capital,150000);assert.equal(result.balanceGeneral.resultadosAcumulados,20000+result.estadoResultados.utilidadNeta);assert.equal(result.estadoResultados.gastosFinancieros,459.28);assert.equal(result.estadoResultados.impuestoRenta,1782.01);assert.equal(result.balanceGeneral.activos,result.balanceGeneral.pasivoPatrimonio);
 });

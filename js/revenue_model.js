@@ -19,13 +19,15 @@
     const workers=sum(staff.map(([,q])=>q)),masters=sum(staff.filter(([id])=>['corte_maestro','ens_personal_esp','aca_personal_art'].includes(id)).map(([,q])=>q));
     const marketing=state.INV_MARKETING?.optionIds?.[0],publicidad=({mkt_baja:1500,mkt_media:6000,mkt_alta:12000})[marketing]||0;
     const reputation=COSTS.reputacionOperativa({produccion:{totalProducido:sum(produced),lotes:produced.map((producido,i)=>({molde:['INF-08','INF-09','INF-10'][i],producido}))},consumoMP,proporcionN3:workers?masters/workers:0,publicidad});
-    return {id:input.id,reputacionMercado:reputation.valor,reputation,lines:ids.map((id,i)=>({id,segmento:`SEG-0${i+1}`,quantity:n(lines[i]?.target??lines[i]?.plannedUnits)+n(state.__finishedGoods?.[id]),price:n(input.prices?.[id])||defaults[i]}))};
+    const channelIds=state.CANALES?.optionIds;
+    const hasChannel=(channelIds||[]).some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
+    return {hasChannel,id:input.id,reputacionMercado:reputation.valor,reputation,lines:ids.map((id,i)=>({id,segmento:`SEG-0${i+1}`,quantity:n(lines[i]?.target??lines[i]?.plannedUnits)+n(state.__finishedGoods?.[id]),price:n(input.prices?.[id])||defaults[i]}))};
   }
   function allocate(inputs){
     const profiles=inputs.map(profile),out=Object.fromEntries(profiles.map(p=>[p.id,{reputation:p.reputation,products:{}}]));
-    const economic=profiles.filter(p=>p.lines[0].quantity>0).reduce((s,p)=>s+p.reputacionMercado,0);
+    const economic=profiles.filter(p=>p.hasChannel&&p.lines[0].quantity>0).reduce((s,p)=>s+p.reputacionMercado,0);
     for(let i=0;i<3;i++){
-      const participants=profiles.filter(p=>p.lines[i].quantity>0).map(p=>({id:p.id,precio:p.lines[i].price,reputacionMercado:p.reputacionMercado}));
+      const participants=profiles.filter(p=>p.hasChannel&&p.lines[i].quantity>0).map(p=>({id:p.id,precio:p.lines[i].price,reputacionMercado:p.reputacionMercado}));
       for(const row of MARKET.repartoMercado(participants,`SEG-0${i+1}`,{},{sumaReputacionEconomico:economic}))out[row.id].products[ids[i]]={...row,asignado:Math.max(0,row.asignado)};
     }
     return out;

@@ -365,7 +365,7 @@
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
         if(!saved)continue;
         const business=state.__cycleBusiness?.[ciclo]||{};
-        inputs.push({id:company.id,state:{...saved.state,__cycleSettlements:state.__cycleSettlements,__finishedGoods:state.__finishedGoods},ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,...business});
+        inputs.push({id:company.id,state:global.SIDE_CYCLE_MODEL.restoreState(saved.state,state),ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},...business});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
@@ -376,7 +376,9 @@
           if(adjustment!==previous)financialLedger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;
           previous=adjustment;
         }
-        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance});
+        delete result.state.__financialSnapshots?.[ciclo];
+        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
       const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
       if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data.code};

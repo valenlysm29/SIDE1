@@ -67,3 +67,20 @@ test('mount redraws after resize and disconnects observers when the category cha
   resizeHandler();cleanup();assert.ok(disconnected);assert.ok(cancelled);assert.equal(resizeHandler,null);
   frame=null;callback();assert.equal(frame,null);
 });
+
+test('persisted adapter plans render real comparison stock without mutating snapshots',()=>{
+  const snapshot={target:10,producibleUnits:4,productLines:[{label:'Lote 1',target:10,plannedUnits:4}],requirements:{materials:[{id:'CUERO',label:'Cuero',unit:'m²',needs:3}]},comparison:{items:[{id:'CUERO',available:1.2}]}},before=JSON.stringify(snapshot);
+  const html=dop.render(snapshot,{round:2});
+  assert.match(html,/4 unidades totales/);assert.match(html,/3 m²/);assert.doesNotMatch(html,/NaN|undefined|Infinity/);
+  assert.equal(JSON.stringify(snapshot),before);
+});
+
+test('diagram mounts and redraws without ResizeObserver, and tolerates partial markup',()=>{
+  let frame,resize,removed=false;
+  const svg={setAttribute(){},innerHTML:''},boxes=layout();
+  const graph={isConnected:true,querySelector:()=>svg,querySelectorAll:()=>Object.entries(boxes).map(([id,box])=>({dataset:{pdNode:id},getBoundingClientRect:()=>box})),getBoundingClientRect:()=>({left:0,top:0,width:720,height:1018})};
+  const ctx=vm.createContext({requestAnimationFrame(fn){frame=fn;return 1},cancelAnimationFrame(){},getComputedStyle(){return {getPropertyValue:()=> '0'}},window:{addEventListener(_,fn){resize=fn},removeEventListener(){removed=true}},document:{}});
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/production_dop.js'),'utf8'),ctx);
+  const cleanup=ctx.SIDE_PRODUCTION_DOP.mount({querySelector:()=>graph});frame();assert.equal((svg.innerHTML.match(/<path /g)||[]).length,7);resize();frame();cleanup();assert.ok(removed);
+  assert.doesNotThrow(()=>ctx.SIDE_PRODUCTION_DOP.mount({querySelector:()=>({querySelector:()=>null})}));
+});

@@ -224,7 +224,7 @@
             <div><span>FLUJO DE CAJA</span><strong id="studentFlowResult">S/ 0</strong><small>Flujo neto del ciclo</small></div>
           </div>
           <div class="student-result-breakdown">
-            <div><strong>ESTADO DE RESULTADOS</strong><span>Ingresos <b id="studentERIngresos">S/ 0</b></span><span>Gastos operativos <b id="studentERCostos">S/ 0</b></span><span>Impacto de eventos <b id="studentEREventos">S/ 0</b></span><span>Devoluciones <b id="studentERDevoluciones">S/ 0</b></span><span>Resultado de venta de activos <b id="studentERActivos">S/ 0</b></span><span>Otros movimientos <b id="studentEROtros">S/ 0</b></span><span>Utilidad <b id="studentERUtilidad">S/ 0</b></span></div>
+            <div id="studentIncomeStatement"><strong>ESTADO DE RESULTADOS</strong></div>
             <div><strong>BALANCE DE CAJA</strong><span>Caja inicial <b id="studentBCInicial">S/ 0</b></span><span>Entradas <b id="studentBCEntradas">S/ 0</b></span><span>Salidas <b id="studentBCSalidas">S/ 0</b></span><span>Caja final <b id="studentBCFinal">S/ 0</b></span></div>
             <div><strong>FLUJO DE CAJA</strong><span>Operación <b id="studentFCOperacion">S/ 0</b></span><span>Inversión <b id="studentFCInversion">S/ 0</b></span><span>Financiamiento <b id="studentFCFinanciamiento">S/ 0</b></span><span>Flujo neto <b id="studentFCNeto">S/ 0</b></span></div>
           </div>
@@ -633,7 +633,7 @@
 <script src="vendor/supabase-js/supabase.js?v=2.117.3"></script>
 <script src="js/config.js?v=20261022-reversion"></script>
 <script src="services/supabase_client.js?v=20261013-connection"></script>
-<script src="services/partida_service.js?v=20261023-ingresos"></script>
+<script src="services/partida_service.js?v=20261023-integral-v2"></script>
 <script src="services/empresa_service.js?v=20261022-reversion"></script>
 <script src="services/decisiones_service.js?v=20260928-secure-cas"></script>
 <script src="services/student_sync.js?v=20261021-expulsion"></script>
@@ -660,15 +660,15 @@
 <script src="js/simulator3d.js?v=20261023-continuous-flow"></script>
 <script src="js/production_model.js?v=20261023-limpieza"></script>
 <script src="js/decision_review_model.js?v=20261023-limpieza"></script>
-<script src="js/production_dop.js?v=20261023-limpieza"></script>
-<script src="js/financial_model.js?v=20261023-finance"></script>
+<script src="js/production_dop.js?v=20261023-integral-v2"></script>
+<script src="js/financial_model.js?v=20261023-integral-v2"></script>
 <script src="js/engine/config_excel.js?v=20261023-ingresos"></script>
 <script src="js/engine/mercado.js?v=20261023-ingresos"></script>
 <script src="js/engine/costos.js?v=20261023-ingresos"></script>
-<script src="js/revenue_model.js?v=20261023-ingresos"></script>
-<script src="js/cycle_model.js?v=20261023-ingresos"></script>
-<script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261023-ingresos"></script>
+<script src="js/revenue_model.js?v=20261023-integral-v2"></script>
+<script src="js/cycle_model.js?v=20261023-integral-v2"></script>
+<script src="js/student_financial_view.js?v=20261023-standard-er"></script>
+<script src="js/app.js?v=20261023-integral-v2"></script>
 <script src="js/cycle_cost_notice.js?v=20261023-limpieza"></script>
 <script src="js/company_summary.js?v=20261023-limpieza"></script>
 </body>

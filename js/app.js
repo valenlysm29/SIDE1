@@ -1379,9 +1379,10 @@ function applyEventCashEffects(){
   const events=activeStudentEvents();
   events.forEach(ev=>{const delta=Number(ev.effect?.cashDelta||0);if(!delta)return;const key=`${ev.startRound}:EVENT:${ev.id}`;if(cashLedger[key]===undefined)cashLedger[key]=delta;});
   if(events.some(ev=>ev.effect?.revenuePct||ev.effect?.costPct)||cashLedger[`${currentRound()}:EVENT:PERCENT`]!==undefined){
-    const base=financialReport().estadoResultados;let revenue=base.ingresos,cost=base.costos;
-    events.forEach(ev=>{revenue*=1+Number(ev.effect?.revenuePct||0)/100;cost*=1+Number(ev.effect?.costPct||0)/100;});
-    cashLedger[`${currentRound()}:EVENT:PERCENT`]=Math.round(((revenue-base.ingresos)-(cost-base.costos))*100)/100;
+    if(decisionState.__cycleSettlements?.[currentRound()])return;
+    const base=financialReport().estadoResultados;let cost=base.costos;
+    events.forEach(ev=>{cost*=1+Number(ev.effect?.costPct||0)/100;});
+    cashLedger[`${currentRound()}:EVENT:PERCENT`]=Math.round((-(cost-base.costos))*100)/100;
   }
   persistGameState();
 }
@@ -1393,7 +1394,7 @@ function recordedFinancialSections(){
   return sections;
 }
 function financialReport(){
-  return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance});
+  return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance,state:decisionState,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),currentRound())||teacherConfig()});
 }
 let financialSyncTimer=null;
 function queueFinancialSync(){
@@ -1403,7 +1404,8 @@ function queueFinancialSync(){
 function cycleBusinessData(round=currentRound()){
   const code=($('lobbyCode')?.textContent||'SIDE').replace(/\s+/g,'_'),company=String(currentStudent.company||'MI EMPRESA').trim().replace(/[^a-z0-9_-]+/gi,'_').slice(0,36)||'EMPRESA',context=`${code}_${company}_${round}`;
   let inventory={},business={};try{inventory=JSON.parse(localStorage.getItem('side3d_inventory_'+context)||'{}');business=JSON.parse(localStorage.getItem('side3d_business_'+context)||'{}');}catch{}
-  return {prices:business.prices||{},soldByProduct:inventory.sold||{},soldUnits:Object.values(inventory.sold||{}).reduce((sum,value)=>sum+Number(value||0),0)};
+  const events=round===currentRound()?activeStudentEvents():decisionState.__cycleBusiness?.[round]?.events||[];
+  return {events:deepClone(events),prices:business.prices||{},soldByProduct:inventory.sold||{},soldUnits:Object.values(inventory.sold||{}).reduce((sum,value)=>sum+Number(value||0),0)};
 }
 function captureCyclePlan(){
   const round=currentRound(),state=deepClone(decisionState);delete state.__cyclePlans;
@@ -1418,11 +1420,11 @@ function settleCycle(round=currentRound()){
   const live=decisionState,ctx=cycleBusinessData(round),id=currentStudent.participantId||('local-'+storageKey()),game=currentStudent.game?.codigo||'SIDE-000';
   let peers=[];try{peers=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
   const inputs=peers.filter(r=>r.id!==id&&r.partida===game&&r.estado!=='eliminada'&&r.enviado&&r.gameState?.__cyclePlans?.[round]).map(r=>{
-    const plan=r.gameState.__cyclePlans[round];return {id:r.id,state:plan.state,production:plan.production,round,prices:r.gameState.__cycleBusiness?.[round]?.prices||r.productPrices};
+    const plan=r.gameState.__cyclePlans[round];return {id:r.id,state:plan.state,production:plan.production,round,...r.gameState.__cycleBusiness?.[round],prices:r.gameState.__cycleBusiness?.[round]?.prices||r.productPrices};
   });
-  inputs.push({id,state:{...saved.state,__cycleSettlements:live.__cycleSettlements,__finishedGoods:live.__finishedGoods},ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,...ctx});
+  inputs.push({id,state:window.SIDE_CYCLE_MODEL.restoreState(saved.state,live),ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig(),...ctx});
   const result=window.SIDE_CYCLE_MODEL.closeMany(inputs)[id];
-  decisionState={...live,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
+  decisionState={...live,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
   try{queueStudentSnapshot(buildStudentSnapshot(currentRound()));syncReportToSupabase(syncStudentReportPreview());}catch(error){console.warn('SIDE: cierre guardado; sincronización pendiente',error);}
   return true;
 }
@@ -1686,6 +1688,7 @@ function renderStudentStatus(){
   const set=(id,val)=>{if($(id))$(id).textContent=money(val)};
   set('studentIncomeResult',er.utilidad);set('studentCashResult',bc.cajaFinal);set('studentFlowResult',fc.flujoNeto);
   for(const [id,val] of Object.entries({studentERIngresos:er.ingresos,studentERCostos:er.costos,studentEREventos:er.impactoEventos,studentERUtilidad:er.utilidad,studentERDevoluciones:er.devoluciones,studentERActivos:er.resultadoVentaActivos,studentEROtros:er.otros,studentBCInicial:bc.cajaInicial,studentBCPrestamos:bc.prestamos,studentBCEntradas:bc.entradas,studentBCSalidas:bc.salidas,studentBCFinal:bc.cajaFinal,studentFCOperacion:fc.operacion,studentFCFinanciamiento:fc.financiamiento,studentFCEventos:fc.eventos,studentFCInversion:fc.inversion,studentFCNeto:fc.flujoNeto}))set(id,val);
+  if($('studentIncomeStatement')&&window.SIDE_STUDENT_FINANCIAL_VIEW)$('studentIncomeStatement').innerHTML='<strong>ESTADO DE RESULTADOS</strong>'+window.SIDE_STUDENT_FINANCIAL_VIEW.incomeHtml(er);
   if($('studentFinancialDetail'))$('studentFinancialDetail').innerHTML=financialDetailsHtml(f);
   const historyMount=$('studentCycleHistory');
   if(historyMount&&window.SIDE_STUDENT_FINANCIAL_VIEW){
@@ -1694,7 +1697,7 @@ function renderStudentStatus(){
     if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
   }
   const events=activeStudentEvents();
-  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
+  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. El costo de ventas corresponde a unidades vendidas; inventarios y activos conservan su valor pendiente de consumo o depreciación. Préstamos como deuda.`;
   const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>';
 }
 function renderOfficeFinances(){
@@ -1706,7 +1709,7 @@ function renderOfficeFinances(){
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;
   return `<details class="financial-details"><summary>Flujo de caja detallado · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
-  <div class="financial-details"><strong>BALANCE GENERAL · ${f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Equipos, moldes y mejoras',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
+  <div class="financial-details"><strong>BALANCE GENERAL · ${f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Inventarios',bg.inventarios)}${row('Equipos, moldes y mejoras (netos)',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
 }
 let lastObservedRound=currentRound();
 let lastDeadlineRefresh='';

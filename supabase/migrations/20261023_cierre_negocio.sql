@@ -57,7 +57,7 @@ begin
  for emp in select * from jsonb_array_elements(ctx->'empresas') loop
   sid:=(emp->>'id')::bigint; result:=p_cierre->'resultadosPorEmpresa'->sid::text;fin:=result->'financial';
   select snapshot into snapshot_actual from public.side_student_state where empresa_id=sid;
-  next_state:=coalesce(snapshot_actual->'decision_state','{}')||jsonb_build_object('__cycleSettlements',result#>'{state,__cycleSettlements}','__finishedGoods',result#>'{state,__finishedGoods}','__inventarioMP',result#>'{state,__inventarioMP}');
+  next_state:=coalesce(snapshot_actual->'decision_state','{}')||jsonb_build_object('__financialSnapshots',coalesce(result#>'{state,__financialSnapshots}','{}'::jsonb)||jsonb_build_object(p_ciclo::text,fin-'history')||coalesce(snapshot_actual#>'{decision_state,__financialSnapshots}','{}'::jsonb),'__cycleSettlements',result#>'{state,__cycleSettlements}','__finishedGoods',result#>'{state,__finishedGoods}','__inventarioMP',result#>'{state,__inventarioMP}');
   update public.side_student_state set snapshot=jsonb_set(jsonb_set(snapshot_actual,'{decision_state}',next_state),'{cash_ledger}',result->'ledger'),revision=revision+1,updated_at=clock_timestamp() where empresa_id=sid;
   insert into public.reportes_ciclo(empresa_id,ciclo,capital,ingresos,costos,utilidad,caja_final,balance_caja,flujo_caja,estado_resultados)
   values(sid,p_ciclo,(emp->>'capital')::numeric,(fin#>>'{estadoResultados,ingresos}')::numeric,(fin#>>'{estadoResultados,costos}')::numeric,(fin#>>'{estadoResultados,utilidad}')::numeric,(fin#>>'{balanceCaja,cajaFinal}')::numeric,fin->'balanceCaja',fin->'flujoCaja',(fin->'estadoResultados')||jsonb_build_object('balanceGeneral',fin->'balanceGeneral','cycleReceipt',result->'receipt'))

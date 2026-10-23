@@ -6,7 +6,7 @@ const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
 // Literal source values checked in DECISIONES SIDE (17).xlsx, Costos!C118:J147.
 const prices=[[40,45,43,41],[120,150,190,200],[250,300,220,400]];
 const expected=[[1292,285,772,1151],[1067,955,819,659],[174,194,236,195]];
-function tableInputs(){return [7,8.3,10.2,9].map((rep,i)=>({id:String(i),round:1,prices:Object.fromEntries(productIds.map((id,j)=>[id,prices[j][i]])),state:{
+function tableInputs(){return [7,8.3,10.2,9].map((rep,i)=>({id:String(i),round:1,prices:Object.fromEntries(productIds.map((id,j)=>[id,prices[j][i]])),state:{CANALES:{optionIds:['web']},
   PERS_CORTE:{round:1,quantities:{corte_maestro:i===2?87:rep*10,corte_basico:i===2?13:100-rep*10}},
   ...(i===2?{INV_MARKETING:{round:1,optionIds:['mkt_baja']}}:{})
 },production:{productLines:productIds.map(()=>({target:5000,plannedUnits:0})),materials:[]}}));}
@@ -36,20 +36,20 @@ test('shared closure competes across companies, caps sales at stock and reconcil
     production:{producibleUnits:2000,productLines:[{target:2000,plannedUnits:2000}],materials:[]},ledger:{'1:SIM_VENTAS':999999,'1:C':-2000},soldUnits:500,soldByProduct:{esencial:500}}));
   const results=CYCLE.closeMany(inputs);
   for(const [i,input] of inputs.entries()){
-    const r=results[input.id];assert.equal(r.receipt.sold,expected[0][i]);
-    assert.equal(r.receipt.revenue,expected[0][i]*prices[0][i]);
+    const r=results[input.id];assert.equal(r.receipt.sold,Math.max(500,expected[0][i]));
+    assert.equal(r.receipt.revenue,Math.max(500,expected[0][i])*prices[0][i]);
     assert.equal(r.ledger['1:SIM_VENTAS'],r.receipt.revenue);
     assert.equal(r.ledger['1:C'],-2000);assert.equal(r.state.__finishedGoods.esencial,2000-r.receipt.sold);
-    assert.equal(r.financial.balanceCaja.cajaFinal,98000+r.receipt.revenue);
+    assert.equal(r.financial.balanceCaja.cajaFinal,98000+r.receipt.revenue+r.ledger['1:COMISION_VENTAS']);
     assert.equal(CYCLE.close({...input,state:r.state,ledger:r.ledger}).reused,true);
   }
-  const short=CYCLE.close({state:{},round:1,production:{producibleUnits:12,productLines:[{plannedUnits:12}],materials:[]},prices:{esencial:40}});
+  const short=CYCLE.close({state:{CANALES:{optionIds:['web']}},round:1,production:{producibleUnits:12,productLines:[{plannedUnits:12}],materials:[]},prices:{esencial:40}});
   assert.equal(short.receipt.sold,12);assert.equal(short.receipt.revenue,480);
 });
 test('unsold goods carry forward; web and store counts no longer impose invented demand',()=>{
   for(const optionIds of [[],['web'],['los_olivos','miraflores','sjl']]){
     const r=CYCLE.close({round:2,state:{CANALES:{optionIds},__finishedGoods:{esencial:10}},production:{producibleUnits:1000,productLines:[{plannedUnits:1000}],materials:[]},prices:{esencial:40}});
-    assert.equal(r.receipt.sold,1010);assert.equal(r.receipt.revenue,40400);assert.equal(r.state.__finishedGoods.esencial,0);
+    assert.equal(r.receipt.sold,optionIds.length?1010:0);assert.equal(r.receipt.revenue,optionIds.length?40400:0);assert.equal(r.state.__finishedGoods.esencial,optionIds.length?0:1010);
   }
 });
 test('browser pages load the same revenue dependencies as Node',()=>{

@@ -19,7 +19,8 @@ test('teacher cash adjustments preserve closed cycles and enter equity, never pr
   assert.equal(after.balanceCaja.salidas,20000);
   assert.equal(after.balanceGeneral.capital,120000);
   assert.equal(after.balanceGeneral.deuda,0);
-  assert.equal(after.balanceGeneral.resultadosAcumulados,1500);
+  assert.equal(before.history[0].estadoResultados.impuestoRenta,590);
+  assert.equal(after.balanceGeneral.resultadosAcumulados,910);
   assert.equal(after.balanceGeneral.activos,after.balanceGeneral.pasivoPatrimonio);
 });
 
@@ -27,7 +28,8 @@ test('summary retains every cycle, including quiet cycles, and reports cumulativ
   const report=model.calculate({capital:1000,round:3,ledger:{'1:SIM_VENTAS':200,'3:SIM_GASTOS':-50}});
   assert.deepEqual(report.history.map(row=>row.round),[1,2,3]);
   assert.equal(report.history[1].balanceCaja.cajaFinal,1200);
-  assert.equal(report.balanceGeneral.resultadosAcumulados,150);
+  assert.equal(report.history[0].estadoResultados.impuestoRenta,59);
+  assert.equal(report.balanceGeneral.resultadosAcumulados,91);
   const html=view.summaryHtml(report,true);
   for(const label of ['Ciclo 1','Ciclo 2','Ciclo 3','Estado de resultados','Balance de caja','Flujo de caja','Balance general','Deuda / préstamos','Pasivo + patrimonio','simulación finalizada'])assert.ok(html.includes(label),label);
   assert.equal((html.match(/class="student-cycle-report"/g)||[]).length,3);
@@ -36,7 +38,7 @@ test('summary retains every cycle, including quiet cycles, and reports cumulativ
 test('office view uses financial model statements, including debt and assets',()=>{
   const report=model.calculate({capital:500,round:1,ledger:{'1:SIM_VENTAS':100,'1:SIM_INVERSION':-40}});
   const html=view.officeHtml(report);
-  for(const label of ['Caja','Ingresos','Costos','Utilidad','Deuda / préstamos','Flujo neto','Activos','Patrimonio','Ver estados financieros e indicadores'])assert.ok(html.includes(label),label);
+  for(const label of ['Caja','Ventas Totales','Costo de Ventas','Utilidad Neta','Impuesto a la Renta (29.5%)','Deuda / préstamos','Flujo neto','Activos','Patrimonio','Ver estados financieros e indicadores'])assert.ok(html.includes(label),label);
   assert.ok(html.includes('560'));
 });
 
@@ -44,7 +46,7 @@ test('student financial report uses the same ledger model as the teacher summary
   const source=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
   const start=source.indexOf('function financialReport(){'),end=source.indexOf('let financialSyncTimer=',start);
   const ledger={'1:SIM_VENTAS':2000,'2:SIM_GASTOS':-500},sections={};
-  const context={decisionState:{},window:{SIDE_FINANCIAL_MODEL:model},initialCapital:()=>100000,financialLedger:()=>ledger,recordedFinancialSections:()=>sections,DECISION_CATALOG:[],currentRound:()=>2};
+  const context={decisionState:{},window:{SIDE_FINANCIAL_MODEL:model},teacherConfig:()=>({interest:20}),initialCapital:()=>100000,financialLedger:()=>ledger,recordedFinancialSections:()=>sections,DECISION_CATALOG:[],currentRound:()=>2};
   vm.createContext(context);vm.runInContext(source.slice(start,end),context);
   const report=context.financialReport();
   assert.equal(report.estadoResultados.costos,500);
