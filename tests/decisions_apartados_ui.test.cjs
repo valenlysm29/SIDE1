@@ -20,36 +20,31 @@ for(const version of ['excel-16','side-lotes-2026-10-20'])test('Student edits ev
  await page.evaluate(async()=>{
   stopStudentSync();currentStudent={game:{id:'test-game',codigo:'SIDE-418'},company:'Marca A',legalName:'Legal A',empresaId:1,snapshotRevision:server.revision};
   studentConnected=true;studentProgressHydrated=true;await refreshStudentGame();stopStudentSync();
-  decisionState.__excel={habilitado:true,round:1,enviado:false,decisiones:SIDE_EXCEL_UI.nuevasDecisiones()};
   persistGameState();currentCategory='B';openDecisionMenu();
  });
+ if(await page.locator('#cycleCostsUnderstood').isVisible())await page.locator('#cycleCostsUnderstood').click();
  async function change(cat,selector,value){
+  console.log('EDIT',cat,selector);
   await page.locator(`[data-cat="${cat}"]`).click();
   const input=page.locator(selector).first();
   assert.equal(await input.isVisible(),true,cat+' shows its controls');
   assert.equal(await input.isEnabled(),true,cat+' allows editing');
   await input.fill(value);await input.press('Tab');
  }
- await change('B','[data-activo="mesa"]','1');
- await change('C','[data-personal="corte,0,0"]','2');
- await change('C','[data-compra="INS-01"]','3');
- await change('D','[data-excel-tienda="los_olivos"]','1');
- await change('E','[data-excel-prestamo]','125');
- assert.deepEqual(await page.evaluate(()=>{
-  const d=decisionState.__excel.decisiones;
-  return [d.maquinaria.mesa,d.personal.corte[0][0],d.comprasUnidades['INS-01'],d.tiendasPorDistrito.los_olivos,d.montoPrestamo];
- }),[1,2,3,1,125]);
- await page.locator('[data-excel-prestamo]').focus();
- await page.evaluate(()=>resolveCapability({available:true,motorVersion:SIDE_EXCEL_CONFIG.MOTOR_ACTUAL}));
- await page.waitForFunction(()=>!document.querySelector('[data-excel-enviar]').disabled);
- assert.equal(await page.locator('[data-excel-prestamo]').evaluate(el=>el===document.activeElement),true,'Capability response preserves focus');
- assert.equal(await page.locator('[data-excel-prestamo]').inputValue(),'125');
- await page.evaluate(()=>{SIDE.PartidaService.excelDisponible=async()=>{throw Error('offline')};});
- await change('B','[data-activo="INF-08"]','1');
- await page.locator('[data-cat="E"]').click();
- assert.equal(await page.locator('[data-excel-prestamo]').inputValue(),'125','Draft survives tab navigation');
- assert.equal(await page.locator('[data-excel-prestamo]').isEnabled(),true,'Rejected capability check preserves editing');
- assert.equal(await page.locator('[data-excel-enviar]').isDisabled(),true,'Confirmation still requires a ready server');
+ await change('B','[data-qty="MESA_CORTE"][data-option="mesa"]','1');
+ await change('C','[data-qty="PERS_CORTE"][data-option="corte_basico"]','2');
+ await change('F','[data-qty="CUERO"][data-option="cuero_sint"]','3');
+ await page.locator('[data-cat="D"]').click();await page.locator('label').filter({has:page.locator('[data-choice="CANALES"][data-option="los_olivos"]')}).click();
+ await change('E','[data-loan-number]','125');
+ assert.deepEqual(await page.evaluate(()=>[decisionDrafts.MESA_CORTE.quantities.mesa,decisionDrafts.PERS_CORTE.quantities.corte_basico,decisionDrafts.CUERO.quantities.cuero_sint,decisionDrafts.CANALES.optionIds.includes('los_olivos'),decisionDrafts.PRESTAMO.amount]),[1,2,3,true,125]);
+ const loan=page.locator('[data-loan-number]');await loan.focus();
+ assert.equal(await loan.evaluate(el=>el===document.activeElement),true);
+ await page.locator('[data-cat="B"]').click();await page.locator('[data-cat="E"]').click();
+ assert.equal(await loan.inputValue(),'125','Draft survives tab navigation');
+ assert.equal(await loan.isEnabled(),true,'Editing uses internal game rules');
+ await page.locator('#topSubmitAllDecisions').click();assert.equal(await page.locator('#companyReviewDialog').isVisible(),true);
+ assert.equal(await page.locator('#confirmCompanyReview').isDisabled(),true,'Missing required decisions block confirmation');
+ assert.doesNotMatch(await page.locator('body').innerText(),/Excel|No definido/);
  assert.deepEqual(errors,[]);
- await page.screenshot({path:path.join(root,'tests/output/decisions-editable',version+'-editable.png')});
+ fs.mkdirSync(path.join(root,'tests/output/decisions-editable'),{recursive:true});await page.screenshot({path:path.join(root,'tests/output/decisions-editable',version+'-editable.png')});
 });

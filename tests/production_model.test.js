@@ -11,14 +11,14 @@ function completeLine(extra={}){
     MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},
     PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}},
     JEFATURA:{optionIds:['si_jefatura']},MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{value:100},
-    CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:3}},...extra
+    CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:600}},...extra
   };
 }
 
-test('workbook conversions turn purchases into usable raw material',()=>{
+test('purchase fields use physical material units without multiplying by packs',()=>{
   const plan=model.calculate(context(completeLine()));
   assert.equal(plan.materials.find(m=>m.id==='CUERO').available,30);
-  assert.equal(plan.materials.find(m=>m.id==='HILO').available,810);
+  assert.equal(plan.materials.find(m=>m.id==='HILO').available,600);
   assert.equal(plan.materialCapacity,100);assert.equal(plan.producibleUnits,100);
 });
 
@@ -28,38 +28,27 @@ test('a raw-material shortage limits all three production processes',()=>{
   assert.deepEqual(plan.processes.map(process=>process.plannedUnits),[96,96,96]);
 });
 
-test('physical persisted inventory adds to current purchases without a second pack conversion or charge',()=>{
-  const drafts=completeLine({CUERO:{quantities:{cuero_std:10}},ACCESORIOS:{quantities:{acc_eco:90}},HILO:{quantities:{hilo_std:1}}});
+test('physical inventory adds to current purchases without charging inventory again',()=>{
+  const drafts=completeLine({CUERO:{quantities:{cuero_std:20}},ACCESORIOS:{quantities:{acc_eco:90}},HILO:{quantities:{hilo_std:270}}});
   const withoutStock=model.calculate(context(drafts));
-  const plan=model.calculate(context(drafts,{state:{__inventarioMP:{'INS-02':10.5,'INS-04':10,'INS-06':330}}}));
+  const plan=model.calculate(context(drafts,{state:{__inventarioMP:{cuero_std:10.5,acc_eco:10,hilo_std:330}}}));
   const leather=plan.materials.find(row=>row.id==='CUERO'),thread=plan.materials.find(row=>row.id==='HILO');
   assert.equal(leather.inventoryAvailable,10.5);assert.equal(leather.purchasesAvailable,20);assert.equal(leather.available,30.5);
-  assert.deepEqual(leather.inventoryByCode,{'INS-02':10.5});
   assert.equal(thread.inventoryAvailable,330);assert.equal(thread.purchasesAvailable,270);assert.equal(thread.available,600);
-  assert.equal(plan.producibleUnits,100);
-  const comparison=plan.comparison.items.find(row=>row.id==='CUERO');
-  assert.equal(comparison.inventoryAvailable,10.5);assert.equal(comparison.purchasesAvailable,20);
-  assert.equal(comparison.available,30.5);assert.equal(comparison.missing,0);assert.equal(comparison.surplus,0.5);
-  assert.deepEqual(plan.requirements,withoutStock.requirements);
-  assert.deepEqual(plan.costs,withoutStock.costs);assert.equal(plan.comparison.currentCost,withoutStock.comparison.currentCost);
+  assert.equal(plan.producibleUnits,100);assert.deepEqual(plan.costs,withoutStock.costs);
 });
-
-test('material stock accepts only explicit valid physical codes and never infers old purchases',()=>{
+test('stock ignores invalid values and never infers old purchases',()=>{
   const drafts=completeLine({CUERO:{quantities:{}},ACCESORIOS:{quantities:{}},HILO:{quantities:{}}});
-  const state={__inventarioMP:{'INS-01':-5,'INS-02':Infinity,'INS-03':'2.5','INS-04':'bad','INS-99':99999,cuero_sint:99999},
-    CUERO:{round:1,quantities:{cuero_sint:500},purchases:{1:{cuero_std:500}}}};
+  const state={__inventarioMP:{cuero_sint:-5,cuero_std:Infinity,cuero_prem:'2.5',acc_eco:'bad',unknown:99999},CUERO:{round:1,quantities:{cuero_sint:500}}};
   const plan=model.calculate(context(drafts,{round:2,state}));
   assert.equal(plan.materials.find(row=>row.id==='CUERO').available,2.5);
-  assert.deepEqual(plan.materials.find(row=>row.id==='CUERO').inventoryByCode,{'INS-01':0,'INS-03':2.5});
-  assert.equal(plan.materials.find(row=>row.id==='ACCESORIOS').available,0);
-  assert.equal(plan.materials.find(row=>row.id==='HILO').available,0);
-  assert.equal(plan.producibleUnits,0);
+  assert.equal(plan.materials.find(row=>row.id==='ACCESORIOS').available,0);assert.equal(plan.producibleUnits,0);
 });
 
 test('workers and machines are paired and the slowest process is the bottleneck',()=>{
   const plan=model.calculate(context(completeLine({
     PERS_CORTE:{quantities:{corte_basico:1}},MESA_CORTE:{quantities:{mesa:1}},PRODUCCION_META:{value:500},
-    CUERO:{quantities:{cuero_sint:200}},ACCESORIOS:{quantities:{acc_eco:500}},HILO:{quantities:{hilo_std:20}}
+    CUERO:{quantities:{cuero_sint:200}},ACCESORIOS:{quantities:{acc_eco:500}},HILO:{quantities:{hilo_std:3000}}
   })));
   // CAMBIOS_DOP_Y_PRODUCCION.md: 24 productive days; current basic cutting rate is 5/day.
   // Two level-three workers and leadership yield 96%: round(5 * 24 * 0.96) = 115.
@@ -110,6 +99,9 @@ test('industrial DOP separates operations, inspection and combined activity',()=
 test('DOP data includes purchased material qualities and cycle yield by mold',()=>{
   const plan=model.calculate(context(completeLine({PRODUCCION_META:{moldTargets:{molde_1:80,molde_2:20,molde_3:0}}})));
   assert.equal(plan.materials.find(material=>material.id==='CUERO').selections[0].label,'Cuero sintético');
-  assert.equal(plan.productLines.find(line=>line.id==='molde_1').productionPercent,93);
+  assert.equal(plan.productLines.find(line=>line.id==='molde_1').productionPercent,100);
+  assert.equal(plan.productLines.find(line=>line.id==='molde_2').plannedUnits,0);
   assert.equal(plan.productLines.find(line=>line.id==='molde_3').plannedUnits,0);
 });
+
+test('no available mold means no production despite complete staff and stock',()=>{const plan=model.calculate(context(completeLine({MOLDE:{optionIds:[]}})));assert.equal(plan.producibleUnits,0);assert.ok(plan.productLines.every(line=>line.plannedUnits===0));});

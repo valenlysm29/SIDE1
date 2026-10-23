@@ -10,10 +10,10 @@ const mock=`
 window.calls=[];
 // These synchronization cases start after the initial fixed-cost notice.
 // The separate cycle-cost contract verifies charging and acknowledging it.
-const empty={decision_state:{__cycleCosts:{1:{round:1,items:[{id:'LOCAL_PROD',label:'Local de producción',amount:2000},{id:'LIMPIEZA',label:'Limpieza',amount:712.32}],total:2712.32,before:100000,after:97287.68,acknowledged:true}}},cash_ledger:{'1:B':-2000,'1:C':-712.32},financial_sections:{},section_submissions:{},decisions_submitted:false,selected_character:null};
+const empty={decision_state:{__cycleCosts:{1:{round:1,items:[{id:'LOCAL_PROD',label:'Local de producción',amount:2000},{id:'LIMPIEZA',label:'Limpieza',amount:600}],total:2600,before:100000,after:97400,acknowledged:true}}},cash_ledger:{'1:B':-2000,'1:C':-600},financial_sections:{},section_submissions:{},decisions_submitted:false,selected_character:null};
 window.server=JSON.parse(localStorage.getItem('TEST_SERVER')||'null')||{revision:0,snapshot:empty};
 const storeServer=()=>localStorage.setItem('TEST_SERVER',JSON.stringify(server));
-const state=()=>({partida:{serverTime:new Date().toISOString(),id:'test-game',codigo:'SIDE-418',nombre:'Prueba',estado:'activa',configuracion:{capital:100000,round:1,cycles:6}},empresa:{id:1,nombre_legal:'Legal A',nombre_comercial:'Marca A',caja_actual:97287.68,ciclo_actual:1},empresa_id:1,ciclo_partida:1,snapshot_revision:server.revision,snapshot:server.snapshot});
+const state=()=>({partida:{serverTime:new Date().toISOString(),id:'test-game',codigo:'SIDE-418',nombre:'Prueba',estado:'activa',configuracion:{capital:100000,round:1,cycles:6}},empresa:{id:1,nombre_legal:'Legal A',nombre_comercial:'Marca A',caja_actual:97400,ciclo_actual:1},empresa_id:1,ciclo_partida:1,snapshot_revision:server.revision,snapshot:server.snapshot});
 SIDE.EmpresaService.obtenerEstado=async()=>{
   calls.push({type:'read'});
   if(sessionStorage.TEST_READ_ERROR==='network')return {success:false,technical:true,code:'FETCH_ERROR',error:'Failed to fetch'};

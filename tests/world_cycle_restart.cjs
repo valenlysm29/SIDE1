@@ -62,7 +62,7 @@ const seed = {
       await page.waitForFunction(frame=>SIDE3D.diagnostics().renderedFrames>frame+2,frame);
     }
     assert.equal(await submit(1),true);
-    assert.equal(await page.evaluate(()=>requestWorldEntry()),true);
+    await page.locator('#characterSelection').waitFor({state:'visible'});
     await page.locator('[data-character="miguel"]').click();
     await page.locator('#confirmCharacterBtn').click();
     await active();
@@ -94,6 +94,8 @@ const seed = {
       // This local fixture bypasses login, so no student polling loop is started.
       // Deliver the same tick that a connected student's timer receives.
       await page.evaluate(round=>{localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));studentConnected=true;tickStudentGame();},round);
+      // A real student acknowledges the mandatory-cost receipt before editing.
+      if(await page.locator('#cycleCostsModal').isVisible())await page.locator('#cycleCostsModal [data-close]').first().click();
       await page.waitForFunction(round=>lastObservedRound===round && SIDE3D.diagnostics().session===null,round);
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().running),false);
       assert.equal(await page.locator('#decisionMenu').isVisible(),true);
@@ -109,9 +111,7 @@ const seed = {
       await page.evaluate(()=>cycleQA.openDecisionsFrom3D());
       assert.equal(await submit(round,round===2),true);
       assert.equal(await page.evaluate(()=>companySummaryRound),'current');
-      await page.locator('#companyStartWorld').waitFor({state:'visible'});
       const ledger=await page.evaluate(()=>JSON.stringify(cashLedger));
-      await page.locator('#companyStartWorld').click();
       await active();
       const session=await page.evaluate(()=>SIDE3D.diagnostics().session);
       assert.ok(session.context.endsWith('_'+round));

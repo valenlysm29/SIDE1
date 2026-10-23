@@ -40,8 +40,8 @@ test('rendering an empty plan preserves inputs and shows zero output, percent an
   const plan=model.calculate(),before=JSON.stringify(plan),html=dop.render(plan,{round:3,producedPercent:0});
   assert.equal(JSON.stringify(plan),before);
   assert.match(html,/<strong>0%<\/strong>/);assert.match(html,/0 unidades/);
-  assert.match(html,/Qué necesitas para producir tu meta/);assert.match(html,/No definido en el Excel/);
-  assert.ok(html.indexOf('data-pd-node=')<html.indexOf('class="pd-comparison"'));
+  assert.match(html,/Insumos para la cantidad deseada/);assert.doesNotMatch(html,/Excel|No definido|Costo de realizar tu meta|Ahora compara/);
+  assert.match(html,/<th>Insumo<\/th><th>Cantidad necesaria<\/th>/);
   assert.equal((html.match(/data-pd-node=/g)||[]).length,8);
   assert.doesNotMatch(html,/NaN|Infinity|undefined/);
 });

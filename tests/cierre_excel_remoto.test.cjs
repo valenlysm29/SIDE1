@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const {decision}=require('./escenarios_excel.cjs');
 function entorno(mock){const store=new Map(),context={SIDE:{SupabaseClient:{get:()=>mock}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)}};context.window=context;vm.createContext(context);
  for(const f of ['config_excel','catalogo_excel','puntajes','produccion','costos','consecuencias','mercado','ciclo','caja','ui_excel'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/engine',f+'.js'),'utf8'),context);
- vm.runInContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),context);return context;}
+ vm.runInContext(fs.readFileSync(path.join(__dirname,'fixtures/previous_model_partida_service.js'),'utf8'),context);return context;}
 test('Cierre remoto mock y local usan exactamente motor y caja comunes; retry no duplica',async()=>{
  let saved=null,calls=0;const d=decision({seleccion:['FIN-01A'],montoPrestamo:5000}),envelope={habilitado:true,round:1,enviado:true,decisiones:d,cajaTransicion:98000};
  const mock={rpc:async(name,args)=>{if(name==='side_contexto_cierre_excel')return {data:saved?{cierre:saved}:{empresas:[{id:'1',capital:100000,revision:3,envelope}],historialPorEmpresa:{},token:'cas-3'}};if(name==='side_guardar_cierre_excel'){calls++;assert.equal(args.p_token,'cas-3');saved=args.p_cierre;return {data:{cierre:saved,reused:false}};}throw Error('RPC inesperada '+name);}};

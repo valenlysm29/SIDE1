@@ -7,7 +7,7 @@ const cerca=(a,b)=>assert.ok(Math.abs(a-b)<=1e-9*Math.max(1,Math.abs(b)),`${a} !
 function plan(){return decision({seleccion:['INF-02','INF-05','INF-08','RH-01','RH-04','RH-07','RH-10B','COM-01B','FIN-01B'],marketingNivel:null,compras:{},comprasUnidades:{'INS-01':25,'INS-04':80,'INS-06':2},lotes:[{segmento:'SEG-01',cantidad:100,cuero:'INS-01',accesorios:'INS-04',hilo:'INS-06',molde:'INF-08',precio:40}]});}
 function entorno(mock){const store=new Map(),ctx={SIDE:{SupabaseClient:{get:()=>mock}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)}};ctx.window=ctx;vm.createContext(ctx);
  for(const name of ['config_excel','catalogo_excel','puntajes','produccion','costos','consecuencias','mercado','ciclo','caja','ui_excel'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/engine',name+'.js'),'utf8'),ctx);
- vm.runInContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),ctx);return ctx;}
+ vm.runInContext(fs.readFileSync(path.join(__dirname,'fixtures/previous_model_partida_service.js'),'utf8'),ctx);return ctx;}
 
 test('Diagnóstico ingresos: un plan factible vende; faltar recursos produce cero sin inventar stock',()=>{
  const d=plan(),close=dec=>CICLO.cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:dec}},overrides).resultadosPorEmpresa.A;

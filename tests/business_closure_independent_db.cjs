@@ -1,0 +1,58 @@
+'use strict';
+// Local PGlite only: no network or Supabase credentials.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const {database,config,createGame,rpcAfterWaiting:rpc,professor}=require('./lifecycle_db_fixture.cjs');
+const CYCLE=require('../js/cycle_model.js');
+(async()=>{
+ const db=await database();
+ try{
+  await db.exec("alter table empresas add column if not exists estado text default 'activa'");
+  await db.exec('alter table participantes add column if not exists expulsada_at timestamptz');
+  const sql=fs.readFileSync(path.join(__dirname,'../supabase/migrations/20261023_cierre_negocio.sql'),'utf8');await db.exec(sql);await db.exec(sql);
+  const game=await createGame(db,config({capital:200000})),entry=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Offline Audit',p_nombre_comercial:'Offline Audit'}),id=String(entry.empresa_id);
+  assert.equal(entry.success,true);
+  const state={CANALES:{round:1,optionIds:['web']}},production={producibleUnits:10,productLines:[{plannedUnits:10},{plannedUnits:0},{plannedUnits:0}],materials:[]};
+  const snapshot={decision_state:{...state,__cyclePlans:{1:{state,production}}},cash_ledger:{'1:C':-1000},financial_sections:{}};
+  await db.query('insert into side_student_state(empresa_id,snapshot) values($1,$2) on conflict(empresa_id) do update set snapshot=excluded.snapshot',[id,snapshot]);
+  await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'iniciar'});
+  const context=()=>rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1});
+  const early=await context();
+  await rpc(db,'controlar_partida',{p_partida_id:game.id,p_accion:'cerrar',p_expected_round:1});
+  const ctx=await context();assert.equal(ctx.empresas.length,1);
+  const result=CYCLE.close({state,production,ledger:snapshot.cash_ledger,round:1,capital:200000});
+  const payload={ciclo:1,resultadosPorEmpresa:{[id]:result}},save=token=>rpc(db,'side_guardar_cierre_negocio',{p_partida_id:game.id,p_ciclo:1,p_token:token,p_cierre:payload});
+  await db.query("select set_config('test.uid','22222222-2222-2222-2222-222222222222',false)");
+  assert.equal((await context()).code,'NO_AUTORIZADO');assert.equal((await save(ctx.token)).code,'NO_AUTORIZADO');
+  await db.query("select set_config('test.uid',$1,false)",[professor]);
+  await db.query('update side_student_state set revision=revision+1 where empresa_id=$1',[id]);
+  assert.equal((await save(ctx.token)).code,'ESTADO_DESACTUALIZADO');
+  await db.exec('set role anon');await assert.rejects(context);await db.exec('reset role');
+  const updated=await context();
+  const window={SIDE_CYCLE_MODEL:CYCLE,SIDE_FINANCIAL_MODEL:require('../js/financial_model.js'),SIDE_DECISION_CATALOG:[],SIDE:{SupabaseClient:{get:()=>({rpc:async(name,args)=>({data:await rpc(db,name,args),error:null})})}}};
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../services/partida_service.js'),'utf8'),{window,console,setTimeout,clearTimeout});
+  const serviceResult=await window.SIDE.PartidaService.cerrarNegocio(game.id,1);
+  assert.equal(serviceResult.success,true);assert.equal(serviceResult.reused,false);
+  assert.equal((await save(updated.token)).reused,true);
+  assert.equal((await window.SIDE.PartidaService.cerrarNegocio(game.id,1)).reused,true);
+  const report=(await db.query('select ingresos,caja_final from reportes_ciclo where empresa_id=$1 and ciclo=1',[id])).rows[0];
+  assert.equal(Number(report.ingresos),750);assert.equal(Number(report.caja_final),199750);
+  const saved=(await db.query('select snapshot,revision from side_student_state where empresa_id=$1',[id])).rows[0];
+  assert.equal(saved.snapshot.cash_ledger['1:SIM_VENTAS'],750);assert.equal(saved.snapshot.decision_state.__cycleSettlements[1].revenue,750);assert.equal(saved.revision,2);
+  assert.equal(Number((await db.query('select caja_actual from empresas where id=$1',[id])).rows[0].caja_actual),199750);
+  console.log('PASS local SQL: repeat deployment, owner auth, CAS, idempotence, offline student report/cash/snapshot settlement');
+  assert.ok(early.error,'an active cycle must not be irreversibly settled before it closes');
+  console.log('PASS active cycle rejects early settlement');
+  const scheduled=await createGame(db,config({capital:200000,financialSchedule:[{effectiveRound:1,capitalMode:'fixed',capital:200000},{effectiveRound:2,capitalMode:'fixed',capital:250000}]}));
+  const adjusted=await rpc(db,'ingresar_empresa',{p_codigo:scheduled.codigo,p_nombre_legal:'Adjusted Audit',p_nombre_comercial:'Adjusted Audit'}),adjustedId=String(adjusted.empresa_id);
+  const state2={CANALES:{round:2,optionIds:['web']}},snapshot2={decision_state:{...state2,__cyclePlans:{2:{state:state2,production}}},cash_ledger:{'2:C':-1000},financial_sections:{}};
+  await db.query('insert into side_student_state(empresa_id,snapshot) values($1,$2) on conflict(empresa_id) do update set snapshot=excluded.snapshot',[adjustedId,snapshot2]);
+  await db.query("update partidas set configuracion=configuracion||'{\"round\":2,\"phase\":\"results\",\"runtime\":{\"round\":2,\"phase\":\"results\",\"status\":\"finished\"}}'::jsonb where id=$1",[scheduled.id]);
+  window.SIDE_FINANCE_CONFIG=require('../services/finance_config.js');
+  const adjustedResult=await window.SIDE.PartidaService.cerrarNegocio(scheduled.id,2);assert.equal(adjustedResult.success,true);
+  const adjustedReport=(await db.query('select ingresos,caja_final from reportes_ciclo where empresa_id=$1 and ciclo=2',[adjustedId])).rows[0];
+  assert.equal(Number(adjustedReport.caja_final),249750,'a later teacher capital adjustment must survive remote closure');
+  const adjustedSnapshot=(await db.query('select snapshot from side_student_state where empresa_id=$1',[adjustedId])).rows[0].snapshot;
+  assert.equal(adjustedSnapshot.cash_ledger['2:CAPITAL_ADJUSTMENT'],undefined,'derived capital must not be counted twice after reconnect');
+  console.log('PASS later financial schedule preserves adjusted cash without duplicating it on reconnect');
+ }finally{await db.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

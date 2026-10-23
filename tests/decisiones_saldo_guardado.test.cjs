@@ -29,17 +29,20 @@ test('Guardar un ítem conserva el otro cambio como borrador, incluso al cambiar
  const balance=envelope.value.saldoFinalGuardado;
  container.oninput({target:control('data-excel-marketing','baja')});assert.equal(envelope.value.saldoFinalGuardado,balance);
 });
-test('El HUD usa únicamente el saldo guardado; un cambio de ciclo descarta el saldo anterior',()=>{
- const ctx={decisionState:{__excel:{habilitado:true,round:1,saldoFinalGuardado:85000,decisiones:{publicidad:12000}}},currentRound:()=>1,excelSavedResult:()=>null,cashBalance:()=>100000};vm.createContext(ctx);appFunction('excelSavedCashBalance',ctx);
- assert.equal(ctx.excelSavedCashBalance(),85000);ctx.decisionState.__excel.decisiones.publicidad=0;assert.equal(ctx.excelSavedCashBalance(),85000);
- ctx.currentRound=()=>2;assert.equal(ctx.excelSavedCashBalance(),100000);
- ctx.currentRound=()=>1;ctx.excelSavedResult=()=>({financial:{balanceCaja:{cajaFinal:91000}}});ctx.cashBalance=()=>91000;assert.equal(ctx.excelSavedCashBalance(),91000);
+test('HUD muestra la caja guardada y no cobra borradores',()=>{
+ let cash=85000;const nodes={};const node=id=>nodes[id]||(nodes[id]={textContent:'',classList:{toggle(){}}});
+ const saved=node('saved');const ctx={cashBalance:()=>cash,initialCapital:()=>100000,money:v=>'S/ '+v,$:node,document:{querySelectorAll:()=>[saved]}};vm.createContext(ctx);appFunction('updateCashHud',ctx);
+ ctx.updateCashHud();assert.equal(nodes.cashBalance.textContent,'S/ 85000');assert.equal(saved.textContent,'S/ 85000');
+ ctx.pendingDraft={amount:12000};ctx.updateCashHud();assert.equal(saved.textContent,'S/ 85000');
+ cash=73000;ctx.updateCashHud();assert.equal(saved.textContent,'S/ 73000');assert.equal(nodes.projectedCash.textContent,'S/ 73000');
 });
-test('Navegación canónica conserva exactamente cinco pestañas y Empresa vuelve a decidir',()=>{
- const ctx={decisionState:{__excel:{habilitado:true}},DECISION_CATALOG:['A','B','C','D','E','F'].map(cat=>({cat,items:[],summaryOnly:cat==='A'}))};vm.createContext(ctx);appFunction('navigationCategories',ctx);
- const categories=ctx.navigationCategories();assert.deepEqual(Array.from(categories,c=>c.title),['Empresa','Infraestructura','Producción','Ventas','Finanzas']);assert.ok(categories.every(c=>!c.summaryOnly));
+test('Navegación conserva cinco decisiones y el resumen según ciclo',()=>{
+ let round=1;const catalog=['A','B','C','D','E','F'].map(cat=>({cat,items:[],summaryOnly:cat==='A'}));
+ const ctx={DECISION_CATALOG:catalog,currentRound:()=>round,decisionCategories:()=>catalog.filter(c=>!c.summaryOnly)};vm.createContext(ctx);appFunction('navigationCategories',ctx);
+ assert.deepEqual(Array.from(ctx.navigationCategories(),c=>c.cat),['B','C','D','E','F','A']);round=2;
+ assert.deepEqual(Array.from(ctx.navigationCategories(),c=>c.cat),['A','B','C','D','E','F']);assert.equal(ctx.navigationCategories().filter(c=>!c.summaryOnly).length,5);
 });
-test('Enviar desde la barra superior utiliza la validación y el envío existente de cualquier pestaña',()=>{
- let sent=0;const ctx={decisionState:{__excel:{habilitado:true}},document:{querySelector:()=>({click(){sent++;}})}};vm.createContext(ctx);
- const start=source.indexOf('function submitAllDecisions('),end=source.indexOf('\n',start);vm.runInContext(source.slice(start,end),ctx);ctx.submitAllDecisions();assert.equal(sent,1);
+test('Enviar todo desde cualquier pestaña abre revisión validada antes de cobrar',()=>{
+ let reviews=0;const ctx={openCompanyReview(){reviews++;}};vm.createContext(ctx);
+ const start=source.indexOf('function submitAllDecisions('),end=source.indexOf('\n',start);vm.runInContext(source.slice(start,end),ctx);ctx.submitAllDecisions();assert.equal(reviews,1);
 });

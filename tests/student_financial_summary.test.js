@@ -40,19 +40,16 @@ test('office view uses financial model statements, including debt and assets',()
   assert.ok(html.includes('560'));
 });
 
-test('pending cycle preserves the complete last closed balance with debt and fixed assets',()=>{
-  const balance={efectivo:700,activosFijos:900,inventarioMP:100,activos:1700,deuda:400,capital:1000,resultadosAcumulados:300,patrimonio:1300,pasivoPatrimonio:1700};
-  const closed={round:1,balanceGeneral:balance};
+test('student financial report uses the same ledger model as the teacher summary',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
   const start=source.indexOf('function financialReport(){'),end=source.indexOf('let financialSyncTimer=',start);
-  const context={decisionState:{__excel:{habilitado:true,historial:{deudaPrincipal:400,financialHistory:[closed]}}},excelSavedResult:()=>null,cashBalance:()=>700,currentRound:()=>2,initialCapital:()=>1000};
+  const ledger={'1:SIM_VENTAS':2000,'2:SIM_GASTOS':-500},sections={};
+  const context={decisionState:{},window:{SIDE_FINANCIAL_MODEL:model},initialCapital:()=>100000,financialLedger:()=>ledger,recordedFinancialSections:()=>sections,DECISION_CATALOG:[],currentRound:()=>2};
   vm.createContext(context);vm.runInContext(source.slice(start,end),context);
-  const pending=context.financialReport();
-  assert.equal(pending.pendiente,true);assert.equal(pending.balanceGeneralRound,1);
-  assert.deepEqual({...pending.balanceGeneral},balance);
-  assert.equal(pending.balanceGeneral.activos,pending.balanceGeneral.deuda+pending.balanceGeneral.patrimonio);
-  pending.balanceGeneral.activosFijos=0;assert.equal(closed.balanceGeneral.activosFijos,900,'view cannot mutate the closed balance');
-  const html=view.officeHtml(context.financialReport());
-  assert.match(html,/Ciclo pendiente de cierre/);assert.match(html,/último cierre: ciclo 1/);
-  assert.match(html,/1,700/);assert.match(html,/1,300/);assert.match(html,/400/);
+  const report=context.financialReport();
+  assert.equal(report.estadoResultados.costos,500);
+  assert.equal(report.history[0].estadoResultados.ingresos,2000);
+  assert.equal(report.balanceCaja.cajaFinal,101500);
+  assert.equal(report.balanceGeneral.activos,report.balanceGeneral.pasivoPatrimonio);
+  assert.match(view.officeHtml(report),/101,500/);
 });

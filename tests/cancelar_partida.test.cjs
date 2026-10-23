@@ -16,7 +16,7 @@ function teacher(){
   creationRequest:null,previousRoom:{id:'old',codigo:'SIDE-AA2',estado:'esperando'},active:false,
   localStorage:{removeItem:k=>storage.delete(k),setItem:(k,v)=>storage.set(k,v),getItem:k=>storage.get(k)||null},
   refreshSetupSummary(){},refreshStartButton(){},gameStatus:()=>({active:context.active}),
-  closeExcelRemoteRound:async()=>true,
+  closeBusinessRemoteRound:async()=>true,
   applyTeacherState:data=>{context.active=data.estado!=='finalizada';storage.set('SIDE_GAME_STATUS',JSON.stringify({active:context.active}));},
   window:{SIDE:{PartidaService:{cancelar:async id=>({success:true,data:{id,estado:'cancelada'}}),controlar:async(id,action)=>{
    calls.push({id,action});return {success:true,data:{id,estado:action==='cancelar'?'finalizada':'activa',configuracion:{runtime:{round:1,phase:'results'}}}};
@@ -46,10 +46,10 @@ test('un fallo de cancelación conserva la identidad heredada para reintentar si
  assert.deepEqual(t.calls,[{id:'old',action:'cancelar'},{id:'old',action:'cancelar'}]);
  assert.equal(t.context.previousRoom,null);assert.equal(t.context.$('cancelGameDialog').closed,true);
 });
-test('un poll detenido en cierre Excel no reaplica su sala activa después de cancelar',async()=>{
+test('un poll detenido en cierre de negocio no reaplica su sala activa después de cancelar',async()=>{
  const t=teacher(),closure=deferred(),entered=deferred();
  t.context.state.partidaId='old';t.context.active=true;
- t.context.closeExcelRemoteRound=async()=>{entered.resolve();return closure.promise;};
+ t.context.closeBusinessRemoteRound=async()=>{entered.resolve();return closure.promise;};
  const poll=t.context.refreshTeacherGame();await entered.promise;
  await t.confirm();
  assert.equal(t.context.state.partidaId,null);assert.equal(t.context.active,false);

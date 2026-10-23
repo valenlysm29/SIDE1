@@ -123,7 +123,7 @@ test('DOP renders once in Production and nowhere in the other categories or summ
 test('visual DOP handles empty, zero and valid targets and updates from active drafts',()=>{
   const r=runtime();
   assert.match(r.run('productionDopHtml()'),/Aún no hay producción para mostrar/);
-  r.run(`decisionDrafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}},JEFATURA:{optionIds:['si_jefatura']},MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:100}},CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:3}}};`);
+  r.run(`decisionDrafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}},JEFATURA:{optionIds:['si_jefatura']},MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:100}},CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:600}}};`);
   assert.equal(r.run('productionPlan().producibleUnits'),100);
   assert.match(r.run('productionDopHtml()'),/<strong>100%<\/strong>/);
   r.run('decisionDrafts.CUERO.quantities.cuero_sint=15;');

@@ -45,7 +45,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
    SIDE.EmpresaService.obtenerEstado=async identity=>({success:true,data:await dbState(identity)});
    currentStudent={game,company:name,legalName:name,name,empresaId:joined.empresa_id,participantId:joined.participante_id,snapshotRevision:joined.snapshot_revision||0};
    studentConnected=true;loadDecisionState();startStudentSync();await refreshStudentGame();await prepareLobby();
-  },{game,joined,name});return p;
+  },{game,joined,name});if(await p.locator('#cycleCostsUnderstood').isVisible())await p.locator('#cycleCostsUnderstood').click();return p;
  }
  async function assertDraftSave(p,label){
   const before=Number((await db.query('select count(*) as n from partidas')).rows[0].n);
@@ -117,6 +117,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await db.query(`update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(now()-interval '1 second')) where id=$1`,[game.id]);
   await Promise.all([s1,s2].map(p=>p.evaluate(()=>refreshStudentGame())));
   await s1.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));await s2.waitForFunction(()=>!$('decisionMenu').classList.contains('hidden'));
+  for(const p of [s1,s2])if(await p.locator('#cycleCostsUnderstood').isVisible())await p.locator('#cycleCostsUnderstood').click();
   assert.equal(await s1.locator('#studentWaiting').isVisible(),false);
   assert.equal(await s1.evaluate(()=>worldCalls.enter),0,'waiting room must open decisions before the 3D world');
   await s1.evaluate(()=>{setDecisionsSubmitted(true);localStorage.setItem(characterSelectionKey(),'miguel');characterSelectionConfirmed=true;return requestWorldEntry();});
