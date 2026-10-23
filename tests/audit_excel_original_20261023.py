@@ -135,10 +135,31 @@ def build_com_plans(book,quantity,costs):
         inp={'personal':personal,'jefes':val(quantity,'F21',mutations)}
         for cell,path in [('I8','capacidadPorArea.corte'),('I14','capacidadPorArea.ensamble'),('I20','capacidadPorArea.acabado'),('K5','capacidadDiaria'),('L5','capacidadCicloBase'),('M5','factorEficienciaProduccion'),('N5','produccionCapacidad')]:
             checks.append({'key':'quantity__'+cell,'module':'produccion','function':'calcularCapacidad','input':inp,'output_path':path,'scope':'original_quantity_formula'})
+        cost_personal={area:[[val(costs,openpyxl.utils.get_column_letter(col)+str(row),mutations) or 0 for col in range(6,9)] for row in rows] for area,rows in [('corte',range(5,8)),('ensamble',range(11,14)),('acabado',range(17,20))]}
+        cost_productivity={area:[val(costs,'E'+str(row),mutations) for row in rows] for area,rows in [('corte',range(5,8)),('ensamble',range(11,14)),('acabado',range(17,20))]}
+        for cell,path in [('I8','capacidadPorArea.corte'),('I14','capacidadPorArea.ensamble'),('I20','capacidadPorArea.acabado'),('K5','capacidadDiaria'),('L5','capacidadCicloBase'),('M5','factorEficienciaProduccion'),('N5','produccionCapacidad')]:
+            checks.append({'key':'costs__'+cell,'module':'produccion','function':'calcularCapacidad','input':{'personal':cost_personal,'jefes':val(costs,'F21',mutations)},'overrides':{'DIAS_CICLO':30,'PRODUCTIVIDAD':cost_productivity},'output_path':path,'scope':'original_cost_sheet_capacity_literal'})
+        target_lots=[{'cantidad':val(quantity,'D'+str(37+i),mutations),'molde':code} for i,code in enumerate(['INF-08','INF-09','INF-10'])]
+        for i,cells in enumerate([['D42','G42','J42'],['E43','H43','K43'],['F44','I44','L44']]):
+            for family,cell in zip(['cuero','accesorios','hilo'],cells):
+                checks.append({'key':'quantity__'+cell,'module':'produccion','function':'calcularProduccion','input':{'lotes':target_lots},'output_path':f'lotes.{i}.requerimiento.{family}','scope':'original_quantity_requirements_without_stock'})
+        score_input={'seleccion':[val('Seleccion_Ciclo0','B'+str(row),mutations) for row in range(2,16)],'lotes':[]}
+        for row in range(2,5):
+            score_input['lotes'].append({key:val('Lotes_Produccion',col+str(row),mutations) for key,col in [('segmento','B'),('cantidad','C'),('cuero','D'),('accesorios','E'),('hilo','F'),('molde','G')]})
+            for col,field in [('H','costoUnitario'),('I','calidad'),('J','umbral'),('K','resultado'),('L','mensaje')]:
+                checks.append({'key':'lots__'+col+str(row),'module':'puntajes','function':'calcularPuntajes','input':score_input,'output_path':f'lotes.{row-2}.{field}','scope':'original_lot_formula','blank_string_is_null':True})
+        for cell,path in [('B6','calidadEmpresaMotor'),('D6','niveles.calidad'),('B9','puntajeEficiencia'),('D9','niveles.eficiencia'),('B10','reputacionMatriz'),('D10','niveles.reputacion'),('B11','saludFinanciera'),('D11','niveles.salud')]:
+            checks.append({'key':'scores__'+cell,'module':'puntajes','function':'calcularPuntajes','input':score_input,'output_path':path,'scope':'original_score_formula','blank_string_is_null':True})
+        for cell,path in [('C5','totalCantidades'),('H5','costoInsumos')]:
+            checks.append({'key':'lots__'+cell,'module':'puntajes','function':'calcularPuntajes','input':score_input,'output_path':path,'scope':'original_lot_total_formula'})
         for regime,cols in [('MYPE',['U','Y','AC']),('NO_MYPE',['V','Z','AD'])]:
-            for role,col in zip(['corte','ensamble','acabado'],cols):
-                for level,start in [(1,5),(2,14),(3,23)]:
-                    checks.append({'key':'costs__'+col+str(start+6),'module':'costos','function':'costoLaboral','arguments':[role,level,regime],'overrides':{'SUELDOS':{r:[val(costs,c+str(row),mutations) for row in [5,14,23]] for r,c in [('corte','U'),('ensamble','Y'),('acabado','AC')]}},'output_path':'pagoMensual','scope':'original_payroll_formula'})
+            for role,col in list(zip(['corte','ensamble','acabado'],cols))+[('jefatura',cols[0]),('limpieza',cols[1])]:
+                profiles=[(1,5),(2,14),(3,23)] if role in ['corte','ensamble','acabado'] else [(1,33)]
+                for level,start in profiles:
+                    salaries={r:[val(costs,c+str(row),mutations) for row in [5,14,23]] for r,c in [('corte','U'),('ensamble','Y'),('acabado','AC')]}
+                    salaries.update({'jefatura':val(costs,'U33',mutations),'limpieza':val(costs,'Y33',mutations)})
+                    for field,offset in [('base',0),('essalud',1),('gratificacion',2),('cts',3),('vacaciones',4),('sumaAnual',5),('pagoMensual',6)]:
+                        checks.append({'key':'costs__'+col+str(start+offset),'module':'costos','function':'costoLaboral','arguments':[role,level,regime],'overrides':{'SUELDOS':salaries},'output_path':field,'scope':'original_payroll_formula'})
         for code,col,row,mold in [('mesa','U',45,False),('INF-02','Y',45,False),('INF-03','Y',53,False),('INF-04','Y',61,False),('INF-05','AC',45,False),('INF-06','AC',53,False),('INF-07','AC',61,False),('INF-08','U',53,True),('INF-09','U',60,True),('INF-10','U',67,True)]:
             for regime in ['MYPE','NO_MYPE']:
                 cl=col if regime=='MYPE' else openpyxl.utils.get_column_letter(openpyxl.utils.column_index_from_string(col)+1)
@@ -178,7 +199,13 @@ def build_com_plans(book,quantity,costs):
                 if cell.data_type=='f': outputs[prefix+'__'+cell.coordinate]=[sheet,cell.coordinate]
     plans=[]
     for name,mutations in variants:
-        plans.append({'nombre':name,'entradas':mutations,'salidas':outputs,'side_checks':records(mutations),'note':'Copy untouched original, apply only inputs, CalculateFullRebuild, preserve Excel errors as errors. No added sheets. Includes exact formula snapshots separately in audit report.'})
+        checks=records(mutations)
+        case_outputs=dict(outputs)
+        source_sheets={'quantity':quantity,'costs':costs,'lots':'Lotes_Produccion','scores':'Motor_Puntajes'}
+        for check in checks:
+            prefix,cell=check['key'].split('__')
+            case_outputs.setdefault(check['key'],[source_sheets[prefix],cell])
+        plans.append({'nombre':name,'entradas':mutations,'salidas':case_outputs,'side_checks':checks,'note':'Copy untouched original, apply only inputs, CalculateFullRebuild, preserve Excel errors as errors. No added sheets. Includes exact formula snapshots separately in audit report.'})
     arithmetic=[]
     for i,(initial,bought,used) in enumerate([(0.1,0.7,0.8),(0.1,0.2,0.3),(0.3,0.6,0.9),(0.6,0.3,0.9)],1):
         arithmetic.append({'nombre':'operand_injection_inventory_'+str(i),'entradas':{costs:{'D54':initial,'E54':bought,'F54':used}},'salidas':{'costs__G54':[costs,'G54']},'formula_modified_in_copy':True,'original_formula_overwritten':{'sheet':costs,'cell':'F54','formula':book[costs]['F54'].value},'expected_arithmetic_identity':0,'note':'Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched.'})
