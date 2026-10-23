@@ -28,6 +28,34 @@ test('a raw-material shortage limits all three production processes',()=>{
   assert.deepEqual(plan.processes.map(process=>process.plannedUnits),[96,96,96]);
 });
 
+test('physical persisted inventory adds to current purchases without a second pack conversion or charge',()=>{
+  const drafts=completeLine({CUERO:{quantities:{cuero_std:10}},ACCESORIOS:{quantities:{acc_eco:90}},HILO:{quantities:{hilo_std:1}}});
+  const withoutStock=model.calculate(context(drafts));
+  const plan=model.calculate(context(drafts,{state:{__inventarioMP:{'INS-02':10.5,'INS-04':10,'INS-06':330}}}));
+  const leather=plan.materials.find(row=>row.id==='CUERO'),thread=plan.materials.find(row=>row.id==='HILO');
+  assert.equal(leather.inventoryAvailable,10.5);assert.equal(leather.purchasesAvailable,20);assert.equal(leather.available,30.5);
+  assert.deepEqual(leather.inventoryByCode,{'INS-02':10.5});
+  assert.equal(thread.inventoryAvailable,330);assert.equal(thread.purchasesAvailable,270);assert.equal(thread.available,600);
+  assert.equal(plan.producibleUnits,100);
+  const comparison=plan.comparison.items.find(row=>row.id==='CUERO');
+  assert.equal(comparison.inventoryAvailable,10.5);assert.equal(comparison.purchasesAvailable,20);
+  assert.equal(comparison.available,30.5);assert.equal(comparison.missing,0);assert.equal(comparison.surplus,0.5);
+  assert.deepEqual(plan.requirements,withoutStock.requirements);
+  assert.deepEqual(plan.costs,withoutStock.costs);assert.equal(plan.comparison.currentCost,withoutStock.comparison.currentCost);
+});
+
+test('material stock accepts only explicit valid physical codes and never infers old purchases',()=>{
+  const drafts=completeLine({CUERO:{quantities:{}},ACCESORIOS:{quantities:{}},HILO:{quantities:{}}});
+  const state={__inventarioMP:{'INS-01':-5,'INS-02':Infinity,'INS-03':'2.5','INS-04':'bad','INS-99':99999,cuero_sint:99999},
+    CUERO:{round:1,quantities:{cuero_sint:500},purchases:{1:{cuero_std:500}}}};
+  const plan=model.calculate(context(drafts,{round:2,state}));
+  assert.equal(plan.materials.find(row=>row.id==='CUERO').available,2.5);
+  assert.deepEqual(plan.materials.find(row=>row.id==='CUERO').inventoryByCode,{'INS-01':0,'INS-03':2.5});
+  assert.equal(plan.materials.find(row=>row.id==='ACCESORIOS').available,0);
+  assert.equal(plan.materials.find(row=>row.id==='HILO').available,0);
+  assert.equal(plan.producibleUnits,0);
+});
+
 test('workers and machines are paired and the slowest process is the bottleneck',()=>{
   const plan=model.calculate(context(completeLine({
     PERS_CORTE:{quantities:{corte_basico:1}},MESA_CORTE:{quantities:{mesa:1}},PRODUCCION_META:{value:500},

@@ -802,3 +802,5 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison){grid-template-columns:minmax(0,1fr)}
 .pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison) > *{min-width:0;max-width:100%}
 .pd-target-first .pd-table-scroll{min-width:0;width:100%}
+
+.production-dop .pd-stock-origin{display:block;margin-top:6px;font-size:11px;line-height:1.5;color:var(--ui-muted)}

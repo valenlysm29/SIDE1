@@ -105,8 +105,10 @@
   function compareRequirements(requirements,plan){
     const difference=(needs,available)=>needs===null?{missing:null,surplus:null}:{missing:Math.max(0,exact(needs-available)),surplus:Math.max(0,exact(available-needs))};
     const rows=requirements.materials.map(material=>{
-      const available=plan.materials.find(row=>row.id===material.id)?.available||0,diff=difference(material.needs,available),scenario=material.options.find(option=>option.id===material.selectedScenario);
-      return {id:material.id,label:material.label,kind:'material',unit:material.unit,needs:material.needs,available,...diff,
+      const stock=plan.materials.find(row=>row.id===material.id),available=stock?.available||0,diff=difference(material.needs,available),scenario=material.options.find(option=>option.id===material.selectedScenario);
+      return {id:material.id,label:material.label,kind:'material',unit:material.unit,needs:material.needs,available,
+        inventoryAvailable:stock?.inventoryAvailable||0,purchasesAvailable:stock?.purchasesAvailable||0,inventoryByCode:{...stock?.inventoryByCode},
+        availabilityScope:'Inventario físico registrado más compras del ciclo, en unidades físicas',...diff,
         costToCover:diff.missing===0?0:diff.missing===null||!scenario?null:exact(diff.missing*scenario.unitPrice*(1-(excelConfig?.CONFIG?.DESCUENTO_CANTIDAD??0.08))),
         costToCoverOptions:material.options.map(option=>({id:option.id,label:option.label,amount:diff.missing===null?null:exact(diff.missing*option.unitPrice*(1-(excelConfig?.CONFIG?.DESCUENTO_CANTIDAD??0.08)))})),
         excelSource:material.excelSource,costScope:'Referencia teórica de materia prima; no registra compras ni cobros'};
@@ -121,7 +123,7 @@
     return {items:rows,target:requirements.target,producibleUnits:plan.producibleUnits,productionGap:Math.max(0,requirements.target-plan.producibleUnits),
       compliancePercent:requirements.target?Math.round(plan.producibleUnits/requirements.target*100):null,
       feasible:requirements.target>0&&plan.producibleUnits>=requirements.target,scope:'Comparación operativa existente; no es una fórmula inversa del Excel',
-      currentCost:exact(plan.costs.labor+plan.costs.materials),currentCostScope:'Personal y materiales de la configuración operativa existente; no es el costo total de la meta',
+      currentCost:exact(plan.costs.labor+plan.costs.materials),currentCostScope:'Personal y compras de materiales del ciclo; no vuelve a cobrar el inventario físico registrado ni es el costo total de la meta',
       costToCoverTotal:hasCapacityGap||materialRows.some(row=>row.costToCover===null)?null:knownCostToCoverSubtotal,knownCostToCoverSubtotal,
       unresolved:[...requirements.unresolved,'La comparación conserva las reglas operativas existentes del juego: emparejamiento de personal y máquinas, eficiencia y límite por materiales. No se atribuyen esas reglas a una paridad literal con ambas hojas del Excel.']};
   }
@@ -234,10 +236,16 @@
       return {id,label:spec.label,target:lineTarget,suggested,owned:ownedIds.includes(id),selectedThisCycle:selectedMoldIds.includes(id),available:availableMoldIds.includes(id),requirements:{CUERO:lineTarget*spec.CUERO,ACCESORIOS:lineTarget*spec.ACCESORIOS,HILO:lineTarget*spec.HILO}};
     });
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
-      const counts=quantityCounts(ctx,id),available=sum(Object.entries(spec.yields).map(([optionId,yieldValue])=>whole(counts[optionId])*yieldValue));
+      const counts=quantityCounts(ctx,id),purchasesAvailable=sum(Object.entries(spec.yields).map(([optionId,yieldValue])=>whole(counts[optionId])*yieldValue));
+      // Only persisted physical stock proves a carry-over. It already uses m²,
+      // units or metres, so do not apply purchase-pack yields to it again.
+      const inventoryByCode=Object.fromEntries(MATERIAL_EXCEL[id].map(([,code])=>[code,ctx.state?.__inventarioMP?.[code]])
+        .filter(([code,value])=>Object.hasOwn(excelConfig?.CONFIG?.PRECIO_MP||{},code)&&Number.isFinite(Number(value)))
+        .map(([code,value])=>[code,Math.max(0,Number(value))]));
+      const inventoryAvailable=sum(Object.values(inventoryByCode)),available=exact(inventoryAvailable+purchasesAvailable);
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=target?neededForTarget/target:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:whole(counts[option.id]),contribution:whole(counts[option.id])*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
-      return {id,label:spec.label,unit:spec.unit,available,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
+      return {id,label:spec.label,unit:spec.unit,available,inventoryAvailable,purchasesAvailable,inventoryByCode,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
     const materialCapacity=materials.length?Math.min(...materials.map(material=>material.supportedUnits)):0;
     const producibleUnits=Math.max(0,Math.min(target,processCapacity,materialCapacity));
