@@ -137,6 +137,6 @@ Cada tarjeta conserva las etiquetas, precios/descripciones y controles de su dec
 
 ### Publicación y pendientes
 
-Commits pequeños locales: `0a4562a`, `58218cf`, `e540813`, `7a4bd79`, `a6605fc`. Runner NPC final directo aprobado en ambos casos: assets suministrados y fallback; salida 0 (`tests/output/restaurar-decisiones/npc-final.log`). No se reprodujo el fallo histórico y no bloquea esta entrega. No quedan pendientes de implementación ni pruebas. Publicación a main autorizada y en ejecución al guardar este informe. El contenedor padre solo contiene SIDE1 y no se alteraron repositorios externos.
+Commits pequeños locales: `0a4562a`, `58218cf`, `e540813`, `7a4bd79`, `a6605fc`. Runner NPC final directo aprobado en ambos casos: assets suministrados y fallback; salida 0 (`tests/output/restaurar-decisiones/npc-final.log`). No se reprodujo el fallo histórico y no bloquea esta entrega. No quedan pendientes de implementación ni pruebas. Publicación completada en `origin/main`: push de `65d195b` a `b3b1ba4`, que contiene esta restauración y sus verificaciones. El commit posterior de este registro solo confirma la publicación. El contenedor padre solo contiene SIDE1 y no se alteraron repositorios externos.
 
 La ejecución final de NPC evita el empaquetador que había producido EBUSY en la línea base. Ambos casos pasan sin cambiar avatares ni código de NPC; por tanto no hay excepción de pruebas necesaria para publicar.
