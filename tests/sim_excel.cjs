@@ -70,7 +70,7 @@ async function ejecutar(numero=3){
     return report;
   }
   try{
-    for(const id of escenario.empresas){console.log('Registro',id);const p=await nueva(studentHTML);pages[id]=p;await sync(p,1);await p.evaluate(()=>showModal('studentModal'));await p.locator('#gameCode').fill(game);await p.locator('#companyLegalName').fill('Empresa '+id);await p.locator('#companyBrandName').fill(id);await p.locator('#studentForm button[type=submit]').click();await p.waitForFunction(id=>currentStudent.company===id&&studentConnected,id);const r=await p.evaluate(()=>syncStudentReportPreview());ids[id]=r.id;reports.push(r);}
+    for(const id of escenario.empresas){console.log('Registro',id);const p=await nueva(studentHTML);pages[id]=p;await sync(p,1);await p.evaluate(()=>showModal('studentModal'));await p.locator('#gameCode').fill(game);await p.locator('#companyLegalName').fill('Empresa '+id);await p.locator('#companyBrandName').fill(id);await p.locator('#studentForm button[type=submit]').click();await p.waitForFunction(id=>currentStudent.company===id&&studentConnected,id);if(await p.locator('#cycleCostsUnderstood').isVisible())await p.locator('#cycleCostsUnderstood').click();const r=await p.evaluate(()=>syncStudentReportPreview());ids[id]=r.id;reports.push(r);}
     const teacher=await nueva(teacherHTML);
     for(let i=0;i<escenario.ciclos.length;i++){
       console.log('Ciclo',i+1);const ciclo=i+1,decisiones=escenario.ciclos[i].decisionesPorEmpresa;
