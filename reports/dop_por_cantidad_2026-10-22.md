@@ -92,4 +92,7 @@ La prueba nueva `tests/dop_confirmation_capacity.test.cjs` ejecutada contra el a
 - `decision_options_db.cjs`: contrato de múltiples opciones, importes, reintentos, permisos privados y revisiones correcto en PostgreSQL local; no producción.
 - Batería Node final secuencial sobre el código integrado: **514/514**, cero fallos y cero omitidos (126,8 s). No quedó ningún fallo NPC en esta batería; no se modificó lógica 3D ni se presenta la batería como una revisión visual nueva del mundo.
 - Todos los cambios de producto y pruebas están en commits por área. No hay SQL pendiente.
-- Siguiente paso exacto: push normal a `origin/main` y comprobar los archivos servidos por GitHub Pages.
+- Push normal completado a `origin/main`: `a27d0471f6ad9c83275c07deff6131f8f7fdcec3` (base `7cb8e98`).
+- GitHub Pages verificado: respuesta 200 y coincidencia del contenido publicado con el código local para nueve recursos: estudiante/docente, modelo, DOP, revisión, costos, editor, aplicación y CSS. Ambos HTML cargan las claves `20261022-dop-cantidad`. Evidencia local `tests/output/dop-20261022/published.json`; despliegue `https://github.com/valenlysm29/SIDE1/actions/runs/39902258238`.
+- Hecho: código, pruebas, informe, commits, push y publicación. Este cierre documental se guarda en un commit posterior sin modificar los recursos ya verificados.
+- Pendiente exclusivamente de criterio: resolver las diferencias/ausencias del libro enumeradas arriba para completar una recomendación inversa única y alinear todas las reglas históricas. No hay prueba fallida ni SQL pendiente ocultos.
