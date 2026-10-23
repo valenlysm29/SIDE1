@@ -511,7 +511,7 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
     gap: 4px 7px;
   }
   #decisionMenu .decision-tab img { width: 20px; height: 20px; }
-  #decisionMenu .decision-tab .tab-status { font-size: 10px; padding: 2px 4px; }
+  #decisionMenu .decision-tab .tab-status { font-size: 11px; min-height: 24px; padding: 4px 6px; }
   #decisionMenu .sticky-section-head {
     grid-template-columns: minmax(0, 1fr) minmax(110px, auto);
     gap: 10px;
