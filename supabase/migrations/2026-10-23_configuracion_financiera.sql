@@ -1,5 +1,6 @@
 -- Ejecutar después de las migraciones de sala y cierre Excel. No reescribe cierres.
 begin;
+create schema if not exists side_private;
 create or replace function public.side_financial_values(c jsonb)
 returns jsonb language sql immutable as $$
  select jsonb_build_object('interest',coalesce(c->'interest','20'),'capitalMode',coalesce(c->'capitalMode','"fixed"'),
@@ -36,12 +37,11 @@ begin
   definition:=replace(definition,needle,'c:=c||public.side_schedule_financial(c,p_config);'||chr(10)||needle);
   execute definition;
  end if;
- -- Contexto incluye la programación autoritativa; token ya incluye configuración.
+ -- Conserva el contexto instalado, incluido el filtro de expulsión del 21/10.
+ -- No depende del texto interno ni de dónde se construye el JSON original.
  definition:=pg_get_functiondef('public.side_contexto_cierre_excel(uuid,integer)'::regprocedure);
- if strpos(definition,'''financialConfig''')=0 then
-  if strpos(definition,'''overrides'',coalesce(p.configuracion->''excelParametros'',''{}''))')=0 then raise exception 'Contexto Excel incompatible';end if;
-  definition:=replace(definition,'''overrides'',coalesce(p.configuracion->''excelParametros'',''{}''))','''financialConfig'',p.configuracion,''overrides'',coalesce(p.configuracion->''excelParametros'',''{}''))');
-  execute definition;
+ if strpos(definition,'side_private.contexto_antes_finanzas_20261023')=0 then
+  execute replace(definition,'FUNCTION public.side_contexto_cierre_excel(','FUNCTION side_private.contexto_antes_finanzas_20261023(');
  end if;
  -- Las nuevas admisiones conservan la caja inicial del ciclo 1; el aporte
  -- programado se aplica igual que a las empresas que ya estaban presentes.
@@ -53,4 +53,20 @@ begin
   execute definition;
  end if;
 end $migration$;
+
+revoke all on function side_private.contexto_antes_finanzas_20261023(uuid,integer) from public,anon,authenticated;
+create or replace function public.side_contexto_cierre_excel(p_partida_id uuid,p_ciclo integer)
+returns jsonb language plpgsql security definer set search_path=pg_catalog as $finance_context$
+declare contexto jsonb;config jsonb;
+begin
+ contexto:=side_private.contexto_antes_finanzas_20261023(p_partida_id,p_ciclo);
+ -- El contexto original valida dueño/permisos y puede devolver un cierre ya
+ -- guardado. Esas respuestas se conservan sin consultar ni exponer finanzas.
+ if contexto is null or contexto ? 'error' or contexto ? 'cierre'
+    or not (contexto ? 'empresas') then return contexto;end if;
+ select configuracion into config from public.partidas where id=p_partida_id;
+ return contexto||jsonb_build_object('financialConfig',config);
+end $finance_context$;
+revoke all on function public.side_contexto_cierre_excel(uuid,integer) from public,anon;
+grant execute on function public.side_contexto_cierre_excel(uuid,integer) to authenticated;
 commit;

@@ -80,3 +80,26 @@ Si el servidor sigue usando la función anterior, el panel muestra la ruta de
 la migración y no informa falsamente que guardó los cambios financieros.
 
 No se modificó ninguna partida real durante las pruebas.
+
+## Corrección de compatibilidad SQL tras el primer despliegue
+
+El primer intento en Supabase devolvió `Contexto Excel incompatible`. La
+migración inicial buscaba una cadena literal dentro de la función pública;
+las migraciones de expulsión del 21/10 y reversión del 22/10 la habían
+convertido en un wrapper. La prueba SQL inicial solo cubría el contexto base
+del 11/10 y no detectó esa combinación instalada.
+
+Se sustituyó ese parche literal por una función envolvente que llama al
+contexto instalado, conserva íntegramente sus controles/filtros/token y añade
+`financialConfig` únicamente a respuestas autorizadas pendientes de cierre.
+Los errores y cierres existentes se devuelven intactos. La copia interna no
+puede ejecutarse directamente por los roles públicos o autenticados.
+
+`tests/finance_config_compat_db.cjs` verifica las versiones del 21/10 y 22/10,
+migración repetida, filtro de expulsión, igualdad del contexto anterior,
+permisos y devolución intacta del cierre. Ambas variantes pasan, además de
+`finance_config_sql.cjs` y `excel_sql_db.cjs`.
+
+Volver a ejecutar el archivo completo actualizado de la migración financiera.
+El script original estaba dentro de `BEGIN`/`COMMIT`, por lo que el fallo
+interrumpía la transacción y no debía dejar una aplicación parcial.
