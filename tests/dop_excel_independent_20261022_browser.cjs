@@ -85,6 +85,31 @@ async function scenario(browser,origin,width,height){
   await page.clock.runFor(100);check(width+' seven attached connector paths',await page.locator('[data-pd-connectors] path').count()===7);
   check(width+' no horizontal viewport overflow',await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
   await page.screenshot({path:path.join(OUT,'dop-saved-'+width+'.png'),fullPage:true});
+  // Explicit saved physical stock is a fixture, not a purchase or carry-over
+  // inferred from earlier purchase quantities. Fractions remain physical units.
+  const inventoryBefore=await page.evaluate(()=>({cash:cashBalance(),ledger:JSON.stringify(cashLedger),requirements:productionPlan().requirements}));
+  await page.evaluate(()=>{decisionState.__inventarioMP={'INS-01':1.5,'INS-04':7,'INS-06':12};persistGameState();refreshProductionDop();});
+  const physical=await page.evaluate(()=>({requirements:productionPlan().requirements,comparison:productionPlan().comparison,snapshot:buildStudentSnapshot(),cash:cashBalance(),ledger:JSON.stringify(cashLedger)}));
+  check(width+' persisted physical stock keeps target requirements',JSON.stringify(physical.requirements)===JSON.stringify(inventoryBefore.requirements));
+  for(const [id,available,missing] of [['CUERO',1.5,1.5],['ACCESORIOS',7,3],['HILO',12,48]]){
+   const row=physical.comparison.items.find(row=>row.id===id);near(row.available,available,width+' '+id+' saved physical units');near(row.missing,missing,width+' '+id+' actual delta missing');near(row.surplus,0,width+' '+id+' no invented surplus');
+   const cells=await page.locator('[data-pd-comparison="'+id+'"] td').allTextContents();near(amount(cells[1].split('Almacén:')[0]),available,width+' '+id+' UI saved stock');near(amount(cells[2]),missing,width+' '+id+' UI missing stock');
+  }
+  check(width+' explicit stock is in real snapshot',JSON.stringify(physical.snapshot.decision_state.__inventarioMP)===JSON.stringify({'INS-01':1.5,'INS-04':7,'INS-06':12}));
+  near(physical.cash,inventoryBefore.cash,width+' persisted stock not charged again');check(width+' persisted stock adds no ledger entry',physical.ledger===inventoryBefore.ledger);
+  await page.locator('.pd-comparison').evaluate(el=>el.scrollIntoView({block:'start'}));await page.clock.runFor(100);await page.screenshot({path:path.join(OUT,'physical-inventory-'+width+'.png')});
+  await page.locator('#saveDecisionSection').click();near(await page.evaluate(()=>cashBalance()),inventoryBefore.cash,width+' saving with prior inventory has no repeat debit');
+  await page.reload({waitUntil:'networkidle'});await page.waitForFunction(()=>studentConnected);await page.evaluate(()=>openDecisionMenu());await page.locator('[data-cat="C"]').click();
+  const hydrated=await page.evaluate(()=>({inventory:decisionState.__inventarioMP,comparison:productionPlan().comparison,cash:cashBalance(),ledger:JSON.stringify(cashLedger),target:productionPlan().requirements.target}));
+  check(width+' physical inventory survives reentry',JSON.stringify(hydrated.inventory)===JSON.stringify({'INS-01':1.5,'INS-04':7,'INS-06':12}));near(hydrated.target,10,width+' stock reload preserves desired target');near(hydrated.cash,inventoryBefore.cash,width+' stock reload no repeat debit');check(width+' stock reload ledger unchanged',hydrated.ledger===inventoryBefore.ledger);
+  near(hydrated.comparison.items.find(row=>row.id==='HILO').missing,48,width+' stock reload retains correct missing thread');
+  await page.locator('[data-cat="F"]').click();
+  for(const [id,option,value] of [['CUERO','cuero_sint',1],['ACCESORIOS','acc_eco',2],['HILO','hilo_std',1]])await page.locator('[data-qty="'+id+'"][data-option="'+option+'"]').fill(String(value));
+  await page.locator('[data-cat="C"]').click();
+  const combined=await page.evaluate(()=>({materials:productionPlan().comparison.items.filter(row=>row.kind==='material'),cash:cashBalance(),ledger:JSON.stringify(cashLedger)}));
+  for(const [id,available,missing,surplus] of [['CUERO',2.5,0.5,0],['ACCESORIOS',9,1,0],['HILO',282,0,222]]){const row=combined.materials.find(row=>row.id===id);near(row.available,available,width+' '+id+' physical stock plus current purchases');near(row.missing,missing,width+' '+id+' combined missing');near(row.surplus,surplus,width+' '+id+' combined surplus');}
+  near(combined.cash,inventoryBefore.cash,width+' draft replenishment no premature debit');check(width+' draft replenishment ledger unchanged',combined.ledger===inventoryBefore.ledger);
+  await page.locator('[data-cat="F"]').click();for(const [id,option] of [['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']])await page.locator('[data-qty="'+id+'"][data-option="'+option+'"]').fill('0');await page.locator('[data-cat="C"]').click();
   // Advance the actual automatic schedule, rather than calling a round setter.
   for(let cycle=2;cycle<=3;cycle++){
    await page.clock.fastForward(60000);await page.waitForFunction(cycle=>currentRound()===cycle,cycle);

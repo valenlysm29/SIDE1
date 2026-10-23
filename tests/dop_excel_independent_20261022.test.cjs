@@ -30,6 +30,16 @@ for(const row of oracle.direct)test('actual Excel requirements: '+row.name,()=>{
 });
 
 const {cerrarCiclo}=require('../js/engine/ciclo.js'),{adjuntarCaja}=require('../js/engine/caja.js');
+test('explicit persisted stock is physical and combines only with current purchases',()=>{
+ const materials=[['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']];
+ const ctx={round:2,catalog:[{items:materials.map(([id,option])=>({id,type:'quantity',options:[{id:option}]}))}],state:{__inventarioMP:{'INS-01':1.5,'INS-04':7,'INS-06':12},CUERO:{round:1,quantities:{cuero_sint:1000}}},drafts:{PRODUCCION_META:{moldTargets:{molde_1:10}}}};
+ const before=JSON.stringify(ctx),plan=model.calculate(ctx);
+ for(const [id,available,missing] of [['CUERO',1.5,1.5],['ACCESORIOS',7,3],['HILO',12,48]]){const row=plan.comparison.items.find(row=>row.id===id);close(row.available,available,id+' physical');close(row.missing,missing,id+' missing');}
+ const replenished=model.calculate({...ctx,drafts:{...ctx.drafts,CUERO:{quantities:{cuero_sint:1}},ACCESORIOS:{quantities:{acc_eco:2}},HILO:{quantities:{hilo_std:1}}}});
+ assert.deepEqual(plan.requirements,replenished.requirements);
+ for(const [id,available] of [['CUERO',2.5],['ACCESORIOS',9],['HILO',282]])close(replenished.comparison.items.find(row=>row.id===id).available,available,id+' replenished');
+ assert.equal(JSON.stringify(ctx),before);
+});
 const pipeline=require('./oracle/comparar_pipeline.cjs'),scenarios=require('./escenarios_excel.cjs');
 function simulate(scenario){let history={};const results=[];
  for(let i=0;i<scenario.ciclos.length;i++){
