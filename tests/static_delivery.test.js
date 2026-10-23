@@ -51,7 +51,7 @@ test('DOP presentation loads before the app and keeps the documented cycle',()=>
   const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
   const dop=fs.readFileSync(path.join(root,'js/production_dop.js'),'utf8');
   assert.ok(html.indexOf('js/production_dop.js')<html.indexOf('js/app.js'));
-  for(const label of ['MATERIA PRIMA PRINCIPAL','MATERIA PRIMA SECUNDARIA','Corte de piezas','Clasificación','Preparación','Ensamblado y colocación de accesorios','Acabado final','PORCENTAJE PRODUCIDO','PRODUCCIÓN FINAL DEL CICLO','Tabla de resumen'])assert.ok(dop.includes(label),label);
+  for(const label of ['Materia prima principal','Materia prima secundaria','Corte de piezas','Clasificación','Preparación','Ensamblado y colocación de accesorios','Acabado final','Qué necesitas para producir tu meta','Ahora compara con lo que tienes','Actividades del proceso'])assert.ok(dop.includes(label),label);
   assert.doesNotMatch(dop,/Inspección final/);
   assert.match(dop,/<td>Operaciones<\/td><td>2<\/td>/);
   assert.match(dop,/<td>Inspecciones<\/td><td>1<\/td>/);

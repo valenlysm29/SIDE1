@@ -797,3 +797,8 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 }
 
 .production-dop .pd-cover-option{display:block;white-space:normal;margin-block:4px}
+
+/* Keep wide comparison tables inside their own scroller on narrow screens. */
+.pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison){grid-template-columns:minmax(0,1fr)}
+.pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison) > *{min-width:0;max-width:100%}
+.pd-target-first .pd-table-scroll{min-width:0;width:100%}
