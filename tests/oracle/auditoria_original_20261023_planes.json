@@ -103496,5 +103496,103 @@
       ],
       "note": "Copy untouched original, apply only inputs, CalculateFullRebuild, preserve Excel errors as errors. No added sheets. Includes exact formula snapshots separately in audit report."
     }
+  ],
+  "planes_operando_inyectado": [
+    {
+      "nombre": "operand_injection_inventory_1",
+      "entradas": {
+        "Costos De Producción": {
+          "D54": 0.1,
+          "E54": 0.7,
+          "F54": 0.8
+        }
+      },
+      "salidas": {
+        "costs__G54": [
+          "Costos De Producción",
+          "G54"
+        ]
+      },
+      "formula_modified_in_copy": true,
+      "original_formula_overwritten": {
+        "sheet": "Costos De Producción",
+        "cell": "F54",
+        "formula": "=MIN(E54,H49)"
+      },
+      "expected_arithmetic_identity": 0,
+      "note": "Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched."
+    },
+    {
+      "nombre": "operand_injection_inventory_2",
+      "entradas": {
+        "Costos De Producción": {
+          "D54": 0.1,
+          "E54": 0.2,
+          "F54": 0.3
+        }
+      },
+      "salidas": {
+        "costs__G54": [
+          "Costos De Producción",
+          "G54"
+        ]
+      },
+      "formula_modified_in_copy": true,
+      "original_formula_overwritten": {
+        "sheet": "Costos De Producción",
+        "cell": "F54",
+        "formula": "=MIN(E54,H49)"
+      },
+      "expected_arithmetic_identity": 0,
+      "note": "Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched."
+    },
+    {
+      "nombre": "operand_injection_inventory_3",
+      "entradas": {
+        "Costos De Producción": {
+          "D54": 0.3,
+          "E54": 0.6,
+          "F54": 0.9
+        }
+      },
+      "salidas": {
+        "costs__G54": [
+          "Costos De Producción",
+          "G54"
+        ]
+      },
+      "formula_modified_in_copy": true,
+      "original_formula_overwritten": {
+        "sheet": "Costos De Producción",
+        "cell": "F54",
+        "formula": "=MIN(E54,H49)"
+      },
+      "expected_arithmetic_identity": 0,
+      "note": "Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched."
+    },
+    {
+      "nombre": "operand_injection_inventory_4",
+      "entradas": {
+        "Costos De Producción": {
+          "D54": 0.6,
+          "E54": 0.3,
+          "F54": 0.9
+        }
+      },
+      "salidas": {
+        "costs__G54": [
+          "Costos De Producción",
+          "G54"
+        ]
+      },
+      "formula_modified_in_copy": true,
+      "original_formula_overwritten": {
+        "sheet": "Costos De Producción",
+        "cell": "F54",
+        "formula": "=MIN(E54,H49)"
+      },
+      "expected_arithmetic_identity": 0,
+      "note": "Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched."
+    }
   ]
 }

@@ -60,7 +60,40 @@
   "formula_count": 871,
   "formula_family_count": 215,
   "family_normalization": "openpyxl Translator moves copied formulas to CV1000; absolute references and constants preserved; families are structural, not proof of mathematical correctness.",
-  "cached_errors": [],
+  "cached_errors": [
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E75",
+      "kind": "formula",
+      "original": "=AVERAGE(H65,H68,H71)*10",
+      "cached": "#DIV/0!",
+      "cache_storage_type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G75",
+      "kind": "formula",
+      "original": "=SUM(C75:F75)",
+      "cached": "#DIV/0!",
+      "cache_storage_type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E123",
+      "kind": "formula",
+      "original": "=AVERAGE(H65,H68,H71)*10",
+      "cached": "#DIV/0!",
+      "cache_storage_type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G123",
+      "kind": "formula",
+      "original": "=SUM(C123:F123)",
+      "cached": "#DIV/0!",
+      "cache_storage_type": "s"
+    }
+  ],
   "comparisons": [
     {
       "label": "productivity corte",

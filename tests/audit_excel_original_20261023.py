@@ -102,13 +102,17 @@ def main():
     consequence_rows=[]
     for row in range(2,10): consequence_rows.append({'id':formulas['Matriz_Consecuencias']['A'+str(row)].value,'status':'numeric_text_rule' if row in [2,3,4,5,9] else 'qualitative_text_rule','condition_cell':'C'+str(row),'condition':formulas['Matriz_Consecuencias']['C'+str(row)].value,'effect_cell':'D'+str(row),'effect':formulas['Matriz_Consecuencias']['D'+str(row)].value})
     normalized=[{'sheet':s,'normalized_to_CV1000':norm,'representative':addresses[0],'cells':addresses,'count':len(addresses)} for (s,norm),addresses in families.items()]
-    errors=[c for c in all_cells if cache[c['sheet']][c['cell']].data_type=='e']
+    excel_errors={'#DIV/0!','#VALUE!','#REF!','#NAME?','#NUM!','#N/A','#NULL!','#SPILL!','#CALC!'}
+    # This workbook stores four formula-error caches as strings (t="str"),
+    # so data_type=='e' alone incorrectly reports zero cached error results.
+    errors=[{**c,'cache_storage_type':cache[c['sheet']][c['cell']].data_type} for c in all_cells if cache[c['sheet']][c['cell']].data_type=='e' or (isinstance(c['cached'],str) and c['cached'] in excel_errors)]
     report={'source':str(SOURCE.relative_to(ROOT)),'sha256_before':before,'sha256_after':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'mode':'read-only dual load; original cache is not a fresh recalculation','counts_by_sheet':counts,'formula_count':sum(x.get('formula',0) for x in counts),'formula_family_count':len(families),'family_normalization':'openpyxl Translator moves copied formulas to CV1000; absolute references and constants preserved; families are structural, not proof of mathematical correctness.','cached_errors':errors,'comparisons':comparisons,'comparison_count':len(comparisons),'differences':[c for c in comparisons if not c['equal']],'formula_families':normalized,'consequences':consequence_rows,'original_ambiguities':contradictions,'rules_absent':absent,'all_nonempty_cells':all_cells}
     assert report['sha256_after']==before
     dest=ROOT/'reports/auditoria_excel_original_20261023.json'
     dest.write_text(json.dumps(report,ensure_ascii=False,indent=2,default=str)+'\n',encoding='utf-8')
     lines=['# Auditoría reproducible del Excel original — 23/10/2026','',f'Fuente intacta: `{report["source"]}`. SHA-256 antes/después: `{before}`. Skill xlsx aplicada; dos cargas independientes openpyxl. No se ejecutó COM ni se guardó el libro.','',f'Se inventariaron {len(all_cells)} celdas no vacías, {report["formula_count"]} fórmulas y {len(families)} familias estructurales. Todas las fórmulas/cachés y pertenencias a familias están en el JSON acompañante. Errores en caché original: {len(errors)}.','',f'Comparaciones nuevas contra SIDE: {len(comparisons)}; diferencias: {len(report["differences"])}. Incluyen productividades, consumos, conversiones, precios, todos los componentes laborales de ambos regímenes, todos los activos de ambos regímenes, parámetros de los tres mercados y catálogo completo. Son comparaciones con caché original, no prueba de recálculo ni cobertura integral de transiciones de caja.','','## Cobertura por hoja','','| Hoja | Fórmulas | Literales numéricos | Textos |','|---|---:|---:|---:|']
     for c in counts: lines.append(f'| {c["sheet"]} | {c.get("formula",0)} | {c.get("numeric_literal",0)} | {c.get("text",0)} |')
+    lines+=['','Errores originales guardados como texto en la caché (tipo `s`, no `e`): '+', '.join(f'`{c["sheet"]}!{c["cell"]}={c["cached"]}`' for c in errors)+'. La detección comprueba tanto el tipo como los códigos textuales de error.','']
     lines+=['','## Diferencias observadas contra SIDE','']
     for d in report['differences']: lines.append(f'- {d["label"]}: `{d["excel_sheet"]}!{d["excel_cell"]}` original `{d["excel_cached"]}`, SIDE `{d["side"]}`; fuente `{d["side_source"]}`.')
     if not report['differences']: lines.append('Sin diferencias en las comparaciones enumeradas. Esto no convierte reglas ausentes en fórmulas originales.')
@@ -175,7 +179,10 @@ def build_com_plans(book,quantity,costs):
     plans=[]
     for name,mutations in variants:
         plans.append({'nombre':name,'entradas':mutations,'salidas':outputs,'side_checks':records(mutations),'note':'Copy untouched original, apply only inputs, CalculateFullRebuild, preserve Excel errors as errors. No added sheets. Includes exact formula snapshots separately in audit report.'})
+    arithmetic=[]
+    for i,(initial,bought,used) in enumerate([(0.1,0.7,0.8),(0.1,0.2,0.3),(0.3,0.6,0.9),(0.6,0.3,0.9)],1):
+        arithmetic.append({'nombre':'operand_injection_inventory_'+str(i),'entradas':{costs:{'D54':initial,'E54':bought,'F54':used}},'salidas':{'costs__G54':[costs,'G54']},'formula_modified_in_copy':True,'original_formula_overwritten':{'sheet':costs,'cell':'F54','formula':book[costs]['F54'].value},'expected_arithmetic_identity':0,'note':'Arithmetic unit experiment only. F54 originally is a formula and is intentionally replaced with its operand result in the output COPY. This is not an original-input scenario and must not be counted as unmodified-source oracle coverage. G54 remains the original formula D54+E54-F54. Original workbook untouched.'})
     path=ROOT/'tests/oracle/auditoria_original_20261023_planes.json'
-    path.write_text(json.dumps({'source':'.codex-work/DECISIONES_SIDE_16.xlsx','sha256':SHA,'planes':plans},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    path.write_text(json.dumps({'source':'.codex-work/DECISIONES_SIDE_16.xlsx','sha256':SHA,'planes':plans,'planes_operando_inyectado':arithmetic},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 if __name__=='__main__': main()

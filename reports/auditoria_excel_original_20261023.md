@@ -2,7 +2,7 @@
 
 Fuente intacta: `.codex-work\DECISIONES_SIDE_16.xlsx`. SHA-256 antes/después: `3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1`. Skill xlsx aplicada; dos cargas independientes openpyxl. No se ejecutó COM ni se guardó el libro.
 
-Se inventariaron 3047 celdas no vacías, 871 fórmulas y 215 familias estructurales. Todas las fórmulas/cachés y pertenencias a familias están en el JSON acompañante. Errores en caché original: 0.
+Se inventariaron 3047 celdas no vacías, 871 fórmulas y 215 familias estructurales. Todas las fórmulas/cachés y pertenencias a familias están en el JSON acompañante. Errores en caché original: 4.
 
 Comparaciones nuevas contra SIDE: 727; diferencias: 6. Incluyen productividades, consumos, conversiones, precios, todos los componentes laborales de ambos regímenes, todos los activos de ambos regímenes, parámetros de los tres mercados y catálogo completo. Son comparaciones con caché original, no prueba de recálculo ni cobertura integral de transiciones de caja.
 
@@ -20,6 +20,9 @@ Comparaciones nuevas contra SIDE: 727; diferencias: 6. Incluyen productividades,
 | Lotes_Produccion | 17 | 3 | 17 |
 | Motor_Puntajes | 17 | 0 | 18 |
 | Matriz_Consecuencias | 0 | 0 | 45 |
+
+Errores originales guardados como texto en la caché (tipo `s`, no `e`): `CANTIDAD DE PRODUCCIÓN!E75=#DIV/0!`, `CANTIDAD DE PRODUCCIÓN!G75=#DIV/0!`, `CANTIDAD DE PRODUCCIÓN!E123=#DIV/0!`, `CANTIDAD DE PRODUCCIÓN!G123=#DIV/0!`. La detección comprueba tanto el tipo como los códigos textuales de error.
+
 
 ## Diferencias observadas contra SIDE
 
