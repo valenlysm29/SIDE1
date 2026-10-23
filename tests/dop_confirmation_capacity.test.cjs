@@ -29,7 +29,7 @@ test('desired quantity above Excel capacity is confirmed intact and executed wit
  assert.match(editor.status.textContent,/producción real se limitará/);
  const result=c.SIDE_EXCEL_CICLO.prepararEmpresa(editor.saved().decisiones);
  assert.equal(result.produccion.produccionCapacidad,396);assert.equal(result.produccion.totalPlaneado,520);
- assert.ok(result.produccion.totalProducido<=396);assert.ok(result.consecuencias.mensajes.some(row=>row.id==='CONS-06'));
+ assert.ok(result.produccion.totalProducido<=396);assert.ok(!result.consecuencias.mensajes.some(row=>row.id==='CONS-06'));assert.equal(result.consecuencias.efectos.costoHorasExtra,0);
 });
 test('material shortage warns and preserves the target while the engine never consumes missing stock',()=>{
  const c=load(),d=plan(c);d.lotes[0].cantidad=10;d.comprasUnidades={};

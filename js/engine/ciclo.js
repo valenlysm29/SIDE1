@@ -8,13 +8,13 @@
     decisiones={...decisiones,maquinaria};
     const c=C.configurar(overrides),puntajes=P.calcularPuntajes(decisiones,overrides);
     const produccion=PRO.calcularProduccion({...decisiones,inventarioInicial:historial.inventarioMP||decisiones.inventarioInicial||{}},overrides);
-    const pre=CON.evaluarConsecuencias({puntajes,lotes:puntajes.lotes,jefes:decisiones.jefes,planeado:produccion.totalPlaneado,capacidad:produccion.produccionCapacidad},historial,overrides);
+    const pre=CON.evaluarConsecuencias({puntajes,lotes:puntajes.lotes,jefes:decisiones.jefes,planeado:produccion.totalPlaneado,producido:produccion.totalProducido,capacidad:produccion.produccionCapacidad},historial,overrides);
     // El factor reduce cada lote ya limitado por capacidad y MP; solo se consume lo que se fabrica.
     for(const l of produccion.lotes){const anterior=l.producido;l.producido=C.excelRoundDown(Number((anterior*pre.efectos.factorProduccion).toPrecision(c.PRECISION_INVENTARIO)));const ratio=anterior?l.producido/anterior:0;for(const [codigo,valor] of Object.entries(l.consumoPorInsumo)){const nuevo=valor*ratio;produccion.consumoPorInsumo[codigo]-=valor-nuevo;produccion.inventarioFinal[codigo]+=valor-nuevo;l.consumoPorInsumo[codigo]=nuevo;}for(const familia of Object.keys(l.consumo)){produccion.consumoTotal[familia]-=l.consumo[familia]*(1-ratio);l.consumo[familia]*=ratio;}}
     for(const mapa of [produccion.consumoTotal,produccion.consumoPorInsumo,produccion.inventarioFinal,...produccion.lotes.flatMap(l=>[l.consumo,l.consumoPorInsumo])])for(const k of Object.keys(mapa))mapa[k]=Number(mapa[k].toPrecision(c.PRECISION_INVENTARIO));
     produccion.totalProducido=produccion.lotes.reduce((a,l)=>a+l.producido,0);
     const costos=COS.calcularCostos({...decisiones,compras:produccion.compras,consumoMP:produccion.consumoPorInsumo,inventarioInicial:produccion.inventarioInicial,produccion},overrides);
-    const consecuencias=CON.evaluarConsecuencias({puntajes,lotes:puntajes.lotes,jefes:decisiones.jefes,planeado:produccion.totalPlaneado,capacidad:produccion.produccionCapacidad,costoMOciclo:costos.costoMOciclo},historial,overrides);
+    const consecuencias=CON.evaluarConsecuencias({puntajes,lotes:puntajes.lotes,jefes:decisiones.jefes,planeado:produccion.totalPlaneado,producido:produccion.totalProducido,capacidad:produccion.produccionCapacidad,costoMOciclo:costos.costoMOciclo},historial,overrides);
     let reputacionMercado=c.REPUTACION_FUENTE_MERCADO==='motor'?puntajes.reputacionMatriz:costos.reputacionOperativa;
     if(c.REPUTACION_FUENTE_MERCADO==='excel_literal')reputacionMercado=Number(decisiones.reputacionLiteral||0);
     reputacionMercado+=consecuencias.efectos.reputacionCambio;

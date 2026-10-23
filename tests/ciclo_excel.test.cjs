@@ -18,10 +18,12 @@ test('La penalización bancaria se conserva hasta el préstamo siguiente',()=>{
   c=cerrarCiclo({ciclo:3,empresas:['A'],decisionesPorEmpresa:{A:{...saludable,seleccion:saludable.seleccion.filter(k=>k!=='FIN-01B').concat('FIN-01A'),montoPrestamo:5000}},historialPorEmpresa:c.historialPorEmpresa});
   assert.equal(c.resultadosPorEmpresa.A.financiamiento.tasaTEA,23);assert.equal(c.historialPorEmpresa.A.tasaAdicionalPP,3,'la salud baja del nuevo préstamo genera una penalización nueva');
 });
-test('SIM-2 dispara las ocho reglas en tres ciclos; no atribuye efectos al lote calidad4',()=>{
+test('SIM-2 dispara las siete reglas alcanzables; no cobra sobrecapacidad de una meta ni atribuye efectos al lote calidad4',()=>{
   const escenario=crearSim2(),resultados=ejecutarEscenario(escenario,cerrarCiclo);
   const ids=new Set(resultados.flatMap(c=>Object.values(c.resultadosPorEmpresa).flatMap(r=>r.consecuencias.mensajes.map(m=>m.id))));
-  for(let i=1;i<=8;i++)assert.ok(ids.has('CONS-'+String(i).padStart(2,'0')),`falta CONS-${i}`);
+  for(const i of [1,2,3,4,5,7,8])assert.ok(ids.has('CONS-'+String(i).padStart(2,'0')),`falta CONS-${i}`);
+  assert.ok(!ids.has('CONS-06'),'Matriz C7 exige producción sobre capacidad; el motor limita producción a capacidad');
+  for(const ciclo of resultados)for(const r of Object.values(ciclo.resultadosPorEmpresa))assert.equal(r.consecuencias.efectos.costoHorasExtra,0);
   const b=resultados[0].resultadosPorEmpresa.B;
   cerca(b.consecuencias.efectos.factorProduccion,0.665);
   assert.equal(b.lotes[1].calidad,4);assert.equal(b.lotes[1].resultado,'No alcanza el segmento');cerca(b.lotes[1].precioEfectivo,250);

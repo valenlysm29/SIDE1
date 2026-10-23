@@ -21,7 +21,11 @@
     const ciclosReputacionBaja=reputacionFinal<r.REPUTACION_BAJA?Number(historial.ciclosReputacionBaja||0)+1:0;
     const demandaBaja=ciclosReputacionBaja>=r.CICLOS_REPUTACION;if(demandaBaja)add('CONS-04');
     const tasaAdicionalPP=p.saludFinanciera<r.SALUD_BAJA?c.TEA_ADICIONAL_PP:0;if(tasaAdicionalPP)add('CONS-05');
-    const exceso=Math.max(0,Number(estado.planeado||0)-Number(estado.capacidad||0));if(exceso)add('CONS-06');
+    // Matriz_Consecuencias!C7 compara cantidad producida, no la meta deseada.
+    // Una evaluación parcial (p. ej. solo demanda) no supone capacidad cero.
+    const tieneProduccion=estado.producido!==null&&estado.producido!==undefined&&Number.isFinite(Number(estado.producido));
+    const tieneCapacidad=estado.capacidad!==null&&estado.capacidad!==undefined&&Number.isFinite(Number(estado.capacidad));
+    const exceso=tieneProduccion&&tieneCapacidad?Math.max(0,Number(estado.producido)-Number(estado.capacidad)):0;if(exceso)add('CONS-06');
     const sinVender=estado.demanda===undefined?0:Math.max(0,Number(estado.producido||0)-Number(estado.demanda||0));if(sinVender)add('CONS-07');
     return {efectos:{precios,reputacionCambio,reputacionFinal,factorProduccion,factorDemanda:demandaBaja?r.DEMANDA_BAJA:1,tasaAdicionalPP,ciclosReputacionBaja,costoHorasExtra:exceso?c.HORAS_EXTRA_PCT*Number(estado.costoMOciclo||0)*Math.min(1,estado.capacidad?exceso/estado.capacidad:1):0,costoAlmacenaje:sinVender*c.COSTO_ALMACENAJE_UNIDAD},mensajes};
   }
