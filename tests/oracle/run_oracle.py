@@ -33,7 +33,9 @@ def construir():
         ['eficiencia',17,'CONS-03','=B4<4','=IF(D4,0.7,1)'],
         ['reputacion',8,'CONS-04','=AND(B5+B15<3,B6+1>=2)','=IF(D5,0.8,1)'],
         ['ciclosBajaPrevios',0,'CONS-05','=B7<3','=IF(D6,3,0)'],
-        ['saludFinanciera',-3,'CONS-06','=B9>B10','=IF(D7,0.25*B13*MIN(1,IFERROR((B9-B10)/B10,0)),0)'],
+        # Matriz_Consecuencias!C7 specifies produced quantity, not planned quantity.
+        # The tariff remains an explicit historical extension, not a source formula.
+        ['saludFinanciera',-3,'CONS-06','=B11>B10','=IF(D7,0.25*B13*MIN(1,IFERROR((B11-B10)/B10,0)),0)'],
         ['jefatura',True,'CONS-07','=B11>B12','=IF(D8,(B11-B12)*2,0)'],
         ['planeado',520,'CONS-08','=AND(NOT(B8),B4<5)','=IF(D9,0.95,1)'],
         ['capacidad',396],['producido',365],['demanda',350],['costoMO',10000],

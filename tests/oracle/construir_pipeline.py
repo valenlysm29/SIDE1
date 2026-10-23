@@ -165,7 +165,13 @@ def construir(escenario,config):
         price_range=f'${col("precio")}$2:${col("precio")}${last}'
         maxp=f'_xlfn.MAXIFS({price_range},{group_range},{R("grupoMercado")})';minp=f'_xlfn.MINIFS({price_range},{group_range},{R("grupoMercado")})'
         form('puntajePrecio',r,f'IF({R("segmento")}="SEG-01",IFERROR(100*({maxp}-{R("precio")})/({maxp}-{minp}),100),100-ABS({R("precio")}-{R("precioIdeal")})/{R("precioIdeal")}*100)')
-        form('calidadMercado',r,f'ROUND(MIN(100,{R("calidad")}*10),0)')
+        if cfg.get('CALIDAD_MERCADO_MODO') == 'excel_literal':
+            rep_range=f'${col("reputacionMercado")}$2:${col("reputacionMercado")}${last}'
+            # Original Costos!E118:E147 keeps the absolute economic total $D$122.
+            economic_group=quoted(f'{item["cycle"]}|SEG-01')
+            form('calidadMercado',r,f'IFERROR(ROUND({R("reputacionMercado")}/SUMIF({group_range},{economic_group},{rep_range})*100,0),0)')
+        else:
+            form('calidadMercado',r,f'ROUND(MIN(100,{R("calidad")}*10),0)')
         form('puntajeTotal',r,f'{m["pesos"][0]}*{R("puntajePrecio")}+{m["pesos"][1]}*{R("reputacionMercado")}*10+{m["pesos"][2]}*{R("calidadMercado")}')
         totals=f'${col("puntajeTotal")}$2:${col("puntajeTotal")}${last}'
         form('porcentaje',r,f'IFERROR({R("puntajeTotal")}/SUMIF({group_range},{R("grupoMercado")},{totals}),0)')
@@ -175,7 +181,7 @@ def construir(escenario,config):
         form('ingresos',r,f'{R("vendido")}*{R("precio")}*{R("precioFactor")}')
         form('inventarioProducto',r,f'{R("stockProductoAntes")}-{R("vendido")}')
         form('almacenaje',r,f'{R("inventarioProducto")}*{cfg["COSTO_ALMACENAJE_UNIDAD"]}')
-        form('horasExtra',r,f'IF({R("planeado")}>{R("produccionCapacidad")},{cfg["HORAS_EXTRA_PCT"]}*{R("costoMO")}*IFERROR(MIN(1,({R("planeado")}-{R("produccionCapacidad")})/{R("produccionCapacidad")}),1),0)')
+        form('horasExtra',r,f'IF({R("producido")}>{R("produccionCapacidad")},{cfg["HORAS_EXTRA_PCT"]}*{R("costoMO")}*IFERROR(MIN(1,({R("producido")}-{R("produccionCapacidad")})/{R("produccionCapacidad")}),1),0)')
         warranty=next((c for c in selection if c.startswith('COM-06')),'')
         # Las opciones base GARANTIA_PT no tenían efecto de caja. No inventar una provisión.
         form('costoGarantia',r,'0' if 'garantiaDias' in d else f'{look(quoted(warranty),"G")}*{R("vendido")}')
@@ -185,7 +191,7 @@ def construir(escenario,config):
         setv('costoAnalista',r,cfg['ANALISTA_BASE']['costo']*cfg['CICLO_EQUIVALE_A_MESES'] if d.get('analistaCompras') else 0)
         form('costosTotales',r,'+'.join(R(k) for k in ['costoMO','costoMP','mantenimiento','depreciacion','publicidad','almacenaje','horasExtra','costoGarantia','costoRecurrente','costoLeadTime','costoAnalista']))
         form('utilidad',r,f'{R("ingresos")}-{R("costosTotales")}')
-        for i,expr in enumerate([f'AND({R("segmento")}="SEG-03",{R("calidad")}<4,{R("planeado")}>0)',f'AND({R("segmento")}="SEG-03",{R("calidad")}> =7,{R("planeado")}>0)'.replace('> =','>='),f'{R("puntajeEficiencia")}<4',f'{R("ciclosReputacionBaja")}> =2'.replace('> =','>='),f'{R("saludFinanciera")}<3',f'{R("planeado")}>{R("produccionCapacidad")}',f'{R("producido")}>{R("vendido")}',f'AND({R("jefes")}=0,{R("puntajeEficiencia")}<5)'],1):
+        for i,expr in enumerate([f'AND({R("segmento")}="SEG-03",{R("calidad")}<4,{R("planeado")}>0)',f'AND({R("segmento")}="SEG-03",{R("calidad")}> =7,{R("planeado")}>0)'.replace('> =','>='),f'{R("puntajeEficiencia")}<4',f'{R("ciclosReputacionBaja")}> =2'.replace('> =','>='),f'{R("saludFinanciera")}<3',f'{R("producido")}>{R("produccionCapacidad")}',f'{R("producido")}>{R("vendido")}',f'AND({R("jefes")}=0,{R("puntajeEficiencia")}<5)'],1):
             form(f'CONS-{i:02}',r,expr)
         fields=['calidad','puntajeEficiencia','reputacionMatriz','saludFinanciera','capacidadDiaria','capacidadCiclo','factorEficiencia','produccionCapacidad','producido','consumoCuero','consumoAccesorios','consumoHilo','costoMO','costoMP','mantenimiento','depreciacion','reputacionOperativa','reputacionMercado','asignado','demandaAjustada','vendido','ingresos','inventarioProducto','almacenaje','horasExtra','costoGarantia','costoRecurrente','costosTotales','utilidad','ciclosReputacionBaja','tasaAdicionalPP']+[f'stockMP_{c}' for c in codes]+[f'CONS-{i:02}' for i in range(1,9)]
         outputs.update({f'ciclo.{item["cycle"]}.{item["id"]}.{key}':[sh.title,R(key)] for key in fields})

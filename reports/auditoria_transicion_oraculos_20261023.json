@@ -1,0 +1,3529 @@
+{
+  "base": {
+    "salidas": 351,
+    "diferencias_semanticas": 0,
+    "cambios": []
+  },
+  "sim2": {
+    "salidas": 28,
+    "diferencias_semanticas": 3,
+    "cambios": [
+      {
+        "clave": "consecuencias.CONS-06.activa",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "consecuencias.CONS-06.efecto",
+        "antes": 782.8282828282829,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "consecuencias.CONS-06.mensaje",
+        "antes": "Intentaste producir mas de lo que tu planta soporta. Hubo cuellos de botella y tuviste que pagar horas extra para cumplir.",
+        "ahora_excel": ""
+      }
+    ]
+  },
+  "sim2_premium": {
+    "salidas": 28,
+    "diferencias_semanticas": 3,
+    "cambios": [
+      {
+        "clave": "consecuencias.CONS-06.activa",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "consecuencias.CONS-06.efecto",
+        "antes": 782.8282828282829,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "consecuencias.CONS-06.mensaje",
+        "antes": "Intentaste producir mas de lo que tu planta soporta. Hubo cuellos de botella y tuviste que pagar horas extra para cumplir.",
+        "ahora_excel": ""
+      }
+    ]
+  },
+  "sim1_pipeline": {
+    "salidas": 468,
+    "diferencias_semanticas": 68,
+    "cambios": [
+      {
+        "clave": "ciclo.1.A.horasExtra",
+        "antes": 1642.2988785046725,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.costosTotales",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.A.utilidad",
+        "antes": -15799.293878504657,
+        "ahora_excel": -14156.994999999995
+      },
+      {
+        "clave": "ciclo.1.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.B.horasExtra",
+        "antes": 1642.2988785046725,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.costosTotales",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.B.utilidad",
+        "antes": -5154.293878504657,
+        "ahora_excel": -3511.9949999999953
+      },
+      {
+        "clave": "ciclo.1.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.C.horasExtra",
+        "antes": 1642.2988785046725,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.C.costosTotales",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.C.utilidad",
+        "antes": -7932.293878504657,
+        "ahora_excel": -6289.994999999995
+      },
+      {
+        "clave": "ciclo.1.C.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.D.horasExtra",
+        "antes": 1642.2988785046725,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.D.costosTotales",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.D.utilidad",
+        "antes": 11785.706121495343,
+        "ahora_excel": 13428.005000000005
+      },
+      {
+        "clave": "ciclo.1.D.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costos",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.utilidad",
+        "antes": -15799.293878504657,
+        "ahora_excel": -14156.994999999995
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costosProduccion",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.salidas",
+        "antes": 151117.58887850464,
+        "ahora_excel": 149475.28999999998
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.cajaFinal",
+        "antes": 900742.4111214953,
+        "ahora_excel": 902384.71
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.pagosOperacion",
+        "antes": 143254.58887850464,
+        "ahora_excel": 141612.28999999998
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.operacion",
+        "antes": -91394.58887850464,
+        "ahora_excel": -89752.28999999998
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.flujoNeto",
+        "antes": -99257.5888785047,
+        "ahora_excel": -97615.29000000004
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cajaFinal",
+        "antes": 900742.4111214953,
+        "ahora_excel": 902384.71
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.efectivo",
+        "antes": 900742.4111214953,
+        "ahora_excel": 902384.71
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.activos",
+        "antes": 983837.7061214953,
+        "ahora_excel": 985480.005
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.patrimonio",
+        "antes": 983837.7061214953,
+        "ahora_excel": 985480.005
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 983837.7061214953,
+        "ahora_excel": 985480.005
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costos",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.utilidad",
+        "antes": -5154.293878504657,
+        "ahora_excel": -3511.9949999999953
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costosProduccion",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.salidas",
+        "antes": 151117.58887850464,
+        "ahora_excel": 149475.28999999998
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.cajaFinal",
+        "antes": 911387.4111214953,
+        "ahora_excel": 913029.71
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.pagosOperacion",
+        "antes": 143254.58887850464,
+        "ahora_excel": 141612.28999999998
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.operacion",
+        "antes": -80749.58887850464,
+        "ahora_excel": -79107.28999999998
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.flujoNeto",
+        "antes": -88612.5888785047,
+        "ahora_excel": -86970.29000000004
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.cajaFinal",
+        "antes": 911387.4111214953,
+        "ahora_excel": 913029.71
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.efectivo",
+        "antes": 911387.4111214953,
+        "ahora_excel": 913029.71
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.activos",
+        "antes": 994482.7061214953,
+        "ahora_excel": 996125.005
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.patrimonio",
+        "antes": 994482.7061214953,
+        "ahora_excel": 996125.005
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 994482.7061214953,
+        "ahora_excel": 996125.005
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.costos",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.utilidad",
+        "antes": -7932.293878504657,
+        "ahora_excel": -6289.994999999995
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.costosProduccion",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceCaja.salidas",
+        "antes": 151117.58887850464,
+        "ahora_excel": 149475.28999999998
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceCaja.cajaFinal",
+        "antes": 908609.4111214953,
+        "ahora_excel": 910251.71
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.pagosOperacion",
+        "antes": 143254.58887850464,
+        "ahora_excel": 141612.28999999998
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.operacion",
+        "antes": -83527.58887850464,
+        "ahora_excel": -81885.28999999998
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.flujoNeto",
+        "antes": -91390.5888785047,
+        "ahora_excel": -89748.29000000004
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.cajaFinal",
+        "antes": 908609.4111214953,
+        "ahora_excel": 910251.71
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.efectivo",
+        "antes": 908609.4111214953,
+        "ahora_excel": 910251.71
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.activos",
+        "antes": 991704.7061214953,
+        "ahora_excel": 993347.005
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.patrimonio",
+        "antes": 991704.7061214953,
+        "ahora_excel": 993347.005
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 991704.7061214953,
+        "ahora_excel": 993347.005
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.costos",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.utilidad",
+        "antes": 11785.706121495343,
+        "ahora_excel": 13428.005000000005
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.costosProduccion",
+        "antes": 67659.29387850466,
+        "ahora_excel": 66016.995
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceCaja.salidas",
+        "antes": 151117.58887850464,
+        "ahora_excel": 149475.28999999998
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceCaja.cajaFinal",
+        "antes": 928327.4111214953,
+        "ahora_excel": 929969.71
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.pagosOperacion",
+        "antes": 143254.58887850464,
+        "ahora_excel": 141612.28999999998
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.operacion",
+        "antes": -63809.58887850464,
+        "ahora_excel": -62167.28999999998
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.flujoNeto",
+        "antes": -71672.5888785047,
+        "ahora_excel": -70030.29000000004
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.cajaFinal",
+        "antes": 928327.4111214953,
+        "ahora_excel": 929969.71
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.efectivo",
+        "antes": 928327.4111214953,
+        "ahora_excel": 929969.71
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.activos",
+        "antes": 1011422.7061214953,
+        "ahora_excel": 1013065.005
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.patrimonio",
+        "antes": 1011422.7061214953,
+        "ahora_excel": 1013065.005
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 1011422.7061214953,
+        "ahora_excel": 1013065.005
+      }
+    ]
+  },
+  "sim2_pipeline": {
+    "salidas": 585,
+    "diferencias_semanticas": 190,
+    "cambios": [
+      {
+        "clave": "ciclo.1.A.asignado",
+        "antes": 9,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.1.A.demandaAjustada",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.A.vendido",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.A.ingresos",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.1.A.inventarioProducto",
+        "antes": 112,
+        "ahora_excel": 111
+      },
+      {
+        "clave": "ciclo.1.A.almacenaje",
+        "antes": 224,
+        "ahora_excel": 222
+      },
+      {
+        "clave": "ciclo.1.A.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.costosTotales",
+        "antes": 44210.32549180328,
+        "ahora_excel": 42433.135
+      },
+      {
+        "clave": "ciclo.1.A.utilidad",
+        "antes": -40710.32549180328,
+        "ahora_excel": -38583.135
+      },
+      {
+        "clave": "ciclo.1.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.B.asignado",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.demandaAjustada",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.vendido",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.ingresos",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.inventarioProducto",
+        "antes": 69,
+        "ahora_excel": 70
+      },
+      {
+        "clave": "ciclo.1.B.almacenaje",
+        "antes": 138,
+        "ahora_excel": 140
+      },
+      {
+        "clave": "ciclo.1.B.horasExtra",
+        "antes": 1946.1799999999998,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.costosTotales",
+        "antes": 12977.675,
+        "ahora_excel": 11033.494999999999
+      },
+      {
+        "clave": "ciclo.1.B.utilidad",
+        "antes": -12815.175,
+        "ahora_excel": -11033.494999999999
+      },
+      {
+        "clave": "ciclo.1.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.A.asignado",
+        "antes": 9,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.2.A.demandaAjustada",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.A.vendido",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.A.ingresos",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.2.A.inventarioProducto",
+        "antes": 224,
+        "ahora_excel": 222
+      },
+      {
+        "clave": "ciclo.2.A.almacenaje",
+        "antes": 448,
+        "ahora_excel": 444
+      },
+      {
+        "clave": "ciclo.2.A.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.A.costosTotales",
+        "antes": 44434.32549180328,
+        "ahora_excel": 42655.135
+      },
+      {
+        "clave": "ciclo.2.A.utilidad",
+        "antes": -40934.32549180328,
+        "ahora_excel": -38805.135
+      },
+      {
+        "clave": "ciclo.2.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.B.asignado",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.inventarioProducto",
+        "antes": 139,
+        "ahora_excel": 140
+      },
+      {
+        "clave": "ciclo.2.B.almacenaje",
+        "antes": 278,
+        "ahora_excel": 280
+      },
+      {
+        "clave": "ciclo.2.B.horasExtra",
+        "antes": 1946.1799999999998,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.costosTotales",
+        "antes": 13117.675,
+        "ahora_excel": 11173.494999999999
+      },
+      {
+        "clave": "ciclo.2.B.utilidad",
+        "antes": -13117.675,
+        "ahora_excel": -11173.494999999999
+      },
+      {
+        "clave": "ciclo.2.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.A.asignado",
+        "antes": 8,
+        "ahora_excel": 9
+      },
+      {
+        "clave": "ciclo.3.A.demandaAjustada",
+        "antes": 8,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.3.A.vendido",
+        "antes": 8,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.3.A.ingresos",
+        "antes": 2800,
+        "ahora_excel": 3500
+      },
+      {
+        "clave": "ciclo.3.A.inventarioProducto",
+        "antes": 338,
+        "ahora_excel": 334
+      },
+      {
+        "clave": "ciclo.3.A.almacenaje",
+        "antes": 676,
+        "ahora_excel": 668
+      },
+      {
+        "clave": "ciclo.3.A.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.A.costosTotales",
+        "antes": 44662.32549180328,
+        "ahora_excel": 42879.135
+      },
+      {
+        "clave": "ciclo.3.A.utilidad",
+        "antes": -41862.32549180328,
+        "ahora_excel": -39379.135
+      },
+      {
+        "clave": "ciclo.3.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.B.vendido",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.ingresos",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.inventarioProducto",
+        "antes": 138,
+        "ahora_excel": 140
+      },
+      {
+        "clave": "ciclo.3.B.almacenaje",
+        "antes": 276,
+        "ahora_excel": 280
+      },
+      {
+        "clave": "ciclo.3.B.costosTotales",
+        "antes": 9656.095,
+        "ahora_excel": 9660.095
+      },
+      {
+        "clave": "ciclo.3.B.utilidad",
+        "antes": -9493.595,
+        "ahora_excel": -9660.095
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-03.puntajeTotal",
+        "antes": 190,
+        "ahora_excel": 150
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-03.porcentaje",
+        "antes": 0.9121459433509361,
+        "ahora_excel": 0.9523809523809523
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-03.asignado",
+        "antes": 9,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-03.demandaAjustada",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-03.puntajeTotal",
+        "antes": 18.3,
+        "ahora_excel": 7.5
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-03.porcentaje",
+        "antes": 0.08785405664906384,
+        "ahora_excel": 0.047619047619047616
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-03.asignado",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-03.demandaAjustada",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-03.calidadMercado",
+        "antes": 27,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-03.puntajeTotal",
+        "antes": 190,
+        "ahora_excel": 150
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-03.porcentaje",
+        "antes": 0.9121459433509361,
+        "ahora_excel": 0.9523809523809523
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-03.asignado",
+        "antes": 9,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-03.demandaAjustada",
+        "antes": 10,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-03.puntajeTotal",
+        "antes": 18.3,
+        "ahora_excel": 7.5
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-03.porcentaje",
+        "antes": 0.08785405664906384,
+        "ahora_excel": 0.047619047619047616
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-03.asignado",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-03.calidadMercado",
+        "antes": 27,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-03.puntajeTotal",
+        "antes": 190,
+        "ahora_excel": 150
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-03.porcentaje",
+        "antes": 0.7676767676767676,
+        "ahora_excel": 0.8955223880597015
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-03.asignado",
+        "antes": 8,
+        "ahora_excel": 9
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-03.demandaAjustada",
+        "antes": 8,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-02.puntajeTotal",
+        "antes": 70.25,
+        "ahora_excel": 45.25
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-02.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-03.puntajeTotal",
+        "antes": 57.5,
+        "ahora_excel": 17.5
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-03.porcentaje",
+        "antes": 0.23232323232323232,
+        "ahora_excel": 0.1044776119402985
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-03.asignado",
+        "antes": 2,
+        "ahora_excel": 1
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-03.demandaAjustada",
+        "antes": 1,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.ingresos",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.ventasNetas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costos",
+        "antes": 44210.32549180328,
+        "ahora_excel": 42433.135
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.utilidad",
+        "antes": -40710.32549180328,
+        "ahora_excel": -38583.135
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costosProduccion",
+        "antes": 44210.32549180328,
+        "ahora_excel": 42433.135
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.entradas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.salidas",
+        "antes": 176179.7604918033,
+        "ahora_excel": 174402.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.cajaFinal",
+        "antes": 827320.2395081967,
+        "ahora_excel": 829447.4299999999
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cobrosVentas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.pagosOperacion",
+        "antes": 168316.7604918033,
+        "ahora_excel": 166539.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.operacion",
+        "antes": -164816.7604918033,
+        "ahora_excel": -162689.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.flujoNeto",
+        "antes": -172679.7604918033,
+        "ahora_excel": -170552.57000000007
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cajaFinal",
+        "antes": 827320.2395081967,
+        "ahora_excel": 829447.4299999999
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.efectivo",
+        "antes": 827320.2395081967,
+        "ahora_excel": 829447.4299999999
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.activos",
+        "antes": 958926.6745081968,
+        "ahora_excel": 961053.865
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.patrimonio",
+        "antes": 958926.6745081968,
+        "ahora_excel": 961053.865
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 958926.6745081968,
+        "ahora_excel": 961053.865
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.ingresos",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.ventasNetas",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costos",
+        "antes": 13054.222352498655,
+        "ahora_excel": 11110.042352498655
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.utilidad",
+        "antes": -12891.722352498655,
+        "ahora_excel": -11110.042352498655
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costosProduccion",
+        "antes": 12977.675,
+        "ahora_excel": 11033.494999999999
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.entradas",
+        "antes": 5162.5,
+        "ahora_excel": 5000
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.salidas",
+        "antes": 40959.69735249866,
+        "ahora_excel": 39015.51735249866
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.cajaFinal",
+        "antes": 964202.8026475013,
+        "ahora_excel": 965984.4826475014
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.cobrosVentas",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.pagosOperacion",
+        "antes": 33096.69735249866,
+        "ahora_excel": 31152.517352498657
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.operacion",
+        "antes": -32934.19735249866,
+        "ahora_excel": -31152.517352498657
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.flujoNeto",
+        "antes": -35797.19735249865,
+        "ahora_excel": -34015.5173524986
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.cajaFinal",
+        "antes": 964202.8026475013,
+        "ahora_excel": 965984.4826475014
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.efectivo",
+        "antes": 964202.8026475013,
+        "ahora_excel": 965984.4826475014
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.activos",
+        "antes": 991745.2776475013,
+        "ahora_excel": 993526.9576475014
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.patrimonio",
+        "antes": 986745.2776475013,
+        "ahora_excel": 988526.9576475014
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 991745.2776475013,
+        "ahora_excel": 993526.9576475014
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.ingresos",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.ventasNetas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costos",
+        "antes": 44434.32549180328,
+        "ahora_excel": 42655.135
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.utilidad",
+        "antes": -40934.32549180328,
+        "ahora_excel": -38805.135
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costosProduccion",
+        "antes": 44434.32549180328,
+        "ahora_excel": 42655.135
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaInicial",
+        "antes": 827320.2395081967,
+        "ahora_excel": 829447.4299999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.entradas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.salidas",
+        "antes": 168540.7604918033,
+        "ahora_excel": 166761.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaFinal",
+        "antes": 662279.4790163934,
+        "ahora_excel": 666535.8599999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaInicial",
+        "antes": 827320.2395081967,
+        "ahora_excel": 829447.4299999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cobrosVentas",
+        "antes": 3500,
+        "ahora_excel": 3850
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.pagosOperacion",
+        "antes": 168540.7604918033,
+        "ahora_excel": 166761.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.operacion",
+        "antes": -165040.7604918033,
+        "ahora_excel": -162911.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.flujoNeto",
+        "antes": -165040.7604918033,
+        "ahora_excel": -162911.57000000007
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaFinal",
+        "antes": 662279.4790163934,
+        "ahora_excel": 666535.8599999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.efectivo",
+        "antes": 662279.4790163934,
+        "ahora_excel": 666535.8599999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.activos",
+        "antes": 917992.3490163934,
+        "ahora_excel": 922248.7299999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.patrimonio",
+        "antes": 917992.3490163934,
+        "ahora_excel": 922248.7299999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 917992.3490163934,
+        "ahora_excel": 922248.7299999999
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.costos",
+        "antes": 13281.226561359563,
+        "ahora_excel": 11337.046561359562
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.utilidad",
+        "antes": -13281.226561359563,
+        "ahora_excel": -11337.046561359562
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.costosProduccion",
+        "antes": 13117.675,
+        "ahora_excel": 11173.494999999999
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.cajaInicial",
+        "antes": 964202.8026475013,
+        "ahora_excel": 965984.4826475014
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.salidas",
+        "antes": 33323.701561359565,
+        "ahora_excel": 31379.521561359565
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.cajaFinal",
+        "antes": 935879.1010861418,
+        "ahora_excel": 939604.9610861419
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.cajaInicial",
+        "antes": 964202.8026475013,
+        "ahora_excel": 965984.4826475014
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.pagosOperacion",
+        "antes": 33323.701561359565,
+        "ahora_excel": 31379.521561359565
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.operacion",
+        "antes": -33323.701561359565,
+        "ahora_excel": -31379.521561359565
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.flujoNeto",
+        "antes": -28323.701561359572,
+        "ahora_excel": -26379.52156135952
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.cajaFinal",
+        "antes": 935879.1010861418,
+        "ahora_excel": 939604.9610861419
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.efectivo",
+        "antes": 935879.1010861418,
+        "ahora_excel": 939604.9610861419
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.activos",
+        "antes": 983464.0510861417,
+        "ahora_excel": 987189.9110861418
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.patrimonio",
+        "antes": 973464.0510861417,
+        "ahora_excel": 977189.9110861418
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 983464.0510861417,
+        "ahora_excel": 987189.9110861418
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.ingresos",
+        "antes": 2800,
+        "ahora_excel": 3500
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.ventasNetas",
+        "antes": 2800,
+        "ahora_excel": 3500
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costos",
+        "antes": 44662.32549180328,
+        "ahora_excel": 42879.135
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.utilidad",
+        "antes": -41862.32549180328,
+        "ahora_excel": -39379.135
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costosProduccion",
+        "antes": 44662.32549180328,
+        "ahora_excel": 42879.135
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaInicial",
+        "antes": 662279.4790163934,
+        "ahora_excel": 666535.8599999999
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.entradas",
+        "antes": 2800,
+        "ahora_excel": 3500
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.salidas",
+        "antes": 168768.7604918033,
+        "ahora_excel": 166985.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaFinal",
+        "antes": 496310.71852459013,
+        "ahora_excel": 503050.28999999986
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaInicial",
+        "antes": 662279.4790163934,
+        "ahora_excel": 666535.8599999999
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cobrosVentas",
+        "antes": 2800,
+        "ahora_excel": 3500
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.pagosOperacion",
+        "antes": 168768.7604918033,
+        "ahora_excel": 166985.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.operacion",
+        "antes": -165968.7604918033,
+        "ahora_excel": -163485.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.flujoNeto",
+        "antes": -165968.7604918033,
+        "ahora_excel": -163485.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaFinal",
+        "antes": 496310.71852459013,
+        "ahora_excel": 503050.28999999986
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.efectivo",
+        "antes": 496310.71852459013,
+        "ahora_excel": 503050.28999999986
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.activos",
+        "antes": 876130.0235245901,
+        "ahora_excel": 882869.5949999999
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.patrimonio",
+        "antes": 876130.0235245901,
+        "ahora_excel": 882869.5949999999
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 876130.0235245901,
+        "ahora_excel": 882869.5949999999
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.ingresos",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.ventasNetas",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.costos",
+        "antes": 9819.646561359563,
+        "ahora_excel": 9823.646561359563
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.utilidad",
+        "antes": -9657.146561359563,
+        "ahora_excel": -9823.646561359563
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.costosProduccion",
+        "antes": 9656.095,
+        "ahora_excel": 9660.095
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.cajaInicial",
+        "antes": 935879.1010861418,
+        "ahora_excel": 939604.9610861419
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.entradas",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.salidas",
+        "antes": 9755.521561359563,
+        "ahora_excel": 9759.521561359563
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.cajaFinal",
+        "antes": 926286.0795247823,
+        "ahora_excel": 929845.4395247824
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.cajaInicial",
+        "antes": 935879.1010861418,
+        "ahora_excel": 939604.9610861419
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.cobrosVentas",
+        "antes": 162.5,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.pagosOperacion",
+        "antes": 9755.521561359563,
+        "ahora_excel": 9759.521561359563
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.operacion",
+        "antes": -9593.021561359563,
+        "ahora_excel": -9759.521561359563
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.flujoNeto",
+        "antes": -9593.021561359521,
+        "ahora_excel": -9759.521561359521
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.cajaFinal",
+        "antes": 926286.0795247823,
+        "ahora_excel": 929845.4395247824
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.efectivo",
+        "antes": 926286.0795247823,
+        "ahora_excel": 929845.4395247824
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.activos",
+        "antes": 973806.9045247822,
+        "ahora_excel": 977366.2645247823
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.patrimonio",
+        "antes": 963806.9045247822,
+        "ahora_excel": 967366.2645247823
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 973806.9045247822,
+        "ahora_excel": 977366.2645247823
+      }
+    ]
+  },
+  "sim3_pipeline": {
+    "salidas": 1140,
+    "diferencias_semanticas": 322,
+    "cambios": [
+      {
+        "clave": "ciclo.1.A.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.1.A.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.1.A.vendido",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.1.A.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.1.A.inventarioProducto",
+        "antes": 80,
+        "ahora_excel": 83
+      },
+      {
+        "clave": "ciclo.1.A.almacenaje",
+        "antes": 160,
+        "ahora_excel": 166
+      },
+      {
+        "clave": "ciclo.1.A.horasExtra",
+        "antes": 2137.720884955752,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.costosTotales",
+        "antes": 17442.47588495575,
+        "ahora_excel": 15310.755
+      },
+      {
+        "clave": "ciclo.1.A.utilidad",
+        "antes": -16122.475884955751,
+        "ahora_excel": -14110.755
+      },
+      {
+        "clave": "ciclo.1.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.B.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.costosTotales",
+        "antes": 32244.885491803278,
+        "ahora_excel": 30469.695
+      },
+      {
+        "clave": "ciclo.1.B.utilidad",
+        "antes": -27404.885491803278,
+        "ahora_excel": -25629.695
+      },
+      {
+        "clave": "ciclo.1.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.C.horasExtra",
+        "antes": 1914.7008196721313,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.C.costosTotales",
+        "antes": 45170.044665825975,
+        "ahora_excel": 43255.343846153846
+      },
+      {
+        "clave": "ciclo.1.C.utilidad",
+        "antes": -29154.044665825975,
+        "ahora_excel": -27239.343846153846
+      },
+      {
+        "clave": "ciclo.1.C.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.D.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.1.D.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.D.vendido",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.D.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.1.D.inventarioProducto",
+        "antes": 115,
+        "ahora_excel": 111
+      },
+      {
+        "clave": "ciclo.1.D.almacenaje",
+        "antes": 230,
+        "ahora_excel": 222
+      },
+      {
+        "clave": "ciclo.1.D.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.D.costosTotales",
+        "antes": 34228.008691803276,
+        "ahora_excel": 32444.8182
+      },
+      {
+        "clave": "ciclo.1.D.utilidad",
+        "antes": -33913.008691803276,
+        "ahora_excel": -31949.8182
+      },
+      {
+        "clave": "ciclo.1.D.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.A.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.2.A.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.2.A.vendido",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.2.A.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.2.A.inventarioProducto",
+        "antes": 160,
+        "ahora_excel": 166
+      },
+      {
+        "clave": "ciclo.2.A.almacenaje",
+        "antes": 320,
+        "ahora_excel": 332
+      },
+      {
+        "clave": "ciclo.2.A.horasExtra",
+        "antes": 2137.720884955752,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.A.costosTotales",
+        "antes": 17602.47588495575,
+        "ahora_excel": 15476.755
+      },
+      {
+        "clave": "ciclo.2.A.utilidad",
+        "antes": -16282.475884955751,
+        "ahora_excel": -14276.755
+      },
+      {
+        "clave": "ciclo.2.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.B.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.costosTotales",
+        "antes": 32400.885491803278,
+        "ahora_excel": 30625.695
+      },
+      {
+        "clave": "ciclo.2.B.utilidad",
+        "antes": -27560.885491803278,
+        "ahora_excel": -25785.695
+      },
+      {
+        "clave": "ciclo.2.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.C.horasExtra",
+        "antes": 1914.7008196721313,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.C.costosTotales",
+        "antes": 45326.044665825975,
+        "ahora_excel": 43411.343846153846
+      },
+      {
+        "clave": "ciclo.2.C.utilidad",
+        "antes": -29310.044665825975,
+        "ahora_excel": -27395.343846153846
+      },
+      {
+        "clave": "ciclo.2.C.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.D.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.2.D.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.D.vendido",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.D.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.2.D.inventarioProducto",
+        "antes": 230,
+        "ahora_excel": 222
+      },
+      {
+        "clave": "ciclo.2.D.almacenaje",
+        "antes": 460,
+        "ahora_excel": 444
+      },
+      {
+        "clave": "ciclo.2.D.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.D.costosTotales",
+        "antes": 34510.76149180328,
+        "ahora_excel": 32719.571
+      },
+      {
+        "clave": "ciclo.2.D.utilidad",
+        "antes": -34195.76149180328,
+        "ahora_excel": -32224.571
+      },
+      {
+        "clave": "ciclo.2.D.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.A.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.3.A.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.3.A.vendido",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.3.A.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.3.A.inventarioProducto",
+        "antes": 240,
+        "ahora_excel": 249
+      },
+      {
+        "clave": "ciclo.3.A.almacenaje",
+        "antes": 480,
+        "ahora_excel": 498
+      },
+      {
+        "clave": "ciclo.3.A.horasExtra",
+        "antes": 2137.720884955752,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.A.costosTotales",
+        "antes": 17762.47588495575,
+        "ahora_excel": 15642.755
+      },
+      {
+        "clave": "ciclo.3.A.utilidad",
+        "antes": -16442.47588495575,
+        "ahora_excel": -14442.755
+      },
+      {
+        "clave": "ciclo.3.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.B.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.costosTotales",
+        "antes": 32556.885491803278,
+        "ahora_excel": 30781.695
+      },
+      {
+        "clave": "ciclo.3.B.utilidad",
+        "antes": -27716.885491803278,
+        "ahora_excel": -25941.695
+      },
+      {
+        "clave": "ciclo.3.B.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.C.horasExtra",
+        "antes": 1914.7008196721313,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.C.costosTotales",
+        "antes": 45482.044665825975,
+        "ahora_excel": 43567.343846153846
+      },
+      {
+        "clave": "ciclo.3.C.utilidad",
+        "antes": -29466.044665825975,
+        "ahora_excel": -27551.343846153846
+      },
+      {
+        "clave": "ciclo.3.C.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.D.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.3.D.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.3.D.vendido",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.3.D.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.3.D.inventarioProducto",
+        "antes": 345,
+        "ahora_excel": 333
+      },
+      {
+        "clave": "ciclo.3.D.almacenaje",
+        "antes": 690,
+        "ahora_excel": 666
+      },
+      {
+        "clave": "ciclo.3.D.horasExtra",
+        "antes": 1775.1904918032787,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.D.costosTotales",
+        "antes": 34793.51429180328,
+        "ahora_excel": 32994.3238
+      },
+      {
+        "clave": "ciclo.3.D.utilidad",
+        "antes": -34478.51429180328,
+        "ahora_excel": -32499.3238
+      },
+      {
+        "clave": "ciclo.3.D.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-01.puntajeTotal",
+        "antes": 74,
+        "ahora_excel": 70
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-01.porcentaje",
+        "antes": 0.8222222222222222,
+        "ahora_excel": 0.7608695652173914
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-01.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-01.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.1.A.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-02.puntajeTotal",
+        "antes": 74.5,
+        "ahora_excel": 82
+      },
+      {
+        "clave": "ciclo.1.B.mercado.SEG-02.calidadMercado",
+        "antes": 70,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.1.C.mercado.SEG-03.puntajeTotal",
+        "antes": 189.6,
+        "ahora_excel": 336.4
+      },
+      {
+        "clave": "ciclo.1.C.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 467
+      },
+      {
+        "clave": "ciclo.1.D.mercado.SEG-01.puntajeTotal",
+        "antes": 16,
+        "ahora_excel": 22
+      },
+      {
+        "clave": "ciclo.1.D.mercado.SEG-01.porcentaje",
+        "antes": 0.17777777777777778,
+        "ahora_excel": 0.2391304347826087
+      },
+      {
+        "clave": "ciclo.1.D.mercado.SEG-01.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.1.D.mercado.SEG-01.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.1.D.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-01.puntajeTotal",
+        "antes": 74,
+        "ahora_excel": 70
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-01.porcentaje",
+        "antes": 0.8222222222222222,
+        "ahora_excel": 0.7608695652173914
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-01.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-01.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.2.A.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-02.puntajeTotal",
+        "antes": 74.5,
+        "ahora_excel": 82
+      },
+      {
+        "clave": "ciclo.2.B.mercado.SEG-02.calidadMercado",
+        "antes": 70,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.2.C.mercado.SEG-03.puntajeTotal",
+        "antes": 189.6,
+        "ahora_excel": 336.4
+      },
+      {
+        "clave": "ciclo.2.C.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 467
+      },
+      {
+        "clave": "ciclo.2.D.mercado.SEG-01.puntajeTotal",
+        "antes": 16,
+        "ahora_excel": 22
+      },
+      {
+        "clave": "ciclo.2.D.mercado.SEG-01.porcentaje",
+        "antes": 0.17777777777777778,
+        "ahora_excel": 0.2391304347826087
+      },
+      {
+        "clave": "ciclo.2.D.mercado.SEG-01.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.2.D.mercado.SEG-01.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.2.D.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-01.puntajeTotal",
+        "antes": 74,
+        "ahora_excel": 70
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-01.porcentaje",
+        "antes": 0.8222222222222222,
+        "ahora_excel": 0.7608695652173914
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-01.asignado",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-01.demandaAjustada",
+        "antes": 33,
+        "ahora_excel": 30
+      },
+      {
+        "clave": "ciclo.3.A.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-02.puntajeTotal",
+        "antes": 74.5,
+        "ahora_excel": 82
+      },
+      {
+        "clave": "ciclo.3.B.mercado.SEG-02.calidadMercado",
+        "antes": 70,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.3.C.mercado.SEG-03.puntajeTotal",
+        "antes": 189.6,
+        "ahora_excel": 336.4
+      },
+      {
+        "clave": "ciclo.3.C.mercado.SEG-03.calidadMercado",
+        "antes": 100,
+        "ahora_excel": 467
+      },
+      {
+        "clave": "ciclo.3.D.mercado.SEG-01.puntajeTotal",
+        "antes": 16,
+        "ahora_excel": 22
+      },
+      {
+        "clave": "ciclo.3.D.mercado.SEG-01.porcentaje",
+        "antes": 0.17777777777777778,
+        "ahora_excel": 0.2391304347826087
+      },
+      {
+        "clave": "ciclo.3.D.mercado.SEG-01.asignado",
+        "antes": 7,
+        "ahora_excel": 10
+      },
+      {
+        "clave": "ciclo.3.D.mercado.SEG-01.demandaAjustada",
+        "antes": 7,
+        "ahora_excel": 11
+      },
+      {
+        "clave": "ciclo.3.D.mercado.SEG-01.calidadMercado",
+        "antes": 40,
+        "ahora_excel": 100
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.ventasNetas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costos",
+        "antes": 17442.47588495575,
+        "ahora_excel": 15310.755
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.utilidad",
+        "antes": -16122.475884955751,
+        "ahora_excel": -14110.755
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costosProduccion",
+        "antes": 17442.47588495575,
+        "ahora_excel": 15310.755
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.entradas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.salidas",
+        "antes": 44418.29088495575,
+        "ahora_excel": 42286.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.cajaFinal",
+        "antes": 956901.7091150442,
+        "ahora_excel": 958913.43
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cobrosVentas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.pagosOperacion",
+        "antes": 36555.29088495575,
+        "ahora_excel": 34423.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.operacion",
+        "antes": -35235.29088495575,
+        "ahora_excel": -33223.57
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.flujoNeto",
+        "antes": -43098.290884955786,
+        "ahora_excel": -41086.56999999995
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cajaFinal",
+        "antes": 956901.7091150442,
+        "ahora_excel": 958913.43
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.efectivo",
+        "antes": 956901.7091150442,
+        "ahora_excel": 958913.43
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.activos",
+        "antes": 983514.5241150442,
+        "ahora_excel": 985526.2450000001
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.patrimonio",
+        "antes": 983514.5241150442,
+        "ahora_excel": 985526.2450000001
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 983514.5241150442,
+        "ahora_excel": 985526.2450000001
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costos",
+        "antes": 32244.885491803278,
+        "ahora_excel": 30469.695
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.utilidad",
+        "antes": -27404.885491803278,
+        "ahora_excel": -25629.695
+      },
+      {
+        "clave": "ciclo.1.B.financial.estadoResultados.costosProduccion",
+        "antes": 32244.885491803278,
+        "ahora_excel": 30469.695
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.salidas",
+        "antes": 72611.76049180327,
+        "ahora_excel": 70836.57
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceCaja.cajaFinal",
+        "antes": 932228.2395081967,
+        "ahora_excel": 934003.43
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.pagosOperacion",
+        "antes": 64748.760491803274,
+        "ahora_excel": 62973.57
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.operacion",
+        "antes": -59908.760491803274,
+        "ahora_excel": -58133.57
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.flujoNeto",
+        "antes": -67771.76049180329,
+        "ahora_excel": -65996.56999999995
+      },
+      {
+        "clave": "ciclo.1.B.financial.flujoCaja.cajaFinal",
+        "antes": 932228.2395081967,
+        "ahora_excel": 934003.43
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.efectivo",
+        "antes": 932228.2395081967,
+        "ahora_excel": 934003.43
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.activos",
+        "antes": 972232.1145081967,
+        "ahora_excel": 974007.305
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.patrimonio",
+        "antes": 972232.1145081967,
+        "ahora_excel": 974007.305
+      },
+      {
+        "clave": "ciclo.1.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 972232.1145081967,
+        "ahora_excel": 974007.305
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.costos",
+        "antes": 45170.044665825975,
+        "ahora_excel": 43255.343846153846
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.utilidad",
+        "antes": -29154.044665825975,
+        "ahora_excel": -27239.343846153846
+      },
+      {
+        "clave": "ciclo.1.C.financial.estadoResultados.costosProduccion",
+        "antes": 45170.044665825975,
+        "ahora_excel": 43255.343846153846
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceCaja.salidas",
+        "antes": 104681.85466582597,
+        "ahora_excel": 102767.15384615384
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceCaja.cajaFinal",
+        "antes": 911334.145334174,
+        "ahora_excel": 913248.8461538461
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.pagosOperacion",
+        "antes": 96599.85466582597,
+        "ahora_excel": 94685.15384615384
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.operacion",
+        "antes": -80583.85466582597,
+        "ahora_excel": -78669.15384615384
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.flujoNeto",
+        "antes": -88665.85466582596,
+        "ahora_excel": -86751.15384615387
+      },
+      {
+        "clave": "ciclo.1.C.financial.flujoCaja.cajaFinal",
+        "antes": 911334.145334174,
+        "ahora_excel": 913248.8461538461
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.efectivo",
+        "antes": 911334.145334174,
+        "ahora_excel": 913248.8461538461
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.activos",
+        "antes": 970263.9553341741,
+        "ahora_excel": 972178.6561538462
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.patrimonio",
+        "antes": 970263.9553341741,
+        "ahora_excel": 972178.6561538462
+      },
+      {
+        "clave": "ciclo.1.C.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 970263.9553341741,
+        "ahora_excel": 972178.6561538462
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.ventasNetas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.costos",
+        "antes": 34228.008691803276,
+        "ahora_excel": 32444.8182
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.utilidad",
+        "antes": -33913.008691803276,
+        "ahora_excel": -31949.8182
+      },
+      {
+        "clave": "ciclo.1.D.financial.estadoResultados.costosProduccion",
+        "antes": 34228.008691803276,
+        "ahora_excel": 32444.8182
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceCaja.entradas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceCaja.salidas",
+        "antes": 58731.36049180327,
+        "ahora_excel": 56948.17
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceCaja.cajaFinal",
+        "antes": 941583.6395081967,
+        "ahora_excel": 943546.83
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.cobrosVentas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.pagosOperacion",
+        "antes": 50868.36049180327,
+        "ahora_excel": 49085.17
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.operacion",
+        "antes": -50553.36049180327,
+        "ahora_excel": -48590.17
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.flujoNeto",
+        "antes": -58416.360491803265,
+        "ahora_excel": -56453.17000000004
+      },
+      {
+        "clave": "ciclo.1.D.financial.flujoCaja.cajaFinal",
+        "antes": 941583.6395081967,
+        "ahora_excel": 943546.83
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.efectivo",
+        "antes": 941583.6395081967,
+        "ahora_excel": 943546.83
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.activos",
+        "antes": 965723.9913081967,
+        "ahora_excel": 967687.1817999999
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.patrimonio",
+        "antes": 965723.9913081967,
+        "ahora_excel": 967687.1817999999
+      },
+      {
+        "clave": "ciclo.1.D.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 965723.9913081967,
+        "ahora_excel": 967687.1817999999
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.ventasNetas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costos",
+        "antes": 17602.47588495575,
+        "ahora_excel": 15476.755
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.utilidad",
+        "antes": -16282.475884955751,
+        "ahora_excel": -14276.755
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costosProduccion",
+        "antes": 17602.47588495575,
+        "ahora_excel": 15476.755
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaInicial",
+        "antes": 956901.7091150442,
+        "ahora_excel": 958913.43
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.entradas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.salidas",
+        "antes": 36715.29088495575,
+        "ahora_excel": 34589.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaFinal",
+        "antes": 921506.4182300884,
+        "ahora_excel": 925523.8600000001
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaInicial",
+        "antes": 956901.7091150442,
+        "ahora_excel": 958913.43
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cobrosVentas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.pagosOperacion",
+        "antes": 36715.29088495575,
+        "ahora_excel": 34589.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.operacion",
+        "antes": -35395.29088495575,
+        "ahora_excel": -33389.57
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.flujoNeto",
+        "antes": -35395.290884955786,
+        "ahora_excel": -33389.56999999995
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaFinal",
+        "antes": 921506.4182300884,
+        "ahora_excel": 925523.8600000001
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.efectivo",
+        "antes": 921506.4182300884,
+        "ahora_excel": 925523.8600000001
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.activos",
+        "antes": 967232.0482300884,
+        "ahora_excel": 971249.4900000001
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.patrimonio",
+        "antes": 967232.0482300884,
+        "ahora_excel": 971249.4900000001
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 967232.0482300884,
+        "ahora_excel": 971249.4900000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.costos",
+        "antes": 32400.885491803278,
+        "ahora_excel": 30625.695
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.utilidad",
+        "antes": -27560.885491803278,
+        "ahora_excel": -25785.695
+      },
+      {
+        "clave": "ciclo.2.B.financial.estadoResultados.costosProduccion",
+        "antes": 32400.885491803278,
+        "ahora_excel": 30625.695
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.cajaInicial",
+        "antes": 932228.2395081967,
+        "ahora_excel": 934003.43
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.salidas",
+        "antes": 64904.760491803274,
+        "ahora_excel": 63129.57
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceCaja.cajaFinal",
+        "antes": 872163.4790163934,
+        "ahora_excel": 875713.8600000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.cajaInicial",
+        "antes": 932228.2395081967,
+        "ahora_excel": 934003.43
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.pagosOperacion",
+        "antes": 64904.760491803274,
+        "ahora_excel": 63129.57
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.operacion",
+        "antes": -60064.760491803274,
+        "ahora_excel": -58289.57
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.flujoNeto",
+        "antes": -60064.76049180329,
+        "ahora_excel": -58289.56999999995
+      },
+      {
+        "clave": "ciclo.2.B.financial.flujoCaja.cajaFinal",
+        "antes": 872163.4790163934,
+        "ahora_excel": 875713.8600000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.efectivo",
+        "antes": 872163.4790163934,
+        "ahora_excel": 875713.8600000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.activos",
+        "antes": 944671.2290163934,
+        "ahora_excel": 948221.6100000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.patrimonio",
+        "antes": 944671.2290163934,
+        "ahora_excel": 948221.6100000001
+      },
+      {
+        "clave": "ciclo.2.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 944671.2290163934,
+        "ahora_excel": 948221.6100000001
+      },
+      {
+        "clave": "ciclo.2.C.financial.estadoResultados.costos",
+        "antes": 45326.044665825975,
+        "ahora_excel": 43411.343846153846
+      },
+      {
+        "clave": "ciclo.2.C.financial.estadoResultados.utilidad",
+        "antes": -29310.044665825975,
+        "ahora_excel": -27395.343846153846
+      },
+      {
+        "clave": "ciclo.2.C.financial.estadoResultados.costosProduccion",
+        "antes": 45326.044665825975,
+        "ahora_excel": 43411.343846153846
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceCaja.cajaInicial",
+        "antes": 911334.145334174,
+        "ahora_excel": 913248.8461538461
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceCaja.salidas",
+        "antes": 96755.85466582597,
+        "ahora_excel": 94841.15384615384
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceCaja.cajaFinal",
+        "antes": 830594.2906683481,
+        "ahora_excel": 834423.6923076923
+      },
+      {
+        "clave": "ciclo.2.C.financial.flujoCaja.cajaInicial",
+        "antes": 911334.145334174,
+        "ahora_excel": 913248.8461538461
+      },
+      {
+        "clave": "ciclo.2.C.financial.flujoCaja.pagosOperacion",
+        "antes": 96755.85466582597,
+        "ahora_excel": 94841.15384615384
+      },
+      {
+        "clave": "ciclo.2.C.financial.flujoCaja.operacion",
+        "antes": -80739.85466582597,
+        "ahora_excel": -78825.15384615384
+      },
+      {
+        "clave": "ciclo.2.C.financial.flujoCaja.flujoNeto",
+        "antes": -80739.85466582596,
+        "ahora_excel": -78825.15384615387
+      },
+      {
+        "clave": "ciclo.2.C.financial.flujoCaja.cajaFinal",
+        "antes": 830594.2906683481,
+        "ahora_excel": 834423.6923076923
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceGeneral.efectivo",
+        "antes": 830594.2906683481,
+        "ahora_excel": 834423.6923076923
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceGeneral.activos",
+        "antes": 940953.9106683481,
+        "ahora_excel": 944783.3123076922
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceGeneral.patrimonio",
+        "antes": 940953.9106683481,
+        "ahora_excel": 944783.3123076922
+      },
+      {
+        "clave": "ciclo.2.C.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 940953.9106683481,
+        "ahora_excel": 944783.3123076922
+      },
+      {
+        "clave": "ciclo.2.D.financial.estadoResultados.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.2.D.financial.estadoResultados.ventasNetas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.2.D.financial.estadoResultados.costos",
+        "antes": 34510.76149180328,
+        "ahora_excel": 32719.571
+      },
+      {
+        "clave": "ciclo.2.D.financial.estadoResultados.utilidad",
+        "antes": -34195.76149180328,
+        "ahora_excel": -32224.571
+      },
+      {
+        "clave": "ciclo.2.D.financial.estadoResultados.costosProduccion",
+        "antes": 34510.76149180328,
+        "ahora_excel": 32719.571
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceCaja.cajaInicial",
+        "antes": 941583.6395081967,
+        "ahora_excel": 943546.83
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceCaja.entradas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceCaja.salidas",
+        "antes": 51530.760491803274,
+        "ahora_excel": 49739.57
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceCaja.cajaFinal",
+        "antes": 890367.8790163934,
+        "ahora_excel": 894302.26
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.cajaInicial",
+        "antes": 941583.6395081967,
+        "ahora_excel": 943546.83
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.cobrosVentas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.pagosOperacion",
+        "antes": 51530.760491803274,
+        "ahora_excel": 49739.57
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.operacion",
+        "antes": -51215.760491803274,
+        "ahora_excel": -49244.57
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.flujoNeto",
+        "antes": -51215.76049180329,
+        "ahora_excel": -49244.56999999995
+      },
+      {
+        "clave": "ciclo.2.D.financial.flujoCaja.cajaFinal",
+        "antes": 890367.8790163934,
+        "ahora_excel": 894302.26
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceGeneral.efectivo",
+        "antes": 890367.8790163934,
+        "ahora_excel": 894302.26
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceGeneral.activos",
+        "antes": 931907.8770163935,
+        "ahora_excel": 935842.258
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceGeneral.patrimonio",
+        "antes": 931907.8770163935,
+        "ahora_excel": 935842.258
+      },
+      {
+        "clave": "ciclo.2.D.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 931907.8770163935,
+        "ahora_excel": 935842.258
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.ingresos",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.ventasNetas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costos",
+        "antes": 17762.47588495575,
+        "ahora_excel": 15642.755
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.utilidad",
+        "antes": -16442.47588495575,
+        "ahora_excel": -14442.755
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costosProduccion",
+        "antes": 17762.47588495575,
+        "ahora_excel": 15642.755
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaInicial",
+        "antes": 921506.4182300884,
+        "ahora_excel": 925523.8600000001
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.entradas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.salidas",
+        "antes": 36875.29088495575,
+        "ahora_excel": 34755.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaFinal",
+        "antes": 885951.1273451326,
+        "ahora_excel": 891968.2900000002
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaInicial",
+        "antes": 921506.4182300884,
+        "ahora_excel": 925523.8600000001
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cobrosVentas",
+        "antes": 1320,
+        "ahora_excel": 1200
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.pagosOperacion",
+        "antes": 36875.29088495575,
+        "ahora_excel": 34755.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.operacion",
+        "antes": -35555.29088495575,
+        "ahora_excel": -33555.57
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.flujoNeto",
+        "antes": -35555.290884955786,
+        "ahora_excel": -33555.56999999995
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaFinal",
+        "antes": 885951.1273451326,
+        "ahora_excel": 891968.2900000002
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.efectivo",
+        "antes": 885951.1273451326,
+        "ahora_excel": 891968.2900000002
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.activos",
+        "antes": 950789.5723451326,
+        "ahora_excel": 956806.7350000001
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.patrimonio",
+        "antes": 950789.5723451326,
+        "ahora_excel": 956806.7350000001
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 950789.5723451326,
+        "ahora_excel": 956806.7350000001
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.costos",
+        "antes": 32556.885491803278,
+        "ahora_excel": 30781.695
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.utilidad",
+        "antes": -27716.885491803278,
+        "ahora_excel": -25941.695
+      },
+      {
+        "clave": "ciclo.3.B.financial.estadoResultados.costosProduccion",
+        "antes": 32556.885491803278,
+        "ahora_excel": 30781.695
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.cajaInicial",
+        "antes": 872163.4790163934,
+        "ahora_excel": 875713.8600000001
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.salidas",
+        "antes": 65060.760491803274,
+        "ahora_excel": 63285.57
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceCaja.cajaFinal",
+        "antes": 811942.7185245901,
+        "ahora_excel": 817268.2900000002
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.cajaInicial",
+        "antes": 872163.4790163934,
+        "ahora_excel": 875713.8600000001
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.pagosOperacion",
+        "antes": 65060.760491803274,
+        "ahora_excel": 63285.57
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.operacion",
+        "antes": -60220.760491803274,
+        "ahora_excel": -58445.57
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.flujoNeto",
+        "antes": -60220.76049180329,
+        "ahora_excel": -58445.56999999995
+      },
+      {
+        "clave": "ciclo.3.B.financial.flujoCaja.cajaFinal",
+        "antes": 811942.7185245901,
+        "ahora_excel": 817268.2900000002
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.efectivo",
+        "antes": 811942.7185245901,
+        "ahora_excel": 817268.2900000002
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.activos",
+        "antes": 916954.3435245901,
+        "ahora_excel": 922279.9150000002
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.patrimonio",
+        "antes": 916954.3435245901,
+        "ahora_excel": 922279.9150000002
+      },
+      {
+        "clave": "ciclo.3.B.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 916954.3435245901,
+        "ahora_excel": 922279.9150000002
+      },
+      {
+        "clave": "ciclo.3.C.financial.estadoResultados.costos",
+        "antes": 45482.044665825975,
+        "ahora_excel": 43567.343846153846
+      },
+      {
+        "clave": "ciclo.3.C.financial.estadoResultados.utilidad",
+        "antes": -29466.044665825975,
+        "ahora_excel": -27551.343846153846
+      },
+      {
+        "clave": "ciclo.3.C.financial.estadoResultados.costosProduccion",
+        "antes": 45482.044665825975,
+        "ahora_excel": 43567.343846153846
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceCaja.cajaInicial",
+        "antes": 830594.2906683481,
+        "ahora_excel": 834423.6923076923
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceCaja.salidas",
+        "antes": 96911.85466582597,
+        "ahora_excel": 94997.15384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceCaja.cajaFinal",
+        "antes": 749698.4360025221,
+        "ahora_excel": 755442.5384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.flujoCaja.cajaInicial",
+        "antes": 830594.2906683481,
+        "ahora_excel": 834423.6923076923
+      },
+      {
+        "clave": "ciclo.3.C.financial.flujoCaja.pagosOperacion",
+        "antes": 96911.85466582597,
+        "ahora_excel": 94997.15384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.flujoCaja.operacion",
+        "antes": -80895.85466582597,
+        "ahora_excel": -78981.15384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.flujoCaja.flujoNeto",
+        "antes": -80895.85466582596,
+        "ahora_excel": -78981.15384615387
+      },
+      {
+        "clave": "ciclo.3.C.financial.flujoCaja.cajaFinal",
+        "antes": 749698.4360025221,
+        "ahora_excel": 755442.5384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceGeneral.efectivo",
+        "antes": 749698.4360025221,
+        "ahora_excel": 755442.5384615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceGeneral.activos",
+        "antes": 911487.8660025222,
+        "ahora_excel": 917231.9684615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceGeneral.patrimonio",
+        "antes": 911487.8660025222,
+        "ahora_excel": 917231.9684615384
+      },
+      {
+        "clave": "ciclo.3.C.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 911487.8660025222,
+        "ahora_excel": 917231.9684615384
+      },
+      {
+        "clave": "ciclo.3.D.financial.estadoResultados.ingresos",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.3.D.financial.estadoResultados.ventasNetas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.3.D.financial.estadoResultados.costos",
+        "antes": 34793.51429180328,
+        "ahora_excel": 32994.3238
+      },
+      {
+        "clave": "ciclo.3.D.financial.estadoResultados.utilidad",
+        "antes": -34478.51429180328,
+        "ahora_excel": -32499.3238
+      },
+      {
+        "clave": "ciclo.3.D.financial.estadoResultados.costosProduccion",
+        "antes": 34793.51429180328,
+        "ahora_excel": 32994.3238
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceCaja.cajaInicial",
+        "antes": 890367.8790163934,
+        "ahora_excel": 894302.26
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceCaja.entradas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceCaja.salidas",
+        "antes": 52193.16049180328,
+        "ahora_excel": 50393.97
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceCaja.cajaFinal",
+        "antes": 838489.7185245901,
+        "ahora_excel": 844403.29
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.cajaInicial",
+        "antes": 890367.8790163934,
+        "ahora_excel": 894302.26
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.cobrosVentas",
+        "antes": 315,
+        "ahora_excel": 495
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.pagosOperacion",
+        "antes": 52193.16049180328,
+        "ahora_excel": 50393.97
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.operacion",
+        "antes": -51878.16049180328,
+        "ahora_excel": -49898.97
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.flujoNeto",
+        "antes": -51878.16049180331,
+        "ahora_excel": -49898.96999999997
+      },
+      {
+        "clave": "ciclo.3.D.financial.flujoCaja.cajaFinal",
+        "antes": 838489.7185245901,
+        "ahora_excel": 844403.29
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceGeneral.efectivo",
+        "antes": 838489.7185245901,
+        "ahora_excel": 844403.29
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceGeneral.activos",
+        "antes": 898188.6571245901,
+        "ahora_excel": 904102.2286
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceGeneral.patrimonio",
+        "antes": 898188.6571245901,
+        "ahora_excel": 904102.2286
+      },
+      {
+        "clave": "ciclo.3.D.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 898188.6571245901,
+        "ahora_excel": 904102.2286
+      }
+    ]
+  },
+  "banca_pipeline": {
+    "salidas": 252,
+    "diferencias_semanticas": 55,
+    "cambios": [
+      {
+        "clave": "ciclo.1.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.costosTotales",
+        "antes": 12572.972037037036,
+        "ahora_excel": 10915.115
+      },
+      {
+        "clave": "ciclo.1.A.utilidad",
+        "antes": -9732.972037037036,
+        "ahora_excel": -8075.115
+      },
+      {
+        "clave": "ciclo.1.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.A.costosTotales",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.2.A.utilidad",
+        "antes": -8232.972037037036,
+        "ahora_excel": -6575.115
+      },
+      {
+        "clave": "ciclo.2.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.A.costosTotales",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.3.A.utilidad",
+        "antes": -8232.972037037036,
+        "ahora_excel": -6575.115
+      },
+      {
+        "clave": "ciclo.3.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costos",
+        "antes": 12572.972037037036,
+        "ahora_excel": 10915.115
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.utilidad",
+        "antes": -9732.972037037036,
+        "ahora_excel": -8075.115
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costosProduccion",
+        "antes": 12572.972037037036,
+        "ahora_excel": 10915.115
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.salidas",
+        "antes": 40456.82703703704,
+        "ahora_excel": 38798.97
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.cajaFinal",
+        "antes": 962383.172962963,
+        "ahora_excel": 964041.03
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.pagosOperacion",
+        "antes": 32593.827037037037,
+        "ahora_excel": 30935.97
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.operacion",
+        "antes": -29753.827037037037,
+        "ahora_excel": -28095.97
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.flujoNeto",
+        "antes": -37616.827037037,
+        "ahora_excel": -35958.96999999997
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cajaFinal",
+        "antes": 962383.172962963,
+        "ahora_excel": 964041.03
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.efectivo",
+        "antes": 962383.172962963,
+        "ahora_excel": 964041.03
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.activos",
+        "antes": 989904.027962963,
+        "ahora_excel": 991561.885
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.patrimonio",
+        "antes": 989904.027962963,
+        "ahora_excel": 991561.885
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 989904.027962963,
+        "ahora_excel": 991561.885
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costos",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.utilidad",
+        "antes": -8232.972037037036,
+        "ahora_excel": -6575.115
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costosProduccion",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaInicial",
+        "antes": 962383.172962963,
+        "ahora_excel": 964041.03
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.salidas",
+        "antes": 31093.827037037037,
+        "ahora_excel": 29435.97
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaFinal",
+        "antes": 934129.345925926,
+        "ahora_excel": 937445.06
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaInicial",
+        "antes": 962383.172962963,
+        "ahora_excel": 964041.03
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.pagosOperacion",
+        "antes": 31093.827037037037,
+        "ahora_excel": 29435.97
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.operacion",
+        "antes": -28253.827037037037,
+        "ahora_excel": -26595.97
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.flujoNeto",
+        "antes": -28253.827037037,
+        "ahora_excel": -26595.969999999972
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaFinal",
+        "antes": 934129.345925926,
+        "ahora_excel": 937445.06
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.efectivo",
+        "antes": 934129.345925926,
+        "ahora_excel": 937445.06
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.activos",
+        "antes": 981671.055925926,
+        "ahora_excel": 984986.77
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.patrimonio",
+        "antes": 981671.055925926,
+        "ahora_excel": 984986.77
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 981671.055925926,
+        "ahora_excel": 984986.77
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costos",
+        "antes": 11159.976245897944,
+        "ahora_excel": 9502.119208860908
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.utilidad",
+        "antes": -8319.976245897944,
+        "ahora_excel": -6662.119208860908
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costosProduccion",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaInicial",
+        "antes": 934129.345925926,
+        "ahora_excel": 937445.06
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.salidas",
+        "antes": 31180.831245897945,
+        "ahora_excel": 29522.97420886091
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaFinal",
+        "antes": 910788.5146800281,
+        "ahora_excel": 915762.0857911392
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaInicial",
+        "antes": 934129.345925926,
+        "ahora_excel": 937445.06
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.pagosOperacion",
+        "antes": 31180.831245897945,
+        "ahora_excel": 29522.97420886091
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.operacion",
+        "antes": -28340.831245897945,
+        "ahora_excel": -26682.97420886091
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.flujoNeto",
+        "antes": -23340.83124589792,
+        "ahora_excel": -21682.97420886089
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaFinal",
+        "antes": 910788.5146800281,
+        "ahora_excel": 915762.0857911392
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.efectivo",
+        "antes": 910788.5146800281,
+        "ahora_excel": 915762.0857911392
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.activos",
+        "antes": 978351.0796800281,
+        "ahora_excel": 983324.6507911391
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.patrimonio",
+        "antes": 973351.0796800281,
+        "ahora_excel": 978324.6507911391
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 978351.0796800281,
+        "ahora_excel": 983324.6507911391
+      }
+    ]
+  },
+  "bancamezcla_pipeline": {
+    "salidas": 252,
+    "diferencias_semanticas": 55,
+    "cambios": [
+      {
+        "clave": "ciclo.1.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.1.A.costosTotales",
+        "antes": 12572.972037037036,
+        "ahora_excel": 10915.115
+      },
+      {
+        "clave": "ciclo.1.A.utilidad",
+        "antes": -9732.972037037036,
+        "ahora_excel": -8075.115
+      },
+      {
+        "clave": "ciclo.1.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.2.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.2.A.costosTotales",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.2.A.utilidad",
+        "antes": -8232.972037037036,
+        "ahora_excel": -6575.115
+      },
+      {
+        "clave": "ciclo.2.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.3.A.horasExtra",
+        "antes": 1657.857037037037,
+        "ahora_excel": 0
+      },
+      {
+        "clave": "ciclo.3.A.costosTotales",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.3.A.utilidad",
+        "antes": -8232.972037037036,
+        "ahora_excel": -6575.115
+      },
+      {
+        "clave": "ciclo.3.A.CONS-06",
+        "antes": true,
+        "ahora_excel": false
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costos",
+        "antes": 12649.519389535692,
+        "ahora_excel": 10991.662352498655
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.utilidad",
+        "antes": -9809.519389535692,
+        "ahora_excel": -8151.662352498655
+      },
+      {
+        "clave": "ciclo.1.A.financial.estadoResultados.costosProduccion",
+        "antes": 12572.972037037036,
+        "ahora_excel": 10915.115
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.salidas",
+        "antes": 40533.37438953569,
+        "ahora_excel": 38875.51735249866
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceCaja.cajaFinal",
+        "antes": 967306.6256104643,
+        "ahora_excel": 968964.4826475014
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.pagosOperacion",
+        "antes": 32670.374389535693,
+        "ahora_excel": 31012.517352498657
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.operacion",
+        "antes": -29830.374389535693,
+        "ahora_excel": -28172.517352498657
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.flujoNeto",
+        "antes": -32693.374389535747,
+        "ahora_excel": -31035.517352498602
+      },
+      {
+        "clave": "ciclo.1.A.financial.flujoCaja.cajaFinal",
+        "antes": 967306.6256104643,
+        "ahora_excel": 968964.4826475014
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.efectivo",
+        "antes": 967306.6256104643,
+        "ahora_excel": 968964.4826475014
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.activos",
+        "antes": 994827.4806104642,
+        "ahora_excel": 996485.3376475014
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.patrimonio",
+        "antes": 989827.4806104642,
+        "ahora_excel": 991485.3376475014
+      },
+      {
+        "clave": "ciclo.1.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 994827.4806104642,
+        "ahora_excel": 996485.3376475014
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costos",
+        "antes": 11149.519389535692,
+        "ahora_excel": 9491.662352498655
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.utilidad",
+        "antes": -8309.519389535692,
+        "ahora_excel": -6651.662352498655
+      },
+      {
+        "clave": "ciclo.2.A.financial.estadoResultados.costosProduccion",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaInicial",
+        "antes": 967306.6256104643,
+        "ahora_excel": 968964.4826475014
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.salidas",
+        "antes": 31170.374389535693,
+        "ahora_excel": 29512.517352498657
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceCaja.cajaFinal",
+        "antes": 938976.2512209285,
+        "ahora_excel": 942291.9652950028
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaInicial",
+        "antes": 967306.6256104643,
+        "ahora_excel": 968964.4826475014
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.pagosOperacion",
+        "antes": 31170.374389535693,
+        "ahora_excel": 29512.517352498657
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.operacion",
+        "antes": -28330.374389535693,
+        "ahora_excel": -26672.517352498657
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.flujoNeto",
+        "antes": -28330.374389535747,
+        "ahora_excel": -26672.517352498602
+      },
+      {
+        "clave": "ciclo.2.A.financial.flujoCaja.cajaFinal",
+        "antes": 938976.2512209285,
+        "ahora_excel": 942291.9652950028
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.efectivo",
+        "antes": 938976.2512209285,
+        "ahora_excel": 942291.9652950028
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.activos",
+        "antes": 986517.9612209285,
+        "ahora_excel": 989833.6752950028
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.patrimonio",
+        "antes": 981517.9612209285,
+        "ahora_excel": 984833.6752950028
+      },
+      {
+        "clave": "ciclo.2.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 986517.9612209285,
+        "ahora_excel": 989833.6752950028
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costos",
+        "antes": 11236.5235983966,
+        "ahora_excel": 9578.666561359563
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.utilidad",
+        "antes": -8396.5235983966,
+        "ahora_excel": -6738.666561359563
+      },
+      {
+        "clave": "ciclo.3.A.financial.estadoResultados.costosProduccion",
+        "antes": 11072.972037037036,
+        "ahora_excel": 9415.115
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaInicial",
+        "antes": 938976.2512209285,
+        "ahora_excel": 942291.9652950028
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.salidas",
+        "antes": 31257.3785983966,
+        "ahora_excel": 29599.521561359565
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceCaja.cajaFinal",
+        "antes": 915558.872622532,
+        "ahora_excel": 920532.4437336433
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaInicial",
+        "antes": 938976.2512209285,
+        "ahora_excel": 942291.9652950028
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.pagosOperacion",
+        "antes": 31257.3785983966,
+        "ahora_excel": 29599.521561359565
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.operacion",
+        "antes": -28417.3785983966,
+        "ahora_excel": -26759.521561359565
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.flujoNeto",
+        "antes": -23417.37859839655,
+        "ahora_excel": -21759.52156135952
+      },
+      {
+        "clave": "ciclo.3.A.financial.flujoCaja.cajaFinal",
+        "antes": 915558.872622532,
+        "ahora_excel": 920532.4437336433
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.efectivo",
+        "antes": 915558.872622532,
+        "ahora_excel": 920532.4437336433
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.activos",
+        "antes": 983121.437622532,
+        "ahora_excel": 988095.0087336432
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.patrimonio",
+        "antes": 973121.437622532,
+        "ahora_excel": 978095.0087336432
+      },
+      {
+        "clave": "ciclo.3.A.financial.balanceGeneral.pasivoPatrimonio",
+        "antes": 983121.437622532,
+        "ahora_excel": 988095.0087336432
+      }
+    ]
+  }
+}

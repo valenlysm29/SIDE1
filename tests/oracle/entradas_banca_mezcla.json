@@ -110,7 +110,7 @@
     "ESSALUD_ANUAL_LITERAL": true,
     "CONS08_MODO": "multiplicativo",
     "REPUTACION_FUENTE_MERCADO": "operativa",
-    "CALIDAD_MERCADO_MODO": "motor",
+    "CALIDAD_MERCADO_MODO": "excel_literal",
     "ACCESORIOS_N3_HABILITADO": false,
     "CONSUMO_MOLDE": {
       "INF-08": {

@@ -127,7 +127,8 @@ def construir_multilote(original,config):
             tr=f'${ensure(market,hm,"puntajeTotal")}$2:${ensure(market,hm,"puntajeTotal")}${last}'
             if cfg.get('CALIDAD_MERCADO_MODO')=='excel_literal':
                 rr=f'${ensure(market,hm,"reputacion")}$2:${ensure(market,hm,"reputacion")}${last}'
-                MF('calidad',r,f'IFERROR(ROUND({R("reputacion")}/SUMIFS({rr},{gr},{R("grupo")},{active},TRUE())*100,0),0)')
+                economic_group=f'"{group["cycle"]}|SEG-01"'
+                MF('calidad',r,f'IFERROR(ROUND({R("reputacion")}/SUMIFS({rr},{gr},{economic_group},{active},TRUE())*100,0),0)')
             MF('reputacionEscalada',r,f'{R("reputacion")}*10')
             MF('porcentaje',r,f'IFERROR({R("puntajeTotal")}/SUMIF({gr},{R("grupo")},{tr}),0)')
             MF('asignado',r,f'IFERROR(ROUND({R("puntajeTotal")}/SUMIF({gr},{R("grupo")},{tr})*{m["unidades"]}*{m["penetracion"]},0),0)')
