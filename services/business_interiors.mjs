@@ -19,7 +19,8 @@ export const WORKER_CYCLE = Object.freeze([
   {state:'salir del almacén',x:-20,z:-10.4},
   {state:'transportar',x:20,z:-10.4,action:'carry'},
   {state:'entrar en producción',x:20,z:-13.2,action:'carry'},
-  {state:'operar',x:15.2,z:-21.55,wait:1.8,action:'inspect'},
+  // Stand beside the operator, whose station is occupied from world entry.
+  {state:'operar',x:16,z:-21.55,wait:1.8,action:'inspect'},
   {state:'inspeccionar',x:24,z:-21.4,wait:.8,action:'inspect'},
   {state:'entregar',x:24.7,z:-19.6,wait:.7,action:'carry'},
   {state:'salir de producción',x:20,z:-10.4},
@@ -933,8 +934,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     }
     const {object}=courier;
     const world={x:object.position.x+offsetX,z:object.position.z};
-    const distanceToPlayer=position?Math.hypot(world.x-position.x,world.z-position.z):Infinity;
-    object.visible=distanceToPlayer<30;
+    object.visible=true;
     const stage=WORKER_CYCLE[courier.index];
     if(courier.wait>0){
       courier.wait=Math.max(0,courier.wait-dt);
@@ -965,13 +965,11 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     if (disposed) return;
     dt = Math.max(0, Math.min(.05, Number(dt) || 0)); const active = zoneAt(position);
     for (const room of rooms) {
-      const b = room.layout, distance = position ? Math.hypot(position.x - offsetX - b.x, position.z - b.z) : Infinity;
-      if(distance<24)ensureRoom(room);
-      room.detail.visible = distance < 24; // preload geometry is allocated once, render only near its parcel
+      // The city is one running simulation; a doorway only changes the HUD.
+      // Three.js frustum culling handles off-screen geometry without stopping staff.
+      room.detail.visible = true;
       const inside = active === room.id; room.lights.forEach((light, index) => { light.visible = inside && index < Number(room.realLightLimit || 0); });
-      for (const actor of room.actors) actor.object.visible = inside;
-      if (!inside) continue;
-      ensureActors(room);
+      for (const actor of room.actors) actor.object.visible = true;
       for (const actor of room.actors) {
         const { object, route } = actor;
         const target = route.points[actor.target];
@@ -986,7 +984,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
             const motion=actor.motion||(actor.motion={speed:0,yaw:object.rotation.y});
             Object.assign(motion,{x:world.x,z:world.z});
             const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z,radius:npcNavigation.NPC_RADIUS}));
-            neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
+            if(position)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
             const step=interiorNavigation.advance(room,motion,{x:waypoint[0],z:waypoint[1]},dt,neighbors,.65,storePropQuality,actor.path.length===1);
             object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
             moving=step.distance>.0001;
@@ -997,9 +995,12 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       }
     }
     tickCourier(dt,position);
-    for (const animation of animated) if (active === animation.zone) animation.object.position.y = animation.y + (snapshot.productionActive ? Math.sin(time * 20 + animation.phase) * .045 : 0);
+    for (const animation of animated) animation.object.position.y = animation.y + (snapshot.productionActive ? Math.sin(time * 20 + animation.phase) * .045 : 0);
     group.userData.activeZone = active;
   }
+  // Prepare every establishment before the caller copies collisions/hotspots.
+  // Each room and staff actor is allocated once, independently of player position.
+  for (const room of rooms) { ensureRoom(room); ensureActors(room); room.detail.visible = true; }
   sync();
   group.userData.connectedWorld = true;
   return {
@@ -1014,7 +1015,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       group.traverseVisible(object => { if (object.isMesh) visibleBatches++; });
       return { rooms: rooms.length, deferredRooms: rooms.filter(room=>room.deferred).length, navigation:interiorNavigation.stats(), colliders: colliders.length,
         stockLevels: Object.fromEntries(rooms.map(room => [room.id, room.stockLevel])),
-        activeNpcs: rooms.filter(r => r.id === group.userData.activeZone).reduce((n, r) => n + r.actors.length, 0),
+        activeNpcs: rooms.reduce((n, r) => n + r.actors.length, 0),
         activeLights: rooms.reduce((n, r) => n + r.lights.filter(l => l.visible && r.detail.visible).length, 0),
         instancedBatches, geometryInstances, visibleBatches,
         sharedGeometries: 2, stockBatches: rooms.reduce((n, room) => n + room.stock.reduce((s, stock) => s + stock.group.children.length, 0), 0),

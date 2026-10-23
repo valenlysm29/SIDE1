@@ -14,16 +14,27 @@ for(const name of ['buildLegacyWorld','buildRetiredStaticInterior','rebuildRetir
 source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
   pause(){cancelAnimationFrame(raf);},
   resume(){clock.getDelta();raf=requestAnimationFrame(frame);},
+  isolateManualScenario(){
+    // Doors/solid geometry and manual checkout use a deterministic customer fixture.
+    // Continuous population is covered separately by world_population_flow_browser.cjs.
+    clearCustomerFlow(true);nextAutoServeAt=Infinity;lastAutoRestock=Infinity;
+  },
   place(x,z,heading=0){positionPlayer(x,z,heading);updateBusinessZone();},
+  tickWalkingWorld(time){
+    // Keep the same moving collision participants as the production frame.
+    // Pausing RAF must not leave a seeded customer frozen in a doorway.
+    updatePlayer(1/60);updateHubActors(1/60);businessInteriors.tick(1/60,player,time);
+    npcs.forEach(n=>moveNpc(n,1/60));npcs=npcs.filter(n=>!n.dead);animateActors(time,1/60);
+  },
   step(seconds,forward=1,side=0){
     const samples=[];keys={KeyW:forward>0,KeyS:forward<0,KeyD:side>0,KeyA:side<0};
-    for(let i=0;i<Math.round(seconds*60);i++){lastCameraInputAt=performance.now();updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);samples.push({x:player.x,z:player.z});}
+    for(let i=0;i<Math.round(seconds*60);i++){lastCameraInputAt=performance.now();continuousQA.tickWalkingWorld(i/60);samples.push({x:player.x,z:player.z});}
     keys={};renderInventoryDisplays();updateHUD();updateHubObjective();updateGameplayCamera(1/60);renderer.render(scene,camera);return samples;
   },
   walkTo(x,z){
     let i=0;for(;i<1800;i++){
       const dx=x-player.x,dz=z-player.z;if(Math.hypot(dx,dz)<.12)break;
-      yaw=targetYaw=Math.atan2(-dx,-dz);keys={KeyW:true};lastCameraInputAt=performance.now();updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);
+      yaw=targetYaw=Math.atan2(-dx,-dz);keys={KeyW:true};lastCameraInputAt=performance.now();continuousQA.tickWalkingWorld(i/60);
     }keys={};player.vx=player.vz=0;updateGameplayCamera(1);renderInventoryDisplays();updateHubObjective();renderer.render(scene,camera);return {arrived:i<1800,x:player.x,z:player.z};
   },
   doors(){return hubWorld.entrances;},
@@ -66,7 +77,7 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
     await page.goto(url,{waitUntil:'domcontentloaded'});
     assert.equal(await page.evaluate(seed=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA CONTINUO',company:'QA CONTINUO',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seed);return commitReviewedSections(decisionCategories().map(c=>c.cat),true);},seed),true);
     assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
-    await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);await page.evaluate(()=>continuousQA.pause());
+    await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);await page.evaluate(()=>{continuousQA.pause();continuousQA.isolateManualScenario();});
     const initial=await page.evaluate(()=>({diagnostic:SIDE3D.diagnostics(),world:continuousQA.inspect(),legacy:continuousCounters.legacy,listeners:continuousCounters.listeners}));
     assert.equal(initial.legacy,0);assert.equal(initial.diagnostic.hub.active,true);assert.equal(initial.diagnostic.hub.interior,null);assert.ok(initial.diagnostic.player.x>100);assert.equal(initial.world.stats.rooms,6);
     pass(1,'Nuevo mapa único',initial);
@@ -76,9 +87,9 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
       const samples=await page.evaluate(()=>continuousQA.step(1.1));
       for(let i=1;i<samples.length;i++)assert.ok(Math.hypot(samples[i].x-samples[i-1].x,samples[i].z-samples[i-1].z)<.06,'door has no coordinate jump');
       assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.interior),id);assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().hub.active),true);
-      assert.ok(samples.every(p=>Math.abs(p.x-door.x)<.1));return samples.at(-1);
+      assert.ok(samples.every(p=>Math.abs(p.x-door.x)<door.portal.halfWidth-.34),'entry stays within physical doorway');return samples.at(-1);
     }
-    async function exit(id){const door=doors.find(e=>e.id===id);await page.evaluate(e=>continuousQA.place(e.x,e.portal.z-1,Math.PI),door);await page.evaluate(()=>continuousQA.step(1.1));const d=await page.evaluate(()=>SIDE3D.diagnostics());assert.equal(d.hub.interior,null);assert.equal(d.hub.active,true);assert.ok(d.player.z>door.portal.z&&Math.abs(d.player.x-door.x)<.1);assert.equal(await page.evaluate(()=>continuousQA.blocked(SIDE3D.diagnostics().player.x,SIDE3D.diagnostics().player.z)),false);return d.player;}
+    async function exit(id){const door=doors.find(e=>e.id===id);await page.evaluate(e=>continuousQA.place(e.x,e.portal.z-1,Math.PI),door);await page.evaluate(()=>continuousQA.step(1.1));const d=await page.evaluate(()=>SIDE3D.diagnostics());assert.equal(d.hub.interior,null);assert.equal(d.hub.active,true);assert.ok(d.player.z>door.portal.z&&Math.abs(d.player.x-door.x)<door.portal.halfWidth-.34,`exit stays within physical doorway: ${JSON.stringify(d.player)}`);assert.equal(await page.evaluate(()=>continuousQA.blocked(SIDE3D.diagnostics().player.x,SIDE3D.diagnostics().player.z)),false);return d.player;}
     async function walkRoute(points){for(const [x,z] of points){const step=await page.evaluate(({x,z})=>continuousQA.walkTo(x,z),{x,z});assert.ok(step.arrived,`connected street route reaches ${x},${z}: ${JSON.stringify(step)}`);}}
     async function interiorPhoto(name,points){
       await walkRoute(points);await page.keyboard.press('KeyV');
@@ -131,7 +142,7 @@ source=source.replace('  window.SIDE3D = {',`  window.continuousQA={
     const repeated=await page.evaluate(()=>continuousQA.inspect());assert.equal(repeated.sceneId,stable.sceneId);assert.equal(repeated.sceneChildren,stable.sceneChildren);assert.equal(repeated.routes,stable.routes);assert.equal(await page.evaluate(()=>continuousCounters.listeners),listeners);
     const old=await page.evaluate(()=>continuousQA.finance());await page.evaluate(()=>continuousQA.decisions());await page.locator('#exitDecisions').click();await page.waitForFunction(()=>SIDE3D.diagnostics().running);await page.evaluate(()=>continuousQA.pause());assert.equal((await page.evaluate(()=>continuousQA.finance())).cash,old.cash);
     await page.evaluate(()=>{continuousQA.resume();localStorage.setItem('SIDE_ACTIVE_ROUND','2');studentConnected=true;tickStudentGame();});await page.waitForFunction(()=>lastObservedRound===2&&SIDE3D.diagnostics().session===null);
-    assert.equal(await page.evaluate(seed=>{delete seed.MOLDE;Object.assign(decisionDrafts,seed);return commitReviewedSections(decisionCategories().map(c=>c.cat),true);},seed),true);const cycleCash=await page.evaluate(()=>cashBalance());assert.equal(await page.evaluate(()=>startSimulationLoading()),true);await page.waitForFunction(()=>SIDE3D.diagnostics().running);await page.evaluate(()=>continuousQA.pause());const next=await page.evaluate(()=>({world:continuousQA.inspect(),finance:continuousQA.finance(),listeners:continuousCounters.listeners,legacy:continuousCounters.legacy,raf:continuousCounters.raf.size}));assert.equal(next.world.sceneId,stable.sceneId);assert.equal(next.world.sceneChildren,stable.sceneChildren);assert.equal(next.listeners,listeners);assert.equal(next.legacy,0);assert.ok(next.finance.session.context.endsWith('_2'));assert.equal(next.finance.cash,cycleCash);assert.equal(next.finance.business.pendingSupplierOrder??null,null);assert.equal(next.raf,0);
+    assert.equal(await page.evaluate(seed=>{delete seed.MOLDE;Object.assign(decisionDrafts,seed);return commitReviewedSections(decisionCategories().map(c=>c.cat),true);},seed),true);const cycleCash=await page.evaluate(()=>cashBalance());assert.equal(await page.evaluate(()=>startSimulationLoading()),true);await page.waitForFunction(()=>SIDE3D.diagnostics().running);await page.evaluate(async()=>{await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));continuousQA.pause();});const next=await page.evaluate(()=>({world:continuousQA.inspect(),finance:continuousQA.finance(),listeners:continuousCounters.listeners,legacy:continuousCounters.legacy,raf:continuousCounters.raf.size}));assert.equal(next.world.sceneId,stable.sceneId);assert.equal(next.world.sceneChildren,stable.sceneChildren);assert.equal(next.listeners,listeners);assert.equal(next.legacy,0);assert.ok(next.finance.session.context.endsWith('_2'));assert.equal(next.finance.cash,cycleCash);assert.equal(next.finance.business.pendingSupplierOrder??null,null);assert.equal(next.raf,0);
     for(const id of ['store','warehouse','production']){await enter(id);await exit(id);}pass(9,'Ciclo sin escenas, NPCs, listeners o RAF duplicados',next);
     assert.deepEqual(errors,[]);assert.deepEqual(failures,[]);assert.equal(await page.evaluate(()=>continuousCounters.legacy),0);pass(10,'Lobby, vehículo, pedido, caja, producción, decisiones y ciclo',{sale:sold.cash-saleBefore.cash,output:produced,cycle:next.finance.session.context,errors,failures});
     assert.equal(results.length,10);fs.writeFileSync(path.join(output,'functional-results.json'),JSON.stringify({passed:true,results,errors,failures},null,2));

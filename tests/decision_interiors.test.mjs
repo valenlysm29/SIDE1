@@ -22,7 +22,7 @@ function fixture() {
 
 test('decision interiors allocate furniture once and preserve directed physical entry and exit', () => {
   const f = fixture();
-  assert.ok(f.rooms.every(room => room.deferred && room.detail.children.length === 0));
+  assert.ok(f.rooms.every(room => !room.deferred && room.detail.children.length > 0), 'all businesses exist at world entry');
   for (const room of f.rooms) {
     f.world.ensureRoom(room);
     const count = f.world.colliders.length, children = room.detail.children.length;

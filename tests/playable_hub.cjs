@@ -75,7 +75,8 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
       Object.assign(decisionDrafts,seed);
       return commitReviewedSections(decisionCategories().map(c=>c.cat),true);
     },seed),true);
-    assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
+    const entered=await page.evaluate(()=>startSimulationLoading());
+    assert.equal(entered,true,await page.evaluate(()=>JSON.stringify({error:SIDE3D.getLastError?.(),loading:document.getElementById('simulationLoadingText')?.textContent})));
     console.log('Hub loaded');
     await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
     const initial=await page.evaluate(()=>SIDE3D.diagnostics());

@@ -14,7 +14,7 @@
   let yaw = 0, pitch = 0, targetYaw = 0, targetPitch = 0, jumpQueued = false;
   let keys = {}, dynamicGroup = null, npcGroup = null, interactables = [], npcs = [], colliders = [], dynamicColliders = [];
   let animatedActors = [], checkoutQueue = [], queueDecor = [], trafficCars = [], crossingPedestrians = [], npcPool = [];
-  let simSales = 0, simVisitors = 0, lastSpawn = 0, lastAutoRestock = 0;
+  let simSales = 0, simVisitors = 0, lastSpawn = -Infinity, lastAutoRestock = 0;
   let registerMesh = null, restockMesh = null, inventoryDisplayGroup = null;
   let productInteractables = [], productInspectOpen = false;
   let inventory = null, gameSession = null, sessionContext = '';
@@ -827,8 +827,8 @@
     } catch(error) {console.warn('Se conserva la iluminación directa del mundo.',error);}
   }
 
-  // Indoor staff are not needed to walk or drive in the city. Lobby preloading
-  // may request them early; cold entry schedules them after its first frame.
+  // Detailed models may stream after entry; their actors and routes already
+  // exist throughout the city using fallback models while assets arrive.
   async function loadStorePropTemplates() {
     if (storePropsPromise) return storePropsPromise;
     if (!GLTFLoader || !assetCache) return storePropTemplates;
@@ -1024,7 +1024,7 @@
     const nearby=serviceRoom?room.actors.filter(actor=>actor.object!==previous).map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
     if(serviceRoom)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
     const config={...look,cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby};
-    const obj=serviceRoom?cityNpcFromTemplate(config):person(config);
+    const obj=person(config);
     if(!obj)return null;
     obj.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(obj.userData,{role});return obj;
   }
@@ -2584,7 +2584,7 @@
     }
     if(restored)saveInventory();
     npcs=[];checkoutQueue=[];crossingPedestrians=[];
-    lastSpawn=0;
+    lastSpawn=-Infinity;
   }
 
   function createNpcRecord(obj, spawnX, archetype, extra = {}) {
@@ -2751,7 +2751,6 @@
   }
 
   function spawnNpc(now) {
-    if(currentInterior!=='store')return;
     const score = npcDemandScore();
     const dayBoost = gameSession?.difficulty || 1;
     const rush = businessState?.rushBoostUntil > now ? 1.65 : 1;
@@ -3183,9 +3182,9 @@
     worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
     worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
-    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20260928-production-props-4');
+    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-continuous-flow');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
-      createNpc:createBusinessNpc,onCollidersAdded:items=>hubWorld.colliders.push(...items),
+      createNpc:createBusinessNpc,onCollidersAdded:items=>{if(businessInteriors)hubWorld.colliders.push(...items);},
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
     businessInteriors.installStoreProps(storePropTemplates,perfMode);
     businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);
@@ -3219,7 +3218,7 @@
     }));
     sky.name='ProceduralSky';sky.renderOrder=-1;sky.frustumCulled=false;scene.add(sky);
     hubWorld.sky=sky;
-    ensureHubCharacters();
+    ensureHubCharacters({allowFallback:true});
     playerAvatar=createPlayableCharacter(activeCharacterId());scene.add(playerAvatar);
     enterHub(false);
   }
@@ -3766,11 +3765,13 @@
         triggerRandomEvent(now);
         tickProduction(now);
         tickSupplier(now);
-        if(currentInterior==='store')npcs.forEach((n) => moveNpc(n, dt));
+        npcs.forEach((n) => moveNpc(n, dt));
         npcs = npcs.filter((n) => !n.dead);
       }
-      if(currentInterior==='store')animateActors(time,dt);
-      for(const npc of npcs)npc.obj.visible=currentInterior==='store'||Math.hypot(npc.obj.position.x-player.x,npc.obj.position.z-player.z)<18;
+      animateActors(time,dt);
+      // Presence and simulation belong to the city; Three.js handles frustum
+      // culling without making customers appear when the player enters a zone.
+      for(const npc of npcs)npc.obj.visible=true;
       if (now - lastLightTick > 250) { updateDayLighting(dt); lastLightTick = now; }
       if (now - lastPromptTick > 100) { updatePrompt(); lastPromptTick = now; }
       if (now - lastHudTick > 220) {

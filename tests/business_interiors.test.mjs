@@ -137,20 +137,34 @@ test('stock levels clamp valid ratios and malformed values safely', () => {
   assert.deepEqual([0, .01, .25, .5, .75, 1, 8, -1, NaN, Infinity].map(stockVisualLevel), [0, 1, 1, 2, 3, 4, 4, 0, 0, 0]);
 });
 
-test('only current room lights and NPCs run; revisiting never duplicates actors', () => {
+test('every room has actors from world entry and keeps moving while the player stays outside', () => {
   let created = 0, animated = 0;
   const f = fixture({ createNpc: () => { created++; return new THREE.Group(); }, animateNpc: () => animated++ });
-  f.world.tick(.05, { x: 131, z: 27 });
-  assert.equal(created, 0); assert.equal(f.world.stats().activeLights, 0);
-  f.world.tick(.05, { x: 131, z: 20 });
-  assert.equal(created, 4); assert.equal(f.world.stats().activeLights, 2);
-  const before = animated;
-  f.world.tick(.05, { x: 150, z: 0 });
-  assert.equal(animated, before);
+  assert.equal(f.world.rooms.length, 6);
+  assert.ok(f.world.rooms.every(room => !room.deferred && room.actors.length >= 2), 'no first visit is needed to populate a business');
+  const originals = f.world.rooms.flatMap(room => room.actors.map(actor => actor.object));
+  const count = created;
+  const travel = new Map(originals.map(object => [object, 0]));
+  const observer = { x: 150, z: 0 };
+  assert.equal(f.world.zoneAt(observer), null);
+  for (let frame = 0; frame < 600; frame++) {
+    const before = new Map(originals.map(object => [object, object.position.clone()]));
+    f.world.tick(1 / 60, observer, frame / 60);
+    for (const object of originals) travel.set(object, travel.get(object) + object.position.distanceTo(before.get(object)));
+  }
+  for (const room of f.world.rooms) {
+    assert.equal(room.detail.visible, true, `${room.id} is present outside its area`);
+    assert.ok(room.actors.every(actor => actor.object.visible), `${room.id} actors never disappear with player distance`);
+    assert.ok(room.actors.filter(actor => !actor.route.stationary).every(actor => travel.get(actor.object) > .1), `${room.id} mobile workers advance before a visit`);
+  }
+  assert.ok(animated >= originals.length * 600);
   assert.equal(f.world.stats().activeLights, 0);
-  assert.ok(f.world.rooms[0].actors.every(a => !a.object.visible));
-  f.world.tick(.05, { x: 131, z: 20 });
-  assert.equal(created, 4); assert.equal(f.world.stats().activeNpcs, 4);
+  for (const room of f.world.rooms) {
+    f.world.tick(.05, { x: 150 + room.layout.x, z: room.layout.z });
+    f.world.tick(.05, observer);
+  }
+  assert.equal(created, count, 'entering and leaving reuses the existing population');
+  assert.deepEqual(f.world.rooms.flatMap(room => room.actors.map(actor => actor.object)), originals);
   f.close();
 });
 
