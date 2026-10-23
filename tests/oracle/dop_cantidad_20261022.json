@@ -1,12 +1,12 @@
 {
   "provenance": {
-    "generated_at": "2026-10-23T04:20:09.616833+00:00",
-    "source": ".codex-work/DECISIONES_SIDE_16.xlsx",
+    "generated_at": "2026-10-23T04:56:14.344637+00:00",
+    "source": ".codex-work\\DECISIONES_SIDE_16.xlsx",
     "source_sha256": "3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1",
     "engine": "Microsoft Excel COM",
     "version": "16.0",
     "calculation_state": 0,
-    "runner": "tests/dop_excel_actual_oracle_20261022.py",
+    "runner": "tests\\dop_excel_actual_oracle_20261022.py",
     "direct_cells": {
       "D36": [
         "CANTIDAD DE PRODUCCIÓN",

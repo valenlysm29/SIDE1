@@ -16,6 +16,18 @@ OUT = ROOT / 'tests/output/dop-20261022/independent'
 ORACLE = ROOT / 'tests/oracle'
 SOURCE = ROOT / '.codex-work/DECISIONES_SIDE_16.xlsx'
 SHA = '3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1'
+EXCEL_ERRORS = {'#DIV/0!', '#N/A', '#NAME?', '#NULL!', '#NUM!', '#REF!', '#VALUE!', '#SPILL!', '#CALC!'}
+
+def cached_errors(path):
+    """Original files can cache Excel errors as shared strings (data_type s)."""
+    book = openpyxl.load_workbook(path, data_only=True)
+    try:
+        return [{'sheet': sheet.title, 'cell': cell.coordinate, 'error': cell.value,
+                 'data_type': cell.data_type}
+                for sheet in book for row in sheet for cell in row
+                if cell.data_type == 'e' or isinstance(cell.value, str) and cell.value in EXCEL_ERRORS]
+    finally:
+        book.close()
 
 def read(path):
     return json.loads(path.read_text(encoding='utf-8-sig'))
@@ -79,6 +91,7 @@ def main():
         historical.append({'name': name, 'model': str(model.relative_to(ROOT)), 'count': len(expected),
                            'metadata': result['metadatos'], 'differences': differences, 'errors': errors})
     summary = {'source_sha256': SHA, 'original_metadata': baseline['metadatos'],
+               'original_cached_errors': cached_errors(SOURCE),
                'original_errors': baseline_errors, 'direct': direct, 'historical': historical,
                'historical_total': sum(row['count'] for row in historical),
                'historical_differences': sum(len(row['differences']) for row in historical)}

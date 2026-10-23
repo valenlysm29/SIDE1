@@ -11,6 +11,40 @@ function decisions(c,quantity=1){
   return d;
 }
 const json=value=>JSON.parse(JSON.stringify(value));
+const oracle=require('./oracle/dop_cantidad_20261022.json');
+const close=(actual,expected,label)=>assert.ok(Number.isFinite(actual)&&Math.abs(actual-expected)<=1e-9*Math.max(1,Math.abs(expected)),`${label}: SIDE=${actual}; Excel=${expected}`);
+// These expectations are actual Excel COM cell results, not values recomputed
+// from SIDE's consumption constants. N5 is the workbook example, not a maximum.
+for(const row of oracle.summary.direct)test('Excel editor matches actual workbook quantity case: '+row.name,()=>{
+  const c=load(),d=decisions(c);
+  d.lotes=row.inputs.map((input,index)=>({...d.lotes[0],cantidad:input.set_to,molde:['INF-08','INF-09','INF-10'][index]}));
+  const before=JSON.stringify(d),empty=c.SIDE_EXCEL_UI.proyectarPlan(d,{cash:1e6});
+  close(empty.plan.requirements.target,row.values.D36,'CANTIDAD!D36');
+  for(const [family,cells] of [[0,['D42','E43','F44']],[1,['G42','H43','I44']],[2,['J42','K43','L44']]]){
+    const expected=cells.reduce((sum,cell)=>sum+row.values[cell],0);
+    close(empty.plan.requirements.materials[family].needs,expected,cells.join('+'));
+    close(empty.plan.comparison.items[family].missing,expected,'missing '+cells.join('+'));
+  }
+  const stocked=json(d);stocked.comprasUnidades={'INS-01':10000,'INS-04':10000,'INS-06':10000};
+  stocked.personal={corte:[10,0,0],ensamble:[10,0,0],acabado:[10,0,0]};
+  const available=c.SIDE_EXCEL_UI.proyectarPlan(stocked,{cash:1e6});
+  assert.deepEqual(json(empty.plan.requirements),json(available.plan.requirements),'stock and workers must not change requirements');
+  assert.ok(available.plan.comparison.items.filter(item=>item.kind==='material').every(item=>item.missing===0));
+  assert.equal(JSON.stringify(d),before,'projection preserves input');
+  assert.ok(Number.isFinite(empty.cashAfter));
+  if(row.values.D36>row.values.N5)assert.ok(empty.plan.requirements.target>row.values.N5,'above-capacity target is not capped');
+});
+
+test('changing only target recalculates preview without charging missing stock or mutating decisions',()=>{
+  const c=load(),d=decisions(c,1),initial=JSON.stringify(d),one=c.SIDE_EXCEL_UI.proyectarPlan(d,{cash:100000});
+  for(const quantity of [0,10,397,1000,1]){
+    const next=json(d);next.lotes[0].cantidad=quantity;
+    const projection=c.SIDE_EXCEL_UI.proyectarPlan(next,{cash:100000});
+    assert.equal(projection.plan.requirements.target,quantity);
+    assert.equal(projection.cashAfter,one.cashAfter,'unbought material requirement creates no cash charge');
+  }
+  assert.equal(JSON.stringify(d),initial);
+});
 test('Excel editor requirements depend on desired quantities even when inventory and capacity change',()=>{
   const c=load(),d=decisions(c,397),first=c.SIDE_EXCEL_UI.proyectarPlan(d,{cash:1e6});
   const stocked=json(d);stocked.comprasUnidades={'INS-01':1000,'INS-04':1000,'INS-06':100};

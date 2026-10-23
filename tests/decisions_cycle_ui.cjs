@@ -30,7 +30,7 @@ for(const [width,height] of [[1366,768],[1024,768],[768,1024],[390,844],[320,568
    assert.equal(await page.locator('.production-dop').isVisible(),true);
    assert.ok(await page.evaluate(()=>!!(document.querySelector('[data-item="PRODUCCION_META"]').compareDocumentPosition(document.querySelector('.production-dop'))&Node.DOCUMENT_POSITION_FOLLOWING)));
   }
-  if(cat==='C')assert.equal(await page.locator('.mold-requirements').count(),3);
+  if(cat==='C')assert.equal(await page.locator('.mold-requirements').count(),1);
   if(cat==='A')assert.equal(await page.locator('.cs-production-kpis > div').count(),4);
  }
  console.log(`PASS all tabs layout ${width}x${height}`);
@@ -69,9 +69,9 @@ const productivity=()=>page.evaluate(()=>SIDE_PRODUCTION_MODEL.cycleProductivity
 assert.equal((await productivity()).produced,null);
 await page.locator('[data-mold-target="molde_1"]').fill('100');
 await page.locator('[data-mold-target="molde_1"]').press('Tab');
-await page.waitForFunction(()=>document.querySelector('.pd-plan strong')?.textContent==='100 u.');
+await page.waitForFunction(()=>Number(document.querySelector('.production-dop')?.dataset.productionTarget)===100);
 assert.equal(await page.locator('.production-total b').innerText(),'100 u.');
-assert.equal(await page.locator('.pd-plan strong').innerText(),'100 u.');
+assert.equal(await page.locator('.production-dop').getAttribute('data-production-target'),'100');
 await page.evaluate(()=>{const code=($('lobbyCode')?.textContent||'SIDE').replace(/\s+/g,'_');const company=currentStudent.company.replace(/[^a-z0-9_-]+/gi,'_').slice(0,36)||'EMPRESA';localStorage.setItem(`side3d_inventory_${code}_${company}_${currentRound()}`,JSON.stringify({schemaVersion:2,producedUnits:75}));});
 assert.deepEqual(await productivity(),{produced:75,compliance:75,difference:25});
 const plan=await page.evaluate(()=>productionPlan());
@@ -93,9 +93,9 @@ assert.equal((await productivity()).produced,null);
 assert.equal(await page.locator('.production-total b').innerText(),'0 u.');
 await page.evaluate(()=>{localStorage.setItem('SIDE_ACTIVE_ROUND','1');loadDecisionState();restoreDraftsForRound();currentCategory='A';renderDecisionCategory();});
 await page.locator('#companyReviewAll').click();assert.equal(await page.locator('#companyReviewDialog').isVisible(),true);await page.locator('#closeCompanyReview').click();
-await page.locator('[data-cat="C"]').click();await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));await page.waitForTimeout(200);
-assert.ok(await page.evaluate(()=>window.scrollY>0));
-await page.evaluate(()=>window.scrollTo(0,0));await page.waitForTimeout(3000);await page.screenshot({path:path.join(__dirname,'output/production-desktop.png'),fullPage:true});
+await page.locator('[data-cat="C"]').click();await page.locator('#decisionFormScroll').evaluate(el=>el.scrollTo({top:el.scrollHeight,behavior:'instant'}));await page.waitForTimeout(200);
+assert.ok(await page.locator('#decisionFormScroll').evaluate(el=>el.scrollTop>0&&el.scrollTop+el.clientHeight>=el.scrollHeight-2),'El panel de decisiones llega al final');
+await page.locator('#decisionFormScroll').evaluate(el=>el.scrollTo({top:0,behavior:'instant'}));await page.waitForTimeout(3000);await page.screenshot({path:path.join(__dirname,'output/production-desktop.png'),fullPage:true});
 await page.setViewportSize({width:390,height:844});await page.locator('[data-cat="A"]').click();await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(__dirname,'output/summary-mobile.png'),fullPage:true});
 await page.evaluate(()=>{decisionCategories().forEach(c=>setSectionSubmitted(c.cat));renderTabs();});
 for(const [width,height] of [[1366,768],[1024,768],[768,1024],[390,844],[320,568],[844,390]]){

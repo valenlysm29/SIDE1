@@ -43,6 +43,20 @@ async function scenario(browser,origin,width,height){
   await page.goto(origin+'/index.html',{waitUntil:'networkidle'});await page.evaluate(()=>showModal('studentModal'));await page.locator('#gameCode').fill('SIDE-000');await page.locator('#companyLegalName').fill('Oraculo '+width+' SAC');await page.locator('#companyBrandName').fill('Oraculo '+width);await page.locator('#studentForm button[type="submit"]').click();await page.waitForFunction(()=>studentConnected);
   await page.locator('#cycleCostsUnderstood').click();await page.evaluate(()=>openDecisionMenu());await page.locator('[data-cat="C"]').click();
   const baseline=await page.evaluate(()=>({cash:cashBalance(),ledger:JSON.stringify(cashLedger)}));
+  await page.locator('#productionMoldSelector').selectOption('molde_1');
+  const targetInput=page.locator('[data-mold-target]');
+  check(width+' target help associated',await targetInput.getAttribute('aria-describedby')==='productionPlanningHint');
+  check(width+' total atomic live status',await page.locator('[data-production-total]').getAttribute('role')==='status'&&await page.locator('[data-production-total]').getAttribute('aria-atomic')==='true');
+  await targetInput.fill('17');
+  check(width+' live total updated',await page.locator('[data-production-total]').innerText()==='17 u.');
+  const plus=page.locator('[data-mold-step="molde_1"][data-delta="10"]');
+  await plus.focus();await page.keyboard.press('Space');
+  check(width+' keyboard plus keeps focus',await plus.evaluate(el=>el===document.activeElement));
+  check(width+' keyboard plus updates target',await targetInput.inputValue()==='27');
+  await page.keyboard.press('Space');
+  check(width+' keyboard repeat keeps focus',await plus.evaluate(el=>el===document.activeElement));
+  check(width+' keyboard repeat updates target',await targetInput.inputValue()==='37');
+  near(await page.evaluate(()=>cashBalance()),baseline.cash,width+' keyboard target changes no cash');
   if(process.env.SIDE_DOP_CAPTURE_ONLY==='1'){
    await page.locator('#productionMoldSelector').selectOption('molde_1');await page.locator('[data-mold-target]').fill('397');
    await checkDopWidths(page,width);await captureDop(page,width);return;
