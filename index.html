@@ -17,7 +17,8 @@
   <link rel="stylesheet" href="css/hub-world.css?v=20260927-continuous-world">
   <link rel="stylesheet" href="css/company_summary.css?v=20260917-realismo3">
   <link rel="stylesheet" href="css/responsive.css?v=20261011-decision-stack">
-  <link rel="stylesheet" href="css/production.css?v=20261022-reversion">
+  <link rel="stylesheet" href="css/production.css?v=20261022-calculadora-costos">
+  <link rel="stylesheet" href="css/cycle-costs.css?v=20261022">
   <link rel="stylesheet" href="css/tablet-return.css?v=20261022-decision-return">
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
   <link rel="stylesheet" href="css/world_minimap.css?v=20261009-mobile-map">
@@ -71,6 +72,19 @@
 
   <div id="modalRoot" class="modal-root hidden">
     <div class="modal-backdrop"></div>
+
+    <section id="cycleCostsModal" class="modal cycle-costs-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cycleCostsTitle" aria-describedby="cycleCostsIntro">
+      <p id="cycleCostsCycle" class="cycle-costs-cycle"></p>
+      <h2 id="cycleCostsTitle">Costos descontados al iniciar el ciclo</h2>
+      <p id="cycleCostsIntro" class="modal-lead">Estos pagos ya están registrados en tu caja. Cerrar este aviso no vuelve a cobrarlos.</p>
+      <ul id="cycleCostsItems" class="cycle-costs-items" aria-label="Detalle de costos descontados"></ul>
+      <div class="cycle-costs-total"><span>Total descontado</span><strong id="cycleCostsTotal"></strong></div>
+      <dl class="cycle-costs-balances">
+        <div><dt>Caja antes del descuento</dt><dd id="cycleCostsBefore"></dd></div>
+        <div><dt>Caja después del descuento</dt><dd id="cycleCostsAfter"></dd></div>
+      </dl>
+      <button id="cycleCostsUnderstood" type="button" class="primary-gold" data-close>Entendido</button>
+    </section>
 
     <section id="studentExpelledModal" class="modal hidden" role="alertdialog" aria-modal="true" aria-labelledby="studentExpelledTitle" aria-describedby="studentExpelledMessage">
       <h2 id="studentExpelledTitle">Tu empresa fue eliminada de la partida</h2>
@@ -656,10 +670,11 @@
 <script src="js/simulator3d.js?v=20261022-reversion"></script>
 <script src="js/production_model.js?v=20260910-2"></script>
 <script src="js/decision_review_model.js?v=20260910-2"></script>
-<script src="js/production_dop.js?v=20260917-visual"></script>
+<script src="js/production_dop.js?v=20261022-calculadora-costos"></script>
 <script src="js/financial_model.js?v=20260922-finance"></script>
 <script src="js/student_financial_view.js?v=20260929-cycle-history"></script>
-<script src="js/app.js?v=20261022-sin-plan-lotes"></script>
+<script src="js/app.js?v=20261022-calculadora-costos"></script>
+<script src="js/cycle_cost_notice.js?v=20261022"></script>
 <script src="js/company_summary.js?v=20261022-reversion"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@ const hasConfig = cfg.SUPABASE_URL && !cfg.SUPABASE_URL.includes('TU-PROYECTO') 
 const supabaseClient = window.SIDE?.SupabaseClient?.get() || null;
 const $ = id => document.getElementById(id);
 const screens = ['landing','profiles','studentLoading','tutorial','studentLobby','characterSelection','simulationLoading','simulator3d','decisionMenu'];
-const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','creditsModal','studentExpelledModal'];
+const modals = ['teacherLoginModal','teacherRegisterModal','studentModal','creditsModal','studentExpelledModal','cycleCostsModal'];
 const DEMO_TEACHER = {email:'profesor@upch.pe',password:'Heredia'};
 const DEMO_GAME = {id:'demo-side-000',codigo:'SIDE-000',nombre:'SIDE — Simulación Principal',curso:'Finanzas Corporativas',estado:'esperando'};
 const COMPANY_NAME = 'MI EMPRESA'; // respaldo visual; el estudiante define el nombre comercial al ingresar
@@ -61,6 +61,7 @@ function showModal(id){
   setTimeout(()=>$(id)?.querySelector('input,button,a[href]')?.focus(),80);
 }
 function closeModal(){
+  if(typeof acknowledgeCycleCostNotice==='function')acknowledgeCycleCostNotice();
   $('modalRoot')?.classList.add('hidden');
   modals.forEach(m=>$(m)?.classList.add('hidden'));
   const trigger=modalTrigger;modalTrigger=null;
@@ -453,6 +454,52 @@ function loadDecisionState(){
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
 function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)}
+function ensureCycleFixedCosts(){
+  if(decisionState.__excel?.habilitado||!studentAccess().canOperate)return null;
+  const round=currentRound(),previous=decisionState.__cycleCosts?.[round];
+  if(previous&&Number(previous.round)===round)return previous.total>0?previous:null;
+  const context=decisionModelContext(),state=deepClone(decisionState),ledger={...cashLedger},sections=deepClone(recordedFinancialSections());
+  const before=initialCapital()+ledgerTotal(),items=[],prepared=[];
+  for(const category of decisionCategories()){
+    const key=`${round}:${category.cat}`;
+    // A category net already saved in this cycle may mix many decisions. Never
+    // add a second charge or infer a missing debit from an old partial record.
+    if(Object.hasOwn(ledger,key))continue;
+    const fixed=[];
+    for(const item of category.items){
+      if(item.type==='info'||item.asset||item.type==='loan')continue;
+      const entry=decisionState[item.id];let draft;
+      if(item.mandatoryFixed)draft={optionIds:[...(item.defaultOptionIds||[])]};
+      else if(item.recurring&&entry&&Number(entry.round)<round){
+        // Reuse the existing recurring-cost classification. Training, marketing,
+        // materials and other one-cycle purchases have no recurring component.
+        draft=window.SIDE_REVIEW_MODEL.draft(item,{...context,drafts:{}});
+        if(item.type==='quantity'||item.type==='quantity-choice')draft={quantities:deepClone(entry.quantities||{})};
+        const continuity=window.SIDE_REVIEW_MODEL.breakdown(item,{...context,drafts:{...context.drafts,[item.id]:draft}});
+        if(!(continuity.recurring>0))continue;
+      }else continue;
+      context.drafts[item.id]=deepClone(draft);fixed.push(item);
+    }
+    if(!fixed.length)continue;
+    const plan=prepareSectionSave({...category,items:fixed},context);
+    const charges=plan.model.items.filter(item=>Number(item.outflow)>0);
+    if(!charges.length)continue;
+    // The partial category contains only the already-defined fixed/recurring
+    // choices. A later save replaces this same ledger key with the full section.
+    ledger[key]=plan.net;Object.assign(state,plan.entries);
+    sections[round]={...(sections[round]||{}),[category.cat]:{...plan.model,recordedNet:plan.net}};
+    items.push(...charges.map(item=>({id:item.id,label:item.name,amount:Number(item.outflow)})));prepared.push(...fixed.map(item=>item.id));
+  }
+  if(!items.length)return null;
+  const total=items.reduce((sum,item)=>sum+item.amount,0),after=initialCapital()+Object.values(ledger).reduce((sum,value)=>sum+(Number(value)||0),0);
+  const receipt={round,items,total,before,after,acknowledged:false,createdAt:new Date().toISOString()};
+  state.__cycleCosts={...(state.__cycleCosts||{}),[round]:receipt};
+  if(!writeDecisionBatch({[decisionKey()]:JSON.stringify(state),[ledgerKey()]:JSON.stringify(ledger),[financialSectionsKey()]:JSON.stringify(sections)}))return null;
+  decisionState=state;cashLedger=ledger;
+  for(const id of prepared)decisionDrafts[id]=deepClone(context.drafts[id]);
+  try{queueStudentSnapshot(buildStudentSnapshot(round));}catch(error){console.warn('SIDE: costos del ciclo guardados; sincronización pendiente',error);}
+  return receipt;
+}
 function cashBalance(){if(decisionState.__excel?.habilitado)return excelSavedResult()?.financial?.balanceCaja.cajaFinal??decisionState.__excel.historial?.cajaFinal??decisionState.__excel.cajaTransicion??initialCapital();return initialCapital()+ledgerTotal()}
 function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${currentRound()}`}
 function decisionsSubmitted(){if(decisionState.__excel?.habilitado)return !!decisionState.__excel.enviado&&Number(decisionState.__excel.round)===Number(currentRound());return localStorage.getItem(submissionKey())==='1'}
@@ -869,10 +916,13 @@ function projectedCash(){const old=Number(cashLedger[sectionLedgerKey(currentCat
 function openDecisionMenu(){
   const access=studentAccess();if(!access.canOperate&&!access.canReview){showScreen('studentLobby');updateIntegrationUI();toast(access.reason);return false;}
 
-  loadDecisionState(); playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
+  loadDecisionState();
+  if(typeof ensureCycleFixedCosts==='function')ensureCycleFixedCosts();
+  playerIsDeciding=true; currentCategory=currentCategory||navigationCategories()[0]?.cat; restoreDraftsForRound(); showScreen('decisionMenu');
   updateDecisionReturnButton();
   renderTabs(); renderDecisionCategory(); updateHud(); syncStudentReportPreview();
   updateDecisionLayout();
+  if(typeof maybeShowCycleCostNotice==='function')maybeShowCycleCostNotice();
 }
 function updateDecisionLayout(){
   const screen=$('decisionMenu');
@@ -932,18 +982,34 @@ function productionDopHtml(plan=productionPlan()){
   const producedPercent=plan.target?Math.min(100,Math.round(plan.producibleUnits/plan.target*100)):0;
   return window.SIDE_PRODUCTION_DOP.render(plan,{round:currentRound(),producedPercent});
 }
-// Refresh only the diagram while the existing input handlers own state and calculations.
+function calculatorMoldLine(plan,draft){
+  return plan.productLines.find(line=>line.id===draft.viewMoldId)||plan.productLines.find(line=>line.selectedThisCycle)||plan.productLines.find(line=>line.target>0)||plan.productLines[0];
+}
+function productionCalculatorHtml(plan,draft,locked){
+  const line=calculatorMoldLine(plan,draft);draft.viewMoldId=line.id;
+  return `<div class="production-calculator production-calculator-single"><header><div><strong>Calculadora de producción</strong><p>Elige un molde para calcular sus insumos. Las cantidades de los demás moldes se conservan y se suman en el DOP.</p></div><div class="production-total"><small>Total deseado de todos los moldes</small><b data-production-total>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields"><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><p class="production-calculator-availability" data-production-mold-state>${line.available?'Molde disponible para producir.':'Puedes calcular este escenario; todavía debes adquirir el molde para producir.'}</p><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements" data-mold-requirements aria-live="polite">${productionCalculatorRequirements(line)}</div></div><footer><span>Capacidad de la línea: <b data-production-capacity>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b data-production-possible>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>El DOP consolida todas las cantidades elegidas. Esta calculadora no realiza compras ni cambia las decisiones de Infraestructura.</small></footer></div>`;
+}
+function productionCalculatorRequirements(line){return `<span>Insumos para ${line.target.toLocaleString('es-PE')} unidades de ${escapeHtml(line.label)}</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b>`;}
+function normalizeProductionTargetInput(input){const value=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));if(input.value!=='')input.value=String(value);return value;}
+function refreshProductionCalculator(plan){
+  const calculator=document.querySelector('.production-calculator-single');if(!calculator)return;
+  const line=calculatorMoldLine(plan,initDraft(findDecisionItem('PRODUCCION_META')));
+  calculator.querySelector('[data-production-total]').textContent=plan.target.toLocaleString('es-PE')+' u.';
+  calculator.querySelector('[data-mold-requirements]').innerHTML=productionCalculatorRequirements(line);
+  calculator.querySelector('[data-production-capacity]').textContent=plan.processCapacity.toLocaleString('es-PE')+' u./ciclo';
+  calculator.querySelector('[data-production-possible]').textContent=plan.producibleUnits.toLocaleString('es-PE')+' u.';
+  calculator.querySelector('[data-mold-suggest]').textContent='Usar sugerencia SIDE: '+line.suggested.toLocaleString('es-PE')+' u.';
+}
+// Calculator and diagram read the same working draft after each control updates it.
 function refreshProductionDop(){
   if(currentCategory!=='C')return;
+  const plan=productionPlan();refreshProductionCalculator(plan);
   const mount=document.querySelector('.production-dop-mount');
   if(!mount)return;
-  disposeProductionDop();
-  mount.innerHTML=productionDopHtml();
+  disposeProductionDop();mount.innerHTML=productionDopHtml(plan);
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
 }
-document.addEventListener('input',event=>{
-  if(event.target?.matches?.('[data-qty], [data-mold-target]'))refreshProductionDop();
-});
+
 function renderDecisionCategory(){
   disposeProductionDop();
   if(decisionState.__excel?.habilitado&&currentCategory==='F')currentCategory='C';
@@ -954,7 +1020,7 @@ function renderDecisionCategory(){
   let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
   if(!decisionState.__excel?.habilitado){
     const fixed=allDecisionItems().filter(item=>item.mandatoryFixed);
-    lead+=`<aside class="event-clue" aria-label="Costos obligatorios previstos"><span>COSTOS OBLIGATORIOS PREVISTOS</span><strong>${fixed.map(item=>`${escapeHtml(item.name)}: − ${money(computeItemCost(item))}`).join(' · ')}</strong><small>Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}. La caja estimada incluye estos costos; el movimiento se registra al guardar o enviar la sección.</small></aside>`;
+    lead+=`<aside class="event-clue" aria-label="Costos obligatorios previstos"><span>COSTOS OBLIGATORIOS PREVISTOS</span><strong>${fixed.map(item=>`${escapeHtml(item.name)}: − ${money(computeItemCost(item))}`).join(' · ')}</strong><small>Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}. Los costos registrados al inicio ya están incluidos en tu caja; guardar después no los cobra otra vez.</small></aside>`;
   }
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
@@ -1038,8 +1104,7 @@ function renderDecisionRow(item){
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
     body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='production-plan'){
-    const plan=productionPlan();
-    body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
+    body=productionCalculatorHtml(productionPlan(),d,locked);
   } else if(item.type==='number'){
     const plan=productionPlan();body=`<div class="number-decision"><button data-number-step="${item.id}" data-delta="-10">−10</button><input data-number="${item.id}" type="number" min="${item.min||0}" step="${item.step||1}" value="${Number(d.value||0)}"><button data-number-step="${item.id}" data-delta="10">+10</button><span>${escapeHtml(item.unit||'')}</span></div><div class="requirements"><span>Materia prima para la meta · ${escapeHtml(plan.moldLabel)}</span>${plan.materials.map(material=>`<b>${escapeHtml(material.label)}: ${material.neededForTarget.toLocaleString('es-PE')} ${escapeHtml(material.unit)}</b>`).join('')}<small>La compra se convierte según su presentación: rollo, piel, juego o carrete.</small></div>`;
   } else if(item.type==='sales-staff'){
@@ -1099,13 +1164,21 @@ function bindDecisionControls(){
     });
   });
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
-  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item);d.quantities[i.dataset.option]=nonnegativeDecisionNumber(i.value);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty)}));
+  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item);d.quantities[i.dataset.option]=nonnegativeDecisionNumber(i.value);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty);refreshProductionDop()}));
+  document.querySelectorAll('[data-production-mold]').forEach(select=>select.addEventListener('change',()=>{
+    if(decisionEditingBlocked())return;
+    const d=initDraft(findDecisionItem('PRODUCCION_META'));
+    if(!productionPlan().productLines.some(line=>line.id===select.value))return;
+    d.viewMoldId=select.value;persistCurrentDraftOnly();renderDecisionCategory();
+    document.querySelector('[data-production-mold]')?.focus({preventScroll:true});
+  }));
   document.querySelectorAll('[data-mold-step]').forEach(button=>button.addEventListener('click',()=>{
     if(decisionEditingBlocked())return;const item=findDecisionItem('PRODUCCION_META'),d=initDraft(item),id=button.dataset.moldStep;
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
   }));
   document.querySelectorAll('[data-mold-target]').forEach(input=>{
-    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();updateHud();});
+    input.addEventListener('beforeinput',event=>{if(!/[-−]/.test(event.data||''))return;event.preventDefault();input.value='0';input.dispatchEvent(new Event('input',{bubbles:true}));});
+    input.addEventListener('input',()=>{const value=normalizeProductionTargetInput(input);if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=value;persistCurrentDraftOnly();updateHud();refreshProductionDop();});
     input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META')),id=input.dataset.moldTarget;d.moldTargets[id]=Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();renderDecisionCategory();});
   });
   document.querySelectorAll('[data-mold-suggest]').forEach(button=>button.addEventListener('click',()=>{
@@ -1118,7 +1191,7 @@ function bindDecisionControls(){
     i.addEventListener('change',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.number),d=initDraft(item);d.value=Math.max(Number(item.min||0),Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.number);});
   });
   document.querySelectorAll('[data-staff-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeStaff(b.dataset.staffStep,b.dataset.store,Number(b.dataset.delta));persistCurrentDraftOnly();}));
-  document.querySelectorAll('[data-staff]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem(i.dataset.staff));d.staff[i.dataset.store]=Math.max(0,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.staff)}));
+  document.querySelectorAll('[data-staff]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem(i.dataset.staff));d.staff[i.dataset.store]=Math.max(0,Number(i.value)||0);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.staff);refreshProductionDop()}));
   document.querySelectorAll('[data-loan]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;setLoan(i.dataset.loan,Number(i.value),true);persistCurrentDraftOnly();}));
   document.querySelectorAll('[data-loan-number]').forEach(i=>i.addEventListener('input',()=>{
     if(decisionEditingBlocked())return;
@@ -1382,7 +1455,7 @@ function decisionProgressPercent(){if(decisionState.__excel?.habilitado)return d
 function categoryCompletionMap(){if(decisionState.__excel?.habilitado){const readiness=excelCategoryReadiness(),sent=decisionsSubmitted();return Object.fromEntries(navigationCategories().map(cat=>{const complete=sent||readiness[cat.cat];return [cat.cat,{title:cat.title,done:complete?1:0,total:1,complete,submitted:sent}]}));}const out={};decisionCategories().forEach(cat=>{const req=cat.items.filter(i=>i.type!=='info'&&itemRequired(i));out[cat.cat]={title:cat.short||cat.title,done:req.filter(itemComplete).length,total:req.length,complete:req.length?req.every(itemComplete):true}});return out}
 let excelCashDisplayed={owner:null,value:null};
 function updateCashHud(){
-  const cash=decisionState.__excel?.habilitado?excelSavedCashBalance():typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
+  const cash=decisionState.__excel?.habilitado?excelSavedCashBalance():cashBalance();
   $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
   if($('projectedCash'))$('projectedCash').textContent=money(cash);
   for(const node of document.querySelectorAll('[data-saved-final-balance]'))node.textContent=money(cash);
@@ -1755,7 +1828,9 @@ function tickStudentGame(){
     if(Number.isFinite(deadline)&&studentNow()>=deadline&&lastDeadlineRefresh!==key){lastDeadlineRefresh=key;refreshStudentGame();}
   }
   if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;currentCategory=round>1?'A':navigationCategories()[0]?.cat;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
+  if(typeof ensureCycleFixedCosts==='function')ensureCycleFixedCosts();
   syncStudentTimer();if(studentConnected)updateIntegrationUI();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();renderOfficeFinances();
+  if(typeof maybeShowCycleCostNotice==='function')maybeShowCycleCostNotice();
 }
 
 function resumeStudentSession(){

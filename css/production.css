@@ -734,3 +734,26 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 #decisionMenu .excel-compulsory-details{padding-block:8px}
 #decisionMenu .excel-compulsory-details>summary{font-size:12px;color:var(--side-gold);min-height:32px}
 @media(max-width:600px){#decisionMenu .sticky-section-head{grid-template-columns:1fr;gap:8px}#decisionMenu .section-balance{text-align:left;border-left:0;padding:0;display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center}#decisionMenu .section-balance small{grid-column:1/-1}#decisionMenu .section-balance strong{font-size:18px}}
+
+/* One production workbench; the selector changes the view, not other mold targets. */
+#decisionMenu .production-calculator-single { border-radius: var(--ui-radius); }
+#decisionMenu .production-calculator-single > header { align-items: center; }
+#decisionMenu .production-calculator-single > header strong { font-size: 20px; color: var(--ui-text); }
+#decisionMenu .production-calculator-single .production-total { min-width: 180px; }
+#decisionMenu .production-calculator-fields { display: grid; grid-template-columns: minmax(180px,1fr) minmax(240px,1.4fr); gap: 14px 24px; padding: 20px; }
+#decisionMenu .production-calculator-fields > label,
+#decisionMenu .production-calculator-quantity { display: grid; align-content: start; gap: 8px; font-size: 14px; font-weight: 700; }
+#decisionMenu .production-calculator-fields select { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; color: var(--ui-text); background: var(--ui-inset); border: 1px solid var(--ui-line); border-radius: 8px; font: inherit; }
+#decisionMenu .production-calculator-fields select:focus-visible { outline: 3px solid var(--ui-yellow); outline-offset: 3px; }
+#decisionMenu .production-calculator-single .mold-target-control { margin: 0; }
+#decisionMenu .production-calculator-availability { margin: 0; font-size: 12px; line-height: 1.5; color: var(--ui-muted); }
+#decisionMenu .production-calculator-single .mold-suggestion { align-self: start; margin: 0; }
+#decisionMenu .production-calculator-single .mold-requirements { grid-column: 1/-1; display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0; padding: 14px; background: var(--ui-inset); border: 1px solid var(--ui-line); border-radius: 8px; }
+#decisionMenu .production-calculator-single .mold-requirements > span { flex-basis: 100%; }
+#decisionMenu .production-calculator-single footer { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+#decisionMenu .production-calculator-single footer small { flex-basis: 100%; }
+@media(max-width:600px) {
+  #decisionMenu .production-calculator-fields { grid-template-columns: minmax(0,1fr); gap: 14px; padding: 14px; }
+  #decisionMenu .production-calculator-single .production-total { min-width: 0; }
+  #decisionMenu .production-calculator-single .mold-suggestion { width: 100%; }
+}
