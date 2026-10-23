@@ -28,7 +28,7 @@ test('missing materials or workers never invent production or revenue',()=>{
 test('POS sales subtract the actual product and settle exactly once',()=>{
  const production={producibleUnits:20,productLines:[{plannedUnits:10},{plannedUnits:0},{plannedUnits:10}],materials:[]},state={CANALES:{optionIds:['web']}};
  const r=cycle.close({state,ledger:{'1:SIM_VENTAS':1250},catalog,production,soldUnits:10,soldByProduct:{premium:10}});
- assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,0);assert.equal(r.ledger['1:SIM_VENTAS'],2000);assert.equal(r.receipt.goods.premium,0);
+ assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],2000);assert.equal(r.receipt.goods.premium,0);
 });
 test('700 metres of thread cost S/64.40 with retained volume discount',()=>{
  const ctx={catalog,state:{},drafts:{HILO:{quantities:{hilo_std:700}}},round:1,rules};const item=catalog.flatMap(c=>c.items||[]).find(i=>i.id==='HILO');assert.ok(Math.abs(review.breakdown(item,ctx).outflow-64.4)<1e-9);

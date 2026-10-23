@@ -360,19 +360,23 @@
       const context=await sb.rpc('side_contexto_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo});
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
-      const resultadosPorEmpresa={};
+      const inputs=[];
       for(const company of ctx.empresas||[]){
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
         if(!saved)continue;
         const business=state.__cycleBusiness?.[ciclo]||{};
-        resultadosPorEmpresa[company.id]=global.SIDE_CYCLE_MODEL.close({state:{...saved.state,__cycleSettlements:state.__cycleSettlements,__finishedGoods:state.__finishedGoods},ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,...business});
-        const result=resultadosPorEmpresa[company.id],financialLedger={...result.ledger};let previous=0;
+        inputs.push({id:company.id,state:{...saved.state,__cycleSettlements:state.__cycleSettlements,__finishedGoods:state.__finishedGoods},ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,...business});
+      }
+      const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
+      for(const company of ctx.empresas||[]){
+        if(!resultadosPorEmpresa[company.id])continue;
+        const snapshot=company.snapshot||{},result=resultadosPorEmpresa[company.id],financialLedger={...result.ledger};let previous=0;
         for(let round=1;round<=ciclo;round++){
           const adjustment=global.SIDE_FINANCE_CONFIG?.adjustment(ctx.financialConfig||{},round,company.id,Number(company.capital))||0;
           if(adjustment!==previous)financialLedger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;
           previous=adjustment;
         }
-        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:state.__openingBalance});
+        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance});
       }
       const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
       if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data.code};

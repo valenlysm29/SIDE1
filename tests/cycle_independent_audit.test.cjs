@@ -9,7 +9,8 @@ test('closing respects the product already sold at the POS',()=>{
   const essential=result.receipt.sales.find(row=>row.id==='esencial'),premium=result.receipt.sales.find(row=>row.id==='premium');
   assert.equal(essential.alreadySold,0,'premium sales must never consume essential stock');
   assert.equal(premium.alreadySold,10);
-  assert.equal(premium.sold,0,'the same premium goods cannot be sold twice');
+  assert.equal(premium.sold,10,'closing records total market sales including the POS advance');
+  assert.equal(result.state.__finishedGoods.premium,0,'premium stock is consumed once');
   assert.equal(result.ledger['1:SIM_VENTAS'],2000,'1250 POS + 750 essential close sales');
 });
 test('the last automatic cycle settles when its runtime reaches simulation-finished',()=>{

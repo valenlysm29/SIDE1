@@ -1411,15 +1411,24 @@ function captureCyclePlan(){
 }
 function settleCycle(round=currentRound()){
   if(!window.SIDE_CYCLE_MODEL||decisionState.__cycleSettlements?.[round])return false;
+  // Shared market is settled once by the teacher using every company snapshot.
+  if(currentStudent.empresaId)return false;
   const saved=decisionState.__cyclePlans?.[round];
   if(!saved)return false;
-  const live=decisionState,ctx=cycleBusinessData(round),result=window.SIDE_CYCLE_MODEL.close({state:{...saved.state,__cycleSettlements:live.__cycleSettlements,__finishedGoods:live.__finishedGoods},ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,...ctx});
+  const live=decisionState,ctx=cycleBusinessData(round),id=currentStudent.participantId||('local-'+storageKey()),game=currentStudent.game?.codigo||'SIDE-000';
+  let peers=[];try{peers=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
+  const inputs=peers.filter(r=>r.id!==id&&r.partida===game&&r.estado!=='eliminada'&&r.enviado&&r.gameState?.__cyclePlans?.[round]).map(r=>{
+    const plan=r.gameState.__cyclePlans[round];return {id:r.id,state:plan.state,production:plan.production,round,prices:r.gameState.__cycleBusiness?.[round]?.prices||r.productPrices};
+  });
+  inputs.push({id,state:{...saved.state,__cycleSettlements:live.__cycleSettlements,__finishedGoods:live.__finishedGoods},ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,...ctx});
+  const result=window.SIDE_CYCLE_MODEL.closeMany(inputs)[id];
   decisionState={...live,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
   try{queueStudentSnapshot(buildStudentSnapshot(currentRound()));syncReportToSupabase(syncStudentReportPreview());}catch(error){console.warn('SIDE: cierre guardado; sincronización pendiente',error);}
   return true;
 }
 function syncStudentReportPreview(){
   if(currentStudent.expulsada||localStudentExpelled())return null;
+  decisionState.__cycleBusiness={...decisionState.__cycleBusiness,[currentRound()]:cycleBusinessData()};
   applyEventCashEffects();
   const entries=allDecisionItems().filter(i=>savedEntry(i));
   const financial=financialReport(),er=financial.estadoResultados;
