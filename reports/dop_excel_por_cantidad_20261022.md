@@ -1,6 +1,6 @@
 # DOP por cantidad: lectura independiente del libro original
 
-Fecha: 22/10/2026. Subagente Excel. Se aplicó `.agents/skills/xlsx/SKILL.md` y se leyó `.codex-work/DECISIONES_SIDE_16.xlsx` con dos cargas de openpyxl, fórmulas y caché por separado. SHA-256 confirmado: `3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1`. No se modificó el original. La caché original no contiene celdas de error.
+Fecha: 22/10/2026. Subagente Excel. Se aplicó `.agents/skills/xlsx/SKILL.md` y se leyó `.codex-work/DECISIONES_SIDE_16.xlsx` con dos cargas de openpyxl, fórmulas y caché por separado. SHA-256 confirmado: `3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1`. No se modificó el original. La caché original no contiene celdas tipadas como error, pero sí cuatro cadenas `#DIV/0!` en CANTIDAD E75/G75/E123/G123 (tipo texto); se detectaron en la auditoría de integración y no deben confundirse con un libro sin errores.
 
 ## Dependencias de la cantidad deseada
 

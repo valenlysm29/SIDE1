@@ -1,6 +1,34 @@
 # DOP por cantidad deseada — 22/10/2026
 
-## Alcance y punto de partida
+## Revisión adicional sobre la versión ya publicada
+
+Esta ejecución parte de `159e5fc`, con el árbol limpio y remoto verificado `https://github.com/valenlysm29/SIDE1.git`. Las secciones posteriores conservan la implementación y validación previas; este apartado las complementa y precisa su alcance. Se trabajó con cinco subagentes de alcances separados (Excel, Código, Auditoría, UI y Pruebas), en tandas por el límite de concurrencia, y se integraron sobre el mismo repositorio.
+
+La ruta principal ya calculaba necesidades desde la meta. Persistía un defecto en el editor Excel: `js/engine/ui_excel.js:dopPlan` entregaba el contrato antiguo y el renderer recurría a una representación incompleta de faltantes, sobrantes y costos. Además, la equivalencia de compra imponía `Math.ceil(faltante/conversión)`, que no aparece en el Excel. Se reemplaza por requisitos explícitos desde cantidad × coeficiente y comparación posterior por la calidad elegida. Un sobrante de cuero premium no elimina un faltante de cuero sintético. Se muestra la división del faltante por la presentación sin imponer redondeo de paquetes.
+
+Fuentes: necesidades `CANTIDAD DE PRODUCCIÓN!D37:D39`, coeficientes `D31:L33`, resultados `D42:L44`; precios `Costos De Producción!V76:W83` y conversiones `D32:K33`. La dotación inversa y el costo total no determinado se conservan como **no definidos**, nunca como cero ni como una optimización inventada. La edición de la cantidad no realiza compras ni cargos de caja.
+
+La UI conserva las pestañas y el estilo existente. Se revisan actualización en vivo, guardado, acceso por teclado y avisos de cambios para lectores de pantalla. No se modifican el menú congelado, los avatares ni el mundo 3D. **No hay actualización ni SQL pendiente para Supabase.**
+
+Informes por área: [Excel](dop_excel_por_cantidad_20261022.md), [Código](dop_codigo_20261022.md), [Auditoría](dop_auditoria_20261022.md), [UI](dop_ui_20261022.md) y [Pruebas](dop_pruebas_20261022.md). La auditoría nueva aporta 412 comparaciones con celdas originales, sin diferencias en los adaptadores literales. Incluye cada discrepancia operativa restante con archivo, línea, valor o regla del Excel y comportamiento de SIDE.
+
+**Límite de aceptación:** cero diferencias en los casos comprobados no significa paridad integral de todas las reglas del juego con el libro original. Los oráculos históricos agregan fórmulas financieras y de consecuencias que no están en sus diez hojas originales. Siguen identificadas las diferencias de calidad para mercado, el disparador planeado/producido de CONS-06, la precedencia de CONS-03 y las tarifas históricas sin fórmula fuente. Tampoco existe una inversa única de cantidad a personal, máquinas y tiempo. No se cambian silenciosamente estos criterios ni se modifican los esperados numéricos para declarar una igualdad inexistente. Por estas razones, la auditoría integral solicitada **no puede darse por cerrada** con el Excel actual.
+
+La caché original contiene cuatro cadenas `#DIV/0!` en `CANTIDAD DE PRODUCCIÓN!E75/G75/E123/G123`, almacenadas con tipo texto. La afirmación anterior de ausencia de errores en caché se refería solo al tipo de celda de error y era insuficiente. Tras recalcular, Excel también produce los errores ya documentados de `Lotes_Produccion`. El archivo original no se modifica.
+
+Revalidación independiente de esta ejecución: 14 casos DOP recalculados con Microsoft Excel COM 16.0; ocho escenarios históricos, 3.104 salidas, cero diferencias. Fuente preservada por SHA-256 antes y después. SIM-1 (468 salidas, un ciclo y cuatro empresas), SIM-2 (585 salidas, tres ciclos y dos empresas) y SIM-3 (1.140 salidas, tres ciclos y cinco empresas) pasan con cero diferencias en cada ciclo contra sus oráculos históricos. Línea de base Node: 514/514; batería final ampliada, después de integrar código y UI: **533/533**, cero fallos, cancelados u omitidos, 104,5 segundos. Las 19 pruebas nuevas del editor incluyen los 14 casos del fixture independiente real y conservación de caja al editar la meta. No quedan fallos NPC en esta batería. `decision_options_db.cjs` pasa en PostgreSQL local y el runner de tarjetas de decisiones pasa en móvil y escritorio.
+
+La revisión UI reproduce y corrige pérdida de foco al salir del campo de cantidad y al usar repetidamente los botones ±10. Se asocia la ayuda al campo y se anuncian total/requisitos en vivo. La última corrida del navegador independiente amplía la regresión de teclado dentro del runner versionado y pasa **767 comprobaciones**, sin errores JS, en 1150×666, 1440×900 y 390×844. Verifica metas, requisitos, caja, inventario físico, faltantes, costos, guardado y reingreso; los ciclos automáticos 2 y 3 también coinciden con el ledger. La corrida auxiliar de accesibilidad de 25 comprobaciones también pasó.
+
+Se corrigieron contratos de prueba antiguos que todavía esperaban compra redondeada o tres campos simultáneos de molde, y se inicializó correctamente el modo Excel en el arnés de tarjetas. No se modificaron esperados matemáticos para ocultar diferencias. Los fallos de contrato se describen en Pruebas; no se atribuyen a NPC.
+
+El runner final de navegación pasa en seis resoluciones, con cinco pestañas, guardado, teclado y desplazamiento hasta el final del panel real. Detectó y se corrigió un defecto preexistente de legibilidad de las insignias (10 px): ahora tienen al menos 11 px y 24 px de alto. Los 16 contratos UI/responsive dirigidos posteriores a ese último cambio CSS también pasan. Logs finales: `tests/output/dop-20261022/browser/decisions_cycle_ui-final.log` y `tests/output/dop-20261022/css-targeted-final.log`.
+
+Commits de esta revisión: Código `aa31844`; Excel `13b5a7b` y `df632e7`; Auditoría `3154882` y `7f05011`; UI `3a70289` y `183445f`; Pruebas `35ec184`; más el cierre de integración de este informe. El árbol queda limpio después de restaurar exclusivamente capturas y bytecode generados por las pruebas. Se verificó que el contenedor del proyecto sigue teniendo únicamente SIDE1 y no se crearon archivos de trabajo fuera de él.
+
+**No se realiza un nuevo push en esta ejecución.** La instrucción condiciona el push a que todo pase: las pruebas implementadas pasan, pero la auditoría integral requerida conserva discrepancias sin corregir y la recomendación inversa no está definida por la fuente. Para cerrar ese alcance se necesita resolver en el modelo fuente los criterios señalados en Auditoría: dotación/tiempos desde una meta, hoja de capacidad prevalente, calidad del mercado, precedencia/disparador de consecuencias y tarifas sin fórmula. No se equipara aprobación de pruebas con aceptación de esas reglas. Los commits locales y los informes dejan el resultado concreto disponible para revisión; no hay SQL pendiente.
+
+## Alcance y punto de partida de la implementación previa
 
 Base: `7cb8e98`. Repositorio inicialmente limpio. Se conserva el menú de decisiones y no se modifican avatares ni mundo 3D. No se ejecuta SQL en producción.
 
@@ -50,7 +78,7 @@ Ver `reports/auditoria_motor_dop_2026-10-22.md`: diez hojas, 871 celdas de fórm
 
 El Excel tiene contradicciones: sus hojas de cantidad y costos usan productividad/días y dotaciones distintas (capacidad de ejemplo 396 frente a 382); precios por unidad productiva frente a algunos ejemplos incrustados incompatibles; sueldos de corte distintos entre catálogo y costos. Para nómina se usa la fórmula completa de Costos, sin reemplazarla por normativa externa. Los ejemplos no se reescriben para obtener una falsa igualdad.
 
-Al recalcular una copia intacta del original aparecen siete errores: cuatro `#DIV/0!` en CANTIDAD E75/G75/E123/G123 y tres `#NAME?` en Lotes J2:J4. La caché original no mostraba esos errores. Las variantes cero además dividen por cero en E37:E39; el juego protege la meta cero, sin atribuir esa protección al Excel. La compatibilidad `_xlfn.IFS` del oráculo histórico se aplica solo a sus copias.
+Al recalcular una copia intacta del original aparecen siete errores: cuatro `#DIV/0!` en CANTIDAD E75/G75/E123/G123 y tres `#NAME?` en Lotes J2:J4. Los cuatro primeros ya están en la caché original como cadenas de texto, aunque no estén tipados como error. Las variantes cero además dividen por cero en E37:E39; el juego protege la meta cero, sin atribuir esa protección al Excel. La compatibilidad `_xlfn.IFS` del oráculo histórico se aplica solo a sus copias.
 
 No se afirma paridad de todas las reglas de la UI histórica con el libro: emparejamiento de trabajadores/máquinas, tope histórico de eficiencia, contabilidad simplificada, mantenimiento mensual, depreciación, liquidación, indemnización y crédito tienen diferencias o extensiones explícitas en el informe de auditoría. Las reglas no definidas por el Excel no se sustituyen por valores inventados.
 
@@ -75,7 +103,7 @@ La prueba nueva `tests/dop_confirmation_capacity.test.cjs` ejecutada contra el a
 
 **No hay SQL pendiente ni se debe actualizar Supabase para este cambio.** Se conservan el esquema y el contrato de snapshot; la cantidad usa el campo existente `PRODUCCION_META.moldTargets`. No se ejecutó SQL en producción.
 
-## Verificación y punto de control
+## Verificación y publicación de la ejecución previa
 
 - Fuente original preservada y hash verificado antes/después del recálculo.
 - 14 casos nuevos: recalculados con Microsoft Excel 16.0 en copias; 126 requerimientos físicos sin diferencias.
