@@ -90,4 +90,6 @@ La prueba nueva `tests/dop_confirmation_capacity.test.cjs` ejecutada contra el a
 - Navegador final con inventario físico persistido: 743 comprobaciones, cero errores JavaScript, nueve ciclos automáticos; cantidades, requisitos, faltantes, costos por calidad, guardado, snapshot, reingreso y caja correctos. Revisión visual de capturas realizada en escritorio y móvil.
 - Runner de aviso/calculadora anterior: 153 comprobaciones, cero errores, tres ciclos y persistencia de confirmación.
 - `decision_options_db.cjs`: contrato de múltiples opciones, importes, reintentos, permisos privados y revisiones correcto en PostgreSQL local; no producción.
-- Siguiente paso exacto: terminar Node final, registrar resultado, publicar y comprobar GitHub Pages.
+- Batería Node final secuencial sobre el código integrado: **514/514**, cero fallos y cero omitidos (126,8 s). No quedó ningún fallo NPC en esta batería; no se modificó lógica 3D ni se presenta la batería como una revisión visual nueva del mundo.
+- Todos los cambios de producto y pruebas están en commits por área. No hay SQL pendiente.
+- Siguiente paso exacto: push normal a `origin/main` y comprobar los archivos servidos por GitHub Pages.
