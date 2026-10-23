@@ -1,0 +1,20 @@
+Registro A
+Registro B
+Registro C
+Registro D
+Registro E
+Ciclo 1
+Decision 1 A
+Decision 1 B
+Decision 1 C
+Decision 1 D
+Ciclo 2
+Decision 2 A
+Decision 2 C
+Decision 2 D
+Ciclo 3
+Decision 3 A
+Decision 3 B
+Decision 3 C
+Decision 3 D
+PASS SIM-3: registro normal, decisiones UI, cierre docente, 3 ciclo(s), 5 empresas; móvil sin desborde.

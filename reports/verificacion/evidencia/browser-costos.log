@@ -1,0 +1,154 @@
+PASS 1150 actual automatic cycle 1
+PASS 1150 receipt has fixed amount 1
+PASS 1150 opening balance 1
+PASS 1150 closing balance 1
+PASS 1150 real cash equals receipt 1
+PASS 1150 displayed total equals charge 1
+PASS 1150 displayed initial equals real 1
+PASS 1150 displayed final equals real 1
+PASS 1150 announced LOCAL_PROD/1
+PASS 1150 announced LIMPIEZA/1
+PASS 1150 sum displayed items 1
+PASS 1150 no unannounced ledger debit 1
+PASS 1150 receipt persists in student snapshot 1
+PASS 1150 modal inside viewport 1
+PASS 1150 acknowledgement stored 1
+PASS 1150 acknowledged notice not repeated 1
+PASS 1150 reload reenters same company
+PASS 1150 reload does not repeat acknowledged notice
+PASS 1150 reload no double charge
+PASS 1150 actual automatic cycle 2
+PASS 1150 receipt has fixed amount 2
+PASS 1150 opening balance 2
+PASS 1150 closing balance 2
+PASS 1150 real cash equals receipt 2
+PASS 1150 displayed total equals charge 2
+PASS 1150 displayed initial equals real 2
+PASS 1150 displayed final equals real 2
+PASS 1150 announced LOCAL_PROD/2
+PASS 1150 announced LIMPIEZA/2
+PASS 1150 sum displayed items 2
+PASS 1150 no unannounced ledger debit 2
+PASS 1150 receipt persists in student snapshot 2
+PASS 1150 modal inside viewport 2
+PASS 1150 actual automatic cycle 3
+PASS 1150 receipt has fixed amount 3
+PASS 1150 opening balance 3
+PASS 1150 closing balance 3
+PASS 1150 real cash equals receipt 3
+PASS 1150 displayed total equals charge 3
+PASS 1150 displayed initial equals real 3
+PASS 1150 displayed final equals real 3
+PASS 1150 announced LOCAL_PROD/3
+PASS 1150 announced LIMPIEZA/3
+PASS 1150 sum displayed items 3
+PASS 1150 no unannounced ledger debit 3
+PASS 1150 receipt persists in student snapshot 3
+PASS 1150 modal inside viewport 3
+PASS 1150 acknowledgement stored 3
+PASS 1150 acknowledged notice not repeated 3
+PASS 1150 replacing open cycle2 notice never acknowledges it
+PASS 1150 saving fixed sections no second charge
+PASS 1150 exactly one units input
+PASS 1150 mold selector present
+PASS 1150 molde_1 CUERO requirements
+PASS 1150 molde_1 ACCESORIOS requirements
+PASS 1150 molde_1 HILO requirements
+PASS 1150 molde_1 DOP target from same plan
+PASS 1150 molde_1 total from same plan
+PASS 1150 molde_1 comparison does not buy mold or charge
+PASS 1150 molde_1 still one numeric control
+PASS 1150 molde_2 CUERO requirements
+PASS 1150 molde_2 ACCESORIOS requirements
+PASS 1150 molde_2 HILO requirements
+PASS 1150 molde_2 DOP target from same plan
+PASS 1150 molde_2 total from same plan
+PASS 1150 molde_2 comparison does not buy mold or charge
+PASS 1150 molde_2 still one numeric control
+PASS 1150 molde_3 CUERO requirements
+PASS 1150 molde_3 ACCESORIOS requirements
+PASS 1150 molde_3 HILO requirements
+PASS 1150 molde_3 DOP target from same plan
+PASS 1150 molde_3 total from same plan
+PASS 1150 molde_3 comparison does not buy mold or charge
+PASS 1150 molde_3 still one numeric control
+PASS 1150 negative clamp immediate
+PASS 1150 no global horizontal overflow
+PASS 390 actual automatic cycle 1
+PASS 390 receipt has fixed amount 1
+PASS 390 opening balance 1
+PASS 390 closing balance 1
+PASS 390 real cash equals receipt 1
+PASS 390 displayed total equals charge 1
+PASS 390 displayed initial equals real 1
+PASS 390 displayed final equals real 1
+PASS 390 announced LOCAL_PROD/1
+PASS 390 announced LIMPIEZA/1
+PASS 390 sum displayed items 1
+PASS 390 no unannounced ledger debit 1
+PASS 390 receipt persists in student snapshot 1
+PASS 390 modal inside viewport 1
+PASS 390 acknowledgement stored 1
+PASS 390 acknowledged notice not repeated 1
+PASS 390 reload reenters same company
+PASS 390 reload does not repeat acknowledged notice
+PASS 390 reload no double charge
+PASS 390 actual automatic cycle 2
+PASS 390 receipt has fixed amount 2
+PASS 390 opening balance 2
+PASS 390 closing balance 2
+PASS 390 real cash equals receipt 2
+PASS 390 displayed total equals charge 2
+PASS 390 displayed initial equals real 2
+PASS 390 displayed final equals real 2
+PASS 390 announced LOCAL_PROD/2
+PASS 390 announced LIMPIEZA/2
+PASS 390 sum displayed items 2
+PASS 390 no unannounced ledger debit 2
+PASS 390 receipt persists in student snapshot 2
+PASS 390 modal inside viewport 2
+PASS 390 actual automatic cycle 3
+PASS 390 receipt has fixed amount 3
+PASS 390 opening balance 3
+PASS 390 closing balance 3
+PASS 390 real cash equals receipt 3
+PASS 390 displayed total equals charge 3
+PASS 390 displayed initial equals real 3
+PASS 390 displayed final equals real 3
+PASS 390 announced LOCAL_PROD/3
+PASS 390 announced LIMPIEZA/3
+PASS 390 sum displayed items 3
+PASS 390 no unannounced ledger debit 3
+PASS 390 receipt persists in student snapshot 3
+PASS 390 modal inside viewport 3
+PASS 390 acknowledgement stored 3
+PASS 390 acknowledged notice not repeated 3
+PASS 390 replacing open cycle2 notice never acknowledges it
+PASS 390 saving fixed sections no second charge
+PASS 390 exactly one units input
+PASS 390 mold selector present
+PASS 390 molde_1 CUERO requirements
+PASS 390 molde_1 ACCESORIOS requirements
+PASS 390 molde_1 HILO requirements
+PASS 390 molde_1 DOP target from same plan
+PASS 390 molde_1 total from same plan
+PASS 390 molde_1 comparison does not buy mold or charge
+PASS 390 molde_1 still one numeric control
+PASS 390 molde_2 CUERO requirements
+PASS 390 molde_2 ACCESORIOS requirements
+PASS 390 molde_2 HILO requirements
+PASS 390 molde_2 DOP target from same plan
+PASS 390 molde_2 total from same plan
+PASS 390 molde_2 comparison does not buy mold or charge
+PASS 390 molde_2 still one numeric control
+PASS 390 molde_3 CUERO requirements
+PASS 390 molde_3 ACCESORIOS requirements
+PASS 390 molde_3 HILO requirements
+PASS 390 molde_3 DOP target from same plan
+PASS 390 molde_3 total from same plan
+PASS 390 molde_3 comparison does not buy mold or charge
+PASS 390 molde_3 still one numeric control
+PASS 390 negative clamp immediate
+PASS 390 no global horizontal overflow
+PASS no uncaught page errors
+PASS 153 independent checks

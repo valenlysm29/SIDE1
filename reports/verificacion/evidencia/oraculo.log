@@ -1,0 +1,11 @@
+{
+  "source_sha256": "3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1",
+  "engine": "Microsoft Excel COM",
+  "cases": 12,
+  "exported_source_values": 9648,
+  "comparisons": 4272,
+  "comparable_checks": 4220,
+  "numeric_comparisons": 4100,
+  "differences": [],
+  "source_errors": 52
+}

@@ -1,0 +1,14 @@
+{
+  "total": 112.0,
+  "status": "success",
+  "errors": [],
+  "total_formulas": 369,
+  "no_comparable": 1.0,
+  "motor": "Microsoft Excel COM",
+  "diferencia": 0.0,
+  "pendiente": 0.0,
+  "ok": 111.0,
+  "tolerancia_absoluta": 0.01,
+  "total_errors": 0,
+  "version": "16.0"
+}

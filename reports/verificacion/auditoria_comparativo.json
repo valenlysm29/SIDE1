@@ -1,0 +1,1021 @@
+{
+  "archivo": "COMPARATIVO_SIDE_vs_EXCEL.xlsx",
+  "escenarios": 15,
+  "filas_por_tema": {
+    "DOP por cantidad": 90,
+    "costo de producción": 10,
+    "caja": 1,
+    "consecuencias": 4,
+    "puntajes": 7
+  },
+  "filas": [
+    {
+      "caso": "E01",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 8,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 9,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 10,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 11,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 12,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 13,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 14,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 15,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 16,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E01",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 17,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 18,
+      "esperado": 1,
+      "obtenido": 1,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 19,
+      "esperado": 0.3,
+      "obtenido": 0.3,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 20,
+      "esperado": 1,
+      "obtenido": 1,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 21,
+      "esperado": 6,
+      "obtenido": 6,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 22,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 23,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 24,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 25,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 26,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E02",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 27,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 28,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 29,
+      "esperado": 3,
+      "obtenido": 3,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 30,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 31,
+      "esperado": 60,
+      "obtenido": 60,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 32,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 33,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 34,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 35,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 36,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E03",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 37,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 38,
+      "esperado": 396,
+      "obtenido": 396,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 39,
+      "esperado": 118.8,
+      "obtenido": 118.8,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 40,
+      "esperado": 396,
+      "obtenido": 396,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 41,
+      "esperado": 2376,
+      "obtenido": 2376,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 42,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 43,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 44,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 45,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 46,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E04",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 47,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 48,
+      "esperado": 397,
+      "obtenido": 397,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 49,
+      "esperado": 119.1,
+      "obtenido": 119.1,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 50,
+      "esperado": 397,
+      "obtenido": 397,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 51,
+      "esperado": 2382,
+      "obtenido": 2382,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 52,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 53,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 54,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 55,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 56,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E05",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 57,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 58,
+      "esperado": 1000,
+      "obtenido": 1000,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 59,
+      "esperado": 300,
+      "obtenido": 300,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 60,
+      "esperado": 1000,
+      "obtenido": 1000,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 61,
+      "esperado": 6000,
+      "obtenido": 6000,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 62,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 63,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 64,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 65,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 66,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E06",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 67,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 68,
+      "esperado": 520,
+      "obtenido": 520,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 69,
+      "esperado": 75,
+      "obtenido": 75,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 70,
+      "esperado": 250,
+      "obtenido": 250,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 71,
+      "esperado": 1500,
+      "obtenido": 1500,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 72,
+      "esperado": 72,
+      "obtenido": 72,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 73,
+      "esperado": 180,
+      "obtenido": 180,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 74,
+      "esperado": 1260,
+      "obtenido": 1260,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 75,
+      "esperado": 62.99999999999999,
+      "obtenido": 63,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 76,
+      "esperado": 90,
+      "obtenido": 90,
+      "comparable": true
+    },
+    {
+      "caso": "E07",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 77,
+      "esperado": 1170,
+      "obtenido": 1170,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 78,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 79,
+      "esperado": 3,
+      "obtenido": 3,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 80,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 81,
+      "esperado": 60,
+      "obtenido": 60,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 82,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 83,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 84,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 85,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 86,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E08",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 87,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "D36",
+      "sheet": "DOP por cantidad",
+      "row": 88,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "D42",
+      "sheet": "DOP por cantidad",
+      "row": 89,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "G42",
+      "sheet": "DOP por cantidad",
+      "row": 90,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "J42",
+      "sheet": "DOP por cantidad",
+      "row": 91,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "E43",
+      "sheet": "DOP por cantidad",
+      "row": 92,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "H43",
+      "sheet": "DOP por cantidad",
+      "row": 93,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "K43",
+      "sheet": "DOP por cantidad",
+      "row": 94,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "F44",
+      "sheet": "DOP por cantidad",
+      "row": 95,
+      "esperado": 7,
+      "obtenido": 7,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "I44",
+      "sheet": "DOP por cantidad",
+      "row": 96,
+      "esperado": 10,
+      "obtenido": 10,
+      "comparable": true
+    },
+    {
+      "caso": "E09",
+      "key": "L44",
+      "sheet": "DOP por cantidad",
+      "row": 97,
+      "esperado": 130,
+      "obtenido": 130,
+      "comparable": true
+    },
+    {
+      "caso": "E10",
+      "key": "corte.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 8,
+      "esperado": 1690.8,
+      "obtenido": 1690.8,
+      "comparable": true
+    },
+    {
+      "caso": "E10",
+      "key": "ensamble.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 9,
+      "esperado": 1690.8,
+      "obtenido": 1690.8,
+      "comparable": true
+    },
+    {
+      "caso": "E10",
+      "key": "acabado.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 10,
+      "esperado": 1690.8,
+      "obtenido": 1690.8,
+      "comparable": true
+    },
+    {
+      "caso": "E10",
+      "key": "local",
+      "sheet": "costo de producción",
+      "row": 11,
+      "esperado": 2000,
+      "obtenido": 2000,
+      "comparable": true
+    },
+    {
+      "caso": "E10",
+      "key": "cuero_neto",
+      "sheet": "costo de producción",
+      "row": 12,
+      "esperado": 23,
+      "obtenido": 23,
+      "comparable": true
+    },
+    {
+      "caso": "E11",
+      "key": "corte.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 13,
+      "esperado": 1856.5384615384614,
+      "obtenido": 1856.5384615384614,
+      "comparable": true
+    },
+    {
+      "caso": "E11",
+      "key": "ensamble.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 14,
+      "esperado": 1856.5384615384614,
+      "obtenido": 1856.5384615384614,
+      "comparable": true
+    },
+    {
+      "caso": "E11",
+      "key": "acabado.pagoMensual",
+      "sheet": "costo de producción",
+      "row": 15,
+      "esperado": 1856.5384615384614,
+      "obtenido": 1856.5384615384614,
+      "comparable": true
+    },
+    {
+      "caso": "E11",
+      "key": "local",
+      "sheet": "costo de producción",
+      "row": 16,
+      "esperado": 2000,
+      "obtenido": 2000,
+      "comparable": true
+    },
+    {
+      "caso": "E11",
+      "key": "cuero_neto",
+      "sheet": "costo de producción",
+      "row": 17,
+      "esperado": 23,
+      "obtenido": 23,
+      "comparable": true
+    },
+    {
+      "caso": "E12",
+      "key": "caja_final",
+      "sheet": "caja",
+      "row": 8,
+      "esperado": null,
+      "obtenido": -2712.32,
+      "comparable": false
+    },
+    {
+      "caso": "E13",
+      "key": "calidad",
+      "sheet": "puntajes",
+      "row": 8,
+      "esperado": 6.2,
+      "obtenido": 6.2,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "eficiencia",
+      "sheet": "puntajes",
+      "row": 9,
+      "esperado": 16,
+      "obtenido": 16,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "reputacion",
+      "sheet": "puntajes",
+      "row": 10,
+      "esperado": 6,
+      "obtenido": 6,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "saludFinanciera",
+      "sheet": "puntajes",
+      "row": 11,
+      "esperado": -1,
+      "obtenido": -1,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "costo_lote2",
+      "sheet": "puntajes",
+      "row": 12,
+      "esperado": 96,
+      "obtenido": 96,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "costo_lote3",
+      "sheet": "puntajes",
+      "row": 13,
+      "esperado": 51,
+      "obtenido": 51,
+      "comparable": true
+    },
+    {
+      "caso": "E13",
+      "key": "costo_lote4",
+      "sheet": "puntajes",
+      "row": 14,
+      "esperado": 31,
+      "obtenido": 31,
+      "comparable": true
+    },
+    {
+      "caso": "E14",
+      "key": "precioFactor",
+      "sheet": "consecuencias",
+      "row": 8,
+      "esperado": 1,
+      "obtenido": 1,
+      "comparable": true
+    },
+    {
+      "caso": "E14",
+      "key": "reputacionCambio",
+      "sheet": "consecuencias",
+      "row": 9,
+      "esperado": 0,
+      "obtenido": 0,
+      "comparable": true
+    },
+    {
+      "caso": "E15",
+      "key": "precioFactor",
+      "sheet": "consecuencias",
+      "row": 10,
+      "esperado": 1.4,
+      "obtenido": 1.4,
+      "comparable": true
+    },
+    {
+      "caso": "E15",
+      "key": "reputacionCambio",
+      "sheet": "consecuencias",
+      "row": 11,
+      "esperado": 2,
+      "obtenido": 2,
+      "comparable": true
+    }
+  ]
+}

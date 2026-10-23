@@ -1,0 +1,1185 @@
+[
+  {
+    "id": "E10",
+    "values": {
+      "corte.pagoMensual": 1690.8,
+      "ensamble.pagoMensual": 1690.8,
+      "acabado.pagoMensual": 1690.8,
+      "local": 2000,
+      "cuero_neto": 23
+    },
+    "inputs": {
+      "regimen": "MYPE"
+    },
+    "saved": {
+      "habilitado": true,
+      "round": 1,
+      "decisiones": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "",
+            "cantidad": 0,
+            "cuero": "",
+            "accesorios": "",
+            "hilo": "",
+            "molde": "",
+            "precio": 0
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "decisionesGuardadas": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "",
+            "cantidad": 0,
+            "cuero": "",
+            "accesorios": "",
+            "hilo": "",
+            "molde": "",
+            "precio": 0
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "saldoFinalGuardado": 997287.68,
+      "version": 1,
+      "enviado": false
+    },
+    "source": "Componente real js/engine/ui_excel.js montado aislado en Chromium, estado precargado y campos editados; motor browser lee estado guardado. No partida remota ni cierre docente."
+  },
+  {
+    "id": "E11",
+    "values": {
+      "corte.pagoMensual": 1856.5384615384614,
+      "ensamble.pagoMensual": 1856.5384615384614,
+      "acabado.pagoMensual": 1856.5384615384614,
+      "local": 2000,
+      "cuero_neto": 23
+    },
+    "inputs": {
+      "regimen": "NO_MYPE"
+    },
+    "saved": {
+      "habilitado": true,
+      "round": 1,
+      "decisiones": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "",
+            "cantidad": 0,
+            "cuero": "",
+            "accesorios": "",
+            "hilo": "",
+            "molde": "",
+            "precio": 0
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "NO_MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "decisionesGuardadas": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "",
+            "cantidad": 0,
+            "cuero": "",
+            "accesorios": "",
+            "hilo": "",
+            "molde": "",
+            "precio": 0
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "NO_MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "saldoFinalGuardado": 997188.1538461539,
+      "version": 1,
+      "enviado": false
+    },
+    "source": "Componente real js/engine/ui_excel.js montado aislado en Chromium, estado precargado y campos editados; motor browser lee estado guardado. No partida remota ni cierre docente."
+  },
+  {
+    "id": "E13",
+    "values": {
+      "calidad": 6.2,
+      "eficiencia": 16,
+      "reputacion": 6,
+      "saludFinanciera": -1,
+      "costo_lote2": 96,
+      "costo_lote3": 51,
+      "costo_lote4": 31
+    },
+    "inputs": {
+      "seleccion": [
+        "INF-03",
+        "INF-06",
+        "INF-09",
+        "RH-02",
+        "RH-05",
+        "RH-08",
+        "RH-10A",
+        "COM-01C",
+        "FIN-01B",
+        "INS-09B",
+        "INS-10A",
+        "INS-11B",
+        "INV-01B",
+        "INV-02B"
+      ],
+      "lotes": [
+        {
+          "segmento": "SEG-03",
+          "cantidad": 100,
+          "cuero": "INS-03",
+          "accesorios": "INS-05",
+          "hilo": "INS-08",
+          "molde": "INF-10",
+          "costoUnitario": 96,
+          "calidad": 12,
+          "umbral": 7,
+          "resultado": "Coherente",
+          "precio": 250
+        },
+        {
+          "segmento": "SEG-02",
+          "cantidad": 300,
+          "cuero": "INS-02",
+          "accesorios": "INS-04",
+          "hilo": "INS-06",
+          "molde": "INF-08",
+          "costoUnitario": 51,
+          "calidad": 5,
+          "umbral": 4,
+          "resultado": "Coherente",
+          "precio": 250
+        },
+        {
+          "segmento": "SEG-03",
+          "cantidad": 100,
+          "cuero": "INS-01",
+          "accesorios": "INS-04",
+          "hilo": "INS-06",
+          "molde": "INF-08",
+          "costoUnitario": 31,
+          "calidad": 4,
+          "umbral": 7,
+          "resultado": "No alcanza el segmento",
+          "precio": 250
+        }
+      ]
+    },
+    "saved": {
+      "habilitado": true,
+      "round": 1,
+      "decisiones": {
+        "seleccion": [
+          "INF-03",
+          "INF-06",
+          "INF-09",
+          "RH-02",
+          "RH-05",
+          "RH-08",
+          "RH-10A",
+          "COM-01C",
+          "FIN-01B",
+          "INV-01B"
+        ],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 100,
+            "cuero": "INS-03",
+            "accesorios": "INS-05",
+            "hilo": "INS-08",
+            "molde": "INF-10",
+            "costoUnitario": 96,
+            "calidad": 12,
+            "umbral": 7,
+            "resultado": "Coherente",
+            "precio": 250
+          },
+          {
+            "segmento": "SEG-02",
+            "cantidad": 300,
+            "cuero": "INS-02",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "costoUnitario": 51,
+            "calidad": 5,
+            "umbral": 4,
+            "resultado": "Coherente",
+            "precio": 250
+          },
+          {
+            "segmento": "SEG-03",
+            "cantidad": 100,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "costoUnitario": 31,
+            "calidad": 4,
+            "umbral": 7,
+            "resultado": "No alcanza el segmento",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 1,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "decisionesGuardadas": {
+        "seleccion": [
+          "INF-03",
+          "INF-06",
+          "INF-09",
+          "RH-02",
+          "RH-05",
+          "RH-08",
+          "RH-10A",
+          "COM-01C",
+          "FIN-01B",
+          "INV-01B"
+        ],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 100,
+            "cuero": "INS-03",
+            "accesorios": "INS-05",
+            "hilo": "INS-08",
+            "molde": "INF-10",
+            "costoUnitario": 96,
+            "calidad": 12,
+            "umbral": 7,
+            "resultado": "Coherente",
+            "precio": 250
+          },
+          {
+            "segmento": "SEG-02",
+            "cantidad": 300,
+            "cuero": "INS-02",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "costoUnitario": 51,
+            "calidad": 5,
+            "umbral": 4,
+            "resultado": "Coherente",
+            "precio": 250
+          },
+          {
+            "segmento": "SEG-03",
+            "cantidad": 100,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "costoUnitario": 31,
+            "calidad": 4,
+            "umbral": 7,
+            "resultado": "No alcanza el segmento",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 1,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {}
+      },
+      "saldoFinalGuardado": 986466.08,
+      "version": 1,
+      "enviado": false
+    },
+    "source": "Componente real js/engine/ui_excel.js montado aislado en Chromium, estado precargado y campos editados; motor browser lee estado guardado. No partida remota ni cierre docente."
+  },
+  {
+    "id": "E14",
+    "values": {
+      "precioFactor": 1,
+      "reputacionCambio": 0,
+      "calidadReal": 4
+    },
+    "inputs": {
+      "calidad": 4,
+      "segmento": "SEG-03",
+      "eficiencia": 7,
+      "reputacion": 7,
+      "saludFinanciera": 7,
+      "jefes": 1,
+      "planeado": 10,
+      "capacidad": 396,
+      "producido": 10,
+      "demanda": 100,
+      "costoMOciclo": 0,
+      "lotes_manuales": [
+        {
+          "segmento": "SEG-03",
+          "cantidad": 10,
+          "cuero": "INS-01",
+          "accesorios": "INS-04",
+          "hilo": "INS-06",
+          "molde": "INF-08"
+        }
+      ],
+      "lotes": [
+        {
+          "segmento": "SEG-03",
+          "cantidad": 10,
+          "cuero": "INS-01",
+          "accesorios": "INS-04",
+          "hilo": "INS-06",
+          "molde": "INF-08",
+          "precio": 250
+        }
+      ]
+    },
+    "saved": {
+      "habilitado": true,
+      "round": 1,
+      "decisiones": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {},
+        "calidad": 4,
+        "segmento": "SEG-03",
+        "eficiencia": 7,
+        "reputacion": 7,
+        "saludFinanciera": 7,
+        "planeado": 10,
+        "capacidad": 396,
+        "producido": 10,
+        "demanda": 100,
+        "costoMOciclo": 0,
+        "lotes_manuales": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08"
+          }
+        ]
+      },
+      "decisionesGuardadas": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {},
+        "calidad": 4,
+        "segmento": "SEG-03",
+        "eficiencia": 7,
+        "reputacion": 7,
+        "saludFinanciera": 7,
+        "planeado": 10,
+        "capacidad": 396,
+        "producido": 10,
+        "demanda": 100,
+        "costoMOciclo": 0,
+        "lotes_manuales": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-01",
+            "accesorios": "INS-04",
+            "hilo": "INS-06",
+            "molde": "INF-08"
+          }
+        ]
+      },
+      "saldoFinalGuardado": 997287.68,
+      "version": 1,
+      "enviado": false
+    },
+    "source": "Componente real js/engine/ui_excel.js montado aislado en Chromium, estado precargado y campos editados; motor browser lee estado guardado. No partida remota ni cierre docente."
+  },
+  {
+    "id": "E15",
+    "values": {
+      "precioFactor": 1.4,
+      "reputacionCambio": 2,
+      "calidadReal": 12
+    },
+    "inputs": {
+      "calidad": 12,
+      "segmento": "SEG-03",
+      "eficiencia": 7,
+      "reputacion": 7,
+      "saludFinanciera": 7,
+      "jefes": 1,
+      "planeado": 10,
+      "capacidad": 396,
+      "producido": 10,
+      "demanda": 100,
+      "costoMOciclo": 0,
+      "lotes": [
+        {
+          "segmento": "SEG-03",
+          "cantidad": 10,
+          "cuero": "INS-03",
+          "accesorios": "INS-05",
+          "hilo": "INS-08",
+          "molde": "INF-10",
+          "precio": 250
+        }
+      ]
+    },
+    "saved": {
+      "habilitado": true,
+      "round": 1,
+      "decisiones": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-03",
+            "accesorios": "INS-05",
+            "hilo": "INS-08",
+            "molde": "INF-10",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {},
+        "calidad": 12,
+        "segmento": "SEG-03",
+        "eficiencia": 7,
+        "reputacion": 7,
+        "saludFinanciera": 7,
+        "planeado": 10,
+        "capacidad": 396,
+        "producido": 10,
+        "demanda": 100,
+        "costoMOciclo": 0
+      },
+      "decisionesGuardadas": {
+        "seleccion": [],
+        "garantiaDias": null,
+        "mantenimientoPreventivo": false,
+        "marketingNivel": null,
+        "analistaCompras": false,
+        "garantiaProveedor": 0,
+        "tiendasPorDistrito": {
+          "los_olivos": 0,
+          "miraflores": 0,
+          "sjl": 0
+        },
+        "lotes": [
+          {
+            "segmento": "SEG-03",
+            "cantidad": 10,
+            "cuero": "INS-03",
+            "accesorios": "INS-05",
+            "hilo": "INS-08",
+            "molde": "INF-10",
+            "precio": 250
+          }
+        ],
+        "personal": {
+          "corte": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "ensamble": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "acabado": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        },
+        "jefes": 0,
+        "regimen": "MYPE",
+        "publicidad": 0,
+        "montoPrestamo": 0,
+        "comprasUnidades": {},
+        "maquinaria": {},
+        "calidad": 12,
+        "segmento": "SEG-03",
+        "eficiencia": 7,
+        "reputacion": 7,
+        "saludFinanciera": 7,
+        "planeado": 10,
+        "capacidad": 396,
+        "producido": 10,
+        "demanda": 100,
+        "costoMOciclo": 0
+      },
+      "saldoFinalGuardado": 997287.68,
+      "version": 1,
+      "enviado": false
+    },
+    "source": "Componente real js/engine/ui_excel.js montado aislado en Chromium, estado precargado y campos editados; motor browser lee estado guardado. No partida remota ni cierre docente."
+  }
+]

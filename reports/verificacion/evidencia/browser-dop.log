@@ -1,0 +1,767 @@
+PASS 1150 target help associated
+PASS 1150 total atomic live status
+PASS 1150 live total updated
+PASS 1150 keyboard plus keeps focus
+PASS 1150 keyboard plus updates target
+PASS 1150 keyboard repeat keeps focus
+PASS 1150 keyboard repeat updates target
+PASS 1150 keyboard target changes no cash
+PASS 1150 cero_todos visible DOP meta
+PASS 1150 cero_todos Excel D42
+PASS 1150 cero_todos Excel G42
+PASS 1150 cero_todos Excel J42
+PASS 1150 cero_todos Excel E43
+PASS 1150 cero_todos Excel H43
+PASS 1150 cero_todos Excel K43
+PASS 1150 cero_todos Excel F44
+PASS 1150 cero_todos Excel I44
+PASS 1150 cero_todos Excel L44
+PASS 1150 cero_todos no real cash movement
+PASS 1150 cero_todos no ledger movement
+PASS 1150 cero_todos diagram finite
+PASS 1150 uno_basico visible DOP meta
+PASS 1150 uno_basico Excel D42
+PASS 1150 uno_basico Excel G42
+PASS 1150 uno_basico Excel J42
+PASS 1150 uno_basico Excel E43
+PASS 1150 uno_basico Excel H43
+PASS 1150 uno_basico Excel K43
+PASS 1150 uno_basico Excel F44
+PASS 1150 uno_basico Excel I44
+PASS 1150 uno_basico Excel L44
+PASS 1150 uno_basico no real cash movement
+PASS 1150 uno_basico no ledger movement
+PASS 1150 uno_basico diagram finite
+PASS 1150 uno_mejorado visible DOP meta
+PASS 1150 uno_mejorado Excel D42
+PASS 1150 uno_mejorado Excel G42
+PASS 1150 uno_mejorado Excel J42
+PASS 1150 uno_mejorado Excel E43
+PASS 1150 uno_mejorado Excel H43
+PASS 1150 uno_mejorado Excel K43
+PASS 1150 uno_mejorado Excel F44
+PASS 1150 uno_mejorado Excel I44
+PASS 1150 uno_mejorado Excel L44
+PASS 1150 uno_mejorado no real cash movement
+PASS 1150 uno_mejorado no ledger movement
+PASS 1150 uno_mejorado diagram finite
+PASS 1150 uno_premium visible DOP meta
+PASS 1150 uno_premium Excel D42
+PASS 1150 uno_premium Excel G42
+PASS 1150 uno_premium Excel J42
+PASS 1150 uno_premium Excel E43
+PASS 1150 uno_premium Excel H43
+PASS 1150 uno_premium Excel K43
+PASS 1150 uno_premium Excel F44
+PASS 1150 uno_premium Excel I44
+PASS 1150 uno_premium Excel L44
+PASS 1150 uno_premium no real cash movement
+PASS 1150 uno_premium no ledger movement
+PASS 1150 uno_premium diagram finite
+PASS 1150 diez_basico visible DOP meta
+PASS 1150 diez_basico Excel D42
+PASS 1150 diez_basico Excel G42
+PASS 1150 diez_basico Excel J42
+PASS 1150 diez_basico Excel E43
+PASS 1150 diez_basico Excel H43
+PASS 1150 diez_basico Excel K43
+PASS 1150 diez_basico Excel F44
+PASS 1150 diez_basico Excel I44
+PASS 1150 diez_basico Excel L44
+PASS 1150 diez_basico no real cash movement
+PASS 1150 diez_basico no ledger movement
+PASS 1150 diez_basico diagram finite
+PASS 1150 diez_mejorado visible DOP meta
+PASS 1150 diez_mejorado Excel D42
+PASS 1150 diez_mejorado Excel G42
+PASS 1150 diez_mejorado Excel J42
+PASS 1150 diez_mejorado Excel E43
+PASS 1150 diez_mejorado Excel H43
+PASS 1150 diez_mejorado Excel K43
+PASS 1150 diez_mejorado Excel F44
+PASS 1150 diez_mejorado Excel I44
+PASS 1150 diez_mejorado Excel L44
+PASS 1150 diez_mejorado no real cash movement
+PASS 1150 diez_mejorado no ledger movement
+PASS 1150 diez_mejorado diagram finite
+PASS 1150 diez_premium visible DOP meta
+PASS 1150 diez_premium Excel D42
+PASS 1150 diez_premium Excel G42
+PASS 1150 diez_premium Excel J42
+PASS 1150 diez_premium Excel E43
+PASS 1150 diez_premium Excel H43
+PASS 1150 diez_premium Excel K43
+PASS 1150 diez_premium Excel F44
+PASS 1150 diez_premium Excel I44
+PASS 1150 diez_premium Excel L44
+PASS 1150 diez_premium no real cash movement
+PASS 1150 diez_premium no ledger movement
+PASS 1150 diez_premium diagram finite
+PASS 1150 capacidad_ejemplo_396 visible DOP meta
+PASS 1150 capacidad_ejemplo_396 Excel D42
+PASS 1150 capacidad_ejemplo_396 Excel G42
+PASS 1150 capacidad_ejemplo_396 Excel J42
+PASS 1150 capacidad_ejemplo_396 Excel E43
+PASS 1150 capacidad_ejemplo_396 Excel H43
+PASS 1150 capacidad_ejemplo_396 Excel K43
+PASS 1150 capacidad_ejemplo_396 Excel F44
+PASS 1150 capacidad_ejemplo_396 Excel I44
+PASS 1150 capacidad_ejemplo_396 Excel L44
+PASS 1150 capacidad_ejemplo_396 no real cash movement
+PASS 1150 capacidad_ejemplo_396 no ledger movement
+PASS 1150 capacidad_ejemplo_396 diagram finite
+PASS 1150 sobre_capacidad_ejemplo_397 visible DOP meta
+PASS 1150 sobre_capacidad_ejemplo_397 Excel D42
+PASS 1150 sobre_capacidad_ejemplo_397 Excel G42
+PASS 1150 sobre_capacidad_ejemplo_397 Excel J42
+PASS 1150 sobre_capacidad_ejemplo_397 Excel E43
+PASS 1150 sobre_capacidad_ejemplo_397 Excel H43
+PASS 1150 sobre_capacidad_ejemplo_397 Excel K43
+PASS 1150 sobre_capacidad_ejemplo_397 Excel F44
+PASS 1150 sobre_capacidad_ejemplo_397 Excel I44
+PASS 1150 sobre_capacidad_ejemplo_397 Excel L44
+PASS 1150 sobre_capacidad_ejemplo_397 no real cash movement
+PASS 1150 sobre_capacidad_ejemplo_397 no ledger movement
+PASS 1150 sobre_capacidad_ejemplo_397 diagram finite
+PASS 1150 mezcla_uno_cada_molde visible DOP meta
+PASS 1150 mezcla_uno_cada_molde Excel D42
+PASS 1150 mezcla_uno_cada_molde Excel G42
+PASS 1150 mezcla_uno_cada_molde Excel J42
+PASS 1150 mezcla_uno_cada_molde Excel E43
+PASS 1150 mezcla_uno_cada_molde Excel H43
+PASS 1150 mezcla_uno_cada_molde Excel K43
+PASS 1150 mezcla_uno_cada_molde Excel F44
+PASS 1150 mezcla_uno_cada_molde Excel I44
+PASS 1150 mezcla_uno_cada_molde Excel L44
+PASS 1150 mezcla_uno_cada_molde no real cash movement
+PASS 1150 mezcla_uno_cada_molde no ledger movement
+PASS 1150 mezcla_uno_cada_molde diagram finite
+PASS 1150 mezcla_original_520 visible DOP meta
+PASS 1150 mezcla_original_520 Excel D42
+PASS 1150 mezcla_original_520 Excel G42
+PASS 1150 mezcla_original_520 Excel J42
+PASS 1150 mezcla_original_520 Excel E43
+PASS 1150 mezcla_original_520 Excel H43
+PASS 1150 mezcla_original_520 Excel K43
+PASS 1150 mezcla_original_520 Excel F44
+PASS 1150 mezcla_original_520 Excel I44
+PASS 1150 mezcla_original_520 Excel L44
+PASS 1150 mezcla_original_520 no real cash movement
+PASS 1150 mezcla_original_520 no ledger movement
+PASS 1150 mezcla_original_520 diagram finite
+PASS 1150 mezcla_total_396 visible DOP meta
+PASS 1150 mezcla_total_396 Excel D42
+PASS 1150 mezcla_total_396 Excel G42
+PASS 1150 mezcla_total_396 Excel J42
+PASS 1150 mezcla_total_396 Excel E43
+PASS 1150 mezcla_total_396 Excel H43
+PASS 1150 mezcla_total_396 Excel K43
+PASS 1150 mezcla_total_396 Excel F44
+PASS 1150 mezcla_total_396 Excel I44
+PASS 1150 mezcla_total_396 Excel L44
+PASS 1150 mezcla_total_396 no real cash movement
+PASS 1150 mezcla_total_396 no ledger movement
+PASS 1150 mezcla_total_396 diagram finite
+PASS 1150 premium_397 visible DOP meta
+PASS 1150 premium_397 Excel D42
+PASS 1150 premium_397 Excel G42
+PASS 1150 premium_397 Excel J42
+PASS 1150 premium_397 Excel E43
+PASS 1150 premium_397 Excel H43
+PASS 1150 premium_397 Excel K43
+PASS 1150 premium_397 Excel F44
+PASS 1150 premium_397 Excel I44
+PASS 1150 premium_397 Excel L44
+PASS 1150 premium_397 no real cash movement
+PASS 1150 premium_397 no ledger movement
+PASS 1150 premium_397 diagram finite
+PASS 1150 supera_ejemplo_ampliamente_1000 visible DOP meta
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel D42
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel G42
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel J42
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel E43
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel H43
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel K43
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel F44
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel I44
+PASS 1150 supera_ejemplo_ampliamente_1000 Excel L44
+PASS 1150 supera_ejemplo_ampliamente_1000 no real cash movement
+PASS 1150 supera_ejemplo_ampliamente_1000 no ledger movement
+PASS 1150 supera_ejemplo_ampliamente_1000 diagram finite
+PASS 1150 stock zero really empty
+PASS 1150 sufficient stock really available
+PASS 1150 requirements invariant with available stock
+PASS 1150 unsaved material scenarios no charge
+PASS 1150 HUD actual cash
+PASS 1150 shown cash actual while comparing
+PASS 1150 no fictitious purchases in ledger
+PASS 1150 DOP paragraphs and table containers inside viewport []
+PASS 1150 saving target has no fictitious purchase
+PASS 1150 saved target survives reentry
+PASS 1150 saved mold input survives
+PASS 1150 one quantity input
+PASS 1150 comparison follows requirements
+PASS 1150 seven attached connector paths
+PASS 1150 no horizontal viewport overflow
+PASS 1150 persisted physical stock keeps target requirements
+PASS 1150 CUERO saved physical units
+PASS 1150 CUERO actual delta missing
+PASS 1150 CUERO no invented surplus
+PASS 1150 CUERO UI saved stock
+PASS 1150 CUERO UI missing stock
+PASS 1150 ACCESORIOS saved physical units
+PASS 1150 ACCESORIOS actual delta missing
+PASS 1150 ACCESORIOS no invented surplus
+PASS 1150 ACCESORIOS UI saved stock
+PASS 1150 ACCESORIOS UI missing stock
+PASS 1150 HILO saved physical units
+PASS 1150 HILO actual delta missing
+PASS 1150 HILO no invented surplus
+PASS 1150 HILO UI saved stock
+PASS 1150 HILO UI missing stock
+PASS 1150 explicit stock is in real snapshot
+PASS 1150 persisted stock not charged again
+PASS 1150 persisted stock adds no ledger entry
+PASS 1150 saving with prior inventory has no repeat debit
+PASS 1150 physical inventory survives reentry
+PASS 1150 stock reload preserves desired target
+PASS 1150 stock reload no repeat debit
+PASS 1150 stock reload ledger unchanged
+PASS 1150 stock reload retains correct missing thread
+PASS 1150 CUERO physical stock plus current purchases
+PASS 1150 CUERO combined missing
+PASS 1150 CUERO combined surplus
+PASS 1150 ACCESORIOS physical stock plus current purchases
+PASS 1150 ACCESORIOS combined missing
+PASS 1150 ACCESORIOS combined surplus
+PASS 1150 HILO physical stock plus current purchases
+PASS 1150 HILO combined missing
+PASS 1150 HILO combined surplus
+PASS 1150 draft replenishment no premature debit
+PASS 1150 draft replenishment ledger unchanged
+PASS 1150 cycle 2 actual Excel fixed costs
+PASS 1150 cycle 2 receipt equals real debit
+PASS 1150 cycle 2 real cash matches receipt
+PASS 1150 cycle 2 HUD cents
+PASS 1150 cycle 2 no unannounced debits
+PASS 1150 cycle 2 visible cost notice
+PASS 1150 cycle 2 target save no invented purchase
+PASS 1150 cycle 3 actual Excel fixed costs
+PASS 1150 cycle 3 receipt equals real debit
+PASS 1150 cycle 3 real cash matches receipt
+PASS 1150 cycle 3 HUD cents
+PASS 1150 cycle 3 no unannounced debits
+PASS 1150 cycle 3 visible cost notice
+PASS 1150 cycle 3 target save no invented purchase
+PASS 1440 target help associated
+PASS 1440 total atomic live status
+PASS 1440 live total updated
+PASS 1440 keyboard plus keeps focus
+PASS 1440 keyboard plus updates target
+PASS 1440 keyboard repeat keeps focus
+PASS 1440 keyboard repeat updates target
+PASS 1440 keyboard target changes no cash
+PASS 1440 cero_todos visible DOP meta
+PASS 1440 cero_todos Excel D42
+PASS 1440 cero_todos Excel G42
+PASS 1440 cero_todos Excel J42
+PASS 1440 cero_todos Excel E43
+PASS 1440 cero_todos Excel H43
+PASS 1440 cero_todos Excel K43
+PASS 1440 cero_todos Excel F44
+PASS 1440 cero_todos Excel I44
+PASS 1440 cero_todos Excel L44
+PASS 1440 cero_todos no real cash movement
+PASS 1440 cero_todos no ledger movement
+PASS 1440 cero_todos diagram finite
+PASS 1440 uno_basico visible DOP meta
+PASS 1440 uno_basico Excel D42
+PASS 1440 uno_basico Excel G42
+PASS 1440 uno_basico Excel J42
+PASS 1440 uno_basico Excel E43
+PASS 1440 uno_basico Excel H43
+PASS 1440 uno_basico Excel K43
+PASS 1440 uno_basico Excel F44
+PASS 1440 uno_basico Excel I44
+PASS 1440 uno_basico Excel L44
+PASS 1440 uno_basico no real cash movement
+PASS 1440 uno_basico no ledger movement
+PASS 1440 uno_basico diagram finite
+PASS 1440 uno_mejorado visible DOP meta
+PASS 1440 uno_mejorado Excel D42
+PASS 1440 uno_mejorado Excel G42
+PASS 1440 uno_mejorado Excel J42
+PASS 1440 uno_mejorado Excel E43
+PASS 1440 uno_mejorado Excel H43
+PASS 1440 uno_mejorado Excel K43
+PASS 1440 uno_mejorado Excel F44
+PASS 1440 uno_mejorado Excel I44
+PASS 1440 uno_mejorado Excel L44
+PASS 1440 uno_mejorado no real cash movement
+PASS 1440 uno_mejorado no ledger movement
+PASS 1440 uno_mejorado diagram finite
+PASS 1440 uno_premium visible DOP meta
+PASS 1440 uno_premium Excel D42
+PASS 1440 uno_premium Excel G42
+PASS 1440 uno_premium Excel J42
+PASS 1440 uno_premium Excel E43
+PASS 1440 uno_premium Excel H43
+PASS 1440 uno_premium Excel K43
+PASS 1440 uno_premium Excel F44
+PASS 1440 uno_premium Excel I44
+PASS 1440 uno_premium Excel L44
+PASS 1440 uno_premium no real cash movement
+PASS 1440 uno_premium no ledger movement
+PASS 1440 uno_premium diagram finite
+PASS 1440 diez_basico visible DOP meta
+PASS 1440 diez_basico Excel D42
+PASS 1440 diez_basico Excel G42
+PASS 1440 diez_basico Excel J42
+PASS 1440 diez_basico Excel E43
+PASS 1440 diez_basico Excel H43
+PASS 1440 diez_basico Excel K43
+PASS 1440 diez_basico Excel F44
+PASS 1440 diez_basico Excel I44
+PASS 1440 diez_basico Excel L44
+PASS 1440 diez_basico no real cash movement
+PASS 1440 diez_basico no ledger movement
+PASS 1440 diez_basico diagram finite
+PASS 1440 diez_mejorado visible DOP meta
+PASS 1440 diez_mejorado Excel D42
+PASS 1440 diez_mejorado Excel G42
+PASS 1440 diez_mejorado Excel J42
+PASS 1440 diez_mejorado Excel E43
+PASS 1440 diez_mejorado Excel H43
+PASS 1440 diez_mejorado Excel K43
+PASS 1440 diez_mejorado Excel F44
+PASS 1440 diez_mejorado Excel I44
+PASS 1440 diez_mejorado Excel L44
+PASS 1440 diez_mejorado no real cash movement
+PASS 1440 diez_mejorado no ledger movement
+PASS 1440 diez_mejorado diagram finite
+PASS 1440 diez_premium visible DOP meta
+PASS 1440 diez_premium Excel D42
+PASS 1440 diez_premium Excel G42
+PASS 1440 diez_premium Excel J42
+PASS 1440 diez_premium Excel E43
+PASS 1440 diez_premium Excel H43
+PASS 1440 diez_premium Excel K43
+PASS 1440 diez_premium Excel F44
+PASS 1440 diez_premium Excel I44
+PASS 1440 diez_premium Excel L44
+PASS 1440 diez_premium no real cash movement
+PASS 1440 diez_premium no ledger movement
+PASS 1440 diez_premium diagram finite
+PASS 1440 capacidad_ejemplo_396 visible DOP meta
+PASS 1440 capacidad_ejemplo_396 Excel D42
+PASS 1440 capacidad_ejemplo_396 Excel G42
+PASS 1440 capacidad_ejemplo_396 Excel J42
+PASS 1440 capacidad_ejemplo_396 Excel E43
+PASS 1440 capacidad_ejemplo_396 Excel H43
+PASS 1440 capacidad_ejemplo_396 Excel K43
+PASS 1440 capacidad_ejemplo_396 Excel F44
+PASS 1440 capacidad_ejemplo_396 Excel I44
+PASS 1440 capacidad_ejemplo_396 Excel L44
+PASS 1440 capacidad_ejemplo_396 no real cash movement
+PASS 1440 capacidad_ejemplo_396 no ledger movement
+PASS 1440 capacidad_ejemplo_396 diagram finite
+PASS 1440 sobre_capacidad_ejemplo_397 visible DOP meta
+PASS 1440 sobre_capacidad_ejemplo_397 Excel D42
+PASS 1440 sobre_capacidad_ejemplo_397 Excel G42
+PASS 1440 sobre_capacidad_ejemplo_397 Excel J42
+PASS 1440 sobre_capacidad_ejemplo_397 Excel E43
+PASS 1440 sobre_capacidad_ejemplo_397 Excel H43
+PASS 1440 sobre_capacidad_ejemplo_397 Excel K43
+PASS 1440 sobre_capacidad_ejemplo_397 Excel F44
+PASS 1440 sobre_capacidad_ejemplo_397 Excel I44
+PASS 1440 sobre_capacidad_ejemplo_397 Excel L44
+PASS 1440 sobre_capacidad_ejemplo_397 no real cash movement
+PASS 1440 sobre_capacidad_ejemplo_397 no ledger movement
+PASS 1440 sobre_capacidad_ejemplo_397 diagram finite
+PASS 1440 mezcla_uno_cada_molde visible DOP meta
+PASS 1440 mezcla_uno_cada_molde Excel D42
+PASS 1440 mezcla_uno_cada_molde Excel G42
+PASS 1440 mezcla_uno_cada_molde Excel J42
+PASS 1440 mezcla_uno_cada_molde Excel E43
+PASS 1440 mezcla_uno_cada_molde Excel H43
+PASS 1440 mezcla_uno_cada_molde Excel K43
+PASS 1440 mezcla_uno_cada_molde Excel F44
+PASS 1440 mezcla_uno_cada_molde Excel I44
+PASS 1440 mezcla_uno_cada_molde Excel L44
+PASS 1440 mezcla_uno_cada_molde no real cash movement
+PASS 1440 mezcla_uno_cada_molde no ledger movement
+PASS 1440 mezcla_uno_cada_molde diagram finite
+PASS 1440 mezcla_original_520 visible DOP meta
+PASS 1440 mezcla_original_520 Excel D42
+PASS 1440 mezcla_original_520 Excel G42
+PASS 1440 mezcla_original_520 Excel J42
+PASS 1440 mezcla_original_520 Excel E43
+PASS 1440 mezcla_original_520 Excel H43
+PASS 1440 mezcla_original_520 Excel K43
+PASS 1440 mezcla_original_520 Excel F44
+PASS 1440 mezcla_original_520 Excel I44
+PASS 1440 mezcla_original_520 Excel L44
+PASS 1440 mezcla_original_520 no real cash movement
+PASS 1440 mezcla_original_520 no ledger movement
+PASS 1440 mezcla_original_520 diagram finite
+PASS 1440 mezcla_total_396 visible DOP meta
+PASS 1440 mezcla_total_396 Excel D42
+PASS 1440 mezcla_total_396 Excel G42
+PASS 1440 mezcla_total_396 Excel J42
+PASS 1440 mezcla_total_396 Excel E43
+PASS 1440 mezcla_total_396 Excel H43
+PASS 1440 mezcla_total_396 Excel K43
+PASS 1440 mezcla_total_396 Excel F44
+PASS 1440 mezcla_total_396 Excel I44
+PASS 1440 mezcla_total_396 Excel L44
+PASS 1440 mezcla_total_396 no real cash movement
+PASS 1440 mezcla_total_396 no ledger movement
+PASS 1440 mezcla_total_396 diagram finite
+PASS 1440 premium_397 visible DOP meta
+PASS 1440 premium_397 Excel D42
+PASS 1440 premium_397 Excel G42
+PASS 1440 premium_397 Excel J42
+PASS 1440 premium_397 Excel E43
+PASS 1440 premium_397 Excel H43
+PASS 1440 premium_397 Excel K43
+PASS 1440 premium_397 Excel F44
+PASS 1440 premium_397 Excel I44
+PASS 1440 premium_397 Excel L44
+PASS 1440 premium_397 no real cash movement
+PASS 1440 premium_397 no ledger movement
+PASS 1440 premium_397 diagram finite
+PASS 1440 supera_ejemplo_ampliamente_1000 visible DOP meta
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel D42
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel G42
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel J42
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel E43
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel H43
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel K43
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel F44
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel I44
+PASS 1440 supera_ejemplo_ampliamente_1000 Excel L44
+PASS 1440 supera_ejemplo_ampliamente_1000 no real cash movement
+PASS 1440 supera_ejemplo_ampliamente_1000 no ledger movement
+PASS 1440 supera_ejemplo_ampliamente_1000 diagram finite
+PASS 1440 stock zero really empty
+PASS 1440 sufficient stock really available
+PASS 1440 requirements invariant with available stock
+PASS 1440 unsaved material scenarios no charge
+PASS 1440 HUD actual cash
+PASS 1440 shown cash actual while comparing
+PASS 1440 no fictitious purchases in ledger
+PASS 1440 DOP paragraphs and table containers inside viewport []
+PASS 1440 saving target has no fictitious purchase
+PASS 1440 saved target survives reentry
+PASS 1440 saved mold input survives
+PASS 1440 one quantity input
+PASS 1440 comparison follows requirements
+PASS 1440 seven attached connector paths
+PASS 1440 no horizontal viewport overflow
+PASS 1440 persisted physical stock keeps target requirements
+PASS 1440 CUERO saved physical units
+PASS 1440 CUERO actual delta missing
+PASS 1440 CUERO no invented surplus
+PASS 1440 CUERO UI saved stock
+PASS 1440 CUERO UI missing stock
+PASS 1440 ACCESORIOS saved physical units
+PASS 1440 ACCESORIOS actual delta missing
+PASS 1440 ACCESORIOS no invented surplus
+PASS 1440 ACCESORIOS UI saved stock
+PASS 1440 ACCESORIOS UI missing stock
+PASS 1440 HILO saved physical units
+PASS 1440 HILO actual delta missing
+PASS 1440 HILO no invented surplus
+PASS 1440 HILO UI saved stock
+PASS 1440 HILO UI missing stock
+PASS 1440 explicit stock is in real snapshot
+PASS 1440 persisted stock not charged again
+PASS 1440 persisted stock adds no ledger entry
+PASS 1440 saving with prior inventory has no repeat debit
+PASS 1440 physical inventory survives reentry
+PASS 1440 stock reload preserves desired target
+PASS 1440 stock reload no repeat debit
+PASS 1440 stock reload ledger unchanged
+PASS 1440 stock reload retains correct missing thread
+PASS 1440 CUERO physical stock plus current purchases
+PASS 1440 CUERO combined missing
+PASS 1440 CUERO combined surplus
+PASS 1440 ACCESORIOS physical stock plus current purchases
+PASS 1440 ACCESORIOS combined missing
+PASS 1440 ACCESORIOS combined surplus
+PASS 1440 HILO physical stock plus current purchases
+PASS 1440 HILO combined missing
+PASS 1440 HILO combined surplus
+PASS 1440 draft replenishment no premature debit
+PASS 1440 draft replenishment ledger unchanged
+PASS 1440 cycle 2 actual Excel fixed costs
+PASS 1440 cycle 2 receipt equals real debit
+PASS 1440 cycle 2 real cash matches receipt
+PASS 1440 cycle 2 HUD cents
+PASS 1440 cycle 2 no unannounced debits
+PASS 1440 cycle 2 visible cost notice
+PASS 1440 cycle 2 target save no invented purchase
+PASS 1440 cycle 3 actual Excel fixed costs
+PASS 1440 cycle 3 receipt equals real debit
+PASS 1440 cycle 3 real cash matches receipt
+PASS 1440 cycle 3 HUD cents
+PASS 1440 cycle 3 no unannounced debits
+PASS 1440 cycle 3 visible cost notice
+PASS 1440 cycle 3 target save no invented purchase
+PASS 390 target help associated
+PASS 390 total atomic live status
+PASS 390 live total updated
+PASS 390 keyboard plus keeps focus
+PASS 390 keyboard plus updates target
+PASS 390 keyboard repeat keeps focus
+PASS 390 keyboard repeat updates target
+PASS 390 keyboard target changes no cash
+PASS 390 cero_todos visible DOP meta
+PASS 390 cero_todos Excel D42
+PASS 390 cero_todos Excel G42
+PASS 390 cero_todos Excel J42
+PASS 390 cero_todos Excel E43
+PASS 390 cero_todos Excel H43
+PASS 390 cero_todos Excel K43
+PASS 390 cero_todos Excel F44
+PASS 390 cero_todos Excel I44
+PASS 390 cero_todos Excel L44
+PASS 390 cero_todos no real cash movement
+PASS 390 cero_todos no ledger movement
+PASS 390 cero_todos diagram finite
+PASS 390 uno_basico visible DOP meta
+PASS 390 uno_basico Excel D42
+PASS 390 uno_basico Excel G42
+PASS 390 uno_basico Excel J42
+PASS 390 uno_basico Excel E43
+PASS 390 uno_basico Excel H43
+PASS 390 uno_basico Excel K43
+PASS 390 uno_basico Excel F44
+PASS 390 uno_basico Excel I44
+PASS 390 uno_basico Excel L44
+PASS 390 uno_basico no real cash movement
+PASS 390 uno_basico no ledger movement
+PASS 390 uno_basico diagram finite
+PASS 390 uno_mejorado visible DOP meta
+PASS 390 uno_mejorado Excel D42
+PASS 390 uno_mejorado Excel G42
+PASS 390 uno_mejorado Excel J42
+PASS 390 uno_mejorado Excel E43
+PASS 390 uno_mejorado Excel H43
+PASS 390 uno_mejorado Excel K43
+PASS 390 uno_mejorado Excel F44
+PASS 390 uno_mejorado Excel I44
+PASS 390 uno_mejorado Excel L44
+PASS 390 uno_mejorado no real cash movement
+PASS 390 uno_mejorado no ledger movement
+PASS 390 uno_mejorado diagram finite
+PASS 390 uno_premium visible DOP meta
+PASS 390 uno_premium Excel D42
+PASS 390 uno_premium Excel G42
+PASS 390 uno_premium Excel J42
+PASS 390 uno_premium Excel E43
+PASS 390 uno_premium Excel H43
+PASS 390 uno_premium Excel K43
+PASS 390 uno_premium Excel F44
+PASS 390 uno_premium Excel I44
+PASS 390 uno_premium Excel L44
+PASS 390 uno_premium no real cash movement
+PASS 390 uno_premium no ledger movement
+PASS 390 uno_premium diagram finite
+PASS 390 diez_basico visible DOP meta
+PASS 390 diez_basico Excel D42
+PASS 390 diez_basico Excel G42
+PASS 390 diez_basico Excel J42
+PASS 390 diez_basico Excel E43
+PASS 390 diez_basico Excel H43
+PASS 390 diez_basico Excel K43
+PASS 390 diez_basico Excel F44
+PASS 390 diez_basico Excel I44
+PASS 390 diez_basico Excel L44
+PASS 390 diez_basico no real cash movement
+PASS 390 diez_basico no ledger movement
+PASS 390 diez_basico diagram finite
+PASS 390 diez_mejorado visible DOP meta
+PASS 390 diez_mejorado Excel D42
+PASS 390 diez_mejorado Excel G42
+PASS 390 diez_mejorado Excel J42
+PASS 390 diez_mejorado Excel E43
+PASS 390 diez_mejorado Excel H43
+PASS 390 diez_mejorado Excel K43
+PASS 390 diez_mejorado Excel F44
+PASS 390 diez_mejorado Excel I44
+PASS 390 diez_mejorado Excel L44
+PASS 390 diez_mejorado no real cash movement
+PASS 390 diez_mejorado no ledger movement
+PASS 390 diez_mejorado diagram finite
+PASS 390 diez_premium visible DOP meta
+PASS 390 diez_premium Excel D42
+PASS 390 diez_premium Excel G42
+PASS 390 diez_premium Excel J42
+PASS 390 diez_premium Excel E43
+PASS 390 diez_premium Excel H43
+PASS 390 diez_premium Excel K43
+PASS 390 diez_premium Excel F44
+PASS 390 diez_premium Excel I44
+PASS 390 diez_premium Excel L44
+PASS 390 diez_premium no real cash movement
+PASS 390 diez_premium no ledger movement
+PASS 390 diez_premium diagram finite
+PASS 390 capacidad_ejemplo_396 visible DOP meta
+PASS 390 capacidad_ejemplo_396 Excel D42
+PASS 390 capacidad_ejemplo_396 Excel G42
+PASS 390 capacidad_ejemplo_396 Excel J42
+PASS 390 capacidad_ejemplo_396 Excel E43
+PASS 390 capacidad_ejemplo_396 Excel H43
+PASS 390 capacidad_ejemplo_396 Excel K43
+PASS 390 capacidad_ejemplo_396 Excel F44
+PASS 390 capacidad_ejemplo_396 Excel I44
+PASS 390 capacidad_ejemplo_396 Excel L44
+PASS 390 capacidad_ejemplo_396 no real cash movement
+PASS 390 capacidad_ejemplo_396 no ledger movement
+PASS 390 capacidad_ejemplo_396 diagram finite
+PASS 390 sobre_capacidad_ejemplo_397 visible DOP meta
+PASS 390 sobre_capacidad_ejemplo_397 Excel D42
+PASS 390 sobre_capacidad_ejemplo_397 Excel G42
+PASS 390 sobre_capacidad_ejemplo_397 Excel J42
+PASS 390 sobre_capacidad_ejemplo_397 Excel E43
+PASS 390 sobre_capacidad_ejemplo_397 Excel H43
+PASS 390 sobre_capacidad_ejemplo_397 Excel K43
+PASS 390 sobre_capacidad_ejemplo_397 Excel F44
+PASS 390 sobre_capacidad_ejemplo_397 Excel I44
+PASS 390 sobre_capacidad_ejemplo_397 Excel L44
+PASS 390 sobre_capacidad_ejemplo_397 no real cash movement
+PASS 390 sobre_capacidad_ejemplo_397 no ledger movement
+PASS 390 sobre_capacidad_ejemplo_397 diagram finite
+PASS 390 mezcla_uno_cada_molde visible DOP meta
+PASS 390 mezcla_uno_cada_molde Excel D42
+PASS 390 mezcla_uno_cada_molde Excel G42
+PASS 390 mezcla_uno_cada_molde Excel J42
+PASS 390 mezcla_uno_cada_molde Excel E43
+PASS 390 mezcla_uno_cada_molde Excel H43
+PASS 390 mezcla_uno_cada_molde Excel K43
+PASS 390 mezcla_uno_cada_molde Excel F44
+PASS 390 mezcla_uno_cada_molde Excel I44
+PASS 390 mezcla_uno_cada_molde Excel L44
+PASS 390 mezcla_uno_cada_molde no real cash movement
+PASS 390 mezcla_uno_cada_molde no ledger movement
+PASS 390 mezcla_uno_cada_molde diagram finite
+PASS 390 mezcla_original_520 visible DOP meta
+PASS 390 mezcla_original_520 Excel D42
+PASS 390 mezcla_original_520 Excel G42
+PASS 390 mezcla_original_520 Excel J42
+PASS 390 mezcla_original_520 Excel E43
+PASS 390 mezcla_original_520 Excel H43
+PASS 390 mezcla_original_520 Excel K43
+PASS 390 mezcla_original_520 Excel F44
+PASS 390 mezcla_original_520 Excel I44
+PASS 390 mezcla_original_520 Excel L44
+PASS 390 mezcla_original_520 no real cash movement
+PASS 390 mezcla_original_520 no ledger movement
+PASS 390 mezcla_original_520 diagram finite
+PASS 390 mezcla_total_396 visible DOP meta
+PASS 390 mezcla_total_396 Excel D42
+PASS 390 mezcla_total_396 Excel G42
+PASS 390 mezcla_total_396 Excel J42
+PASS 390 mezcla_total_396 Excel E43
+PASS 390 mezcla_total_396 Excel H43
+PASS 390 mezcla_total_396 Excel K43
+PASS 390 mezcla_total_396 Excel F44
+PASS 390 mezcla_total_396 Excel I44
+PASS 390 mezcla_total_396 Excel L44
+PASS 390 mezcla_total_396 no real cash movement
+PASS 390 mezcla_total_396 no ledger movement
+PASS 390 mezcla_total_396 diagram finite
+PASS 390 premium_397 visible DOP meta
+PASS 390 premium_397 Excel D42
+PASS 390 premium_397 Excel G42
+PASS 390 premium_397 Excel J42
+PASS 390 premium_397 Excel E43
+PASS 390 premium_397 Excel H43
+PASS 390 premium_397 Excel K43
+PASS 390 premium_397 Excel F44
+PASS 390 premium_397 Excel I44
+PASS 390 premium_397 Excel L44
+PASS 390 premium_397 no real cash movement
+PASS 390 premium_397 no ledger movement
+PASS 390 premium_397 diagram finite
+PASS 390 supera_ejemplo_ampliamente_1000 visible DOP meta
+PASS 390 supera_ejemplo_ampliamente_1000 Excel D42
+PASS 390 supera_ejemplo_ampliamente_1000 Excel G42
+PASS 390 supera_ejemplo_ampliamente_1000 Excel J42
+PASS 390 supera_ejemplo_ampliamente_1000 Excel E43
+PASS 390 supera_ejemplo_ampliamente_1000 Excel H43
+PASS 390 supera_ejemplo_ampliamente_1000 Excel K43
+PASS 390 supera_ejemplo_ampliamente_1000 Excel F44
+PASS 390 supera_ejemplo_ampliamente_1000 Excel I44
+PASS 390 supera_ejemplo_ampliamente_1000 Excel L44
+PASS 390 supera_ejemplo_ampliamente_1000 no real cash movement
+PASS 390 supera_ejemplo_ampliamente_1000 no ledger movement
+PASS 390 supera_ejemplo_ampliamente_1000 diagram finite
+PASS 390 stock zero really empty
+PASS 390 sufficient stock really available
+PASS 390 requirements invariant with available stock
+PASS 390 unsaved material scenarios no charge
+PASS 390 HUD actual cash
+PASS 390 shown cash actual while comparing
+PASS 390 no fictitious purchases in ledger
+PASS 390 DOP paragraphs and table containers inside viewport []
+PASS 390 comparison last columns reachable
+PASS 390 saving target has no fictitious purchase
+PASS 390 saved target survives reentry
+PASS 390 saved mold input survives
+PASS 390 one quantity input
+PASS 390 comparison follows requirements
+PASS 390 seven attached connector paths
+PASS 390 no horizontal viewport overflow
+PASS 390 persisted physical stock keeps target requirements
+PASS 390 CUERO saved physical units
+PASS 390 CUERO actual delta missing
+PASS 390 CUERO no invented surplus
+PASS 390 CUERO UI saved stock
+PASS 390 CUERO UI missing stock
+PASS 390 ACCESORIOS saved physical units
+PASS 390 ACCESORIOS actual delta missing
+PASS 390 ACCESORIOS no invented surplus
+PASS 390 ACCESORIOS UI saved stock
+PASS 390 ACCESORIOS UI missing stock
+PASS 390 HILO saved physical units
+PASS 390 HILO actual delta missing
+PASS 390 HILO no invented surplus
+PASS 390 HILO UI saved stock
+PASS 390 HILO UI missing stock
+PASS 390 explicit stock is in real snapshot
+PASS 390 persisted stock not charged again
+PASS 390 persisted stock adds no ledger entry
+PASS 390 saving with prior inventory has no repeat debit
+PASS 390 physical inventory survives reentry
+PASS 390 stock reload preserves desired target
+PASS 390 stock reload no repeat debit
+PASS 390 stock reload ledger unchanged
+PASS 390 stock reload retains correct missing thread
+PASS 390 CUERO physical stock plus current purchases
+PASS 390 CUERO combined missing
+PASS 390 CUERO combined surplus
+PASS 390 ACCESORIOS physical stock plus current purchases
+PASS 390 ACCESORIOS combined missing
+PASS 390 ACCESORIOS combined surplus
+PASS 390 HILO physical stock plus current purchases
+PASS 390 HILO combined missing
+PASS 390 HILO combined surplus
+PASS 390 draft replenishment no premature debit
+PASS 390 draft replenishment ledger unchanged
+PASS 390 cycle 2 actual Excel fixed costs
+PASS 390 cycle 2 receipt equals real debit
+PASS 390 cycle 2 real cash matches receipt
+PASS 390 cycle 2 HUD cents
+PASS 390 cycle 2 no unannounced debits
+PASS 390 cycle 2 visible cost notice
+PASS 390 cycle 2 target save no invented purchase
+PASS 390 cycle 3 actual Excel fixed costs
+PASS 390 cycle 3 receipt equals real debit
+PASS 390 cycle 3 real cash matches receipt
+PASS 390 cycle 3 HUD cents
+PASS 390 cycle 3 no unannounced debits
+PASS 390 cycle 3 visible cost notice
+PASS 390 cycle 3 target save no invented purchase
+PASS no uncaught browser errors
