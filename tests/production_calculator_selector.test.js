@@ -24,7 +24,8 @@ test('one rectangular calculator renders only the selected mold while retaining 
 test('calculator respects the submitted lock and distinguishes comparison from acquisition',()=>{
  const c=calculator(),html=c.render({viewMoldId:'molde_3',moldTargets:{molde_1:10,molde_2:10,molde_3:10}},true);
  assert.match(html,/data-production-mold disabled/);assert.match(html,/data-mold-target="molde_3"[^>]*disabled/);
- assert.match(html,/todavía debes adquirir el molde/);assert.match(html,/no realiza compras/);
+ assert.doesNotMatch(html,/data-mold-suggest|Usar sugerencia SIDE/);assert.match(html,/no realiza compras/);
+ assert.ok(html.indexOf('data-mold-target')<html.indexOf('data-production-mold'));assert.doesNotMatch(html,/Capacidad de la línea|Producción posible con tus insumos/);
 });
 
 test('production target input normalizes negatives and fractions immediately in the visible field',()=>{

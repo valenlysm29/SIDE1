@@ -39,14 +39,14 @@ test('connector coordinates follow changed card widths and heights instead of fi
 test('rendering an empty plan preserves inputs and shows zero output, percent and mold detail',()=>{
   const plan=model.calculate(),before=JSON.stringify(plan),html=dop.render(plan,{round:3,producedPercent:0});
   assert.equal(JSON.stringify(plan),before);
-  assert.match(html,/<strong>0%<\/strong>/);assert.match(html,/0 unidades totales/);
-  assert.match(html,/PRODUCCIÓN FINAL DEL CICLO 3/);
-  for(const mold of ['Molde básico','Molde mejorado','Molde premium'])assert.ok(html.includes(mold));
+  assert.match(html,/<strong>0%<\/strong>/);assert.match(html,/0 unidades/);
+  assert.match(html,/Qué necesitas para producir tu meta/);assert.match(html,/No definido en el Excel/);
+  assert.ok(html.indexOf('data-pd-node=')<html.indexOf('class="pd-comparison"'));
   assert.equal((html.match(/data-pd-node=/g)||[]).length,8);
   assert.doesNotMatch(html,/NaN|Infinity|undefined/);
 });
-test('material labels are escaped and percentages are supplied by the existing app calculation',()=>{
-  const plan=model.calculate();plan.materials[0].selections=[{label:'<img src=x onerror=alert(1)>'}];
+test('material requirement labels are escaped and coverage is supplied by the model',()=>{
+  const plan=model.calculate();plan.materials[0].label='<img src=x onerror=alert(1)>';if(plan.requirements)plan.requirements.materials[0].label='<img src=x onerror=alert(1)>';
   const html=dop.render(plan,{round:1,producedPercent:37});
   assert.match(html,/&lt;img src=x onerror=alert\(1\)&gt;/);assert.doesNotMatch(html,/<img/);
   assert.match(html,/<strong>37%<\/strong>/);

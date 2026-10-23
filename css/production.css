@@ -757,3 +757,43 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
   #decisionMenu .production-calculator-single .production-total { min-width: 0; }
   #decisionMenu .production-calculator-single .mold-suggestion { width: 100%; }
 }
+
+/* The desired quantity leads the plan; stock comparison closes it. */
+#decisionMenu .production-calculator-single .production-calculator-fields { grid-template-columns: minmax(240px,1.4fr) minmax(180px,1fr); }
+#decisionMenu .production-calculator-single .production-calculator-quantity > label { color: var(--ui-yellow); font-size: 16px; }
+#decisionMenu .production-calculator-single .mold-target-control input { font-size: 24px; font-weight: 800; }
+#decisionMenu .production-calculator-reading { grid-column: 1/-1; margin: 0; color: var(--ui-muted); line-height: 1.5; font-size: 13px; }
+.pd-target-first .pd-process-requirements { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px 14px; width: 100%; margin: 0; }
+.pd-target-first .pd-process-requirements > div { min-width: 0; }
+.pd-target-first dt { color: var(--ui-muted); font-size: 11px; line-height: 1.4; }
+.pd-target-first dd { margin: 3px 0 0; color: var(--ui-text); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+.pd-target-first .pd-result { display: block; background: var(--ui-panel); }
+.pd-target-result { display: grid; gap: 10px; padding: 20px; }
+.pd-target-result > strong { color: var(--ui-yellow); font-size: clamp(24px,4vw,34px); }
+.pd-target-first .pd-table-scroll { max-width: 100%; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--ui-blue) var(--ui-inset); }
+.pd-target-first .pd-table-scroll:focus-visible { outline: 2px solid var(--ui-yellow); outline-offset: 2px; }
+.pd-target-first .pd-table-scroll table { width: 100%; min-width: 520px; border-collapse: collapse; font-size: 12px; }
+.pd-target-first .pd-table-scroll th,
+.pd-target-first .pd-table-scroll td { border: 1px solid var(--ui-line); padding: 10px 12px; text-align: left; line-height: 1.5; vertical-align: top; }
+.pd-target-first .pd-table-scroll th { color: var(--ui-text); background: var(--ui-inset); }
+.pd-target-first .pd-table-scroll td { color: var(--ui-muted); }
+.pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison) { min-width: 0; display: grid; gap: 12px; }
+.pd-target-first :is(.pd-requirements-table,.pd-target-costs,.pd-comparison) > h4 { color: var(--ui-text); font-size: 18px; margin: 0; }
+.pd-target-first .pd-cost-total { margin: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.pd-target-first .pd-cost-total > div { border-left: 3px solid var(--ui-yellow); padding-left: 12px; }
+.pd-target-first .pd-cost-total dd { font-size: 18px; font-weight: 700; }
+.pd-target-first .pd-unresolved { color: var(--ui-muted); font-size: 12px; line-height: 1.5; margin: 0; }
+.pd-target-first .pd-unresolved-details { color: var(--ui-muted); border-top: 1px solid var(--ui-line); padding-top: 12px; font-size: 13px; }
+.pd-target-first .pd-unresolved-details summary { color: var(--ui-blue); cursor: pointer; }
+.pd-target-first .pd-excel-note { margin: 0; color: var(--ui-muted); font-size: 12px; line-height: 1.55; }
+.pd-target-first .pd-comparison { padding: 20px; border: 1px solid var(--ui-line); border-radius: var(--ui-radius); background: var(--ui-panel); }
+.pd-target-first .pd-comparison table { min-width: 740px; }
+.pd-target-first .pd-metrics { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
+@media(max-width:600px) {
+  #decisionMenu .production-calculator-single .production-calculator-fields { grid-template-columns: minmax(0,1fr); }
+  .pd-target-first .pd-process-requirements,
+  .pd-target-first .pd-cost-total { grid-template-columns: minmax(0,1fr); }
+  .pd-target-first .pd-comparison { padding: 14px; }
+}
+
+.production-dop .pd-cover-option{display:block;white-space:normal;margin-block:4px}
