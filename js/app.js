@@ -970,7 +970,6 @@ function renderDecisionCategory(){
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
-  if(cat.cat==='C'&&window.SIDE_EXCEL_UI)mountExcelProductionEditor();
 }
 function excelCompanyId(){return currentStudent.participantId||('local-'+storageKey());}
 function excelGameCode(){return currentStudent.game?.codigo||'SIDE-000';}
