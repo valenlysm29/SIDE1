@@ -14,7 +14,7 @@
     PRODUCTIVIDAD:{corte:[5,7,9],ensamble:[6,8,12],acabado:[6,7,10]},
     MULTIPLICADORES_MAQUINA:[1,1.2,1.5],EFICIENCIA_BASE:0.9,BONO_N3:0.01,BONO_JEFATURA:0.04,
     EFICIENCIA_N3_LITERAL:true,ESSALUD_ANUAL_LITERAL:true,CONS08_MODO:'multiplicativo',
-    REPUTACION_FUENTE_MERCADO:'operativa',CALIDAD_MERCADO_MODO:'motor',ACCESORIOS_N3_HABILITADO:false,
+    REPUTACION_FUENTE_MERCADO:'operativa',CALIDAD_MERCADO_MODO:'excel_literal',ACCESORIOS_N3_HABILITADO:false,
     CONSUMO_MOLDE:{'INF-08':{cuero:0.3,accesorios:1,hilo:6},'INF-09':{cuero:0.4,accesorios:1,hilo:7},'INF-10':{cuero:0.7,accesorios:1,hilo:13}},
     CONVERSION_COMPRA:{'INS-01':1,'INS-02':2,'INS-03':2,'INS-04':1,'INS-05':1,'INS-06':270,'INS-07':250,'INS-08':200},
     INSUMOS_POR_FAMILIA:{cuero:['INS-01','INS-02','INS-03'],accesorios:['INS-04','INS-05'],hilo:['INS-06','INS-07','INS-08']},

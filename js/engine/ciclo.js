@@ -28,13 +28,18 @@
       for(const l of r.lotes){const key=claveLote(l),stock=r.inventarioProductos[key]||{...l,cantidad:0};stock.cantidad+=l.producido;r.inventarioProductos[key]=stock;}
       resultadosPorEmpresa[id]=r;
     }
-    for(const segmento of Object.keys(c.MERCADOS)){
+    const participantesPorSegmento=Object.fromEntries(Object.keys(c.MERCADOS).map(segmento=>{
       const participantes=Object.values(resultadosPorEmpresa).flatMap(r=>{
         const lotes=r.lotes.filter(l=>l.segmento===segmento&&l.cantidad>0);const stock=Object.values(r.inventarioProductos).filter(l=>l.segmento===segmento&&l.cantidad>0);if(!lotes.length&&!stock.length)return [];
         const usados=lotes.length?lotes:stock,total=usados.reduce((a,l)=>a+l.cantidad,0);
         return [{id:r.id,precio:usados.reduce((a,l)=>a+Number(l.precio||0)*l.cantidad,0)/total,reputacionMercado:r.reputacionMercado,calidadEmpresaMotor:r.puntajes.calidadEmpresaMotor}];
       });
-      const reparto=MER.repartoMercado(participantes,segmento,overrides);
+      return [segmento,participantes];
+    }));
+    // All three source tables use the economic table's absolute denominator D122.
+    const sumaReputacionEconomico=(participantesPorSegmento['SEG-01']||[]).reduce((sum,r)=>sum+r.reputacionMercado,0);
+    for(const [segmento,participantes] of Object.entries(participantesPorSegmento)){
+      const reparto=MER.repartoMercado(participantes,segmento,overrides,{sumaReputacionEconomico});
       for(const asignacion of reparto){const r=resultadosPorEmpresa[asignacion.id];let pendiente=Math.max(0,C.excelRoundDown(asignacion.asignado*r.consecuencias.efectos.factorDemanda*((r.decisiones.seleccion||[]).includes('INV-02B')?1+c.BONO_DEMANDA_MARKETING:1)));const asignado=pendiente;
         for(const [key,stock] of Object.entries(r.inventarioProductos)){if(stock.segmento!==segmento||stock.cantidad<=0)continue;const vendido=Math.min(stock.cantidad,pendiente),actual=r.lotes.find(l=>claveLote(l)===key),precioEfectivo=actual?.precioEfectivo??stock.precioEfectivo??Number(stock.precio||0);r.ventas.push({clave:key,segmento,vendido,precioEfectivo,ingreso:vendido*precioEfectivo});stock.cantidad-=vendido;pendiente-=vendido;}
         (r.mercado||=([])).push({...asignacion,demandaAjustada:asignado});
