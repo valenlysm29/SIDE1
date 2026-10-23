@@ -46,7 +46,7 @@ export const DECISION_INTERIOR_LAYOUTS = Object.freeze([
 ].map(Object.freeze));
 
 /** Presentation only: snapshot comes from the existing SIDE business model. */
-export function createBusinessInteriors({ scene, offsetX = 150, createNpc, animateNpc, onCollidersAdded } = {}) {
+export function createBusinessInteriors({ scene, offsetX = 150, createNpc, animateNpc, onCollidersAdded, getNeighbors } = {}) {
   const group = new THREE.Group(); group.name = 'SIDE connected businesses'; group.position.x = offsetX;
   scene?.add(group);
   const resources = new Set(), colliders = [], hotspots = [], rooms = [], animated = [];
@@ -276,7 +276,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   // connects these points directly, so diagonal approaches must also avoid
   // cutting through the checkout counter. Interior ambience NPCs browse the
   // deeper shelf aisles using their separate validated loops below.
-  const browsePoints = [{ x: offsetX - 21.5, z: 22.7 }, { x: offsetX - 17.5, z: 22.7 }];
+  const browsePoints = [-23, -21.7, -20.4].map(x => ({ x: offsetX + x, z: 22.7 }));
 
   function hotspot(room, id, type, label, x, z, cat, extra = {}) { hotspots.push({ id, type, label, x: x + offsetX, z, cat, zone: room.id, ...extra }); }
   function solid(room, b, x, y, z, w, h, d, mat, kind = 'furniture') {
@@ -914,7 +914,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       const object = createNpc(route.role, room); if (!object) continue;
       const start = route.points[0]; object.position.set(start.x - offsetX, .025, start.z);
       object.name = `SIDE ${route.zone} ${route.role}`; room.detail.add(object);
-      room.actors.push({ object, route, target: route.stationary ? 0 : 1, wait: 0 });
+      room.actors.push({ object, route, target: route.stationary ? 0 : 1, wait: room.actors.length * .35 });
     }
   }
   function tickCourier(dt, position) {
@@ -951,8 +951,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
     }
     const target=courier.path[0],motion=courier.motion;
     Object.assign(motion,{x:world.x,z:world.z});
-    const neighbors=rooms.flatMap(room=>room.actors.map(actor=>({x:actor.object.position.x+offsetX,z:actor.object.position.z,radius:npcNavigation.NPC_RADIUS})));
-    if(position)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
+    const neighbors=getNeighbors?.(object)||rooms.flatMap(room=>room.actors.map(actor=>({x:actor.object.position.x+offsetX,z:actor.object.position.z,radius:npcNavigation.NPC_RADIUS})));
+    if(position&&!getNeighbors)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
     const result=npcNavigation.advance(motion,{x:target[0],z:target[1]},dt,colliders,neighbors,.85,courier.path.length===1);
     object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
     animateNpc?.(object,dt,result.distance>.0001);
@@ -983,11 +983,19 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
           if(waypoint){
             const motion=actor.motion||(actor.motion={speed:0,yaw:object.rotation.y});
             Object.assign(motion,{x:world.x,z:world.z});
-            const neighbors=room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z,radius:npcNavigation.NPC_RADIUS}));
-            if(position)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
+            const neighbors=getNeighbors?.(object)||room.actors.filter(other=>other!==actor).map(other=>({x:other.object.position.x+offsetX,z:other.object.position.z,radius:npcNavigation.NPC_RADIUS}));
+            if(position&&!getNeighbors)neighbors.push({x:position.x,z:position.z,radius:position.radius||.36});
             const step=interiorNavigation.advance(room,motion,{x:waypoint[0],z:waypoint[1]},dt,neighbors,.65,storePropQuality,actor.path.length===1);
             object.position.x=motion.x-offsetX;object.position.z=motion.z;object.rotation.y=motion.yaw;
             moving=step.distance>.0001;
+            actor.blockedFor=moving?0:(actor.blockedFor||0)+dt;
+            if(actor.blockedFor>1.8){
+              // Replan around occupied bodies, preserving the assigned work loop.
+              const people=neighbors.filter(p=>Math.hypot(p.x-world.x,p.z-world.z)<4).map(p=>({minX:p.x-.35,maxX:p.x+.35,minZ:p.z-.35,maxZ:p.z+.35}));
+              const detour=npcNavigation.planPath(motion,target,[...blocks,...people]);
+              if(detour.length)actor.path=detour;
+              actor.blockedFor=0;
+            }
             if(step.arrived){actor.path.shift();if(!actor.path.length){actor.target=(actor.target+1)%route.points.length;actor.wait=route.role==='cliente'?2: .7;}}
           }
         }

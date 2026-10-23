@@ -185,6 +185,12 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   // The central crossing remains intact. A larger connected street grid makes
   // the business district one part of a city instead of an isolated diorama.
   ground(0, 0, CITY_MAP.visualExtent * 2, CITY_MAP.visualExtent * 2, m.grass, -.08, 16);
+  // Paved urban ground connects the enlarged district; grass stays outside.
+  ground(0, 0, 176, 176, m.paving, .085, 8);
+  for (const side of [-1, 1]) for (const lane of [-1, 1]) {
+    ground(side * 47, lane * 7, 24, 3, m.paving, .12, 6);
+    ground(lane * 7, side * 47, 3, 24, m.paving, .12, 6);
+  }
   // Two avenue spurs connect the old crossing to a calmer outer ring.
   for (const side of [-1, 1]) {
     ground(side * 71, 0, 38, 10, m.asphalt, .145);

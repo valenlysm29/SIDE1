@@ -13,7 +13,7 @@ const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8')
 assert.ok(source.includes('  window.SIDE3D = {'));
 const instrumented=source.replace('const time = performance.now() * 0.001;', 'const time = now * 0.001;').replace('  window.SIDE3D = {',`  window.populationFlowQA={
   freeze(){cancelAnimationFrame(raf);},
-  snapshot(){return {running,interior:currentInterior,rooms:businessInteriors.rooms.map(r=>({id:r.id,visible:r.detail.visible,actors:r.actors.map(a=>({id:a.object.uuid,x:a.object.position.x,z:a.object.position.z,visible:a.object.visible,stationary:!!a.route.stationary}))})),customers:npcs.map(n=>({id:n.obj.uuid,x:n.obj.position.x,z:n.obj.position.z,state:n.state})),stock:totalDisplayStock()+totalReserveStock(),cash:decisionCash()};},
+  snapshot(){return {running,interior:currentInterior,rooms:businessInteriors.rooms.map(r=>({id:r.id,visible:r.detail.visible,actors:r.actors.map(a=>({id:a.object.uuid,x:a.object.position.x,z:a.object.position.z,visible:a.object.visible,stationary:!!a.route.stationary}))})),customers:npcs.map(n=>({id:n.obj.uuid,x:n.obj.position.x,z:n.obj.position.z,state:n.state,browse:n.browsePoint?{x:n.browsePoint.x,z:n.browsePoint.z}:null})),stock:totalDisplayStock()+totalReserveStock(),cash:decisionCash()};},
   advance(seconds){cancelAnimationFrame(raf);const original=clock.getDelta,render=renderer.render;clock.getDelta=()=>1/60;renderer.render=()=>{};this.now??=performance.now();try{for(let i=0;i<Math.round(seconds*60);i++){this.now+=1000/60;frame(this.now);cancelAnimationFrame(raf);}}finally{clock.getDelta=original;renderer.render=render;}renderer.render(scene,camera);return this.snapshot();},
   visit(id){const r=businessInteriors.rooms.find(r=>r.id===id);positionPlayer(HUB_OFFSET+r.layout.x,r.layout.z,0);updateBusinessZone();},
   outside(){positionPlayer(HUB_OFFSET,0,0);updateBusinessZone();},
@@ -42,6 +42,9 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   console.log('Checking remote actors and customers');
   const outside=results.outside=await page.evaluate(()=>populationFlowQA.advance(12));
   assert.equal(outside.interior,null);
+  const stops=outside.customers.filter(n=>n.browse).map(n=>`${n.browse.x}:${n.browse.z}`);
+  assert.equal(new Set(stops).size,stops.length,'customers reserve distinct display positions');
+  assert.ok(stops.length<=3,'display admission is bounded');
   assert.ok(outside.customers.length>0,'real customer spawning runs while player remains in plaza');
   for(const room of initial.rooms){
    const current=outside.rooms.find(r=>r.id===room.id);

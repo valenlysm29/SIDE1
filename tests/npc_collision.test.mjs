@@ -87,3 +87,18 @@ test('an interior walker near the player keeps moving while workers retain their
     for(const entry of fixed){assert.equal(entry.actor.object.position.x,entry.x);assert.equal(entry.actor.object.position.z,entry.z)}
   }finally{interiors.dispose()}
 });
+
+
+test('interior staff respect customers supplied by the shared world population',()=>{
+  globalThis.document={createElement:()=>({width:0,height:0,getContext:()=>({fillRect(){},fillText(){}})})};
+  const customer={x:128.5,z:18.8,radius:.4};let calls=0;
+  const interiors=createBusinessInteriors({scene:new THREE.Scene(),createNpc:()=>new THREE.Group(),getNeighbors:()=>{calls++;return [customer]}});
+  try{
+    const actor=interiors.rooms.find(r=>r.id==='store').actors.find(a=>!a.route.stationary);
+    for(let i=0;i<150;i++){
+      interiors.tick(.05,{x:0,z:0});
+      assert.ok(Math.hypot(actor.object.position.x+150-customer.x,actor.object.position.z-customer.z)>=NPC_RADIUS+customer.radius-1e-6);
+    }
+    assert.ok(calls>100);
+  }finally{interiors.dispose()}
+});

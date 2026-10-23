@@ -39,3 +39,13 @@ test('office, bank, cashier, supplier and guard roles select only assigned outfi
   assert.equal(roster.draw('office','oficina').model.id,'suit');
   assert.equal(validCityManifest([{...model('bad'),roles:['fantasy']}]).length,0);
 });
+
+
+test('a model already present in another scene gets a distinct appearance',()=>{
+  const roster=createCityRoster([model('a')],{random:()=>.25});
+  const first=roster.draw('store','cliente');
+  const adjacent=roster.draw('plaza','cliente',[first.model.id]);
+  assert.equal(adjacent.repeated,true);
+  assert.notEqual(adjacent.tint,null);
+  assert.notEqual(adjacent.heightScale,first.heightScale);
+});

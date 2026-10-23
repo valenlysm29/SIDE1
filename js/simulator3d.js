@@ -1019,7 +1019,7 @@
 
   function createBusinessNpc(role, room, previous = null) {
     const cityRole=['oficina','banco','cajero','proveedor','almacen','cliente','guardia'].includes(role)?role:role==='warehouse-worker'?'almacen':role==='production-supervisor'||role==='sewing-operator'||role==='cutting-operator'?'produccion':role==='customer'?'cliente':'tienda';
-    const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:'male',formal:role==='supervisor'};
+    const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:Math.random()<.5?'female':'male',formal:role==='supervisor',shirt:[0x9c553e,0x4f7669,0xc29c52,0x657e9a,0x805e86][Math.floor(Math.random()*5)]};
     const serviceRoom=room&&['office','bank','suppliers'].includes(room.id);
     const nearby=serviceRoom?room.actors.filter(actor=>actor.object!==previous).map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
     if(serviceRoom)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
@@ -1699,6 +1699,10 @@
 
   function spawnReturnCustomer() {
     if(!THREE || !npcGroup || checkoutQueue.length>=queueCapacity()) return;
+    const stops=businessInteriors?.browsePoints||[];
+    const entering=npcs.filter(n=>!n.dead&&n.state===NPC_STATE.ENTER_STORE).length;
+    const reserved=npcs.filter(n=>!n.dead&&n.browsePoint).length;
+    if(entering+reserved>=stops.length)return;
     const spawn=findNpcSpawn();if(!spawn)return;
     const archetype=randomArchetype();
     const p=acquireNpcPerson(customerStyle(archetype));
@@ -1709,7 +1713,7 @@
     const npc=createNpcRecord(p,spawnX,archetype,{isReturn:true,productId:prod.id,productPrice:prod.price});
     attachBagToNpc(npc);
     const entry=hubWorld?.entrances.find(e=>e.id==='store');if(!entry)return;
-    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
+    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x-.65,entry.portal.z+1],[entry.portal.x-.65,entry.portal.z-1.2]]);
     npcs.push(npc); simVisitors++; updateHUD();
   }
 
@@ -2646,9 +2650,10 @@
   }
 
   function leaveStore(npc) {
+    npc.browsePoint = null;
     npc.leavingWorld = true;
     const entry=hubWorld.entrances.find(e=>e.id==='store');
-    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[entry.portal.x,entry.portal.z-1.3],[entry.portal.x,entry.portal.z+1.4],[entry.portal.x,entry.portal.z+3.2]]);
+    setNpcRoute(npc,NPC_STATE.LEAVE_STORE,[[entry.portal.x+.65,entry.portal.z-1.3],[entry.portal.x+.65,entry.portal.z+1.4],[entry.portal.x+.65,entry.portal.z+3.2]]);
   }
 
   function releaseCrossing(npc) {
@@ -2733,6 +2738,7 @@
   function tryJoinQueue(n) {
     if (checkoutQueue.length >= queueCapacity()) return false;
     n.queueIndex = checkoutQueue.length;
+    n.browsePoint=null;
     setNpcRoute(n,NPC_STATE.WALK_TO_CHECKOUT,[[queueSlots[n.queueIndex].x,queueSlots[n.queueIndex].z]]);
     checkoutQueue.push(n);
     updateHUD();
@@ -2757,6 +2763,10 @@
     const interval = Math.max(1500, 8200 / (score * dayBoost * rush));
     const preset=PERF[perfMode]||PERF.auto||{maxCustomers:8};
     if (now - lastSpawn < interval || npcs.length >= Number(preset.maxCustomers||8)) return;
+    const stops=businessInteriors?.browsePoints||[];
+    const entering=npcs.filter(n=>!n.dead&&n.state===NPC_STATE.ENTER_STORE).length;
+    const reserved=npcs.filter(n=>!n.dead&&n.browsePoint).length;
+    if(entering+reserved>=stops.length)return;
     const spawn=findNpcSpawn();if(!spawn)return;
     lastSpawn = now;
     const archetype = randomArchetype();
@@ -2766,7 +2776,7 @@
     npcGroup.add(p);
     const npc=createNpcRecord(p,spawnX,archetype);
     const entry=hubWorld.entrances.find(e=>e.id==='store');
-    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
+    setNpcRoute(npc,NPC_STATE.ENTER_STORE,[[entry.portal.x-.65,entry.portal.z+1],[entry.portal.x-.65,entry.portal.z-1.2]]);
     npcs.push(npc);
     simVisitors++;
     updateHUD();
@@ -2881,13 +2891,17 @@
       const entry=hubWorld?.entrances.find(e=>e.id==='store');
       if(!entry){recycleNpcPerson(n);n.dead=true;return;}
       if(n.leavingWorld)leaveStore(n);
-      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[entry.portal.x,entry.portal.z+1],[entry.portal.x,entry.portal.z-1.2]]);
+      else setNpcRoute(n,NPC_STATE.ENTER_STORE,[[entry.portal.x-.65,entry.portal.z+1],[entry.portal.x-.65,entry.portal.z-1.2]]);
       return;
     }
     if(n.state===NPC_STATE.ENTER_STORE){
       if(n.isReturn){ if(!tryJoinQueue(n)){leaveStore(n);markLostCustomer('queue');} return; }
-      const selected=[...(businessInteriors?.browsePoints||[{x:HUB_OFFSET-19,z:18},{x:HUB_OFFSET-19,z:21}])].sort(()=>Math.random()-.5).slice(0,2),points=[];
-      selected.forEach(p=>points.push([p.x,p.z]));
+      // Reserve a display stop until the decision phase ends.
+      const available=(businessInteriors?.browsePoints||[]).filter(p=>!npcs.some(other=>other!==n&&!other.dead&&other.browsePoint===p));
+      const point=available.find(p=>worldPeople(n.obj).every(person=>Math.hypot(person.x-p.x,person.z-p.z)>1))||available[0];
+      if(!point){leaveStore(n);return;}
+      n.browsePoint=point;
+      const points=[[point.x,point.z]];
       setNpcRoute(n,NPC_STATE.BROWSE,points);return;
     }
     if(n.state===NPC_STATE.BROWSE){setNpcState(n,NPC_STATE.COMPARE);n.route=[];n.wait=1.2+Math.random()*1.2;return;}
@@ -3170,7 +3184,7 @@
     ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs'));
     const {createWorldEventVisuals}=await import('../services/world_event_visuals.mjs');
     worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
-    const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20260929-decision-city');
+    const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20261023-ordered-city');
     cityMap=CITY_MAP;
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
     const [orientationModule,{createWorldMinimapControl},{createWorldWayfinding}]=await Promise.all([
@@ -3182,9 +3196,9 @@
     worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
     worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
-    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-continuous-flow');
+    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-ordered-city');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
-      createNpc:createBusinessNpc,onCollidersAdded:items=>{if(businessInteriors)hubWorld.colliders.push(...items);},
+      createNpc:createBusinessNpc,getNeighbors:npcNeighbors,onCollidersAdded:items=>{if(businessInteriors)hubWorld.colliders.push(...items);},
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
     businessInteriors.installStoreProps(storePropTemplates,perfMode);
     businessInteriors.installWarehouseProps(warehousePropTemplates,perfMode);

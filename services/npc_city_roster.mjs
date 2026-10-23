@@ -40,7 +40,7 @@ export function createCityRoster(rows,{random=Math.random}={}){
     const model=uniqueModel||bag.splice(index,1)[0];
     const count=counts.get(key)||0;counts.set(key,count+1);
     // Variation only begins after the first full pass through the pool.
-    const repeated=count>=pool.length;
+    const repeated=count>=pool.length||near.has(model.id);
     return {model,repeated,heightScale:repeated?0.96+random()*.08:1,
       tint:repeated?Math.floor(random()*0xffffff):null,animationOffset:random()*8};
   }
