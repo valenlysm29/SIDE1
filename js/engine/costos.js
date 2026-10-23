@@ -5,6 +5,9 @@
   const n=value=>Number.isFinite(Number(value))?Number(value):0;
   const positivo=value=>Math.max(0,n(value));
   const sumar=values=>values.reduce((total,value)=>total+n(value),0);
+  // Igual que producción: Excel conserva quince cifras significativas.
+  // Normalizar la suma antes de compararla evita rechazar 0.1 + 0.7 = 0.8.
+  const precisionStock=(value,c)=>Number(value.toPrecision(c.PRECISION_INVENTARIO));
   const cfg=overrides=>configApi.configurar(overrides);
   const regimenValido=regimen=>regimen==='NO_MYPE'?'NO_MYPE':'MYPE';
   function descuentoAnalista(ciclo=1,overrides={}){const a=cfg(overrides).ANALISTA_BASE;return Math.max(a.descuentoMinimoPct,a.descuentoInicialPct-(Math.max(1,n(ciclo))-1)*a.reduccionPorCicloPct);}
@@ -54,7 +57,7 @@
     const c=cfg(overrides),consumoMP={},inventarioFinal={},faltantes={};
     for(const [grupo,codigos] of Object.entries(c.INSUMOS_POR_FAMILIA)){
       let restante=positivo(necesidad[grupo]);
-      for(const codigo of codigos){const disponible=positivo(inventarioInicial[codigo])+positivo(compras[codigo]);consumoMP[codigo]=Math.min(disponible,restante);restante-=consumoMP[codigo];inventarioFinal[codigo]=disponible-consumoMP[codigo];}
+      for(const codigo of codigos){const disponible=precisionStock(positivo(inventarioInicial[codigo])+positivo(compras[codigo]),c);consumoMP[codigo]=Math.min(disponible,restante);restante=precisionStock(restante-consumoMP[codigo],c);inventarioFinal[codigo]=precisionStock(disponible-consumoMP[codigo],c);}
       faltantes[grupo]=restante;
     }
     return {consumoMP,inventarioFinal,faltantes};
@@ -100,13 +103,14 @@
     const factorDescuento=(1-c.DESCUENTO_CANTIDAD)*(seleccion.includes('INS-09A')?1-c.DESCUENTO_PROVEEDOR_UNICO:1)*(seleccion.includes('INS-10A')?1-c.DESCUENTO_CONTADO:1)*(1-descuentoAnalistaPct/100);
     for(const [codigo,precio] of Object.entries(c.PRECIO_MP)){
       const comprado=positivo(compras[codigo]),inventarioInicial=positivo(inicial[codigo]),consumido=positivo(consumoMP[codigo]);
-      if(consumido>comprado+inventarioInicial)throw new RangeError('Consumo superior al inventario disponible: '+codigo);
-      const inventarioFinal=inventarioInicial+comprado-consumido;
+      const disponible=precisionStock(comprado+inventarioInicial,c);
+      if(consumido>disponible)throw new RangeError('Consumo superior al inventario disponible: '+codigo);
+      const inventarioFinal=precisionStock(disponible-consumido,c);
       detallesMP.push({codigo,precio,comprado,inventarioInicial,consumido,inventarioFinal,valorComprado:comprado*precio,valorConsumido:consumido*precio,valorInventario:inventarioFinal*precio});
     }
     if(c.VALORIZACION_MP_MODO==='excel_literal'){
       if(!entrada.consumoValorizado)throw new TypeError('El modo excel_literal requiere consumoValorizado explícito.');
-      for(const detalle of detallesMP){const usado=positivo(entrada.consumoValorizado[detalle.codigo]);if(usado>detalle.comprado+detalle.inventarioInicial)throw new RangeError('Valorización superior al stock: '+detalle.codigo);detalle.valorConsumido=usado*detalle.precio;detalle.valorInventario=(detalle.comprado+detalle.inventarioInicial-usado)*detalle.precio;}
+      for(const detalle of detallesMP){const usado=positivo(entrada.consumoValorizado[detalle.codigo]),disponible=precisionStock(detalle.comprado+detalle.inventarioInicial,c);if(usado>disponible)throw new RangeError('Valorización superior al stock: '+detalle.codigo);detalle.valorConsumido=usado*detalle.precio;detalle.valorInventario=precisionStock(disponible-usado,c)*detalle.precio;}
     }
     const valorComprado=sumar(detallesMP.map(detalle=>detalle.valorComprado)),valorConsumido=sumar(detallesMP.map(detalle=>detalle.valorConsumido)),valorInventario=sumar(detallesMP.map(detalle=>detalle.valorInventario));
     const valorCompradoNeto=valorComprado*factorDescuento,valorConsumidoNeto=valorConsumido*factorDescuento,valorInventarioNeto=valorInventario*factorDescuento;

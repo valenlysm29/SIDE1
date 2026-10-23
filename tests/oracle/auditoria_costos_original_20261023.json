@@ -1,0 +1,2078 @@
+{
+  "provenance": {
+    "source": ".codex-work\\DECISIONES_SIDE_16.xlsx",
+    "sha256": "3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1",
+    "method": "openpyxl dual-load original formulas + original cached values; no recalculation",
+    "generator": "tests\\auditoria_costos_original_20261023.py"
+  },
+  "labor": [
+    {
+      "role": "corte",
+      "level": 1,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "U5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "U6",
+          "formula_or_literal": "=U5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U7",
+          "formula_or_literal": "=U5",
+          "value": 1500
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "U8",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "U9",
+          "formula_or_literal": "=U5/2",
+          "value": 750
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U10",
+          "formula_or_literal": "=SUM(U6:U9)+U5*12",
+          "value": 21135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "U11",
+          "formula_or_literal": "=U10/12.5",
+          "value": 1690.8
+        }
+      }
+    },
+    {
+      "role": "corte",
+      "level": 1,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "V5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "V6",
+          "formula_or_literal": "=V5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V7",
+          "formula_or_literal": "=V5*2",
+          "value": 3000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "V8",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "V9",
+          "formula_or_literal": "=V5",
+          "value": 1500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V10",
+          "formula_or_literal": "=SUM(V6:V9)+V5*12",
+          "value": 24135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "V11",
+          "formula_or_literal": "=V10/13",
+          "value": 1856.538462
+        }
+      }
+    },
+    {
+      "role": "corte",
+      "level": 2,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "U14",
+          "formula_or_literal": 2000.0,
+          "value": 2000.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "U15",
+          "formula_or_literal": "=U14*0.09",
+          "value": 180
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U16",
+          "formula_or_literal": "=U14",
+          "value": 2000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "U17",
+          "formula_or_literal": "=U14/2",
+          "value": 1000
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "U18",
+          "formula_or_literal": "=U14/2",
+          "value": 1000
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U19",
+          "formula_or_literal": "=SUM(U15:U18)+U14*12",
+          "value": 28180
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "U20",
+          "formula_or_literal": "=U19/12.5",
+          "value": 2254.4
+        }
+      }
+    },
+    {
+      "role": "corte",
+      "level": 2,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "V14",
+          "formula_or_literal": 2000.0,
+          "value": 2000.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "V15",
+          "formula_or_literal": "=V14*0.09",
+          "value": 180
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V16",
+          "formula_or_literal": "=V14*2",
+          "value": 4000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "V17",
+          "formula_or_literal": "=V14",
+          "value": 2000
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "V18",
+          "formula_or_literal": "=V14",
+          "value": 2000
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V19",
+          "formula_or_literal": "=SUM(V15:V18)+V14*12",
+          "value": 32180
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "V20",
+          "formula_or_literal": "=V19/13",
+          "value": 2475.384615
+        }
+      }
+    },
+    {
+      "role": "corte",
+      "level": 3,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "U23",
+          "formula_or_literal": 3800.0,
+          "value": 3800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "U24",
+          "formula_or_literal": "=U23*0.09",
+          "value": 342
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U25",
+          "formula_or_literal": "=U23",
+          "value": 3800
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "U26",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "U27",
+          "formula_or_literal": "=U23/2",
+          "value": 1900
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U28",
+          "formula_or_literal": "=SUM(U24:U27)+U23*12",
+          "value": 52392
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "U29",
+          "formula_or_literal": "=U28/12.5",
+          "value": 4191.36
+        }
+      }
+    },
+    {
+      "role": "corte",
+      "level": 3,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "V23",
+          "formula_or_literal": 3800.0,
+          "value": 3800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "V24",
+          "formula_or_literal": "=V23*0.09",
+          "value": 342
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V25",
+          "formula_or_literal": "=V23*2",
+          "value": 7600
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "V26",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "V27",
+          "formula_or_literal": "=V23",
+          "value": 3800
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V28",
+          "formula_or_literal": "=SUM(V24:V27)+V23*12",
+          "value": 58842
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "V29",
+          "formula_or_literal": "=V28/13",
+          "value": 4526.307692
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 1,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Y5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Y6",
+          "formula_or_literal": "=Y5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y7",
+          "formula_or_literal": "=Y5",
+          "value": 1500
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Y8",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Y9",
+          "formula_or_literal": "=Y5/2",
+          "value": 750
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y10",
+          "formula_or_literal": "=SUM(Y6:Y9)+Y5*12",
+          "value": 21135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y11",
+          "formula_or_literal": "=Y10/12.5",
+          "value": 1690.8
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 1,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Z5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Z6",
+          "formula_or_literal": "=Z5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z7",
+          "formula_or_literal": "=Z5*2",
+          "value": 3000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Z8",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Z9",
+          "formula_or_literal": "=Z5",
+          "value": 1500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z10",
+          "formula_or_literal": "=SUM(Z6:Z9)+Z5*12",
+          "value": 24135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z11",
+          "formula_or_literal": "=Z10/13",
+          "value": 1856.538462
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 2,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Y14",
+          "formula_or_literal": 2800.0,
+          "value": 2800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Y15",
+          "formula_or_literal": "=Y14*0.09",
+          "value": 252
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y16",
+          "formula_or_literal": "=Y14",
+          "value": 2800
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Y17",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Y18",
+          "formula_or_literal": "=Y14/2",
+          "value": 1400
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y19",
+          "formula_or_literal": "=SUM(Y15:Y18)+Y14*12",
+          "value": 38802
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y20",
+          "formula_or_literal": "=Y19/12.5",
+          "value": 3104.16
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 2,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Z14",
+          "formula_or_literal": 2800.0,
+          "value": 2800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Z15",
+          "formula_or_literal": "=Z14*0.09",
+          "value": 252
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z16",
+          "formula_or_literal": "=Z14*2",
+          "value": 5600
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Z17",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Z18",
+          "formula_or_literal": "=Z14",
+          "value": 2800
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z19",
+          "formula_or_literal": "=SUM(Z15:Z18)+Z14*12",
+          "value": 43752
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z20",
+          "formula_or_literal": "=Z19/13",
+          "value": 3365.538462
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 3,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Y23",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Y24",
+          "formula_or_literal": "=Y23*0.09",
+          "value": 405
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y25",
+          "formula_or_literal": "=Y23",
+          "value": 4500
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Y26",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Y27",
+          "formula_or_literal": "=Y23/2",
+          "value": 2250
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y28",
+          "formula_or_literal": "=SUM(Y24:Y27)+Y23*12",
+          "value": 61905
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y29",
+          "formula_or_literal": "=Y28/12.5",
+          "value": 4952.4
+        }
+      }
+    },
+    {
+      "role": "ensamble",
+      "level": 3,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Z23",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Z24",
+          "formula_or_literal": "=Z23*0.09",
+          "value": 405
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z25",
+          "formula_or_literal": "=Z23*2",
+          "value": 9000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Z26",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Z27",
+          "formula_or_literal": "=Z23",
+          "value": 4500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z28",
+          "formula_or_literal": "=SUM(Z24:Z27)+Z23*12",
+          "value": 69405
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z29",
+          "formula_or_literal": "=Z28/13",
+          "value": 5338.846154
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 1,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AC5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AC6",
+          "formula_or_literal": "=AC5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC7",
+          "formula_or_literal": "=AC5",
+          "value": 1500
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AC8",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AC9",
+          "formula_or_literal": "=AC5/2",
+          "value": 750
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC10",
+          "formula_or_literal": "=SUM(AC6:AC9)+AC5*12",
+          "value": 21135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC11",
+          "formula_or_literal": "=AC10/12.5",
+          "value": 1690.8
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 1,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AD5",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AD6",
+          "formula_or_literal": "=AD5*0.09",
+          "value": 135
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD7",
+          "formula_or_literal": "=AD5*2",
+          "value": 3000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AD8",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AD9",
+          "formula_or_literal": "=AD5",
+          "value": 1500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD10",
+          "formula_or_literal": "=SUM(AD6:AD9)+AD5*12",
+          "value": 24135
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD11",
+          "formula_or_literal": "=AD10/13",
+          "value": 1856.538462
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 2,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AC14",
+          "formula_or_literal": 2800.0,
+          "value": 2800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AC15",
+          "formula_or_literal": "=AC14*0.09",
+          "value": 252
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC16",
+          "formula_or_literal": "=AC14",
+          "value": 2800
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AC17",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AC18",
+          "formula_or_literal": "=AC14/2",
+          "value": 1400
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC19",
+          "formula_or_literal": "=SUM(AC15:AC18)+AC14*12",
+          "value": 38802
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC20",
+          "formula_or_literal": "=AC19/12.5",
+          "value": 3104.16
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 2,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AD14",
+          "formula_or_literal": 2800.0,
+          "value": 2800.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AD15",
+          "formula_or_literal": "=AD14*0.09",
+          "value": 252
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD16",
+          "formula_or_literal": "=AD14*2",
+          "value": 5600
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AD17",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AD18",
+          "formula_or_literal": "=AD14",
+          "value": 2800
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD19",
+          "formula_or_literal": "=SUM(AD15:AD18)+AD14*12",
+          "value": 43752
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD20",
+          "formula_or_literal": "=AD19/13",
+          "value": 3365.538462
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 3,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AC23",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AC24",
+          "formula_or_literal": "=AC23*0.09",
+          "value": 405
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC25",
+          "formula_or_literal": "=AC23",
+          "value": 4500
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AC26",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AC27",
+          "formula_or_literal": "=AC23/2",
+          "value": 2250
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC28",
+          "formula_or_literal": "=SUM(AC24:AC27)+AC23*12",
+          "value": 61905
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC29",
+          "formula_or_literal": "=AC28/12.5",
+          "value": 4952.4
+        }
+      }
+    },
+    {
+      "role": "acabado",
+      "level": 3,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "AD23",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "AD24",
+          "formula_or_literal": "=AD23*0.09",
+          "value": 405
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD25",
+          "formula_or_literal": "=AD23*2",
+          "value": 9000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "AD26",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "AD27",
+          "formula_or_literal": "=AD23",
+          "value": 4500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD28",
+          "formula_or_literal": "=SUM(AD24:AD27)+AD23*12",
+          "value": 69405
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD29",
+          "formula_or_literal": "=AD28/13",
+          "value": 5338.846154
+        }
+      }
+    },
+    {
+      "role": "jefatura",
+      "level": 1,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "U33",
+          "formula_or_literal": 3000.0,
+          "value": 3000.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "U34",
+          "formula_or_literal": "=U33*0.09",
+          "value": 270
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U35",
+          "formula_or_literal": "=U33",
+          "value": 3000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "U36",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "U37",
+          "formula_or_literal": "=U33/2",
+          "value": 1500
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U38",
+          "formula_or_literal": "=SUM(U34:U37)+U33*12",
+          "value": 41520
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "U39",
+          "formula_or_literal": "=U38/12.5",
+          "value": 3321.6
+        }
+      }
+    },
+    {
+      "role": "jefatura",
+      "level": 1,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "V33",
+          "formula_or_literal": 3000.0,
+          "value": 3000.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "V34",
+          "formula_or_literal": "=V33*0.09",
+          "value": 270
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V35",
+          "formula_or_literal": "=V33*2",
+          "value": 6000
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "V36",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "V37",
+          "formula_or_literal": "=V33",
+          "value": 3000
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V38",
+          "formula_or_literal": "=SUM(V34:V37)+V33*12",
+          "value": 46770
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "V39",
+          "formula_or_literal": "=V38/13",
+          "value": 3597.692308
+        }
+      }
+    },
+    {
+      "role": "limpieza",
+      "level": 1,
+      "regime": "MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Y33",
+          "formula_or_literal": 600.0,
+          "value": 600.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Y34",
+          "formula_or_literal": "=Y33*0.09",
+          "value": 54
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y35",
+          "formula_or_literal": "=Y33",
+          "value": 600
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Y36",
+          "formula_or_literal": 750.0,
+          "value": 750.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Y37",
+          "formula_or_literal": "=Y33/2",
+          "value": 300
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y38",
+          "formula_or_literal": "=SUM(Y34:Y37)+Y33*12",
+          "value": 8904
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y39",
+          "formula_or_literal": "=Y38/12.5",
+          "value": 712.32
+        }
+      }
+    },
+    {
+      "role": "limpieza",
+      "level": 1,
+      "regime": "NO_MYPE",
+      "expected": {
+        "base": {
+          "sheet": "Costos De Producción",
+          "cell": "Z33",
+          "formula_or_literal": 600.0,
+          "value": 600.0
+        },
+        "essalud": {
+          "sheet": "Costos De Producción",
+          "cell": "Z34",
+          "formula_or_literal": "=Z33*0.09",
+          "value": 54
+        },
+        "gratificacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z35",
+          "formula_or_literal": "=Z33*2",
+          "value": 1200
+        },
+        "cts": {
+          "sheet": "Costos De Producción",
+          "cell": "Z36",
+          "formula_or_literal": 1500.0,
+          "value": 1500.0
+        },
+        "vacaciones": {
+          "sheet": "Costos De Producción",
+          "cell": "Z37",
+          "formula_or_literal": "=Z33",
+          "value": 600
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z38",
+          "formula_or_literal": "=SUM(Z34:Z37)+Z33*12",
+          "value": 10554
+        },
+        "pagoMensual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z39",
+          "formula_or_literal": "=Z38/13",
+          "value": 811.8461538
+        }
+      }
+    }
+  ],
+  "assets": [
+    {
+      "code": "mesa",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "U45",
+          "formula_or_literal": 2500.0,
+          "value": 2500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U46",
+          "formula_or_literal": "=U45*3%",
+          "value": 75
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U47",
+          "formula_or_literal": "=U45*2%",
+          "value": 50
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U48",
+          "formula_or_literal": "=U45*5%",
+          "value": 125
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U49",
+          "formula_or_literal": "=-((U45-U45*5%)/10)",
+          "value": -237.5
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U50",
+          "formula_or_literal": "=SUM(U46:U49)+U45",
+          "value": 2512.5
+        }
+      }
+    },
+    {
+      "code": "mesa",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "V45",
+          "formula_or_literal": 2500.0,
+          "value": 2500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V46",
+          "formula_or_literal": "=V45*5%",
+          "value": 125
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V47",
+          "formula_or_literal": "=V45*3%",
+          "value": 75
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V48",
+          "formula_or_literal": "=V45*8%",
+          "value": 200
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V49",
+          "formula_or_literal": "=-((V45-V45*10%)/10)",
+          "value": -225
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V50",
+          "formula_or_literal": "=SUM(V46:V49)+V45",
+          "value": 2675
+        }
+      }
+    },
+    {
+      "code": "INF-02",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y45",
+          "formula_or_literal": 3500.0,
+          "value": 3500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y46",
+          "formula_or_literal": "=Y45*3%",
+          "value": 105
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y47",
+          "formula_or_literal": "=Y45*2%",
+          "value": 70
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y48",
+          "formula_or_literal": "=Y45*5%",
+          "value": 175
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y49",
+          "formula_or_literal": "=-(Y45-Y45*5%)/10",
+          "value": -332.5
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y50",
+          "formula_or_literal": "=SUM(Y46:Y49)+Y45",
+          "value": 3517.5
+        }
+      }
+    },
+    {
+      "code": "INF-02",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z45",
+          "formula_or_literal": 3500.0,
+          "value": 3500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z46",
+          "formula_or_literal": "=Z45*5%",
+          "value": 175
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z47",
+          "formula_or_literal": "=Z45*3%",
+          "value": 105
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z48",
+          "formula_or_literal": "=Z45*8%",
+          "value": 280
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z49",
+          "formula_or_literal": "=-(Z45-Z45*10%)/10",
+          "value": -315
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z50",
+          "formula_or_literal": "=SUM(Z46:Z49)+Z45",
+          "value": 3745
+        }
+      }
+    },
+    {
+      "code": "INF-03",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y53",
+          "formula_or_literal": 7500.0,
+          "value": 7500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y54",
+          "formula_or_literal": "=Y53*3%",
+          "value": 225
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y55",
+          "formula_or_literal": "=Y53*2%",
+          "value": 150
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y56",
+          "formula_or_literal": "=Y53*5%",
+          "value": 375
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y57",
+          "formula_or_literal": "=-(Y53-Y53*5%)/10",
+          "value": -712.5
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y58",
+          "formula_or_literal": "=SUM(Y54:Y57)+Y53",
+          "value": 7537.5
+        }
+      }
+    },
+    {
+      "code": "INF-03",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z53",
+          "formula_or_literal": 7500.0,
+          "value": 7500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z54",
+          "formula_or_literal": "=Z53*5%",
+          "value": 375
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z55",
+          "formula_or_literal": "=Z53*3%",
+          "value": 225
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z56",
+          "formula_or_literal": "=Z53*8%",
+          "value": 600
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z57",
+          "formula_or_literal": "=-(Z53-Z53*10%)/10",
+          "value": -675
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z58",
+          "formula_or_literal": "=SUM(Z54:Z57)+Z53",
+          "value": 8025
+        }
+      }
+    },
+    {
+      "code": "INF-04",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y61",
+          "formula_or_literal": 15000.0,
+          "value": 15000.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y62",
+          "formula_or_literal": "=Y61*3%",
+          "value": 450
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Y63",
+          "formula_or_literal": "=Y61*2%",
+          "value": 300
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y64",
+          "formula_or_literal": "=Y61*5%",
+          "value": 750
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y65",
+          "formula_or_literal": "=-(Y61-Y61*5%)/10",
+          "value": -1425
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Y66",
+          "formula_or_literal": "=SUM(Y62:Y65)+Y61",
+          "value": 15075
+        }
+      }
+    },
+    {
+      "code": "INF-04",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z61",
+          "formula_or_literal": 15000.0,
+          "value": 15000.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z62",
+          "formula_or_literal": "=Z61*5%",
+          "value": 750
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "Z63",
+          "formula_or_literal": "=Z61*3%",
+          "value": 450
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z64",
+          "formula_or_literal": "=Z61*8%",
+          "value": 1200
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z65",
+          "formula_or_literal": "=-(Z61-Z61*10%)/10",
+          "value": -1350
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "Z66",
+          "formula_or_literal": "=SUM(Z62:Z65)+Z61",
+          "value": 16050
+        }
+      }
+    },
+    {
+      "code": "INF-05",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC45",
+          "formula_or_literal": 1200.0,
+          "value": 1200.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC46",
+          "formula_or_literal": "=AC45*3%",
+          "value": 36
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC47",
+          "formula_or_literal": "=AC45*2%",
+          "value": 24
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC48",
+          "formula_or_literal": "=AC45*5%",
+          "value": 60
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC49",
+          "formula_or_literal": "=-(AC45-AC45*5%)/8",
+          "value": -142.5
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC50",
+          "formula_or_literal": "=SUM(AC46:AC49)+AC45",
+          "value": 1177.5
+        }
+      }
+    },
+    {
+      "code": "INF-05",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD45",
+          "formula_or_literal": 1200.0,
+          "value": 1200.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD46",
+          "formula_or_literal": "=AD45*5%",
+          "value": 60
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD47",
+          "formula_or_literal": "=AD45*3%",
+          "value": 36
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD48",
+          "formula_or_literal": "=AD45*8%",
+          "value": 96
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD49",
+          "formula_or_literal": "=-(AD45-AD45*10%)/8",
+          "value": -135
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD50",
+          "formula_or_literal": "=SUM(AD46:AD49)+AD45",
+          "value": 1257
+        }
+      }
+    },
+    {
+      "code": "INF-06",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC53",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC54",
+          "formula_or_literal": "=AC53*3%",
+          "value": 135
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC55",
+          "formula_or_literal": "=AC53*2%",
+          "value": 90
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC56",
+          "formula_or_literal": "=AC53*5%",
+          "value": 225
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC57",
+          "formula_or_literal": "=-(AC53-AC53*5%)/8",
+          "value": -534.375
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC58",
+          "formula_or_literal": "=SUM(AC54:AC57)+AC53",
+          "value": 4415.625
+        }
+      }
+    },
+    {
+      "code": "INF-06",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD53",
+          "formula_or_literal": 4500.0,
+          "value": 4500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD54",
+          "formula_or_literal": "=AD53*5%",
+          "value": 225
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD55",
+          "formula_or_literal": "=AD53*3%",
+          "value": 135
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD56",
+          "formula_or_literal": "=AD53*8%",
+          "value": 360
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD57",
+          "formula_or_literal": "=-(AD53-AD53*10%)/8",
+          "value": -506.25
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD58",
+          "formula_or_literal": "=SUM(AD54:AD57)+AD53",
+          "value": 4713.75
+        }
+      }
+    },
+    {
+      "code": "INF-07",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC61",
+          "formula_or_literal": 9500.0,
+          "value": 9500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC62",
+          "formula_or_literal": "=AC61*3%",
+          "value": 285
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AC63",
+          "formula_or_literal": "=AC61*2%",
+          "value": 190
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC64",
+          "formula_or_literal": "=AC61*5%",
+          "value": 475
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC65",
+          "formula_or_literal": "=-(AC61-AC61*5%)/8",
+          "value": -1128.125
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AC66",
+          "formula_or_literal": "=SUM(AC62:AC65)+AC61",
+          "value": 9321.875
+        }
+      }
+    },
+    {
+      "code": "INF-07",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD61",
+          "formula_or_literal": 9500.0,
+          "value": 9500.0
+        },
+        "instalacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD62",
+          "formula_or_literal": "=AD61*5%",
+          "value": 475
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "AD63",
+          "formula_or_literal": "=AD61*3%",
+          "value": 285
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD64",
+          "formula_or_literal": "=AD61*8%",
+          "value": 760
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD65",
+          "formula_or_literal": "=-(AD61-AD61*10%)/8",
+          "value": -1068.75
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "AD66",
+          "formula_or_literal": "=SUM(AD62:AD65)+AD61",
+          "value": 9951.25
+        }
+      }
+    },
+    {
+      "code": "INF-08",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "U53",
+          "formula_or_literal": 300.0,
+          "value": 300.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U54",
+          "formula_or_literal": "=U53*1%",
+          "value": 3
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U55",
+          "formula_or_literal": "=U53*5%",
+          "value": 15
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U56",
+          "formula_or_literal": "=-((U53-U53*5%)/5)",
+          "value": -57
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U57",
+          "formula_or_literal": "=SUM(U54:U56)+U53",
+          "value": 261
+        }
+      }
+    },
+    {
+      "code": "INF-08",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "V53",
+          "formula_or_literal": 300.0,
+          "value": 300.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V54",
+          "formula_or_literal": "=V53*2%",
+          "value": 6
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V55",
+          "formula_or_literal": "=V53*8%",
+          "value": 24
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V56",
+          "formula_or_literal": "=-((V53-V53*10%)/5)",
+          "value": -54
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V57",
+          "formula_or_literal": "=SUM(V54:V56)+V53",
+          "value": 276
+        }
+      }
+    },
+    {
+      "code": "INF-09",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "U60",
+          "formula_or_literal": 1200.0,
+          "value": 1200.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U61",
+          "formula_or_literal": "=U60*1%",
+          "value": 12
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U62",
+          "formula_or_literal": "=U60*5%",
+          "value": 60
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U63",
+          "formula_or_literal": "=-((U60-U60*5%)/5)",
+          "value": -228
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U64",
+          "formula_or_literal": "=SUM(U61:U63)+U60",
+          "value": 1044
+        }
+      }
+    },
+    {
+      "code": "INF-09",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "V60",
+          "formula_or_literal": 1200.0,
+          "value": 1200.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V61",
+          "formula_or_literal": "=V60*2%",
+          "value": 24
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V62",
+          "formula_or_literal": "=V60*8%",
+          "value": 96
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V63",
+          "formula_or_literal": "=-((V60-V60*10%)/5)",
+          "value": -216
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V64",
+          "formula_or_literal": "=SUM(V61:V63)+V60",
+          "value": 1104
+        }
+      }
+    },
+    {
+      "code": "INF-10",
+      "regime": "MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "U67",
+          "formula_or_literal": 3500.0,
+          "value": 3500.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "U68",
+          "formula_or_literal": "=U67*1%",
+          "value": 35
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U69",
+          "formula_or_literal": "=U67*5%",
+          "value": 175
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U70",
+          "formula_or_literal": "=-((U67-U67*5%)/5)",
+          "value": -665
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "U71",
+          "formula_or_literal": "=SUM(U68:U70)+U67",
+          "value": 3045
+        }
+      }
+    },
+    {
+      "code": "INF-10",
+      "regime": "NO_MYPE",
+      "expected": {
+        "adquisicion": {
+          "sheet": "Costos De Producción",
+          "cell": "V67",
+          "formula_or_literal": 3500.0,
+          "value": 3500.0
+        },
+        "capacitacion": {
+          "sheet": "Costos De Producción",
+          "cell": "V68",
+          "formula_or_literal": "=V67*2%",
+          "value": 70
+        },
+        "mantenimientoAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V69",
+          "formula_or_literal": "=V67*8%",
+          "value": 280
+        },
+        "depreciacionAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V70",
+          "formula_or_literal": "=-((V67-V67*10%)/5)",
+          "value": -630
+        },
+        "sumaAnual": {
+          "sheet": "Costos De Producción",
+          "cell": "V71",
+          "formula_or_literal": "=SUM(V68:V70)+V67",
+          "value": 3220
+        }
+      }
+    }
+  ],
+  "materials": [
+    {
+      "code": "INS-01",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V76",
+        "formula_or_literal": 25.0,
+        "value": 25.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W76",
+        "formula_or_literal": "=V76-V76*8%",
+        "value": 23
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "D32",
+        "formula_or_literal": 1.0,
+        "value": 1.0
+      }
+    },
+    {
+      "code": "INS-02",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V77",
+        "formula_or_literal": 45.0,
+        "value": 45.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W77",
+        "formula_or_literal": "=V77-V77*8%",
+        "value": 41.4
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "E32",
+        "formula_or_literal": 2.0,
+        "value": 2.0
+      }
+    },
+    {
+      "code": "INS-03",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V78",
+        "formula_or_literal": 80.0,
+        "value": 80.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W78",
+        "formula_or_literal": "=V78-V78*8%",
+        "value": 73.6
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "F32",
+        "formula_or_literal": 2.0,
+        "value": 2.0
+      }
+    },
+    {
+      "code": "INS-04",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V79",
+        "formula_or_literal": 4.0,
+        "value": 4.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W79",
+        "formula_or_literal": "=V79-V79*8%",
+        "value": 3.68
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "G32",
+        "formula_or_literal": 1.0,
+        "value": 1.0
+      }
+    },
+    {
+      "code": "INS-05",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V80",
+        "formula_or_literal": 9.0,
+        "value": 9.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W80",
+        "formula_or_literal": "=V80-V80*8%",
+        "value": 8.28
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "H32",
+        "formula_or_literal": 1.0,
+        "value": 1.0
+      }
+    },
+    {
+      "code": "INS-06",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V81",
+        "formula_or_literal": 2.0,
+        "value": 2.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W81",
+        "formula_or_literal": "=V81-V81*8%",
+        "value": 1.84
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "I32",
+        "formula_or_literal": 270.0,
+        "value": 270.0
+      }
+    },
+    {
+      "code": "INS-07",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V82",
+        "formula_or_literal": 4.0,
+        "value": 4.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W82",
+        "formula_or_literal": "=V82-V82*8%",
+        "value": 3.68
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "J32",
+        "formula_or_literal": 250.0,
+        "value": 250.0
+      }
+    },
+    {
+      "code": "INS-08",
+      "price": {
+        "sheet": "Costos De Producción",
+        "cell": "V83",
+        "formula_or_literal": 7.0,
+        "value": 7.0
+      },
+      "discounted_unit_price": {
+        "sheet": "Costos De Producción",
+        "cell": "W83",
+        "formula_or_literal": "=V83-V83*8%",
+        "value": 6.44
+      },
+      "conversion": {
+        "sheet": "Costos De Producción",
+        "cell": "K32",
+        "formula_or_literal": 200.0,
+        "value": 200.0
+      }
+    }
+  ],
+  "local": [
+    {
+      "sheet": "Costos De Producción",
+      "cell": "AC33",
+      "formula_or_literal": 2000.0,
+      "value": 2000.0
+    },
+    {
+      "sheet": "Costos De Producción",
+      "cell": "AD33",
+      "formula_or_literal": 2000.0,
+      "value": 2000.0
+    }
+  ]
+}
