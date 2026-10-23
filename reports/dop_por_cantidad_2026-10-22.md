@@ -1,5 +1,9 @@
 # DOP por cantidad deseada — 22/10/2026
 
+## Estado actualizado — auditoría del 23/10/2026
+
+La revisión posterior solicitada en «haz la auditoria» corrigió CONS-06 por producción efectiva, el proxy y denominador del mercado y los errores de precisión de inventario. Se contrastaron 12 copias del original recalculadas con Excel, sin hojas añadidas: 4.220 comprobaciones válidas sin diferencias; los errores de la fuente se registran aparte. Los oráculos históricos se regeneraron desde fórmulas y SIM-1/2/3 pasan. El informe vigente es [auditoria_integral_2026-10-23.md](auditoria_integral_2026-10-23.md), con criterios aplicados a las contradicciones y reglas ausentes. La petición posterior «haz push» autoriza publicar estos cambios y los commits anteriores. Los apartados siguientes conservan el historial y el estado de la revisión del día 22; su decisión de no hacer push ya fue superada por esa petición. No requiere SQL ni actualización de Supabase.
+
 ## Revisión adicional sobre la versión ya publicada
 
 Esta ejecución parte de `159e5fc`, con el árbol limpio y remoto verificado `https://github.com/valenlysm29/SIDE1.git`. Las secciones posteriores conservan la implementación y validación previas; este apartado las complementa y precisa su alcance. Se trabajó con cinco subagentes de alcances separados (Excel, Código, Auditoría, UI y Pruebas), en tandas por el límite de concurrencia, y se integraron sobre el mismo repositorio.

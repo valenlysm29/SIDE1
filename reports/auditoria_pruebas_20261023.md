@@ -44,3 +44,18 @@ Ejemplos verificables: en el escenario de consecuencias, producir 365 con capaci
 ## Verificación
 
 Los logs de esta ejecución están en `tests/output/auditoria-20261023/`. El coordinador mantiene por separado la auditoría directa del libro original y sus perturbaciones; este informe documenta la reconstrucción de los escenarios históricos y las regresiones de integración.
+
+| Verificación completada | Resultado | Log |
+|---|---|---|
+| Recálculo COM DOP14 + ocho históricos | 3.104 salidas históricas y 14 casos DOP; cero diferencias | `oraculo14mas8.log` |
+| SIM-1 navegador | 468 salidas, un ciclo, cuatro empresas; cero diferencias | `sim1-browser.log` |
+| SIM-2 navegador | 585 salidas, tres ciclos, dos empresas; cero diferencias | `sim2-browser.log` |
+| SIM-3 navegador | 1.140 salidas, tres ciclos, cinco empresas; cero diferencias | `sim3-browser.log` |
+| Banca / mezcla | 252 + 252 salidas; cero diferencias | `banca-node.log`, `bancamezcla-node.log` |
+| Navegador DOP | 767 comprobaciones, cero errores | evidencia de navegador de esta ejecución |
+| Persistencia DB local / tarjetas | pasan | `decision-options-db.log`, `decision-cards.log` |
+| Node completo final | **568/568**, sin fallos, cancelados ni omitidos; 571,3 s | `node-final.log` |
+
+La auditoría directa nueva incluye 12 escenarios originales, 4.220 comprobaciones válidas sin diferencias y cuatro experimentos aritméticos aislados; la procedencia y los errores de la fuente se conservan en el informe integral. No se hizo una segunda reconstrucción numérica desde resultados SIDE.
+
+No se detectaron fallos NPC en la batería final. Las primeras diferencias del comparador de la auditoría original correspondían a literales salariales que aún no se habían incluido en la exportación de celdas, no a errores del motor: se añadieron las referencias omitidas y se leyeron de las mismas copias ya recalculadas, comprobando igualdad de hash y operandos; no se calcularon esperados con SIDE. La prueba final comprende todos esos componentes.
