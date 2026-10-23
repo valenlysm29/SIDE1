@@ -1,0 +1,3330 @@
+{
+  "source": ".codex-work/DECISIONES_SIDE_16.xlsx",
+  "method": "original cached Excel values, independent dual-load formulas dump; historical literal adapter inputs; no COM recalc in this audit",
+  "comparisons": 412,
+  "differences": [],
+  "original_errors": [
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E75",
+      "error": "#DIV/0!",
+      "type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G75",
+      "error": "#DIV/0!",
+      "type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E123",
+      "error": "#DIV/0!",
+      "type": "s"
+    },
+    {
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G123",
+      "error": "#DIV/0!",
+      "type": "s"
+    }
+  ],
+  "rows": [
+    {
+      "key": "produccion.I8",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I8",
+      "excel": 21,
+      "side": 21,
+      "ok": true
+    },
+    {
+      "key": "produccion.I14",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I14",
+      "excel": 31.4,
+      "side": 31.4,
+      "ok": true
+    },
+    {
+      "key": "produccion.I20",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I20",
+      "excel": 17.2,
+      "side": 17.2,
+      "ok": true
+    },
+    {
+      "key": "produccion.K5",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "K5",
+      "excel": 17.2,
+      "side": 17.2,
+      "ok": true
+    },
+    {
+      "key": "produccion.L5",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "L5",
+      "excel": 412.8,
+      "side": 412.79999999999995,
+      "ok": true
+    },
+    {
+      "key": "produccion.M5",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "M5",
+      "excel": 0.96,
+      "side": 0.9600000000000001,
+      "ok": true
+    },
+    {
+      "key": "produccion.N5",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "N5",
+      "excel": 396,
+      "side": 396,
+      "ok": true
+    },
+    {
+      "key": "produccion.L9",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "L9",
+      "excel": 8,
+      "side": 8,
+      "ok": true
+    },
+    {
+      "key": "produccion.L10",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "L10",
+      "excel": 3,
+      "side": 3,
+      "ok": true
+    },
+    {
+      "key": "produccion.M10",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "M10",
+      "excel": 0.375,
+      "side": 0.375,
+      "ok": true
+    },
+    {
+      "key": "produccion.D37",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D37",
+      "excel": 250.0,
+      "side": 250,
+      "ok": true
+    },
+    {
+      "key": "produccion.E37",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E37",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "produccion.D56",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D56",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "produccion.E56",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E56",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "produccion.G56",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G56",
+      "excel": 57,
+      "side": 57,
+      "ok": true
+    },
+    {
+      "key": "produccion.H56",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "H56",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "produccion.I56",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I56",
+      "excel": 1140,
+      "side": 1140,
+      "ok": true
+    },
+    {
+      "key": "produccion.D38",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D38",
+      "excel": 180.0,
+      "side": 180,
+      "ok": true
+    },
+    {
+      "key": "produccion.E38",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E38",
+      "excel": 137,
+      "side": 137,
+      "ok": true
+    },
+    {
+      "key": "produccion.D57",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D57",
+      "excel": 125,
+      "side": 125,
+      "ok": true
+    },
+    {
+      "key": "produccion.E57",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E57",
+      "excel": 125,
+      "side": 125,
+      "ok": true
+    },
+    {
+      "key": "produccion.G57",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G57",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "produccion.H57",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "H57",
+      "excel": 125,
+      "side": 125,
+      "ok": true
+    },
+    {
+      "key": "produccion.I57",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I57",
+      "excel": 875,
+      "side": 875,
+      "ok": true
+    },
+    {
+      "key": "produccion.D39",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D39",
+      "excel": 90.0,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "produccion.E39",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E39",
+      "excel": 68,
+      "side": 68,
+      "ok": true
+    },
+    {
+      "key": "produccion.D58",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D58",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "produccion.E58",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E58",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "produccion.G58",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G58",
+      "excel": 35,
+      "side": 35,
+      "ok": true
+    },
+    {
+      "key": "produccion.H58",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "H58",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "produccion.I58",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "I58",
+      "excel": 650,
+      "side": 650,
+      "ok": true
+    },
+    {
+      "key": "produccion.D63",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D63",
+      "excel": 15.0,
+      "side": 15,
+      "ok": true
+    },
+    {
+      "key": "produccion.E63",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E63",
+      "excel": 60.0,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "produccion.F63",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F63",
+      "excel": 75.0,
+      "side": 75,
+      "ok": true
+    },
+    {
+      "key": "produccion.G63",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G63",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D64",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D64",
+      "excel": 17.0,
+      "side": 17,
+      "ok": true
+    },
+    {
+      "key": "produccion.E64",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E64",
+      "excel": 55.0,
+      "side": 55,
+      "ok": true
+    },
+    {
+      "key": "produccion.F64",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F64",
+      "excel": 72.0,
+      "side": 72,
+      "ok": true
+    },
+    {
+      "key": "produccion.G64",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G64",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D65",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D65",
+      "excel": 48.0,
+      "side": 48,
+      "ok": true
+    },
+    {
+      "key": "produccion.E65",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E65",
+      "excel": 15.0,
+      "side": 15,
+      "ok": true
+    },
+    {
+      "key": "produccion.F65",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F65",
+      "excel": 63.0,
+      "side": 63,
+      "ok": true
+    },
+    {
+      "key": "produccion.G65",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G65",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D66",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D66",
+      "excel": 50.0,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "produccion.E66",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E66",
+      "excel": 200.0,
+      "side": 200,
+      "ok": true
+    },
+    {
+      "key": "produccion.F66",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F66",
+      "excel": 250.0,
+      "side": 250,
+      "ok": true
+    },
+    {
+      "key": "produccion.G66",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G66",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D67",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D67",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.E67",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E67",
+      "excel": 190.0,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "produccion.F67",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F67",
+      "excel": 180.0,
+      "side": 180,
+      "ok": true
+    },
+    {
+      "key": "produccion.G67",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G67",
+      "excel": 10,
+      "side": 10,
+      "ok": true
+    },
+    {
+      "key": "produccion.D68",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D68",
+      "excel": 90.0,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "produccion.E68",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E68",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.F68",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F68",
+      "excel": 90.0,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "produccion.G68",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G68",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D69",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D69",
+      "excel": 1494.0,
+      "side": 1494,
+      "ok": true
+    },
+    {
+      "key": "produccion.E69",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E69",
+      "excel": 6.0,
+      "side": 6,
+      "ok": true
+    },
+    {
+      "key": "produccion.F69",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F69",
+      "excel": 1500.0,
+      "side": 1500,
+      "ok": true
+    },
+    {
+      "key": "produccion.G69",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G69",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D70",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D70",
+      "excel": 1253.0,
+      "side": 1253,
+      "ok": true
+    },
+    {
+      "key": "produccion.E70",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E70",
+      "excel": 7.0,
+      "side": 7,
+      "ok": true
+    },
+    {
+      "key": "produccion.F70",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F70",
+      "excel": 1260.0,
+      "side": 1260,
+      "ok": true
+    },
+    {
+      "key": "produccion.G70",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G70",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.D71",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "D71",
+      "excel": 1170.0,
+      "side": 1170,
+      "ok": true
+    },
+    {
+      "key": "produccion.E71",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "E71",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "produccion.F71",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "F71",
+      "excel": 1170.0,
+      "side": 1170,
+      "ok": true
+    },
+    {
+      "key": "produccion.G71",
+      "sheet": "CANTIDAD DE PRODUCCIÓN",
+      "cell": "G71",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E118",
+      "sheet": "Costos De Producción",
+      "cell": "E118",
+      "excel": 20,
+      "side": 20,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F118",
+      "sheet": "Costos De Producción",
+      "cell": "F118",
+      "excel": 100,
+      "side": 100,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G118",
+      "sheet": "Costos De Producción",
+      "cell": "G118",
+      "excel": 70,
+      "side": 70,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H118",
+      "sheet": "Costos De Producción",
+      "cell": "H118",
+      "excel": 86,
+      "side": 86,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I118",
+      "sheet": "Costos De Producción",
+      "cell": "I118",
+      "excel": 0.3690987124,
+      "side": 0.36909871244635195,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J118",
+      "sheet": "Costos De Producción",
+      "cell": "J118",
+      "excel": 1292,
+      "side": 1292,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E119",
+      "sheet": "Costos De Producción",
+      "cell": "E119",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F119",
+      "sheet": "Costos De Producción",
+      "cell": "F119",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G119",
+      "sheet": "Costos De Producción",
+      "cell": "G119",
+      "excel": 83,
+      "side": 83,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H119",
+      "sheet": "Costos De Producción",
+      "cell": "H119",
+      "excel": 19,
+      "side": 19,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I119",
+      "sheet": "Costos De Producción",
+      "cell": "I119",
+      "excel": 0.08154506438,
+      "side": 0.0815450643776824,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J119",
+      "sheet": "Costos De Producción",
+      "cell": "J119",
+      "excel": 285,
+      "side": 285,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E120",
+      "sheet": "Costos De Producción",
+      "cell": "E120",
+      "excel": 30,
+      "side": 30,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F120",
+      "sheet": "Costos De Producción",
+      "cell": "F120",
+      "excel": 40,
+      "side": 40,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G120",
+      "sheet": "Costos De Producción",
+      "cell": "G120",
+      "excel": 102,
+      "side": 102,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H120",
+      "sheet": "Costos De Producción",
+      "cell": "H120",
+      "excel": 51.4,
+      "side": 51.400000000000006,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I120",
+      "sheet": "Costos De Producción",
+      "cell": "I120",
+      "excel": 0.2206008584,
+      "side": 0.22060085836909873,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J120",
+      "sheet": "Costos De Producción",
+      "cell": "J120",
+      "excel": 772,
+      "side": 772,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E121",
+      "sheet": "Costos De Producción",
+      "cell": "E121",
+      "excel": 26,
+      "side": 26,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F121",
+      "sheet": "Costos De Producción",
+      "cell": "F121",
+      "excel": 80,
+      "side": 80,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G121",
+      "sheet": "Costos De Producción",
+      "cell": "G121",
+      "excel": 90,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H121",
+      "sheet": "Costos De Producción",
+      "cell": "H121",
+      "excel": 76.6,
+      "side": 76.6,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I121",
+      "sheet": "Costos De Producción",
+      "cell": "I121",
+      "excel": 0.3287553648,
+      "side": 0.3287553648068669,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J121",
+      "sheet": "Costos De Producción",
+      "cell": "J121",
+      "excel": 1151,
+      "side": 1151,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E73",
+      "sheet": "Costos De Producción",
+      "cell": "E73",
+      "excel": 5,
+      "side": 5,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F73",
+      "sheet": "Costos De Producción",
+      "cell": "F73",
+      "excel": 12,
+      "side": 12,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G73",
+      "sheet": "Costos De Producción",
+      "cell": "G73",
+      "excel": 0.223880597,
+      "side": 0.22388059701492538,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H73",
+      "sheet": "Costos De Producción",
+      "cell": "H73",
+      "excel": 784,
+      "side": 784,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E74",
+      "sheet": "Costos De Producción",
+      "cell": "E74",
+      "excel": 4.5,
+      "side": 4.5,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F74",
+      "sheet": "Costos De Producción",
+      "cell": "F74",
+      "excel": 12.8,
+      "side": 12.8,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G74",
+      "sheet": "Costos De Producción",
+      "cell": "G74",
+      "excel": 0.2388059701,
+      "side": 0.23880597014925373,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H74",
+      "sheet": "Costos De Producción",
+      "cell": "H74",
+      "excel": 836,
+      "side": 836,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E75",
+      "sheet": "Costos De Producción",
+      "cell": "E75",
+      "excel": 4.7,
+      "side": 4.7,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F75",
+      "sheet": "Costos De Producción",
+      "cell": "F75",
+      "excel": 14.9,
+      "side": 14.899999999999999,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G75",
+      "sheet": "Costos De Producción",
+      "cell": "G75",
+      "excel": 0.2779850746,
+      "side": 0.2779850746268656,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H75",
+      "sheet": "Costos De Producción",
+      "cell": "H75",
+      "excel": 973,
+      "side": 973,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E76",
+      "sheet": "Costos De Producción",
+      "cell": "E76",
+      "excel": 4.9,
+      "side": 4.9,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F76",
+      "sheet": "Costos De Producción",
+      "cell": "F76",
+      "excel": 13.9,
+      "side": 13.9,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G76",
+      "sheet": "Costos De Producción",
+      "cell": "G76",
+      "excel": 0.2593283582,
+      "side": 0.2593283582089552,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H76",
+      "sheet": "Costos De Producción",
+      "cell": "H76",
+      "excel": 908,
+      "side": 908,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E131",
+      "sheet": "Costos De Producción",
+      "cell": "E131",
+      "excel": 20,
+      "side": 20,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F131",
+      "sheet": "Costos De Producción",
+      "cell": "F131",
+      "excel": 80,
+      "side": 80,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G131",
+      "sheet": "Costos De Producción",
+      "cell": "G131",
+      "excel": 70,
+      "side": 70,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H131",
+      "sheet": "Costos De Producción",
+      "cell": "H131",
+      "excel": 61.5,
+      "side": 61.5,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I131",
+      "sheet": "Costos De Producción",
+      "cell": "I131",
+      "excel": 0.3048327138,
+      "side": 0.3048327137546468,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J131",
+      "sheet": "Costos De Producción",
+      "cell": "J131",
+      "excel": 1067,
+      "side": 1067,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E132",
+      "sheet": "Costos De Producción",
+      "cell": "E132",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F132",
+      "sheet": "Costos De Producción",
+      "cell": "F132",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G132",
+      "sheet": "Costos De Producción",
+      "cell": "G132",
+      "excel": 83,
+      "side": 83,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H132",
+      "sheet": "Costos De Producción",
+      "cell": "H132",
+      "excel": 55.05,
+      "side": 55.05,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I132",
+      "sheet": "Costos De Producción",
+      "cell": "I132",
+      "excel": 0.2728624535,
+      "side": 0.2728624535315985,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J132",
+      "sheet": "Costos De Producción",
+      "cell": "J132",
+      "excel": 955,
+      "side": 955,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E133",
+      "sheet": "Costos De Producción",
+      "cell": "E133",
+      "excel": 30,
+      "side": 30,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F133",
+      "sheet": "Costos De Producción",
+      "cell": "F133",
+      "excel": 10,
+      "side": 10,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G133",
+      "sheet": "Costos De Producción",
+      "cell": "G133",
+      "excel": 102,
+      "side": 102,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H133",
+      "sheet": "Costos De Producción",
+      "cell": "H133",
+      "excel": 47.2,
+      "side": 47.199999999999996,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I133",
+      "sheet": "Costos De Producción",
+      "cell": "I133",
+      "excel": 0.233952912,
+      "side": 0.2339529120198265,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J133",
+      "sheet": "Costos De Producción",
+      "cell": "J133",
+      "excel": 819,
+      "side": 819,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E134",
+      "sheet": "Costos De Producción",
+      "cell": "E134",
+      "excel": 26,
+      "side": 26,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F134",
+      "sheet": "Costos De Producción",
+      "cell": "F134",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G134",
+      "sheet": "Costos De Producción",
+      "cell": "G134",
+      "excel": 90,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H134",
+      "sheet": "Costos De Producción",
+      "cell": "H134",
+      "excel": 38,
+      "side": 38,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I134",
+      "sheet": "Costos De Producción",
+      "cell": "I134",
+      "excel": 0.1883519207,
+      "side": 0.18835192069392812,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J134",
+      "sheet": "Costos De Producción",
+      "cell": "J134",
+      "excel": 659,
+      "side": 659,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E87",
+      "sheet": "Costos De Producción",
+      "cell": "E87",
+      "excel": 28,
+      "side": 28,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F87",
+      "sheet": "Costos De Producción",
+      "cell": "F87",
+      "excel": 35,
+      "side": 35,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G87",
+      "sheet": "Costos De Producción",
+      "cell": "G87",
+      "excel": 0.2723735409,
+      "side": 0.2723735408560311,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H87",
+      "sheet": "Costos De Producción",
+      "cell": "H87",
+      "excel": 953,
+      "side": 953,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E88",
+      "sheet": "Costos De Producción",
+      "cell": "E88",
+      "excel": 25,
+      "side": 25,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F88",
+      "sheet": "Costos De Producción",
+      "cell": "F88",
+      "excel": 33.3,
+      "side": 33.3,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G88",
+      "sheet": "Costos De Producción",
+      "cell": "G88",
+      "excel": 0.2591439689,
+      "side": 0.2591439688715953,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H88",
+      "sheet": "Costos De Producción",
+      "cell": "H88",
+      "excel": 907,
+      "side": 907,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E89",
+      "sheet": "Costos De Producción",
+      "cell": "E89",
+      "excel": 21,
+      "side": 21,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F89",
+      "sheet": "Costos De Producción",
+      "cell": "F89",
+      "excel": 31.2,
+      "side": 31.2,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G89",
+      "sheet": "Costos De Producción",
+      "cell": "G89",
+      "excel": 0.2428015564,
+      "side": 0.24280155642023346,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H89",
+      "sheet": "Costos De Producción",
+      "cell": "H89",
+      "excel": 850,
+      "side": 850,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E90",
+      "sheet": "Costos De Producción",
+      "cell": "E90",
+      "excel": 20,
+      "side": 20,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F90",
+      "sheet": "Costos De Producción",
+      "cell": "F90",
+      "excel": 29,
+      "side": 29,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G90",
+      "sheet": "Costos De Producción",
+      "cell": "G90",
+      "excel": 0.2256809339,
+      "side": 0.22568093385214008,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H90",
+      "sheet": "Costos De Producción",
+      "cell": "H90",
+      "excel": 790,
+      "side": 790,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E144",
+      "sheet": "Costos De Producción",
+      "cell": "E144",
+      "excel": 20,
+      "side": 20,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F144",
+      "sheet": "Costos De Producción",
+      "cell": "F144",
+      "excel": 100,
+      "side": 100,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G144",
+      "sheet": "Costos De Producción",
+      "cell": "G144",
+      "excel": 70,
+      "side": 70,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H144",
+      "sheet": "Costos De Producción",
+      "cell": "H144",
+      "excel": 53,
+      "side": 53,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I144",
+      "sheet": "Costos De Producción",
+      "cell": "I144",
+      "excel": 0.21783806,
+      "side": 0.2178380600082203,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J144",
+      "sheet": "Costos De Producción",
+      "cell": "J144",
+      "excel": 174,
+      "side": 174,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E145",
+      "sheet": "Costos De Producción",
+      "cell": "E145",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F145",
+      "sheet": "Costos De Producción",
+      "cell": "F145",
+      "excel": 80,
+      "side": 80,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G145",
+      "sheet": "Costos De Producción",
+      "cell": "G145",
+      "excel": 83,
+      "side": 83,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H145",
+      "sheet": "Costos De Producción",
+      "cell": "H145",
+      "excel": 59.1,
+      "side": 59.1,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I145",
+      "sheet": "Costos De Producción",
+      "cell": "I145",
+      "excel": 0.2429099877,
+      "side": 0.2429099876695438,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J145",
+      "sheet": "Costos De Producción",
+      "cell": "J145",
+      "excel": 194,
+      "side": 194,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E146",
+      "sheet": "Costos De Producción",
+      "cell": "E146",
+      "excel": 30,
+      "side": 30,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F146",
+      "sheet": "Costos De Producción",
+      "cell": "F146",
+      "excel": 88,
+      "side": 88,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G146",
+      "sheet": "Costos De Producción",
+      "cell": "G146",
+      "excel": 102,
+      "side": 102,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H146",
+      "sheet": "Costos De Producción",
+      "cell": "H146",
+      "excel": 71.8,
+      "side": 71.8,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I146",
+      "sheet": "Costos De Producción",
+      "cell": "I146",
+      "excel": 0.295108919,
+      "side": 0.29510891903000414,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J146",
+      "sheet": "Costos De Producción",
+      "cell": "J146",
+      "excel": 236,
+      "side": 236,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.E147",
+      "sheet": "Costos De Producción",
+      "cell": "E147",
+      "excel": 26,
+      "side": 26,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.F147",
+      "sheet": "Costos De Producción",
+      "cell": "F147",
+      "excel": 40,
+      "side": 40,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.G147",
+      "sheet": "Costos De Producción",
+      "cell": "G147",
+      "excel": 90,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.H147",
+      "sheet": "Costos De Producción",
+      "cell": "H147",
+      "excel": 59.4,
+      "side": 59.4,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.I147",
+      "sheet": "Costos De Producción",
+      "cell": "I147",
+      "excel": 0.2441430333,
+      "side": 0.24414303329223183,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo2.J147",
+      "sheet": "Costos De Producción",
+      "cell": "J147",
+      "excel": 195,
+      "side": 195,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E101",
+      "sheet": "Costos De Producción",
+      "cell": "E101",
+      "excel": 55,
+      "side": 55,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F101",
+      "sheet": "Costos De Producción",
+      "cell": "F101",
+      "excel": 62,
+      "side": 62,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G101",
+      "sheet": "Costos De Producción",
+      "cell": "G101",
+      "excel": 0.2610526316,
+      "side": 0.26105263157894737,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H101",
+      "sheet": "Costos De Producción",
+      "cell": "H101",
+      "excel": 209,
+      "side": 209,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E102",
+      "sheet": "Costos De Producción",
+      "cell": "E102",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F102",
+      "sheet": "Costos De Producción",
+      "cell": "F102",
+      "excel": 58.3,
+      "side": 58.3,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G102",
+      "sheet": "Costos De Producción",
+      "cell": "G102",
+      "excel": 0.2454736842,
+      "side": 0.24547368421052632,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H102",
+      "sheet": "Costos De Producción",
+      "cell": "H102",
+      "excel": 196,
+      "side": 196,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E103",
+      "sheet": "Costos De Producción",
+      "cell": "E103",
+      "excel": 58,
+      "side": 58,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F103",
+      "sheet": "Costos De Producción",
+      "cell": "F103",
+      "excel": 68.2,
+      "side": 68.2,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G103",
+      "sheet": "Costos De Producción",
+      "cell": "G103",
+      "excel": 0.2871578947,
+      "side": 0.2871578947368421,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H103",
+      "sheet": "Costos De Producción",
+      "cell": "H103",
+      "excel": 230,
+      "side": 230,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.E104",
+      "sheet": "Costos De Producción",
+      "cell": "E104",
+      "excel": 40,
+      "side": 40,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.F104",
+      "sheet": "Costos De Producción",
+      "cell": "F104",
+      "excel": 49,
+      "side": 49,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.G104",
+      "sheet": "Costos De Producción",
+      "cell": "G104",
+      "excel": 0.2063157895,
+      "side": 0.2063157894736842,
+      "ok": true
+    },
+    {
+      "key": "ventas_modelo1.H104",
+      "sheet": "Costos De Producción",
+      "cell": "H104",
+      "excel": 165,
+      "side": 165,
+      "ok": true
+    },
+    {
+      "key": "costos.I8",
+      "sheet": "Costos De Producción",
+      "cell": "I8",
+      "excel": 14,
+      "side": 14,
+      "ok": true
+    },
+    {
+      "key": "costos.I14",
+      "sheet": "Costos De Producción",
+      "cell": "I14",
+      "excel": 31.4,
+      "side": 31.4,
+      "ok": true
+    },
+    {
+      "key": "costos.I20",
+      "sheet": "Costos De Producción",
+      "cell": "I20",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "costos.K5",
+      "sheet": "Costos De Producción",
+      "cell": "K5",
+      "excel": 14,
+      "side": 14,
+      "ok": true
+    },
+    {
+      "key": "costos.L5",
+      "sheet": "Costos De Producción",
+      "cell": "L5",
+      "excel": 420,
+      "side": 420,
+      "ok": true
+    },
+    {
+      "key": "costos.M5",
+      "sheet": "Costos De Producción",
+      "cell": "M5",
+      "excel": 0.91,
+      "side": 0.91,
+      "ok": true
+    },
+    {
+      "key": "costos.N5",
+      "sheet": "Costos De Producción",
+      "cell": "N5",
+      "excel": 382,
+      "side": 382,
+      "ok": true
+    },
+    {
+      "key": "costos.L9",
+      "sheet": "Costos De Producción",
+      "cell": "L9",
+      "excel": 7,
+      "side": 7,
+      "ok": true
+    },
+    {
+      "key": "costos.L10",
+      "sheet": "Costos De Producción",
+      "cell": "L10",
+      "excel": 2,
+      "side": 2,
+      "ok": true
+    },
+    {
+      "key": "costos.M10",
+      "sheet": "Costos De Producción",
+      "cell": "M10",
+      "excel": 0.2857142857,
+      "side": 0.2857142857142857,
+      "ok": true
+    },
+    {
+      "key": "costos.D46",
+      "sheet": "Costos De Producción",
+      "cell": "D46",
+      "excel": 150.0,
+      "side": 150,
+      "ok": true
+    },
+    {
+      "key": "costos.E46",
+      "sheet": "Costos De Producción",
+      "cell": "E46",
+      "excel": 150.0,
+      "side": 150,
+      "ok": true
+    },
+    {
+      "key": "costos.F46",
+      "sheet": "Costos De Producción",
+      "cell": "F46",
+      "excel": 0.4076086957,
+      "side": 0.4076086956521739,
+      "ok": true
+    },
+    {
+      "key": "costos.H46",
+      "sheet": "Costos De Producción",
+      "cell": "H46",
+      "excel": 45,
+      "side": 45,
+      "ok": true
+    },
+    {
+      "key": "costos.L46",
+      "sheet": "Costos De Producción",
+      "cell": "L46",
+      "excel": 45,
+      "side": 45,
+      "ok": true
+    },
+    {
+      "key": "costos.I46",
+      "sheet": "Costos De Producción",
+      "cell": "I46",
+      "excel": 150,
+      "side": 150,
+      "ok": true
+    },
+    {
+      "key": "costos.M46",
+      "sheet": "Costos De Producción",
+      "cell": "M46",
+      "excel": 150,
+      "side": 150,
+      "ok": true
+    },
+    {
+      "key": "costos.J46",
+      "sheet": "Costos De Producción",
+      "cell": "J46",
+      "excel": 900,
+      "side": 900,
+      "ok": true
+    },
+    {
+      "key": "costos.N46",
+      "sheet": "Costos De Producción",
+      "cell": "N46",
+      "excel": 900,
+      "side": 900,
+      "ok": true
+    },
+    {
+      "key": "costos.D47",
+      "sheet": "Costos De Producción",
+      "cell": "D47",
+      "excel": 140.0,
+      "side": 140,
+      "ok": true
+    },
+    {
+      "key": "costos.E47",
+      "sheet": "Costos De Producción",
+      "cell": "E47",
+      "excel": 140.0,
+      "side": 140,
+      "ok": true
+    },
+    {
+      "key": "costos.F47",
+      "sheet": "Costos De Producción",
+      "cell": "F47",
+      "excel": 0.3804347826,
+      "side": 0.3804347826086957,
+      "ok": true
+    },
+    {
+      "key": "costos.H47",
+      "sheet": "Costos De Producción",
+      "cell": "H47",
+      "excel": 56,
+      "side": 56,
+      "ok": true
+    },
+    {
+      "key": "costos.L47",
+      "sheet": "Costos De Producción",
+      "cell": "L47",
+      "excel": 56,
+      "side": 56,
+      "ok": true
+    },
+    {
+      "key": "costos.I47",
+      "sheet": "Costos De Producción",
+      "cell": "I47",
+      "excel": 140,
+      "side": 140,
+      "ok": true
+    },
+    {
+      "key": "costos.M47",
+      "sheet": "Costos De Producción",
+      "cell": "M47",
+      "excel": 140,
+      "side": 140,
+      "ok": true
+    },
+    {
+      "key": "costos.J47",
+      "sheet": "Costos De Producción",
+      "cell": "J47",
+      "excel": 980,
+      "side": 980,
+      "ok": true
+    },
+    {
+      "key": "costos.N47",
+      "sheet": "Costos De Producción",
+      "cell": "N47",
+      "excel": 980,
+      "side": 980,
+      "ok": true
+    },
+    {
+      "key": "costos.D48",
+      "sheet": "Costos De Producción",
+      "cell": "D48",
+      "excel": 95.0,
+      "side": 95,
+      "ok": true
+    },
+    {
+      "key": "costos.E48",
+      "sheet": "Costos De Producción",
+      "cell": "E48",
+      "excel": 78.0,
+      "side": 78,
+      "ok": true
+    },
+    {
+      "key": "costos.F48",
+      "sheet": "Costos De Producción",
+      "cell": "F48",
+      "excel": 0.2119565217,
+      "side": 0.21195652173913043,
+      "ok": true
+    },
+    {
+      "key": "costos.H48",
+      "sheet": "Costos De Producción",
+      "cell": "H48",
+      "excel": 66.5,
+      "side": 66.5,
+      "ok": true
+    },
+    {
+      "key": "costos.L48",
+      "sheet": "Costos De Producción",
+      "cell": "L48",
+      "excel": 54.6,
+      "side": 54.599999999999994,
+      "ok": true
+    },
+    {
+      "key": "costos.I48",
+      "sheet": "Costos De Producción",
+      "cell": "I48",
+      "excel": 95,
+      "side": 95,
+      "ok": true
+    },
+    {
+      "key": "costos.M48",
+      "sheet": "Costos De Producción",
+      "cell": "M48",
+      "excel": 78,
+      "side": 78,
+      "ok": true
+    },
+    {
+      "key": "costos.J48",
+      "sheet": "Costos De Producción",
+      "cell": "J48",
+      "excel": 1235,
+      "side": 1235,
+      "ok": true
+    },
+    {
+      "key": "costos.N48",
+      "sheet": "Costos De Producción",
+      "cell": "N48",
+      "excel": 1014,
+      "side": 1014,
+      "ok": true
+    },
+    {
+      "key": "costos.D49",
+      "sheet": "Costos De Producción",
+      "cell": "D49",
+      "excel": 385,
+      "side": 385,
+      "ok": true
+    },
+    {
+      "key": "costos.E49",
+      "sheet": "Costos De Producción",
+      "cell": "E49",
+      "excel": 368,
+      "side": 368,
+      "ok": true
+    },
+    {
+      "key": "costos.F49",
+      "sheet": "Costos De Producción",
+      "cell": "F49",
+      "excel": 1,
+      "side": 1,
+      "ok": true
+    },
+    {
+      "key": "costos.H49",
+      "sheet": "Costos De Producción",
+      "cell": "H49",
+      "excel": 167.5,
+      "side": 167.5,
+      "ok": true
+    },
+    {
+      "key": "costos.L49",
+      "sheet": "Costos De Producción",
+      "cell": "L49",
+      "excel": 155.6,
+      "side": 155.6,
+      "ok": true
+    },
+    {
+      "key": "costos.I49",
+      "sheet": "Costos De Producción",
+      "cell": "I49",
+      "excel": 385,
+      "side": 385,
+      "ok": true
+    },
+    {
+      "key": "costos.M49",
+      "sheet": "Costos De Producción",
+      "cell": "M49",
+      "excel": 368,
+      "side": 368,
+      "ok": true
+    },
+    {
+      "key": "costos.J49",
+      "sheet": "Costos De Producción",
+      "cell": "J49",
+      "excel": 3115,
+      "side": 3115,
+      "ok": true
+    },
+    {
+      "key": "costos.N49",
+      "sheet": "Costos De Producción",
+      "cell": "N49",
+      "excel": 2894,
+      "side": 2894,
+      "ok": true
+    },
+    {
+      "key": "costos.D54",
+      "sheet": "Costos De Producción",
+      "cell": "D54",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E54",
+      "sheet": "Costos De Producción",
+      "cell": "E54",
+      "excel": 60,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "costos.F54",
+      "sheet": "Costos De Producción",
+      "cell": "F54",
+      "excel": 60,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "costos.G54",
+      "sheet": "Costos De Producción",
+      "cell": "G54",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.D55",
+      "sheet": "Costos De Producción",
+      "cell": "D55",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E55",
+      "sheet": "Costos De Producción",
+      "cell": "E55",
+      "excel": 110,
+      "side": 110,
+      "ok": true
+    },
+    {
+      "key": "costos.F55",
+      "sheet": "Costos De Producción",
+      "cell": "F55",
+      "excel": 107.5,
+      "side": 107.5,
+      "ok": true
+    },
+    {
+      "key": "costos.G55",
+      "sheet": "Costos De Producción",
+      "cell": "G55",
+      "excel": 2.5,
+      "side": 2.5,
+      "ok": true
+    },
+    {
+      "key": "costos.D56",
+      "sheet": "Costos De Producción",
+      "cell": "D56",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E56",
+      "sheet": "Costos De Producción",
+      "cell": "E56",
+      "excel": 30,
+      "side": 30,
+      "ok": true
+    },
+    {
+      "key": "costos.F56",
+      "sheet": "Costos De Producción",
+      "cell": "F56",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.G56",
+      "sheet": "Costos De Producción",
+      "cell": "G56",
+      "excel": 30,
+      "side": 30,
+      "ok": true
+    },
+    {
+      "key": "costos.D57",
+      "sheet": "Costos De Producción",
+      "cell": "D57",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E57",
+      "sheet": "Costos De Producción",
+      "cell": "E57",
+      "excel": 200,
+      "side": 200,
+      "ok": true
+    },
+    {
+      "key": "costos.F57",
+      "sheet": "Costos De Producción",
+      "cell": "F57",
+      "excel": 200,
+      "side": 200,
+      "ok": true
+    },
+    {
+      "key": "costos.G57",
+      "sheet": "Costos De Producción",
+      "cell": "G57",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.D58",
+      "sheet": "Costos De Producción",
+      "cell": "D58",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E58",
+      "sheet": "Costos De Producción",
+      "cell": "E58",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "costos.F58",
+      "sheet": "Costos De Producción",
+      "cell": "F58",
+      "excel": 185,
+      "side": 185,
+      "ok": true
+    },
+    {
+      "key": "costos.G58",
+      "sheet": "Costos De Producción",
+      "cell": "G58",
+      "excel": 5,
+      "side": 5,
+      "ok": true
+    },
+    {
+      "key": "costos.D59",
+      "sheet": "Costos De Producción",
+      "cell": "D59",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E59",
+      "sheet": "Costos De Producción",
+      "cell": "E59",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.F59",
+      "sheet": "Costos De Producción",
+      "cell": "F59",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.G59",
+      "sheet": "Costos De Producción",
+      "cell": "G59",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.D60",
+      "sheet": "Costos De Producción",
+      "cell": "D60",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E60",
+      "sheet": "Costos De Producción",
+      "cell": "E60",
+      "excel": 1500,
+      "side": 1500,
+      "ok": true
+    },
+    {
+      "key": "costos.F60",
+      "sheet": "Costos De Producción",
+      "cell": "F60",
+      "excel": 1500,
+      "side": 1500,
+      "ok": true
+    },
+    {
+      "key": "costos.G60",
+      "sheet": "Costos De Producción",
+      "cell": "G60",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.D61",
+      "sheet": "Costos De Producción",
+      "cell": "D61",
+      "excel": 0.0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.E61",
+      "sheet": "Costos De Producción",
+      "cell": "E61",
+      "excel": 1400,
+      "side": 1400,
+      "ok": true
+    },
+    {
+      "key": "costos.F61",
+      "sheet": "Costos De Producción",
+      "cell": "F61",
+      "excel": 1400,
+      "side": 1400,
+      "ok": true
+    },
+    {
+      "key": "costos.G61",
+      "sheet": "Costos De Producción",
+      "cell": "G61",
+      "excel": 0,
+      "side": 0,
+      "ok": true
+    },
+    {
+      "key": "costos.C65",
+      "sheet": "Costos De Producción",
+      "cell": "C65",
+      "excel": 2.119565217,
+      "side": 2.119565217391304,
+      "ok": true
+    },
+    {
+      "key": "costos.D65",
+      "sheet": "Costos De Producción",
+      "cell": "D65",
+      "excel": 2.857142857,
+      "side": 2.8571428571428568,
+      "ok": true
+    },
+    {
+      "key": "costos.E65",
+      "sheet": "Costos De Producción",
+      "cell": "E65",
+      "excel": 3.210927004,
+      "side": 3.2109270040304523,
+      "ok": true
+    },
+    {
+      "key": "costos.F65",
+      "sheet": "Costos De Producción",
+      "cell": "F65",
+      "excel": 3,
+      "side": 3,
+      "ok": true
+    },
+    {
+      "key": "costos.G65",
+      "sheet": "Costos De Producción",
+      "cell": "G65",
+      "excel": 11.18763508,
+      "side": 11.187635078564613,
+      "ok": true
+    },
+    {
+      "key": "costos.V95",
+      "sheet": "Costos De Producción",
+      "cell": "V95",
+      "excel": 27160,
+      "side": 27160,
+      "ok": true
+    },
+    {
+      "key": "costos.W95",
+      "sheet": "Costos De Producción",
+      "cell": "W95",
+      "excel": 24987.2,
+      "side": 24987.2,
+      "ok": true
+    },
+    {
+      "key": "costos.AB96",
+      "sheet": "Costos De Producción",
+      "cell": "AB96",
+      "excel": 24580,
+      "side": 24580,
+      "ok": true
+    },
+    {
+      "key": "costos.AC96",
+      "sheet": "Costos De Producción",
+      "cell": "AC96",
+      "excel": 22613.6,
+      "side": 22613.600000000002,
+      "ok": true
+    },
+    {
+      "key": "costos.V100",
+      "sheet": "Costos De Producción",
+      "cell": "V100",
+      "excel": 2580,
+      "side": 2580,
+      "ok": true
+    },
+    {
+      "key": "costos.W100",
+      "sheet": "Costos De Producción",
+      "cell": "W100",
+      "excel": 2373.6,
+      "side": 2373.6,
+      "ok": true
+    },
+    {
+      "key": "costos.U11",
+      "sheet": "Costos De Producción",
+      "cell": "U11",
+      "excel": 1690.8,
+      "side": 1690.8,
+      "ok": true
+    },
+    {
+      "key": "costos.U20",
+      "sheet": "Costos De Producción",
+      "cell": "U20",
+      "excel": 2254.4,
+      "side": 2254.4,
+      "ok": true
+    },
+    {
+      "key": "costos.U29",
+      "sheet": "Costos De Producción",
+      "cell": "U29",
+      "excel": 4191.36,
+      "side": 4191.36,
+      "ok": true
+    },
+    {
+      "key": "costos.V11",
+      "sheet": "Costos De Producción",
+      "cell": "V11",
+      "excel": 1856.538462,
+      "side": 1856.5384615384614,
+      "ok": true
+    },
+    {
+      "key": "costos.V20",
+      "sheet": "Costos De Producción",
+      "cell": "V20",
+      "excel": 2475.384615,
+      "side": 2475.3846153846152,
+      "ok": true
+    },
+    {
+      "key": "costos.V29",
+      "sheet": "Costos De Producción",
+      "cell": "V29",
+      "excel": 4526.307692,
+      "side": 4526.307692307692,
+      "ok": true
+    },
+    {
+      "key": "costos.Y11",
+      "sheet": "Costos De Producción",
+      "cell": "Y11",
+      "excel": 1690.8,
+      "side": 1690.8,
+      "ok": true
+    },
+    {
+      "key": "costos.Y20",
+      "sheet": "Costos De Producción",
+      "cell": "Y20",
+      "excel": 3104.16,
+      "side": 3104.16,
+      "ok": true
+    },
+    {
+      "key": "costos.Y29",
+      "sheet": "Costos De Producción",
+      "cell": "Y29",
+      "excel": 4952.4,
+      "side": 4952.4,
+      "ok": true
+    },
+    {
+      "key": "costos.Z11",
+      "sheet": "Costos De Producción",
+      "cell": "Z11",
+      "excel": 1856.538462,
+      "side": 1856.5384615384614,
+      "ok": true
+    },
+    {
+      "key": "costos.Z20",
+      "sheet": "Costos De Producción",
+      "cell": "Z20",
+      "excel": 3365.538462,
+      "side": 3365.5384615384614,
+      "ok": true
+    },
+    {
+      "key": "costos.Z29",
+      "sheet": "Costos De Producción",
+      "cell": "Z29",
+      "excel": 5338.846154,
+      "side": 5338.846153846154,
+      "ok": true
+    },
+    {
+      "key": "costos.AC11",
+      "sheet": "Costos De Producción",
+      "cell": "AC11",
+      "excel": 1690.8,
+      "side": 1690.8,
+      "ok": true
+    },
+    {
+      "key": "costos.AC20",
+      "sheet": "Costos De Producción",
+      "cell": "AC20",
+      "excel": 3104.16,
+      "side": 3104.16,
+      "ok": true
+    },
+    {
+      "key": "costos.AC29",
+      "sheet": "Costos De Producción",
+      "cell": "AC29",
+      "excel": 4952.4,
+      "side": 4952.4,
+      "ok": true
+    },
+    {
+      "key": "costos.AD11",
+      "sheet": "Costos De Producción",
+      "cell": "AD11",
+      "excel": 1856.538462,
+      "side": 1856.5384615384614,
+      "ok": true
+    },
+    {
+      "key": "costos.AD20",
+      "sheet": "Costos De Producción",
+      "cell": "AD20",
+      "excel": 3365.538462,
+      "side": 3365.5384615384614,
+      "ok": true
+    },
+    {
+      "key": "costos.AD29",
+      "sheet": "Costos De Producción",
+      "cell": "AD29",
+      "excel": 5338.846154,
+      "side": 5338.846153846154,
+      "ok": true
+    },
+    {
+      "key": "costos.U38",
+      "sheet": "Costos De Producción",
+      "cell": "U38",
+      "excel": 41520,
+      "side": 41520,
+      "ok": true
+    },
+    {
+      "key": "costos.Y38",
+      "sheet": "Costos De Producción",
+      "cell": "Y38",
+      "excel": 8904,
+      "side": 8904,
+      "ok": true
+    },
+    {
+      "key": "costos.V38",
+      "sheet": "Costos De Producción",
+      "cell": "V38",
+      "excel": 46770,
+      "side": 46770,
+      "ok": true
+    },
+    {
+      "key": "costos.Z38",
+      "sheet": "Costos De Producción",
+      "cell": "Z38",
+      "excel": 10554,
+      "side": 10554,
+      "ok": true
+    },
+    {
+      "key": "costos.U45",
+      "sheet": "Costos De Producción",
+      "cell": "U45",
+      "excel": 2500.0,
+      "side": 2500,
+      "ok": true
+    },
+    {
+      "key": "costos.U46",
+      "sheet": "Costos De Producción",
+      "cell": "U46",
+      "excel": 75,
+      "side": 75,
+      "ok": true
+    },
+    {
+      "key": "costos.U47",
+      "sheet": "Costos De Producción",
+      "cell": "U47",
+      "excel": 50,
+      "side": 50,
+      "ok": true
+    },
+    {
+      "key": "costos.U48",
+      "sheet": "Costos De Producción",
+      "cell": "U48",
+      "excel": 125,
+      "side": 125,
+      "ok": true
+    },
+    {
+      "key": "costos.U49",
+      "sheet": "Costos De Producción",
+      "cell": "U49",
+      "excel": -237.5,
+      "side": -237.5,
+      "ok": true
+    },
+    {
+      "key": "costos.U50",
+      "sheet": "Costos De Producción",
+      "cell": "U50",
+      "excel": 2512.5,
+      "side": 2512.5,
+      "ok": true
+    },
+    {
+      "key": "costos.V45",
+      "sheet": "Costos De Producción",
+      "cell": "V45",
+      "excel": 2500.0,
+      "side": 2500,
+      "ok": true
+    },
+    {
+      "key": "costos.V46",
+      "sheet": "Costos De Producción",
+      "cell": "V46",
+      "excel": 125,
+      "side": 125,
+      "ok": true
+    },
+    {
+      "key": "costos.V47",
+      "sheet": "Costos De Producción",
+      "cell": "V47",
+      "excel": 75,
+      "side": 75,
+      "ok": true
+    },
+    {
+      "key": "costos.V48",
+      "sheet": "Costos De Producción",
+      "cell": "V48",
+      "excel": 200,
+      "side": 200,
+      "ok": true
+    },
+    {
+      "key": "costos.V49",
+      "sheet": "Costos De Producción",
+      "cell": "V49",
+      "excel": -225,
+      "side": -225,
+      "ok": true
+    },
+    {
+      "key": "costos.V50",
+      "sheet": "Costos De Producción",
+      "cell": "V50",
+      "excel": 2675,
+      "side": 2675,
+      "ok": true
+    },
+    {
+      "key": "costos.U53",
+      "sheet": "Costos De Producción",
+      "cell": "U53",
+      "excel": 300.0,
+      "side": 300,
+      "ok": true
+    },
+    {
+      "key": "costos.U54",
+      "sheet": "Costos De Producción",
+      "cell": "U54",
+      "excel": 3,
+      "side": 3,
+      "ok": true
+    },
+    {
+      "key": "costos.U55",
+      "sheet": "Costos De Producción",
+      "cell": "U55",
+      "excel": 15,
+      "side": 15,
+      "ok": true
+    },
+    {
+      "key": "costos.U56",
+      "sheet": "Costos De Producción",
+      "cell": "U56",
+      "excel": -57,
+      "side": -57,
+      "ok": true
+    },
+    {
+      "key": "costos.U57",
+      "sheet": "Costos De Producción",
+      "cell": "U57",
+      "excel": 261,
+      "side": 261,
+      "ok": true
+    },
+    {
+      "key": "costos.V53",
+      "sheet": "Costos De Producción",
+      "cell": "V53",
+      "excel": 300.0,
+      "side": 300,
+      "ok": true
+    },
+    {
+      "key": "costos.V54",
+      "sheet": "Costos De Producción",
+      "cell": "V54",
+      "excel": 6,
+      "side": 6,
+      "ok": true
+    },
+    {
+      "key": "costos.V55",
+      "sheet": "Costos De Producción",
+      "cell": "V55",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "costos.V56",
+      "sheet": "Costos De Producción",
+      "cell": "V56",
+      "excel": -54,
+      "side": -54,
+      "ok": true
+    },
+    {
+      "key": "costos.V57",
+      "sheet": "Costos De Producción",
+      "cell": "V57",
+      "excel": 276,
+      "side": 276,
+      "ok": true
+    },
+    {
+      "key": "costos.U60",
+      "sheet": "Costos De Producción",
+      "cell": "U60",
+      "excel": 1200.0,
+      "side": 1200,
+      "ok": true
+    },
+    {
+      "key": "costos.U61",
+      "sheet": "Costos De Producción",
+      "cell": "U61",
+      "excel": 12,
+      "side": 12,
+      "ok": true
+    },
+    {
+      "key": "costos.U62",
+      "sheet": "Costos De Producción",
+      "cell": "U62",
+      "excel": 60,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "costos.U63",
+      "sheet": "Costos De Producción",
+      "cell": "U63",
+      "excel": -228,
+      "side": -228,
+      "ok": true
+    },
+    {
+      "key": "costos.U64",
+      "sheet": "Costos De Producción",
+      "cell": "U64",
+      "excel": 1044,
+      "side": 1044,
+      "ok": true
+    },
+    {
+      "key": "costos.V60",
+      "sheet": "Costos De Producción",
+      "cell": "V60",
+      "excel": 1200.0,
+      "side": 1200,
+      "ok": true
+    },
+    {
+      "key": "costos.V61",
+      "sheet": "Costos De Producción",
+      "cell": "V61",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "costos.V62",
+      "sheet": "Costos De Producción",
+      "cell": "V62",
+      "excel": 96,
+      "side": 96,
+      "ok": true
+    },
+    {
+      "key": "costos.V63",
+      "sheet": "Costos De Producción",
+      "cell": "V63",
+      "excel": -216,
+      "side": -216,
+      "ok": true
+    },
+    {
+      "key": "costos.V64",
+      "sheet": "Costos De Producción",
+      "cell": "V64",
+      "excel": 1104,
+      "side": 1104,
+      "ok": true
+    },
+    {
+      "key": "costos.U67",
+      "sheet": "Costos De Producción",
+      "cell": "U67",
+      "excel": 3500.0,
+      "side": 3500,
+      "ok": true
+    },
+    {
+      "key": "costos.U68",
+      "sheet": "Costos De Producción",
+      "cell": "U68",
+      "excel": 35,
+      "side": 35,
+      "ok": true
+    },
+    {
+      "key": "costos.U69",
+      "sheet": "Costos De Producción",
+      "cell": "U69",
+      "excel": 175,
+      "side": 175,
+      "ok": true
+    },
+    {
+      "key": "costos.U70",
+      "sheet": "Costos De Producción",
+      "cell": "U70",
+      "excel": -665,
+      "side": -665,
+      "ok": true
+    },
+    {
+      "key": "costos.U71",
+      "sheet": "Costos De Producción",
+      "cell": "U71",
+      "excel": 3045,
+      "side": 3045,
+      "ok": true
+    },
+    {
+      "key": "costos.V67",
+      "sheet": "Costos De Producción",
+      "cell": "V67",
+      "excel": 3500.0,
+      "side": 3500,
+      "ok": true
+    },
+    {
+      "key": "costos.V68",
+      "sheet": "Costos De Producción",
+      "cell": "V68",
+      "excel": 70,
+      "side": 70,
+      "ok": true
+    },
+    {
+      "key": "costos.V69",
+      "sheet": "Costos De Producción",
+      "cell": "V69",
+      "excel": 280,
+      "side": 280,
+      "ok": true
+    },
+    {
+      "key": "costos.V70",
+      "sheet": "Costos De Producción",
+      "cell": "V70",
+      "excel": -630,
+      "side": -630,
+      "ok": true
+    },
+    {
+      "key": "costos.V71",
+      "sheet": "Costos De Producción",
+      "cell": "V71",
+      "excel": 3220,
+      "side": 3220,
+      "ok": true
+    },
+    {
+      "key": "costos.Y45",
+      "sheet": "Costos De Producción",
+      "cell": "Y45",
+      "excel": 3500.0,
+      "side": 3500,
+      "ok": true
+    },
+    {
+      "key": "costos.Y46",
+      "sheet": "Costos De Producción",
+      "cell": "Y46",
+      "excel": 105,
+      "side": 105,
+      "ok": true
+    },
+    {
+      "key": "costos.Y47",
+      "sheet": "Costos De Producción",
+      "cell": "Y47",
+      "excel": 70,
+      "side": 70,
+      "ok": true
+    },
+    {
+      "key": "costos.Y48",
+      "sheet": "Costos De Producción",
+      "cell": "Y48",
+      "excel": 175,
+      "side": 175,
+      "ok": true
+    },
+    {
+      "key": "costos.Y49",
+      "sheet": "Costos De Producción",
+      "cell": "Y49",
+      "excel": -332.5,
+      "side": -332.5,
+      "ok": true
+    },
+    {
+      "key": "costos.Y50",
+      "sheet": "Costos De Producción",
+      "cell": "Y50",
+      "excel": 3517.5,
+      "side": 3517.5,
+      "ok": true
+    },
+    {
+      "key": "costos.Z45",
+      "sheet": "Costos De Producción",
+      "cell": "Z45",
+      "excel": 3500.0,
+      "side": 3500,
+      "ok": true
+    },
+    {
+      "key": "costos.Z46",
+      "sheet": "Costos De Producción",
+      "cell": "Z46",
+      "excel": 175,
+      "side": 175,
+      "ok": true
+    },
+    {
+      "key": "costos.Z47",
+      "sheet": "Costos De Producción",
+      "cell": "Z47",
+      "excel": 105,
+      "side": 105,
+      "ok": true
+    },
+    {
+      "key": "costos.Z48",
+      "sheet": "Costos De Producción",
+      "cell": "Z48",
+      "excel": 280,
+      "side": 280,
+      "ok": true
+    },
+    {
+      "key": "costos.Z49",
+      "sheet": "Costos De Producción",
+      "cell": "Z49",
+      "excel": -315,
+      "side": -315,
+      "ok": true
+    },
+    {
+      "key": "costos.Z50",
+      "sheet": "Costos De Producción",
+      "cell": "Z50",
+      "excel": 3745,
+      "side": 3745,
+      "ok": true
+    },
+    {
+      "key": "costos.Y53",
+      "sheet": "Costos De Producción",
+      "cell": "Y53",
+      "excel": 7500.0,
+      "side": 7500,
+      "ok": true
+    },
+    {
+      "key": "costos.Y54",
+      "sheet": "Costos De Producción",
+      "cell": "Y54",
+      "excel": 225,
+      "side": 225,
+      "ok": true
+    },
+    {
+      "key": "costos.Y55",
+      "sheet": "Costos De Producción",
+      "cell": "Y55",
+      "excel": 150,
+      "side": 150,
+      "ok": true
+    },
+    {
+      "key": "costos.Y56",
+      "sheet": "Costos De Producción",
+      "cell": "Y56",
+      "excel": 375,
+      "side": 375,
+      "ok": true
+    },
+    {
+      "key": "costos.Y57",
+      "sheet": "Costos De Producción",
+      "cell": "Y57",
+      "excel": -712.5,
+      "side": -712.5,
+      "ok": true
+    },
+    {
+      "key": "costos.Y58",
+      "sheet": "Costos De Producción",
+      "cell": "Y58",
+      "excel": 7537.5,
+      "side": 7537.5,
+      "ok": true
+    },
+    {
+      "key": "costos.Z53",
+      "sheet": "Costos De Producción",
+      "cell": "Z53",
+      "excel": 7500.0,
+      "side": 7500,
+      "ok": true
+    },
+    {
+      "key": "costos.Z54",
+      "sheet": "Costos De Producción",
+      "cell": "Z54",
+      "excel": 375,
+      "side": 375,
+      "ok": true
+    },
+    {
+      "key": "costos.Z55",
+      "sheet": "Costos De Producción",
+      "cell": "Z55",
+      "excel": 225,
+      "side": 225,
+      "ok": true
+    },
+    {
+      "key": "costos.Z56",
+      "sheet": "Costos De Producción",
+      "cell": "Z56",
+      "excel": 600,
+      "side": 600,
+      "ok": true
+    },
+    {
+      "key": "costos.Z57",
+      "sheet": "Costos De Producción",
+      "cell": "Z57",
+      "excel": -675,
+      "side": -675,
+      "ok": true
+    },
+    {
+      "key": "costos.Z58",
+      "sheet": "Costos De Producción",
+      "cell": "Z58",
+      "excel": 8025,
+      "side": 8025,
+      "ok": true
+    },
+    {
+      "key": "costos.Y61",
+      "sheet": "Costos De Producción",
+      "cell": "Y61",
+      "excel": 15000.0,
+      "side": 15000,
+      "ok": true
+    },
+    {
+      "key": "costos.Y62",
+      "sheet": "Costos De Producción",
+      "cell": "Y62",
+      "excel": 450,
+      "side": 450,
+      "ok": true
+    },
+    {
+      "key": "costos.Y63",
+      "sheet": "Costos De Producción",
+      "cell": "Y63",
+      "excel": 300,
+      "side": 300,
+      "ok": true
+    },
+    {
+      "key": "costos.Y64",
+      "sheet": "Costos De Producción",
+      "cell": "Y64",
+      "excel": 750,
+      "side": 750,
+      "ok": true
+    },
+    {
+      "key": "costos.Y65",
+      "sheet": "Costos De Producción",
+      "cell": "Y65",
+      "excel": -1425,
+      "side": -1425,
+      "ok": true
+    },
+    {
+      "key": "costos.Y66",
+      "sheet": "Costos De Producción",
+      "cell": "Y66",
+      "excel": 15075,
+      "side": 15075,
+      "ok": true
+    },
+    {
+      "key": "costos.Z61",
+      "sheet": "Costos De Producción",
+      "cell": "Z61",
+      "excel": 15000.0,
+      "side": 15000,
+      "ok": true
+    },
+    {
+      "key": "costos.Z62",
+      "sheet": "Costos De Producción",
+      "cell": "Z62",
+      "excel": 750,
+      "side": 750,
+      "ok": true
+    },
+    {
+      "key": "costos.Z63",
+      "sheet": "Costos De Producción",
+      "cell": "Z63",
+      "excel": 450,
+      "side": 450,
+      "ok": true
+    },
+    {
+      "key": "costos.Z64",
+      "sheet": "Costos De Producción",
+      "cell": "Z64",
+      "excel": 1200,
+      "side": 1200,
+      "ok": true
+    },
+    {
+      "key": "costos.Z65",
+      "sheet": "Costos De Producción",
+      "cell": "Z65",
+      "excel": -1350,
+      "side": -1350,
+      "ok": true
+    },
+    {
+      "key": "costos.Z66",
+      "sheet": "Costos De Producción",
+      "cell": "Z66",
+      "excel": 16050,
+      "side": 16050,
+      "ok": true
+    },
+    {
+      "key": "costos.AC45",
+      "sheet": "Costos De Producción",
+      "cell": "AC45",
+      "excel": 1200.0,
+      "side": 1200,
+      "ok": true
+    },
+    {
+      "key": "costos.AC46",
+      "sheet": "Costos De Producción",
+      "cell": "AC46",
+      "excel": 36,
+      "side": 36,
+      "ok": true
+    },
+    {
+      "key": "costos.AC47",
+      "sheet": "Costos De Producción",
+      "cell": "AC47",
+      "excel": 24,
+      "side": 24,
+      "ok": true
+    },
+    {
+      "key": "costos.AC48",
+      "sheet": "Costos De Producción",
+      "cell": "AC48",
+      "excel": 60,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "costos.AC49",
+      "sheet": "Costos De Producción",
+      "cell": "AC49",
+      "excel": -142.5,
+      "side": -142.5,
+      "ok": true
+    },
+    {
+      "key": "costos.AC50",
+      "sheet": "Costos De Producción",
+      "cell": "AC50",
+      "excel": 1177.5,
+      "side": 1177.5,
+      "ok": true
+    },
+    {
+      "key": "costos.AD45",
+      "sheet": "Costos De Producción",
+      "cell": "AD45",
+      "excel": 1200.0,
+      "side": 1200,
+      "ok": true
+    },
+    {
+      "key": "costos.AD46",
+      "sheet": "Costos De Producción",
+      "cell": "AD46",
+      "excel": 60,
+      "side": 60,
+      "ok": true
+    },
+    {
+      "key": "costos.AD47",
+      "sheet": "Costos De Producción",
+      "cell": "AD47",
+      "excel": 36,
+      "side": 36,
+      "ok": true
+    },
+    {
+      "key": "costos.AD48",
+      "sheet": "Costos De Producción",
+      "cell": "AD48",
+      "excel": 96,
+      "side": 96,
+      "ok": true
+    },
+    {
+      "key": "costos.AD49",
+      "sheet": "Costos De Producción",
+      "cell": "AD49",
+      "excel": -135,
+      "side": -135,
+      "ok": true
+    },
+    {
+      "key": "costos.AD50",
+      "sheet": "Costos De Producción",
+      "cell": "AD50",
+      "excel": 1257,
+      "side": 1257,
+      "ok": true
+    },
+    {
+      "key": "costos.AC53",
+      "sheet": "Costos De Producción",
+      "cell": "AC53",
+      "excel": 4500.0,
+      "side": 4500,
+      "ok": true
+    },
+    {
+      "key": "costos.AC54",
+      "sheet": "Costos De Producción",
+      "cell": "AC54",
+      "excel": 135,
+      "side": 135,
+      "ok": true
+    },
+    {
+      "key": "costos.AC55",
+      "sheet": "Costos De Producción",
+      "cell": "AC55",
+      "excel": 90,
+      "side": 90,
+      "ok": true
+    },
+    {
+      "key": "costos.AC56",
+      "sheet": "Costos De Producción",
+      "cell": "AC56",
+      "excel": 225,
+      "side": 225,
+      "ok": true
+    },
+    {
+      "key": "costos.AC57",
+      "sheet": "Costos De Producción",
+      "cell": "AC57",
+      "excel": -534.375,
+      "side": -534.375,
+      "ok": true
+    },
+    {
+      "key": "costos.AC58",
+      "sheet": "Costos De Producción",
+      "cell": "AC58",
+      "excel": 4415.625,
+      "side": 4415.625,
+      "ok": true
+    },
+    {
+      "key": "costos.AD53",
+      "sheet": "Costos De Producción",
+      "cell": "AD53",
+      "excel": 4500.0,
+      "side": 4500,
+      "ok": true
+    },
+    {
+      "key": "costos.AD54",
+      "sheet": "Costos De Producción",
+      "cell": "AD54",
+      "excel": 225,
+      "side": 225,
+      "ok": true
+    },
+    {
+      "key": "costos.AD55",
+      "sheet": "Costos De Producción",
+      "cell": "AD55",
+      "excel": 135,
+      "side": 135,
+      "ok": true
+    },
+    {
+      "key": "costos.AD56",
+      "sheet": "Costos De Producción",
+      "cell": "AD56",
+      "excel": 360,
+      "side": 360,
+      "ok": true
+    },
+    {
+      "key": "costos.AD57",
+      "sheet": "Costos De Producción",
+      "cell": "AD57",
+      "excel": -506.25,
+      "side": -506.25,
+      "ok": true
+    },
+    {
+      "key": "costos.AD58",
+      "sheet": "Costos De Producción",
+      "cell": "AD58",
+      "excel": 4713.75,
+      "side": 4713.75,
+      "ok": true
+    },
+    {
+      "key": "costos.AC61",
+      "sheet": "Costos De Producción",
+      "cell": "AC61",
+      "excel": 9500.0,
+      "side": 9500,
+      "ok": true
+    },
+    {
+      "key": "costos.AC62",
+      "sheet": "Costos De Producción",
+      "cell": "AC62",
+      "excel": 285,
+      "side": 285,
+      "ok": true
+    },
+    {
+      "key": "costos.AC63",
+      "sheet": "Costos De Producción",
+      "cell": "AC63",
+      "excel": 190,
+      "side": 190,
+      "ok": true
+    },
+    {
+      "key": "costos.AC64",
+      "sheet": "Costos De Producción",
+      "cell": "AC64",
+      "excel": 475,
+      "side": 475,
+      "ok": true
+    },
+    {
+      "key": "costos.AC65",
+      "sheet": "Costos De Producción",
+      "cell": "AC65",
+      "excel": -1128.125,
+      "side": -1128.125,
+      "ok": true
+    },
+    {
+      "key": "costos.AC66",
+      "sheet": "Costos De Producción",
+      "cell": "AC66",
+      "excel": 9321.875,
+      "side": 9321.875,
+      "ok": true
+    },
+    {
+      "key": "costos.AD61",
+      "sheet": "Costos De Producción",
+      "cell": "AD61",
+      "excel": 9500.0,
+      "side": 9500,
+      "ok": true
+    },
+    {
+      "key": "costos.AD62",
+      "sheet": "Costos De Producción",
+      "cell": "AD62",
+      "excel": 475,
+      "side": 475,
+      "ok": true
+    },
+    {
+      "key": "costos.AD63",
+      "sheet": "Costos De Producción",
+      "cell": "AD63",
+      "excel": 285,
+      "side": 285,
+      "ok": true
+    },
+    {
+      "key": "costos.AD64",
+      "sheet": "Costos De Producción",
+      "cell": "AD64",
+      "excel": 760,
+      "side": 760,
+      "ok": true
+    },
+    {
+      "key": "costos.AD65",
+      "sheet": "Costos De Producción",
+      "cell": "AD65",
+      "excel": -1068.75,
+      "side": -1068.75,
+      "ok": true
+    },
+    {
+      "key": "costos.AD66",
+      "sheet": "Costos De Producción",
+      "cell": "AD66",
+      "excel": 9951.25,
+      "side": 9951.25,
+      "ok": true
+    }
+  ]
+}
