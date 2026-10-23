@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from '../vendor/three/build/three.module.js';
+import { segmentClear, expanded } from '../services/npc_navigation.mjs';
 import { createHubWorld } from '../services/hub_world.js';
 
 // The hub creates deterministic procedural CanvasTextures for its fallback
@@ -167,4 +168,33 @@ test('outdoor placement is deterministic across worlds and birds use transform a
   b.close();
   geometry.dispose();
   material.dispose();
+});
+
+
+test('expanded district has clear service approaches, crossings and separated garden parcels',()=>{
+  const f=fixture();
+  try{
+    assert.equal(f.world.pedestrianCrossings.length,22);
+    assert.equal(f.world.pocketGardens.length,4);
+    const blocks=expanded(f.world.colliders,.36);
+    for(const [a,b] of [
+      [{x:169,z:35},{x:169,z:68}],
+      [{x:185,z:19},{x:218,z:19}],
+      [{x:115,z:-19},{x:82,z:-19}]
+    ])assert.ok(segmentClear(a,b,blocks),'service footway is obstructed');
+    for(const route of f.world.patrolRoutes)for(let i=0;i<route.length;i++){
+      assert.ok(segmentClear(route[i],route[(i+1)%route.length],blocks),'patrol cuts through a building or parcel');
+    }
+    assert.equal(f.world.patrolRoutes.length,5);
+    for(const garden of f.world.pocketGardens){
+      assert.ok(f.world.colliders.some(c=>c.kind==='garden'&&garden.x>c.minX&&garden.x<c.maxX&&garden.z>c.minZ&&garden.z<c.maxZ));
+      assert.ok(Math.abs(garden.x-150)>44&&Math.abs(garden.z)>44);
+    }
+    for(const crossing of f.world.pedestrianCrossings){
+      const half=crossing.width/2+.3;
+      const a={x:crossing.x-(crossing.axis==='x'?half:0),z:crossing.z-(crossing.axis==='z'?half:0)};
+      const b={x:crossing.x+(crossing.axis==='x'?half:0),z:crossing.z+(crossing.axis==='z'?half:0)};
+      assert.ok(segmentClear(a,b,blocks),'crosswalk has a physical obstacle');
+    }
+  }finally{f.close()}
 });

@@ -225,6 +225,62 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
       box(x, .09, z + side * 14.55, 29.4, .3, .25, m.white);
     }
   }
+  // Service approaches extend the central footways to each remote doorway.
+  // Crossings stay flush with the roads, so wheels and pedestrians share heights.
+  const pedestrianCrossings=[];
+  function crosswalk(x,z,axis,width){
+    pedestrianCrossings.push({x:offsetX+x,z,axis,width});
+    const count=Math.floor(width/1.1);
+    for(let i=0;i<count;i++){
+      const along=(i-(count-1)/2)*1.1;
+      box(x+(axis==='x'?along:0),.181,z+(axis==='z'?along:0),axis==='x'?.55:2.6,.014,axis==='z'?.55:2.6,m.paint);
+    }
+  }
+  for(const radius of [39,60])for(const side of [-1,1])for(const lane of [-7,7]){
+    crosswalk(side*radius,lane,'x',radius===39?10:8);
+    crosswalk(lane,side*radius,'z',radius===39?10:8);
+  }
+  const serviceApproaches=[
+    {id:'office',x:19,z:53,w:3,d:33,axis:'z',crossings:[39,60]},
+    {id:'bank',x:53,z:19,w:33,d:3,axis:'x',crossings:[39,60]},
+    {id:'suppliers',x:-53,z:-19,w:33,d:3,axis:'x',crossings:[-39,-60]}
+  ];
+  for(const link of serviceApproaches){
+    const mesh=ground(link.x,link.z,link.w,link.d,m.paving,.12,6);
+    mesh.name=`SIDE pedestrian access ${link.id}`;
+    // Narrow edge bands make the path legible without blocking crossings.
+    for(const side of [-1,1]){
+      const x=link.x+(link.axis==='z'?side*1.55:0),z=link.z+(link.axis==='x'?side*1.55:0);
+      box(x,.135,z,link.axis==='z'?.12:link.w,.025,link.axis==='x'?.12:link.d,m.darkSteel);
+    }
+    for(const at of link.crossings)crosswalk(link.axis==='x'?at:link.x,link.axis==='z'?at:link.z,link.axis,Math.abs(at)===39?10:8);
+  }
+  // Four compact gardens give the open blocks a purpose. They sit between
+  // the two road rings, leaving the sidewalks and service approaches clear.
+  const pocketGardens=[];
+  for(const sx of [-1,1])for(const sz of [-1,1]){
+    const x=sx*50,z=sz*50;
+    const garden=ground(x,z,7.2,7.2,m.grass,.16,5);
+    garden.name='SIDE pocket garden';
+    pocketGardens.push({x:offsetX+x,z,width:7.6,depth:7.6});
+    for(const edge of [-1,1]){
+      box(x+edge*3.7,.27,z,.2,.3,7.6,m.concrete);
+      box(x,.27,z+edge*3.7,7.6,.3,.2,m.concrete);
+    }
+    // A planted parcel is a real obstacle; routing cannot cut through its curb.
+    collider(x,z,7.6,7.6,'garden');
+    for(const dx of [-1.7,1.7]){
+      cyl(x+dx,.7,z,.09,1.1,m.bark);
+      instance(sphereGeometry,m.foliage,x+dx,1.55,z,.8,.9,.8);
+    }
+    for(const dx of [-1.8,1.8]){
+      box(x+dx,.55,z-sz*4.7,1.45,.14,.5,m.wood);
+      box(x+dx,.83,z-sz*4.94,1.45,.46,.1,m.wood);
+      collider(x+dx,z-sz*4.7,1.5,.8,'garden-bench');
+      for(const leg of [-.5,.5])box(x+dx+leg,.3,z-sz*4.7,.09,.5,.42,m.darkSteel);
+    }
+  }
+
   // Stop bars, pedestrian crossings and lane markers are shallow geometry.
   for (let a = -49; a <= 49; a += 6) if (Math.abs(a) > 9) {
     box(a, .173, 0, 3, .013, .11, m.yellow); box(0, .173, a, .11, .013, 3, m.yellow);
@@ -461,8 +517,12 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
       box(edge,(h+3.1)/2+.15,z,.24,h-3.1,3,material);
     }
     box(x, h + .33, z, w + .7, .36, d + .7, m.darkSteel);
-    const front = z > 50 ? z - d / 2 - .055 : z < -50 ? z + d / 2 + .055 : z;
-    const side = x > 50 ? x - w / 2 - .055 : x < -50 ? x + w / 2 + .055 : x;
+    const front = z > 50 ? z - d / 2 - .25 : z < -50 ? z + d / 2 + .25 : z;
+    const side = x > 50 ? x - w / 2 - .25 : x < -50 ? x + w / 2 + .25 : x;
+    const title={office:'OFICINA SIDE',bank:'BANCO',suppliers:'PROVEEDORES'}[id];
+    const subtitle={office:'ADMINISTRACIÓN',bank:'SERVICIOS FINANCIEROS',suppliers:'ABASTECIMIENTO'}[id];
+    if(axis==='z')label(title,subtitle,x,4.3,front-.02,Math.min(w*.7,8),1.15,'#203a42',Math.PI);
+    else label(title,subtitle,side-direction*.02,4.3,z,Math.min(d*.7,8),1.15,'#203a42',direction>0?-Math.PI/2:Math.PI/2);
     if (Math.abs(z) > 50) {
       for (const side of [-1,1]) box(x+side*(1.65+w*.12),2,front,w*.24,3.2,.11,m.opaqueGlass);
       box(x, h - .8, front, w * .7, .18, .15, m.mint);
@@ -515,7 +575,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   } });
   label('COSTA SIDE','EL NEGOCIO EMPIEZA EN LA CALLE',0,20.5,42.9,12,2.7,'#392941',Math.PI);
   label('PASEO COSTA','BARRIO COMERCIAL',-7,20,-42.4,11,2.3,'#294951');
-  withFallback('trees', () => { for(const x of [-29,-17,-5,7,19,29])palm(x,45.5,7.5+(x+29)%3,x*.2); });
+  withFallback('trees', () => { for(const x of [-29,-17,-5,7,23,29])palm(x,45.5,7.5+(x+29)%3,x*.2); });
 
   let instanceCount = 0;
   batches.forEach(({ geo, material, matrices, fallbackCategory: category }) => {
@@ -530,7 +590,7 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
 
   const OUTDOOR_SEED = 4107;
   const treeFootprints = [[8.8,.82,8.8],[29.2,.82,8.8],[8.8,.82,29.2],[-30.5,.15,8.7],[-8.5,.15,30.5],[-30.5,.15,30.5],[31.4,.15,-8],[-30.5,.15,-8]];
-  const treeRow = [-29,-17,-5,7,19,29].map(x => [x,.15,45.5]);
+  const treeRow = [-29,-17,-5,7,23,29].map(x => [x,.15,45.5]);
   const benchPlacements = [[19,.15,9.4,0],[19,.15,28.6,Math.PI],[9.4,.15,19,Math.PI/2],[28.6,.15,19,-Math.PI/2],[-25,.15,29,0],[-13,.15,29,0]];
   const lampPlacements = [[-7,.15,-29,Math.PI],[-7,.15,12,Math.PI],[-29,.15,-7,-Math.PI/2],[12,.15,-7,-Math.PI/2],[7,.15,-29,0],[7,.15,30,0],[-29,.15,7,Math.PI/2],[30,.15,7,Math.PI/2],[33,.15,23,Math.PI],[-33,.15,23,0]];
   const trafficPlacements = [[-5.9,.15,-5.9,0],[5.9,.15,-5.9,Math.PI/2],[5.9,.15,5.9,Math.PI],[-5.9,.15,5.9,-Math.PI/2]];
@@ -658,17 +718,19 @@ export function createHubWorld({ scene, offsetX = 150 } = {}) {
   ];
   setOutdoorQuality('auto');
   return {
-    group, colliders, entrances, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
+    group, colliders, entrances, pedestrianCrossings, pocketGardens, kiosk: { x: offsetX + kioskX, z: kioskZ + 1.45 },
     crossedEntrance: (previous, next) => crossedEntrance(previous, next, entrances),
     spawn: { x: offsetX + 16, z: 27 }, groundY: .025, groundHeightAt,
     patrolRoutes: [
       [[13.5, 13.5], [24.5, 13.5], [24.5, 24.5], [13.5, 24.5]],
-      [[7, 12.5], [7, 25], [12.5, 25], [12.5, 12.5]],
-      [[11, -9.9], [28.7, -9.9], [28.7, -6.1], [11, -6.1]]
+      [[-28, 26.8], [-21, 26.8], [-21, 30.5], [-28, 30.5]],
+      [[66, 11], [66, 27], [68, 27], [68, 11]],
+      [[11, 66], [27, 66], [27, 68], [11, 68]],
+      [[-66, -28], [-66, -11], [-68, -11], [-68, -28]]
     ].map(route => route.map(([x, z]) => ({ x: x + offsetX, z }))),
     updateDistrict, installOutdoorProps, setQuality: setOutdoorQuality, tickOutdoorProps,
     outdoorProps: outdoorPropState,
-    stats() { return { colliders: colliders.length, entrances: entrances.length, patrolRoutes: 3, outdoorProps: outdoorPropState() }; },
+    stats() { return { colliders: colliders.length, entrances: entrances.length, patrolRoutes: 5, pedestrianCrossings: pedestrianCrossings.length, pocketGardens: pocketGardens.length, outdoorProps: outdoorPropState() }; },
     dispose() {
       group.removeFromParent(); group.traverse(object => { if (object.isInstancedMesh) object.dispose(); });
       resources.forEach(resource => resource.dispose()); group.clear();

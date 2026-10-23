@@ -13,6 +13,8 @@ const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8')
 assert.ok(source.includes('  window.SIDE3D = {'));
 const instrumented=source.replace('const time = performance.now() * 0.001;', 'const time = now * 0.001;').replace('  window.SIDE3D = {',`  window.populationFlowQA={
   freeze(){cancelAnimationFrame(raf);},
+  district(){return hubWorld.stats();},
+  districtView(x,z,tx,tz){camera.position.set(HUB_OFFSET+x,25,z);camera.lookAt(HUB_OFFSET+tx,0,tz);renderer.render(scene,camera);},
   snapshot(){return {running,interior:currentInterior,rooms:businessInteriors.rooms.map(r=>({id:r.id,visible:r.detail.visible,actors:r.actors.map(a=>({id:a.object.uuid,x:a.object.position.x,z:a.object.position.z,visible:a.object.visible,stationary:!!a.route.stationary}))})),customers:npcs.map(n=>({id:n.obj.uuid,x:n.obj.position.x,z:n.obj.position.z,state:n.state,browse:n.browsePoint?{x:n.browsePoint.x,z:n.browsePoint.z}:null})),stock:totalDisplayStock()+totalReserveStock(),cash:decisionCash()};},
   advance(seconds){cancelAnimationFrame(raf);const original=clock.getDelta,render=renderer.render;clock.getDelta=()=>1/60;renderer.render=()=>{};this.now??=performance.now();try{for(let i=0;i<Math.round(seconds*60);i++){this.now+=1000/60;frame(this.now);cancelAnimationFrame(raf);}}finally{clock.getDelta=original;renderer.render=render;}renderer.render(scene,camera);return this.snapshot();},
   visit(id){const r=businessInteriors.rooms.find(r=>r.id===id);positionPlayer(HUB_OFFSET+r.layout.x,r.layout.z,0);updateBusinessZone();},
@@ -34,6 +36,8 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   await page.waitForFunction(()=>SIDE3D.diagnostics().renderedFrames>3);
   await page.evaluate(()=>SIDE3D.preloadDetails());
   await page.evaluate(()=>{populationFlowQA.freeze();populationFlowQA.outside();});
+  const district=results.district=await page.evaluate(()=>populationFlowQA.district());
+  assert.equal(district.pedestrianCrossings,22);assert.equal(district.pocketGardens,4);
   console.log('Loaded real world and detailed models');
   const initial=results.initial=await page.evaluate(()=>populationFlowQA.snapshot());
   assert.equal(initial.interior,null);
@@ -77,6 +81,10 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   assert.equal(afterClosed.cash,closed.cash);assert.equal(afterClosed.stock,closed.stock);
   assert.deepEqual(errors,[]);results.errors=errors;
   await page.screenshot({path:path.join(output,'world-active.png')});
+  await page.evaluate(()=>populationFlowQA.districtView(34,72,50,50));
+  await page.screenshot({path:path.join(output,'expanded-gardens.png')});
+  await page.evaluate(()=>populationFlowQA.districtView(50,40,76,19));
+  await page.screenshot({path:path.join(output,'bank-approach.png')});
   fs.writeFileSync(path.join(output,'results.json'),JSON.stringify({passed:true,...results},null,2));
   console.log('PASS all six businesses populated at entry; remote workers and customers advance; pause freezes simulation; visits preserve actors');
  }finally{await browser.close();}

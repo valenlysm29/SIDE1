@@ -3132,7 +3132,7 @@
     [[34,13],[57,13],[57,26],[34,26]],
     [[-42,-26],[-65,-26],[-65,-11],[-42,-11]]
   ];
-  const hubNpcLimit=()=>perfMode==='low'?2:perfMode==='high'?5:3;
+  const hubNpcLimit=()=>perfMode==='low'?2:perfMode==='high'?5:4;
 
   function ensureHubCharacters({allowFallback=false}={}) {
     if(!scene||!hubWorld||!npcNames)return;
@@ -3153,7 +3153,7 @@
     hubActors.forEach(actor=>{actor.obj.visible=Number(actor.obj.userData.cityHubIndex)<hubNpcLimit();});
     Array.from({length:hubNpcLimit()},(_,index)=>index).forEach(index=>{
       if(hubActors.some(actor=>actor.obj.userData.cityHubIndex===index)||!allowFallback)return;
-      const object=person({cityRole:'cliente',cityScene:'hub',gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62][index]});
+      const object=person({cityRole:'cliente',cityScene:'hub',gender:index%2?'female':'male',shirt:[0x3979b8,0x9b4968,0x4f8d62,0xc38d45,0x795f9c][index]});
       object.getObjectByName('NpcNameLabel')?.removeFromParent();
       Object.assign(object.userData,{role:'hub-pedestrian',cityHubIndex:index});
       const source=hubWorld.patrolRoutes?.[index]||HUB_CHARACTER_ROUTES[index].map(([x,z])=>[x+HUB_OFFSET,z]);
@@ -3184,7 +3184,7 @@
     ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs'));
     const {createWorldEventVisuals}=await import('../services/world_event_visuals.mjs');
     worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
-    const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20261023-ordered-city');
+    const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20261023-pedestrian-district');
     cityMap=CITY_MAP;
     hubWorld=createHubWorld({scene,offsetX:HUB_OFFSET});
     const [orientationModule,{createWorldMinimapControl},{createWorldWayfinding}]=await Promise.all([
@@ -3196,7 +3196,7 @@
     worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
     worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
-    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-ordered-city');
+    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-pedestrian-district');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
       createNpc:createBusinessNpc,getNeighbors:npcNeighbors,onCollidersAdded:items=>{if(businessInteriors)hubWorld.colliders.push(...items);},
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
