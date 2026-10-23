@@ -27,7 +27,7 @@ const DECISION_CATALOG = Array.isArray(window.SIDE_DECISION_CATALOG) ? window.SI
 const EVENT_CATALOG = Array.isArray(window.SIDE_EVENT_CATALOG) ? window.SIDE_EVENT_CATALOG : [];
 const CREDIT_INITIAL_PERCENT = 70;
 const CREDIT_ASSET_PERCENT = 20;
-// Cada ciclo contable incluye 24 días productivos, según el Excel del curso.
+// Supuestos del modelo de producción: un ciclo representa 30 días de operación.
 const WORKING_DAYS_PER_MONTH = 24;
 // Indemnización por reducir personal de un ciclo a otro: medio "sueldo" (costo de la
 // opción) por persona que se retira, como aproximación simple de liquidación laboral.
@@ -87,7 +87,7 @@ function toast(msg){const t=$('toast');if(!t)return;t.textContent=msg;t.classLis
 function message(id,msg,error=false){const el=$(id);if(!el)return;el.textContent=msg;el.style.color=error?'#ff9d9d':'#ffe06a'}
 function requireSupabase(){if(!supabaseClient){toast('Modo local activo: configura Supabase para sincronización.');return false}return true}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function money(n){const value=Number(n)||0;return 'S/ '+value.toLocaleString('es-PE',{minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2})}
+function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
 function deepClone(v){return JSON.parse(JSON.stringify(v??{}))}
 
 function scopedStudentState(){
@@ -102,7 +102,6 @@ function teacherConfig(){
 function stableHash(text){let h=2166136261;for(const ch of String(text||'')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function initialCapital(){const source=currentStudent?.initialCapital,remote=Number(source);if(source!==null&&source!==undefined&&source!==''&&Number.isFinite(remote)&&remote>=0)return remote;const c=teacherConfig();if(c.capitalMode!=='random')return Math.max(0,Number(c.capital||100000));let min=Math.max(0,Number(c.capitalMin||80000)),max=Math.max(min,Number(c.capitalMax||120000));const ratio=(stableHash(storageKey())%10001)/10000;return Math.round((min+(max-min)*ratio)/500)*500}
 function creditOutstanding(){
-  if(usesCanonicalMotor())return Math.max(0,Number(excelSavedResult()?.financial?.balanceGeneral?.deuda??decisionState.__excel?.historial?.deudaPrincipal??0));
   const prefix=`SIDE_DECISION_RECEIPTS_${storageKey()}_`;
   let total=0;
   for(let i=0;i<localStorage.length;i++){
@@ -117,7 +116,6 @@ function creditOutstanding(){
   return Math.max(0,total);
 }
 function creditAssetValue(){
-  if(usesCanonicalMotor()){const history=decisionState.__excel?.historial;return Math.max(0,Number(excelSavedResult()?.financial?.balanceGeneral?.activosFijos??((history?.activosCosto||0)-(history?.depreciacionAcumulada||0))));}
   let total=0;
   const assetIds=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'];
   for(const id of assetIds){
@@ -181,7 +179,7 @@ function updateIntegrationUI(){
   }
   $('studentLobby')?.classList.toggle('game-cancelled',Boolean(access.cancelled));
   $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
-  const cycleRuntime=readRoundRuntime(),cycleClosed=['finished','simulation-finished'].includes(cycleRuntime?.status)||['results','finished'].includes(cycleRuntime?.phase);
+  const cycleRuntime=readRoundRuntime();
   const paused=cycleRuntime?.status==='paused';
   for(const id of ['studentLobby','decisionMenu']){
     const host=$(id);if(!host)continue;
@@ -196,7 +194,7 @@ function updateIntegrationUI(){
     if(decisionState.__excel?.habilitado&&send)send.disabled=decisionsSubmitted()||!access.canOperate||!excelEditorRemoteReady;
   }
   if(paused&&['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){window.SIDE3D?.suspend?.();showScreen('studentLobby');}
-  if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · '+(cycleRuntime?.status==='simulation-finished'||cycleRuntime?.phase==='finished'?'SIMULACIÓN FINALIZADA':cycleClosed?'CICLO CERRADO · CONSULTA TUS RESULTADOS':access.canOperate?'REVISA Y REGISTRA TUS DECISIONES':'ESPERANDO EL SIGUIENTE CICLO'));
+  if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
   if(button){button.disabled=!access.canOperate&&!access.canReview;button.classList.toggle('hidden',(!access.canOperate&&!access.canReview)||decisionsComplete);button.textContent=paused?'Revisar decisiones':'Entrar a decisiones';}
   if(notice){
@@ -448,12 +446,10 @@ window.addEventListener('storage',event=>{if(['SIDE_GAME_STATUS','SIDE_ROUND_RUN
 function storageKey(){return `${currentStudent.game?.codigo||'SIDE-000'}_${currentStudent.company}`}
 function decisionKey(){return 'SIDE_DECISIONS_'+storageKey()}
 function ledgerKey(){return 'SIDE_CASH_LEDGER_'+storageKey()}
-function usesCanonicalMotor(){return Boolean(window.SIDE_EXCEL_CONFIG?.MOTOR_ACTUAL&&teacherConfig().motor_version===window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL)}
 function loadDecisionState(){
   try{decisionState=JSON.parse(localStorage.getItem(decisionKey())||'{}')||{}}catch{decisionState={}}
   try{cashLedger=JSON.parse(localStorage.getItem(ledgerKey())||'{}')||{}}catch{cashLedger={}}
   decisionDrafts={};
-  if(usesCanonicalMotor()&&!decisionState.__excel?.habilitado&&window.SIDE_EXCEL_UI){decisionState.__excel={habilitado:true,motor_version:window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,version:1,round:currentRound(),decisiones:window.SIDE_EXCEL_UI.nuevasDecisiones(),enviado:false,cicloActivacion:1,cajaTransicion:initialCapital()};persistGameState();}
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
 function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)}
@@ -498,7 +494,6 @@ window.SIDE_GAME_BRIDGE={
   decisionProgress:()=>decisionProgressPercent(),
   canStartSimulation:()=>canStartSimulation(),
   canExplore:()=>canExploreWorld(),
-  guidedTour:()=>usesCanonicalMotor(),
   canOperate:()=>canOperateWorld(),
   companyName:()=>currentStudent.company||COMPANY_NAME,
   legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
@@ -508,7 +503,6 @@ window.SIDE_GAME_BRIDGE={
   financialReport:()=>financialReport(),
   financialOfficeHtml:()=>window.SIDE_STUDENT_FINANCIAL_VIEW?.officeHtml(financialReport())||'',
   recordOperatingExpense(amount,kind='SIM_GASTOS',storageWrites={}){
-    if(usesCanonicalMotor()){toast('Las ventas y los costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.');return false;}
     if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
     const key=`${currentRound()}:${['SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES'].includes(kind)?kind:'SIM_GASTOS'}`;
     const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)-Number(amount)};
@@ -518,7 +512,6 @@ window.SIDE_GAME_BRIDGE={
     return true;
   },
   recordSimulatedSale(amount=75,storageWrites={}){
-    if(usesCanonicalMotor()){toast('Las ventas y los costos se calculan al cierre del ciclo. El recorrido 3D no cambia tu caja.');return false;}
     if(!canOperateWorld()||!Number.isFinite(Number(amount))||Number(amount)<0)return false;
     const sale=Math.max(0,Number(amount)||0),key=`${currentRound()}:SIM_VENTAS`;
     const ledger={...cashLedger,[key]:Number(cashLedger[key]||0)+sale};
@@ -532,16 +525,7 @@ window.SIDE_GAME_BRIDGE={
 };
 
 // Landing / acceso
-// The first screen is ready when its DOM and critical styles are available.
-// The 3D world loads later, after the student's explicit action.
-function initialScreenReady(){
-  const bar=$('loadingBar');if(bar){bar.dataset.p='100';bar.style.width='100%';}
-  if($('loadingPercent'))$('loadingPercent').textContent='100%';
-  if($('startBtn'))$('startBtn').disabled=false;
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialScreenReady,{once:true});else initialScreenReady();
-for(const el of document.querySelectorAll('[data-side-version]'))el.textContent=window.SIDE_RELEASE?.version?'SIDE · v'+window.SIDE_RELEASE.version:'SIDE';
-const buildMeta=document.querySelector('meta[name="side-build"]');if(buildMeta&&window.SIDE_RELEASE?.version)buildMeta.content=window.SIDE_RELEASE.version;
+const loadingTimer=setInterval(()=>{const bar=$('loadingBar');if(!bar){clearInterval(loadingTimer);return}const p=Math.min(100,(Number(bar.dataset.p)||0)+1);bar.dataset.p=p;bar.style.width=p+'%';$('loadingPercent').textContent=p+'%';if(p>=100){clearInterval(loadingTimer);$('startBtn').disabled=false}},28);
 $('startBtn')?.addEventListener('click',()=>showScreen('profiles'));
 $('openCreditsBtn')?.addEventListener('click',()=>{renderCredits();showModal('creditsModal')});
 document.querySelector('.modal-backdrop')?.addEventListener('click',closeModal);
@@ -563,6 +547,8 @@ document.addEventListener('keydown',e=>{
   e.preventDefault();e.stopImmediatePropagation();closeDecisionMenu();
 });
 function openTeacherPanel(){closeModal();window.location.href='docente.html?v=20261012-sesion-codigos'}
+$('loginForm')?.addEventListener('submit',async e=>{e.preventDefault();const email=$('loginEmail').value.trim().toLowerCase(),password=$('loginPassword').value;if(!hasConfig&&email===DEMO_TEACHER.email&&password===DEMO_TEACHER.password){openTeacherPanel();return}if(!requireSupabase())return;message('loginMessage','Ingresando...');const{error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){message('loginMessage',error.message,true);return}openTeacherPanel()});
+$('registerForm')?.addEventListener('submit',async e=>{e.preventDefault();if(!requireSupabase())return;message('registerMessage','Creando cuenta...');const email=$('registerEmail').value.trim(),password=$('registerPassword').value;const{data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{nombre:$('registerName').value.trim(),apellido:$('registerLastName').value.trim(),curso:$('registerCourse').value.trim()}}});if(error){message('registerMessage',error.message,true);return}$('registerForm')?.reset();if(data.session)openTeacherPanel();else message('registerMessage','Cuenta creada. Revisa tu correo si la confirmación está activada.')});
 $('studentForm')?.addEventListener('submit',async e=>{
   e.preventDefault();studentSessionRecovering=false;studentStateFailure=null;stopStudentSync();studentProgressHydrated=false;studentSnapshotEpoch++; const S=window.SIDE||{},cleanText=S.EmpresaService?.cleanText||(value=>String(value||'').normalize('NFC').trim().replace(/\s+/g,' ')),cleanCode=S.EmpresaService?.cleanCode||(value=>cleanText(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase());
   const joinEpoch=studentSnapshotEpoch;
@@ -602,7 +588,6 @@ $('studentForm')?.addEventListener('submit',async e=>{
       if(ingreso?.code==='MIGRACION_PENDIENTE'){message('studentMessage',ingreso.error,true);return}
       if(ingreso?.code==='PARTIDA_INICIADA'){message('studentMessage',JOIN_STARTED_MESSAGE,true);return}
       if(ingreso?.code==='SALA_LLENA'){message('studentMessage','La sala está llena. Pide al docente que revise su capacidad.',true);return}
-      if(ingreso?.code==='INGRESO_BLOQUEADO'){message('studentMessage','No se pudo validar el ingreso. Espera quince minutos antes de volver a intentar.',true);return}
       if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
       console.error('SIDE: error técnico al validar el ingreso',ingreso);
       $('studentReconnectBtn')?.classList.remove('hidden');
@@ -711,7 +696,7 @@ function navigationCategories(){
     return ['A','B','C','D','E'].map(cat=>({...DECISION_CATALOG.find(c=>c.cat===cat),cat,title:labels[cat][0],short:labels[cat][0],desc:labels[cat][1],summaryOnly:false}));
   }
   const summary=DECISION_CATALOG.find(category=>category.summaryOnly),decisions=decisionCategories();
-  return [...decisions,...(summary?[summary]:[])];
+  return currentRound()<=1?[...decisions,...(summary?[summary]:[])]:[...(summary?[summary]:[]),...decisions];
 }
 function categoryByCat(cat){return DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
@@ -790,16 +775,11 @@ function createDecisionDraft(item){
 function selectedOptionIds(item){return initDraft(item).optionIds||[]}
 function analystSelected(){const item=findDecisionItem('ANALISTA_COMPRAS');return selectedOptionIds(item).includes('si_analista')}
 function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound()-1)*2):0}
-function optionUnitCost(item,opt){const real=teacherConfig().motor_version===window.SIDE_EXCEL_CONFIG?.MOTOR_ACTUAL?opt.costoMensualReal:undefined,base=Number(real??opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
-function laborCostDetail(option){
-  if(teacherConfig().motor_version!==window.SIDE_EXCEL_CONFIG?.MOTOR_ACTUAL||!Number.isFinite(Number(option.costoMensualReal)))return '';
-  const base=Number(option.sueldoBase??option.desgloseLaboral?.base??0),total=Number(option.costoMensualReal);
-  return `<small class="labor-cost-detail">Costo mensual: ${money(total)} = sueldo base ${money(base)} + beneficios laborales ${money(total-base)}. Incluye EsSalud, gratificación, CTS y vacaciones según el régimen del Excel.</small>`;
-}
+function optionUnitCost(item,opt){const base=Number(opt.cost)||0;return item.material?base*(1-analystDiscount()/100):base}
 function currentProductionTarget(){return Object.values(initDraft(findDecisionItem('PRODUCCION_META')).moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)}
 function productionPlan(){return window.SIDE_PRODUCTION_MODEL.calculate(decisionModelContext())}
 function materialYieldLabel(itemId,optionId){
-  const amount=window.SIDE_PRODUCTION_MODEL.yieldFor(itemId,optionId),rawUnit=window.SIDE_PRODUCTION_MODEL.materialUnit(itemId),unit=amount===1&&rawUnit==='unidades'?'unidad':rawUnit;
+  const amount=window.SIDE_PRODUCTION_MODEL.yieldFor(itemId,optionId),unit=window.SIDE_PRODUCTION_MODEL.materialUnit(itemId);
   return amount?`Cada compra aporta ${amount.toLocaleString('es-PE')} ${unit}`:'';
 }
 function districtDemand(id){const c=teacherConfig();return id==='los_olivos'?Number(c.demandLosOlivos??1000):id==='miraflores'?Number(c.demandMiraflores??1250):id==='sjl'?Number(c.demandSJL??1100):0}
@@ -1010,19 +990,19 @@ function importExcelPersonnel(){
 }
 async function mountExcelProductionEditor(){
   const container=document.createElement('div');container.id='excelProductionMount';$('decisionCards').prepend(container);
-  const canonical=usesCanonicalMotor(),local=!currentStudent.empresaId;
+  const local=!currentStudent.empresaId;
   excelEditorRemoteReady=local;
-  const legacyMoved=!canonical&&!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
+  const legacyMoved=!decisionState.__excel?.habilitado&&Object.entries(cashLedger).some(([key,value])=>key.startsWith(currentRound()+':')&&Number(value)!==0);
   const transition=decisionState.__excel?.transicion||captureExcelTransition();
   const historiaGuardada=decisionState.__excel?.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId());
-  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:canonical||decisionState.__excel?.habilitado?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:teacherConfig().motor_version||'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady:local,activationBlocked:legacyMoved,
+  disposeProductionDop=window.SIDE_EXCEL_UI?.mountEditor(container,{canSave:()=>studentAccess().canOperate,lockReason:()=>studentAccess().reason,cash:cashBalance(),category:decisionState.__excel?.habilitado?currentCategory:undefined,creditAvailable:creditAvailable(),motorVersion:'excel-16',round:currentRound(),locked:cycleDecisionsLocked(),local,remoteReady:local,activationBlocked:legacyMoved,
     historial:Object.keys(historiaGuardada).length?historiaGuardada:transition,getState:()=>decisionState.__excel,importar:importExcelPersonnel,refreshSavedBalance:()=>{updateCashHud();if($('companySummaryMount')&&typeof renderCompanySummary==='function')renderCompanySummary();},
-    save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(canonical){value.motor_version=window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL;value.cicloActivacion=1;value.cajaTransicion=decisionState.__excel?.cajaTransicion??initialCapital();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
+    save:value=>{if(!studentAccess().canOperate){toast('No puedes guardar ni confirmar decisiones en este momento.');return;}if(legacyMoved&&value.habilitado){toast('Activa el plan por lotes al comenzar el próximo ciclo, antes de confirmar compras o pagos.');return;}if(!decisionState.__excel?.transicion&&value.habilitado)value.transicion=captureExcelTransition();value.transicion=decisionState.__excel?.transicion||value.transicion;if(value.habilitado)value.cicloActivacion=decisionState.__excel?.cicloActivacion??currentRound();value.cajaTransicion=value.transicion?.cajaFinal??decisionState.__excel?.cajaTransicion??initialCapital()+ledgerTotal();decisionState.__excel=value;persistGameState();const report=syncStudentReportPreview();syncReportToSupabase(report);updateHud();if(value.habilitado){for(const el of Array.from($('decisionCards').children))if(el!==container)el.remove();document.querySelector('.section-save-bar')?.classList.add('hidden');}}});
   const editor=disposeProductionDop;
   if(!local){
     try{
       const status=await window.SIDE?.PartidaService?.excelDisponible?.();
-      if(container.isConnected){excelEditorRemoteReady=!!status?.available&&(!canonical||status.motorVersion===window.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL);editor?.setRemoteReady?.(excelEditorRemoteReady);updateHud();}
+      if(container.isConnected){excelEditorRemoteReady=!!status?.available;editor?.setRemoteReady?.(excelEditorRemoteReady);updateHud();}
     }catch{
       if(container.isConnected){excelEditorRemoteReady=false;editor?.setRemoteReady?.(false);updateHud();}
     }
@@ -1046,7 +1026,7 @@ function captureExcelTransition(){
   return {cajaFinal:initialCapital()+ledgerTotal(),maquinariaActivos,activosCosto,depreciacionAcumulada:0,inventarioMP,deudaPrincipal,teaVigente:tea,tasaMensualVigente:Math.pow(1+tea/100,1/window.SIDE_EXCEL_CONFIG.CONFIG.MESES_ANIO)-1};
 }
 function renderDecisionRow(item){
-  const locked=isLocked(item)||cycleDecisionsLocked(),saved=item.type!=='info'&&itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
+  const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
   let body='';
   if(item.id==='CANALES'){
     body=renderChannelChoices(item,locked);
@@ -1055,9 +1035,9 @@ function renderDecisionRow(item){
     body=`<div class="choice-strip radio-options">${item.options.map(o=>{const already=ownedIds.includes(o.id),isSelected=selected===o.id&&!already;const disabled=locked||already;return `<label class="choice-pill ${isSelected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="radio" name="decision-${item.id}" ${isSelected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${already?'<span class="owned-badge">YA TIENES ESTE MOLDE · NO SE VUELVE A COMPRAR</span>':isSelected?'<span class="buying-badge">MOLDE ELEGIDO EN INFRAESTRUCTURA</span>':''}</label>`}).join('')}</div><div class="mandatory-note">Por reglamento debes adquirir al menos un molde antes de enviar el ciclo. Los moldes comprados permanecen disponibles y cada tipo se paga una sola vez.</div><div class="mold-owned-list"><strong>MOLDES DISPONIBLES</strong>${owned.length?owned.map(x=>{const o=item.options.find(v=>v.id===x.id);return `<span>${escapeHtml(o?.label||x.id)}</span>`}).join(''):'<span>Ninguno de ciclos anteriores</span>'}${selected?`<span>Elegido ahora: ${escapeHtml(item.options.find(o=>o.id===selected)?.label||selected)}</span>`:''}</div>`;
   } else if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
-    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${laborCostDetail(o)}${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
+    body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
-    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} ${item.recurring&&!item.material?'/ persona al mes':'c/u'}${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${laborCostDetail(o)}${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*optionUnitCost(item,o)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} c/u${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" type="number" min="${floor}" step="1" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
   } else if(item.type==='production-plan'){
     const plan=productionPlan();
     body=`<div class="production-calculator"><header><div><span>CALCULADORA DE PRODUCCIÓN</span><strong>Define el volumen por cada molde</strong><p>Los tres escenarios siempre se muestran. La sugerencia es una referencia calculada por SIDE según tu capacidad instalada; tú decides la cantidad final.</p></div><div class="production-total"><small>TOTAL DESEADO</small><b>${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="mold-production-grid">${plan.productLines.map(line=>`<article class="mold-production-card ${line.available?'is-available':'is-unavailable'}"><div class="mold-production-title"><div><span>${line.available?(line.selectedThisCycle?'ELEGIDO EN INFRAESTRUCTURA':'DISPONIBLE'):'ESCENARIO DE CÁLCULO'}</span><h4>${escapeHtml(line.label)}</h4></div>${line.available?'<b>✓ Molde habilitado</b>':'<b>Molde aún no adquirido</b>'}</div><label for="production-${line.id}">¿Cuánto deseas producir con este molde?</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" ${locked?'disabled':''}>+10</button><span>unidades</span></div><button type="button" class="mold-suggestion" data-mold-suggest="${line.id}" ${locked?'disabled':''}>Usar sugerencia SIDE: ${line.suggested.toLocaleString('es-PE')} u.</button><div class="mold-requirements"><span>INSUMOS NECESARIOS PARA ${line.target.toLocaleString('es-PE')} U.</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b></div></article>`).join('')}</div><footer><span>Capacidad del cuello de botella: <b>${plan.processCapacity.toLocaleString('es-PE')} u./ciclo</b></span><span>Producción posible con tus insumos: <b>${plan.producibleUnits.toLocaleString('es-PE')} u.</b></span><small>La calculadora permite comparar los moldes aunque todavía no los hayas comprado. Para operar, debes cumplir la compra obligatoria de al menos un molde en Infraestructura.</small></footer></div>`;
@@ -1068,11 +1048,11 @@ function renderDecisionRow(item){
   } else if(item.type==='loan'){
     const rate=Number(teacherConfig().interest??20),approved=creditApprovedLine(),available=creditAvailable(),amount=Math.min(available,Number(d.amount||0)),afterRequest=Math.max(0,available-amount);body=`<div class="loan-box"><div><span>TEA</span><strong>${rate.toFixed(1)}%</strong><small>Condición definida por el docente</small></div><div><span>LÍNEA APROBADA</span><strong>${money(approved)}</strong><small>${currentRound()===1?'70% de la caja inicial':'Se actualiza según caja y activos'}</small></div><div><span>LÍNEA DISPONIBLE</span><strong>${money(afterRequest)}</strong><small>Después de esta solicitud</small></div></div><div class="loan-control"><input data-loan="${item.id}" type="range" min="0" max="${available}" step="500" value="${amount}"><input data-loan-number="${item.id}" type="number" min="0" max="${available}" step="500" value="${amount}"><b>${money(amount)}</b></div><div class="micro-caption">La línea inicia en 70% de la caja. Al avanzar los ciclos puede aumentar o disminuir según la caja y los activos. Lo utilizado reduce la línea disponible.</div>`;
   } else if(item.type==='info'){
-    let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}</div>`;
+    let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   const sent=sectionSubmitted(currentCategory)||decisionsSubmitted();
-  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${item.type==='info'?'REGLA AUTOMÁTICA':sent?'ENVIADA · BLOQUEADA':locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
+  return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${sent?'ENVIADA · BLOQUEADA':locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
 }
 document.addEventListener('wheel',e=>{if(e.target?.matches?.('.number-decision input[type=number], .quantity-option input[type=number], [data-store-qty], [data-mold-target]')&&document.activeElement===e.target)e.preventDefault()},{passive:false});
 // Captura antes de los editores: el valor visible y el borrador reciben lo mismo.
@@ -1126,7 +1106,7 @@ function bindDecisionControls(){
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
   }));
   document.querySelectorAll('[data-mold-target]').forEach(input=>{
-    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));if(input.value!=='')input.value=String(d.moldTargets[input.dataset.moldTarget]);persistCurrentDraftOnly();updateHud();});
+    input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();updateHud();});
     input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META')),id=input.dataset.moldTarget;d.moldTargets[id]=Math.max(0,Math.trunc(Number(input.value)||0));persistCurrentDraftOnly();renderDecisionCategory();});
   });
   document.querySelectorAll('[data-mold-suggest]').forEach(button=>button.addEventListener('click',()=>{
@@ -1156,7 +1136,7 @@ function updateSectionCost(){
   const locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
-  $('projectedCash').textContent=$('cashBalance').textContent;$('projectedCash').classList.toggle('danger',projected<0);
+  $('projectedCash').textContent=money(cashBalance());$('projectedCash').classList.toggle('danger',projected<0);
   updateCashHud();
   $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
   // El presupuesto puede impedir confirmar una decisión, pero nunca debe impedir
@@ -1315,15 +1295,14 @@ function openCharacterSelection(){
   return true;
 }
 function requestWorldEntry(){
-  if(usesCanonicalMotor()&&simulationSubmissionComplete())toast('Recorrido 3D: las ventas y los costos se calculan al cierre del ciclo.');
-  if(decisionState.__excel?.habilitado&&!usesCanonicalMotor()){toast('Tu plan por lotes se resuelve en el cierre local del docente. Consulta Producción y Resumen.');return false;}
+  if(decisionState.__excel?.habilitado){toast('Tu plan por lotes se resuelve en el cierre local del docente. Consulta Producción y Resumen.');return false;}
   if(!simulationSubmissionComplete())return openDecisionMenu();
   const admitted=localStorage.getItem(worldAdmissionKey())==='1';
   if((characterSelectionConfirmed||admitted)&&selectedCharacterModel())return startSimulationLoading({selectedCharacter:selectedCharacterModel()});
   return openCharacterSelection();
 }
 async function startSimulationLoading(options={}){
-  if(decisionState.__excel?.habilitado&&!usesCanonicalMotor()){toast('Esta empresa participa en el cierre por lotes del docente.');return false;}
+  if(decisionState.__excel?.habilitado){toast('Esta empresa participa en el cierre por lotes del docente.');return false;}
   if(simulationLoadingActive)return false;
   if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
   const requestedCharacter=CHARACTER_SLUGS[options?.selectedCharacter]?options.selectedCharacter:(selectedCharacterModel()||'chico2');
@@ -1405,7 +1384,7 @@ function categoryCompletionMap(){if(decisionState.__excel?.habilitado){const rea
 let excelCashDisplayed={owner:null,value:null};
 function updateCashHud(){
   const cash=decisionState.__excel?.habilitado?excelSavedCashBalance():typeof liveCompanyReview==='function'?liveCompanyReview().financial.projectedCash:cashBalance();
-  $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}`;
+  $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
   if($('projectedCash'))$('projectedCash').textContent=money(cash);
   for(const node of document.querySelectorAll('[data-saved-final-balance]'))node.textContent=money(cash);
   if(decisionState.__excel?.habilitado){const owner=storageKey();if(excelCashDisplayed.owner===owner&&excelCashDisplayed.value!==null&&cash!==excelCashDisplayed.value){const mandatory=(decisionState.__excel.resultado?.costos?.detalles?.manoObra||[]).filter(row=>['local','limpieza'].includes(row.rol)).reduce((sum,row)=>sum+Number(row.costo||0),0);animateCash(cash-excelCashDisplayed.value,mandatory);}excelCashDisplayed={owner,value:cash};}
@@ -1533,7 +1512,7 @@ function renderStudentConnection(){
   el.textContent=!studentConnected?'Sin conexión con la partida.':!currentStudent.empresaId?'Modo local · sin conexión a una sala remota.':navigator.onLine===false?'Sin conexión a internet. Tus avances guardados se conservan en este dispositivo.':studentStateFailure?'No se pudo confirmar la conexión con el servidor. Reintentando…':studentSessionRecovering||studentConnectionConfirmedAt===null?'Verificando conexión con la partida…':performance.now()-studentConnectionConfirmedAt>15000?'Conexión con el servidor sin confirmar. Reintentando…':'Conexión con el servidor confirmada. Al iniciar la partida entrarás al menú de decisiones.';
 }
 function showStudentSyncStatus(status,error){
-  const labels={synced:'Cambios guardados y sincronizados.',saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
+  const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
   if(error)console.warn('SIDE: sincronización pendiente',error);
 }
@@ -1733,20 +1712,6 @@ function syncStudentTimer(){
   if($('decisionRoundTimer'))$('decisionRoundTimer').textContent=text;
   if($('studentCycleLabel'))$('studentCycleLabel').textContent=r?.phase==='integration'?'Integración previa al Ciclo 1':`Ciclo ${currentRound()} / ${conf.cycles||6}`;
   if($('studentTimerNote'))$('studentTimerNote').textContent=note;
-  updateDeadlineWarning(remain,Boolean(r?.running&&r?.phase!=='integration'&&!decisionsSubmitted()));
-}
-let lastDeadlineWarning='';
-function updateDeadlineWarning(remain,running){
-  const level=running&&remain>0&&remain<=15?'urgent':running&&remain>0&&remain<=60?'warning':'';
-  for(const id of ['decisionRoundTimer','studentRoundTimer']){
-    const timer=$(id);timer?.classList.toggle('timer-warning',level==='warning');timer?.classList.toggle('timer-urgent',level==='urgent');
-  }
-  for(const warning of document.querySelectorAll('[data-cycle-deadline-warning]')){warning.classList.toggle('hidden',!level);warning.textContent=level?`${level==='urgent'?'Quedan 15 segundos o menos.':'Queda un minuto o menos.'} Al terminar se enviarán automáticamente los borradores guardados.`:'';}
-  const key=level?`${storageKey()}:${currentRound()}:${level}`:'';
-  if(key&&lastDeadlineWarning!==key){
-    lastDeadlineWarning=key;toast(level==='urgent'?'Últimos 15 segundos: guarda tus cambios.':'Queda un minuto: revisa y guarda tus decisiones.');
-    try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){const context=new Audio();if(context.state==='running'){const tone=context.createOscillator(),gain=context.createGain();tone.connect(gain);gain.connect(context.destination);gain.gain.value=.035;tone.frequency.value=level==='urgent'?660:440;tone.start();tone.stop(context.currentTime+.18);tone.onended=()=>context.close();}else context.close();}}catch{}
-  }
 }
 function renderStudentStatus(){
   if(!$('studentCashResult'))return;
@@ -1762,7 +1727,7 @@ function renderStudentStatus(){
     if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
   }
   const events=activeStudentEvents();
-  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:usesCanonicalMotor()?`Ciclo ${currentRound()} cerrado: ventas, costos y caja registrados. Consulta el desglose y los ciclos anteriores.`:`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
+  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:decisionState.__excel?.habilitado?`Ciclo ${currentRound()} cerrado: ventas, costos y caja registrados. Consulta el desglose y los ciclos anteriores.`:`Ciclo ${currentRound()}: movimientos guardados. Insumos como costo del ciclo; equipos y moldes al costo, sin depreciación. Préstamos como deuda, no como ingresos.`;
   const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>';
 }
 function renderOfficeFinances(){
@@ -1790,7 +1755,7 @@ function tickStudentGame(){
     const key=`${round}:${deadline}`;
     if(Number.isFinite(deadline)&&studentNow()>=deadline&&lastDeadlineRefresh!==key){lastDeadlineRefresh=key;refreshStudentGame();}
   }
-  if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;currentCategory=navigationCategories()[0]?.cat;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
+  if(round!==lastObservedRound){if(typeof closeCompanyReview==='function')closeCompanyReview();lastObservedRound=round;currentCategory=round>1?'A':navigationCategories()[0]?.cat;loadDecisionState();restoreDraftsForRound();if(!$('decisionMenu')?.classList.contains('hidden')){renderTabs();renderDecisionCategory()}}
   syncStudentTimer();if(studentConnected)updateIntegrationUI();if(!$('studentLobby')?.classList.contains('hidden'))renderStudentStatus();renderOfficeFinances();
 }
 

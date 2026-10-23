@@ -69,16 +69,8 @@ function fixture(name){
  await page.evaluate(()=>{switchTab('podio');const report=state.reports.find(r=>r.empresa==='Empresa A');saveCompanyGrade(report.id,18);});
  await page.waitForFunction(()=>document.querySelector('#podiumPreview')?.textContent.includes('Empresa A'));
  await page.locator('#publishPodium').click();
- assert.equal(await page.locator('#podiumDialog').isVisible(),true);
- await page.locator('#cancelPodiumPublish').click();
- // La publicación procede del servidor; el fixture no la fabrica escribiendo
- // una clave local que el producto dejó de usar en la migración del podio.
- await page.evaluate(async()=>{
-  state.partidaId='qa-podium';const now=Date.now();window.qaPublication={code:$('gameCode').value,publishedAt:new Date(now).toISOString(),expiresAt:new Date(now+86400000).toISOString(),visible:true,scheduled:false,podium:[{empresa:'Empresa A',grade:18}]};
-  SIDE.PartidaService.podio=async()=>({success:true,data:{success:true,serverTime:new Date().toISOString(),publication:qaPublication}});await loadPublished();
- });
  assert.match(await page.locator('#podiumState').innerText(),/24 horas/i);
- await page.evaluate(async()=>{qaPublication.publishedAt=new Date(Date.now()-86400000).toISOString();qaPublication.expiresAt=new Date(Date.now()-1000).toISOString();qaPublication.visible=false;await loadPublished();});
+ await page.evaluate(()=>{const p=publishedPodium();p.publishedAt=new Date(Date.now()-86400000).toISOString();p.expiresAt=new Date(Date.now()-1000).toISOString();localStorage.setItem('SIDE_PUBLISHED_PODIUM',JSON.stringify(p));loadPublished();});
  assert.equal(await page.locator('#podiumPreview .podium-place').count(),1,'expiry hides the publication, not the teacher grade preview');
  assert.match(await page.locator('#podiumState').innerText(),/vencida/i);
  await page.evaluate(async()=>{

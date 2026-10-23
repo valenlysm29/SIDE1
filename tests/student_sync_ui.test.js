@@ -66,8 +66,8 @@ test('student synchronization and session recovery through the delivered UI',asy
       assert.ok(calls.some(c=>c.type==='report'));
       assert.equal(calls.filter(c=>c.type==='snapshot').length,1);
       assert.ok(calls.filter(c=>c.type==='decisions'||c.type==='report').every(c=>c.revision===1));
-      assert.equal(await p.locator('[data-student-sync-status]').last().textContent(),'Cambios guardados y sincronizados.');
-      assert.equal(await p.locator('[data-student-sync-status]').last().isVisible(),true);
+      assert.equal(await p.locator('[data-student-sync-status]').last().textContent(),'');
+      assert.equal(await p.locator('[data-student-sync-status]').last().isVisible(),false);
       // Simulate an older response arriving after a successful write.
       const stale=await p.evaluate(async()=>{
         SIDE.EmpresaService.obtenerEstado=async()=>({success:true,data:{...state(),snapshot_revision:0,snapshot:empty}});

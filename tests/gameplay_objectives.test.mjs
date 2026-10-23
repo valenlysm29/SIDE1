@@ -2,14 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {deriveObjective} from '../services/gameplay_objectives.mjs';
 
-test('lot-model tour has reachable objectives without arcade sales or stock',()=>{
-  const base={guidedTour:true,queue:3,stockKnown:true,display:0,reserve:0};
-  assert.equal(deriveObjective(base).id,'explore-store');
-  assert.equal(deriveObjective({...base,visited:['store']}).id,'explore-production');
-  assert.equal(deriveObjective({...base,visited:['store','production']}).id,'explore-warehouse');
-  assert.equal(deriveObjective({...base,visited:['store','production','warehouse']}).id,'review-plan');
-});
-
 test('operational tasks supersede the tour without changing financial state', () => {
   const snapshot = Object.freeze({visited: Object.freeze([]), queue: 2, stockKnown: true, display: 0, reserve: 12});
   assert.equal(deriveObjective(snapshot).id, 'checkout');

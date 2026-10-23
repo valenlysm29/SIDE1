@@ -34,7 +34,7 @@ with sync_playwright() as p:
           studentConnected=true;
           window.qaPhase=(round,phase,status='running')=>{
             const runtime={round,phase,status,running:status==='running',remaining:600,duration:600,startedAt:new Date().toISOString()};
-            const config={capital:100000,lifecycleVersion:2,cycles:3,round,roundMinutes:10,cycleCloseMode:'automatic',motor_version:SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,runtime,gameStartAt:new Date(Date.now()+60000).toISOString()};
+            const config={capital:100000,lifecycleVersion:2,cycles:3,round,roundMinutes:10,cycleCloseMode:'automatic',motor_version:'excel-16',runtime,gameStartAt:new Date(Date.now()+60000).toISOString()};
             localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));
             localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(runtime));localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true}));
             updateIntegrationUI();
@@ -43,7 +43,7 @@ with sync_playwright() as p:
         }""")
         check(f'{width}: waiting room blocks decisions', page.evaluate('!studentAccess().canOperate && openDecisionMenu()===false'))
         for cycle in [1, 2, 3]:
-            page.evaluate("cycle=>{qaPhase(cycle,'decisions');loadDecisionState();openDecisionMenu();}", cycle)
+            page.evaluate("cycle=>{qaPhase(cycle,'decisions');loadDecisionState();if(!decisionState.__excel?.habilitado){decisionState.__excel={habilitado:true,round:cycle,enviado:false,decisiones:SIDE_EXCEL_UI.nuevasDecisiones()};persistGameState();}openDecisionMenu();}", cycle)
             check(f'{width}: cycle {cycle} running access', page.evaluate('studentAccess().canOperate && canExploreWorld()'))
             expect(page.locator('.decision-tab')).to_have_count(5)
             for category in ['A', 'B', 'C', 'D', 'E']:

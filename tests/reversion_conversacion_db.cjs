@@ -1,0 +1,31 @@
+'use strict';
+// Exclusivamente PostgreSQL local. Comprueba la vuelta desde el SQL publicado.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),cp=require('node:child_process');
+const {database,createGame,config,rpc}=require('./lifecycle_db_fixture.cjs');
+const read=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',name),'utf8').replaceAll('collate "es-x-icu"','collate "C"');
+const old=name=>cp.execFileSync('git',['show','7c04179:supabase/migrations/'+name],{cwd:path.join(__dirname,'..'),encoding:'utf8'}).replaceAll('collate "es-x-icu"','collate "C"');
+(async()=>{const db=await database();try{
+ for(const name of ['2026-10-11_fix_crear_partida.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql','2026-10-11_logica_excel.sql','2026-10-12_podio_programado.sql'])await db.exec(read(name));
+ for(const name of ['2026-10-20_correcciones_docente_estudiante.sql','2026-10-21_expulsion_empresa.sql','2026-10-21_pausa_escrituras_estudiante.sql'])await db.exec(old(name));
+ assert.equal((await rpc(db,'side_excel_features',{})).correccionesVersion,20261020);
+ const existing=await createGame(db,config({capital:100000}));
+ assert.equal(existing.motor_version,'side-lotes-2026-10-20');
+ const identity={p_codigo:existing.codigo,p_nombre_legal:'Conservada SAC',p_nombre_comercial:'Conservada'};
+ const joined=await rpc(db,'unirse_partida_por_codigo',identity);assert.equal(joined.success,true);
+ const rowsBefore=(await db.query('select count(*) n from empresas')).rows[0].n;
+ const rollback=read('2026-10-22_revertir_correcciones_conversacion.sql');
+ await db.exec(rollback);await db.exec(rollback);
+ assert.deepEqual(await rpc(db,'side_excel_features',{}),{cierreVersion:1});
+ assert.equal((await db.query('select count(*) n from empresas')).rows[0].n,rowsBefore);
+ assert.equal((await db.query('select motor_version from partidas where id=$1',[existing.id])).rows[0].motor_version,'side-lotes-2026-10-20','preserva datos históricos');
+ const newId='99999999-1111-4111-8111-111111111111';
+ await db.query('insert into partidas(id,profesor_id,codigo,nombre,configuracion) select $1,profesor_id,$2,nombre,configuracion from partidas where id=$3',[newId,'SIDE-REV',existing.id]);
+ assert.equal((await db.query('select motor_version from partidas where id=$1',[newId])).rows[0].motor_version,'excel-16');
+ const reject=await rpc(db,'side_expulsar_empresa',{p_partida_id:existing.id,p_empresa_id:joined.empresa_id,p_expulsar:true});assert.equal(reject.success,true);
+ assert.equal((await rpc(db,'obtener_estado_estudiante',identity)).code,'EMPRESA_EXPULSADA');
+ assert.equal((await rpc(db,'side_expulsar_empresa',{p_partida_id:existing.id,p_empresa_id:joined.empresa_id,p_expulsar:false})).success,true);
+ await db.query("update partidas set estado='activa',configuracion=jsonb_set(configuracion,'{runtime}',$2) where id=$1",[existing.id,{phase:'decisions',status:'paused',running:false,round:1}]);
+ assert.equal((await rpc(db,'guardar_estado_estudiante',{...identity,p_snapshot:{},p_expected_revision:0})).code,'CICLO_PAUSADO');
+ assert.ok((await rpc(db,'obtener_estado_estudiante',identity)).partida);
+ console.log('PASS reversión SQL repetible desde 20+21: datos históricos, motor nuevo retirado, nuevas salas excel-16, expulsión/reactivación, pausa/lectura y capacidades base.');
+}finally{await db.close();}})().catch(e=>{console.error(e);process.exitCode=1});

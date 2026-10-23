@@ -8,13 +8,6 @@
   const cfg=overrides=>configApi.configurar(overrides);
   const regimenValido=regimen=>regimen==='NO_MYPE'?'NO_MYPE':'MYPE';
   function descuentoAnalista(ciclo=1,overrides={}){const a=cfg(overrides).ANALISTA_BASE;return Math.max(a.descuentoMinimoPct,a.descuentoInicialPct-(Math.max(1,n(ciclo))-1)*a.reduccionPorCicloPct);}
-  function costosCanales(entrada={},overrides={}){
-    const c=cfg(overrides),detalles=Object.entries(c.COSTOS_TIENDAS).map(([distrito,precio])=>({codigo:'tienda_'+distrito,distrito,cantidad:Math.floor(positivo(entrada.tiendasPorDistrito?.[distrito])),precio}));
-    for(const detalle of detalles)detalle.costo=detalle.cantidad*detalle.precio;
-    const tiendas=sumar(detalles.map(d=>d.cantidad)),web=(entrada.seleccion||[]).some(k=>['COM-01B','COM-01C'].includes(k));
-    detalles.push({codigo:'web',cantidad:web?1:0,precio:c.COSTO_WEB,costo:web?c.COSTO_WEB:0});
-    return {tiendas,web,detalles,total:sumar(detalles.map(d=>d.costo))};
-  }
 
   function costoLaboral(rol,nivel=1,regimen='MYPE',overrides={}){
     if(typeof rol==='object'){const entrada=rol;return costoLaboral(entrada.rol,entrada.nivel,entrada.regimen,nivel&&typeof nivel==='object'?nivel:overrides);}
@@ -83,7 +76,7 @@
       trabajadores+=cantidad;if(nivel===c.PRODUCTIVIDAD[area].length-1)n3+=cantidad;
       const detalle=costoLaboral(area,nivel+1,regimen,c);detallesMO.push({...detalle,cantidad,costo:detalle.pagoMensual*cantidad*c.CICLO_EQUIVALE_A_MESES});
     }
-    for(const [rol,cantidad] of [['jefatura',positivo(entrada.jefes??(seleccion.includes('RH-10A')?1:0))],['limpieza',!c.NUEVO_MODELO&&entrada.limpieza===false?0:1],['local',!c.NUEVO_MODELO&&entrada.local===false?0:1]]){
+    for(const [rol,cantidad] of [['jefatura',positivo(entrada.jefes??(seleccion.includes('RH-10A')?1:0))],['limpieza',entrada.limpieza===false?0:1],['local',entrada.local===false?0:1]]){
       const detalle=costoLaboral(rol,1,regimen,c);detallesMO.push({...detalle,cantidad,costo:detalle.pagoMensual*cantidad*c.CICLO_EQUIVALE_A_MESES});
     }
     const costoMOciclo=sumar(detallesMO.map(detalle=>detalle.costo));
@@ -119,5 +112,5 @@
       totalCostos:costoMOciclo+costoMantenimiento+depreciacion+costoMP+costoPublicidad+costoAnalistaCompras+costoAlmacenaje+costoHorasExtra+costoLeadTime,
       detalles:{manoObra:detallesMO,maquinaria:detallesMaquinaria,materiaPrima:detallesMP}};
   }
-  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa,descuentoAnalista,costosCanales};
+  return {calcularCostos,costoLaboral,costoMaquinaria,consumirAlmacen,reputacionOperativa,descuentoAnalista};
 });

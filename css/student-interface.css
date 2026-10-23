@@ -155,9 +155,3 @@
   :is(#landing,#profiles,#studentLoading,#studentLobby) *::after { animation: none !important; transition: none !important; }
 }
 .student-podium{width:min(880px,calc(100% - 32px));margin:16px auto;position:relative;z-index:2}.student-podium[hidden]{display:none}.student-podium li{margin:8px 0}.student-podium p{overflow-wrap:anywhere}
-/* Correcciones de acceso: controles de contraseña visibles y con foco. */
-#modalRoot .password-field { display: flex; align-items: stretch; gap: 8px; }
-#modalRoot .password-field input { flex: 1 1 0; width: 0; min-width: 0; }
-#modalRoot .password-field button { min-width: 72px; padding: 8px; border: 1px solid var(--side-line-control); border-radius: var(--side-radius-control); background: var(--side-panel-raised); color: var(--side-text); }
-#modalRoot #passwordRecoveryForm h3 { margin-block: 14px; }
-#modalRoot #forgotPassword { color: var(--side-blue); }

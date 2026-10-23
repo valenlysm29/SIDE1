@@ -3,8 +3,12 @@
 ## Instalar en Supabase
 
 Ejecuta **todo** `supabase/migrations/2026-10-21_expulsion_empresa.sql` en
-Supabase → SQL Editor, después de
-`2026-10-20_correcciones_docente_estudiante.sql` y sus dependencias.
+Supabase → SQL Editor, después de las migraciones de identidad exacta,
+códigos de sala, cierre Excel y podio publicadas hasta el 12/10/2026.
+La migración de expulsión se adaptó tras revertir las correcciones del
+20/10/2026: ya no depende de ese archivo ni reinstala su limitador de intentos.
+Si se necesita la pausa de escrituras, aplica después
+`2026-10-21_pausa_escrituras_estudiante.sql`.
 La migración puede ejecutarse más de una vez. No basta con publicar la web
 o hacer push: la instalación SQL es un paso separado.
 

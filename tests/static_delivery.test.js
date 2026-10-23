@@ -41,10 +41,10 @@ test('productive catalog requires a mold and a sales channel, with calculator fi
   assert.equal(production.items[0].type,'production-plan');
 });
 
-test('summary retains its navigation position across cycles',()=>{
+test('cycle zero places summary last and later cycles place it first',()=>{
   const source=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
-  assert.match(source,/return \[\.\.\.decisions,\.\.\.\(summary\?\[summary\]:\[\]\)\]/);
-  assert.doesNotMatch(source,/round>1\?'A':navigationCategories/);
+  assert.match(source,/currentRound\(\)<=1\?\[\.\.\.decisions,\.\.\.\(summary\?\[summary\]:\[\]\)\]/);
+  assert.match(source,/round>1\?'A':navigationCategories\(\)\[0\]\?\.cat/);
 });
 
 test('DOP presentation loads before the app and keeps the documented cycle',()=>{

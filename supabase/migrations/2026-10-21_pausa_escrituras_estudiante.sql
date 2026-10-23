@@ -1,4 +1,5 @@
 -- Ejecutar después de 2026-10-21_expulsion_empresa.sql. No modifica el motor.
+-- Compatible con la base anterior al 20/10 y la expulsión adaptada del 21/10.
 -- Congela escrituras del estudiante durante una pausa; lecturas/heartbeat siguen activos.
 begin;
 do $$ begin
@@ -12,8 +13,7 @@ declare identidad record; configuracion jsonb; partida_id uuid; rechazo jsonb;
 begin
  rechazo:=side_private.comprobar_expulsion(p_codigo,p_nombre_legal,p_nombre_comercial);
  if rechazo is not null then return rechazo; end if;
- if side_private.ingreso_bloqueado(side_private.clave_ingreso(p_codigo)) then return null; end if;
- select * into identidad from side_private.resolver_original_20261020(public.side_normalizar_codigo_sala(p_codigo),p_nombre_legal,p_nombre_comercial);
+ select * into identidad from side_private.resolver_antes_expulsion_20261021(public.side_normalizar_codigo_sala(p_codigo),p_nombre_legal,p_nombre_comercial);
  if identidad.participante_id is null then return null; end if;
  select t.partida_id into partida_id from public.participantes t where t.id=identidad.participante_id;
  select p.configuracion into configuracion from public.partidas p where p.id=partida_id for update;

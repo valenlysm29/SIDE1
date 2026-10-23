@@ -18,9 +18,7 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
  async function teacher(){
   const p=await page(teacherHTML);
   await p.exposeFunction('dbCreate',async c=>{
-    // Este escenario prueba el ciclo heredado; el motor nuevo dispone de las
-    // simulaciones canónicas independientes y necesita confirmar su plan.
-    const created=await createGame(db,{...c,motor_version:'excel-16'});
+    const created=await createGame(db,c);
     return rpc(db,'controlar_partida',{p_partida_id:created.id,p_accion:'sincronizar',p_config:null,p_expected_round:null});
   });
   await p.exposeFunction('dbCancel',id=>rpc(db,'cancelar_partida',{p_partida_id:id}));
@@ -135,13 +133,27 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   assert.equal(await t.locator('#startCycle1Btn').isVisible(),false);
   await t.evaluate(()=>switchTab('configuracion'));
   assert.equal(await t.locator('#startGame').isDisabled(),true,'primero debe cancelar partida');
-  const selectedBefore=await t.evaluate(()=>[...state.enabledEvents]);
   await t.locator('#openEventPicker').click();await t.locator('#eventSearch').fill('crisis');
-  for(const selector of ['#eventSelectAll','#eventRandomize','.event-repeat','.event-first-round'])assert.equal(await t.locator(selector).first().isDisabled(),true,'eventos bloqueados tras inicio: '+selector);
-  await t.locator('#closeEventPicker').click();
-  assert.deepEqual(await t.evaluate(()=>[...state.enabledEvents]),selectedBefore);
-  await t.screenshot({path:path.join(output,'lifecycle-teacher.png')});
-  console.log('PASS UI manual: two live students reach decisions and world; events remain read-only after start');
+  await t.locator('#eventSelectAll').click();await t.evaluate(()=>publishChain);
+  assert.equal(await t.evaluate(()=>state.enabledEvents.size),92);
+  await t.locator('#eventSearch').fill('');
+  const configuredEvent=await t.locator('.event-repeat').first().getAttribute('data-event');
+  await t.locator('.event-repeat').first().uncheck();await t.evaluate(()=>publishChain);
+  await t.locator('.event-first-round').first().fill('2');await t.locator('.event-first-round').first().press('Tab');await t.evaluate(()=>publishChain);
+  assert.deepEqual(await t.evaluate(id=>state.authoritative.eventRules[id],configuredEvent),{firstRound:2,repeat:false});
+  await t.locator('#eventSearch').fill('');
+  const excluded=await t.locator('.event-enable').evaluateAll(nodes=>nodes.slice(0,2).map(n=>n.dataset.event));
+  await t.locator('.event-enable').nth(0).uncheck();await t.evaluate(()=>publishChain);await t.locator('.event-enable').nth(1).uncheck();await t.evaluate(()=>publishChain);
+  assert.equal(await t.evaluate(()=>state.enabledEvents.size),90);
+  await t.locator('input[name="eventSelectionMode"][value="random"]').check();await t.evaluate(()=>publishChain);
+  await t.locator('#eventRandomize').click();await t.evaluate(()=>publishChain);
+  const selection=await t.evaluate(()=>[...state.enabledEvents]);assert.ok(excluded.every(id=>!selection.includes(id)));
+  assert.equal(await t.locator('.event-enable').first().isDisabled(),false);
+  await t.locator('#eventSelectAll').click();await t.evaluate(()=>publishChain);await t.locator('#eventSelectAll').click();await t.evaluate(()=>publishChain);
+  assert.equal(await t.evaluate(()=>state.enabledEvents.size),0);
+  await t.locator('#eventRandomize').click();assert.equal(await t.evaluate(()=>state.enabledEvents.size),0);
+  await t.locator('#closeEventPicker').click();await t.screenshot({path:path.join(output,'lifecycle-teacher.png')});
+  console.log('PASS UI manual: prepare, two live students auto-navigate to decisions before the 3D world; all/individual/random/zero events');
   await t.locator('#cancelGame').click();await t.locator('#keepGame').click();assert.equal(await t.evaluate(()=>gameStatus().active),true);
   await t.evaluate(()=>{window.originalCancel=SIDE.PartidaService.cancelar;SIDE.PartidaService.cancelar=async()=>({success:false,error:'Fallo simulado de conexión'});});
   await t.locator('#cancelGame').click();await t.locator('#confirmCancelGame').click();

@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function load(){const c={};vm.createContext(c);for(const file of ['config_excel','catalogo_excel','puntajes','produccion','costos','consecuencias','mercado','ciclo','caja','ui_excel'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/engine',file+'.js'),'utf8'),c);return c;}
-function editor(c,options={}){let saved;const status={textContent:''},container={innerHTML:'',querySelectorAll:()=>[],querySelector:s=>s==='[data-excel-status]'?status:null};c.SIDE_EXCEL_UI.mountEditor(container,{round:1,motorVersion:c.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,getState:()=>({}),save:value=>saved=value,...options});return {container,status,saved:()=>saved};}
+function editor(c,options={}){let saved;const state=options.getState||(()=>({}));const status={textContent:''},container={innerHTML:'',querySelectorAll:()=>[],querySelector:s=>s==='[data-excel-status]'?status:null};c.SIDE_EXCEL_UI.mountEditor(container,{round:1,motorVersion:'excel-16',getState:()=>({}),save:value=>saved=value,...options,getState:()=>({habilitado:true,...state()})});return {container,status,saved:()=>saved};}
 test('Remote capability failure preserves editable autosaved draft and blocks confirmation',()=>{
  const c=load(),e=editor(c,{local:false,remoteReady:false});
  assert.doesNotMatch(e.container.innerHTML,/data-excel-prestamo[^>]*disabled/);
@@ -15,14 +15,14 @@ test('A mounted editor rejects input when the runtime becomes paused and resumes
  const c=load();let active=true;const e=editor(c,{canSave:()=>active,lockReason:()=>active?'':'La partida está pausada.'});
  const input={type:'number',step:'1',max:'',value:'2',dataset:{activo:'mesa'},matches:()=>false};
  active=false;e.container.oninput({target:input});assert.equal(e.saved(),undefined);assert.match(e.status.textContent,/pausada/);
- active=true;e.container.oninput({target:input});assert.equal(e.saved().decisiones.maquinaria.mesa,1);
+ active=true;e.container.oninput({target:input});assert.equal(e.saved().decisiones.maquinaria.mesa,2);
 });
 test('Plan projection reserves costs once, preserves owned assets, and matches a zero-sales close',()=>{
- const c=load(),api=c.SIDE_EXCEL_UI,version=c.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,d=api.nuevasDecisiones();
- d.lotes=[];d.maquinaria={mesa:1,'INF-08':1};d.montoPrestamo=1000;d.marketingNivel='baja';d.comprasUnidades={'INS-01':2};
+ const c=load(),api=c.SIDE_EXCEL_UI,version='excel-16',d=api.nuevasDecisiones();
+ d.seleccion=['FIN-01A'];d.lotes=[];d.maquinaria={mesa:1,'INF-08':1};d.montoPrestamo=1000;d.marketingNivel='baja';d.comprasUnidades={'INS-01':2};
  const history={maquinariaActivos:{mesa:1},deudaPrincipal:2000,teaVigente:30,cajaFinal:100000};
  const before=JSON.stringify(history),projection=api.proyectarPlan(d,{cash:100000,historial:history,motorVersion:version});
- const overrides=c.SIDE_EXCEL_CONFIG.paraMotor(version),closed=c.SIDE_EXCEL_CICLO.cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:api.prepararDecisiones(d)},historialPorEmpresa:{A:history}},overrides);
+ const overrides={},closed=c.SIDE_EXCEL_CICLO.cerrarCiclo({empresas:['A'],decisionesPorEmpresa:{A:api.prepararDecisiones(d)},historialPorEmpresa:{A:history}},overrides);
  const result=c.SIDE_EXCEL_CAJA.adjuntarCaja(closed,{historialAnterior:{A:history},overrides}).resultadosPorEmpresa.A;
  assert.ok(Math.abs(projection.cashAfter-result.financial.balanceCaja.cajaFinal)<1e-8);
  assert.equal(JSON.stringify(history),before);assert.ok(projection.cashAfter<100000);
@@ -42,7 +42,7 @@ test('Confirmation rejects unfunded or overcapacity plans while keeping a draft 
 
 
 test('Material purchases preserve fractional conversions required by the Excel oracle',()=>{
- const c=load(),e=editor(c,{motorVersion:c.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL});
+ const c=load(),e=editor(c,{motorVersion:'excel-16'});
  assert.match(e.container.innerHTML,/step="any" data-compra=/);
  const converted=2000/c.SIDE_EXCEL_CONFIG.CONFIG.CONVERSION_COMPRA['INS-06'];
  const input={type:'number',step:'any',max:'',value:String(converted),dataset:{compra:'INS-06'},matches:()=>false};

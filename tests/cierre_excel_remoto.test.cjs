@@ -45,12 +45,3 @@ test('Feature check ausente desactiva solo editor remoto, RPC legacy sigue dispo
  const feature=await ctx.SIDE.PartidaService.excelDisponible();assert.equal(feature.available,false);assert.equal(feature.migrationMissing,true);
  assert.equal((await ctx.SIDE.PartidaService.controlar('demo','cerrar',null,1)).success,true);assert.deepEqual(names,['side_excel_features','controlar_partida']);
 });
-
-test('motor nuevo rechaza contexto antiguo antes de cobrar o guardar',async()=>{
- let saved=false;const ctx=entorno({rpc:async name=>{
-  if(name==='side_contexto_cierre_excel')return {data:{empresas:[{id:'1',capital:100000,envelope:{}}],historialPorEmpresa:{},token:'old'}};
-  saved=true;return {data:{}};
- }});
- const result=await ctx.SIDE.PartidaService.cerrarExcel('demo',1,{VERSION:ctx.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL});
- assert.equal(result.code,'MIGRACION_PENDIENTE');assert.equal(saved,false);
-});

@@ -10,7 +10,7 @@ function engine(){
 function control(attribute,value){return {dataset:{},value,matches:s=>s==='['+attribute+']',hasAttribute:s=>s===attribute};}
 function editor(ctx,envelope,category='D'){
  const status={textContent:''},container={innerHTML:'',querySelectorAll:()=>[],querySelector:s=>s==='[data-excel-status]'?status:null};
- ctx.SIDE_EXCEL_UI.mountEditor(container,{category,round:1,cash:100000,historial:{},motorVersion:ctx.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL,getState:()=>envelope.value,save:value=>{envelope.value=JSON.parse(JSON.stringify(value));}});
+ ctx.SIDE_EXCEL_UI.mountEditor(container,{category,round:1,cash:100000,historial:{},motorVersion:'excel-16',getState:()=>envelope.value,save:value=>{envelope.value=JSON.parse(JSON.stringify(value));}});
  return container;
 }
 test('Guardar un ítem conserva el otro cambio como borrador, incluso al cambiar de pestaña',()=>{
@@ -24,7 +24,7 @@ test('Guardar un ítem conserva el otro cambio como borrador, incluso al cambiar
  container.onclick({target:{closest:()=>button}});
  assert.equal(envelope.value.decisionesGuardadas.marketingNivel,'alta');assert.equal(envelope.value.decisionesGuardadas.analistaCompras,false);
  assert.equal(envelope.value.decisiones.analistaCompras,true);assert.equal(envelope.value.enviado,false);
- const expected=api.proyectarPlan(envelope.value.decisionesGuardadas,{cash:100000,historial:{},round:1,motorVersion:ctx.SIDE_EXCEL_CONFIG.MOTOR_ACTUAL}).cashAfter;
+ const expected=api.proyectarPlan(envelope.value.decisionesGuardadas,{cash:100000,historial:{},round:1,motorVersion:'excel-16'}).cashAfter;
  assert.equal(envelope.value.saldoFinalGuardado,expected);
  const balance=envelope.value.saldoFinalGuardado;
  container.oninput({target:control('data-excel-marketing','baja')});assert.equal(envelope.value.saldoFinalGuardado,balance);

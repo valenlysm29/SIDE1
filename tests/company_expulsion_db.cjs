@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {database,createGame,config,rpc,professor}=require('./lifecycle_db_fixture.cjs');
 const sql=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',name),'utf8').replaceAll('collate "es-x-icu"','collate "C"');
 (async()=>{const db=await database();try{
- for(const name of ['2026-10-11_fix_crear_partida.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql','2026-10-11_logica_excel.sql','2026-10-12_podio_programado.sql','2026-10-20_correcciones_docente_estudiante.sql'])await db.exec(sql(name));
+ for(const name of ['2026-10-11_fix_crear_partida.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql','2026-10-11_logica_excel.sql','2026-10-12_podio_programado.sql'])await db.exec(sql(name));
  const migration=sql('2026-10-21_expulsion_empresa.sql');await db.exec(migration);await db.exec(migration);
  const game=await createGame(db,config({capital:100000}));
  const identity={p_codigo:game.codigo,p_nombre_legal:'Empresa Inactiva SAC',p_nombre_comercial:'Inactiva'};
@@ -16,6 +16,8 @@ const sql=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',nam
  assert.equal((await rpc(db,'side_expulsar_empresa',target)).code,'NO_AUTORIZADO');
  await db.query("select set_config('test.uid',$1,false)",[professor]);
  assert.equal((await rpc(db,'side_expulsar_empresa',{...target,p_empresa_id:999999})).code,'EMPRESA_AJENA');
+ // El modelo anterior solo cierra empresas habilitadas explícitamente por lotes.
+ await db.query("update side_student_state set snapshot=jsonb_set(snapshot,'{decision_state}',jsonb_build_object('__excel',jsonb_build_object('habilitado',true,'cicloActivacion',1))) where empresa_id=any($1::bigint[])",[[join.empresa_id,joinOther.empresa_id]]);
  const before=await rpc(db,'side_contexto_cierre_excel',{p_partida_id:game.id,p_ciclo:1});assert.equal(before.empresas.length,2);
  const expelled=await rpc(db,'side_expulsar_empresa',target);assert.equal(expelled.success,true);assert.ok(expelled.expulsada_at);
  assert.equal((await rpc(db,'side_expulsar_empresa',target)).expulsada_at,expelled.expulsada_at,'idempotencia');
@@ -38,7 +40,7 @@ const sql=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',nam
  assert.deepEqual(context.empresas.map(x=>x.id),[String(joinOther.empresa_id)]);assert.notEqual(context.token,before.token);
  assert.equal((await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:before.token,p_cierre:{}})).code,'ESTADO_DESACTUALIZADO');
  const {cerrarCiclo}=require('../js/engine/ciclo.js'),{adjuntarCaja}=require('../js/engine/caja.js');
- const overrides=require('../js/engine/config_excel.js').paraMotor(game.motor_version),id=String(joinOther.empresa_id);
+ const overrides=context.overrides||{},id=String(joinOther.empresa_id);
  const closure=adjuntarCaja(cerrarCiclo({ciclo:1,empresas:[id]},overrides),{capitalPorEmpresa:{[id]:100000},overrides});
  assert.ok((await rpc(db,'side_guardar_cierre_excel',{p_partida_id:game.id,p_ciclo:1,p_token:context.token,p_cierre:closure})).cierre);
  assert.equal((await db.query('select count(*)::int n from reportes_ciclo where empresa_id=$1',[join.empresa_id])).rows[0].n,0,'expulsada no participa ni recibe nuevos costos');

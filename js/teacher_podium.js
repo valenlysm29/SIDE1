@@ -17,7 +17,7 @@
     return Math.round((35*margin+25*roa+25*liquidity+15*leverage)*100)/100;
   }
   function eligibleReports(reports,{finished=false}={}){return reports.filter(r=>!r.expulsadaAt&&(finished||r.estado!=='eliminada'));}
-  function suggestedPodium(reports,options){const scored=eligibleReports(reports,options).map(r=>({...r,sideScore:suggestedScore(r)}));if(!scored.some(r=>r.sideScore>0))return [];return scored.sort((a,b)=>b.sideScore-a.sideScore||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
+  function suggestedPodium(reports,options){return eligibleReports(reports,options).map(r=>({...r,sideScore:suggestedScore(r)})).sort((a,b)=>b.sideScore-a.sideScore||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
   function finalPodium(reports,gradeFor,options){return eligibleReports(reports,options).map(r=>({...r,grade:gradeFor(r)})).filter(r=>r.grade!=null&&Number.isFinite(Number(r.grade))&&Number(r.grade)>=0&&Number(r.grade)<=20).sort((a,b)=>Number(b.grade)-Number(a.grade)||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
   return {suggestedScore,suggestedPodium,finalPodium,eligibleReports};
 });

@@ -1,9 +1,22 @@
--- Aplicar DESPUÉS de 2026-10-20_correcciones_docente_estudiante.sql.
+-- Aplicar sobre las migraciones de identidad, códigos, cierre Excel y podio
+-- publicadas hasta 2026-10-12. No requiere las correcciones revertidas del 20/10.
 -- Expulsión persistente por partida. Conserva empresa, decisiones y resultados.
 begin;
-do $$ begin
- if to_regprocedure('side_private.resolver_original_20261020(text,text,text)') is null then
-  raise exception 'Aplica primero 2026-10-20_correcciones_docente_estudiante.sql';
+create schema if not exists side_private;
+revoke all on schema side_private from public,anon,authenticated;
+do $$
+declare definicion text;
+begin
+ if to_regprocedure('public.side_resolver_identidad_empresa(text,text,text)') is null
+  or to_regprocedure('public.side_normalizar_codigo_sala(text)') is null
+  or to_regprocedure('public.side_contexto_cierre_excel(uuid,integer)') is null
+  or to_regprocedure('public.side_podio_estudiante(text,text,text)') is null then
+  raise exception 'Aplica primero las migraciones de identidad exacta, códigos de sala, cierre Excel y podio hasta 2026-10-12';
+ end if;
+ -- Copia la resolución exacta de la base sin reintroducir el limitador retirado.
+ if to_regprocedure('side_private.resolver_antes_expulsion_20261021(text,text,text)') is null then
+  definicion:=pg_get_functiondef('public.side_resolver_identidad_empresa(text,text,text)'::regprocedure);
+  execute replace(definicion,'FUNCTION public.side_resolver_identidad_empresa(','FUNCTION side_private.resolver_antes_expulsion_20261021(');
  end if;
 end $$;
 
@@ -34,9 +47,7 @@ create or replace function side_private.comprobar_expulsion(p_codigo text,p_nomb
 returns jsonb language plpgsql security definer set search_path=pg_catalog as $$
 declare identidad record; partida_id uuid; expulsada timestamptz;
 begin
- -- El limitador de intentos existente sigue resolviendo los rechazos genéricos.
- if side_private.ingreso_bloqueado(side_private.clave_ingreso(p_codigo)) then return null; end if;
- select * into identidad from side_private.resolver_original_20261020(public.side_normalizar_codigo_sala(p_codigo),p_nombre_legal,p_nombre_comercial);
+ select * into identidad from side_private.resolver_antes_expulsion_20261021(public.side_normalizar_codigo_sala(p_codigo),p_nombre_legal,p_nombre_comercial);
  if identidad.participante_id is null then return null; end if;
  select t.partida_id into partida_id from public.participantes t where t.id=identidad.participante_id;
  perform 1 from public.partidas p where p.id=partida_id for update;

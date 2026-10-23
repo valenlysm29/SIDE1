@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {database,createGame,config,rpc}=require('./lifecycle_db_fixture.cjs');
 const sql=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',name),'utf8').replaceAll('collate "es-x-icu"','collate "C"');
 (async()=>{const db=await database();try{
- for(const name of ['2026-10-11_fix_crear_partida.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql','2026-10-11_logica_excel.sql','2026-10-12_podio_programado.sql','2026-10-20_correcciones_docente_estudiante.sql','2026-10-21_expulsion_empresa.sql'])await db.exec(sql(name));
+ for(const name of ['2026-10-11_fix_crear_partida.sql','2026-10-12_salas_codigo.sql','2026-10-12_codigo_corto.sql','2026-10-11_logica_excel.sql','2026-10-12_podio_programado.sql','2026-10-21_expulsion_empresa.sql'])await db.exec(sql(name));
  const migration=sql('2026-10-21_pausa_escrituras_estudiante.sql');await db.exec(migration);await db.exec(migration);
  const game=await createGame(db,config({capital:100000})),identity={p_codigo:game.codigo,p_nombre_legal:'Empresa Pausa SAC',p_nombre_comercial:'Pausa'};
  const join=await rpc(db,'unirse_partida_por_codigo',identity);assert.equal(join.success,true);

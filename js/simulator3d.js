@@ -435,13 +435,6 @@
 
 
   function createDailyMissions(day = 1) {
-    // El modelo por lotes liquida ventas al cierre; no propone misiones de
-    // cobro arcade que ese modelo no puede completar.
-    if (bridge().guidedTour?.()) return [
-      {id:'tour-store',label:'Visita la tienda',target:1},
-      {id:'tour-production',label:'Visita producción',target:1},
-      {id:'tour-warehouse',label:'Visita el almacén',target:1}
-    ];
     const premiumGoal = Math.max(1, Math.min(4, Math.ceil(day / 2)));
     const serveGoal = Math.max(4, 4 + day * 2);
     const satisfactionGoal = Math.max(72, 88 - Math.min(12, (day - 1) * 2));
@@ -454,7 +447,6 @@
 
   function missionValue(mission) {
     if (!gameSession) return 0;
-    if (mission.id.startsWith('tour-')) return businessState?.exploredHub?.includes(mission.id.slice(5)) ? 1 : 0;
     if (mission.id === 'serve') return gameSession.served;
     if (mission.id === 'premium') return Math.max(0, Number(inventory?.sold?.premium || 0) - Number(gameSession.startPremiumSold || 0));
     if (mission.id === 'satisfaction') return Math.round(gameSession.satisfaction);
@@ -470,7 +462,7 @@
     const list = $3('simMissionList');
     if (!list || !gameSession) return;
     const done = gameSession.missions.filter(missionComplete).length;
-    if ($3('simMissionHeadline')) $3('simMissionHeadline').textContent = bridge().guidedTour?.() ? `RECORRIDO · ${done}/${gameSession.missions.length}` : `DÍA ${gameSession.day} · ${done}/${gameSession.missions.length}`;
+    if ($3('simMissionHeadline')) $3('simMissionHeadline').textContent = `DÍA ${gameSession.day} · ${done}/${gameSession.missions.length}`;
     list.innerHTML = gameSession.missions.map(m => {
       const value = missionValue(m);
       const complete = missionComplete(m);
@@ -3248,7 +3240,6 @@
   function updateHubObjective() {
     if(!hubWorld?.deriveObjective)return;
     const retailObjective=hubWorld.deriveObjective({
-      guidedTour:bridge().guidedTour?.()===true,
       visited:businessState?.exploredHub||[],shiftEnded:gameSession?.shiftEnded,
       queue:checkoutQueue.length,stockKnown:Boolean(inventory),display:totalDisplayStock(),
       reserve:totalReserveStock(),deliveryPending:Boolean(businessState?.pendingSupplierOrder)

@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const {chromium}=require(process.env.SIDE_NODE_MODULES?path.join(process.env.SIDE_NODE_MODULES,'playwright'):'playwright');
 const ROOT=path.resolve(process.env.SIDE_ROOT||path.join(__dirname,'..'));
 const OUT=path.join(ROOT,'tests/output/correcciones-2026-10-20/independiente');fs.mkdirSync(OUT,{recursive:true});
-const VERSION='side-lotes-2026-10-20';
+const VERSION='excel-16';
 const state={started:new Date().toISOString(),root:ROOT,checks:[],simulations:[],errors:[]};
 const save=()=>fs.writeFileSync(path.join(OUT,state.evidenceName||'verification.json'),JSON.stringify(state,null,2));
 function check(label,condition=true){assert.ok(condition,label);state.checks.push(label);console.log('PASS '+label);save();}
@@ -26,7 +26,7 @@ async function newPage(browser,origin,name,teacher=false){
  const context=await browser.newContext({viewport:{width:1150,height:666},locale:'es-PE',timezoneId:'America/Lima'});await context.route('**/*',route=>route.request().url().startsWith(origin)?route.continue():route.abort());
  const page=await context.newPage();page.on('pageerror',e=>{state.errors.push({name,message:e.message});save();});await page.goto(origin+(teacher?'/docente.html':'/index.html'),{waitUntil:'networkidle'});
  await sync(page,1);
- if(!teacher){await page.evaluate(()=>showModal('studentModal'));await page.locator('#gameCode').fill('SIDE-000');await page.locator('#companyLegalName').fill('Verificación '+name+' SAC');await page.locator('#companyBrandName').fill(name);await page.locator('#studentForm button[type=submit]').click();await page.waitForFunction(name=>studentConnected&&currentStudent.company===name,name);await page.evaluate(()=>openDecisionMenu());}
+ if(!teacher){await page.evaluate(()=>showModal('studentModal'));await page.locator('#gameCode').fill('SIDE-000');await page.locator('#companyLegalName').fill('Verificación '+name+' SAC');await page.locator('#companyBrandName').fill(name);await page.locator('#studentForm button[type=submit]').click();await page.waitForFunction(name=>studentConnected&&currentStudent.company===name,name);await page.evaluate(()=>{decisionState.__excel={habilitado:true,round:currentRound(),enviado:false,decisiones:SIDE_EXCEL_UI.nuevasDecisiones()};persistGameState();openDecisionMenu();});}
  return {page,context};
 }
 async function category(page,cat){await page.locator(`[data-cat="${cat}"]`).click();await page.waitForSelector('#excelProductionMount .excel-editor');await page.locator('#excelProductionMount details').evaluateAll(items=>items.forEach(el=>el.open=true));}

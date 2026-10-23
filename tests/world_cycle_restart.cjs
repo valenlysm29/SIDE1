@@ -108,9 +108,6 @@ const seed = {
       assert.equal(await page.evaluate(()=>JSON.stringify(cashLedger)),beforeExploration);
       await page.evaluate(()=>cycleQA.openDecisionsFrom3D());
       assert.equal(await submit(round,round===2),true);
-      // El Resumen conserva la misma posición en todos los ciclos. Después
-      // de enviar secciones individuales se abre explícitamente su pestaña.
-      await page.locator('[data-cat="A"]').click();
       assert.equal(await page.evaluate(()=>companySummaryRound),'current');
       await page.locator('#companyStartWorld').waitFor({state:'visible'});
       const ledger=await page.evaluate(()=>JSON.stringify(cashLedger));
