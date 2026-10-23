@@ -68,15 +68,59 @@
   function dopPlan(d,r){
     const pro=r.produccion,families={cuero:['CUERO','Cuero','m²'],accesorios:['ACCESORIOS','Accesorios','u.'],hilo:['HILO','Hilo','m']};
     const lots=(d.lotes||[]).map((l,index)=>({...l,index})).filter(l=>cfg().CONSUMO_MOLDE[l.molde]);
-    return {target:lots.reduce((s,l)=>s+numero(l.cantidad),0),producibleUnits:pro.totalProducido,efficiency:pro.factorEficienciaProduccion,
+    const exact=value=>Number(value.toPrecision(cfg().PRECISION_INVENTARIO));
+    // Excel D42:L44 starts with the desired quantities. Availability belongs only
+    // to the comparison below and never changes these requirements or scenarios.
+    const target=lots.reduce((s,l)=>s+numero(l.cantidad),0);
+    const priceCells={'INS-01':'V76','INS-02':'V77','INS-03':'V78','INS-04':'V79','INS-05':'V80','INS-06':'V81','INS-07':'V82','INS-08':'V83'};
+    const requiredMaterials=Object.entries(families).map(([family,[id,label,unit]])=>{
+      const needs=exact(lots.reduce((sum,l)=>sum+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0));
+      const options=cfg().INSUMOS_POR_FAMILIA[family].map(code=>({id:code,label:root.SIDE_EXCEL_PUNTAJES.indice[code]?.opcion||code,unit,quantity:needs,
+        unitPrice:cfg().PRECIO_MP[code],amount:exact(needs*cfg().PRECIO_MP[code]*(1-cfg().DESCUENTO_CANTIDAD)),
+        excelSource:'Costos De Producción!'+priceCells[code]+'; W76:W83 (8%)'}));
+      const selectedCodes=[...new Set(lots.filter(l=>numero(l.cantidad)>0).map(l=>l[family]))];
+      const amount=lots.every(l=>!numero(l.cantidad)||cfg().INSUMOS_POR_FAMILIA[family].includes(l[family]))?
+        exact(lots.reduce((sum,l)=>sum+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family]*(cfg().PRECIO_MP[l[family]]||0)*(1-cfg().DESCUENTO_CANTIDAD),0)):null;
+      return {id,label,unit,needs,options,selectedScenario:selectedCodes.length===1?selectedCodes[0]:null,amount,excelSource:'CANTIDAD DE PRODUCCIÓN!D42:L44'};
+    });
+    const unresolved=target?['El Excel recibe dotación y asignación de máquinas como entradas; no define una fórmula inversa de cantidad a personal, equipos o tiempo necesario.']:[];
+    const requiredProcesses=Object.entries(areas).map(([area,label],i)=>({id:['cut','assembly','finish'][i],label,units:target,
+      workersNeeded:target?null:0,machinesNeeded:target?null:0,laborDays:target?null:0,calendarDays:cfg().DIAS_CICLO,monthlyPayroll:target?null:0,unitWorkCost:null,
+      unresolved,excelSource:'CANTIDAD DE PRODUCCIÓN!E5:I20; K5:N5'}));
+    const costItems=requiredMaterials.map(row=>({id:row.id,label:row.label,amount:row.amount,excelSource:'Costos De Producción!V76:W83'}));
+    costItems.push(...requiredProcesses.map(row=>({id:'labor_'+row.id,label:'Mano de obra de '+row.label.toLowerCase(),amount:row.monthlyPayroll,excelSource:'Costos De Producción!U11:AD39'})),
+      {id:'equipment',label:'Equipos para la meta',amount:target?null:0,excelSource:'Costos De Producción!U45:AD71'});
+    const requirements={target,materials:requiredMaterials,processes:requiredProcesses,unresolved,costs:{items:costItems,
+      total:costItems.every(row=>row.amount!==null)?exact(costItems.reduce((sum,row)=>sum+row.amount,0)):null,
+      knownSubtotal:exact(costItems.reduce((sum,row)=>sum+(row.amount||0),0)),unresolved}};
+    const plan={target,producibleUnits:pro.totalProducido,efficiency:pro.factorEficienciaProduccion,
       productLines:lots.map((l,i)=>({id:String(i),label:'Lote '+(l.index+1),target:numero(l.cantidad),plannedUnits:pro.lotes.find(p=>p.indice===l.index)?.producido||0})),
       processes:Object.entries(areas).map(([area],i)=>({id:['cut','assembly','finish'][i],staff:pro.personal[area].flat().reduce((s,n)=>s+n,0),machines:area==='corte'?numero(d.maquinaria?.mesa):Object.entries(d.maquinaria||{}).filter(([k])=>area==='ensamble'?/^INF-0[234]$/.test(k):/^INF-0[567]$/.test(k)).reduce((s,[,v])=>s+numero(v),0),cycleCapacity:pro.capacidadPorArea[area]*cfg().DIAS_CICLO})),
-      materials:Object.entries(families).map(([family,[id,label,unit]])=>{const codes=cfg().INSUMOS_POR_FAMILIA[family],available=codes.reduce((s,k)=>s+numero(pro.disponibleInicial[k]),0),neededForTarget=lots.reduce((s,l)=>s+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0);return {id,label,unit,available,neededForTarget,shortfall:codes.reduce((sum,code)=>sum+Math.max(0,lots.filter(l=>l[family]===code).reduce((need,l)=>need+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0)-numero(pro.disponibleInicial[code])),0),selections:codes.filter(k=>pro.disponibleInicial[k]>0).map(k=>({label:root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion||k}))};})};
+      materials:Object.entries(families).map(([family,[id,label,unit]])=>{const codes=cfg().INSUMOS_POR_FAMILIA[family],available=codes.reduce((s,k)=>s+numero(pro.disponibleInicial[k]),0),neededForTarget=requiredMaterials.find(row=>row.id===id).needs;return {id,label,unit,available,neededForTarget,shortfall:codes.reduce((sum,code)=>sum+Math.max(0,lots.filter(l=>l[family]===code).reduce((need,l)=>need+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0)-numero(pro.disponibleInicial[code])),0),selections:codes.filter(k=>pro.disponibleInicial[k]>0).map(k=>({label:root.SIDE_EXCEL_PUNTAJES.indice[k]?.opcion||k}))};})};
+    const comparisonItems=Object.entries(families).map(([family,[id,label,unit]])=>{
+      const required=requiredMaterials.find(row=>row.id===id),codes=cfg().INSUMOS_POR_FAMILIA[family];
+      let missing=0,surplus=0,cover=0,complete=true;
+      for(const code of codes){
+        const needs=lots.filter(l=>l[family]===code).reduce((sum,l)=>sum+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0);
+        const gap=exact(needs-numero(pro.disponibleInicial[code]));missing+=Math.max(0,gap);surplus+=Math.max(0,-gap);
+        cover+=Math.max(0,gap)*cfg().PRECIO_MP[code]*(1-cfg().DESCUENTO_CANTIDAD);
+      }
+      const undefinedNeeds=lots.filter(l=>!codes.includes(l[family])).reduce((sum,l)=>sum+numero(l.cantidad)*cfg().CONSUMO_MOLDE[l.molde][family],0);
+      if(undefinedNeeds>0){missing+=undefinedNeeds;complete=false;}
+      return {id,label,unit,kind:'material',needs:required.needs,available:plan.materials.find(row=>row.id===id).available,
+        inventoryAvailable:codes.reduce((sum,code)=>sum+numero(pro.inventarioInicial[code]),0),purchasesAvailable:codes.reduce((sum,code)=>sum+numero(pro.compras[code]),0),
+        missing:exact(missing),surplus:exact(surplus),costToCover:complete?exact(cover):null,
+        costToCoverOptions:required.options.map(option=>({id:option.id,label:option.label,amount:exact(missing*option.unitPrice*(1-cfg().DESCUENTO_CANTIDAD))}))};
+    });
+    for(const process of requiredProcesses){const available=plan.processes.find(row=>row.id===process.id);comparisonItems.push({id:'capacity_'+process.id,label:'Capacidad de '+process.label.toLowerCase(),kind:'capacity',unit:'unidades/ciclo',needs:target,available:available.cycleCapacity,missing:Math.max(0,target-available.cycleCapacity),surplus:Math.max(0,available.cycleCapacity-target),costToCover:null});}
+    return {...plan,requirements,comparison:{items:comparisonItems,producibleUnits:pro.totalProducido,
+      currentCost:numero(r.costos?.costoMOciclo)+numero(r.costos?.valorCompradoNeto),currentCostScope:'Personal y compras del ciclo; no es el costo total de la meta',
+      costToCoverTotal:comparisonItems.some(row=>row.costToCover===null&&row.missing>0)?null:exact(comparisonItems.reduce((sum,row)=>sum+(row.costToCover||0),0))}};
   }
   function materialRecommendationHtml(d,r){
     const needs={};for(const l of d.lotes||[]){const consumption=cfg().CONSUMO_MOLDE[l.molde];if(!consumption)continue;for(const family of ['cuero','accesorios','hilo'])if(l[family])needs[l[family]]=(needs[l[family]]||0)+numero(l.cantidad)*consumption[family];}
-    const rows=Object.entries(needs).map(([code,need])=>{const available=numero(r.produccion.disponibleInicial[code]),missing=Math.max(0,need-available),conversion=cfg().CONVERSION_COMPRA[code],unit=cfg().INSUMOS_POR_FAMILIA.hilo.includes(code)?'m':cfg().INSUMOS_POR_FAMILIA.cuero.includes(code)?'m²':'u.';return `<tr><th>${e(root.SIDE_EXCEL_PUNTAJES.indice[code]?.opcion||code)}</th><td>${format(need)} ${unit}</td><td>${format(available)} ${unit}</td><td>${Math.ceil(Number((missing/conversion).toPrecision(15)))} × ${format(conversion)} ${unit}</td></tr>`;});
-    return `<div class="excel-table-wrap"><table><caption>Recomendación de compra por material elegido</caption><thead><tr><th>Material</th><th>Necesario</th><th>Disponible con tus compras</th><th>Compras adicionales sugeridas</th></tr></thead><tbody>${rows.length?rows.join(''):'<tr><td colspan="4">Elige molde, cantidad y materiales del lote para calcular las compras.</td></tr>'}</tbody></table><p class="excel-help">La sugerencia descuenta el inventario inicial y las compras del borrador. Cada compra se redondea a su unidad de venta; no compra ni descuenta caja automáticamente.</p></div>`;
+    const rows=Object.entries(needs).map(([code,need])=>{const available=numero(r.produccion.disponibleInicial[code]),missing=Math.max(0,need-available),conversion=cfg().CONVERSION_COMPRA[code],unit=cfg().INSUMOS_POR_FAMILIA.hilo.includes(code)?'m':cfg().INSUMOS_POR_FAMILIA.cuero.includes(code)?'m²':'u.';return `<tr><th>${e(root.SIDE_EXCEL_PUNTAJES.indice[code]?.opcion||code)}</th><td>${format(need)} ${unit}</td><td>${format(available)} ${unit}</td><td>${format(missing)} / ${format(conversion)} = ${format(missing/conversion)} presentaciones</td></tr>`;});
+    return `<div class="excel-table-wrap"><table><caption>Comparación por material elegido</caption><thead><tr><th>Material</th><th>Necesario</th><th>Disponible con tus compras</th><th>Equivalencia del faltante en compras</th></tr></thead><tbody>${rows.length?rows.join(''):'<tr><td colspan="4">Elige molde, cantidad y materiales del lote para calcular las compras.</td></tr>'}</tbody></table><p class="excel-help">La equivalencia descuenta el inventario inicial y las compras del borrador y divide por la conversión de Costos De Producción!D32:K33. El Excel no define cómo redondear compras; se muestra la división sin imponer unidades enteras. No compra ni descuenta caja automáticamente.</p></div>`;
   }
   // A preview reserves the plan's cash without recording a movement or guessing sales.
   function proyectarPlan(d,{cash=0,historial={},round=1,motorVersion}={}){
