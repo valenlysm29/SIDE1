@@ -1,0 +1,4071 @@
+{
+  "source": ".codex-work/DECISIONES_SIDE_16.xlsx",
+  "sha256": "3b6b42bbbc56a2534ce7e241c607d572dd38dcf02311683609497df36a0c1eb1",
+  "read_mode": "dos cargas openpyxl: fórmulas y data_only; nunca save ni COM",
+  "counterfactual_values": "expected_after_input_change es evaluación aritmética de fórmula literal, no caché del Excel modificado. original_cached siempre viene del original. No se afirma recálculo Excel independiente.",
+  "global_maximum_quantity": null,
+  "maximum_reason": "No hay validación numérica en hojas de cantidad/costos ni en C2:C4 de lotes. 396 es capacidad del ejemplo original, no máximo del modelo.",
+  "stock_used_to_derive_requirements": false,
+  "sheets": [
+    "Instrucciones",
+    "DECISIONES",
+    "Seleccion_Ciclo0",
+    "Catalogo_Decisiones",
+    "FlujoWeb",
+    "CANTIDAD DE PRODUCCIÓN",
+    "Costos De Producción",
+    "Lotes_Produccion",
+    "Motor_Puntajes",
+    "Matriz_Consecuencias"
+  ],
+  "evidence": {
+    "CANTIDAD DE PRODUCCIÓN": {
+      "D36": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520
+      },
+      "D37": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D37",
+        "formula_or_value": 250.0,
+        "original_cached": 250.0
+      },
+      "D38": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D38",
+        "formula_or_value": 180.0,
+        "original_cached": 180.0
+      },
+      "D39": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D39",
+        "formula_or_value": 90.0,
+        "original_cached": 90.0
+      },
+      "E35": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E35",
+        "formula_or_value": "=N5",
+        "original_cached": 396
+      },
+      "E37": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E37",
+        "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+        "original_cached": 190
+      },
+      "E38": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E38",
+        "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+        "original_cached": 137
+      },
+      "E39": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E39",
+        "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+        "original_cached": 68
+      },
+      "E5": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E5",
+        "formula_or_value": 5.0,
+        "original_cached": 5.0
+      },
+      "E6": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E6",
+        "formula_or_value": 7.0,
+        "original_cached": 7.0
+      },
+      "E7": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E7",
+        "formula_or_value": 9.0,
+        "original_cached": 9.0
+      },
+      "E11": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E11",
+        "formula_or_value": 6.0,
+        "original_cached": 6.0
+      },
+      "E12": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E12",
+        "formula_or_value": 8.0,
+        "original_cached": 8.0
+      },
+      "E13": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E13",
+        "formula_or_value": 12.0,
+        "original_cached": 12.0
+      },
+      "E17": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E17",
+        "formula_or_value": 6.0,
+        "original_cached": 6.0
+      },
+      "E18": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E18",
+        "formula_or_value": 7.0,
+        "original_cached": 7.0
+      },
+      "E19": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E19",
+        "formula_or_value": 10.0,
+        "original_cached": 10.0
+      },
+      "F10": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "F10",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "G10": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "G10",
+        "formula_or_value": 1.2,
+        "original_cached": 1.2
+      },
+      "H10": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "H10",
+        "formula_or_value": 1.5,
+        "original_cached": 1.5
+      },
+      "F16": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "F16",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "G16": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "G16",
+        "formula_or_value": 1.2,
+        "original_cached": 1.2
+      },
+      "H16": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "H16",
+        "formula_or_value": 1.5,
+        "original_cached": 1.5
+      },
+      "I8": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "I8",
+        "formula_or_value": "=SUM(I5:I7)",
+        "original_cached": 21
+      },
+      "I14": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "I14",
+        "formula_or_value": "=SUM(I11:I13)",
+        "original_cached": 31.4
+      },
+      "I20": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "I20",
+        "formula_or_value": "=SUM(I17:I19)",
+        "original_cached": 17.2
+      },
+      "K5": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "K5",
+        "formula_or_value": "=MIN(I8,I14,I20)",
+        "original_cached": 17.2
+      },
+      "L5": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "L5",
+        "formula_or_value": "=K5*24",
+        "original_cached": 412.8
+      },
+      "M5": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "M5",
+        "formula_or_value": "=K7+(F7+F13+F19)/100+4%*F21",
+        "original_cached": 0.96
+      },
+      "N5": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396
+      },
+      "K7": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "K7",
+        "formula_or_value": 0.9,
+        "original_cached": 0.9
+      },
+      "F21": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "F21",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "L9": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "L9",
+        "formula_or_value": "=SUM(F5:F7,F11:H13,F17:H19)",
+        "original_cached": 8
+      },
+      "L10": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "L10",
+        "formula_or_value": "=SUM(F7,F13:H13,F19:H19)",
+        "original_cached": 3
+      },
+      "M10": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "M10",
+        "formula_or_value": "=L10/L9",
+        "original_cached": 0.375
+      },
+      "D56": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D56",
+        "formula_or_value": "=MIN(SUM(D49:F49)/D31,SUM(G49:I49)/G31,SUM(J49:L49)/J31,E37,D37)",
+        "original_cached": 190
+      },
+      "E56": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "E56",
+        "formula_or_value": "=ROUNDDOWN(D56,0)",
+        "original_cached": 190
+      }
+    },
+    "Costos De Producción": {
+      "D38": {
+        "sheet": "Costos De Producción",
+        "cell": "D38",
+        "formula_or_value": 0.3,
+        "original_cached": 0.3
+      },
+      "E38": {
+        "sheet": "Costos De Producción",
+        "cell": "E38",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "F38": {
+        "sheet": "Costos De Producción",
+        "cell": "F38",
+        "formula_or_value": 6.0,
+        "original_cached": 6.0
+      },
+      "D39": {
+        "sheet": "Costos De Producción",
+        "cell": "D39",
+        "formula_or_value": 0.4,
+        "original_cached": 0.4
+      },
+      "E39": {
+        "sheet": "Costos De Producción",
+        "cell": "E39",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "F39": {
+        "sheet": "Costos De Producción",
+        "cell": "F39",
+        "formula_or_value": 7.0,
+        "original_cached": 7.0
+      },
+      "D40": {
+        "sheet": "Costos De Producción",
+        "cell": "D40",
+        "formula_or_value": 0.7,
+        "original_cached": 0.7
+      },
+      "E40": {
+        "sheet": "Costos De Producción",
+        "cell": "E40",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "F40": {
+        "sheet": "Costos De Producción",
+        "cell": "F40",
+        "formula_or_value": 13.0,
+        "original_cached": 13.0
+      },
+      "D46": {
+        "sheet": "Costos De Producción",
+        "cell": "D46",
+        "formula_or_value": 150.0,
+        "original_cached": 150.0
+      },
+      "D47": {
+        "sheet": "Costos De Producción",
+        "cell": "D47",
+        "formula_or_value": 140.0,
+        "original_cached": 140.0
+      },
+      "D48": {
+        "sheet": "Costos De Producción",
+        "cell": "D48",
+        "formula_or_value": 95.0,
+        "original_cached": 95.0
+      },
+      "E46": {
+        "sheet": "Costos De Producción",
+        "cell": "E46",
+        "formula_or_value": 150.0,
+        "original_cached": 150.0
+      },
+      "E47": {
+        "sheet": "Costos De Producción",
+        "cell": "E47",
+        "formula_or_value": 140.0,
+        "original_cached": 140.0
+      },
+      "E48": {
+        "sheet": "Costos De Producción",
+        "cell": "E48",
+        "formula_or_value": 78.0,
+        "original_cached": 78.0
+      },
+      "D49": {
+        "sheet": "Costos De Producción",
+        "cell": "D49",
+        "formula_or_value": "=SUM(D46:D48)",
+        "original_cached": 385
+      },
+      "E49": {
+        "sheet": "Costos De Producción",
+        "cell": "E49",
+        "formula_or_value": "=SUM(E46:E48)",
+        "original_cached": 368
+      },
+      "H46": {
+        "sheet": "Costos De Producción",
+        "cell": "H46",
+        "formula_or_value": "=D38*D46",
+        "original_cached": 45
+      },
+      "I46": {
+        "sheet": "Costos De Producción",
+        "cell": "I46",
+        "formula_or_value": "=D46*E38",
+        "original_cached": 150
+      },
+      "J46": {
+        "sheet": "Costos De Producción",
+        "cell": "J46",
+        "formula_or_value": "=F38*D46",
+        "original_cached": 900
+      },
+      "H47": {
+        "sheet": "Costos De Producción",
+        "cell": "H47",
+        "formula_or_value": "=D39*D47",
+        "original_cached": 56
+      },
+      "I47": {
+        "sheet": "Costos De Producción",
+        "cell": "I47",
+        "formula_or_value": "=D47*E39",
+        "original_cached": 140
+      },
+      "J47": {
+        "sheet": "Costos De Producción",
+        "cell": "J47",
+        "formula_or_value": "=F39*D47",
+        "original_cached": 980
+      },
+      "H48": {
+        "sheet": "Costos De Producción",
+        "cell": "H48",
+        "formula_or_value": "=D40*D48",
+        "original_cached": 66.5
+      },
+      "I48": {
+        "sheet": "Costos De Producción",
+        "cell": "I48",
+        "formula_or_value": "=D48*E40",
+        "original_cached": 95
+      },
+      "J48": {
+        "sheet": "Costos De Producción",
+        "cell": "J48",
+        "formula_or_value": "=F40*D48",
+        "original_cached": 1235
+      },
+      "H49": {
+        "sheet": "Costos De Producción",
+        "cell": "H49",
+        "formula_or_value": "=SUM(H46:H48)",
+        "original_cached": 167.5
+      },
+      "I49": {
+        "sheet": "Costos De Producción",
+        "cell": "I49",
+        "formula_or_value": "=SUM(I46:I48)",
+        "original_cached": 385
+      },
+      "J49": {
+        "sheet": "Costos De Producción",
+        "cell": "J49",
+        "formula_or_value": "=SUM(J46:J48)",
+        "original_cached": 3115
+      },
+      "E5": {
+        "sheet": "Costos De Producción",
+        "cell": "E5",
+        "formula_or_value": 6.0,
+        "original_cached": 6.0
+      },
+      "E6": {
+        "sheet": "Costos De Producción",
+        "cell": "E6",
+        "formula_or_value": 8.0,
+        "original_cached": 8.0
+      },
+      "E7": {
+        "sheet": "Costos De Producción",
+        "cell": "E7",
+        "formula_or_value": 12.0,
+        "original_cached": 12.0
+      },
+      "E17": {
+        "sheet": "Costos De Producción",
+        "cell": "E17",
+        "formula_or_value": 6.0,
+        "original_cached": 6.0
+      },
+      "E18": {
+        "sheet": "Costos De Producción",
+        "cell": "E18",
+        "formula_or_value": 8.0,
+        "original_cached": 8.0
+      },
+      "E19": {
+        "sheet": "Costos De Producción",
+        "cell": "E19",
+        "formula_or_value": 12.0,
+        "original_cached": 12.0
+      },
+      "K5": {
+        "sheet": "Costos De Producción",
+        "cell": "K5",
+        "formula_or_value": "=MIN(I8,I14,I20)",
+        "original_cached": 14
+      },
+      "L5": {
+        "sheet": "Costos De Producción",
+        "cell": "L5",
+        "formula_or_value": "=K5*30",
+        "original_cached": 420
+      },
+      "M5": {
+        "sheet": "Costos De Producción",
+        "cell": "M5",
+        "formula_or_value": "=K7+(F7+F13+F19)/100+4%*F21",
+        "original_cached": 0.91
+      },
+      "N5": {
+        "sheet": "Costos De Producción",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 382
+      },
+      "D32": {
+        "sheet": "Costos De Producción",
+        "cell": "D32",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "E32": {
+        "sheet": "Costos De Producción",
+        "cell": "E32",
+        "formula_or_value": 2.0,
+        "original_cached": 2.0
+      },
+      "F32": {
+        "sheet": "Costos De Producción",
+        "cell": "F32",
+        "formula_or_value": 2.0,
+        "original_cached": 2.0
+      },
+      "G32": {
+        "sheet": "Costos De Producción",
+        "cell": "G32",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "H32": {
+        "sheet": "Costos De Producción",
+        "cell": "H32",
+        "formula_or_value": 1.0,
+        "original_cached": 1.0
+      },
+      "I32": {
+        "sheet": "Costos De Producción",
+        "cell": "I32",
+        "formula_or_value": 270.0,
+        "original_cached": 270.0
+      },
+      "J32": {
+        "sheet": "Costos De Producción",
+        "cell": "J32",
+        "formula_or_value": 250.0,
+        "original_cached": 250.0
+      },
+      "K32": {
+        "sheet": "Costos De Producción",
+        "cell": "K32",
+        "formula_or_value": 200.0,
+        "original_cached": 200.0
+      },
+      "D33": {
+        "sheet": "Costos De Producción",
+        "cell": "D33",
+        "formula_or_value": "=D31*D32",
+        "original_cached": 60
+      },
+      "J33": {
+        "sheet": "Costos De Producción",
+        "cell": "J33",
+        "formula_or_value": "=J31*J32",
+        "original_cached": 1500
+      },
+      "U11": {
+        "sheet": "Costos De Producción",
+        "cell": "U11",
+        "formula_or_value": "=U10/12.5",
+        "original_cached": 1690.8
+      },
+      "U20": {
+        "sheet": "Costos De Producción",
+        "cell": "U20",
+        "formula_or_value": "=U19/12.5",
+        "original_cached": 2254.4
+      },
+      "U29": {
+        "sheet": "Costos De Producción",
+        "cell": "U29",
+        "formula_or_value": "=U28/12.5",
+        "original_cached": 4191.36
+      },
+      "Y11": {
+        "sheet": "Costos De Producción",
+        "cell": "Y11",
+        "formula_or_value": "=Y10/12.5",
+        "original_cached": 1690.8
+      },
+      "Y20": {
+        "sheet": "Costos De Producción",
+        "cell": "Y20",
+        "formula_or_value": "=Y19/12.5",
+        "original_cached": 3104.16
+      },
+      "Y29": {
+        "sheet": "Costos De Producción",
+        "cell": "Y29",
+        "formula_or_value": "=Y28/12.5",
+        "original_cached": 4952.4
+      },
+      "AC11": {
+        "sheet": "Costos De Producción",
+        "cell": "AC11",
+        "formula_or_value": "=AC10/12.5",
+        "original_cached": 1690.8
+      },
+      "AC20": {
+        "sheet": "Costos De Producción",
+        "cell": "AC20",
+        "formula_or_value": "=AC19/12.5",
+        "original_cached": 3104.16
+      },
+      "AC29": {
+        "sheet": "Costos De Producción",
+        "cell": "AC29",
+        "formula_or_value": "=AC28/12.5",
+        "original_cached": 4952.4
+      },
+      "U39": {
+        "sheet": "Costos De Producción",
+        "cell": "U39",
+        "formula_or_value": "=U38/12.5",
+        "original_cached": 3321.6
+      },
+      "Y39": {
+        "sheet": "Costos De Producción",
+        "cell": "Y39",
+        "formula_or_value": "=Y38/12.5",
+        "original_cached": 712.32
+      },
+      "AC33": {
+        "sheet": "Costos De Producción",
+        "cell": "AC33",
+        "formula_or_value": 2000.0,
+        "original_cached": 2000.0
+      },
+      "U45": {
+        "sheet": "Costos De Producción",
+        "cell": "U45",
+        "formula_or_value": 2500.0,
+        "original_cached": 2500.0
+      },
+      "Y45": {
+        "sheet": "Costos De Producción",
+        "cell": "Y45",
+        "formula_or_value": 3500.0,
+        "original_cached": 3500.0
+      },
+      "Y53": {
+        "sheet": "Costos De Producción",
+        "cell": "Y53",
+        "formula_or_value": 7500.0,
+        "original_cached": 7500.0
+      },
+      "Y61": {
+        "sheet": "Costos De Producción",
+        "cell": "Y61",
+        "formula_or_value": 15000.0,
+        "original_cached": 15000.0
+      },
+      "AC45": {
+        "sheet": "Costos De Producción",
+        "cell": "AC45",
+        "formula_or_value": 1200.0,
+        "original_cached": 1200.0
+      },
+      "AC53": {
+        "sheet": "Costos De Producción",
+        "cell": "AC53",
+        "formula_or_value": 4500.0,
+        "original_cached": 4500.0
+      },
+      "AC61": {
+        "sheet": "Costos De Producción",
+        "cell": "AC61",
+        "formula_or_value": 9500.0,
+        "original_cached": 9500.0
+      },
+      "U53": {
+        "sheet": "Costos De Producción",
+        "cell": "U53",
+        "formula_or_value": 300.0,
+        "original_cached": 300.0
+      },
+      "U60": {
+        "sheet": "Costos De Producción",
+        "cell": "U60",
+        "formula_or_value": 1200.0,
+        "original_cached": 1200.0
+      },
+      "U67": {
+        "sheet": "Costos De Producción",
+        "cell": "U67",
+        "formula_or_value": 3500.0,
+        "original_cached": 3500.0
+      },
+      "V76": {
+        "sheet": "Costos De Producción",
+        "cell": "V76",
+        "formula_or_value": 25.0,
+        "original_cached": 25.0
+      },
+      "V77": {
+        "sheet": "Costos De Producción",
+        "cell": "V77",
+        "formula_or_value": 45.0,
+        "original_cached": 45.0
+      },
+      "V78": {
+        "sheet": "Costos De Producción",
+        "cell": "V78",
+        "formula_or_value": 80.0,
+        "original_cached": 80.0
+      },
+      "V79": {
+        "sheet": "Costos De Producción",
+        "cell": "V79",
+        "formula_or_value": 4.0,
+        "original_cached": 4.0
+      },
+      "V80": {
+        "sheet": "Costos De Producción",
+        "cell": "V80",
+        "formula_or_value": 9.0,
+        "original_cached": 9.0
+      },
+      "V81": {
+        "sheet": "Costos De Producción",
+        "cell": "V81",
+        "formula_or_value": 2.0,
+        "original_cached": 2.0
+      },
+      "V82": {
+        "sheet": "Costos De Producción",
+        "cell": "V82",
+        "formula_or_value": 4.0,
+        "original_cached": 4.0
+      },
+      "V83": {
+        "sheet": "Costos De Producción",
+        "cell": "V83",
+        "formula_or_value": 7.0,
+        "original_cached": 7.0
+      },
+      "X76": {
+        "sheet": "Costos De Producción",
+        "cell": "X76",
+        "formula_or_value": "m²",
+        "original_cached": "m²"
+      },
+      "X81": {
+        "sheet": "Costos De Producción",
+        "cell": "X81",
+        "formula_or_value": "m",
+        "original_cached": "m"
+      },
+      "W76": {
+        "sheet": "Costos De Producción",
+        "cell": "W76",
+        "formula_or_value": "=V76-V76*8%",
+        "original_cached": 23
+      },
+      "AB76": {
+        "sheet": "Costos De Producción",
+        "cell": "AB76",
+        "formula_or_value": "=25*60",
+        "original_cached": 1500
+      },
+      "AB82": {
+        "sheet": "Costos De Producción",
+        "cell": "AB82",
+        "formula_or_value": "=4*6",
+        "original_cached": 24
+      },
+      "AC82": {
+        "sheet": "Costos De Producción",
+        "cell": "AC82",
+        "formula_or_value": "=AB82-AB82*8%",
+        "original_cached": 22.08
+      }
+    },
+    "Lotes_Produccion": {
+      "C2": {
+        "sheet": "Lotes_Produccion",
+        "cell": "C2",
+        "formula_or_value": 0.0,
+        "original_cached": 0.0
+      },
+      "C3": {
+        "sheet": "Lotes_Produccion",
+        "cell": "C3",
+        "formula_or_value": 0.0,
+        "original_cached": 0.0
+      },
+      "C4": {
+        "sheet": "Lotes_Produccion",
+        "cell": "C4",
+        "formula_or_value": 0.0,
+        "original_cached": 0.0
+      },
+      "C5": {
+        "sheet": "Lotes_Produccion",
+        "cell": "C5",
+        "formula_or_value": "=SUM(C2:C4)",
+        "original_cached": 0
+      },
+      "H2": {
+        "sheet": "Lotes_Produccion",
+        "cell": "H2",
+        "formula_or_value": "=IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($D2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($E2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$G$2:$G$57,MATCH($F2,Catalogo_Decisiones!$A$2:$A$57,0)),0)",
+        "original_cached": 0
+      },
+      "I2": {
+        "sheet": "Lotes_Produccion",
+        "cell": "I2",
+        "formula_or_value": "=IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($D2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($E2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($F2,Catalogo_Decisiones!$A$2:$A$57,0)),0)+IFERROR(INDEX(Catalogo_Decisiones!$H$2:$H$57,MATCH($G2,Catalogo_Decisiones!$A$2:$A$57,0)),0)",
+        "original_cached": 0
+      },
+      "J2": {
+        "sheet": "Lotes_Produccion",
+        "cell": "J2",
+        "formula_or_value": "=IFS($B2=\"SEG-01\",0,$B2=\"SEG-02\",4,$B2=\"SEG-03\",7,TRUE(),0)",
+        "original_cached": 0
+      },
+      "K2": {
+        "sheet": "Lotes_Produccion",
+        "cell": "K2",
+        "formula_or_value": "=IF(B2=\"\",\"\",IF(I2>=J2,\"Coherente\",\"No alcanza el segmento\"))",
+        "original_cached": null
+      },
+      "H5": {
+        "sheet": "Lotes_Produccion",
+        "cell": "H5",
+        "formula_or_value": "=SUMPRODUCT(C2:C4,H2:H4)",
+        "original_cached": 0
+      }
+    },
+    "Motor_Puntajes": {
+      "B6": {
+        "sheet": "Motor_Puntajes",
+        "cell": "B6",
+        "formula_or_value": "=IFERROR(SUMPRODUCT(Lotes_Produccion!C2:C4,Lotes_Produccion!I2:I4)/SUM(Lotes_Produccion!C2:C4),0)",
+        "original_cached": 0
+      },
+      "B9": {
+        "sheet": "Motor_Puntajes",
+        "cell": "B9",
+        "formula_or_value": "=SUM(Seleccion_Ciclo0!G2:G15)",
+        "original_cached": 0
+      },
+      "B10": {
+        "sheet": "Motor_Puntajes",
+        "cell": "B10",
+        "formula_or_value": "=SUM(Seleccion_Ciclo0!H2:H15)",
+        "original_cached": 0
+      },
+      "B11": {
+        "sheet": "Motor_Puntajes",
+        "cell": "B11",
+        "formula_or_value": "=SUM(Seleccion_Ciclo0!I2:I15)",
+        "original_cached": 0
+      }
+    },
+    "Matriz_Consecuencias": {
+      "C4": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "C4",
+        "formula_or_value": "< 4",
+        "original_cached": "< 4"
+      },
+      "D4": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "D4",
+        "formula_or_value": "Produccion real = 70% de lo planeado (retrasos)",
+        "original_cached": "Produccion real = 70% de lo planeado (retrasos)"
+      },
+      "C7": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "C7",
+        "formula_or_value": "Cantidad producida > capacidad instalada",
+        "original_cached": "Cantidad producida > capacidad instalada"
+      },
+      "D7": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "D7",
+        "formula_or_value": "Retraso de entrega, costo extra por horas extra",
+        "original_cached": "Retraso de entrega, costo extra por horas extra"
+      },
+      "C8": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "C8",
+        "formula_or_value": "Cantidad producida > demanda real del mercado",
+        "original_cached": "Cantidad producida > demanda real del mercado"
+      },
+      "D8": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "D8",
+        "formula_or_value": "Inventario sin vender, costo de almacenaje",
+        "original_cached": "Inventario sin vender, costo de almacenaje"
+      },
+      "C9": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "C9",
+        "formula_or_value": "Jefatura = No y Eficiencia < 5",
+        "original_cached": "Jefatura = No y Eficiencia < 5"
+      },
+      "D9": {
+        "sheet": "Matriz_Consecuencias",
+        "cell": "D9",
+        "formula_or_value": "Riesgo de descoordinacion: -5% produccion adicional",
+        "original_cached": "Riesgo de descoordinacion: -5% produccion adicional"
+      }
+    }
+  },
+  "cases": [
+    {
+      "name": "cero_todos",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 0
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": "#DIV/0!"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": "#DIV/0!"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": "#DIV/0!"
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "uno_basico",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 1
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 1
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0.3,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 6,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "uno_mejorado",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 1
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 1
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0.4,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 7,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "uno_premium",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 1
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 1
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0.7,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 13,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 396
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "diez_basico",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 10
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 10
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 3,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 10,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 60,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "diez_mejorado",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 10
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 10
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 4,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 10,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 70,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "diez_premium",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 10
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 10
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 7,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 10,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 130,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 396
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "capacidad_ejemplo_396",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 396
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 118.8,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 396,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 2376,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "sobre_capacidad_ejemplo_397",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 397
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 397
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 119.1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 397,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 2382,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": true,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "mezcla_uno_cada_molde",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 1
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 1
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 1
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 3
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0.3,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 6,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0.4,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 7,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0.7,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 13,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 132
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "mezcla_original_520",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 250
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 180
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 90
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 520
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 75,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 250,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 1500,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 72,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 180,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 1260,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 63,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 90,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 1170,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 190
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 137
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 68
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": true,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "mezcla_total_396",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 132
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 396
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 39.6,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 132,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 792,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 52.8,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 132,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 924,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 92.4,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 132,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 1716,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 132
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 132
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": false,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "premium_397",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 397
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 397
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 277.9,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 397,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 5161,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 396
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": true,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    },
+    {
+      "name": "supera_ejemplo_ampliamente_1000",
+      "inputs": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D37",
+          "formula_or_value": 250.0,
+          "original_cached": 250.0,
+          "set_to": 1000
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D38",
+          "formula_or_value": 180.0,
+          "original_cached": 180.0,
+          "set_to": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D39",
+          "formula_or_value": 90.0,
+          "original_cached": 90.0,
+          "set_to": 0
+        }
+      ],
+      "expected_total": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "D36",
+        "formula_or_value": "=SUM(D37:D39)",
+        "original_cached": 520,
+        "expected_after_input_change": 1000
+      },
+      "requirements": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "D42",
+          "formula_or_value": "=$D37*D31",
+          "original_cached": 75,
+          "material": "cuero",
+          "molde": "basico",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "D31",
+            "formula_or_value": 0.3,
+            "original_cached": 0.3
+          },
+          "expected_after_input_change": 300,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "G42",
+          "formula_or_value": "=$D37*G31",
+          "original_cached": 250,
+          "material": "accesorios",
+          "molde": "basico",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "G31",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 1000,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "J42",
+          "formula_or_value": "=$D37*J31",
+          "original_cached": 1500,
+          "material": "hilo",
+          "molde": "basico",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "J31",
+            "formula_or_value": 6.0,
+            "original_cached": 6.0
+          },
+          "expected_after_input_change": 6000,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E43",
+          "formula_or_value": "=$D38*E32",
+          "original_cached": 72,
+          "material": "cuero",
+          "molde": "mejorado",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "E32",
+            "formula_or_value": 0.4,
+            "original_cached": 0.4
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "H43",
+          "formula_or_value": "=$D38*H32",
+          "original_cached": 180,
+          "material": "accesorios",
+          "molde": "mejorado",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "H32",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "K43",
+          "formula_or_value": "=$D38*K32",
+          "original_cached": 1260,
+          "material": "hilo",
+          "molde": "mejorado",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "K32",
+            "formula_or_value": 7.0,
+            "original_cached": 7.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "F44",
+          "formula_or_value": "=$D39*F33",
+          "original_cached": 63,
+          "material": "cuero",
+          "molde": "premium",
+          "unit": "m²",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "F33",
+            "formula_or_value": 0.7,
+            "original_cached": 0.7
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "I44",
+          "formula_or_value": "=$D39*I33",
+          "original_cached": 90,
+          "material": "accesorios",
+          "molde": "premium",
+          "unit": "unidad",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "I33",
+            "formula_or_value": 1.0,
+            "original_cached": 1.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "L44",
+          "formula_or_value": "=$D39*L33",
+          "original_cached": 1170,
+          "material": "hilo",
+          "molde": "premium",
+          "unit": "m",
+          "coefficient_source": {
+            "sheet": "CANTIDAD DE PRODUCCIÓN",
+            "cell": "L33",
+            "formula_or_value": 13.0,
+            "original_cached": 13.0
+          },
+          "expected_after_input_change": 0,
+          "evaluation": "multiplicación literal; insumo necesario bruto, sin inventario"
+        }
+      ],
+      "capacity_fixed_example": {
+        "sheet": "CANTIDAD DE PRODUCCIÓN",
+        "cell": "N5",
+        "formula_or_value": "=ROUND(L5*M5,0)",
+        "original_cached": 396,
+        "expected_after_input_change": 396
+      },
+      "allocations_literal": [
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E37",
+          "formula_or_value": "=ROUNDDOWN(D37*E35/D36,0)",
+          "original_cached": 190,
+          "expected_after_input_change": 396
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E38",
+          "formula_or_value": "=ROUNDDOWN(D38*E35/D36,0)",
+          "original_cached": 137,
+          "expected_after_input_change": 0
+        },
+        {
+          "sheet": "CANTIDAD DE PRODUCCIÓN",
+          "cell": "E39",
+          "formula_or_value": "=ROUNDDOWN(D39*E35/D36,0)",
+          "original_cached": 68,
+          "expected_after_input_change": 0
+        }
+      ],
+      "quantity_exceeds_fixed_example_capacity": true,
+      "not_defined_by_workbook": {
+        "required_worker_mix": null,
+        "required_machine_mix": null,
+        "required_duration_days": null,
+        "global_maximum_quantity": null,
+        "rounded_purchase_packs": null,
+        "full_cost_for_quantity": null
+      }
+    }
+  ]
+}
