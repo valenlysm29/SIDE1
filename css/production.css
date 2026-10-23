@@ -699,30 +699,6 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
   #decisionMenu #decisionTopbar .top-submit-all { min-width: 118px; padding: 8px; font-size: 11px; }
 }
 /* Decisiones: tarjetas de elección del estudiante, con los tokens compartidos. */
-.excel-editor .excel-decision-card{min-width:0;margin:0;padding:18px;border:1px solid var(--side-line);border-radius:var(--side-radius-card);background:var(--side-decision-raised)}
-.excel-editor .excel-decision-card legend{padding:0 8px;color:var(--side-text-bright);font-size:1rem;font-weight:800;max-width:100%}
-.excel-decision-card__meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:.75rem}
-.excel-decision-badge{padding:4px 9px;border:1px solid var(--side-line-control);border-radius:var(--side-radius-pill);color:var(--side-text-muted)}
-.excel-decision-badge.is-required{border-color:var(--side-gold);color:var(--side-gold)}
-.excel-decision-impact{color:var(--side-success);font-weight:700}
-.excel-editor .excel-decision-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,185px),1fr));gap:10px;width:100%}
-.excel-editor label.excel-decision-option{display:flex;flex-direction:row;align-items:flex-start;gap:10px;border:1px solid var(--side-line-control);border-radius:var(--side-radius-control);padding:14px;cursor:pointer;background:var(--side-panel-inset);font-weight:500;min-width:0}
-.excel-editor .excel-decision-option:has(input:checked){border-color:var(--side-gold);background:var(--side-decision-panel);box-shadow:inset 0 0 0 1px var(--side-gold)}
-.excel-editor .excel-decision-option input[type=radio]{width:18px;height:18px;min-height:18px;margin:3px 0 0;flex-shrink:0;accent-color:var(--side-gold);padding:0}
-.excel-decision-option span{display:flex;flex-direction:column;gap:6px;min-width:0}.excel-decision-option strong{font-size:.875rem;color:var(--side-text-bright)}
-.excel-decision-option b{color:var(--side-gold);font-size:1rem;font-variant-numeric:tabular-nums}.excel-decision-option small{color:var(--side-text-muted);font-size:.75rem;line-height:1.5}
-.excel-editor .excel-decision-save{margin-top:12px;min-height:44px;color:var(--side-gold);border-color:var(--side-gold);padding:10px 16px;background:var(--side-decision-panel)}
-.excel-editor .excel-grid:has(>.excel-decision-card){grid-template-columns:1fr}
-.excel-editor .excel-decision-card>label>input[type=number]{max-width:260px;font-size:1.25rem;font-weight:700;min-height:48px}
-.excel-editor select[hidden],.excel-editor input[hidden],.excel-editor label[hidden]{display:none!important}
-.excel-editor .excel-table-wrap:has(.excel-decision-card) table{table-layout:fixed;min-width:900px}
-.excel-editor .excel-table-wrap .excel-decision-card{padding:10px;white-space:normal}.excel-editor .excel-table-wrap .excel-decision-card legend{font-size:.75rem}.excel-editor .excel-table-wrap .excel-decision-card__meta{gap:6px;margin-bottom:8px}
-.excel-editor--section>.excel-cycle-help{margin-top:12px}.excel-editor--section>header{display:flex;margin-bottom:18px}
-@media(max-width:600px){.excel-editor .excel-decision-card{padding:14px 12px}.excel-editor .excel-decision-options{grid-template-columns:1fr}.excel-editor .excel-decision-save{width:100%}.excel-editor .excel-decision-card>label>input[type=number]{max-width:100%}.excel-editor .excel-table-wrap .excel-decision-save{font-size:.75rem;padding:8px}}
-.excel-personal-cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr))}.excel-personal-quantities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.excel-editor .excel-personal-quantities input{font-size:1.15rem;font-weight:700}.excel-editor .excel-table-wrap:has(.excel-personal-cards){overflow:visible}.excel-personal-quantities label{font-size:.75rem!important}
-@media(max-width:600px){.excel-personal-cards{grid-template-columns:1fr}.excel-personal-quantities{gap:8px}}
-.excel-editor .excel-decision-subcontrol{min-width:0;border:0;border-top:1px solid var(--side-line);padding:12px 0;margin:0}.excel-editor .excel-decision-subcontrol legend{font-size:.875rem;font-weight:700;padding:0 6px;color:var(--side-text)}.excel-editor .excel-decision-subcontrol .excel-decision-badge{display:none}.excel-editor .excel-decision-subcontrol .excel-decision-card__meta{justify-content:flex-end;margin-bottom:8px}.excel-editor .excel-decision-group .excel-choice-disclosure{padding:6px 0}.excel-editor .excel-choice-disclosure summary{font-size:.875rem}.excel-editor .excel-personal-cards{grid-template-columns:1fr}.excel-editor .excel-decision-group .excel-decision-subcontrol small{font-weight:400;color:var(--side-text-muted)}
-.excel-decision-dirty{color:var(--side-gold);font-size:.8rem;font-weight:700;margin-bottom:4px}.excel-decision-dirty[hidden]{display:none}
 
 /* Restore the saved-balance heading; compact legacy rules had clipped it away. */
 #decisionMenu .sticky-section-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,auto);align-items:center;gap:16px}
@@ -730,9 +706,6 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 #decisionMenu .section-balance{position:static;width:auto;height:auto;min-width:0;padding:0 0 0 16px;overflow:visible;clip-path:none;text-align:right}
 #decisionMenu .section-balance span,#decisionMenu .section-balance small{display:block;font-size:10px;line-height:1.4}
 #decisionMenu .section-balance strong{font-size:20px;white-space:nowrap;overflow-wrap:normal}
-#decisionMenu .excel-editor--section>header{display:none}
-#decisionMenu .excel-compulsory-details{padding-block:8px}
-#decisionMenu .excel-compulsory-details>summary{font-size:12px;color:var(--side-gold);min-height:32px}
 @media(max-width:600px){#decisionMenu .sticky-section-head{grid-template-columns:1fr;gap:8px}#decisionMenu .section-balance{text-align:left;border-left:0;padding:0;display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center}#decisionMenu .section-balance small{grid-column:1/-1}#decisionMenu .section-balance strong{font-size:18px}}
 
 /* One production workbench; the selector changes the view, not other mold targets. */
@@ -785,7 +758,6 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .pd-target-first .pd-unresolved { color: var(--ui-muted); font-size: 12px; line-height: 1.5; margin: 0; }
 .pd-target-first .pd-unresolved-details { color: var(--ui-muted); border-top: 1px solid var(--ui-line); padding-top: 12px; font-size: 13px; }
 .pd-target-first .pd-unresolved-details summary { color: var(--ui-blue); cursor: pointer; }
-.pd-target-first .pd-excel-note { margin: 0; color: var(--ui-muted); font-size: 12px; line-height: 1.55; }
 .pd-target-first .pd-comparison { padding: 20px; border: 1px solid var(--ui-line); border-radius: var(--ui-radius); background: var(--ui-panel); }
 .pd-target-first .pd-comparison table { min-width: 740px; }
 .pd-target-first .pd-metrics { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }

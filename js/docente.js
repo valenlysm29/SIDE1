@@ -313,8 +313,8 @@ function beginTimer(auto=false,referenceStart=null){
   state.timer=setInterval(()=>{state.seconds=Math.max(0,duration-Math.floor((Date.now()-started)/1000));updateTimer();if(state.seconds<=0)finishTime()},1000);
 }
 function startTimer(){if(state.lifecycleVersion===2){controlGame(runtime()?.running?'pausar':'reanudar');return;}if(!gameStatus()?.active){toast('Primero pulsa Iniciar partida.');return}if(state.round===1&&state.integrationMinutes===60){toast('El período de integración dura una hora y no se pausa.');return}if(cycleMode()==='automatic'){toast('El reloj se controla por la programación automática.');return}if(state.timer){stopTimer('paused');$('roundState').textContent='Pausado';return}beginTimer(false)}
-function finishTime(){if(state.timer){clearInterval(state.timer);state.timer=null}if(!(state.round===1&&state.integrationMinutes===60))closeExcelLocalRound();state.seconds=0;state.roundClosed=true;writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Tiempo finalizado';addEvent('Tiempo del ciclo agotado.','sistema');if(state.round===1&&state.integrationMinutes===60&&cycleMode()==='manual'){advanceRound(false);if(gameStatus()?.active)beginTimer(false)}else if(cycleMode()==='automatic')advanceRound(true);else toast('Tiempo agotado. El docente puede avanzar cuando quiera.')}
-function cutRound(){if(state.lifecycleVersion===2){controlGame('cerrar');return;}if(!gameStatus()?.active||state.round===1&&state.integrationMinutes===60){toast('El ciclo de integración debe completar una hora.');return}if(cycleMode()!=='manual'){toast('En modo automático el ciclo se controla por programación.');return}closeExcelLocalRound();if(state.timer){clearInterval(state.timer);state.timer=null}state.seconds=0;state.roundClosed=true;updateTimer();writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Ciclo cortado por docente';addEvent('El docente cerró el ciclo manualmente.','sistema');toast('Ciclo cerrado. Ya puedes avanzar.')}
+function finishTime(){if(state.timer){clearInterval(state.timer);state.timer=null}if(!(state.round===1&&state.integrationMinutes===60))closeBusinessLocalRound();state.seconds=0;state.roundClosed=true;writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Tiempo finalizado';addEvent('Tiempo del ciclo agotado.','sistema');if(state.round===1&&state.integrationMinutes===60&&cycleMode()==='manual'){advanceRound(false);if(gameStatus()?.active)beginTimer(false)}else if(cycleMode()==='automatic')advanceRound(true);else toast('Tiempo agotado. El docente puede avanzar cuando quiera.')}
+function cutRound(){if(state.lifecycleVersion===2){controlGame('cerrar');return;}if(!gameStatus()?.active||state.round===1&&state.integrationMinutes===60){toast('El ciclo de integración debe completar una hora.');return}if(cycleMode()!=='manual'){toast('En modo automático el ciclo se controla por programación.');return}closeBusinessLocalRound();if(state.timer){clearInterval(state.timer);state.timer=null}state.seconds=0;state.roundClosed=true;updateTimer();writeRuntime({running:false,remaining:0,status:'finished'});$('roundState').textContent='Ciclo cortado por docente';addEvent('El docente cerró el ciclo manualmente.','sistema');toast('Ciclo cerrado. Ya puedes avanzar.')}
 function refreshAutomaticRuntime(){
   if(state.lifecycleVersion===2){refreshTeacherGame();return;}
 
@@ -507,7 +507,7 @@ async function refreshTeacherGame(){
     teacherBusy=true;
     const id=state.partidaId,generation=roomGeneration;
     const stillCurrent=()=>id===state.partidaId&&generation===roomGeneration;
-    try{teacherRead=window.SIDE.PartidaService.controlar(id,'sincronizar');const result=await teacherRead;if(!stillCurrent())return false;if(!result.success){console.error('SIDE: sincronización de sala',result);creationFeedback('No se pudo sincronizar la sala: '+(result.error||'comprueba la conexión y reintenta.'),'error');return false;}const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!stillCurrent()||!await closeExcelRemoteRound(cycle))return false;}if(!stillCurrent())return false;applyTeacherState(result.data);return true;}
+    try{teacherRead=window.SIDE.PartidaService.controlar(id,'sincronizar');const result=await teacherRead;if(!stillCurrent())return false;if(!result.success){console.error('SIDE: sincronización de sala',result);creationFeedback('No se pudo sincronizar la sala: '+(result.error||'comprueba la conexión y reintenta.'),'error');return false;}const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!stillCurrent()||!await closeBusinessRemoteRound(cycle))return false;}if(!stillCurrent())return false;applyTeacherState(result.data);return true;}
     catch(error){if(stillCurrent()){console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message,'error');}return false;}
     finally{teacherBusy=false;}
   }else{
@@ -553,16 +553,15 @@ async function controlGame(action){
   teacherBusy=true;
   try{
     if(state.partidaId){
-      if(['cerrar','avanzar'].includes(action)&&state.authoritative?.runtime?.phase!=='integration'){
-        for(let cycle=1;cycle<=expectedRound;cycle++){const excel=await closeExcelRemoteRound(cycle);if(!excel)return false;}
-      }
+      const settles=['cerrar','avanzar'].includes(action)&&state.authoritative?.runtime?.phase!=='integration';
       const result=await window.SIDE.PartidaService.controlar(state.partidaId,action,null,expectedRound);
       if(!result.success){toast(result.error||'No se pudo actualizar la partida.');return false;}
       if(action==='cancelar'&&!result.data?.configuracion?.cancelledAt){toast('La cancelación no se aplicó. Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql.');return false;}
       applyTeacherState(result.data);
+      if(settles)for(let cycle=1;cycle<=expectedRound;cycle++){if(!await closeBusinessRemoteRound(cycle))return false;}
     }else{
       const c={...state.authoritative},r={...c.runtime},now=new Date().toISOString(),duration=roundSeconds();
-      if(action==='cerrar'||action==='avanzar'&&r.phase==='decisions')closeExcelLocalRound();
+      if(action==='cerrar'||action==='avanzar'&&r.phase==='decisions')closeBusinessLocalRound();
       if(action==='cancelar'){c.cancelledAt=now;Object.assign(r,{phase:'cancelled',status:'simulation-finished',running:false,remaining:0});}
       else if(action==='iniciar'&&r.phase==='integration'&&cycleMode()==='manual'){
         c.gameStartAt=now;c.gameStartedAt=now;Object.assign(r,{phase:'decisions',status:'running',running:true,startedAt:now,duration,remaining:duration});
@@ -668,7 +667,7 @@ function advanceRound(fromAuto=false){
     toast('Espera a que termine la hora de integración.');return;
   }
   if(cycleMode()==='automatic'&&!fromAuto){toast('Los ciclos avanzan según el calendario automático.');return}
-  closeExcelLocalRound();
+  closeBusinessLocalRound();
   const max=Number($('cycles').value||6);
   if(state.round>=max){
     if(state.timer){clearInterval(state.timer);state.timer=null}
@@ -804,13 +803,12 @@ async function supabaseReports(reportsBase=state.reports){
       enviado:rows.some(d=>d.enviada)||!!local?.enviado,
       eventos:local?.eventos||[],
       estadoResultados:rep?.estado_resultados||local?.estadoResultados||{},
-      excelDecisionState:rep?.estado_resultados?.excelDecisionState||local?.excelDecisionState||null,
       balanceCaja:rep?.balance_caja||local?.balanceCaja||{},
-      balanceGeneral:rep?.estado_resultados?.excel?.financial?.balanceGeneral||rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
+      balanceGeneral:rep?.balance_caja?.balanceGeneral||local?.balanceGeneral||{},
       flujoCaja:rep?.flujo_caja||local?.flujoCaja||{},
       apartados:prog.total>0?prog.apartados:(local?.apartados||{}),progreso:prog.total>0?prog.progreso:(local?.progreso||0),
       score:rep?Number(rep.score):(local?.score||0),
-      estado:p.expulsada_at||emp.estado==='eliminada'||rep?.estado_resultados?.excelDecisionState?.eliminada||rep?.estado_resultados?.excelDecisionState?.historial?.eliminada?'eliminada':'activa',expulsadaAt:p.expulsada_at||null,tomandoDecisiones:!p.expulsada_at&&!!local?.tomandoDecisiones,
+      estado:p.expulsada_at||emp.estado==='eliminada'?'eliminada':'activa',expulsadaAt:p.expulsada_at||null,tomandoDecisiones:!p.expulsada_at&&!!local?.tomandoDecisiones,
       conectada:Boolean(p.last_seen_at),lastSeenAt:p.last_seen_at||null,integracion:runtime()?.phase==='integration',
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
@@ -1008,31 +1006,24 @@ function renderResults(){
   const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
   $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',[['Ventas netas',er.ventasNetas??er.ingresos??r.ingresos],['Gastos operativos',er.costos??r.costos],['Impacto de eventos',er.impactoEventos],['Otros resultados',Number(er.resultadoVentaActivos||0)+Number(er.otros||0)],['Utilidad',er.utilidad??r.utilidad]])}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Activos fijos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
-  if(er.excel&&window.SIDE_EXCEL_UI)$('detailReports').insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(er.excel));
 }
-function closeExcelLocalRound(){
-  if(state.partidaId||!window.SIDE_EXCEL_UI)return null;
+function closeBusinessLocalRound(){
+  if(state.partidaId||!window.SIDE_CYCLE_MODEL)return null;
   let reports=[];try{reports=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]');}catch{}
-  const closure=window.SIDE_EXCEL_UI.cerrarLocal({game:$('gameCode').value||'SIDE-000',ciclo:state.round,reports});
-  if(closure){state.reports=reports;renderResults();addEvent('Cierre local por lotes calculado para las empresas participantes.','sistema');}
-  return closure;
+  const closure=window.SIDE_CYCLE_MODEL.closeReports({reports,game:$('gameCode').value||'SIDE-000',round:state.round,catalog:window.SIDE_DECISION_CATALOG});
+  localStorage.setItem('SIDE_STUDENT_REPORTS',JSON.stringify(reports));
+  state.reports=reports;renderResults();return closure;
 }
-async function closeExcelRemoteRound(ciclo){
+async function closeBusinessRemoteRound(ciclo){
   if(!state.partidaId)return true;
-  const service=window.SIDE?.PartidaService;if(!service?.cerrarExcel)return false;
-  const response=await service.cerrarExcel(state.partidaId,ciclo);
+  const response=await window.SIDE.PartidaService.cerrarNegocio(state.partidaId,ciclo);
   if(!response.success){
-    if(response.migrationMissing&&!state.reports.some(r=>r.excelDecisionState?.habilitado||r.estadoResultados?.excel))return true;
-    toast(response.migrationMissing?'Aplica supabase/migrations/2026-10-11_logica_excel.sql para cerrar las empresas por lotes.':response.error||'No se pudo guardar el cierre.');
-    const status=$('roundState');if(status){status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;let retry=$('retryExcelClosure');if(!retry){retry=document.createElement('button');retry.id='retryExcelClosure';retry.type='button';retry.className='side-button';retry.textContent='Reintentar cierre';status.insertAdjacentElement('afterend',retry);}retry.onclick=async()=>{retry.disabled=true;try{await refreshTeacherGame();}finally{retry.disabled=false;}};}
+    toast(response.migrationMissing?'Aplica la migración 20261023_cierre_negocio.sql para habilitar el cierre de ciclos.':response.error||'No se pudo guardar el cierre del ciclo.');
+    const status=$('roundState');if(status)status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;
     return false;
   }
-  if(response.data){
-    for(const r of state.reports){const result=response.data.resultadosPorEmpresa?.[String(r.empresaId)];if(result)window.SIDE_EXCEL_CAJA.aplicarReporte(r,result);}
-    persistReports();renderResults();
-  }
-  $('retryExcelClosure')?.remove();
-  return true;
+  for(const report of state.reports){const result=response.data?.resultadosPorEmpresa?.[String(report.empresaId)];if(!result)continue;const f=result.financial;Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});}
+  persistReports();renderResults();return true;
 }
 function renderWinnerSelect(){renderPodium();
 }

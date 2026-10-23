@@ -16,7 +16,7 @@ function acknowledgeCycleCostNotice(){
   catch(error){console.warn('SIDE: el aviso se cerró; su confirmación sigue pendiente de guardar.',error);}
 }
 function maybeShowCycleCostNotice(){
-  if(!studentConnected||!studentAccess().canOperate||decisionState.__excel?.habilitado)return null;
+  if(!studentConnected||!studentAccess().canOperate)return null;
   // Admission, recovery and other dialogs take priority; never replace them.
   if(!$('modalRoot')?.classList.contains('hidden')&&$('cycleCostsModal')?.classList.contains('hidden'))return null;
   if(activeCycleCostNotice?.owner===cycleCostNoticeOwner()&&activeCycleCostNotice.round===currentRound()&&!$('cycleCostsModal')?.classList.contains('hidden'))return null;

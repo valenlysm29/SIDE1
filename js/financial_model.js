@@ -4,12 +4,13 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100;
-  function calculate({capital=0,ledger={},sectionsByRound={},catalog=[],round=1}={}){
+  function calculate({capital=0,ledger={},sectionsByRound={},catalog=[],round=1,openingBalance=null}={}){
+    const seed=openingBalance||{},seedRound=Math.max(0,n(seed.round)),seedBG=seed.balanceGeneral||{};
     const items=new Map(catalog.flatMap(c=>c.items||[]).map(i=>[i.id,i]));
     const periods=new Map();
     function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[]});return periods.get(r);}
     for(const [key,value] of Object.entries(ledger)){
-      const [cycle,kind]=key.split(':'),r=Number(cycle);if(!Number.isInteger(r)||r<1||r>round)continue;
+      const [cycle,kind]=key.split(':'),r=Number(cycle);if(!Number.isInteger(r)||r<1||r>round||r<=seedRound)continue;
       const p=period(r),amount=n(value);p.neto+=amount;
       if(kind==='CAPITAL_ADJUSTMENT')p.aportes+=amount;
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
@@ -36,8 +37,8 @@
       }
     }
     // Include quiet cycles so the student can review every played period.
-    for(let r=1;r<=round;r++)period(r);
-    let cash=n(capital),assets=0,debt=0,earnings=0,equity=n(capital);const history=[];
+    for(let r=Math.max(1,seedRound+1);r<=round;r++)period(r);
+    let cash=openingBalance?n(seed.cash??seedBG.efectivo):n(capital),assets=n(seedBG.activosFijos),debt=n(seedBG.deuda),earnings=n(seedBG.resultadosAcumulados),equity=openingBalance?n(seedBG.capital??capital):n(capital);const otherAssets=Math.max(0,n(seedBG.activos)-n(seedBG.efectivo)-assets),history=JSON.parse(JSON.stringify(seed.history||[])).filter(row=>Number(row.round)<=Math.min(round,seedRound));
     for(const p of [...periods.values()].sort((a,b)=>a.r-b.r)){
       const initial=cash,operating=p.ventas-p.devoluciones-p.gastos+p.eventos+p.otros;
       const investing=p.ventaActivos-p.comprasActivos,financing=p.prestamos+p.aportes;
@@ -47,7 +48,7 @@
       const er={ingresos:money(p.ventas),devoluciones:money(p.devoluciones),ventasNetas:money(p.ventas-p.devoluciones),costos:money(p.gastos),impactoEventos:money(p.eventos),otros:money(p.otros),resultadoVentaActivos:money(disposal),utilidad:money(profit)};
       const fc={cobrosVentas:money(p.ventas),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto),cajaInicial:money(initial),cajaFinal:money(cash)};
       const bc={cajaInicial:money(initial),entradas:money(p.ventas+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
-      const bg={efectivo:money(cash),activosFijos:money(assets),activos:money(cash+assets),deuda:money(debt),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+equity+earnings)};
+      const bg={efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(otherAssets),activos:money(cash+assets+otherAssets),deuda:money(debt),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+equity+earnings)};
       history.push({round:p.r,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle});
     }
     return {...history.at(-1),history};

@@ -6,7 +6,7 @@ window.SIDE_DECISION_CATALOG = [
   },
   {
     cat:'B', title:'Infraestructura', short:'Infraestructura', icon:'assets/icons/categories/infraestructura.svg',
-    desc:'Compra activos, define el local de producción y administra el mantenimiento de la planta. El precio de compra incluye instalación y capacitación según el Excel.',
+    desc:'Compra activos, define el local de producción y administra el mantenimiento de la planta.',
     items:[
       // dailyCapacity = unidades/día que aporta CADA equipo de esa opción (valor referencial,
       // ajustar al modelo real del curso). liquidationRate = % del costo original que se
@@ -42,27 +42,27 @@ window.SIDE_DECISION_CATALOG = [
     desc:'Define el volumen del ciclo y organiza el personal que opera la línea única de corte, ensamblado y acabado.',
     items:[
       {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir por cada tipo de molde. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
-      {id:'PERS_CORTE',required:false,name:'Personal de corte',desc:'El costo mensual incluye las cargas laborales MYPE de la hoja de costos del Excel.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
+      {id:'PERS_CORTE',required:false,name:'Personal de corte',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1500},
         {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2500},
         {id:'corte_maestro',label:'Maestro cortador',desc:'Especialista para materiales y diseños complejos.',cost:4000}
       ]},
-      {id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',desc:'El costo mensual incluye las cargas laborales MYPE de la hoja de costos del Excel.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
+      {id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'ens_personal_basico',label:'Costurero básico',desc:'Adecuado para diseños simples y tareas repetitivas.',cost:1500},
         {id:'ens_personal_ind',label:'Maquinista industrial',desc:'Opera equipos industriales con mayor productividad.',cost:2800},
         {id:'ens_personal_esp',label:'Marroquinero especializado',desc:'Especialista para piezas complejas y líneas premium.',cost:4500}
       ]},
-      {id:'PERS_ACABADO',required:false,name:'Personal de acabados',desc:'El costo mensual incluye las cargas laborales MYPE de la hoja de costos del Excel.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
+      {id:'PERS_ACABADO',required:false,name:'Personal de acabados',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'aca_personal_basico',label:'Operario de acabado',desc:'Realiza acabados básicos y tareas de apoyo.',cost:1500},
         {id:'aca_personal_tec',label:'Técnico en acabados',desc:'Maneja herramientas y equipos de acabado.',cost:2800},
         {id:'aca_personal_art',label:'Artesano acabador',desc:'Realiza acabados finos y detalles especiales.',cost:4500}
       ]},
-      {id:'JEFATURA',required:false,name:'Jefatura de producción',desc:'El costo mensual incluye las cargas laborales MYPE de la hoja de costos del Excel.',type:'choice',recurring:true,options:[
+      {id:'JEFATURA',required:false,name:'Jefatura de producción',desc:'Costo mensual del personal elegido.',type:'choice',recurring:true,options:[
         {id:'no_jefatura',label:'No contratar',desc:'La coordinación queda a cargo del equipo.',cost:0},
         {id:'si_jefatura',label:'Contratar',desc:'Incorpora una jefatura para coordinar la operación.',cost:3000}
       ]},
       {id:'LIMPIEZA',name:'Limpieza y servicios generales',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['limpieza'],options:[
-        {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo mensual obligatorio, incluidas las cargas laborales MYPE de la hoja de costos del Excel.',cost:600}
+        {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo operativo fijo obligatorio para mantener el área de producción.',cost:600}
       ]},
       {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:[
         {id:'pt_30',label:'Cobertura comercial 30 días',desc:'Política básica de respaldo al cliente para productos terminados.',cost:0,value:30},
@@ -79,19 +79,19 @@ window.SIDE_DECISION_CATALOG = [
         {id:'no_analista',label:'No contratar',desc:'Compras sin negociación especializada.',cost:0},
         {id:'si_analista',label:'Contratar',desc:'S/ 5,000 por ciclo. Negocia mejores condiciones; el beneficio porcentual es mayor al inicio y luego se reduce.',cost:5000}
       ]},
-      {id:'CUERO',name:'Compra de cuero',desc:'Precio por rollo o piel, convertido a m² según el Excel; incluye el descuento general del 8% y, si se contrata, el del analista.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
+      {id:'CUERO',name:'Compra de cuero',desc:'Cantidad en metros cuadrados (m²). El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
         {id:'cuero_sint',label:'Cuero sintético',desc:'Alternativa económica.',cost:25},
-        {id:'cuero_std',label:'Cuero genuino estándar',desc:'Balance entre costo y durabilidad.',cost:45},
-        {id:'cuero_prem',label:'Cuero genuino premium',desc:'Mayor durabilidad y acabado.',cost:80}
+        {id:'cuero_std',label:'Cuero genuino estándar',desc:'Balance entre costo y durabilidad.',cost:90},
+        {id:'cuero_prem',label:'Cuero genuino premium',desc:'Mayor durabilidad y acabado.',cost:140}
       ]},
-      {id:'ACCESORIOS',name:'Compra de accesorios',desc:'Precio por juego de accesorios; incluye el descuento general del 8% del Excel y, si se contrata, el del analista.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
-        {id:'acc_eco',label:'Aleación económica',desc:'Accesorio funcional de menor costo.',cost:4},
-        {id:'acc_prem',label:'Metal premium',desc:'Mayor durabilidad y mejor acabado.',cost:9}
+      {id:'ACCESORIOS',name:'Compra de accesorios',desc:'Cantidad en unidades. El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
+        {id:'acc_eco',label:'Aleación económica',desc:'Accesorio funcional de menor costo.',cost:2},
+        {id:'acc_prem',label:'Metal premium',desc:'Mayor durabilidad y mejor acabado.',cost:5}
       ]},
-      {id:'HILO',name:'Compra de hilo',desc:'Precio por carrete, convertido a metros según el Excel; incluye el descuento general del 8% y, si se contrata, el del analista.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
-        {id:'hilo_std',label:'Poliéster estándar',desc:'Opción de costo bajo y resistencia media.',cost:2},
-        {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:4},
-        {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:7}
+      {id:'HILO',name:'Compra de hilo',desc:'Cantidad en metros de hilo. El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
+        {id:'hilo_std',label:'Poliéster estándar',desc:'Opción de costo bajo y resistencia media.',cost:0.1},
+        {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:0.15},
+        {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:0.22}
       ]},
       {id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:[
         {id:'gar_0',label:'Sin garantía',desc:'No hay porcentaje de devolución por material fallado.',cost:0,value:0},
@@ -134,19 +134,3 @@ window.SIDE_DECISION_CATALOG = [
     ]
   }
 ];
-
-// Puente de metadatos: el flujo anterior conserva identificadores y precios.
-// El catálogo Excel completo y los cuatro grupos nuevos viven en el editor de lotes.
-(function(){
-  const mappings={
-    MESA_CORTE:['INF-01'],ENSAMBLE:['INF-02','INF-03','INF-04'],ACABADOS:['INF-05','INF-06','INF-07'],MOLDE:['INF-08','INF-09','INF-10'],
-    PERS_CORTE:['RH-01','RH-02','RH-03'],PERS_ENSAMBLE:['RH-04','RH-05','RH-06'],PERS_ACABADO:['RH-07','RH-08','RH-09'],
-    JEFATURA:['RH-10B','RH-10A'],CUERO:['INS-01','INS-02','INS-03'],ACCESORIOS:['INS-04','INS-05'],HILO:['INS-06','INS-07','INS-08'],
-    INV_RRHH:[null,'INV-01A','INV-01B','INV-01C'],INV_MARKETING:['INV-02A','INV-02B','INV-02C']
-  };
-  const indice=Object.fromEntries((window.SIDE_EXCEL_CATALOGO||[]).map(row=>[row.codigo,row]));
-  for(const section of window.SIDE_DECISION_CATALOG)for(const item of section.items||[])(item.options||[]).forEach((option,index)=>{
-    const codigo=mappings[item.id]?.[index],row=indice[codigo];if(!row)return;
-    Object.assign(option,{codigoExcel:codigo,costoReferencialExcel:row.costo,aportesExcel:{calidad:row.calidad,eficiencia:row.eficiencia,reputacion:row.reputacion,financiero:row.financiero}});
-  });
-}());

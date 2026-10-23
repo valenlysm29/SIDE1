@@ -63,7 +63,7 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
         for(const id of d.optionIds||[])if(!item.options.some(o=>o.id===id))issues.push({cat:cat.cat,item:item.id,text:`Opci\u00f3n no v\u00e1lida en ${item.name}.`});
         for(const [id,value] of Object.entries(d.quantities||{})){
           const q=Number(value),floor=item.asset?-getOwned(item,id):item.id==='CANALES'?1:0;
-          if(!Number.isSafeInteger(q)||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
+          if(!(item.material?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
         }
       }
       if(item.type==='number'&&draftItemComplete(item)&&(!Number.isSafeInteger(Number(d.value))||Number(d.value)<Number(item.min||0)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
@@ -82,7 +82,6 @@ function reviewFingerprint(){
     flags:decisionCategories().map(c=>sectionSubmitted(c.cat)),all:decisionsSubmitted()});
 }
 function commitReviewedSections(cats,finalize){
-  if(decisionState.__excel?.habilitado){toast('Confirma el plan por lotes en Producción.');return false;}
   if(!studentAccess().canOperate){toast(studentAccess().reason);return false;}
   if(reviewCommitBusy||decisionsSubmitted())return false;
   reviewCommitBusy=true;
@@ -105,6 +104,7 @@ function commitReviewedSections(cats,finalize){
     if(!writeDecisionBatch(writes))return false;
     const delta=Object.values(ledger).reduce((a,b)=>a+Number(b||0),0)-ledgerTotal();
     decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
+    if(simulationSubmissionComplete())captureCyclePlan();
     if(finalize){currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';closeCompanyReview();}
     try{syncReportToSupabase(syncStudentReportPreview());}catch(error){console.error('SIDE: preview report refresh failed',error);}
     // Fase B-fix: el envío también sincroniza con Supabase (no solo el borrador).
@@ -112,6 +112,16 @@ function commitReviewedSections(cats,finalize){
     try{if(typeof syncSectionToSupabase==='function'){for(const plan of plans){syncSectionToSupabase(plan.cat);}}}catch(error){console.error('SIDE: supabase round sync failed',error);}
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
     toast(finalize?'Decisiones confirmadas en este equipo. Consulta el resumen en Empresa.':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`);
+    if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete()){
+      closeCompanyReview();
+      // Enter only after the complete decision batch has been persisted. Loading
+      // failures keep the saved decisions and use the world's existing retry UI.
+      queueMicrotask(()=>{
+        if(!simulationSubmissionComplete()||!canExploreWorld())return;
+        playerIsDeciding=false;
+        Promise.resolve().then(()=>requestWorldEntry()).catch(error=>console.error('SIDE: entrada automática al mundo',error));
+      });
+    }
     return true;
   }catch(error){console.error('SIDE: review confirmation failed',error);toast('No se pudo confirmar. Revisa tus decisiones e intenta nuevamente.');return false;}
   finally{reviewCommitBusy=false;}
@@ -186,11 +196,9 @@ function productionSummaryHtml(review){
       <div><span>Inversión en planta</span><strong>${reviewMoney(investmentCost)}</strong><small>Se muestra aparte del costo operativo.</small></div>
       <div class="cs-unit-cost"><span>Costo operativo por unidad posible</span><strong>${plan.producibleUnits?reviewMoney(unitCost):'No calculable'}</strong><small>${reviewMoney(cycleProductionCost)} / ${plan.producibleUnits.toLocaleString('es-PE')} unidades posibles.</small></div>
     </div>
-    <p class="cs-production-method">Modelo de producción: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
+    <p class="cs-production-method">Modelo de producción: 24 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
   </section>`;
-  if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
-  }
+
 }
 function sectionSummaryHtml(section,{history=false,compact=false}={}){
   const hasSelection=section.items.some(i=>i.rows?.some(r=>r.outflow||r.income||Number(r.quantity)>0));
@@ -211,13 +219,6 @@ function navigateFromSummary(cat){
 function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
 function renderCompanySummary(){
   const mount=$('companySummaryMount');if(!mount)return;
-  if(decisionState.__excel?.habilitado){
-    const result=excelSavedResult(),f=financialReport(),projection=!result&&typeof excelDraftProjection==='function'?excelDraftProjection():null;
-    let html=`<section class="excel-resultados"><h2>Resultados y resumen del ciclo</h2><p>${projection?'Saldo final guardado':'Caja disponible'}: <b>${reviewMoney(typeof excelSavedCashBalance==='function'?excelSavedCashBalance():f.balanceCaja.cajaFinal)}</b></p>${projection?`<p>Gastos previstos: <b>${reviewMoney(projection.spending)}</b>. Incluye costos obligatorios; las ventas se calculan al cierre.</p>`:''}<p>${decisionState.__excel.enviado&&Number(decisionState.__excel.round)===currentRound()?'Plan confirmado. El docente calcula el cierre conjunto.':'Completa tus decisiones en las cinco pestañas, guarda cada elección y pulsa ENVIAR DECISIÓN para confirmar el ciclo.'}</p></section>`;
-    if(result)html+=window.SIDE_EXCEL_UI.resumenHtml(result)+financialDetailsHtml(f);
-    else try{html+=window.SIDE_EXCEL_UI.resumenHtml(window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},decisionState.__excel.historial||window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId())),{preview:true});}catch{}
-    mount.innerHTML=html;return;
-  }
   const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
   migrateCurrentReceipts();
   const history=companySummaryRound!=='current'&&Number(companySummaryRound)!==currentRound(),review=liveCompanyReview();
@@ -230,6 +231,7 @@ function renderCompanySummary(){
   mount.innerHTML=`<section class="company-summary" aria-labelledby="companySummaryTitle"><header class="cs-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${history?companySummaryRound:currentRound()}</span><h2 id="companySummaryTitle">${heading}</h2><p>Decisiones, proceso productivo, compras, costos y financiamiento en un solo lugar.</p></div><span class="cs-progress">${sent} / ${decisionCategories().length}<small>apartados enviados</small></span></header>
       ${!history&&canStartSimulation()&&simulationSubmissionComplete()?'<div class="cs-world-ready"><div><strong>Tu empresa está lista para abrir</strong><p>Las decisiones están enviadas. Entra al mundo 3D para gestionar el turno.</p></div><button id="companyStartWorld" data-start-world type="button" class="cs-primary">INICIAR MUNDO 3D</button></div>':''}
       <div class="cs-toolbar"><div class="cs-filters" role="group" aria-label="Filtrar decisiones"><button type="button" data-summary-filter="all" aria-pressed="${companySummaryFilter==='all'}">Todas las decisiones</button><button type="button" data-summary-filter="sent" aria-pressed="${companySummaryFilter==='sent'}">Solo enviadas</button></div><label>Ciclo <select id="companySummaryCycle"><option value="current">Actual \u00b7 ciclo ${currentRound()}</option>${rounds.map(r=>`<option value="${r}" ${history&&Number(companySummaryRound)===r?'selected':''}>Ciclo ${r} \u00b7 historial enviado</option>`).join('')}</select></label></div>
+    ${!history&&decisionState.__cycleSettlements?.[currentRound()]?`<div class="cs-financial-scope"><strong>Ingresos del ciclo: ${reviewMoney(financialReport().estadoResultados.ingresos)}</strong><p>Ventas registradas al cierre. Caja final: ${reviewMoney(financialReport().balanceCaja.cajaFinal)}.</p></div>`:''}
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
     ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+`<div class="cs-cumulative-resource"><span>CANTIDAD ACUMULADA</span><strong>${cumulativeResourceQuantity(review).toLocaleString('es-PE')}</strong><small>Suma de las cantidades registradas de ciclos anteriores y del ciclo actual.</small></div>`+productionSummaryHtml(review)+`<details class="financial-details"><summary>Reportes financieros guardados · ciclo ${currentRound()}</summary><p>Utilidad: ${reviewMoney(financialReport().estadoResultados.utilidad)} · Caja: ${reviewMoney(financialReport().balanceCaja.cajaFinal)}</p>${financialDetailsHtml(financialReport())}</details>`+futureHtml(review.financial)}
     <p class="cs-local-note">Las etiquetas ENVIADA corresponden a confirmaciones guardadas en este navegador. No son un acuse de recibo de Supabase. Los borradores no se presentan como enviados.</p>
@@ -238,9 +240,7 @@ function renderCompanySummary(){
     ${!history?`<footer class="cs-main-actions"><span>${decisionsSubmitted()?'Ciclo completo confirmado. Este resumen sigue disponible para consulta.':'Revisa lo elegido y los apartados pendientes antes de confirmar.'}</span><button id="companyReviewAll" type="button" class="cs-primary">${decisionsSubmitted()?'VER REVISI\u00d3N DEL CICLO':'REVISAR Y ENVIAR TODO'}</button></footer>`:''}
   </section>`;
   mount.querySelectorAll('[data-summary-filter]').forEach(b=>b.addEventListener('click',()=>{companySummaryFilter=b.dataset.summaryFilter;renderCompanySummary();}));
-  if(!history&&decisionState.__excel?.habilitado){
-    try{const result=excelSavedResult(),preview=result||window.SIDE_EXCEL_CICLO.prepararEmpresa({...decisionState.__excel.decisiones,ciclo:currentRound()},window.SIDE_EXCEL_UI.historial(excelGameCode(),excelCompanyId()));mount.insertAdjacentHTML('afterbegin',window.SIDE_EXCEL_UI.resumenHtml(preview,{preview:!result}));}catch{}
-  }
+
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
     mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
     mount.querySelector('#companyStartWorld')?.addEventListener('click',requestWorldEntry);
@@ -274,7 +274,6 @@ function paintReviewDialog(message=''){
   bindSummaryLinks(dialog);
 }
 function openCompanyReview(){
-  if(decisionState.__excel?.habilitado){submitAllDecisions();return;}
   // Working drafts are already persisted by the existing input handlers. This
   // read-only path does not call saveCurrentSection or mark anything submitted.
   migrateCurrentReceipts();paintReviewDialog();const dialog=ensureReviewDialog();if(!dialog.open)dialog.showModal();

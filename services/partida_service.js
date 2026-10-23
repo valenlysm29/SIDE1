@@ -354,31 +354,29 @@
     }catch(error){console.error('SIDE: cancelar partida:',error);return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  async function contextoExcel(partidaId,ciclo){
+  async function cerrarNegocio(partidaId,ciclo){
     const sb=client();if(!sb)return offline();
-    try{const {data,error}=await sb.rpc('side_contexto_cierre_excel',{p_partida_id:partidaId,p_ciclo:ciclo});return error||data?.error?{success:false,code:error?.code||data?.code,error:error?.message||data.error,migrationMissing:/PGRST202|42883/.test(error?.code||'')}:{success:true,data};}catch(error){return {success:false,error:error.message};}
-  }
-  async function excelDisponible(){
-    const sb=client();if(!sb)return {success:false,available:false,offline:true};
-    try{const {data,error}=await sb.rpc('side_excel_features');return {success:!error,available:!error&&data?.cierreVersion===1,error:error?.message,migrationMissing:/PGRST202|42883/.test(error?.code||'')};}catch(error){return {success:false,available:false,error:error.message};}
-  }
-  /** Calcula con el mismo motor puro que el cierre local. El CAS de contexto
-   * evita persistir si un estudiante confirmó o modificó su plan entre lecturas. */
-  async function cerrarExcel(partidaId,ciclo,overrides={}){
-    const sb=client();if(!sb)return offline();
-    const ctx=await contextoExcel(partidaId,ciclo);if(!ctx.success)return ctx;
-    if(ctx.data.cierre)return {success:true,data:ctx.data.cierre,reused:true};
-    if(!ctx.data.empresas?.length)return {success:true,data:null};
     try{
-      const d=ctx.data,decisionesPorEmpresa={};overrides={...(d.overrides||{}),...overrides};
-      const financial=d.financialConfig&&global.SIDE_FINANCE_CONFIG?.resolve(d.financialConfig,ciclo);if(financial)overrides.TEA_BASE=Number(financial.interest);
-      const historia=global.SIDE_EXCEL_CAJA.sembrarTransicion(d.historialPorEmpresa||{},d.empresas);
-      for(const empresa of d.empresas){const s=empresa.envelope,plan=s.planesPorCiclo?.[ciclo]||(s?.enviado&&Number(s.round)===Number(ciclo)?s.decisiones:null);if(plan)decisionesPorEmpresa[empresa.id]={...global.SIDE_EXCEL_UI.prepararDecisiones(plan),...(financial?{teaBase:Number(financial.interest)}:{})};}
-      let cierre=global.SIDE_EXCEL_CICLO.cerrarCiclo({ciclo,empresas:d.empresas.map(x=>String(x.id)),decisionesPorEmpresa,historialPorEmpresa:historia},overrides);
-      cierre=global.SIDE_EXCEL_CAJA.adjuntarCaja(cierre,{capitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.capital])),baseCajaPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,x.envelope.cajaTransicion??x.capital])),historialAnterior:historia,overrides,ajustesCapitalPorEmpresa:Object.fromEntries(d.empresas.map(x=>[x.id,global.SIDE_FINANCE_CONFIG?.adjustment(d.financialConfig||{},ciclo,x.id,x.capital)||0]))});
-      const {data,error}=await sb.rpc('side_guardar_cierre_excel',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:d.token,p_cierre:cierre});
-      if(error||data?.error)return {success:false,code:error?.code||data?.code,error:error?.message||data.error};
-      return {success:true,data:data.cierre,reused:!!data.reused};
+      const context=await sb.rpc('side_contexto_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
+      const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
+      const resultadosPorEmpresa={};
+      for(const company of ctx.empresas||[]){
+        const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
+        if(!saved)continue;
+        const business=state.__cycleBusiness?.[ciclo]||{};
+        resultadosPorEmpresa[company.id]=global.SIDE_CYCLE_MODEL.close({state:{...saved.state,__cycleSettlements:state.__cycleSettlements,__finishedGoods:state.__finishedGoods},ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,...business});
+        const result=resultadosPorEmpresa[company.id],financialLedger={...result.ledger};let previous=0;
+        for(let round=1;round<=ciclo;round++){
+          const adjustment=global.SIDE_FINANCE_CONFIG?.adjustment(ctx.financialConfig||{},round,company.id,Number(company.capital))||0;
+          if(adjustment!==previous)financialLedger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;
+          previous=adjustment;
+        }
+        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:state.__openingBalance});
+      }
+      const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
+      if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data.code};
+      return {success:true,data:response.data.cierre,reused:!!response.data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
   async function podio(partidaId,accion='consultar',minutos=0,justificacion=''){
@@ -395,5 +393,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,contextoExcel,cerrarExcel,excelDisponible,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,podio };
 })(window);
