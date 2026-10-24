@@ -3,6 +3,12 @@
 Para iniciar el juego en Windows, abre **INICIAR_JUEGO.bat**. Las páginas de
 entrada siguen siendo `index.html` y `docente.html`.
 
+## Cierre económico v19
+
+La fuente corregida es [DECISIONES_SIDE_19.xlsx](docs/DECISIONES_SIDE_19.xlsx), derivada de la v16 con autorización del usuario. El motor económico no recibe ventas ni precios del mundo 3D. La auditoría, supuestos y resultados están en [el informe de revisión](reports/revision_logica_excel_y_ventas_2026-10-23.md).
+
+Para una base SIDE existente, seguir [la guía v19](docs/despliegue_cierre_v19.md) y ejecutar manualmente el paquete completo [SQL v19](docs/sql/20261023_despliegue_cierre_v19.sql). Sustituye los paquetes anteriores e incluye los cinco bloques en orden. No se ha ejecutado en producción. El cierre sin navegador docente todavía requiere un ejecutor de servidor y su programación; la versión actual recupera los cierres al reconectar.
+
 ## Ubicación de los archivos
 
 | Carpeta | Contenido |

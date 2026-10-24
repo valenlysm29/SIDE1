@@ -1,5 +1,7 @@
 # Despliegue del cierre y aislamiento del mundo 3D
 
+**Guía histórica sustituida por v19.** Para el cliente actual usar [despliegue_cierre_v19.md](despliegue_cierre_v19.md) y el paquete completo `docs/sql/20261023_despliegue_cierre_v19.sql`. No volver a ejecutar el paquete antiguo sobre una instalación v19: reemplazaría funciones nuevas. El texto siguiente se conserva como registro de la sesión anterior.
+
 Ejecutar el SQL exacto de `docs/sql/20261023_despliegue_cierre_completo.sql` en el SQL Editor de Supabase del proyecto SIDE. El archivo concatena, sin cambiar su SQL y en este orden:
 
 1. `supabase/migrations/20261023_retirar_motor_anterior.sql`.
