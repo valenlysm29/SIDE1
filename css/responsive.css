@@ -1050,3 +1050,8 @@ small {
   }
 }
 
+
+/* Labels and the fun-mode notice may wrap; missions clear the measured HUD. */
+@media (max-width: 820px) {
+  #simulator3d.simulator-screen .sim3d-missions { top: max(220px, var(--sim-hud-bottom, 220px)); }
+}

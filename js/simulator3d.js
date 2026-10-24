@@ -109,40 +109,40 @@
   const queueSlots = [];
 
   const $3 = (id) => document.getElementById(id);
-  const fmt = (n) => 'S/ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
-  const bridge = () => window.SIDE_GAME_BRIDGE || {};
+  const fmt = (n) => '★ ' + Math.round(Number(n) || 0).toLocaleString('es-PE');
+  const worldSnapshot = () => window.SIDE_WORLD_BRIDGE?.getWorldSnapshot() || {company:{name:'MI EMPRESA',character:'chico2'},cycle:1,products:[],approximateStock:24,storeLevel:{stores:1,visual:{}},events:[]};
   const CHARACTER_IDS = ['chico1','chico2','chico3','mona'];
   const validCharacterId = id => CHARACTER_IDS.includes(id);
   const activeCharacterId = () => {
-    const requested=bridge().selectedCharacter?.();
+    const requested=worldSnapshot().company.character;
     if(validCharacterId(requested))selectedCharacterId=requested;
     return selectedCharacterId;
   };
-  const companyName = () => String(bridge().companyName?.() || 'MI EMPRESA').trim() || 'MI EMPRESA';
-  const saved = (id) => bridge().decisions?.[id] || null;
+  const companyName = () => String(worldSnapshot().company.name || 'MI EMPRESA').trim() || 'MI EMPRESA';
+  const saved = (id) => worldSnapshot().storeLevel.visual?.[id] || null;
   const sum = (o = {}) => Object.values(o).reduce((a, b) => a + (Number(b) || 0), 0);
   const allPurchases = (entry) => { let t = 0; Object.values(entry?.purchases || {}).forEach(row => t += sum(row || {})); return t; };
   const optSelected = (id, opt) => Boolean(saved(id)?.optionIds?.includes(opt));
   const qty = (id) => sum(saved(id)?.quantities || {});
   const owned = (id) => allPurchases(saved(id));
-  const currentRoundSafe = () => bridge().currentRound?.() || (typeof window.currentRound === 'function' ? window.currentRound() : 1);
-  const decisionCash = () => bridge().cash?.() ?? (typeof window.cashBalance === 'function' ? window.cashBalance() : 100000);
+  const currentRoundSafe = () => worldSnapshot().cycle || 1;
+  const initialFunPoints = () => 100000;
   // Entertainment receipts are stored only in the world's own local state.
   const salesLedger = () => Number(businessState?.revenue || 0);
 
   function companyStorageContext() {
-    const code = ($3('lobbyCode')?.textContent || 'SIDE').replace(/\s+/g, '_');
+    const code = String(worldSnapshot().company.gameCode || 'SIDE').replace(/\s+/g, '_');
     const company = companyName().replace(/[^a-z0-9_-]+/gi, '_').slice(0, 36) || 'EMPRESA';
     return `${code}_${company}`;
   }
   function storageContext() { return `${companyStorageContext()}_${currentRoundSafe()}`; }
 
-  function salesCountKey() { return `side3d_sales_count_${storageContext()}`; }
-  function inventoryKey() { return `side3d_inventory_${storageContext()}`; }
-  function dayKey() { return `side3d_day_${storageContext()}`; }
-  function audioKey() { return `side3d_audio_${storageContext()}`; }
-  function businessKey() { return `side3d_business_${storageContext()}`; }
-  function controlsSeenKey() { return `side3d_controls_seen_v2_${companyStorageContext()}`; }
+  function salesCountKey() { return `side3d_fun_sales_count_${storageContext()}`; }
+  function inventoryKey() { return `side3d_fun_inventory_${storageContext()}`; }
+  function dayKey() { return `side3d_fun_day_${storageContext()}`; }
+  function audioKey() { return `side3d_fun_audio_${storageContext()}`; }
+  function businessKey() { return `side3d_fun_business_${storageContext()}`; }
+  function controlsSeenKey() { return `side3d_fun_controls_seen_v2_${companyStorageContext()}`; }
 
   function createBusinessState() {
     return {
@@ -191,12 +191,12 @@
   }
 
   function operationalCash() {
-    return decisionCash() + salesLedger() - Number(businessState?.expenses || 0);
+    return initialFunPoints() + salesLedger() - Number(businessState?.expenses || 0);
   }
 
   function applyExpense(amount, reason, kind='SIM_GASTOS',businessPatch={}) {
     if (!businessState) loadBusinessState();
-    if(bridge().canOperate?.()===false)return false;
+
     const a = Math.max(0, Number(amount) || 0);
     const next={...businessState,...businessPatch,expenses:Number(businessState.expenses||0)+a};
     businessState=next;
@@ -226,22 +226,18 @@
     localStorage.setItem(inventoryKey(), JSON.stringify(inventory));
   }
 
-  function targetProduction() { return Math.max(0, Math.round(Number(saved('PRODUCCION_META')?.value || 0))); }
-  function productionSnapshot() { try{return bridge().productionPlan?.()||null}catch{return null} }
-  function cycleProductionRecord() {
-    try{
-      const stored=JSON.parse(localStorage.getItem(inventoryKey())||'null'),value=stored?.producedUnits;
-      if(value===null||value===undefined||!Number.isFinite(Number(value))||Number(value)<0)return null;
-      return {round:currentRoundSafe(),producedUnits:Number(value)};
-    }catch{return null;}
+  function targetProduction() { return Math.max(24, Number(worldSnapshot().approximateStock)||24); }
+  function productionSnapshot() {
+    const snapshot=worldSnapshot();
+    return {producibleUnits:Math.max(24,Number(snapshot.approximateStock)||24),productLines:snapshot.products?.length?snapshot.products.map(p=>({plannedUnits:Math.max(0,Number(p.approximateStock)||0)})):null};
   }
 
   function createInitialInventory() {
     const plan=productionSnapshot();
     const planned=Array.isArray(plan?.productLines)?plan.productLines.map(line=>Math.max(0,Math.round(Number(line.plannedUnits||0)))):[];
     const totalFromPlan=planned.reduce((amount,value)=>amount+value,0);
-    const explicitPlan=Array.isArray(plan?.productLines);
-    const total=Math.max(0,explicitPlan?totalFromPlan:plan?Number(plan.producibleUnits)||0:(targetProduction()?0:24));
+    const explicitPlan=Array.isArray(plan?.productLines)&&totalFromPlan>0;
+    const total=Math.max(24,explicitPlan?totalFromPlan:Number(plan?.producibleUnits)||24);
     const split=explicitPlan?PRODUCTS.map((_,i)=>planned[i]||0):[Math.ceil(total*.4),Math.ceil(total*.35),0];
     if(!explicitPlan)split[2]=Math.max(0,total-split[0]-split[1]);
     const display = {}, reserve = {};
@@ -540,7 +536,8 @@
       shownTeacherEvents: []
     };
     simVisitors = 0;
-    businessState.expenses = 0;
+    // Recreational resources persist with orders and upgrades across reloads.
+    businessState.expenses = Math.max(0, Number(businessState.expenses) || 0);
     businessState.production.producedToday = 0;
     businessState.production.stage = 0;
     businessState.supplierDelay = false;
@@ -577,7 +574,7 @@
   }
 
   function showCashFx(text) {
-    const fx = document.getElementById('cashFx');
+    const fx = document.getElementById('simFunFx');
     if (!fx) return;
     const span = fx.querySelector('span');
     if (span) span.textContent = text;
@@ -604,22 +601,13 @@
   function syncSessionContext() {
     if (!sessionContext) return;
     const changed = sessionContext !== storageContext();
-    const closed = (bridge().canExplore?.() ?? bridge().canOperate?.()) === false;
-    if (!changed && !closed) return;
+    if (!changed) return;
     if (lastWorldSnapshot) cacheWorldHistory(lastWorldSnapshot);
-    // Stop the old shift before it can record activity under the new cycle's keys.
-    running = false;
-    clearCustomerFlow(!changed);
-    sessionContext = '';
-    gameSession = null;
-    stopAmbient();
-    document.exitPointerLock?.();
-    clearSessionOverlays();
-    window.__SIDE_RETURN_TO_3D = false;
-    if (!$3(rootId)?.classList.contains('hidden')) {
-      window.openDecisionMenu?.();
-      window.toast?.(changed ? 'El ciclo cambió. Revisa y envía sus decisiones para iniciar el mundo 3D.' : 'El ciclo está cerrado. Revisa los resultados de tu empresa.');
-    }
+    // A new economic cycle refreshes the scenery and its separate local shift.
+    // It never sends the player back to the economic decision workflow.
+    clearCustomerFlow(false);
+    loadBusinessState();loadInventory();resetGameSession(false);
+    rebuildDynamicWorld();renderNewsPanel();updateHUD();
   }
 
   function showSummaryOverlay() {
@@ -636,7 +624,7 @@
     $3('summaryServed').textContent = String(gameSession.served);
     $3('summaryLost').textContent = String(gameSession.lost);
     $3('summarySatisfaction').textContent = `${Math.round(gameSession.satisfaction)}%`;
-    if($3('summaryProfit')) $3('summaryProfit').textContent=fmt(bridge().financialReport?.().estadoResultados.utilidad ?? gameSession.revenue-Number(businessState?.expenses||0));
+    if($3('summaryProfit')) $3('summaryProfit').textContent=fmt(gameSession.revenue-Number(businessState?.expenses||0));
     if($3('summaryReputation')) $3('summaryReputation').textContent=`${Math.round(businessState?.reputation||80)}%`;
     if($3('summaryReturns')) $3('summaryReturns').textContent=String(businessState?.returns||0);
     const consequences=$3('summaryConsequences');
@@ -659,7 +647,7 @@
     stopAmbient();
     const success=gameSession.revenue >= gameSession.targetRevenue;
     updateReputation(success ? 3 : -2, success ? 'Jornada exitosa' : 'Meta no alcanzada');
-    addBusinessLog(`Cierre Día ${gameSession.day}: ingresos ${fmt(gameSession.revenue)}, utilidad ${fmt(gameSession.revenue-businessState.expenses)}.`);
+    addBusinessLog(`Cierre Día ${gameSession.day}: puntos ${fmt(gameSession.revenue)}, balance recreativo ${fmt(gameSession.revenue-businessState.expenses)}.`);
     syncWorldDecisions();
     if(lastWorldSnapshot)cacheWorldHistory(lastWorldSnapshot);
     showSummaryOverlay();
@@ -695,22 +683,22 @@
     if ($3('simTime')) $3('simTime').textContent = gameSession ? formatTime(gameSession.timeLeft) : '5:00';
     if ($3('simRating')) $3('simRating').textContent = gameSession ? `${Math.round(gameSession.satisfaction)}%` : `${Math.round(businessState?.reputation || 80)}%`;
     if ($3('simRevenue')) $3('simRevenue').textContent = gameSession ? fmt(gameSession.revenue) : fmt(0);
-    const productivity=window.SIDE_PRODUCTION_MODEL?.cycleProductivity?.(productionSnapshot(),cycleProductionRecord(),currentRoundSafe());
+    const productivity={produced:inventory?.producedUnits,compliance:100*Math.min(1,Number(inventory?.producedUnits||0)/Math.max(1,targetProduction()))};
     if($3('simProducedUnits'))$3('simProducedUnits').textContent=productivity?.produced==null?'Sin registro':`${productivity.produced} u.`;
     if($3('simProductionCompliance'))$3('simProductionCompliance').textContent=productivity?.compliance==null?'—':`${Math.round(productivity.compliance)}%`;
-    if ($3('simNetProfit')) $3('simNetProfit').textContent = fmt(bridge().financialReport?.().estadoResultados.utilidad ?? Number(gameSession?.revenue || 0) - Number(businessState?.expenses || 0));
+    if ($3('simNetProfit')) $3('simNetProfit').textContent = fmt(Number(gameSession?.revenue || 0) - Number(businessState?.expenses || 0));
     if ($3('simOperatingLosses')) $3('simOperatingLosses').textContent = fmt(Number(businessState?.expenses || 0));
     if ($3('simLostCustomers')) $3('simLostCustomers').textContent = String(gameSession?.lost || 0);
     const lost = gameSession?.lostReasons || businessState?.lostReasons || {};
     ['queue','stock','price','staff'].forEach(reason => { const el=$3(`lost-${reason}`); if(el) el.textContent=String(Number(lost[reason]||0)); });
-    const target = Number(saved('PRODUCCION_META')?.value || 0);
+    const target = targetProduction();
     const channels = saved('CANALES')?.optionIds?.length || 0;
-    const physicalStores = window.SIDE_RULES.storeCount(saved('CANALES'));
+    const physicalStores = Math.max(1,Number(worldSnapshot().storeLevel.stores)||1);
     const queueText = checkoutQueue.length ? ` · Cola: ${checkoutQueue.length}` : '';
     const stockText = inventory ? ` · Stock: ${totalDisplayStock()} tienda / ${totalReserveStock()} almacén` : '';
     const shiftText = gameSession ? ` · Tiempo restante: ${formatTime(gameSession.timeLeft)} · Satisfacción: ${Math.round(gameSession.satisfaction)}% · Combo: x${Math.max(1, gameSession.combo || 0)}` : '';
     $3('simObjectiveText').textContent = gameSession
-      ? `Día ${gameSession.day} · Dificultad ${(gameSession.difficulty || 1).toFixed(1)} · Meta del turno: ${fmt(gameSession.targetRevenue)} · Ingresos: ${fmt(gameSession.revenue)}${queueText}${stockText}${shiftText}.`
+      ? `Día ${gameSession.day} · Dificultad ${(gameSession.difficulty || 1).toFixed(1)} · Meta de puntos: ${fmt(gameSession.targetRevenue)} · Puntos de tienda: ${fmt(gameSession.revenue)}${queueText}${stockText}${shiftText}.`
       : (target
         ? `Meta: ${target} unidades · ${channels} canal(es) · ${physicalStores} tienda(s)${queueText}${stockText}. Repón exhibidores y cobra en caja.`
         : `Gestiona inventario, exhibición y caja${queueText}${stockText}.`);
@@ -1626,12 +1614,11 @@
 
   function refreshAdminUI() {
     if (!businessState) return;
-    const er=bridge().financialReport?.().estadoResultados;
-    const rev=er?.ventasNetas??Number(gameSession?.revenue||0),exp=er?.costos??Number(businessState.expenses||0);
+    const rev=Number(gameSession?.revenue||0),exp=Number(businessState.expenses||0);
     if ($3('adminReputation')) $3('adminReputation').textContent = `Reputación ${Math.round(businessState.reputation)}%`;
     if ($3('adminRevenue')) $3('adminRevenue').textContent = fmt(rev);
     if ($3('adminExpenses')) $3('adminExpenses').textContent = fmt(exp);
-    if ($3('adminProfit')) $3('adminProfit').textContent = fmt(er?.utilidad??rev-exp);
+    if ($3('adminProfit')) $3('adminProfit').textContent = fmt(rev-exp);
     if ($3('adminRepMetric')) $3('adminRepMetric').textContent = `${Math.round(businessState.reputation)}%`;
     PRODUCTS.forEach(p => { const el=$3(`price-${p.id}-input`); if(el && document.activeElement!==el) el.value=String(p.price); });
     const rows=$3('adminStockRows');
@@ -1657,7 +1644,7 @@
   }
 
   function activeCycleEvents() {
-    const events=bridge().activeEvents?.();
+    const events=worldSnapshot().events;
     return Array.isArray(events)?events:[];
   }
 
@@ -1715,7 +1702,7 @@
   function triggerRandomEvent(now) {
     if(!gameSession || gameSession.shiftEnded || now < nextEventAt) return;
     nextEventAt = now + 42000;
-    const active = Array.isArray(bridge().activeEvents?.()) ? bridge().activeEvents() : [];
+    const active = Array.isArray(worldSnapshot().events) ? worldSnapshot().events : [];
     const pending = active.filter(ev=>!gameSession.shownTeacherEvents.includes(ev.id));
     if(!pending.length) return;
     const ev=pending[0]; gameSession.shownTeacherEvents.push(ev.id);
@@ -1746,10 +1733,10 @@
   }
 
   function orderSupplierStock() {
-    if(bridge().canOperate?.()===false)return;
+
     if(businessState.pendingSupplierOrder) { message('Ya existe un pedido en camino.'); return; }
-    if(operationalCash()<360) { message('No hay caja suficiente para este pedido.'); return; }
-    const orderedAt=bridge().serverNow?.()??Date.now(),sequence=Number(businessState.supplierOrderSequence||0)+1;
+    if(operationalCash()<360) { message('No hay puntos de tienda suficientes para este pedido.'); return; }
+    const orderedAt=Date.now(),sequence=Number(businessState.supplierOrderSequence||0)+1;
     const pendingSupplierOrder={id:`${storageContext()}:${sequence}`,orderedAt,
       dueAt:orderedAt+(businessState.supplierDelay?24000:12000),units:12};
     if(!applyExpense(360,'Pedido a proveedor','SIM_GASTOS',{pendingSupplierOrder,supplierOrderSequence:sequence}))return;
@@ -1759,7 +1746,7 @@
 
   function tickSupplier(now) {
     const order=businessState?.pendingSupplierOrder;
-    if(!order||(bridge().serverNow?.()??Date.now())<order.dueAt||bridge().canOperate?.()===false)return;
+    if(!order||(Date.now())<order.dueAt)return;
     // Persist the receipt with stock before clearing the order. If interrupted,
     // replay sees the receipt and cannot deliver the same goods twice.
     if(inventory.lastSupplierOrderId!==order.id){
@@ -1773,10 +1760,10 @@
   }
 
   function buyUpgrade(type,cost,max) {
-    if(bridge().canOperate?.()===false)return;
+
     loadBusinessState(); const current=Number(businessState.upgrades[type]||0);
     if(current>=max) { message('Esta mejora ya está al máximo.'); return; }
-    if(operationalCash()<cost) { message('No hay caja suficiente para esta expansión.'); return; }
+    if(operationalCash()<cost) { message('No hay puntos de tienda suficientes para esta expansión.'); return; }
     if(!applyExpense(cost,`Expansión: ${type}`,'SIM_INVERSION',{upgrades:{...businessState.upgrades,[type]:current+1}}))return;
     rebuildDynamicWorld(); refreshAdminUI();
     message('Mejora aplicada. La capacidad y el servicio usan la nueva configuración.');
@@ -1801,7 +1788,7 @@
     ['Atiende la caja','Acércate al POS y presiona E. Escanea el producto y después cobra.'],
     ['Controla el stock','Acércate al almacén y repón los exhibidores. El personal también ayuda automáticamente.'],
     ['Administra la empresa','Busca la computadora de administración. Allí cambias precios, pides stock y amplías la tienda.'],
-    ['Cumple los objetivos','Completa misiones, protege la reputación y alcanza la meta de ingresos antes de cerrar.']
+    ['Cumple los objetivos','Completa misiones, protege la reputación y alcanza la meta de puntos antes de cerrar.']
   ];
   function showTutorialStep() {
     if(businessState?.tutorialDone) return;
@@ -2352,9 +2339,9 @@
     return {displayStock:display,reserveStock:reserve,displayCapacity:shelfCapacity,warehouseCapacity:capacity,
       storeFill:Math.min(1,display/Math.max(1,shelfCapacity)),warehouseFill:Math.min(1,reserve/Math.max(1,capacity)),
       pendingUnits:businessState?.pendingSupplierOrder?.units||0,
-      productionActive:running&&!gameSession?.shiftEnded&&bridge().canOperate?.()!==false&&accounted<plannedTotal&&display+reserve<capacity,
+      productionActive:running&&!gameSession?.shiftEnded&&accounted<plannedTotal&&display+reserve<capacity,
       producedUnits:inventory?.producedUnits??null,plannedUnits:plan?.producibleUnits??0,productionPlan:plan,
-      profit:bridge().financialReport?.().estadoResultados?.utilidad??null,cash:decisionCash(),round:currentRoundSafe(),debt:bridge().creditState?.().outstanding??null,loan:bridge().decisions?.PRESTAMO?.amount??null,
+      profit:null,cash:operationalCash(),round:currentRoundSafe(),debt:null,loan:null,
       machines:{cutting:owned('MESA_CORTE'),assembly:owned('ENSAMBLE'),finishing:owned('ACABADOS')},
       workers:{cutting:qty('PERS_CORTE'),assembly:qty('PERS_ENSAMBLE'),finishing:qty('PERS_ACABADO')},
       products:PRODUCTS.map(p=>({id:p.id,color:p.color,display:displayStock(p.id),reserve:reserveStock(p.id)}))};
@@ -2366,9 +2353,9 @@
     let previous=null;
     try{previous=JSON.parse(localStorage.getItem(worldHistoryKey(round-1))||'null');}catch{}
     worldDecisionState = deriveWorldDecisionState({
-      round, decisions: bridge().decisions || {}, visual: snapshot, previous,
+      round, decisions: worldSnapshot().storeLevel.visual || {}, visual: snapshot, previous,
       events: activeCycleEvents(), cycleClosed: Boolean(gameSession?.shiftEnded),
-      decisionProgress: bridge().decisionProgress?.() || 0
+      decisionProgress: 0
     });
     worldEventVisuals?.update(worldDecisionState.events, perfMode);
     lastWorldSnapshot={round,cash:worldDecisionState.cues.cash,displayStock:worldDecisionState.cues.displayStock,
@@ -2376,7 +2363,7 @@
     return worldDecisionState;
   }
 
-  function worldHistoryKey(round){return `side3d_world_history_${companyStorageContext()}_${round}`;}
+  function worldHistoryKey(round){return `side3d_fun_world_history_${companyStorageContext()}_${round}`;}
   function cacheWorldHistory(snapshot){
     if(!snapshot||snapshot.round<1)return;
     try{localStorage.setItem(worldHistoryKey(snapshot.round),JSON.stringify(snapshot));}catch{}
@@ -2526,7 +2513,7 @@
       registerAnimatedActor({ type: 'manager', obj: boss, baseY: 0, phase: Math.random() * 6.28, speed: 1.45 });
     }
 
-    const target = Math.min(24, Math.ceil(Number(plan?.producibleUnits ?? saved('PRODUCCION_META')?.value ?? 0) / 5));
+    const target = Math.min(24, Math.ceil(Number(plan?.producibleUnits ?? targetProduction()) / 5));
     for (let i = 0; i < target; i++) dynamicGroup.add(box(0.62, 0.38, 0.50, 0x9b6f43, 4.9 + (i % 6) * 1.18, 0.19, -6.1 + Math.floor(i / 6) * 0.56, 0.78, 0.02));
 
     const ups=businessState?.upgrades||{};
@@ -2563,7 +2550,7 @@
   }
 
   function salesStaff() {
-    return window.SIDE_RULES.storeCount(saved('CANALES')); // One salesperson per physical store, including legacy decisions.
+    return Math.max(1,Number(worldSnapshot().storeLevel.stores)||1); // One salesperson per physical store, including legacy decisions.
   }
 
   function queueCapacity() { return queueSlots.length; }
@@ -2778,13 +2765,14 @@
   }
 
   function recordSale(productId, price) {
-    if(bridge().canOperate?.()===false)return false;
+
     const product = productById(productId);
     const salePrice = Math.max(0, Number(price || product.price));
     const nextInventory=inventory?{...inventory,sold:{...inventory.sold,[product.id]:Number(inventory.sold?.[product.id]||0)+1}}:null;
     const writes={[salesCountKey()]:String(simSales+1),...(nextInventory?{[inventoryKey()]:JSON.stringify(nextInventory)}:{})};
     for(const [key,value] of Object.entries(writes))localStorage.setItem(key,value);
     businessState.revenue=Number(businessState.revenue||0)+salePrice;saveBusinessState();
+    window.SIDE_WORLD_BRIDGE?.emitFunSale({context:storageContext(),productId:product.id,points:salePrice});
     simSales++;if(nextInventory)inventory=nextInventory;
     try{
     if (gameSession) {
@@ -2799,7 +2787,7 @@
     playSfx('sale');
     updateReputation(0.35);
     if (simSales % 3 === 0) addBusinessLog(`Venta: ${product.name} por ${fmt(salePrice)}.`);
-    if (simSales % 5 === 0) message(`¡${simSales} ventas! La tienda está agarrando ritmo.`);
+    if (simSales % 5 === 0) message(`¡${simSales} clientes atendidos! La tienda está agarrando ritmo.`);
     }catch(error){console.error('SIDE: venta confirmada; feedback pendiente',error);}
     return true;
   }
@@ -2848,7 +2836,7 @@
   }
 
   function serveNextQueuedCustomer(autoServed = false) {
-    if(bridge().canOperate?.()===false)return;
+
     if (!checkoutQueue.length) {
       message('No hay clientes en la cola de caja.');
       return;
@@ -3093,7 +3081,7 @@
     });
     updateTraffic(dt);
     // Visual idle frames (help/results/decisions) must never create transactions.
-    if (!running || !gameSession || gameSession.shiftEnded || bridge().canOperate?.()===false) return;
+    if (!running || !gameSession || gameSession.shiftEnded) return;
     if (salesStaff() > 0 && time - lastAutoRestock > Math.max(10, 22 - salesStaff() * 3)) {
       lastAutoRestock = time;
       restockDisplays(false);
@@ -3260,16 +3248,16 @@
     const distance=destination?Math.round(Math.hypot(destination.x-player.x,destination.z-player.z)):0;
     const title=$3('simHubObjective');
     if(title&&title.textContent!==objective.title)title.textContent=objective.title;
-    const preparing=bridge().canOperate?.()===false;
+    const preparing=false;
     const detail=preparing&&cycleObjective?`${destination?.name||targetZone?.label||'Destino'} · ${distance} m · Revisa las decisiones`:currentInterior===objective.region&&station?`${station.label} · ${distance} m · E para interactuar`:entrance?`${entrance.name} · ${distance} m · Camina por la entrada`:destination?`${destination.name||targetZone?.label||'Destino'} · ${distance} m`:objective.instruction;
     if($3('simHubDestination'))$3('simHubDestination').textContent=detail;
     const cycle=$3('simHubCycle');if(cycle)cycle.textContent=`CICLO ${currentRoundSafe()}`;
     const contextual=$3('simBusinessContext');
-    if(contextual){contextual.hidden=!currentInterior;contextual.textContent=currentInterior==='office'?`Ciclo ${currentRoundSafe()} · Caja ${fmt(decisionCash())} · Resumen en la pizarra`:currentInterior==='bank'?`Deuda ${bridge().creditState?fmt(bridge().creditState().outstanding):'Sin datos'} · Préstamos en ventanilla`:currentInterior==='suppliers'?`Pedidos ${businessVisualSnapshot().pendingUnits} uds · Compras en el mostrador`:currentInterior==='warehouse'?`Inventario ${totalReserveStock()}/${warehouseCapacity()} · ${businessState?.pendingSupplierOrder?'Pedido pendiente':'Recepción disponible'}`:currentInterior==='production'?`Producción ${inventory?.producedUnits||0}/${productionSnapshot()?.producibleUnits||0} · Capacidad y productividad en terminal`:`Exhibición ${totalDisplayStock()} · Clientes ${checkoutQueue.length} · Ventas ${fmt(salesLedger())}`;}
+    if(contextual){contextual.hidden=!currentInterior;contextual.textContent=currentInterior==='office'?`Ciclo ${currentRoundSafe()} · Puntos ${fmt(initialFunPoints())} · Resumen en la pizarra`:currentInterior==='bank'?'Banco recreativo · Explora la ciudad':currentInterior==='suppliers'?`Pedidos ${businessVisualSnapshot().pendingUnits} uds · Compras en el mostrador`:currentInterior==='warehouse'?`Inventario ${totalReserveStock()}/${warehouseCapacity()} · ${businessState?.pendingSupplierOrder?'Pedido pendiente':'Recepción disponible'}`:currentInterior==='production'?`Producción ${inventory?.producedUnits||0}/${productionSnapshot()?.producibleUnits||0} · Capacidad y productividad en terminal`:`Exhibición ${totalDisplayStock()} · Clientes ${checkoutQueue.length} · Puntos ${fmt(salesLedger())}`;}
     const order=businessState?.pendingSupplierOrder,orderStatus=$3('simHubOrder');
     if(orderStatus){
       orderStatus.hidden=!order;
-      if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-(bridge().serverNow?.()??Date.now()))/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
+      if(order){const seconds=Math.max(0,Math.ceil((Number(order.dueAt)-(Date.now()))/1000));orderStatus.textContent=`PEDIDO · ${order.units} uds · ${seconds>0?`${seconds} s`:'Por recibir'}`;}
     }
     const direction=$3('simHubDirection');
     if(direction){direction.hidden=!destination;if(destination)direction.style.rotate=`${(Math.atan2(destination.x-player.x,player.z-destination.z)+yaw)*180/Math.PI}deg`;}
@@ -3692,8 +3680,9 @@
     document.exitPointerLock?.();
     stopAmbient();
     window.__SIDE_RETURN_TO_3D = true;
-    if (typeof category==='string' && bridge().openDecisionCategory) bridge().openDecisionCategory(category);
-    else if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
+    try {
+      if (!window.SIDE_WORLD_NAVIGATION?.openDecisions || window.SIDE_WORLD_NAVIGATION.openDecisions(category)===false) running=true;
+    } catch { running=true; message('La Tablet no está disponible. Puedes continuar explorando.'); }
   }
 
   function resize() {
@@ -3705,6 +3694,8 @@
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    const host=$3(rootId),stats=host?.querySelector('.sim3d-stats');
+    if(host&&stats){const bottom=stats.getBoundingClientRect().bottom-host.getBoundingClientRect().top;host.style.setProperty('--sim-hud-bottom',`${Math.ceil(bottom+10)}px`);}
   }
 
 
@@ -3749,7 +3740,7 @@
     }
     pausedFrameDrawn=false;
     if (running) {
-      const operating=bridge().canOperate?.()!==false;
+      const operating=true;
       if (operating && gameSession && !gameSession.shiftEnded) {
         gameSession.timeLeft -= dt;
         if (gameSession.timeLeft <= 0) {
@@ -3879,8 +3870,8 @@
       controlsOpenedFromHelp=false;
     });
     $3('sim3dReplayBtn')?.addEventListener('click', () => {
-      if (sessionContext !== storageContext() || (bridge().canStartSimulation && !bridge().canStartSimulation())) {
-        window.startSimulationLoading?.();
+      if (sessionContext !== storageContext()) {
+        enter({autoStart:true});
         return;
       }
       const advance = Boolean(gameSession && gameSession.revenue >= gameSession.targetRevenue);
@@ -4013,17 +4004,10 @@
   }
 
   async function enter(options = {}) {
-    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
-    if (bridge().canStartSimulation && !bridge().canStartSimulation()) {
-      if (typeof window.openDecisionMenu === 'function') window.openDecisionMenu();
-      if (typeof window.toast === 'function') window.toast('Completa y envía las decisiones obligatorias antes de entrar al simulador 3D.');
-      return false;
-    }
     const requestedContext = storageContext();
     if (!await prepare()) return false;
-    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
-    if (requestedContext !== storageContext() || (bridge().canStartSimulation && !bridge().canStartSimulation())) {
-      window.openDecisionMenu?.();
+    if (requestedContext !== storageContext()) {
+      window.SIDE_WORLD_NAVIGATION?.openDecisions();
       window.toast?.('El ciclo cambió durante la carga. Revisa sus decisiones y vuelve a iniciar el mundo 3D.');
       return false;
     }
@@ -4037,6 +4021,7 @@
     const autoStart = options === true || Boolean(options?.autoStart);
     const controlsSeen=localStorage.getItem(controlsSeenKey())==='1';
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
+    else { document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('hidden',screen.id!==rootId)); }
     document.querySelector('.sim3d-brand strong') && (document.querySelector('.sim3d-brand strong').textContent = companyName());
     document.querySelector('.receipt-brand') && (document.querySelector('.receipt-brand').textContent = companyName());
     document.querySelector('.sim-checkout-kicker') && (document.querySelector('.sim-checkout-kicker').textContent = `CAJA ${companyName().toUpperCase()}`);
@@ -4064,13 +4049,12 @@
   function returnFromDecisions() {
     window.__SIDE_RETURN_TO_3D=false;
     document.activeElement?.blur?.();
-    if (typeof window.loadDecisionState === 'function') window.loadDecisionState();
-    if (!initialized || !gameSession || gameSession.shiftEnded || sessionContext !== storageContext() ||
-        (bridge().canStartSimulation && !bridge().canStartSimulation())) {
-      return window.startSimulationLoading();
+    if (!initialized || !gameSession || gameSession.shiftEnded || sessionContext !== storageContext()) {
+      return enter({autoStart:true});
     }
     clearSessionOverlays();
     if (typeof window.showScreen === 'function') window.showScreen(rootId);
+    else { document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('hidden',screen.id!==rootId)); }
     rebuildDynamicWorld();
     renderNewsPanel();
     syncSalesFromLedger();
@@ -4117,5 +4101,5 @@
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, preloadBase, preload, preloadCharacter, selectCharacter, preloadDetails, loadingStatus, cycleProductionRecord, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  window.SIDE3D = { prepare, preloadBase, preload, preloadCharacter, selectCharacter, preloadDetails, loadingStatus, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

@@ -87,7 +87,7 @@ export function deriveWorldDecisionState(input = {}) {
   else objective = {id:'news', zoneId:'news', title:'Consulta las noticias del ciclo'};
   const previous = input.previous?.round === round - 1 ? input.previous : null;
   const consequences = previous ? [
-    consequence('Caja',previous.cash,cues.cash,'office',n=>`S/ ${Math.round(n)}`),
+    consequence('Recursos de juego',previous.cash,cues.cash,'office',n=>`★ ${Math.round(n)}`),
     consequence('Productos en tienda',previous.displayStock,cues.displayStock,'store'),
     consequence('Productos en almacén',previous.reserveStock,cues.reserveStock,'warehouse'),
     consequence('Producción realizada',previous.producedUnits,cues.producedUnits,'production')

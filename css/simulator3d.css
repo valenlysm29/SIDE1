@@ -170,3 +170,21 @@
 #simulator3d .sim3d-btn:hover { border-color: var(--side-gold, #ffd329); }
 #simulator3d .sim3d-btn:focus-visible,
 #simulator3d .sim3d-missions-head button:focus-visible { outline: 3px solid var(--side-gold, #ffd329); outline-offset: 3px; }
+
+/* The mode stays visible even when the brand and secondary HUD are hidden. */
+#simulator3d .sim3d-fun-notice {
+  grid-column: 1 / -1;
+  padding: 6px 10px;
+  background: var(--side-panel, #06172e);
+  color: var(--side-gold, #ffd329);
+  border-bottom: 1px solid var(--side-line-control, #5c7890);
+  font: 600 11px/1.4 Montserrat, sans-serif;
+  text-align: center;
+  text-wrap: balance;
+}
+#simulator3d .sim3d-fun-notice + .sim3d-stat { border-left: 0; }
+
+.sim3d-fun-fx { position: fixed; z-index: 90; top: 110px; right: 7vw; pointer-events: none; opacity: 0; color: var(--side-gold, #ffd329); }
+.sim3d-fun-fx span { display: block; padding: 10px 14px; border-radius: 999px; background: var(--side-panel, #06172e); font-weight: 800; }
+.sim3d-fun-fx.show { animation: cashFloat 1.1s ease both; }
+@media (prefers-reduced-motion: reduce) { .sim3d-fun-fx.show { animation: none; opacity: 1; } }

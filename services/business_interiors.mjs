@@ -393,7 +393,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       // A small stock preparation alcove, with a walkable side opening.
       solid(room, b, -26.5, .7, 16.7, .7, 1.4, 1.15, m.dark, 'reserve');
       carton(b, -26.5, 1.59, 16.7, .45);
-      hotspot(room, 'store-sales', 'finance', 'Caja y ventas', -14, 22.7, 'comercial');
+      hotspot(room, 'store-sales', 'finance', 'Atención y puntos', -14, 22.7, 'comercial');
       hotspot(room, 'store-inventory', 'inventory', 'Exhibición e inventario', -21.5, 18.8, 'inventario');
       for (const [productId,label,x,z] of [['esencial','Bolso Básico',-24,19.15],['urbano','Bolso Mejorado',-14,19.15],['premium','Bolso Premium',-24,16.1]]) {
         hotspot(room, `product-${productId}`, 'product', label, x, z, 'comercial', {productId});
@@ -511,7 +511,7 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
       room.routes.push({zone:room.id,role:'oficina',stationary:true,points:[stations.finance]},
         {zone:room.id,role:'oficina',points:stations.patrol});
     }
-    if(room.id==='bank')room.stateSigns=[{mesh:sign(room.detail,'ESTADO FINANCIERO','Consulta del ciclo',l.x+1,2.4,l.z-7.8,4,.65),fields:['cash','debt','loan']}];
+    if(room.id==='bank')room.stateSigns=[{mesh:sign(room.detail,'MODO DIVERSIÓN','Recursos locales',l.x+1,2.4,l.z-7.8,4,.65),fields:['cash','debt','loan']}];
     npcRoutes.push(...room.routes);
     setQuality(storePropQuality);
     onCollidersAdded?.(colliders.slice(before));
@@ -520,8 +520,8 @@ export function createBusinessInteriors({ scene, offsetX = 150, createNpc, anima
   function updateStateSigns(room,value) {
     for(const entry of room.stateSigns||[]){
       const number=(key)=>value[key]==null?'Sin datos':Number(value[key]).toLocaleString('es-PE');
-      const text=room.id==='office'?`Ciclo ${number('round')} · Caja S/ ${number('cash')}\nDeuda S/ ${number('debt')} · Utilidad S/ ${number('profit')}\nProducidas ${number('producedUnits')} · Pendientes ${number('pendingUnits')}`:
-        `Caja S/ ${number('cash')} · Deuda S/ ${number('debt')} · Solicitud S/ ${number('loan')}`;
+      const text=room.id==='office'?`Ciclo ${number('round')} · Recursos ★ ${number('cash')}\nModo diversión: no afecta tus ingresos\nProductos de juego ${number('producedUnits')} · Pendientes ${number('pendingUnits')}`:
+        `Recursos de juego ★ ${number('cash')} · Sin movimientos económicos`;
       const mesh=entry.mesh;if(mesh.userData.stateText===text)continue;
       mesh.userData.stateText=text;
       const canvas=mesh.material.map.image,ctx=canvas.getContext('2d');

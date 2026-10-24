@@ -46,9 +46,19 @@ let currentCategory = null;
 let playerIsDeciding = false;
 let tutorialMarkupPromise=null,waitingTutorialCleanup=null,waitingTutorialRequest=0,waitingTutorialPending=false;
 
+let admittedFunContext='';
+function funAdmissionContext(){return `${currentStudent.game?.codigo||''}|${currentStudent.company||''}`;}
+function canVisitFunWorld(){
+  if(currentStudent.expulsada)return false;
+  const admitted=Boolean(admittedFunContext&&admittedFunContext===funAdmissionContext());
+  try {const access=studentAccess();if(access.expelled||access.cancelled)return false;return admitted||canExploreWorld();}
+  catch {return admitted;}
+}
 function showScreen(id){
-  if(['decisionMenu','characterSelection','simulator3d','simulationLoading'].includes(id)&&!canExploreWorld()&&!(id==='decisionMenu'&&studentAccess().canReview))id='studentLobby';
+  if(['simulator3d','simulationLoading'].includes(id)&&!canVisitFunWorld())id='studentLobby';
+  if(['decisionMenu','characterSelection'].includes(id)&&!canExploreWorld()&&!(id==='decisionMenu'&&studentAccess().canReview))id='studentLobby';
   screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
+  if(['simulator3d','simulationLoading'].includes(id)&&$('studentCyclePause'))$('studentCyclePause').hidden=true;
   if(id!=='tutorial')window.stopSIDETutorial?.($('tutorialMount')?.querySelector('.tutorial-shell'));
   syncWaitingTutorial();
   return id;
@@ -194,10 +204,9 @@ function updateIntegrationUI(){
     const host=$(id);if(!host)continue;
     let banner=host.querySelector('[data-cycle-paused]');
     if(!banner){banner=document.createElement('p');banner.dataset.cyclePaused='';banner.className='student-sync-status';banner.setAttribute('role','status');host.prepend(banner);}
-    banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj y la actividad del mundo 3D están detenidos. Puedes revisar y preparar tus decisiones.':'';
+    banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj económico está detenido; el modo diversión sigue disponible. Puedes revisar y preparar tus decisiones.':'';
   }
   renderCyclePause(paused);
-  if(paused&&['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){window.SIDE3D?.suspend?.();showScreen('studentLobby');}
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
   if(button){button.disabled=!access.canOperate&&!access.canReview;button.classList.toggle('hidden',(!access.canOperate&&!access.canReview)||decisionsComplete);button.textContent=paused?'Revisar decisiones':'Entrar a decisiones';}
@@ -233,7 +242,7 @@ function updateIntegrationUI(){
   if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
   if(studentConnected&&autoEnterDecisions&&access.canOperate&&!$('studentLobby')?.classList.contains('hidden')){autoEnterDecisions=false;openDecisionMenu();}
 
-  if(!access.canOperate&&!access.canReview&&['decisionMenu','simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
+  if(!access.canOperate&&!access.canReview&&['decisionMenu'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
 let lastPauseState=null,pauseDismissed=false;
 function renderCyclePause(paused){
@@ -249,7 +258,7 @@ function renderCyclePause(paused){
     pauseDismissed=false;lastPauseState=paused;
     if(paused)setTimeout(()=>overlay.querySelector('button')?.focus(),0);
   }
-  overlay.hidden=!paused||pauseDismissed;
+  overlay.hidden=!paused||pauseDismissed||['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'));
 }
 let cancellationShown=false;
 const STUDENT_EXPULSION_MESSAGE='Tu empresa fue eliminada de la partida por inactividad. Contacta a tu profesor si necesitas volver a participar.';
@@ -460,6 +469,7 @@ function loadDecisionState(){
     cashLedger=cleanLedger;persistGameState();
   }
   decisionDrafts={};
+  publishWorldIdentity();
 }
 function persistGameState(){localStorage.setItem(decisionKey(),JSON.stringify(decisionState));localStorage.setItem(ledgerKey(),JSON.stringify(cashLedger))}
 function ledgerTotal(){return Object.values(cashLedger).reduce((s,n)=>s+(Number(n)||0),0)+financialAdjustment()}
@@ -532,32 +542,41 @@ function canOperateWorld(){
   const submitted=typeof simulationSubmissionComplete==='function'?simulationSubmissionComplete():true;
   return explore&&submitted;
 }
-function canStartSimulation(){return canExploreWorld()}
+function canStartSimulation(){return canVisitFunWorld()}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
-window.SIDE_GAME_BRIDGE={
-  get decisions(){return deepClone(decisionState)},
-  openDecisionCategory(cat){
-    if(!['B','C','D','E','F'].includes(cat))return false;
-    currentCategory=cat;
+// Navigation is deliberately separate from the read-only world data boundary.
+window.SIDE_WORLD_NAVIGATION=Object.freeze({
+  openDecisions(cat){
+    if(['B','C','D','E','F'].includes(cat))currentCategory=cat;
     return openDecisionMenu();
-  },
-  serverNow:()=>studentNow(),
-  currentRound:()=>currentRound(),
-  cash:()=>cashBalance(),
-  creditState:()=>({outstanding:creditOutstanding(),approved:creditApprovedLine(),available:creditAvailable()}),
-  decisionProgress:()=>decisionProgressPercent(),
-  canStartSimulation:()=>canStartSimulation(),
-  canExplore:()=>canExploreWorld(),
-  canOperate:()=>canOperateWorld(),
-  companyName:()=>currentStudent.company||COMPANY_NAME,
-  legalName:()=>currentStudent.legalName||currentStudent.company||COMPANY_NAME,
-  selectedCharacter:()=>selectedCharacterModel()||'chico2',
-  activeEvents:()=>activeStudentEvents(),
-  productionPlan:()=>productionPlan(),
-  financialReport:()=>financialReport(),
-  financialOfficeHtml:()=>window.SIDE_STUDENT_FINANCIAL_VIEW?.officeHtml(financialReport())||'',
-};
+  }
+});
+let worldAtmosphereEvents=[],worldAtmosphereContext='';
+function publishWorldIdentity(){
+  try {
+    const context=funAdmissionContext()+'|'+currentRound(),changed=context!==worldAtmosphereContext;
+    if(changed){worldAtmosphereEvents=[];worldAtmosphereContext=context;}
+    window.SIDE_WORLD_PUBLISHER?.publish({company:{name:currentStudent.company||COMPANY_NAME,gameCode:currentStudent.game?.codigo||'SIDE',character:selectedCharacterModel()||'chico2'},cycle:currentRound(),...(changed?{events:[],news:[],products:[],approximateStock:24,storeLevel:{stores:1,visual:{}}}:{})});
+  }catch{}
+}
+function publishWorldAtmosphere(){
+ try {
+  const context=funAdmissionContext()+'|'+currentRound();if(context!==worldAtmosphereContext){worldAtmosphereEvents=[];worldAtmosphereContext=context;}
+  const visual={};
+  // Only equipment/staff silhouettes and channel appearance cross the boundary.
+  for(const id of ['ENSAMBLE','ACABADOS','MESA_CORTE','MOLDE','PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO','INV_RRHH','CANALES']){
+    const entry=decisionState[id];if(!entry)continue;
+    visual[id]={optionIds:entry.optionIds||[],quantities:entry.quantities||{},purchases:entry.purchases||{},label:entry.label||''};
+  }
+  const plan=productionPlan();
+  return window.SIDE_WORLD_PUBLISHER?.publish({company:{name:currentStudent.company||COMPANY_NAME,gameCode:currentStudent.game?.codigo||'SIDE',character:selectedCharacterModel()||'chico2'},cycle:currentRound(),
+    products:(plan?.productLines||[]).map(line=>({id:line.id,name:line.label,approximateStock:Math.max(0,Math.round(Number(line.plannedUnits)||0))})),
+    approximateStock:Math.max(0,Math.round(Number(plan?.producibleUnits)||24)),
+    storeLevel:{stores:window.SIDE_RULES.storeCount(decisionState.CANALES),visual},
+    news:[],events:worldAtmosphereEvents});
+ } catch {return false;}
+}
 
 // Landing / acceso
 const loadingTimer=setInterval(()=>{const bar=$('loadingBar');if(!bar){clearInterval(loadingTimer);return}const p=Math.min(100,(Number(bar.dataset.p)||0)+1);bar.dataset.p=p;bar.style.width=p+'%';$('loadingPercent').textContent=p+'%';if(p>=100){clearInterval(loadingTimer);$('startBtn').disabled=false}},28);
@@ -1268,7 +1287,7 @@ function openCharacterSelection(){
     },
     onConfirm(slug){
       const id=CHARACTER_MODEL_IDS[slug];if(!id)return;
-      characterSelectionConfirmed=true;selector.close();startSimulationLoading({selectedCharacter:id});
+      characterSelectionConfirmed=true;publishWorldIdentity();selector.close();startSimulationLoading({selectedCharacter:id});
     }
   });
   showScreen('characterSelection');selector.open({storageKey:selectorStorageKey,initialSelection});
@@ -1279,6 +1298,7 @@ function openCharacterSelection(){
   return true;
 }
 function requestWorldEntry(){
+  if(admittedFunContext&&admittedFunContext===funAdmissionContext()&&canVisitFunWorld())return startSimulationLoading({selectedCharacter:selectedCharacterModel()||'chico2'});
   if(!simulationSubmissionComplete())return openDecisionMenu();
   const admitted=localStorage.getItem(worldAdmissionKey())==='1';
   if((characterSelectionConfirmed||admitted)&&selectedCharacterModel())return startSimulationLoading({selectedCharacter:selectedCharacterModel()});
@@ -1286,12 +1306,13 @@ function requestWorldEntry(){
 }
 async function startSimulationLoading(options={}){
   if(simulationLoadingActive)return false;
-  if(!canExploreWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida está pausada.');return false;}
+  if(!canVisitFunWorld()){showScreen('studentLobby');updateIntegrationUI();toast(studentAccess().reason||'La partida no está disponible.');return false;}
+  admittedFunContext=funAdmissionContext();
   const requestedCharacter=CHARACTER_SLUGS[options?.selectedCharacter]?options.selectedCharacter:(selectedCharacterModel()||'chico2');
   if(window.SIDE3D?.selectCharacter&&!window.SIDE3D.selectCharacter(requestedCharacter))return false;
-  loadDecisionState();
+  publishWorldIdentity();
   simulationLoadingActive=true;
-  const gameId=currentStudent.game?.id,company=currentStudent.company,connected=studentConnected;
+  const gameId=currentStudent.game?.id,company=currentStudent.company;
   document.querySelectorAll('[data-start-world],#startSimulationBtn').forEach(button=>button.disabled=true);
   $('retryWorldBtn')?.classList.add('hidden');
   if($('simulationLoadingText'))$('simulationLoadingText').textContent='Preparando mundo 3D…';
@@ -1299,14 +1320,14 @@ async function startSimulationLoading(options={}){
   try{
   if(typeof window.SIDE3D?.prepare!=='function')throw new Error('El motor 3D todavía no está disponible. Comprueba la conexión y vuelve a intentar.');
   const ok=await window.SIDE3D.prepare();
-  if((connected&&!studentConnected)||currentStudent.game?.id!==gameId||currentStudent.company!==company||!canExploreWorld()){window.SIDE3D?.suspend?.();updateIntegrationUI();return false;}
+  if(currentStudent.game?.id!==gameId||currentStudent.company!==company||!canVisitFunWorld()){window.SIDE3D?.suspend?.();updateIntegrationUI();return false;}
   if(!ok)throw new Error(window.SIDE3D.getLastError?.()||'No se pudo preparar el mundo 3D. Revisa que el navegador permita WebGL.');
   if(!await window.SIDE3D.enter({autoStart:true}))throw new Error('No se pudo abrir el mundo 3D. Puedes volver a intentarlo.');
   localStorage.setItem(worldAdmissionKey(),'1');
   return true;
   }catch(error){
     console.error('SIDE: inicio del mundo 3D',error);
-    if(canExploreWorld()){
+    if(canVisitFunWorld()){
       showScreen('simulationLoading');
       if($('simulationLoadingText'))$('simulationLoadingText').textContent=error.message||'No se pudo preparar el mundo 3D.';
       if($('simulationLoadingStage'))$('simulationLoadingStage').textContent='Carga interrumpida';
@@ -1332,6 +1353,7 @@ function updateCashHud(){
   $('cashBalance').textContent=money(cash);$('cashBalance').classList.toggle('danger',cash<0);$('cashMovement').textContent=`Caja inicial asignada: ${money(initialCapital())}`;
 }
 function updateHud(){
+  publishWorldAtmosphere();
   updateCashHud();
   const top=$('topSubmitAllDecisions');if(top){top.disabled=false;top.innerHTML='<span>✓</span> ENVIAR TODO';}
   $('sendDecisionSection')?.classList.remove('hidden');
@@ -1348,12 +1370,12 @@ function deterministicChance(seed,pct){return stableHash(seed)%100 < Number(pct|
 function activeStudentEvents(){
   let stored={};try{stored=JSON.parse(localStorage.getItem(eventStoreKey())||'{}')||{}}catch{}
   const round=currentRound(),conf=teacherConfig(),enabled=new Set(conf.enabledEvents||[]),schedule=eventSchedule();
-  if(conf.lifecycleVersion===2&&studentAccess().integration)return [];
+  if(conf.lifecycleVersion===2&&studentAccess().integration){worldAtmosphereEvents=[];window.SIDE_WORLD_PUBLISHER?.publish({events:[]});return [];}
   const remoteEvents=conf.lifecycleVersion===2&&currentStudent.empresaId;
   let individual={};if(remoteEvents){try{individual=JSON.parse(localStorage.getItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey())||'{}');}catch{}stored={};}
   for(let r=Number(teacherConfig().integrationMinutes)===60?2:1;r<=round;r++)if(!stored[r]){const ids=[];(schedule[r]?.group||[]).forEach(id=>{if(enabled.has(id))ids.push(id)});if(remoteEvents){(individual[r]||[]).filter(id=>enabled.has(id)).forEach(id=>ids.push(id));}else EVENT_CATALOG.filter(e=>e.scope==='individual'&&enabled.has(e.id)&&r>=Number(conf.eventRules?.[e.id]?.firstRound||1)&&(conf.eventRules?.[e.id]?.repeat!==false||!Object.entries(stored).some(([cycle,ids])=>Number(cycle)<r&&ids.includes(e.id)))).forEach(e=>{if(ids.filter(id=>EVENT_CATALOG.find(x=>x.id===id)?.scope==='individual').length>=2)return;if(deterministicChance(`${storageKey()}|${r}|${e.id}`,e.probability))ids.push(e.id)});stored[r]=ids}
   localStorage.setItem(eventStoreKey(),JSON.stringify(stored));
-  const active=[];Object.entries(stored).forEach(([trigger,ids])=>(ids||[]).forEach(id=>{const ev=EVENT_CATALOG.find(e=>e.id===id);if(!ev||!enabled.has(id))return;const effectiveStart=Number(trigger)+Number(ev.cycleOffset||0),effectiveEnd=effectiveStart+Math.max(1,Number(ev.cycles||1));if(round>=effectiveStart&&round<effectiveEnd)active.push({...ev,triggerRound:Number(trigger),startRound:effectiveStart})}));return active;
+  const active=[];Object.entries(stored).forEach(([trigger,ids])=>(ids||[]).forEach(id=>{const ev=EVENT_CATALOG.find(e=>e.id===id);if(!ev||!enabled.has(id))return;const effectiveStart=Number(trigger)+Number(ev.cycleOffset||0),effectiveEnd=effectiveStart+Math.max(1,Number(ev.cycles||1));if(round>=effectiveStart&&round<effectiveEnd)active.push({...ev,triggerRound:Number(trigger),startRound:effectiveStart})}));worldAtmosphereEvents=active.map(event=>({id:event.id,title:event.title,description:event.description,implication:event.implication,scope:event.scope}));window.SIDE_WORLD_PUBLISHER?.publish({events:worldAtmosphereEvents});return active;
 }
 function applyEventCashEffects(){
   if(studentAccess().cancelled)return;
@@ -1683,9 +1705,10 @@ function renderStudentStatus(){
 }
 function renderOfficeFinances(){
   const mount=$('adminFinancialPanel');
-  if(!mount||$('simAdmin')?.classList.contains('hidden')||!window.SIDE_STUDENT_FINANCIAL_VIEW)return;
-  const report=financialReport(),signature=JSON.stringify(report);
-  if(mount.dataset.signature!==signature){mount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.officeHtml(report);mount.dataset.signature=signature;}
+  if(mount&&mount.dataset.signature!=='fun-only'){
+    mount.textContent='Modo diversión: no afecta tus ingresos. Consulta tus finanzas económicas en la Tablet de decisiones.';
+    mount.dataset.signature='fun-only';
+  }
 }
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;

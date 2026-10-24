@@ -16,6 +16,8 @@ function acknowledgeCycleCostNotice(){
   catch(error){console.warn('SIDE: el aviso se cerró; su confirmación sigue pendiente de guardar.',error);}
 }
 function maybeShowCycleCostNotice(){
+  // Economic receipts wait for the 2D interface; they never interrupt play.
+  if(['simulator3d','simulationLoading'].some(id=>{const screen=$(id);return screen&&!screen.classList.contains('hidden');}))return null;
   if(!studentConnected||!studentAccess().canOperate)return null;
   // Admission, recovery and other dialogs take priority; never replace them.
   if(!$('modalRoot')?.classList.contains('hidden')&&$('cycleCostsModal')?.classList.contains('hidden'))return null;
