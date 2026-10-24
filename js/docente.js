@@ -57,6 +57,7 @@ function creationError(result){
 }
 function clearRoomLink(){
   roomGeneration++;
+  stopLiveCompanies();
   sharedRoom=null;
   $('gameCode').value='';$('gameCodeBadge').textContent='Código pendiente';
   state.partidaId=null;state.authoritative=null;teacherClock=null;state.reports=[];publishedState='';
@@ -183,14 +184,36 @@ function publishGameState(savedConfig=null){
   });
   return publishChain;
 }
-let companiesPoll=null,companiesChannel=null,companiesChannelId=null;
+let companiesPoll=null,companiesChannel=null,companiesChannelId=null,companiesRealtime=false,companiesRetry=null,companiesFailures=0,companiesRefresh=null,companiesGeneration=0;
+function stopLiveCompanies(){
+  companiesGeneration++;
+  clearInterval(companiesPoll);clearTimeout(companiesRetry);clearTimeout(companiesRefresh);
+  companiesPoll=null;companiesRetry=null;companiesRefresh=null;companiesRealtime=false;
+  // Reset identity before removing the old channel: CLOSED belongs to that
+  // channel and must not schedule a reconnection after leaving the room.
+  companiesChannelId=null;
+  if(companiesChannel)window.SIDE?.SupabaseClient?.get()?.removeChannel(companiesChannel);
+  companiesChannel=null;
+}
+function scheduleRosterRefresh(){
+  if(companiesRefresh!==null)return;
+  companiesRefresh=setTimeout(()=>{companiesRefresh=null;void loadReports();},250);
+}
 function startLiveCompanies(){
-  if(!companiesPoll)companiesPoll=setInterval(()=>{if(!document.hidden)loadReports()},3000);
+  // Realtime carries roster/presence. Slow reconciliation still discovers
+  // financial writes on tables not included in the roster publication.
+  if(!companiesPoll){let last=0;companiesPoll=setInterval(()=>{
+    const interval=companiesRealtime?30000:Math.min(60000,3000*2**Math.min(companiesFailures,4));
+    if(!document.hidden&&Date.now()-last>=interval){last=Date.now();void loadReports();}
+  },1000);}
   gradeQueue?.flush();
   const sb=window.SIDE?.SupabaseClient?.get();
   if(!sb?.channel||!state.partidaId||companiesChannelId===state.partidaId)return;
+  const channelGeneration=++companiesGeneration;
   if(companiesChannel)sb.removeChannel(companiesChannel);
+  clearTimeout(companiesRetry);companiesRetry=null;companiesRealtime=false;
   companiesChannelId=state.partidaId;
+  const channelId=state.partidaId;
   companiesChannel=sb.channel(`side-roster-${state.partidaId}`)
     .on('postgres_changes',{event:'*',schema:'public',table:'participantes',filter:`partida_id=eq.${state.partidaId}`},payload=>{
       const row=payload?.new;
@@ -198,9 +221,18 @@ function startLiveCompanies(){
         presenceTracker.observe(`${state.partidaId}:${row.empresa_id}`,row.last_seen_at);
         renderCompanies();renderTeacherLobby();
       }
-      loadReports();
+      scheduleRosterRefresh();
     })
-    .subscribe();
+    .subscribe(status=>{
+      if(channelGeneration!==companiesGeneration||channelId!==state.partidaId||channelId!==companiesChannelId)return;
+      companiesRealtime=status==='SUBSCRIBED';
+      if(companiesRealtime){companiesFailures=0;clearTimeout(companiesRetry);companiesRetry=null;scheduleRosterRefresh();return;}
+      if(!['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)||companiesRetry!==null)return;
+      rosterSyncError='Conexión en tiempo real interrumpida; consultando el servidor y reconectando.';
+      renderCompanies();
+      const delay=Math.min(60000,3000*2**Math.min(companiesFailures++,4));
+      companiesRetry=setTimeout(()=>{companiesRetry=null;if(channelId!==state.partidaId)return;companiesChannelId=null;startLiveCompanies();},delay);
+    });
 }
 function generateGameCode(){
   // Solo Supabase asigna códigos. Un borrador no representa una sala creada.
@@ -503,12 +535,13 @@ function paintTeacherClock(){
 }
 async function refreshTeacherGame(){
   if(state.starting||state.cancelling||state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
+  if(Date.now()<Number(state.syncRetryAt||0))return false;
   if(state.partidaId){
     teacherBusy=true;
     const id=state.partidaId,generation=roomGeneration;
     const stillCurrent=()=>id===state.partidaId&&generation===roomGeneration;
-    try{teacherRead=window.SIDE.PartidaService.controlar(id,'sincronizar');const result=await teacherRead;if(!stillCurrent())return false;if(!result.success){console.error('SIDE: sincronización de sala',result);creationFeedback('No se pudo sincronizar la sala: '+(result.error||'comprueba la conexión y reintenta.'),'error');return false;}const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!stillCurrent()||!await closeBusinessRemoteRound(cycle))return false;}if(!stillCurrent())return false;applyTeacherState(result.data);return true;}
-    catch(error){if(stillCurrent()){console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message,'error');}return false;}
+    try{teacherRead=window.SIDE.PartidaService.controlar(id,'sincronizar');const result=await teacherRead;if(!stillCurrent())return false;if(!result.success)throw new Error(result.error||'comprueba la conexión y reintenta.');const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!stillCurrent()||!await closeBusinessRemoteRound(cycle)){state.syncFailures=Number(state.syncFailures||0)+1;state.syncRetryAt=Date.now()+Math.min(60000,3000*2**Math.min(state.syncFailures-1,4));return false;}}if(!stillCurrent())return false;state.syncFailures=0;state.syncRetryAt=0;applyTeacherState(result.data);return true;}
+    catch(error){if(stillCurrent()){state.syncFailures=Number(state.syncFailures||0)+1;state.syncRetryAt=Date.now()+Math.min(60000,3000*2**Math.min(state.syncFailures-1,4));console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message+' Se reintentará automáticamente.','error');}return false;}
     finally{teacherBusy=false;}
   }else{
     const c={...state.authoritative,runtime:RULES.resolveRuntime(state.authoritative,teacherNow())};
@@ -769,9 +802,23 @@ async function supabaseReports(reportsBase=state.reports){
   const cat=await supabaseCatalog();
   if(!stillCurrent())return null;
   const out=[];
+  // Fetch independent financial reports concurrently; avoid N serial network
+  // timeouts freezing the whole roster. Each failure keeps its last snapshot.
+  const reportRows=new Map();
+  const participants=(parts.data||[]).filter(p=>p.empresa_id);
+  let nextReport=0;
+  await Promise.all(Array.from({length:Math.min(4,participants.length)},async()=>{
+    while(nextReport<participants.length){const p=participants[nextReport++];
+      try{reportRows.set(p.empresa_id,await S.DecisionesService.obtenerReporte(p.empresa_id));}
+      catch(error){reportRows.set(p.empresa_id,{success:false,error:error.message});}
+    }
+  }));
+  if(!stillCurrent())return null;
+  const failures=[];
   for(const p of (parts.data||[])){
     if(!p.empresa_id)continue;
-    const rr=await S.DecisionesService.obtenerReporte(p.empresa_id);
+    const rr=reportRows.get(p.empresa_id)||{success:false,error:'Reporte no disponible'};
+    if(!rr.success)failures.push(`${p.empresas?.nombre_comercial||p.empresa||p.empresa_id}: ${rr.error||'No se pudo leer el reporte'}`);
     if(!stillCurrent())return null;
     const info=rr.success?rr.data:null;
     const emp=info?.empresa||p.empresas||{};
@@ -813,6 +860,7 @@ async function supabaseReports(reportsBase=state.reports){
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
   }
+  if(failures.length)rosterSyncError='Reportes pendientes de sincronizar: '+failures.join('; ');
   const names=new Set(out.map(r=>r.empresa));
   for(const l of localBase){if(!names.has(l.empresa))out.push(l)}
   return out;
@@ -1023,7 +1071,7 @@ async function closeBusinessRemoteRound(ciclo){
     return false;
   }
   if(response.pending){
-    const status=$('roundState');if(status)status.textContent=`Ciclo ${ciclo} sin planes confirmados sincronizados; cierre pendiente. Puedes continuar.`;
+    const status=$('roundState');if(status)status.textContent=response.code==='PLANES_EN_GRACIA'?`Ciclo ${ciclo}: esperando confirmaciones en tránsito; el cierre se reintentará automáticamente.`:`Ciclo ${ciclo} sin planes confirmados sincronizados; cierre pendiente. Puedes continuar.`;
     return true;
   }
   for(const report of state.reports){const result=response.data?.resultadosPorEmpresa?.[String(report.empresaId)];if(!result)continue;const f=result.financial;Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});}
@@ -1257,5 +1305,5 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
   // No lanzar otra lectura tardía que pueda borrar una sala recién creada.
 })();
 
-window.addEventListener('pagehide',()=>{[teacherPoll,teacherTick,companiesPoll].forEach(clearInterval);teacherPoll=null;teacherTick=null;companiesPoll=null;if(companiesChannel)window.SIDE?.SupabaseClient?.get()?.removeChannel(companiesChannel);companiesChannel=null;companiesChannelId=null;});
+window.addEventListener('pagehide',()=>{[teacherPoll,teacherTick].forEach(clearInterval);teacherPoll=null;teacherTick=null;stopLiveCompanies();});
 window.addEventListener('pageshow',()=>{if((gameStatus()?.active||state.partidaId)&&state.lifecycleVersion===2){watchTeacherGame();refreshTeacherGame();startLiveCompanies();}});

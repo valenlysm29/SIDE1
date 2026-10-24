@@ -12,7 +12,16 @@
     const storageKey='SIDE_STUDENT_SYNC_OUTBOX';
     let jobs=[];
     try{const stored=JSON.parse(storage.getItem(storageKey)||'[]');if(Array.isArray(stored))jobs=stored.filter(j=>j?.identityKey&&j.snapshot&&Array.isArray(j.operations));}catch{}
-    let task=null,activeJob=null;
+    let task=null,activeJob=null,retryTimer=null,attempts=0,nextAttempt=0;
+    const now=options.now||Date.now,schedule=options.schedule||setTimeout,cancel=options.clearSchedule||clearTimeout;
+    const retryMs=options.retryMs||[3000,6000,15000,30000,60000];
+    function deferRetry(){
+      const delay=retryMs[Math.min(attempts++,retryMs.length-1)];nextAttempt=now()+delay;
+      if(retryTimer!==null)cancel(retryTimer);
+      retryTimer=schedule(()=>{retryTimer=null;void flush();},delay);
+      // A queued offline write must not keep a Node diagnostic process alive.
+      retryTimer?.unref?.();
+    }
     function persist(){
       try{storage.setItem(storageKey,JSON.stringify(jobs));return true;}
       catch(error){onStatus('storage-error',error);return false;}
@@ -45,6 +54,7 @@
       if(task)return task;
       const c=context();
       if(!c.connected||!pending(c.identityKey))return Promise.resolve(!pending(c.identityKey));
+      if(now()<nextAttempt)return Promise.resolve(false);
       const active=()=>{const next=context();return next.connected&&next.identityKey===c.identityKey&&next.epoch===c.epoch;};
       task=Promise.resolve().then(async()=>{
         while(active()){
@@ -80,7 +90,7 @@
                 if(!active())return false;
                 if(!remote?.success){
                   if(remote?.code==='EMPRESA_EXPULSADA'&&!remote.technical){discard(c.identityKey,true);onStatus('rejected',remote);onRejected(remote);return false;}
-                  mergeNewer(job);onStatus('pending',remote);return false;
+                  mergeNewer(job);onStatus('pending',remote);deferRetry();return false;
                 }
                 const revision=Number(remote.data?.snapshot_revision);
                 if(revision===job.expectedRevision+1&&remote.data?.snapshot&&snapshotSignature(remote.data.snapshot)===snapshotSignature(job.snapshot)){
@@ -92,14 +102,15 @@
               discard(c.identityKey,true);onStatus('conflict',error);await onConflict();
             }else if(['CREDENCIALES_INVALIDAS','EMPRESA_EXPULSADA'].includes(error?.code)&&!error.technical){
               discard(c.identityKey,true);onStatus('rejected',error);onRejected(error);
-            }else{mergeNewer(job);onStatus('pending',error);}
+            }else{mergeNewer(job);onStatus('pending',error);deferRetry();}
             return false;
           }
         }
         return false;
-      }).then(result=>{if(result&&active())onStatus('synced');return result;}).finally(()=>{activeJob=null;task=null;});
+      }).then(result=>{if(result&&active()){attempts=0;nextAttempt=0;if(retryTimer!==null)cancel(retryTimer);retryTimer=null;onStatus('synced');}return result;}).finally(()=>{activeJob=null;task=null;});
       return task;
     }
+    if(typeof global.addEventListener==='function')global.addEventListener('online',()=>{attempts=0;nextAttempt=0;if(retryTimer!==null)cancel(retryTimer);retryTimer=null;void flush();});
     return {enqueue,flush,pending,discard};
   }
   const api={createQueue};

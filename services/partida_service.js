@@ -360,7 +360,7 @@
       const context=await sb.rpc('side_contexto_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo});
       // No confirmed company is a provisional no-op, never an empty persisted
       // closure. The teacher can continue and synchronization retries later.
-      if(!context.error&&context.data?.code==='SIN_PLANES_CONFIRMADOS')return {success:true,pending:true,data:null,code:context.data.code};
+      if(!context.error&&['SIN_PLANES_CONFIRMADOS','PLANES_EN_GRACIA'].includes(context.data?.code))return {success:true,pending:true,data:null,code:context.data.code};
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
       const inputs=[];
@@ -368,7 +368,7 @@
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
         if(!saved)continue;
         const business={events:state.__cycleBusiness?.[ciclo]?.events||[]};
-        inputs.push({id:company.id,state:global.SIDE_CYCLE_MODEL.restoreState(saved.state,state),ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},...business});
+        inputs.push({id:company.id,state:global.SIDE_CYCLE_MODEL.restoreState(saved.state,state),ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,planSource:saved.source,fromRound:saved.fromRound,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},...business});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
@@ -380,7 +380,9 @@
           previous=adjustment;
         }
         delete result.state.__financialSnapshots?.[ciclo];
-        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:financialLedger,sectionsByRound:snapshot.financial_sections||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        result.financialSections=result.financialSections||snapshot.financial_sections||{};
+        result.ledger=financialLedger;
+        result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
       const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
