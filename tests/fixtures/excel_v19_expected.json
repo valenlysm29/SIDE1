@@ -1,0 +1,168 @@
+{
+  "metadatos": {
+    "escenario": "v19_fresco",
+    "motor": "Microsoft Excel COM",
+    "version": "16.0",
+    "estadoCalculo": 0,
+    "nota": "Escenario de inputs originales en libro v19 corregido; resultados recalculados por Excel COM16.0, sin importar JS."
+  },
+  "valores": {
+    "lote1_costo": 96.0,
+    "lote1_calidad": 10.0,
+    "lote1_umbral": 7.0,
+    "lote1_precioEfectivo": 350.0,
+    "lote2_costo": 51.0,
+    "lote2_calidad": 5.0,
+    "lote2_umbral": 4.0,
+    "lote2_precioEfectivo": 160.0,
+    "lote3_costo": 31.0,
+    "lote3_calidad": 4.0,
+    "lote3_umbral": 7.0,
+    "lote3_precioEfectivo": 162.5,
+    "calidadEmpresa": 5.8,
+    "eficiencia": 10.0,
+    "reputacion": 9.0,
+    "saludFinanciera": 0.0,
+    "capacidadDiaria": 17.2,
+    "eficienciaProduccion": 0.9700000000000001,
+    "capacidad": 400.0,
+    "produccion1": 192.0,
+    "produccion2": 125.0,
+    "produccion3": 50.0,
+    "mo_corte_1": 1690.8,
+    "mo_corte_2": 2254.4,
+    "mo_corte_3": 4191.36,
+    "mo_ensamble_1": 1690.8,
+    "mo_ensamble_2": 3104.16,
+    "mo_ensamble_3": 4952.4,
+    "mo_acabado_1": 1690.8,
+    "mo_acabado_2": 3104.16,
+    "mo_acabado_3": 4952.4
+  },
+  "celdas": {
+    "lote1_costo": [
+      "Lotes_Produccion",
+      "H2"
+    ],
+    "lote1_calidad": [
+      "Lotes_Produccion",
+      "I2"
+    ],
+    "lote1_umbral": [
+      "Lotes_Produccion",
+      "J2"
+    ],
+    "lote1_precioEfectivo": [
+      "Lotes_Produccion",
+      "O2"
+    ],
+    "lote2_costo": [
+      "Lotes_Produccion",
+      "H3"
+    ],
+    "lote2_calidad": [
+      "Lotes_Produccion",
+      "I3"
+    ],
+    "lote2_umbral": [
+      "Lotes_Produccion",
+      "J3"
+    ],
+    "lote2_precioEfectivo": [
+      "Lotes_Produccion",
+      "O3"
+    ],
+    "lote3_costo": [
+      "Lotes_Produccion",
+      "H4"
+    ],
+    "lote3_calidad": [
+      "Lotes_Produccion",
+      "I4"
+    ],
+    "lote3_umbral": [
+      "Lotes_Produccion",
+      "J4"
+    ],
+    "lote3_precioEfectivo": [
+      "Lotes_Produccion",
+      "O4"
+    ],
+    "calidadEmpresa": [
+      "Motor_Puntajes",
+      "B6"
+    ],
+    "eficiencia": [
+      "Motor_Puntajes",
+      "B9"
+    ],
+    "reputacion": [
+      "Motor_Puntajes",
+      "B10"
+    ],
+    "saludFinanciera": [
+      "Motor_Puntajes",
+      "B11"
+    ],
+    "capacidadDiaria": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "K5"
+    ],
+    "eficienciaProduccion": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "M5"
+    ],
+    "capacidad": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "N5"
+    ],
+    "produccion1": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E56"
+    ],
+    "produccion2": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E57"
+    ],
+    "produccion3": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E58"
+    ],
+    "mo_corte_1": [
+      "Costos De Producción",
+      "U11"
+    ],
+    "mo_corte_2": [
+      "Costos De Producción",
+      "U20"
+    ],
+    "mo_corte_3": [
+      "Costos De Producción",
+      "U29"
+    ],
+    "mo_ensamble_1": [
+      "Costos De Producción",
+      "Y11"
+    ],
+    "mo_ensamble_2": [
+      "Costos De Producción",
+      "Y20"
+    ],
+    "mo_ensamble_3": [
+      "Costos De Producción",
+      "Y29"
+    ],
+    "mo_acabado_1": [
+      "Costos De Producción",
+      "AC11"
+    ],
+    "mo_acabado_2": [
+      "Costos De Producción",
+      "AC20"
+    ],
+    "mo_acabado_3": [
+      "Costos De Producción",
+      "AC29"
+    ]
+  }
+}

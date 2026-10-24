@@ -1,0 +1,174 @@
+{
+  "nombre": "v19_fresco",
+  "entradas": {
+    "Seleccion_Ciclo0": {
+      "B2": "INF-03",
+      "B3": "INF-06",
+      "B4": "INF-09",
+      "B5": "RH-02",
+      "B6": "RH-05",
+      "B7": "RH-08",
+      "B8": "RH-10A",
+      "B9": "COM-01C",
+      "B10": "FIN-01B",
+      "B11": "INS-09B",
+      "B12": "INS-10A",
+      "B13": "INS-11B",
+      "B14": "INV-01B",
+      "B15": "INV-02B",
+      "B24": "FIN-02B",
+      "B25": "COM-06B",
+      "B26": "INF-11B",
+      "B27": "INS-12B"
+    },
+    "Lotes_Produccion": {
+      "B2": "SEG-03",
+      "C2": 100,
+      "D2": "INS-03",
+      "E2": "INS-05",
+      "F2": "INS-08",
+      "G2": "INF-10",
+      "M2": 250,
+      "B3": "SEG-02",
+      "C3": 300,
+      "D3": "INS-02",
+      "E3": "INS-04",
+      "F3": "INS-06",
+      "G3": "INF-08",
+      "M3": 160,
+      "B4": "SEG-03",
+      "C4": 100,
+      "D4": "INS-01",
+      "E4": "INS-04",
+      "F4": "INS-06",
+      "G4": "INF-08",
+      "M4": 250
+    }
+  },
+  "salidas": {
+    "lote1_costo": [
+      "Lotes_Produccion",
+      "H2"
+    ],
+    "lote1_calidad": [
+      "Lotes_Produccion",
+      "I2"
+    ],
+    "lote1_umbral": [
+      "Lotes_Produccion",
+      "J2"
+    ],
+    "lote1_precioEfectivo": [
+      "Lotes_Produccion",
+      "O2"
+    ],
+    "lote2_costo": [
+      "Lotes_Produccion",
+      "H3"
+    ],
+    "lote2_calidad": [
+      "Lotes_Produccion",
+      "I3"
+    ],
+    "lote2_umbral": [
+      "Lotes_Produccion",
+      "J3"
+    ],
+    "lote2_precioEfectivo": [
+      "Lotes_Produccion",
+      "O3"
+    ],
+    "lote3_costo": [
+      "Lotes_Produccion",
+      "H4"
+    ],
+    "lote3_calidad": [
+      "Lotes_Produccion",
+      "I4"
+    ],
+    "lote3_umbral": [
+      "Lotes_Produccion",
+      "J4"
+    ],
+    "lote3_precioEfectivo": [
+      "Lotes_Produccion",
+      "O4"
+    ],
+    "calidadEmpresa": [
+      "Motor_Puntajes",
+      "B6"
+    ],
+    "eficiencia": [
+      "Motor_Puntajes",
+      "B9"
+    ],
+    "reputacion": [
+      "Motor_Puntajes",
+      "B10"
+    ],
+    "saludFinanciera": [
+      "Motor_Puntajes",
+      "B11"
+    ],
+    "capacidadDiaria": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "K5"
+    ],
+    "eficienciaProduccion": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "M5"
+    ],
+    "capacidad": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "N5"
+    ],
+    "produccion1": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E56"
+    ],
+    "produccion2": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E57"
+    ],
+    "produccion3": [
+      "CANTIDAD DE PRODUCCIÓN",
+      "E58"
+    ],
+    "mo_corte_1": [
+      "Costos De Producción",
+      "U11"
+    ],
+    "mo_corte_2": [
+      "Costos De Producción",
+      "U20"
+    ],
+    "mo_corte_3": [
+      "Costos De Producción",
+      "U29"
+    ],
+    "mo_ensamble_1": [
+      "Costos De Producción",
+      "Y11"
+    ],
+    "mo_ensamble_2": [
+      "Costos De Producción",
+      "Y20"
+    ],
+    "mo_ensamble_3": [
+      "Costos De Producción",
+      "Y29"
+    ],
+    "mo_acabado_1": [
+      "Costos De Producción",
+      "AC11"
+    ],
+    "mo_acabado_2": [
+      "Costos De Producción",
+      "AC20"
+    ],
+    "mo_acabado_3": [
+      "Costos De Producción",
+      "AC29"
+    ]
+  }
+}
