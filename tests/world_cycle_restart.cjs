@@ -96,19 +96,18 @@ const seed = {
       await page.evaluate(round=>{localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));studentConnected=true;tickStudentGame();},round);
       // A real student acknowledges the mandatory-cost receipt before editing.
       if(await page.locator('#cycleCostsModal').isVisible())await page.locator('#cycleCostsModal [data-close]').first().click();
-      await page.waitForFunction(round=>lastObservedRound===round && SIDE3D.diagnostics().session===null,round);
-      assert.equal(await page.evaluate(()=>SIDE3D.diagnostics().running),false);
-      assert.equal(await page.locator('#decisionMenu').isVisible(),true);
-      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'new cycle blocks financial operations until its own decisions are sent');
-      assert.equal(await page.evaluate(()=>localStorage.getItem(cycleQA.inventoryKey())),null,'old stock must not leak into new cycle');
-      assert.equal(await page.evaluate(key=>localStorage.getItem(key),oldData.key),oldData.data);
+      await page.waitForFunction(round=>lastObservedRound===round && SIDE_WORLD_BRIDGE.getWorldSnapshot().cycle===round,round);
+      assert.equal(await page.evaluate(()=>canOperateWorld()),false,'new cycle still requires its own 2D decisions');
+      assert.equal(await page.evaluate(key=>localStorage.getItem(key),oldData.key),oldData.data,'prior recreational inventory is preserved under its previous namespace');
       const beforeExploration=await page.evaluate(()=>JSON.stringify(cashLedger));
       assert.equal(await page.evaluate(()=>startSimulationLoading()),true,'the current city remains explorable while preparing new cycle decisions');
       await active();
-      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.recordOperatingExpense(360)),false,'preparation cannot charge procurement');
-      assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.recordSimulatedSale(100)),false,'preparation cannot record sales');
+      assert.equal(await page.evaluate(()=>typeof window.SIDE_GAME_BRIDGE),'undefined','no economic mutation bridge is exposed');
+      await page.evaluate(()=>SIDE_WORLD_BRIDGE.emitFunSale({context:'cycle-preparation',points:100}));
       assert.equal(await page.evaluate(()=>JSON.stringify(cashLedger)),beforeExploration);
       await page.evaluate(()=>cycleQA.openDecisionsFrom3D());
+      // The economic receipt is deferred until the student opens the Tablet.
+      if(await page.locator('#cycleCostsModal').isVisible())await page.locator('#cycleCostsUnderstood').click();
       assert.equal(await submit(round,round===2),true);
       assert.equal(await page.evaluate(()=>companySummaryRound),'current');
       const ledger=await page.evaluate(()=>JSON.stringify(cashLedger));

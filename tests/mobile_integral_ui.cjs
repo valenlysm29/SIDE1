@@ -39,8 +39,10 @@ const sizes=[[360,800],[390,844],[768,1024],[800,360],[844,390],[1024,768]];
    await page.evaluate(()=>openDecisionMenu());
    for(const cat of await page.evaluate(()=>navigationCategories().map(c=>c.cat))){await page.evaluate(cat=>{currentCategory=cat;renderDecisionCategory()},cat);await capture('tablet-'+cat,'#decisionMenu')}
    await page.evaluate(()=>{
+    // This is a DOM-only layout fixture; WebGL entry is covered separately.
+    requestWorldEntry=()=>true;
     Object.assign(decisionDrafts,{MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}});
-    commitReviewedSections(decisionCategories().map(c=>c.cat),true);showScreen('simulator3d');document.querySelector('#sim3dStart').classList.add('hidden');
+    commitReviewedSections(decisionCategories().map(c=>c.cat),true);admittedFunContext=funAdmissionContext();showScreen('simulator3d');document.querySelector('#sim3dStart').classList.add('hidden');
     document.querySelector('#simHubOrder').hidden=false;document.querySelector('#simHubOrder').textContent='Pedido de prueba:12 unidades en camino';
     document.querySelector('#simCash').textContent='S/ 1,234,567.89';document.querySelector('#simNetProfit').textContent='−S/ 1,234,567.89';
     document.querySelector('#simMissionList').innerHTML='<div><span>1</span><p><b>Revisar el stock de la empresa</b><small>Visita el almacén para comprobar las existencias.</small></p></div>';

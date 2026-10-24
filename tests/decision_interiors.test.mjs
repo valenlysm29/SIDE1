@@ -70,8 +70,8 @@ test('financial and order boards read immutable simulation state without creatin
   f.world.sync(source);
   for (const id of ['office', 'bank']) {
     const room = f.rooms.find(room => room.id === id), text = room.stateSigns[0].mesh.userData.stateText;
-    assert.match(text, /1[,.]?234/); assert.match(text, /567/);
-    assert.match(text, id === 'office' ? /Ciclo 3/ : /890/);
+    assert.match(text, /1[,.]?234/); assert.doesNotMatch(text, /567|890/);
+    assert.match(text, id === 'office' ? /Ciclo 3/ : /Sin movimientos econ.micos/);
   }
   const suppliers = f.rooms.find(room => room.id === 'suppliers');
   assert.equal(suppliers.detail.userData.supplierState.pendingUnits, 42);

@@ -53,9 +53,9 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
     interaction(id) {
       const point=businessInteriors.hotspots.find(point=>point.zone===id&&point.type==='decisionZone');
       positionPlayer(point.x,point.z,0);this.tick();
-      const selected=nearestInteractable();const gameBridge=bridge(),previous=gameBridge.openDecisionCategory;let opened=null;
-      gameBridge.openDecisionCategory=category=>{opened=category;};
-      try{running=true;interact();}finally{gameBridge.openDecisionCategory=previous;running=true;}
+      const selected=nearestInteractable();const previous=window.SIDE_WORLD_NAVIGATION;let opened=null;
+      window.SIDE_WORLD_NAVIGATION=Object.freeze({openDecisions(category){opened=category;return true;}});
+      try{running=true;interact();}finally{window.SIDE_WORLD_NAVIGATION=previous;running=true;}
       return {point:point.id,nearest:selected?.id,opened,blocked:collision(point.x,point.z)};
     },
     actors(id) {
@@ -88,7 +88,7 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
     assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
     await page.evaluate(()=>decisionInteriorQA.pause());
     results.deferred=await page.evaluate(()=>decisionInteriorQA.deferred());
-    assert.ok(results.deferred.every(room=>room.deferred&&room.children===0),'service interiors stay unallocated at initial spawn');
+    assert.ok(results.deferred.every(room=>!room.deferred&&room.children>0),'service interiors are populated at entry so workers can advance while the player explores');
     for(const tier of ['low','medium','high','auto']) {
       await page.evaluate(mode=>decisionInteriorQA.tier(mode),tier);results.tiers[tier]={};
       for(const [id,category] of Object.entries({office:'B',bank:'E',suppliers:'F'})) {
@@ -106,9 +106,15 @@ const instrumented = original.replace('  window.SIDE3D = {', `  window.decisionI
         for(let visit=0;visit<3;visit++) {
           assert.equal((await page.evaluate(id=>decisionInteriorQA.door(id,false),id)).zone,null,`${id} exit`);
           await page.evaluate(id=>decisionInteriorQA.door(id,true),id);
+          try {
+            await page.waitForFunction(id=>{const actors=decisionInteriorQA.actors(id);return actors.count>0&&actors.local.every(actor=>actor.id&&actor.manifestRoles.includes(actor.role));},id,{timeout:30000});
+          } catch(error) {
+            const diagnostic=await page.evaluate(id=>decisionInteriorQA.actors(id),id);
+            console.error('STAFF_READINESS',JSON.stringify({tier,id,visit,diagnostic}));throw error;
+          }
           const actors=await page.evaluate(id=>decisionInteriorQA.actors(id),id);
           assert.equal(actors.count,count,`${id} actor count stable`);
-          assert.ok(actors.count>0&&actors.local.every(actor=>actor.id&&actor.manifestRoles.includes(actor.role)),`${tier} ${id} staff approved for each role`);
+          assert.ok(actors.count>0&&actors.local.every(actor=>actor.id&&actor.manifestRoles.includes(actor.role)),`${tier} ${id} staff approved for each role: ${JSON.stringify(actors)}`);
           for(const actor of actors.local)assert.ok(Math.abs(actor.height-actor.approvedHeight)<=.1,`${tier} ${id} ${actor.id} height ${actor.height} expected ${actor.approvedHeight}`);
           assert.equal(new Set(actors.visibleIds).size,actors.visibleIds.length,`${tier} ${id} unique active CC0 actors`);
         }

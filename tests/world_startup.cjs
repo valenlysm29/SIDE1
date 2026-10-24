@@ -21,8 +21,8 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    await context.route('**/*',route=>!route.request().url().startsWith(url)?route.abort():/\/js\/simulator3d\.js(?:\?|$)/.test(route.request().url())?route.fulfill({contentType:'application/javascript',body:source}):route.continue());
    await page.goto(url,{waitUntil:'domcontentloaded'});
    await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA',company:'QA MUNDO',game:DEMO_GAME};openDecisionMenu();});
-   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),true,'the world is available before decisions are submitted');
-   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),false,'financial operations remain locked until decisions are submitted');
+   assert.equal(await page.evaluate(()=>canStartSimulation()),true,'the world is available before decisions are submitted');
+   assert.equal(await page.evaluate(()=>canOperateWorld()),false,'financial operations remain locked until decisions are submitted');
    if(mode==='all'){
     await page.evaluate(seed=>{Object.assign(decisionDrafts,seed);renderDecisionCategory();openCompanyReview()},seed);
     assert.deepEqual(await page.evaluate(()=>reviewProblems(liveCompanyReview())),[]);
@@ -30,7 +30,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    }else{
     const cats=await page.evaluate(()=>decisionCategories().map(c=>c.cat));
     for(let i=0;i<cats.length;i++){
-     const result=await page.evaluate(({cat,seed})=>{currentCategory=cat;Object.assign(decisionDrafts,seed);renderDecisionCategory();const ok=commitReviewedSections([cat],false);return {ok,ready:SIDE_GAME_BRIDGE.canOperate()}},{cat:cats[i],seed});
+     const result=await page.evaluate(({cat,seed})=>{currentCategory=cat;Object.assign(decisionDrafts,seed);renderDecisionCategory();const ok=commitReviewedSections([cat],false);return {ok,ready:canOperateWorld()}},{cat:cats[i],seed});
      assert.equal(result.ok,true,`submit section ${cats[i]}`);
      assert.equal(result.ready,i===cats.length-1,'all sections are required');
     }
@@ -39,8 +39,9 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     await page.reload({waitUntil:'domcontentloaded'});
     await page.evaluate(()=>{currentStudent={name:'QA',company:'QA MUNDO',game:DEMO_GAME};currentCategory='A';openDecisionMenu()});
    }
-   assert.equal(await page.evaluate(()=>SIDE_GAME_BRIDGE.canStartSimulation()),true);
-   await page.locator('#companyStartWorld').waitFor({state:'visible'});
+   assert.equal(await page.evaluate(()=>canStartSimulation()),true);
+   if(mode==='all')await page.locator('#characterSelection').waitFor({state:'visible'});
+   else await page.locator('#companyStartWorld').waitFor({state:'visible'});
    if(mode==='all'){
     // A rejected preparation returns to the summary, releases the button and preserves money.
     const before=await page.evaluate(()=>({ledger:JSON.stringify(cashLedger),state:JSON.stringify(decisionState)}));

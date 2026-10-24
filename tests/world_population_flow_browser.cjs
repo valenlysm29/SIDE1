@@ -15,7 +15,7 @@ const instrumented=source.replace('const time = performance.now() * 0.001;', 'co
   freeze(){cancelAnimationFrame(raf);},
   district(){return hubWorld.stats();},
   districtView(x,z,tx,tz){camera.position.set(HUB_OFFSET+x,25,z);camera.lookAt(HUB_OFFSET+tx,0,tz);renderer.render(scene,camera);},
-  snapshot(){return {running,interior:currentInterior,rooms:businessInteriors.rooms.map(r=>({id:r.id,visible:r.detail.visible,actors:r.actors.map(a=>({id:a.object.uuid,x:a.object.position.x,z:a.object.position.z,visible:a.object.visible,stationary:!!a.route.stationary}))})),customers:npcs.map(n=>({id:n.obj.uuid,x:n.obj.position.x,z:n.obj.position.z,state:n.state,browse:n.browsePoint?{x:n.browsePoint.x,z:n.browsePoint.z}:null})),stock:totalDisplayStock()+totalReserveStock(),cash:decisionCash()};},
+  snapshot(){return {running,interior:currentInterior,rooms:businessInteriors.rooms.map(r=>({id:r.id,visible:r.detail.visible,actors:r.actors.map(a=>({id:a.object.uuid,x:a.object.position.x,z:a.object.position.z,visible:a.object.visible,stationary:!!a.route.stationary}))})),customers:npcs.map(n=>({id:n.obj.uuid,x:n.obj.position.x,z:n.obj.position.z,state:n.state,browse:n.browsePoint?{x:n.browsePoint.x,z:n.browsePoint.z}:null})),stock:totalDisplayStock()+totalReserveStock(),cash:operationalCash(),economic:JSON.stringify({cash:cashBalance(),ledger:cashLedger,state:decisionState})};},
   advance(seconds){cancelAnimationFrame(raf);const original=clock.getDelta,render=renderer.render;clock.getDelta=()=>1/60;renderer.render=()=>{};this.now??=performance.now();try{for(let i=0;i<Math.round(seconds*60);i++){this.now+=1000/60;frame(this.now);cancelAnimationFrame(raf);}}finally{clock.getDelta=original;renderer.render=render;}renderer.render(scene,camera);return this.snapshot();},
   visit(id){const r=businessInteriors.rooms.find(r=>r.id===id);positionPlayer(HUB_OFFSET+r.layout.x,r.layout.z,0);updateBusinessZone();},
   outside(){positionPlayer(HUB_OFFSET,0,0);updateBusinessZone();},
@@ -63,6 +63,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   assert.ok(saleFixture&&saleFixture.staff>1,'real stock and two decision-defined sales staff available');
   const saleBefore=await page.evaluate(()=>populationFlowQA.snapshot());
   const saleAfter=results.remoteCheckout=await page.evaluate(()=>populationFlowQA.advance(.2));
+  assert.equal(saleAfter.economic,saleBefore.economic,'NPC checkout leaves economic state unchanged');
   assert.ok(saleAfter.cash>saleBefore.cash,'existing real customer checked out while player remains in plaza');
   assert.equal(saleBefore.stock,preReservation.stock-1,'existing stock is reserved once');
   assert.equal(saleAfter.stock,saleBefore.stock,'checkout never consumes the reserved stock twice');

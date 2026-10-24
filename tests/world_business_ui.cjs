@@ -9,7 +9,7 @@ const instrumented=source.replace('  window.SIDE3D = {',`  window.businessQA={
   open(){const e=hubWorld.entrances.find(e=>e.id==='warehouse');positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++)updatePlayer(1/60);keys={};openAdmin();},
   due(){if(businessState.pendingSupplierOrder){businessState.pendingSupplierOrder.dueAt=Date.now()-1;saveBusinessState();}tickSupplier();},
   tick:tickSupplier,
-  snapshot(){return {stock:totalDisplayStock()+totalReserveStock(),pending:businessState.pendingSupplierOrder,ledger:JSON.stringify(bridge().ledger),cash:decisionCash(),time:gameSession.timeLeft,frames:renderer.info.render.frame};}
+  snapshot(){return {storageKey:businessKey(),persistedBusiness:localStorage.getItem(businessKey()),stock:totalDisplayStock()+totalReserveStock(),pending:businessState.pendingSupplierOrder,ledger:JSON.stringify(cashLedger),cash:operationalCash(),economic:JSON.stringify({cash:cashBalance(),ledger:cashLedger,state:decisionState}),time:gameSession.timeLeft,frames:renderer.info.render.frame};}
 };\n  window.SIDE3D = {`);
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:1}},INV_MARKETING:{optionIds:['mkt_baja']}};
 (async()=>{
@@ -28,14 +28,14 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   const before=await page.evaluate(()=>businessQA.snapshot());
   await page.locator('[data-admin-tab="stock"]').click();await page.locator('#orderStockBtn').click();
   const paid=await page.evaluate(()=>businessQA.snapshot());
-  assert.equal(paid.cash,before.cash-360);assert.equal(paid.stock,before.stock);assert.ok(paid.pending);
+  assert.equal(paid.cash,before.cash-360);assert.equal(paid.economic,before.economic,'supplier order leaves economic state unchanged');assert.equal(paid.stock,before.stock);assert.ok(paid.pending);
   await page.locator('#orderStockBtn').click();assert.equal((await page.evaluate(()=>businessQA.snapshot())).cash,paid.cash);
   await page.reload({waitUntil:'domcontentloaded'});
   await page.evaluate(()=>{currentStudent={name:'QA BUSINESS',company:'QA BUSINESS',game:DEMO_GAME};openDecisionMenu();});
   assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
   await page.evaluate(()=>{businessQA.freeze();businessQA.due();});
   const delivered=await page.evaluate(()=>businessQA.snapshot());
-  assert.equal(delivered.cash,paid.cash);assert.equal(delivered.stock,before.stock+12);assert.equal(delivered.pending,null);
+  assert.equal(delivered.cash,paid.cash,JSON.stringify({before,paid,delivered}));assert.equal(delivered.economic,paid.economic,'delivery leaves economic state unchanged');assert.equal(delivered.stock,before.stock+12);assert.equal(delivered.pending,null);
   await page.evaluate(()=>{businessQA.tick();businessQA.tick();});
   assert.equal((await page.evaluate(()=>businessQA.snapshot())).stock,delivered.stock);
   console.log('PASS warehouse UI: paid order survives reload, exact stock +12, no repeated debit or delivery');

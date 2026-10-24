@@ -21,9 +21,9 @@ function runtime(){
   return {qa:context.window.runtimeQA,allow:v=>allowed=v,hide:v=>hidden=v,stats:()=>({scheduled,renders,transactions})};
 }
 
-test('same-round closure suspends the world before a transaction can run',()=>{
+test('same-round economic closure does not suspend the independent world',()=>{
   const r=runtime();r.hide(true);r.qa.start();r.allow(false);r.qa.context();
-  assert.equal(r.qa.state().running,false);assert.equal(r.qa.state().session,null);
+  assert.equal(r.qa.state().running,true);assert.ok(r.qa.state().session);
 });
 test('a hidden world schedules a wakeup without rendering or operating',()=>{
   const r=runtime();r.hide(true);r.qa.start();r.qa.frame();

@@ -4,6 +4,12 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const base=process.env.SIDE_TEST_URL||'http://127.0.0.1:8772/';
 const output=path.join(__dirname,'output/mona');fs.mkdirSync(output,{recursive:true});
 const captureScreenshots=process.env.SIDE_SKIP_SCREENSHOTS!=='1';
+// Procedural guides intentionally lack modelKind, so generic model diagnostics
+// omit them. Inspect the actual guide actor rather than treating that as absence.
+const simulatorSource=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
+const instrumented=simulatorSource.replace('  window.SIDE3D = {',`  window.monaGuideQA=()=>{const obj=animatedActors.find(actor=>actor.type==='guide')?.obj;if(!obj)return null;const pos=obj.getWorldPosition(new THREE.Vector3());return {name:obj.userData.displayName||obj.name,x:pos.x,z:pos.z,role:obj.userData.role};};
+  window.SIDE3D = {`);
+
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};
 (async()=>{
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-webgl','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
@@ -34,7 +40,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
    const ctx=await browser.newContext({viewport:{width:1440,height:900}}),p=await ctx.newPage(),pageErrors=[];
    p.setDefaultTimeout(90000);
    p.on('pageerror',e=>pageErrors.push(e.message));
-   await ctx.route('**/*',route=>{const url=route.request().url();if(!url.startsWith(base)||(fallback&&url.endsWith('/npcs/mona.glb')))return route.abort();return route.continue()});
+   await ctx.route('**/*',route=>{const url=route.request().url();if(!url.startsWith(base)||(fallback&&url.endsWith('/npcs/mona.glb')))return route.abort();if(/\/js\/simulator3d\.js(?:\?|$)/.test(url))return route.fulfill({contentType:'application/javascript',body:instrumented});return route.continue()});
    await p.goto(base,{waitUntil:'domcontentloaded'});
    await p.evaluate(seed=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles:6,roundHours:8}));currentStudent={name:'QA MONA',company:'QA MONA',game:DEMO_GAME};openDecisionMenu();Object.assign(decisionDrafts,seed);renderDecisionCategory();openCompanyReview()},seed);
    await p.locator('#confirmCompanyReview').click();
@@ -44,7 +50,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
     let diag=await p.evaluate(()=>SIDE3D.diagnostics());
    assert.equal(diag.mona.loaded,!fallback);assert.equal(diag.mona.instances,0);assert.equal(diag.running,true);
    assert.equal(diag.world.id,'side-city');assert.equal(diag.world.legacyActive,false);
-   const guide=diag.characters.find(c=>c.role==='guide');
+   const guide=await p.evaluate(()=>monaGuideQA());
    assert.ok(guide&&guide.x>100,'guide belongs to the new world');
    assert.equal(guide.name,'Guía SIDE');
    assert.equal(diag.characters.some(c=>c.name==='Valeria'&&c.role!=='player'),false,'playable identity is not an NPC');

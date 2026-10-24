@@ -10,7 +10,7 @@ function fixture() {
     inventory: { display: { esencial: 1, urbano: 3, premium: 0 }, reserve: { esencial: 5, urbano: 0, premium: 2 }, producedUnits: 11, totalTarget: 11 },
     businessState: { pendingSupplierOrder: null }, running: true, gameSession: { shiftEnded: false },
     productionSnapshot: () => ({ producibleUnits: 11 }), displayCapacity: () => 4, warehouseCapacity: () => 30,
-    bridge: () => ({ canOperate: () => true }), decisionCash: () => 100000, currentRoundSafe: () => 1,
+    bridge: () => ({ canOperate: () => true }), operationalCash: () => 100000, currentRoundSafe: () => 1,
     owned: () => 1, qty: () => 1, saveInventory() { writes++; }, updateHUD() {}, message() {}, playSfx() {}
   };
   vm.createContext(context);

@@ -31,30 +31,20 @@ test('legacy multiple stores normalize to one, keeping its district and first co
   // A web-only channel never creates a physical store or a store commission.
   assert.equal(rules.storeCount(rules.singleStoreSelection({optionIds:['web']})),0);
 });
-test('production record is scoped to active company and cycle, never reconstructed from inventory',()=>{
-  const data=new Map();let round=1,company='Example';
-  const context={window:{SIDE_GAME_BRIDGE:{currentRound:()=>round,companyName:()=>company}},document:{getElementById:()=>({textContent:'CODE'})},localStorage:{getItem:key=>data.get(key)||null}};
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8'),context);
-  const read=context.window.SIDE3D.cycleProductionRecord;
-  assert.equal(read(),null);
-  data.set('side3d_inventory_CODE_Example_1',JSON.stringify({totalTarget:200,reserve:{esencial:100},sold:{esencial:20}}));
-  assert.equal(read(),null);
-  data.set('side3d_inventory_CODE_Example_1',JSON.stringify({producedUnits:65,reserve:{esencial:999}}));
-  assert.equal(read().producedUnits,65);
-  round=2;assert.equal(read(),null);round=1;company='Another';assert.equal(read(),null);
+test('world exposes no production record back to the economic model',()=>{
+ const data=new Map();let round=1,company='Example';
+ const context={window:{SIDE_WORLD_BRIDGE:{getWorldSnapshot:()=>({company:{name:company,gameCode:'CODE'},cycle:round,approximateStock:80,products:[],storeLevel:{visual:{}}})}},document:{getElementById:()=>({textContent:'CODE'})},localStorage:{getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)}};
+ const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('window.SIDE3D = { prepare,','window.SIDE3D = { loadInventory, prepare,');
+ vm.runInNewContext(source,context);
+ const world=context.window.SIDE3D;assert.equal(world.cycleProductionRecord,undefined);
+ world.loadInventory();const key='side3d_fun_inventory_CODE_Example_1';
+ assert.equal(JSON.parse(data.get(key)).producedUnits,80);
+ world.loadInventory();assert.equal(JSON.parse(data.get(key)).producedUnits,80);
+ round=2;world.loadInventory();assert.ok(data.has('side3d_fun_inventory_CODE_Example_2'));
+ company='Another';world.loadInventory();assert.ok(data.has('side3d_fun_inventory_CODE_Another_2'));
 });
-
-test('realized cycle output is recorded once on creation and added production, excluding supplied stock',()=>{
-  const data=new Map();let target=80;
-  const context={window:{SIDE_GAME_BRIDGE:{currentRound:()=>1,companyName:()=> 'Factory',productionPlan:()=>({producibleUnits:target,productLines:[{plannedUnits:target},{plannedUnits:0},{plannedUnits:0}]})}},document:{getElementById:()=>({textContent:'CODE'})},localStorage:{getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value)}};
-  // Expose only the existing loader in this isolated VM, without starting WebGL.
-  const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8').replace('window.SIDE3D = { prepare,','window.SIDE3D = { loadInventory, prepare,');
-  vm.runInNewContext(source,context);
-  const simulator=context.window.SIDE3D;
-  simulator.loadInventory();assert.equal(simulator.cycleProductionRecord().producedUnits,80);
-  simulator.loadInventory();assert.equal(simulator.cycleProductionRecord().producedUnits,80);
-  target=100;simulator.loadInventory();assert.equal(simulator.cycleProductionRecord().producedUnits,100);
-  const key='side3d_inventory_CODE_Factory_1',inventory=JSON.parse(data.get(key));
-  inventory.reserve.esencial+=25;data.set(key,JSON.stringify(inventory));
-  simulator.loadInventory();assert.equal(simulator.cycleProductionRecord().producedUnits,100);
+test('local display production and supplier stock never provide economic productivity',()=>{
+ const source=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
+ assert.doesNotMatch(source,/SIDE3D\.cycleProductionRecord/);
+ assert.equal(model.cycleProductivity({target:100},null,1).produced,null);
 });

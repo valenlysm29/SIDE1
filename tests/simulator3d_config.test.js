@@ -41,8 +41,9 @@ test('the local human avatar is a valid GLB with idle and walk clips',()=>{
 
 test('simulator visualizes decisions while entertainment sales stay local',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8');
-  assert.match(source,/activeEvents\?\.\(\)/);
-  assert.match(source,/productionPlan\?\.\(\)/);
+  assert.match(source,/worldSnapshot\(\)\.events/);
+  assert.match(source,/snapshot\.approximateStock/);
+  assert.doesNotMatch(source,/SIDE_GAME_BRIDGE|SIDE_RULES|SIDE_WORLD_PUBLISHER/);
   assert.doesNotMatch(source,/recordSimulatedSale/);
   assert.match(source,/businessState.revenue=Number\(businessState.revenue\|\|0\)\+salePrice/);
   assert.match(source,/trafficLight==='pedestrians'/);

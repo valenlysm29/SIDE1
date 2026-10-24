@@ -122,7 +122,7 @@ const instrumented=source.replace(/new THREE.WebGLRenderer\(\{/g,'new THREE.WebG
     assert.ok((await page.evaluate(()=>SIDE3D.diagnostics().navigationGrid))?.blocked>0,'city navmesh excludes solid parcels');
     const actorsBefore=await page.evaluate(()=>hubQA.actors());
     const activeCharacter=await page.evaluate(()=>SIDE3D.diagnostics().character.selected);
-    assert.equal(actorsBefore.length,3,'three distinct NPC positions patrol outdoors');
+    assert.ok(actorsBefore.length>=3,'at least three distinct NPC positions patrol outdoors; crowd size follows graphics mode');
     assert.ok(actorsBefore.every(a=>a.animated),'all outdoor pedestrians have animation controllers');
     assert.equal(actorsBefore.some(a=>a.kind===activeCharacter),false,'the selected player identity is not duplicated as a pedestrian');
     await page.evaluate(()=>hubQA.stepActors(5));

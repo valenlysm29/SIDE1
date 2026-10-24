@@ -11,7 +11,7 @@ const instrumented=source.replace('  window.SIDE3D = {',`  window.npcWorldQA={
   actors(){return [...hubActors,...animatedActors.filter(a=>a.obj?.userData.role==='guide')];},
   rooms(){return businessInteriors.rooms.map(r=>r.id);},
   measure(object){scene.updateMatrixWorld(true);const bounds=new THREE.Box3();object.traverse(n=>{if(n.isMesh&&n.name!=='ContactShadow'&&!n.userData.characterAccessory)bounds.expandByObject(n,true);});const p=object.getWorldPosition(new THREE.Vector3()),floor=businessInteriors?.groundHeightAt(p.x,p.z)??hubWorld.groundHeightAt(p.x,p.z);return {kind:object.userData.modelKind||object.userData.role,name:object.name,x:p.x,y:p.y,z:p.z,height:bounds.max.y-bounds.min.y,foot:bounds.min.y,ground:object.userData.groundHeight??null,floor,target:object.userData.characterGeometry?.height??null};},
-  snapshot(){return {player:this.measure(playerAvatar),outdoor:this.actors().filter(a=>a.obj.visible).map(a=>this.measure(a.obj)),interior:(businessInteriors?.rooms||[]).flatMap(r=>r.actors.map(a=>({...this.measure(a.object),room:r.id,visible:a.object.visible}))) };},
+  snapshot(){return {expectedOutdoor:hubNpcLimit()+1,player:this.measure(playerAvatar),outdoor:this.actors().filter(a=>a.obj.visible).map(a=>this.measure(a.obj)),interior:(businessInteriors?.rooms||[]).flatMap(r=>r.actors.map(a=>({...this.measure(a.object),room:r.id,visible:a.object.visible}))) };},
   simulate(seconds){const actors=this.actors().filter(a=>a.obj.visible),travel=actors.map(()=>0),initial=actors.map(a=>({x:a.obj.position.x,z:a.obj.position.z}));let roots=0,feet=0,tallest=0,heightExcess=-Infinity;
     for(let i=0;i<Math.round(seconds*60);i++){const before=actors.map(a=>({x:a.obj.position.x,z:a.obj.position.z}));updateHubActors(1/60);businessInteriors.tick(1/60,player,i/60);updateGameplayCamera(1/60);actors.forEach((a,k)=>travel[k]+=Math.hypot(a.obj.position.x-before[k].x,a.obj.position.z-before[k].z));if(i%60===0){const playerHeight=this.measure(playerAvatar).height;for(const a of [...actors.map(a=>a.obj),...(businessInteriors.rooms.find(r=>r.id===currentInterior)?.actors||[]).map(a=>a.object)]){const m=this.measure(a);if(m.floor!==null){roots=Math.max(roots,Math.abs(m.y-m.floor));feet=Math.max(feet,Math.abs(m.foot-m.floor));}tallest=Math.max(tallest,m.height);heightExcess=Math.max(heightExcess,m.height-playerHeight);}}}
     return {travel,displacement:actors.map((a,k)=>Math.hypot(a.obj.position.x-initial[k].x,a.obj.position.z-initial[k].z)),maxRootError:roots,maxFootError:feet,maxHeightExcess:heightExcess,tallest,snapshot:this.snapshot()};},
@@ -38,7 +38,7 @@ const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:
   assert.equal(await page.evaluate(()=>startSimulationLoading()),true);
   await page.evaluate(()=>SIDE3D.preloadDetails());await page.evaluate(()=>npcWorldQA.freeze());
   results.start=await page.evaluate(()=>npcWorldQA.snapshot());
-  assert.equal(results.start.outdoor.length,4,'three pedestrians and the mobile guide');
+  assert.equal(results.start.outdoor.length,results.start.expectedOutdoor,'configured pedestrians and one mobile guide');
   results.windows=[];
   for(let window=0;window<12;window++){
    const measurement=await page.evaluate(()=>npcWorldQA.simulate(5));results.windows.push(measurement);

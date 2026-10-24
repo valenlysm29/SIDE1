@@ -123,8 +123,8 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await s1.evaluate(()=>{setDecisionsSubmitted(true);localStorage.setItem(characterSelectionKey(),'miguel');characterSelectionConfirmed=true;return requestWorldEntry();});
   await s1.waitForFunction(()=>!$('simulator3d').classList.contains('hidden'));
   assert.equal(await s1.evaluate(()=>currentRound()),1);assert.equal(await s2.evaluate(()=>studentAccess().canOperate),true);
-  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canExplore()),true);
-  assert.equal(await s1.evaluate(()=>SIDE_GAME_BRIDGE.canOperate()),true,'submitted decisions enable business operations in the 3D world');
+  assert.equal(await s1.evaluate(()=>canExploreWorld()),true);
+  assert.equal(await s1.evaluate(()=>canOperateWorld()),true,'submitted decisions complete the 2D decision workflow');
   await s1.evaluate(()=>{window.rejectWorld=true;return startSimulationLoading()});
   assert.equal(await s1.locator('#simulationLoading').isVisible(),true);
   assert.equal(await s1.locator('#decisionMenu').isVisible(),false);

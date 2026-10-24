@@ -8,7 +8,7 @@ const source=fs.readFileSync(path.join(root,'js/simulator3d.js'),'utf8').replace
   update(){updateHubObjective();},
   enter(id){const e=hubWorld.entrances.find(e=>e.id===id);positionPlayer(e.x,e.z,0);keys.KeyW=true;for(let i=0;i<110;i++)updatePlayer(1/60);keys={};},
   pending(){businessState.pendingSupplierOrder={id:'qa-pending',units:12,dueAt:Date.now()+60000};updateHubObjective();},
-  snapshot(){return JSON.stringify({inventory,businessState,ledger:bridge().ledger});},
+  snapshot(){return JSON.stringify({inventory,businessState,ledger:cashLedger});},
   state(){return {waypoint:hubWaypoint.visible,position:hubWaypoint.position.toArray()};}
 };\n  window.SIDE3D = {`);
 const seed={MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:10,molde_2:0,molde_3:0}},CUERO:{quantities:{cuero_sint:3}},ACCESORIOS:{quantities:{acc_eco:10}},HILO:{quantities:{hilo_std:1}},GARANTIA_PT:{optionIds:['pt_30']},CANALES:{optionIds:['sjl'],quantities:{sjl:2}},INV_MARKETING:{optionIds:['mkt_baja']}};

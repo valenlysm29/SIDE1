@@ -23,7 +23,8 @@ test('cycle business context never reads world inventory or prices',()=>{
 test('world has no financial write bridge and the bridge exposes no mutable decisions',()=>{
  const world=fs.readFileSync(require.resolve('../js/simulator3d.js'),'utf8'),app=fs.readFileSync(require.resolve('../js/app.js'),'utf8');
  assert.doesNotMatch(world,/bridge\(\)\.(?:recordOperatingExpense|recordSimulatedSale|ledger)/);
- const bridge=app.slice(app.indexOf('window.SIDE_GAME_BRIDGE='),app.indexOf('// Landing / acceso'));
- assert.doesNotMatch(bridge,/recordOperatingExpense|recordSimulatedSale|get ledger/);
- assert.match(bridge,/get decisions\(\)\{return deepClone\(decisionState\)\}/);
+ assert.doesNotMatch(world,/SIDE_GAME_BRIDGE|SIDE_WORLD_PUBLISHER/);
+ const bridge=fs.readFileSync(require.resolve('../js/shared/world_bridge.js'),'utf8');
+ assert.doesNotMatch(bridge,/cashLedger|decisionState|supabase|__cyclePlans/);
+ assert.match(bridge,/freeze\(copy\(last\)\)/);
 });

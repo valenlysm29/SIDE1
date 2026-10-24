@@ -11,7 +11,7 @@ function fixture(){
     businessState:{pendingSupplierOrder:{id:'QA:1',units:12}},running:true,gameSession:{shiftEnded:false},
     plan:{producibleUnits:20,productLines:[{plannedUnits:20}],processes:{cutting:{capacity:20}}},
     productionSnapshot:()=>context.plan,displayCapacity:()=>4,warehouseCapacity:()=>30,
-    bridge:()=>({canOperate:()=>canOperate}),decisionCash:()=>99640,currentRoundSafe:()=>2,
+    bridge:()=>({canOperate:()=>canOperate}),operationalCash:()=>99640,currentRoundSafe:()=>2,
     owned:id=>({MESA_CORTE:2,ENSAMBLE:3,ACABADOS:1}[id]||0),
     qty:id=>({PERS_CORTE:2,PERS_ENSAMBLE:4,PERS_ACABADO:1}[id]||0)
   };
@@ -57,7 +57,7 @@ test('received supplier stock changes warehouse view without fabricating produce
 
 test('machine animation respects pause, shift end and completed production plan',()=>{
   const f=fixture();assert.equal(f.snapshot().productionActive,true);
-  f.allow(false);assert.equal(f.snapshot().productionActive,false);
+  f.allow(false);assert.equal(f.snapshot().productionActive,true,'economic permissions do not pause local recreation');
   f.allow(true);f.context.gameSession.shiftEnded=true;assert.equal(f.snapshot().productionActive,false);
   f.context.gameSession.shiftEnded=false;f.context.running=false;assert.equal(f.snapshot().productionActive,false);
   f.context.running=true;f.context.inventory.producedUnits=20;assert.equal(f.snapshot().productionActive,false);

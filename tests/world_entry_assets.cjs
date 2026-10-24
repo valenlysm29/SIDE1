@@ -6,7 +6,7 @@ const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8')
   pause(){cancelAnimationFrame(raf);},
   store(){const e=hubWorld.entrances.find(e=>e.id==='store');positionPlayer(e.x,e.z,0);keys={KeyW:true};for(let i=0;i<95;i++){updatePlayer(1/60);businessInteriors.tick(1/60,player,i/60);}keys={};updateGameplayCamera(1);return currentInterior;},
   move(){const z=player.z;keys={KeyW:true};updatePlayer(.04);keys={};return Math.abs(player.z-z);},
-  stats(){const room=businessInteriors.rooms.find(r=>r.id==='store'),streamedCharacters=hubActors.length+animatedActors.filter(a=>a.type==='guide').length;return {scene:scene.uuid,children:scene.children.length,streamedCharacters,actors:room.actors.map(a=>({role:a.object.userData.role,kind:a.object.userData.modelKind,pending:Boolean(a.object.userData.pendingCharacterStyle),x:a.object.position.x,z:a.object.position.z})),ledger:JSON.stringify(bridge().ledger)};},
+  stats(){const room=businessInteriors.rooms.find(r=>r.id==='store'),streamedCharacters=hubActors.length+animatedActors.filter(a=>a.type==='guide').length;return {scene:scene.uuid,children:scene.children.length,streamedCharacters,expectedStreamedCharacters:hubNpcLimit()+1,actors:room.actors.map(a=>({role:a.object.userData.role,kind:a.object.userData.modelKind,pending:Boolean(a.object.userData.pendingCharacterStyle),x:a.object.position.x,z:a.object.position.z})),ledger:JSON.stringify(cashLedger)};},
   render(){renderer.render(scene,camera);}
 };\n  window.SIDE3D = {`);
 (async()=>{
@@ -42,8 +42,10 @@ const source=fs.readFileSync(path.join(__dirname,'../js/simulator3d.js'),'utf8')
     release();await page.evaluate(()=>Promise.all([detailsA,detailsB]));
     const after=await page.evaluate(()=>entryQA.stats());
     assert.equal(after.scene,before.scene);
-    assert.equal(after.streamedCharacters-before.streamedCharacters,4,'details stream three city pedestrians and the guide');
-    assert.equal(after.children-before.children,4,'only streamed characters extend the existing scene');
+    assert.equal(after.streamedCharacters,after.expectedStreamedCharacters,'ready city has the configured pedestrians and one guide');
+    const streamedDelta=after.streamedCharacters-before.streamedCharacters;
+    assert.ok(streamedDelta>=0&&streamedDelta<=6,'already streamed characters are reused without duplicate spawning');
+    assert.equal(after.children-before.children,streamedDelta,'only newly streamed characters extend the existing scene');
     assert.equal(after.actors.length,before.actors.length);assert.equal(after.ledger,before.ledger);
     for(const role of ['cashier','salesperson']){
       const a=after.actors.find(a=>a.role===role),b=before.actors.find(a=>a.role===role);assert.equal(a.pending,false);assert.equal(a.x,b.x);assert.equal(a.z,b.z);

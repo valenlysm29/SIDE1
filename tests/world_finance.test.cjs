@@ -20,10 +20,9 @@ function fixture(){
     renderInventoryDisplays(){},refreshAdminUI(){},playSfx(){},showEvent(){},rebuildDynamicWorld(){},
     simSales:0,gameSession:null,productById:id=>({id,price:100}),inventoryKey:()=> 'inventory',salesCountKey:()=> 'sales',
     updateReputation(){},NPC_STATE:{QUEUE:'QUEUE',PAY:'PAY'},checkoutPayment:'cash',checkoutQueue:[],attachBagToNpc(){},showReceipt(){},setNpcState(n,state){n.state=state;},reflowQueue(){}};
-  c.bridge=()=>c.window.SIDE_GAME_BRIDGE;c.operationalCash=()=>c.cashBalance();
+  c.operationalCash=()=>100000+Number(c.businessState.revenue||0)-Number(c.businessState.expenses||0);
   vm.createContext(c);
-  vm.runInContext(app.slice(app.indexOf('function canOperateWorld()'),app.indexOf('\nfunction canStartSimulation')),c);
-  vm.runInContext(app.slice(app.indexOf('window.SIDE_GAME_BRIDGE={'),app.indexOf('\n};',app.indexOf('window.SIDE_GAME_BRIDGE={'))+3),c);
+  vm.runInContext(fs.readFileSync(path.join(__dirname,'../js/shared/world_bridge.js'),'utf8'),c);
   for(const name of ['applyExpense','orderSupplierStock','tickSupplier','buyUpgrade','recordSale','serveNextQueuedCustomer']){
     const start=simulator.indexOf(`  function ${name}(`),end=simulator.indexOf('\n  function ',start+1);
     vm.runInContext(simulator.slice(start,end),c);
@@ -32,29 +31,29 @@ function fixture(){
 }
 test('world sales, supplier expenses and upgrades never mutate economic cash',()=>{
   const {c,store}=fixture();
-  assert.equal(c.bridge().recordSimulatedSale,undefined);assert.equal(c.bridge().recordOperatingExpense,undefined);
+  assert.equal(c.window.SIDE_WORLD_BRIDGE.recordSimulatedSale,undefined);assert.equal(c.window.SIDE_WORLD_BRIDGE.recordOperatingExpense,undefined);
   assert.equal(c.recordSale('a',100),true);assert.equal(c.applyExpense(360,'World supplier'),true);
   c.buyUpgrade('warehouse',1500,2);
   assert.equal(c.cashBalance(),100000);assert.deepEqual(c.cashLedger,{});
   assert.equal(c.businessState.revenue,100);assert.equal(JSON.parse(store.get('inventory')).sold.a,1);
 });
-test('teacher pause and closed cycles block entertainment transactions',()=>{
+test('teacher pause and closed cycles do not block independent entertainment',()=>{
   const f=fixture(),c=f.c;c.readRoundRuntime=()=>({status:'paused'});
-  assert.equal(c.recordSale('a',100),false);assert.equal(c.applyExpense(360,'supplier'),false);
+  assert.equal(c.recordSale('a',100),true);assert.equal(c.applyExpense(360,'supplier'),true);
   c.readRoundRuntime=()=>({status:'running'});f.allow(false);
-  assert.equal(c.recordSale('a',100),false);assert.equal(c.cashBalance(),100000);
+  assert.equal(c.recordSale('a',100),true);assert.equal(c.cashBalance(),100000);
 });
 
-test('supplier delivery follows the server clock despite a shifted device clock',()=>{
+test('local supplier timer is independent of economic server time and delivers once',()=>{
   const f=fixture(),c=f.c;let serverTime=500000;
-  c.bridge().serverNow=()=>serverTime;
-  f.time(999999999);c.orderSupplierStock();
+  c.window.SIDE_GAME_BRIDGE={serverNow:()=>serverTime};
+  f.time(500000);c.orderSupplierStock();
   assert.equal(c.businessState.pendingSupplierOrder.orderedAt,500000);
   assert.equal(c.businessState.pendingSupplierOrder.dueAt,512000);
   c.tickSupplier(0);assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),0);
-  f.time(-999999999);serverTime=511999;c.tickSupplier(0);
+  f.time(511999);serverTime=-999999999;c.tickSupplier(0);
   assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),0);
-  serverTime=512000;c.tickSupplier(0);
+  f.time(512000);c.tickSupplier(0);
   assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),12);
   c.tickSupplier(0);assert.equal(Object.values(c.inventory.reserve).reduce((a,b)=>a+b),12);
 });
