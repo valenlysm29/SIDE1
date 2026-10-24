@@ -16,8 +16,8 @@
     if(item.asset)return {quantities:{...(e?.purchases?.[ctx.round]||{})}};
     if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{}};
     if(item.type==='production-plan'){
-      if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets}};
-      return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{}};
+      if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets},prices:{...e.prices}};
+      return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{},prices:{...(same?e?.prices:{})}};
     }
     if(item.type==='number')return {value:same?n(e?.value):0};
     if(item.type==='loan')return {amount:same?n(e?.amount):0};
@@ -55,6 +55,7 @@
     }else if(item.type==='production-plan'){
       const labels={molde_1:'Molde básico',molde_2:'Molde mejorado',molde_3:'Molde premium'};
       for(const [id,label] of Object.entries(labels)){const quantity=n(d.moldTargets?.[id]);if(quantity)add(label,quantity,null,0,0,'Producción deseada para esta línea de molde.');}
+      for(const [id,label] of Object.entries({esencial:'Económico',urbano:'Medio',premium:'Premium'}))if(d.prices?.[id]!=null)add(`Precio ${label}`,null,n(d.prices[id]),0,0,'Precio de venta elegido; no es un gasto.');
     }else if(item.type==='number'){
       add('Meta del ciclo',n(d.value),null,0,0,item.unit||'unidades');
     }else if(item.type==='sales-staff'){

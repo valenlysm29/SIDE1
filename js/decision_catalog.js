@@ -1,3 +1,5 @@
+/* Costos v19: MP por unidad física (descuento separado); nómina MYPE con beneficios
+ * según Costos De Producción y engine/costos.costoLaboral, no sueldo referencial. */
 window.SIDE_DECISION_CATALOG = [
   {
     cat:'A', title:'Resumen', short:'Resumen', icon:'assets/side_logo.png', summaryOnly:true,
@@ -33,7 +35,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'local_std',label:'Local de producción estándar',desc:'Costo operativo obligatorio para contar con un espacio de producción.',cost:2000}
       ]},
       {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:[
-        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:200}
+        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:1500}
       ]}
     ]
   },
@@ -43,26 +45,26 @@ window.SIDE_DECISION_CATALOG = [
     items:[
       {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir por cada tipo de molde. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
       {id:'PERS_CORTE',required:false,name:'Personal de corte',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
-        {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1500},
-        {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2500},
-        {id:'corte_maestro',label:'Maestro cortador',desc:'Especialista para materiales y diseños complejos.',cost:4000}
+        {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1690.8},
+        {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2254.4},
+        {id:'corte_maestro',label:'Maestro cortador',desc:'Especialista para materiales y diseños complejos.',cost:4191.36}
       ]},
       {id:'PERS_ENSAMBLE',required:false,name:'Personal de ensamble',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
-        {id:'ens_personal_basico',label:'Costurero básico',desc:'Adecuado para diseños simples y tareas repetitivas.',cost:1500},
-        {id:'ens_personal_ind',label:'Maquinista industrial',desc:'Opera equipos industriales con mayor productividad.',cost:2800},
-        {id:'ens_personal_esp',label:'Marroquinero especializado',desc:'Especialista para piezas complejas y líneas premium.',cost:4500}
+        {id:'ens_personal_basico',label:'Costurero básico',desc:'Adecuado para diseños simples y tareas repetitivas.',cost:1690.8},
+        {id:'ens_personal_ind',label:'Maquinista industrial',desc:'Opera equipos industriales con mayor productividad.',cost:3104.16},
+        {id:'ens_personal_esp',label:'Marroquinero especializado',desc:'Especialista para piezas complejas y líneas premium.',cost:4952.4}
       ]},
       {id:'PERS_ACABADO',required:false,name:'Personal de acabados',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
-        {id:'aca_personal_basico',label:'Operario de acabado',desc:'Realiza acabados básicos y tareas de apoyo.',cost:1500},
-        {id:'aca_personal_tec',label:'Técnico en acabados',desc:'Maneja herramientas y equipos de acabado.',cost:2800},
-        {id:'aca_personal_art',label:'Artesano acabador',desc:'Realiza acabados finos y detalles especiales.',cost:4500}
+        {id:'aca_personal_basico',label:'Operario de acabado',desc:'Realiza acabados básicos y tareas de apoyo.',cost:1690.8},
+        {id:'aca_personal_tec',label:'Técnico en acabados',desc:'Maneja herramientas y equipos de acabado.',cost:3104.16},
+        {id:'aca_personal_art',label:'Artesano acabador',desc:'Realiza acabados finos y detalles especiales.',cost:4952.4}
       ]},
       {id:'JEFATURA',required:false,name:'Jefatura de producción',desc:'Costo mensual del personal elegido.',type:'choice',recurring:true,options:[
         {id:'no_jefatura',label:'No contratar',desc:'La coordinación queda a cargo del equipo.',cost:0},
-        {id:'si_jefatura',label:'Contratar',desc:'Incorpora una jefatura para coordinar la operación.',cost:3000}
+        {id:'si_jefatura',label:'Contratar',desc:'Incorpora una jefatura para coordinar la operación.',cost:3321.6}
       ]},
       {id:'LIMPIEZA',name:'Limpieza y servicios generales',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['limpieza'],options:[
-        {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo operativo fijo obligatorio para mantener el área de producción.',cost:600}
+        {id:'limpieza',label:'Limpieza y servicios generales',desc:'Costo operativo fijo obligatorio para mantener el área de producción.',cost:712.32}
       ]},
       {id:'GARANTIA_PT',name:'Garantía de productos terminados',type:'choice',noCashEffect:true,recurring:true,required:true,showPrice:false,options:[
         {id:'pt_30',label:'Cobertura comercial 30 días',desc:'Política básica de respaldo al cliente para productos terminados.',cost:0,value:30},
@@ -81,17 +83,17 @@ window.SIDE_DECISION_CATALOG = [
       ]},
       {id:'CUERO',name:'Compra de cuero',desc:'Cantidad en metros cuadrados (m²). El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
         {id:'cuero_sint',label:'Cuero sintético',desc:'Alternativa económica.',cost:25},
-        {id:'cuero_std',label:'Cuero genuino estándar',desc:'Balance entre costo y durabilidad.',cost:90},
-        {id:'cuero_prem',label:'Cuero genuino premium',desc:'Mayor durabilidad y acabado.',cost:140}
+        {id:'cuero_std',label:'Cuero genuino estándar',desc:'Balance entre costo y durabilidad.',cost:45},
+        {id:'cuero_prem',label:'Cuero genuino premium',desc:'Mayor durabilidad y acabado.',cost:80}
       ]},
       {id:'ACCESORIOS',name:'Compra de accesorios',desc:'Cantidad en unidades. El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
-        {id:'acc_eco',label:'Aleación económica',desc:'Accesorio funcional de menor costo.',cost:2},
-        {id:'acc_prem',label:'Metal premium',desc:'Mayor durabilidad y mejor acabado.',cost:5}
+        {id:'acc_eco',label:'Aleación económica',desc:'Accesorio funcional de menor costo.',cost:4},
+        {id:'acc_prem',label:'Metal premium',desc:'Mayor durabilidad y mejor acabado.',cost:9}
       ]},
       {id:'HILO',name:'Compra de hilo',desc:'Cantidad en metros de hilo. El analista de compras aplica su descuento.',type:'quantity-choice',material:true,recurring:true,requiredWhenProduction:true,options:[
-        {id:'hilo_std',label:'Poliéster estándar',desc:'Opción de costo bajo y resistencia media.',cost:0.1},
-        {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:0.15},
-        {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:0.22}
+        {id:'hilo_std',label:'Poliéster estándar',desc:'Opción de costo bajo y resistencia media.',cost:2},
+        {id:'hilo_ref',label:'Encerado reforzado',desc:'Mayor resistencia a tensión.',cost:4},
+        {id:'hilo_prem',label:'Alta tenacidad',desc:'Alta resistencia para acabados exigentes.',cost:7}
       ]},
       {id:'GARANTIA_PROV',required:false,name:'Garantía de proveedores',type:'choice',noCashEffect:true,recurring:true,showPrice:false,options:[
         {id:'gar_0',label:'Sin garantía',desc:'No hay porcentaje de devolución por material fallado.',cost:0,value:0},

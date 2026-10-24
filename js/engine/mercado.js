@@ -11,7 +11,9 @@
     const rows=empresas.map((e,i)=>{
       const reputacion=Number(e.reputacionMercado||0)*c.ESCALA_REPUTACION;
       const calidad=c.CALIDAD_MERCADO_MODO==='excel_literal'?excelRound(baseRep?Number(e.reputacionMercado||0)/baseRep*escala:0):excelRound(Math.min(escala,Number(e.calidadEmpresaMotor||0)*c.ESCALA_REPUTACION));
-      const puntajePrecio=segmento==='SEG-01'?(max===min?c.PRECIO_EMPATE:escala*(max-precios[i])/(max-min)):escala-Math.abs(precios[i]-m.precioIdeal)/m.precioIdeal*escala;
+      const rawPrice=segmento==='SEG-01'?(max===min?c.PRECIO_EMPATE:escala*(max-precios[i])/(max-min)):escala-Math.abs(precios[i]-m.precioIdeal)/m.precioIdeal*escala;
+      // Explicit v19 override preserves archived literal oracles unchanged.
+      const puntajePrecio=overrides.VERSION==='excel-v19'?Math.max(0,Math.min(escala,rawPrice)):rawPrice;
       const puntajeTotal=m.pesos[0]*puntajePrecio+m.pesos[1]*reputacion+m.pesos[2]*calidad;
       return {...e,calidadMercado:calidad,reputacionEscalada:reputacion,puntajePrecio,puntajeTotal};
     });

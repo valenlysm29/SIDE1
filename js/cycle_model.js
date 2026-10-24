@@ -1,5 +1,5 @@
 /* SIDE cycle settlement: production, unsold goods and cash share one receipt. */
-(function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./production_model.js'):root.SIDE_PRODUCTION_MODEL,typeof module==='object'&&module.exports?require('./financial_model.js'):root.SIDE_FINANCIAL_MODEL,typeof module==='object'&&module.exports?require('./revenue_model.js'):root.SIDE_REVENUE_MODEL);if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_CYCLE_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(PRO,FIN,REV){
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(node?require('./production_model.js'):root.SIDE_PRODUCTION_MODEL,node?require('./financial_model.js'):root.SIDE_FINANCIAL_MODEL,node?require('./revenue_model.js'):root.SIDE_REVENUE_MODEL,node?require('./engine/cierre.js'):root.SIDE_ECONOMIC_CLOSURE,node?require('./decision_review_model.js'):root.SIDE_REVIEW_MODEL,node?require('./side_rules.js'):root.SIDE_RULES);if(node)module.exports=api;else root.SIDE_CYCLE_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(PRO,FIN,REV,ECON,REVIEW,RULES){
   'use strict';
   const clone=v=>JSON.parse(JSON.stringify(v)),n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0,money=v=>Math.round(v*100)/100;
   function restoreState(saved={},live={}){return {...saved,...Object.fromEntries(Object.entries(live).filter(([key])=>key.startsWith('__')))};}
@@ -9,44 +9,55 @@
       return !['SIM_VENTAS','SIM_GASTOS','SIM_INVERSION','SIM_DEVOLUCIONES','COMISION_VENTAS'].includes(kind)||state.__cycleSettlements?.[round]||state.__financialSnapshots?.[round]||Number(round)<=Number(state.__openingBalance?.round||0);
     }));
   }
-  const productIds=['esencial','urbano','premium'],defaultPrices=[75,95,125];
-  function close({state={},ledger={},catalog=[],round=1,capital=0,sectionsByRound={},production,prices={},allocation,financialPolicy={},events=[]}={}){
+  function close({state={},ledger={},catalog=[],round=1,capital=0,sectionsByRound={},production,prices={},allocation,financialPolicy={},events=[],economicResult}={}){
     state=clone(state);ledger=economicLedger(ledger,state);
     const previous=state.__cycleSettlements?.[round];
-    if(previous)return {state,ledger,receipt:previous,reused:true,financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
-    const plan=production||PRO.calculate({state,drafts:{},catalog,round});
-    const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
-    const assigned=allocation||REV.allocate([{id:'self',state,production:plan,round,prices}]).self;
-    const demandFactor=events.reduce((factor,event)=>factor*Math.max(0,1+Number(event.effect?.revenuePct||0)/100),1);
-    const oldGoods=state.__finishedGoods||{},goods={},sales=[];
-    for(const [i,id] of productIds.entries()){
-      const produced=n(plan.productLines?.[i]?.plannedUnits),available=produced+n(oldGoods[id]);
-      const price=n(prices[id])||defaultPrices[i],demand=hasChannel?Math.floor(n(assigned.products[id]?.asignado)*demandFactor):0,sold=Math.floor(Math.min(available,hasChannel?demand:0));
-      goods[id]=available-sold;sales.push({id,produced,available,alreadySold:0,sold,price,revenue:money(sold*price)});
+    if(previous)return {state,ledger,receipt:previous,reused:true,financialSections:clone(sectionsByRound),financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
+    // A replicated plan may arrive without a browser-generated section ledger.
+    // Reconstruct each missing section once from the same decision cost model.
+    sectionsByRound=clone(sectionsByRound);
+    for(const category of catalog.filter(category=>!category.summaryOnly)){
+      const key=`${round}:${category.cat}`;
+      if(Object.hasOwn(ledger,key)||!category.items.some(item=>Number(state[item.id]?.round)===Number(round)))continue;
+      const section=REVIEW.section(category,{state,drafts:{},catalog,round,capital,ledger,rules:RULES,config:financialPolicy});
+      ledger[key]=section.net;sectionsByRound[round]={...sectionsByRound[round],[category.cat]:{...section,recordedNet:section.net}};
     }
+    const economic=economicResult||ECON.closeMany([{id:'self',state,catalog,round,prices,events,financialPolicy}]).self;
+    const plan=economic.plan;
+    const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
+    const assigned=economic.allocation;
+    const demandFactor=events.reduce((factor,event)=>factor*Math.max(0,1+Number(event.effect?.revenuePct||0)/100),1);
+    const goods=economic.goods,sales=economic.sales;
     const market=Object.values(assigned.products).reduce((sum,row)=>sum+n(row.asignado),0);
     const revenue=money(sales.reduce((sum,row)=>sum+row.revenue,0));
     // Only the decision model can record economic sales; world receipts are ignored.
     ledger[`${round}:SIM_VENTAS`]=revenue;
-    ledger[`${round}:COMISION_VENTAS`]=revenue?-money(revenue*.01):0;
+    ledger[`${round}:COMISION_VENTAS`]=revenue?-money(revenue*ECON.config.commission):0;
+    ledger[`${round}:VENTAS_CREDITO`]=-economic.receivable;
+    ledger[`${round}:COBRO_CREDITO`]=economic.collections;
+    ledger[`${round}:ALMACENAJE`]=-economic.storage;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
     for(const material of plan.materials||[]){
       const definition=catalog.flatMap(c=>c.items||[]).find(item=>item.id===material.id),entries=definition?.options||[];
       let consumption=n(material.consumption);
       for(const option of entries){const available=n(state.__inventarioMP?.[option.id])+n(state[material.id]?.round===round?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=money(available-used);consumption-=used;}
     }
-    state.__inventarioMP=inventory;state.__finishedGoods=goods;
+    state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__accountsReceivable=economic.receivable;
+    const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
+    if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
+    state.__economicHistory={lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate)};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
-    const receipt={round,events:clone(events),demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
-    return {state,ledger,receipt,reused:false,financial};
+    return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};
   }
   function closeMany(inputs=[]){
     const prepared=inputs.map(input=>({...input,production:input.production||PRO.calculate({state:input.state||{},drafts:{},catalog:input.catalog||[],round:input.round})}));
-    const allocations=REV.allocate(prepared);
-    return Object.fromEntries(prepared.map(input=>[input.id,close({...input,allocation:allocations[input.id]})]));
+    const active=prepared.filter(input=>!input.state?.__cycleSettlements?.[input.round]);
+    const economics=ECON.closeMany(active);
+    return Object.fromEntries(prepared.map(input=>[input.id,close({...input,economicResult:economics[input.id]})]));
   }
   function closeReports({reports=[],game,round,catalog=[],financialPolicy={}}={}){
     const active=reports.filter(report=>report.partida===game&&report.estado!=='eliminada'&&report.enviado&&report.gameState);
@@ -57,7 +68,7 @@
     }));
     for(const report of active){
       const result=results[report.id],f=result.financial;
-      Object.assign(report,{gameState:{...report.gameState,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
+      Object.assign(report,{gameState:{...report.gameState,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
     }return reports;
   }
   function migrate({state={},ledger={},catalog=[],capital=0,round=1}={}){
@@ -79,7 +90,7 @@
         else {const area={PERS_CORTE:'corte',PERS_ENSAMBLE:'ensamble',PERS_ACABADO:'acabado'}[item.id];qty=(d.personal?.[area]?.[index]||[]);qty=Array.isArray(qty)?qty.reduce((s,v)=>s+n(v),0):n(qty);}
         if(qty){quantities[option.id]=qty;optionIds.push(option.id);}
       }
-      if(optionIds.length)state[item.id]={round:r,optionIds,quantities,...(item.asset?{purchases:{[r]:quantities}}:{})};
+      if(optionIds.length)state[item.id]={round:r,optionIds,quantities,...(item.asset?{purchases:{[Math.max(1,r-1)]:quantities}}:{})};
     }
     const targets={molde_1:0,molde_2:0,molde_3:0};for(const lot of d.lotes||[]){const id={'INF-08':'molde_1','INF-09':'molde_2','INF-10':'molde_3'}[lot.molde];if(id)targets[id]+=n(lot.cantidad);}
     if(Object.values(targets).some(Boolean))state.PRODUCCION_META={round:r,moldTargets:targets,value:Object.values(targets).reduce((s,v)=>s+v,0)};

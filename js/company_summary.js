@@ -34,7 +34,7 @@ function migrateCurrentReceipts(){
   if(changed)writeDecisionBatch({[receiptKey()]:JSON.stringify(receipts)});
 }
 function comparableSummaryDraft(item,d){
-  if(item.type==='production-plan')return {moldTargets:Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Number(value)||0]).filter(([,value])=>value!==0).sort()};
+  if(item.type==='production-plan')return {moldTargets:Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Number(value)||0]).filter(([,value])=>value!==0).sort(),prices:{...defaultSegmentPrices(),...d.prices}};
   if(item.type==='number')return {value:Number(d.value)||0};
   if(item.type==='loan')return {amount:Number(d.amount)||0};
   if(item.asset||item.type==='quantity'||item.type==='quantity-choice')return (item.options||[]).map(o=>[o.id,Number(d.quantities?.[o.id])||0]);
@@ -68,6 +68,10 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
       }
       if(item.type==='number'&&draftItemComplete(item)&&(!Number.isSafeInteger(Number(d.value))||Number(d.value)<Number(item.min||0)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
       if(item.type==='production-plan')for(const value of Object.values(d.moldTargets||{}))if(!Number.isSafeInteger(Number(value))||Number(value)<0)issues.push({cat:cat.cat,item:item.id,text:'Revisa las cantidades de producción por molde.'});
+      if(item.type==='production-plan')for(const [id,segment] of Object.entries(window.SIDE_ECONOMIC_CONFIG.segments)){
+        const value=d.prices?.[id]??segment.defaultPrice;
+        if(value===''||!Number.isFinite(Number(value))||Number(value)<segment.min||Number(value)>segment.max)issues.push({cat:cat.cat,item:item.id,text:`El precio de ${id} debe estar entre S/${segment.min} y S/${segment.max}.`});
+      }
       if(item.type==='loan'&&(!Number.isFinite(Number(d.amount))||Number(d.amount)<0||Number(d.amount)>loanMaximum()))issues.push({cat:cat.cat,item:item.id,text:'El pr\u00e9stamo est\u00e1 fuera del l\u00edmite permitido.'});
       if(item.id==='CANALES')for(const id of RULES.STORE_IDS){try{RULES.nextStoreBatches(decisionState.CANALES,id,RULES.storeQuantity(d,id),ctx.round);}catch{issues.push({cat:'D',item:'CANALES',text:'No puedes reducir tiendas con un compromiso vigente.'});}}
     }

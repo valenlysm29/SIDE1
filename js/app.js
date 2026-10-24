@@ -330,6 +330,7 @@ function renderStudentPodium(publication){
     const list=document.createElement('ol');
     for(const row of publication.podium||[]){const item=document.createElement('li');item.textContent=`${row.empresa}: ${row.grade} / 20`;list.appendChild(item);}
     panel.appendChild(list);const reason=document.createElement('p');reason.textContent=publication.reason||'';panel.appendChild(reason);
+    const retention=document.createElement('p');retention.textContent='Los datos de la partida se guardan como máximo 24 horas.';panel.appendChild(retention);
   }
 }
 function remoteSnapshot(data){
@@ -809,7 +810,7 @@ function createDecisionDraft(item){
     const moldTargets={molde_1:0,molde_2:0,molde_3:0};
     if(e?.round===currentRound()&&e.moldTargets)Object.keys(moldTargets).forEach(id=>moldTargets[id]=Number(e.moldTargets[id]||0));
     else if(e?.round===currentRound()&&e.value){const legacyId=e.moldId||'molde_1';moldTargets[legacyId]=Number(e.value||0);}
-    return decisionDrafts[item.id]={moldTargets};
+    return decisionDrafts[item.id]={moldTargets,prices:{...defaultSegmentPrices(),...(e?.prices||{})}};
   }
   if(item.type==='number')return decisionDrafts[item.id]={value:Number(e?.round===currentRound()?e.value:0)};
   if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:e?.round===currentRound()?(e.optionIds||[]):[]};
@@ -985,9 +986,17 @@ function productionDopHtml(plan=productionPlan()){
 function calculatorMoldLine(plan,draft){
   return plan.productLines.find(line=>line.id===draft.viewMoldId)||plan.productLines.find(line=>line.selectedThisCycle)||plan.productLines.find(line=>line.target>0)||plan.productLines[0];
 }
+function defaultSegmentPrices(){return Object.fromEntries(Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,segment.defaultPrice]));}
+function productionPriceFields(draft,locked){
+  const labels={esencial:'Económico',urbano:'Medio',premium:'Premium'};
+  const segments=Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,labels[id],segment.min,segment.max]);
+  draft.prices={...defaultSegmentPrices(),...draft.prices};
+  return `<div class="production-prices"><strong>Precio de venta por segmento</strong>${segments.map(([id,label,min,max])=>`<label>${label} · S/${min}–${max}<input type="number" inputmode="decimal" data-sale-price="${id}" min="${min}" max="${max}" step="0.01" value="${draft.prices[id]}" ${locked?'disabled':''}></label>`).join('')}</div>`;
+}
 function productionCalculatorHtml(plan,draft,locked){
   const line=calculatorMoldLine(plan,draft);draft.viewMoldId=line.id;
-  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Indica tu meta por molde y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta total de todos los moldes</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields"><div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Cambia de molde para revisar otra meta; las cantidades anteriores se conservan.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
+  const priceFields=productionPriceFields(draft,locked);
+  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Indica tu meta por molde y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta total de todos los moldes</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields">${priceFields}<div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Cambia de molde para revisar otra meta; las cantidades anteriores se conservan.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
 }
 function productionCalculatorRequirements(line){return `<span>Insumos para ${line.target.toLocaleString('es-PE')} unidades de ${escapeHtml(line.label)}</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b>`;}
 function normalizeProductionTargetInput(input){const value=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));if(input.value!=='')input.value=String(value);return value;}
@@ -1021,7 +1030,7 @@ function renderDecisionCategory(){
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
-  $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
+  $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
@@ -1113,6 +1122,14 @@ function bindDecisionControls(){
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
     document.querySelector(`[data-mold-step="${id}"][data-delta="${button.dataset.delta}"]`)?.focus({preventScroll:true});
   }));
+  document.querySelectorAll('[data-sale-price]').forEach(input=>input.addEventListener('input',()=>{
+    if(decisionEditingBlocked())return;
+    const draft=initDraft(findDecisionItem('PRODUCCION_META'));
+    draft.prices={...draft.prices,[input.dataset.salePrice]:input.value===''?'':Number(input.value)};
+    input.setCustomValidity('');
+    input.setCustomValidity(input.value===''||!input.checkValidity()?'Introduce un precio dentro del rango del segmento.':'');
+    persistCurrentDraftOnly();
+  }));
   document.querySelectorAll('[data-mold-target]').forEach(input=>{
     input.addEventListener('beforeinput',event=>{if(!/[-−]/.test(event.data||''))return;event.preventDefault();input.value='0';input.dispatchEvent(new Event('input',{bubbles:true}));});
     input.addEventListener('input',()=>{const value=normalizeProductionTargetInput(input);if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=value;persistCurrentDraftOnly();updateHud();refreshProductionDop();});
@@ -1168,6 +1185,13 @@ function validateRequiredSection(cat){
     if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}
     if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}
     if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}
+    if(item.type==='production-plan'){
+      const ranges=Object.fromEntries(Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,[segment.min,segment.max]]));
+      for(const [id,[min,max]] of Object.entries(ranges)){
+        const value=d.prices?.[id];
+        if(value===''||!Number.isFinite(Number(value))||Number(value)<min||Number(value)>max){toast(`El precio de ${id} debe estar entre S/${min} y S/${max}.`);return false;}
+      }
+    }
     if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}
     if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}
   }
@@ -1193,7 +1217,7 @@ function prepareSectionSave(cat,context=decisionModelContext()){
     if(item.type==='production-plan'){
       const moldTargets=Object.fromEntries(Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Math.max(0,Math.trunc(Number(value)||0))]));
       const value=Object.values(moldTargets).reduce((total,target)=>total+target,0);
-      entries[item.id]={...common,moldTargets,value,label:`Producción deseada: ${value} unidades`};return;
+      entries[item.id]={...common,moldTargets,prices:deepClone(d.prices||{}),value,label:`Producción deseada: ${value} unidades`};return;
     }
     if(item.type==='number'){entries[item.id]={...common,value:Number(d.value||0),label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`};return;}
     if(item.type==='sales-staff'){entries[item.id]={...common,staff:deepClone(d.staff||{})};return;}
@@ -1425,7 +1449,7 @@ function settleCycle(round=currentRound()){
   });
   inputs.push({id,state:window.SIDE_CYCLE_MODEL.restoreState(saved.state,live),ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig(),...ctx});
   const result=window.SIDE_CYCLE_MODEL.closeMany(inputs)[id];
-  decisionState={...live,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
+  decisionState={...live,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
   try{queueStudentSnapshot(buildStudentSnapshot(currentRound()));syncReportToSupabase(syncStudentReportPreview());}catch(error){console.warn('SIDE: cierre guardado; sincronización pendiente',error);}
   return true;
 }
@@ -1712,8 +1736,24 @@ function renderOfficeFinances(){
 }
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;
-  return `<details class="financial-details"><summary>Flujo de caja detallado · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
+  return `${cycleSalesHtml(f.round)}<details class="financial-details"><summary>Flujo de caja detallado · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
   <div class="financial-details"><strong>BALANCE GENERAL · ${f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Inventarios',bg.inventarios)}${row('Equipos, moldes y mejoras (netos)',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
+}
+function cycleSalesHtml(round=currentRound()){
+  const receipt=decisionState.__cycleSettlements?.[round];
+  if(!receipt?.sales)return '<section class="financial-details"><strong>Ventas por segmento</strong><p>El reparto estará disponible cuando se sincronice el cierre del ciclo.</p></section>';
+  const labels={esencial:'Económico',urbano:'Medio',premium:'Premium'};
+  return `<section class="financial-details"><strong>Ventas por segmento · ciclo ${round}</strong>${receipt.sales.map(sale=>{
+    const assigned=Number(sale.demand??receipt.marketAllocation?.products?.[sale.id]?.asignado??0);
+    const plan=receipt.production||{},causes=[];
+    if(!sale.sold&&!sale.produced){
+      if(plan.unavailablePlannedMolds?.length)causes.push('Falta el molde elegido');
+      for(const process of plan.processes||[])if(!process.cycleCapacity)causes.push(`Sin personal o equipo operativo en ${process.label}`);
+      for(const material of plan.materials||[])if(!material.supportedUnits)causes.push(`Sin ${material.label} suficiente`);
+    }
+    const reason=causes.join('. ')||sale.reason||sale.zeroReason||(!sale.sold?(!sale.available?'Sin stock: revisa insumos, personal, equipos y molde.':!assigned?'Sin demanda asignada en este segmento.':'Sin ventas en este ciclo.'):'');
+    return `<div class="segment-sales"><h4>${labels[sale.id]||escapeHtml(sale.id)}</h4><span>Precio elegido <b>${money(sale.chosenPrice??sale.price)}</b></span><span>Precio efectivo <b>${money(sale.price)}</b></span><span>Demanda asignada efectiva <b>${assigned}</b></span><span>Unidades disponibles <b>${Number(sale.available||0)}</b></span><span>Unidades vendidas <b>${Number(sale.sold||0)}</b></span><span>Ingresos <b>${money(sale.revenue||0)}</b></span>${reason?`<p>${escapeHtml(reason)}</p>`:''}</div>`;
+  }).join('')}</section>`;
 }
 let lastObservedRound=currentRound();
 let lastDeadlineRefresh='';

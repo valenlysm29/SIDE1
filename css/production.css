@@ -762,3 +762,11 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .pd-target-first .pd-table-scroll{min-width:0;width:100%}
 
 .production-dop .pd-stock-origin{display:block;margin-top:6px;font-size:11px;line-height:1.5;color:var(--ui-muted)}
+.production-prices{display:grid;gap:10px;grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
+.production-prices>strong{grid-column:1/-1}
+.production-prices label{display:grid;gap:6px;min-width:0}
+.production-prices input{width:100%;min-width:0;padding:8px;border:1px solid #cbd5e1;border-radius:6px}
+.production-prices input:invalid{border-color:#b91c1c}
+.segment-sales{padding:10px 0;border-bottom:1px solid #cbd5e1}
+.segment-sales span{display:flex;justify-content:space-between;gap:12px}
+@media(max-width:600px){.production-prices{grid-template-columns:1fr}}

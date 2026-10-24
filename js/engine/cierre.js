@@ -1,0 +1,99 @@
+/* Cierre económico puro v19: capacidad -> producción -> calidad -> reputación ->
+ * demanda -> reparto -> MIN stock -> ingresos -> costos -> cobranza.
+ * Sin DOM, red, reloj, aleatoriedad ni referencias al mundo recreativo. */
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(node?require('./config.js'):root.SIDE_ECONOMIC_CONFIG,node?require('./catalogo_excel.js'):root.SIDE_EXCEL_CATALOGO,node?require('../production_model.js'):root.SIDE_PRODUCTION_MODEL);if(node)module.exports=api;else root.SIDE_ECONOMIC_CLOSURE=api;})(typeof globalThis!=='undefined'?globalThis:this,function(DEFAULT,CATALOG,PRO){
+  'use strict';
+  const clone=v=>JSON.parse(JSON.stringify(v)),n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0,clamp=v=>Math.max(0,Math.min(10,Number(v)||0)),money=v=>Math.round(v*100)/100;
+  const index=Object.fromEntries(CATALOG.map(row=>[row.codigo,row]));
+  const mapping={MESA_CORTE:{mesa:'INF-01'},ENSAMBLE:{ens_basica:'INF-02',ens_semi:'INF-03',ens_ind:'INF-04'},ACABADOS:{aca_basica:'INF-05',aca_semi:'INF-06',aca_ind:'INF-07'},MOLDE:{molde_1:'INF-08',molde_2:'INF-09',molde_3:'INF-10'},PERS_CORTE:{corte_basico:'RH-01',corte_exp:'RH-02',corte_maestro:'RH-03'},PERS_ENSAMBLE:{ens_personal_basico:'RH-04',ens_personal_ind:'RH-05',ens_personal_esp:'RH-06'},PERS_ACABADO:{aca_personal_basico:'RH-07',aca_personal_tec:'RH-08',aca_personal_art:'RH-09'},JEFATURA:{si_jefatura:'RH-10A',no_jefatura:'RH-10B'},INV_RRHH:{cap_baja:'INV-01A',cap_media:'INV-01B',cap_alta:'INV-01C'},INV_MARKETING:{mkt_baja:'INV-02A',mkt_media:'INV-02B',mkt_alta:'INV-02C'},GARANTIA_PT:{pt_30:'COM-06B',pt_90:'COM-06C'},MANTENIMIENTO:{correctivo:'INF-11B'}};
+  const materialCodes={CUERO:{cuero_sint:'INS-01',cuero_std:'INS-02',cuero_prem:'INS-03'},ACCESORIOS:{acc_eco:'INS-04',acc_prem:'INS-05'},HILO:{hilo_std:'INS-06',hilo_ref:'INS-07',hilo_prem:'INS-08'}};
+  const chosen=(s,key)=>s[key]?.optionIds?.[0];
+  function codes(state){
+    const result=[];
+    for(const [key,map] of Object.entries(mapping)){
+      if(key==='MESA_CORTE')continue; // Not part of Motor_Puntajes selection blocks.
+      const entry=state[key]||{},selected=Object.keys(map).filter(id=>n(entry.quantities?.[id])>0||(entry.optionIds||[]).includes(id));
+      // SUPUESTO: dotación mixta aporta el mayor nivel presente una vez por grupo.
+      if(selected.length)result.push(selected.map(id=>map[id]).sort((a,b)=>n(index[b]?.eficiencia)-n(index[a]?.eficiencia))[0]);
+    }
+    const channels=state.CANALES?.optionIds||[],web=channels.includes('web'),physical=channels.some(id=>['los_olivos','miraflores','sjl'].includes(id));
+    if(web||physical)result.push(web&&physical?'COM-01C':web?'COM-01B':'COM-01A');
+    result.push(n(state.PRESTAMO?.value||state.PRESTAMO?.amount)>0?'FIN-01A':'FIN-01B');
+    for(const code of state.__catalogSelection||[])if(index[code]&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
+    return [...new Set(result)];
+  }
+  function scores(state){const selected=codes(state);return {selected,efficiency:clamp(selected.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0)),reputation:clamp(selected.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0)),health:clamp(selected.reduce((s,id)=>s+Number(index[id]?.financiero||0),0))};}
+  function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(!Number.isFinite(value)||value<segment.min||value>segment.max)throw new RangeError(`Precio ${id}: debe estar entre ${segment.min} y ${segment.max}`);return [id,value];}));}
+  function quality(state,mold,round=state.PRODUCCION_META?.round||1,consumption=null){
+    let value=n(index[mapping.MOLDE[mold]]?.calidad);
+    for(const [family,map] of Object.entries(materialCodes)){
+      let pending=consumption?n(consumption[family]):Infinity;
+      const entries=Object.keys(map).map(id=>{const available=n(state[family]?.round===round?state[family]?.quantities?.[id]:0)+n(state.__inventarioMP?.[id]),qty=Math.min(available,pending);pending-=qty;return {id,qty};}),total=entries.reduce((s,row)=>s+row.qty,0);
+      // FIFO consumption order matches cycle_model inventory debit exactly.
+      value+=total?entries.reduce((s,row)=>s+row.qty*n(index[map[row.id]]?.calidad),0)/total:0;
+    }
+    return clamp(value);
+  }
+  function prepare(input,config=DEFAULT){
+    const state=input.state||{},round=input.round||1,p=scores(state),c=config.consequences,messages=[],plan=clone(PRO.calculate({state,drafts:{},catalog:input.catalog||[],round})),price=prices(state,input.prices,config);
+    let factor=1+(config.training[chosen(state,'INV_RRHH')]||0);
+    if(p.efficiency<c.lowEfficiency){factor*=c.lowProduction;messages.push({id:'CONS-03',text:'Eficiencia menor a 4: producción al 70%.'});}
+    if(!plan.hasLeadership&&p.efficiency<c.noLeaderEfficiency){factor*=c.noLeaderProduction;messages.push({id:'CONS-08',text:'Sin jefatura y eficiencia menor a 5: producción adicional −5%.'});}
+    // Recompute capacity gain and preserve physical material/target ceilings.
+    const max=Math.min(plan.target,Math.floor(plan.processCapacity*(1+(config.training[chosen(state,'INV_RRHH')]||0))),plan.materialCapacity),base=plan.producibleUnits;
+    if(plan.target>plan.processCapacity)messages.push({id:'CONS-06',text:'La meta supera la capacidad: las unidades excedentes quedan sin producir. El límite físico evita sobrecapacidad; no se cobran horas extra no autorizadas.'});
+    const wanted=Math.min(max,Math.floor(base*factor));let assigned=0;
+    const active=plan.productLines.filter(line=>line.available&&line.target>0),eligible=active.reduce((s,line)=>s+line.target,0);
+    for(const line of plan.productLines){line.plannedUnits=!line.available?0:Math.min(line.target,Math.floor(wanted*line.target/(eligible||1)));assigned+=line.plannedUnits;}
+    for(const line of active){const extra=Math.min(line.target-line.plannedUnits,wanted-assigned);line.plannedUnits+=extra;assigned+=extra;}
+    for(const material of plan.materials){
+      const per=line=>line.target?n(line.requirements[material.id])/line.target:0;
+      let used=plan.productLines.reduce((s,line)=>s+line.plannedUnits*per(line),0);
+      for(const line of [...active].reverse())if(used>material.available+1e-9&&per(line)){const remove=Math.min(line.plannedUnits,Math.ceil((used-material.available)/per(line)));line.plannedUnits-=remove;used-=remove*per(line);}
+    }
+    plan.producibleUnits=plan.productLines.reduce((s,line)=>s+line.plannedUnits,0);
+    for(const material of plan.materials){material.consumption=plan.productLines.reduce((s,line)=>s+(line.target?n(line.requirements[material.id])/line.target:0)*line.plannedUnits,0);material.remaining=Math.max(0,material.available-material.consumption);}
+    let reputation=p.reputation;const lines=config.products.map((id,i)=>{
+      const line=plan.productLines[i],q=quality(state,line.id,round,Object.fromEntries(plan.materials.map(m=>[m.id,m.consumption]))),segment=config.segments[id];let effectivePrice=price[id];
+      if(line.plannedUnits>0&&id==='premium'){if(q<segment.quality){effectivePrice*=c.lowQualityPrice;reputation-=c.reputationChange;messages.push({id:'CONS-01',segment:id,text:'Calidad insuficiente para Premium: precio efectivo −35% y reputación −2.'});}else{effectivePrice*=c.premiumPrice;reputation+=c.reputationChange;messages.push({id:'CONS-02',segment:id,text:'Calidad Premium: precio efectivo +40% y reputación +2.'});}}
+      return {id,quality:q,price:price[id],effectivePrice:money(effectivePrice),produced:n(line.plannedUnits),available:n(line.plannedUnits)+n(state.__finishedGoods?.[id])};
+    });
+    reputation=clamp(reputation);const previous=state.__economicHistory||{},lowReputationCycles=reputation<c.lowReputation?n(previous.lowReputationCycles)+1:0;
+    const lowFactor=lowReputationCycles>=c.lowReputationCycles?c.lowDemand:1;
+    if(lowFactor<1)messages.push({id:'CONS-04',text:'Reputación baja durante dos ciclos: demanda −20%.'});
+    const channels=state.CANALES?.optionIds||[],stores=channels.filter(id=>id!=='web').reduce((s,id)=>s+Math.max(1,n(state.CANALES?.quantities?.[id])),0),hasChannel=channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
+    const demandFactor=lowFactor*(1+(config.marketing[chosen(state,'INV_MARKETING')]||0))*(1+Math.min(config.channels.maxExtra,Math.max(0,stores-1)*config.channels.extraStore))*(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
+    const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
+    return {id:input.id,state,round,plan,scores:{...p,reputation},lines,hasChannel,demandFactor,messages,lowReputationCycles,creditRate,nextLoanRatePP:p.health<c.lowHealth?config.nextLoanRatePP:0};
+  }
+  function allocate(prepared,config=DEFAULT){
+    const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:{valor:p.scores.reputation},products:{}}]));
+    for(const id of config.products){const segment=config.segments[id],participants=prepared.filter(p=>p.hasChannel&&p.lines.find(line=>line.id===id)?.produced>0),allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*line.quality*10;return {p,line,score,total};}),sum=rows.reduce((s,row)=>s+row.total,0);
+      for(const row of rows){const share=sum?row.total/sum:1/(rows.length||1),assigned=Math.round(share*segment.market);result[row.p.id].products[id]={asignado:assigned,demandaAjustada:Math.floor(assigned*row.p.demandFactor),porcentaje:share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:row.line.quality*10,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:segment.market};}
+    }return result;
+  }
+  function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!p.hasChannel?'Sin canal de venta':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,revenue:money(sold*line.effectivePrice),reason};});
+    const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
+    if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
+    const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));
+    if(p.nextLoanRatePP)p.messages.push({id:'CONS-05',text:`Salud financiera baja: próximo préstamo +${p.nextLoanRatePP} puntos porcentuales.`});
+    return [p.id,{...p,sales,revenue,goods,storage,receivable,collections,cashRevenue:money(revenue-receivable+collections),allocation:allocations[p.id]}];
+  }));}
+  // Cell-level Excel oracle entry point. Same allocation function as runtime;
+  // inputs represent lots already processed through physical production.
+  function settleMarketCompanies(companies,segment,config=DEFAULT){
+    const id=config.products.find(product=>product===segment||config.segments[product].code===segment);
+    if(!id)throw new RangeError('Segmento desconocido');
+    const c=config.consequences,prepared=companies.map(company=>{
+      let reputation=clamp(company.reputacion),price=Number(company.precio),effective=price;const q=clamp(company.calidad),produced=n(company.producido);
+      if(id==='premium'&&produced>0){if(q<7){effective*=c.lowQualityPrice;reputation-=c.reputationChange;}else{effective*=c.premiumPrice;reputation+=c.reputationChange;}}
+      reputation=clamp(reputation);const lowCycles=reputation<c.lowReputation?n(company.bajaPrevios)+1:0;
+      return {id:String(company.id),hasChannel:true,scores:{reputation},demandFactor:lowCycles>=c.lowReputationCycles?c.lowDemand:1,lines:[{id,price,quality:q,produced,available:n(company.stock)}],effective,reputationFinal:reputation};
+    }),allocations=allocate(prepared,config);
+    return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
+  }
+  return {config:DEFAULT,codes,scores,prices,quality,prepare,allocate,closeMany,settleMarketCompanies};
+});
