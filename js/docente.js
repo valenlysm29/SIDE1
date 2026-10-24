@@ -57,10 +57,11 @@ function creationError(result){
 }
 function clearRoomLink(){
   roomGeneration++;
+  ownConfigRevisions.clear();
   stopLiveCompanies();
   sharedRoom=null;
   $('gameCode').value='';$('gameCodeBadge').textContent='Código pendiente';
-  state.partidaId=null;state.authoritative=null;teacherClock=null;state.reports=[];publishedState='';
+  state.partidaId=null;state.authoritative=null;state.configRevision=null;state.formConfigRevision=null;teacherClock=null;state.reports=[];publishedState='';
   ['SIDE_PARTIDA_ID','SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_EVENT_SCHEDULE'].forEach(k=>localStorage.removeItem(k));
 }
 function renderTeacherLobby(){
@@ -155,6 +156,7 @@ function refreshSetupSummary(){
   renderTeacherLobby();
 }
 let publishedState='',publishChain=Promise.resolve();
+const ownConfigRevisions=new Map();
 function publishGameState(savedConfig=null){
   const service=window.SIDE?.PartidaService;
   if(!state.partidaId||!gameStatus()?.active)return Promise.resolve(true);
@@ -163,12 +165,18 @@ function publishGameState(savedConfig=null){
   if(!savedConfig&&state.authoritative){
     for(const key of ['interest','capitalMode','capital','capitalMin','capitalMax','financialSchedule'])config[key]=state.authoritative[key];
   }
-  const signature=JSON.stringify(config),id=state.partidaId;
+  const signature=JSON.stringify(config),id=state.partidaId,expectedRevision=state.formConfigRevision??state.configRevision??null;
   publishChain=publishChain.catch(()=>{}).then(async()=>{
     if(signature===publishedState)return true;
     try{
-      const result=await service.actualizarConfiguracion(id,config);
+      // Rebase only revisions acknowledged for our own queued writes. A newer
+      // polling response never authorizes overwriting a stale form.
+      let writeRevision=expectedRevision;
+      while(ownConfigRevisions.has(`${id}:${writeRevision}`))writeRevision=ownConfigRevisions.get(`${id}:${writeRevision}`);
+      const result=await service.actualizarConfiguracion(id,config,writeRevision);
       if(result.success){
+        const accepted=Number(result.data?.config_revision);
+        if(Number.isSafeInteger(accepted)&&accepted>writeRevision)ownConfigRevisions.set(`${id}:${writeRevision}`,accepted);
         const received=result.data?.configuracion;
         if(savedConfig?.financialSchedule?.length){
           const finance=window.SIDE_FINANCE_CONFIG,round=savedConfig.financialSchedule.at(-1).effectiveRound;
@@ -176,9 +184,10 @@ function publishGameState(savedConfig=null){
           const confirmed=received?.financialSchedule?.length&&Object.keys(wanted).every(key=>key==='capitalMode'?wanted[key]===actual[key]:Number(wanted[key])===Number(actual[key]));
           if(!confirmed){creationFeedback('El servidor no confirmó los cambios de TEA y caja. Aplica la migración supabase/migrations/2026-10-23_configuracion_financiera.sql y vuelve a guardar.','notice');return false;}
         }
-        publishedState=signature;if(received)applyTeacherState(result.data);return true;
+        publishedState=signature;if(received)applyTeacherState(result.data);state.formConfigRevision=state.configRevision;return true;
       }
-      toast('No se guardó la configuración remota: '+result.error,'error');
+      if(result.code==='CONFIG_DESACTUALIZADA')creationFeedback(result.error,'error');
+      else toast('No se guardó la configuración remota: '+result.error,'error');
     }catch(error){toast('No se guardó la configuración remota: '+error.message,'error');}
     return false;
   });
@@ -286,7 +295,7 @@ async function saveConfig(silent=false){
   const feedback=$('creationFeedback');if(feedback?.dataset.source==='validation'){feedback.classList.add('hidden');delete feedback.dataset.source;}
   if(!silent)toast(gameStatus()?.active?'Configuración guardada.':'Configuración guardada. Pulsa Iniciar partida para abrir la sala de espera.');return true;
 }
-function loadConfig(){const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
+function loadConfig(){state.formConfigRevision=state.configRevision;const raw=localStorage.getItem('SIDE_TEACHER_CONFIG');let c=null;if(raw){try{c=JSON.parse(raw)}catch{}}if(c&&gameStatus()?.active){state.integrationMinutes=Number(c.integrationMinutes)||0;state.lifecycleVersion=c.lifecycleVersion===2?2:1;state.authoritative=c;}else{state.lifecycleVersion=2;state.integrationMinutes=0;}if(!c){setDefaultDates();c={codigo:generateGameCode(),capitalMode:'fixed',cycleCloseMode:'manual',enabledEvents:[]}}const fields=['integrationDurationMinutes','gameName','gameCourse','capital','capitalMin','capitalMax','demandLosOlivos','demandMiraflores','demandSJL','interest','creditPercentStart','cycles','roundHours','roundMinutes','scheduledStart','startDate','endDate'];fields.forEach(k=>{const value=k==='gameName'?c.nombre:k==='gameCourse'?c.curso:c[k];if($(k)&&value!==undefined){if(k==='scheduledStart'&&value){const date=new Date(value);$(k).value=Number.isFinite(date.getTime())?new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16):'';}else $(k).value=value;}});$('gameCode').value=(state.partidaId||gameStatus()?.active)&&c.codigo?c.codigo:generateGameCode();localStorage.removeItem('SIDE_ASSIGNED_GAME_CODE');$('gameCodeBadge').textContent=$('gameCode').value||'Código pendiente';const capRadio=document.querySelector(`input[name="capitalMode"][value="${c.capitalMode||'fixed'}"]`);if(capRadio)capRadio.checked=true;const cycleRadio=document.querySelector(`input[name="cycleMode"][value="${c.cycleCloseMode||'manual'}"]`);if(cycleRadio)cycleRadio.checked=true;state.eventRules=c.eventRules||{};state.enabledEvents=new Set(c.enabledEvents||[]);state.eventSelectionMode=c.eventSelectionMode||'manual';const eventModeRadio=document.querySelector(`input[name="eventSelectionMode"][value="${state.eventSelectionMode}"]`);if(eventModeRadio)eventModeRadio.checked=true;if($('eventRandomCount'))$('eventRandomCount').value=Math.max(1,Math.min(40,Number(c.randomEventCount||15)));const catSel=$('eventCategoryFilter');if(catSel&&catSel.options.length===1){[...new Set(EVENT_CATALOG.map(e=>e.category).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(cat=>{const o=document.createElement('option');o.value=cat;o.textContent=cat;catSel.appendChild(o)})}state.round=Math.max(1,Number(localStorage.getItem('SIDE_ACTIVE_ROUND')||c.round||1));state.seconds=roundSeconds();if(!$('startDate').value||!$('endDate').value)setDefaultDates();let status=null;try{status=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}if(status?.active){if($('startGame'))$('startGame').textContent='Partida iniciada'}state.manualDates={start:c.manualStartDate||$('startDate').value,end:c.manualEndDate||$('endDate').value};syncModeUI();renderEventBank()}
 function syncModeUI(){$('fixedCapitalFields').classList.toggle('hidden',capitalMode()!=='fixed');$('randomCapitalFields').classList.toggle('hidden',capitalMode()!=='random');$('manualCycleDisclaimer').classList.toggle('hidden',cycleMode()!=='manual');$('scheduledStartLabel').classList.toggle('hidden',cycleMode()!=='automatic');$('integrationModeHeading').textContent=cycleMode()==='automatic'?'Modo automático':'Sala de espera';$('integrationModeHelp').textContent=cycleMode()==='automatic'?'El servidor inicia el Ciclo 1 al terminar la integración desde la fecha programada. Puedes cerrar el navegador.':'El servidor inicia el Ciclo 1 al terminar el tiempo de la sala de espera. El docente controla el cierre y avance de los ciclos.';$('cycleCloseMode').value=cycleMode();$('modeSummaryBadge').textContent=cycleMode()==='automatic'?'Automático':'Manual';$('modeRulesText').innerHTML=cycleMode()==='automatic'?'<strong>Automático:</strong> inicia a la hora programada y avanza solo al llegar a cero.':'<strong>Manual:</strong> el Ciclo 1 inicia al terminar la sala de espera; el docente decide cuándo cierra y avanza cada ciclo.';['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id)){$(id).disabled=cycleMode()==='automatic';$(id).title=cycleMode()==='automatic'?'Controlado por la programación automática':''}});renderAcademicCalendar()}
 
 
@@ -507,6 +516,7 @@ function teacherNow(){if(state.partidaId&&!teacherClock)return NaN;return teache
 function applyTeacherState(partida){
   if(partida.id)rememberSharedRoom(partida);
   const c=partida.configuracion;if(!c)return;
+  if(Number.isSafeInteger(Number(partida.config_revision))&&partida.config_revision!=null){state.configRevision=Number(partida.config_revision);if(state.formConfigRevision==null)state.formConfigRevision=state.configRevision;}
   if(state.partidaId&&!Number.isFinite(Date.parse(partida.serverTime||'')))throw new Error('Falta hora del servidor. Aplica la migración 20261009_sala_espera_identidad_exacta.sql en Supabase.');
   if(partida.serverTime)teacherClock={time:Date.parse(partida.serverTime),at:performance.now()};
   if(partida.codigo){$('gameCode').value=partida.codigo;$('gameCodeBadge').textContent=partida.codigo;}

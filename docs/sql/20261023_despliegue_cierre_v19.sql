@@ -1,6 +1,6 @@
 -- PAQUETE EXACTO MANUAL v19. No ejecutado en producción. Requiere esquema SIDE existente.
--- Orden: retiro motor anterior -> persistencia -> reparación columna -> planes/precios/diagnóstico v19.
--- Cada bloque es transaccional. Reversión: ver comentarios de la última migración.
+-- Orden: retiro -> cierre -> reparación -> planes -> revisión configuración.
+-- Cada bloque es transaccional. Reversión: comentarios en cada migración.
 
 -- SOURCE: supabase/migrations/20261023_retirar_motor_anterior.sql
 -- Ejecutar manualmente en Supabase, después de desplegar el cliente restaurado.
@@ -323,15 +323,64 @@ returns jsonb language sql stable security definer set search_path=public as $$
   'functions',jsonb_build_object(
    'context',to_regprocedure('public.side_contexto_cierre_negocio(uuid,integer)') is not null,
    'save',to_regprocedure('public.side_guardar_cierre_negocio(uuid,integer,text,jsonb)') is not null,
-   'prices',to_regprocedure('public.side_precios_v19_validos(jsonb)') is not null),
+   'prices',to_regprocedure('public.side_precios_v19_validos(jsonb)') is not null,
+   'configurationCAS',to_regprocedure('public.side_guardar_configuracion_v19(uuid,jsonb,bigint)') is not null),
   'columns',jsonb_build_object(
    'expulsada_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='participantes' and column_name='expulsada_at'),
    'revision',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='revision'),
-   'updated_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='updated_at')),
+   'updated_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='updated_at'),
+   'config_revision',exists(select 1 from information_schema.columns where table_schema='public' and table_name='partidas' and column_name='config_revision')),
   'legacyTriggers',coalesce((select jsonb_agg(tgname) from pg_trigger where not tgisinternal and tgname in ('side_excel_snapshot_protegido','side_excel_reporte_protegido')),'[]'::jsonb),
   'rls',coalesce((select jsonb_agg(jsonb_build_object('table',c.relname,'enabled',c.relrowsecurity,'policies',(select count(*) from pg_policy p where p.polrelid=c.oid))) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname in ('side_student_state','side_business_closures','participantes','empresas')),'[]'::jsonb))
  where auth.uid() is not null
 $$;
 revoke all on function public.side_diagnostico_v19() from public,anon;
 grant execute on function public.side_diagnostico_v19() to authenticated;
+commit;
+
+
+-- SOURCE: supabase/migrations/2026-10-23_configuracion_version_v19.sql
+-- Manual, después de cierre_planes_v19. No ejecutado en producción.
+-- Reversión: DROP FUNCTION IF EXISTS public.side_guardar_configuracion_v19(uuid,jsonb,bigint);
+-- DROP TRIGGER IF EXISTS side_config_revision_v19 ON public.partidas;
+-- Conservar config_revision para auditoría; no revierte configuraciones guardadas.
+begin;
+alter table public.partidas add column if not exists config_revision bigint not null default 0;
+create or replace function public.side_config_revision_v19()
+returns trigger language plpgsql set search_path=public as $$
+declare ignored text[]:=array['runtime','phase','round','eventSchedule','gameStartedAt','gameStartAt','integrationStartTime','integrationMinutes','cancelledAt'];
+begin
+ -- Polling y lifecycle cambian relojes/eventos resueltos, no la configuración
+ -- editable. Comparación JSONB: el orden de claves no genera falsas revisiones.
+ if (coalesce(new.configuracion,'{}')-ignored) is distinct from (coalesce(old.configuracion,'{}')-ignored) then
+  new.config_revision:=old.config_revision+1;
+ else new.config_revision:=old.config_revision;
+ end if;
+ return new;
+end $$;
+drop trigger if exists side_config_revision_v19 on public.partidas;
+create trigger side_config_revision_v19 before update on public.partidas
+ for each row execute function public.side_config_revision_v19();
+
+create or replace function public.side_guardar_configuracion_v19(p_partida_id uuid,p_config jsonb,p_expected_revision bigint)
+returns jsonb language plpgsql security definer set search_path=public as $$
+declare game public.partidas; result jsonb;
+begin
+ select * into game from public.partidas where id=p_partida_id and profesor_id=auth.uid() for update;
+ if game.id is null then return jsonb_build_object('error','No tienes permiso para modificar esta partida','code','NO_AUTORIZADO'); end if;
+ if p_expected_revision is null or p_expected_revision<0 or p_expected_revision<>game.config_revision then
+  return jsonb_build_object('error','La configuración cambió en otra sesión. Recarga la configuración antes de volver a guardar. Tus cambios no se enviaron.','code','CONFIG_DESACTUALIZADA','config_revision',game.config_revision);
+ end if;
+ if jsonb_typeof(p_config) is distinct from 'object' or octet_length(p_config::text)>1048576 then
+  return jsonb_build_object('error','Configuración inválida','code','CONFIG_INVALIDA');
+ end if;
+ -- Reutiliza autorización, whitelist y validación de eventos/finanzas vigentes;
+ -- nunca acepta runtime arbitrario del navegador ni amplía permisos alumno.
+ result:=public.controlar_partida(p_partida_id,'guardar',p_config,null);
+ if result ? 'error' then return result; end if;
+ select * into game from public.partidas where id=p_partida_id;
+ return to_jsonb(game)||jsonb_build_object('serverTime',clock_timestamp());
+end $$;
+revoke all on function public.side_guardar_configuracion_v19(uuid,jsonb,bigint) from public,anon;
+grant execute on function public.side_guardar_configuracion_v19(uuid,jsonb,bigint) to authenticated;
 commit;

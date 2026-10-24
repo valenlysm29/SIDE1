@@ -1,0 +1,20 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture.cjs');
+(async()=>{const db=await database();try{
+ const sql=fs.readFileSync(path.join(__dirname,'../supabase/migrations/2026-10-23_configuracion_version_v19.sql'),'utf8');await db.exec(sql);await db.exec(sql);
+ const game=await createGame(db,config());assert.equal(Number(game.config_revision),0);
+ const first={...game.configuracion,enabledEvents:['PE01'],eventRules:{PE01:{firstRound:1,repeat:true}}};
+ const args={p_partida_id:game.id,p_config:first,p_expected_revision:0};
+ const result=await rpc(db,'side_guardar_configuracion_v19',args);assert.equal(result.error,undefined,JSON.stringify(result));assert.equal(Number(result.config_revision),1);
+ const stale=await rpc(db,'side_guardar_configuracion_v19',{...args,p_config:{...first,enabledEvents:[]}});assert.equal(stale.code,'CONFIG_DESACTUALIZADA');
+ let row=(await db.query('select * from partidas where id=$1',[game.id])).rows[0];assert.deepEqual(row.configuracion.enabledEvents,['PE01']);
+ await db.query("update partidas set configuracion=configuracion||jsonb_build_object('round',2,'phase','results','eventSchedule','{}'::jsonb,'runtime',jsonb_build_object('round',2,'phase','results','startedAt',clock_timestamp())) where id=$1",[game.id]);
+ row=(await db.query('select * from partidas where id=$1',[game.id])).rows[0];assert.equal(Number(row.config_revision),1,'runtime polling never creates a false configuration conflict');
+ const unchanged=await rpc(db,'side_guardar_configuracion_v19',{...args,p_expected_revision:1});assert.equal(Number(unchanged.config_revision),1);
+ await db.query("select set_config('test.uid','22222222-2222-2222-2222-222222222222',false)");assert.equal((await rpc(db,'side_guardar_configuracion_v19',{...args,p_expected_revision:1})).code,'NO_AUTORIZADO');
+ await db.exec('set role anon');await assert.rejects(rpc(db,'side_guardar_configuracion_v19',args));await db.exec('reset role');
+ await db.query("select set_config('test.uid',$1,false)",[professor]);
+ assert.equal((await db.query('select config_revision from partidas where id=$1',[game.id])).rows[0].config_revision,1);
+ console.log('PASS configuration CAS: repeat deployment, two sessions, stale rejection, no overwrite, owner/anon authorization, no runtime/polling false revision.');
+}finally{await db.close();}})().catch(error=>{console.error(error);process.exitCode=1;});

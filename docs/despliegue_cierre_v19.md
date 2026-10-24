@@ -8,6 +8,9 @@ En una base SIDE existente, pegar **todo** `docs/sql/20261023_despliegue_cierre_
 2. `supabase/migrations/20261023_cierre_negocio.sql`.
 3. `supabase/migrations/20261023_corregir_contexto_cierre_estado.sql`.
 4. `supabase/migrations/2026-10-23_cierre_planes_v19.sql`.
+5. `supabase/migrations/2026-10-23_configuracion_version_v19.sql`.
+
+El último bloque añade `partidas.config_revision` y guardado de configuración con revisión esperada, bloqueo de fila y autorización de propietario. Dos pestañas no pueden guardar sobre la misma revisión: la segunda recibe un conflicto visible y conserva su formulario. El polling y las transiciones de reloj/eventos resueltos no incrementan la revisión. Para revertir sólo este bloque, retirar `side_guardar_configuracion_v19(uuid,jsonb,bigint)` y el trigger `side_config_revision_v19`; conservar la columna para auditoría. El cliente v19 requiere esta RPC para guardar configuración; reinstalar también el cliente anterior si se revierte.
 
 Requiere las tablas y funciones SIDE anteriores de admisión/ciclo de vida, `participantes.expulsada_at`, `side_student_state` con revisiones y `reportes_ciclo`. No reconstruye una base vacía. El paquete completo se aplicó dos veces en PostgreSQL local PGlite y pasó las pruebas de cierre e idempotencia.
 

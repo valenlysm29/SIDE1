@@ -73,7 +73,7 @@ async function main(){
   await db.query("update partidas set configuracion=jsonb_set(configuracion,'{gameStartAt}',to_jsonb(clock_timestamp()-interval '640 seconds')) where id=$1",[automatic.id]);
   const lateContext=await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:automatic.id,p_ciclo:1});
   assert.equal(lateContext.empresas.length,2,'a plan arriving in grace competes with the previously confirmed company');
-  const diagnostic=await rpc(db,'side_diagnostico_v19',{});assert.equal(diagnostic.version,'excel-v19');assert.deepEqual(diagnostic.legacyTriggers,[]);
+  const diagnostic=await rpc(db,'side_diagnostico_v19',{});assert.equal(diagnostic.version,'excel-v19');assert.deepEqual(diagnostic.legacyTriggers,[]);assert.equal(diagnostic.functions.configurationCAS,true);assert.equal(diagnostic.columns.config_revision,true);
   console.log('PASS SQL v19: repeat deployment, all-company resolution, first elimination, replication, recovered plan, invalid prices, auth, CAS, idempotence, automatic grace, economic state persistence.');
   console.log('SIDE-000 disposable local demo:',JSON.stringify(Object.fromEntries(Object.entries(results).map(([id,r])=>[id,{sales:r.receipt.sold,revenue:r.receipt.revenue}]))));
  }finally{await db.close();}

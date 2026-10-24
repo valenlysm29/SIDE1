@@ -298,7 +298,14 @@
     }
   }
 
-  async function actualizarConfiguracion(partidaId, configuracion) {
+  async function actualizarConfiguracion(partidaId, configuracion, expectedRevision) {
+    if(expectedRevision!==undefined){
+      const sb=client();if(!sb)return offline();
+      try{
+        const {data,error}=await sb.rpc('side_guardar_configuracion_v19',{p_partida_id:partidaId,p_config:configuracion,p_expected_revision:expectedRevision});
+        return error||data?.error?{success:false,error:error?.message||data.error,code:error?.code||data.code,configRevision:data?.config_revision}:{success:true,data};
+      }catch(error){return {success:false,error:error.message};}
+    }
     if(configuracion.lifecycleVersion===2)return controlar(partidaId,'guardar',configuracion);
     const sb=client();if(!sb)return offline();
     try{

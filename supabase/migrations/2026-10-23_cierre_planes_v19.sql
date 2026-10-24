@@ -171,11 +171,13 @@ returns jsonb language sql stable security definer set search_path=public as $$
   'functions',jsonb_build_object(
    'context',to_regprocedure('public.side_contexto_cierre_negocio(uuid,integer)') is not null,
    'save',to_regprocedure('public.side_guardar_cierre_negocio(uuid,integer,text,jsonb)') is not null,
-   'prices',to_regprocedure('public.side_precios_v19_validos(jsonb)') is not null),
+   'prices',to_regprocedure('public.side_precios_v19_validos(jsonb)') is not null,
+   'configurationCAS',to_regprocedure('public.side_guardar_configuracion_v19(uuid,jsonb,bigint)') is not null),
   'columns',jsonb_build_object(
    'expulsada_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='participantes' and column_name='expulsada_at'),
    'revision',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='revision'),
-   'updated_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='updated_at')),
+   'updated_at',exists(select 1 from information_schema.columns where table_schema='public' and table_name='side_student_state' and column_name='updated_at'),
+   'config_revision',exists(select 1 from information_schema.columns where table_schema='public' and table_name='partidas' and column_name='config_revision')),
   'legacyTriggers',coalesce((select jsonb_agg(tgname) from pg_trigger where not tgisinternal and tgname in ('side_excel_snapshot_protegido','side_excel_reporte_protegido')),'[]'::jsonb),
   'rls',coalesce((select jsonb_agg(jsonb_build_object('table',c.relname,'enabled',c.relrowsecurity,'policies',(select count(*) from pg_policy p where p.polrelid=c.oid))) from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relname in ('side_student_state','side_business_closures','participantes','empresas')),'[]'::jsonb))
  where auth.uid() is not null
