@@ -8,10 +8,11 @@ test('legacy world charges are removed before closure while frozen history and d
  assert.equal(ledger['3:SIM_VENTAS'],999,'the caller can archive the original ledger');
 });
 test('world sales cannot raise assigned demand, revenue, production, stock or cash',()=>{
- const input={state:{CANALES:{optionIds:['web']}},capital:200000,round:1,production:{producibleUnits:500,productLines:[{plannedUnits:500}],materials:[]},allocation:{products:{esencial:{asignado:7}}}};
+ const fixture=require('./economic_v19_fixture.cjs'),state=fixture.state();state.PRODUCCION_META.moldTargets={molde_1:7};
+ const input={state,catalog:fixture.catalog,capital:200000,round:1};
  const baseline=cycle.close(input);
  const played=cycle.close({...input,soldUnits:999999,soldByProduct:{esencial:999999},ledger:{'1:SIM_VENTAS':999999,'1:SIM_GASTOS':-300,'1:SIM_INVERSION':-1000,'1:SIM_DEVOLUCIONES':-75}});
- assert.deepEqual(played,baseline);assert.equal(played.receipt.sold,7);assert.equal(played.receipt.revenue,525);
+ assert.deepEqual(played,baseline);assert.equal(played.receipt.sold,7);assert.equal(played.receipt.revenue,297.5);
 });
 test('cycle business context never reads world inventory or prices',()=>{
  const source=fs.readFileSync(require.resolve('../js/app.js'),'utf8');

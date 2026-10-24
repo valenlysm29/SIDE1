@@ -7,7 +7,7 @@ function fixture(overrides={}){
   const memory=new Map(),calls=[],statuses=[];
   const storage={getItem:key=>memory.get(key)||null,setItem:(key,value)=>memory.set(key,value)};
   let current={connected:true,identityKey:'A',identity:{codigo:'SIDE-001',nombreLegal:'Legal A',nombreComercial:'A'},revision:0,epoch:1};
-  const options={storage,context:()=>current,
+  const options={storage,context:()=>current,retryMs:[0],
     saveSnapshot:async(identity,state,revision)=>{calls.push({kind:'snapshot',identity,state,revision});return {success:true,data:{snapshot_revision:revision+1}};},
     saveOperation:async(identity,round,operation,revision)=>{calls.push({kind:operation.key,identity,round,operation,revision});return {success:true};},
     onRevision:revision=>{current.revision=revision;},onStatus:status=>statuses.push(status),...overrides};

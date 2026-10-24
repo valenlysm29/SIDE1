@@ -70,13 +70,14 @@ test('3D source and bridge cannot import or call economic services or legacy mut
 });
 test('current CYCLE_MODEL closure remains byte-identical after actual POS handler transactions',()=>{
  const cycle=require('../js/cycle_model.js');
- const input={state:{CANALES:{optionIds:['web']}},capital:200000,round:1,production:{producibleUnits:500,productLines:[{plannedUnits:500}],materials:[]},allocation:{products:{esencial:{asignado:7}}}};
+ const economicFixture=require('./economic_v19_fixture.cjs'),state=economicFixture.state();state.PRODUCCION_META.moldTargets={molde_1:7};
+ const input={state,catalog:economicFixture.catalog,capital:200000,round:1};
  const expected=cycle.close(structuredClone(input)),snapshot=JSON.stringify(input);
  for(const mode of ['loaded','error']){
   const {c}=fixture(mode);c.window.localStorage=c.localStorage;
   for(let n=0;n<80;n++)assert.equal(c.recordSale('esencial',999),true);
   const actual=cycle.close(input);assert.deepEqual(actual,expected);assert.equal(JSON.stringify(input),snapshot);
-  assert.equal(actual.receipt.sold,7);assert.equal(actual.receipt.revenue,525);
+  assert.equal(actual.receipt.sold,7);assert.equal(actual.receipt.revenue,297.5);
  }
 });
 test('resetting or reloading a fun shift preserves spent local resources and economic state',()=>{

@@ -8,7 +8,7 @@ const item=id=>catalog.flatMap(c=>c.items).find(i=>i.id===id);
 function context(patch={}){return {catalog,state:{},drafts:{},round:1,config:{interest:20,cycles:6},rules,capital:100000,ledger:{},...patch};}
 test('empty scenario includes mandatory local and cleaning only',()=>{
  const ctx=context(),sections=catalog.map(c=>model.section(c,ctx));
- assert.equal(model.finances(sections,ctx).outflow,2600);assert.equal(model.finances(sections,ctx).projectedCash,97400);
+ assert.equal(model.finances(sections,ctx).outflow,2712.32);assert.equal(model.finances(sections,ctx).projectedCash,97287.68);
 });
 test('all three districts retain their quantities and cost',()=>{
  const ctx=context({drafts:{CANALES:{optionIds:['web','los_olivos','miraflores','sjl'],quantities:{los_olivos:2,miraflores:3,sjl:4}}}});
@@ -28,23 +28,23 @@ test('same-round submitted mold still costs money; later cycles do not charge ag
 });
 test('staff severance survives repeated saves in the same round',()=>{
  const ctx=context({round:2,state:{PERS_CORTE:{round:2,quantities:{corte_basico:1},previousQuantities:{corte_basico:3}}},drafts:{PERS_CORTE:{quantities:{corte_basico:1}}}});
- const result=model.breakdown(item('PERS_CORTE'),ctx);assert.equal(result.outflow,3000);assert.equal(result.recurring,1500);
+ const result=model.breakdown(item('PERS_CORTE'),ctx);assert.equal(result.outflow,3381.6);assert.equal(result.recurring,1690.8);
 });
 test('analyst discount affects material prices, not wages',()=>{
  const ctx=context({drafts:{ANALISTA_COMPRAS:{optionIds:['si_analista']},CUERO:{quantities:{cuero_std:100}},PERS_CORTE:{quantities:{corte_basico:2}}}});
- assert.ok(Math.abs(model.breakdown(item('CUERO'),ctx).outflow-7286.4)<1e-9);assert.equal(model.breakdown(item('PERS_CORTE'),ctx).outflow,3000);
+ assert.ok(Math.abs(model.breakdown(item('CUERO'),ctx).outflow-3643.2)<1e-9);assert.equal(model.breakdown(item('PERS_CORTE'),ctx).outflow,3381.6);
 });
 
 test('material purchases use physical units and the retained quantity discount',()=>{
  const ctx=context({drafts:{CUERO:{quantities:{cuero_sint:60,cuero_std:55,cuero_prem:15}},ACCESORIOS:{quantities:{acc_eco:200,acc_prem:190}},HILO:{quantities:{hilo_ref:6,hilo_prem:7}}}});
  const total=['CUERO','ACCESORIOS','HILO'].reduce((sum,id)=>sum+model.breakdown(item(id),ctx).outflow,0);
- assert.ok(Math.abs(total-(60*25+55*90+15*140+200*2+190*5+6*.15+7*.22)*.92)<1e-9);
+ assert.ok(Math.abs(total-(60*25+55*45+15*80+200*4+190*9+6*4+7*7)*.92)<1e-9);
 });
 
-test('review uses the nine wages defined by the restored game catalog',()=>{
- const expected={PERS_CORTE:[1500,2500,4000],PERS_ENSAMBLE:[1500,2800,4500],PERS_ACABADO:[1500,2800,4500]};
+test('review uses the nine full MYPE monthly wages recalculated in Excel v19',()=>{
+ const expected={PERS_CORTE:[1690.8,2254.4,4191.36],PERS_ENSAMBLE:[1690.8,3104.16,4952.4],PERS_ACABADO:[1690.8,3104.16,4952.4]};
  for(const [id,monthly] of Object.entries(expected))for(const [index,amount] of monthly.entries())assert.equal(model.unitCost(item(id),item(id).options[index],context()),amount);
- assert.equal(model.unitCost(item('JEFATURA'),item('JEFATURA').options[1],context()),3000);
+ assert.equal(model.unitCost(item('JEFATURA'),item('JEFATURA').options[1],context()),3321.6);
  assert.equal(model.unitCost(item('JEFATURA'),item('JEFATURA').options[0],context()),0);
 });
 

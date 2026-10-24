@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const source=fs.readFileSync(require.resolve('../js/app.js'),'utf8');
 const helpers=source.slice(source.indexOf('function calculatorMoldLine('),source.indexOf('function refreshProductionCalculator('));
 function calculator(){
- const context=vm.createContext({escapeHtml:value=>String(value)});vm.runInContext(helpers,context);
+ const context=vm.createContext({window:{SIDE_ECONOMIC_CONFIG:require('../js/engine/config.js')},escapeHtml:value=>String(value)});vm.runInContext(helpers,context);
  const specifications=[['molde_1','Molde básico',.3,6],['molde_2','Molde mejorado',.4,7],['molde_3','Molde premium',.7,13]];
  const plan={target:30,processCapacity:100,producibleUnits:30,productLines:specifications.map(([id,label,leather,thread])=>({id,label,target:10,suggested:20,available:false,requirements:{CUERO:10*leather,ACCESORIOS:10,HILO:10*thread}}))};
  return {context,plan,render(draft,locked=false){context.plan=plan;context.draft=draft;context.locked=locked;return vm.runInContext('productionCalculatorHtml(plan,draft,locked)',context)}};

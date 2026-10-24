@@ -23,5 +23,5 @@ test('materials use physical units and bounded affordable thread purchases',()=>
  const hilo=catalog.flatMap(c=>c.items).find(i=>i.id==='HILO');
  assert.equal(production.yieldFor('HILO','hilo_std'),1);
  const cost=review.unitCost(hilo,hilo.options[0],{state:{},drafts:{},round:1});
- assert.ok(Math.abs(700*cost-64.4)<1e-8);
+ assert.ok(Math.abs(700*cost-1288)<1e-8);
 });

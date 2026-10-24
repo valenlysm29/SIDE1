@@ -15,7 +15,7 @@ test('three complete restored cycles buy, produce, sell, persist and reconcile c
   sectionsByRound[round]={};for(const category of catalog.filter(c=>!c.summaryOnly)){const section=review.section(category,ctx);sectionsByRound[round][category.cat]={...section,recordedNet:section.net};ledger[`${round}:${category.cat}`]=section.net;}
   const plan=production.calculate(ctx);assert.equal(plan.producibleUnits,100);
   const result=cycle.close({state,ledger,catalog,round,capital:200000,sectionsByRound,production:plan});state=clone(result.state);ledger=clone(result.ledger);
-  assert.equal(result.receipt.sold,100);assert.equal(result.receipt.revenue,7500);assert.equal(result.financial.estadoResultados.ingresos,7500);
+  assert.equal(result.receipt.sold,100);assert.equal(result.receipt.revenue,4250);assert.equal(result.financial.estadoResultados.ingresos,4250);
   const f=result.financial;assert.equal(f.balanceCaja.cajaFinal,Math.round((200000+Object.values(ledger).reduce((s,v)=>s+v,0))*100)/100);assert.equal(f.balanceGeneral.activos,f.balanceGeneral.pasivoPatrimonio);
   assert.equal(cycle.close({state,ledger,catalog,round,capital:200000,sectionsByRound}).reused,true);assert.equal(state.__inventarioMP.hilo_std,0);assert.equal(state.__finishedGoods.esencial,0);
   rows.push({round,produced:plan.producibleUnits,sold:result.receipt.sold,revenue:result.receipt.revenue,cash:f.balanceCaja.cajaFinal,profit:f.estadoResultados.utilidad});
@@ -26,12 +26,14 @@ test('missing materials or workers never invent production or revenue',()=>{
  for(const missing of ['CUERO','ACCESORIOS','HILO','PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO']){const state=decisions(1);state[missing].quantities={};const r=cycle.close({state,catalog,round:1});assert.equal(r.receipt.produced,0);assert.equal(r.receipt.revenue,0);}
 });
 test('legacy POS counts do not change the demand-based settlement',()=>{
- const production={producibleUnits:20,productLines:[{plannedUnits:10},{plannedUnits:0},{plannedUnits:10}],materials:[]},state={CANALES:{optionIds:['web']}};
- const r=cycle.close({state,ledger:{'1:SIM_VENTAS':1250},catalog,production,soldUnits:10,soldByProduct:{premium:10}});
- assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],2000);assert.equal(r.receipt.goods.premium,0);
+ const fixture=require('./economic_v19_fixture.cjs'),state=fixture.state(1,{},3);
+ state.PRODUCCION_META.moldTargets={molde_1:10,molde_2:0,molde_3:10};
+ const baseline=cycle.close({state,catalog:fixture.catalog,round:1});
+ const r=cycle.close({state,catalog:fixture.catalog,round:1,ledger:{'1:SIM_VENTAS':1250},soldUnits:10,soldByProduct:{premium:10}});
+ assert.deepEqual(r,baseline);assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],3925);assert.equal(r.receipt.goods.premium,0);
 });
-test('700 metres of thread cost S/64.40 with retained volume discount',()=>{
- const ctx={catalog,state:{},drafts:{HILO:{quantities:{hilo_std:700}}},round:1,rules};const item=catalog.flatMap(c=>c.items||[]).find(i=>i.id==='HILO');assert.ok(Math.abs(review.breakdown(item,ctx).outflow-64.4)<1e-9);
+test('700 metres of thread cost S/1288.00 with retained volume discount',()=>{
+ const ctx={catalog,state:{},drafts:{HILO:{quantities:{hilo_std:700}}},round:1,rules};const item=catalog.flatMap(c=>c.items||[]).find(i=>i.id==='HILO');assert.ok(Math.abs(review.breakdown(item,ctx).outflow-1288)<1e-9);
 });
 test('migration preserves cash and closed receipts without charging a finished cycle again',()=>{
  const key='__'+'ex'+'cel',old={habilitado:true,round:2,decisiones:{personal:{corte:[1,0,0]},maquinaria:{mesa:1,'INF-02':1,'INF-08':1},comprasUnidades:{'INS-06':2},lotes:[{molde:'INF-08',cantidad:80}]},resultado:{ciclo:2,ingresos:6000,financial:{balanceCaja:{cajaFinal:175000}}}};
