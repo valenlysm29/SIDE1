@@ -49,3 +49,14 @@ test('a model already present in another scene gets a distinct appearance',()=>{
   assert.notEqual(adjacent.tint,null);
   assert.notEqual(adjacent.heightScale,first.heightScale);
 });
+
+test('outdoor bag reuses an available outfit before duplicating a nearby interior worker',()=>{
+  const roster=createCityRoster([model('a'),model('b'),model('c')],{random:()=>.3});
+  const first=roster.draw('hub','cliente').model.id;
+  const second=roster.draw('hub','cliente').model.id;
+  const third=roster.draw('probe','cliente',[first,second]).model.id;
+  // Only the third remains in hub's bag, but it is now an interior worker.
+  const next=roster.draw('hub','cliente',[third]);
+  assert.notEqual(next.model.id,third);
+  assert.ok([first,second].includes(next.model.id));
+});

@@ -31,10 +31,10 @@ export function createCityRoster(rows,{random=Math.random}={}){
     // Interior staff cannot visually repeat a nearby actor, even when the
     // shuffled bag's remaining outfits are all already in the neighborhood.
     let uniqueModel=null;
-    if(unique&&different<0){
+    if(different<0){
       const eligible=pool.filter(row=>!near.has(row.id));
-      if(!eligible.length)return null;
-      uniqueModel=shuffle(eligible,random)[0];
+      if(!eligible.length&&unique)return null;
+      if(eligible.length)uniqueModel=shuffle(eligible,random)[0];
     }
     const index=different>=0?different:0;
     const model=uniqueModel||bag.splice(index,1)[0];

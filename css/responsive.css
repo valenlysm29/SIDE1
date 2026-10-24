@@ -1055,3 +1055,9 @@ small {
 @media (max-width: 820px) {
   #simulator3d.simulator-screen .sim3d-missions { top: max(220px, var(--sim-hud-bottom, 220px)); }
 }
+@media (max-width: 900px) and (max-height: 560px) and (orientation: landscape) {
+  #simulator3d.simulator-screen .sim3d-missions {
+    top: max(150px, var(--sim-hud-bottom, 150px));
+    max-height: max(44px, calc(100dvh - max(150px, var(--sim-hud-bottom, 150px)) - 120px));
+  }
+}

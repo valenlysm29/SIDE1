@@ -703,6 +703,7 @@
         ? `Meta: ${target} unidades · ${channels} canal(es) · ${physicalStores} tienda(s)${queueText}${stockText}. Repón exhibidores y cobra en caja.`
         : `Gestiona inventario, exhibición y caja${queueText}${stockText}.`);
     updateMissionUI();
+    refreshHudLayout();
   }
 
   async function loadThree() {
@@ -3685,8 +3686,17 @@
     } catch { running=true; message('La Tablet no está disponible. Puedes continuar explorando.'); }
   }
 
+  function refreshHudLayout() {
+    const host=$3(rootId),stats=host?.querySelector?.('.sim3d-stats');
+    if(host?.getBoundingClientRect&&stats?.getBoundingClientRect&&host.style?.setProperty){
+      const bottom=stats.getBoundingClientRect().bottom-host.getBoundingClientRect().top;
+      host.style.setProperty('--sim-hud-bottom',`${Math.ceil(bottom+10)}px`);
+    }
+  }
+
   function resize() {
     pausedFrameDrawn=false;
+    refreshHudLayout();
     if (!renderer || !camera) return;
     const c = $3('side3dCanvas');
     const w = c.clientWidth || innerWidth;
@@ -3694,8 +3704,6 @@
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    const host=$3(rootId),stats=host?.querySelector('.sim3d-stats');
-    if(host&&stats){const bottom=stats.getBoundingClientRect().bottom-host.getBoundingClientRect().top;host.style.setProperty('--sim-hud-bottom',`${Math.ceil(bottom+10)}px`);}
   }
 
 
@@ -4101,5 +4109,5 @@
       player:{x:player.x,z:player.z}, renderedFrames:renderer?.info.render.frame||0, lastError:lastPrepareError};
   }
   function suspend(){running=false;keys={};jumpQueued=false;player.vx=player.vz=player.speed=0;document.exitPointerLock?.();stopAmbient();}
-  window.SIDE3D = { prepare, preloadBase, preload, preloadCharacter, selectCharacter, preloadDetails, loadingStatus, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
+  window.SIDE3D = { prepare, refreshHudLayout, preloadBase, preload, preloadCharacter, selectCharacter, preloadDetails, loadingStatus, enter, suspend, returnFromDecisions, rebuild: rebuildDynamicWorld, getLastError:()=>lastPrepareError, diagnostics };
 })();

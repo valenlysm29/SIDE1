@@ -46,6 +46,7 @@ const sizes=[[360,800],[390,844],[768,1024],[800,360],[844,390],[1024,768]];
     document.querySelector('#simHubOrder').hidden=false;document.querySelector('#simHubOrder').textContent='Pedido de prueba:12 unidades en camino';
     document.querySelector('#simCash').textContent='S/ 1,234,567.89';document.querySelector('#simNetProfit').textContent='−S/ 1,234,567.89';
     document.querySelector('#simMissionList').innerHTML='<div><span>1</span><p><b>Revisar el stock de la empresa</b><small>Visita el almacén para comprobar las existencias.</small></p></div>';
+    SIDE3D.refreshHudLayout();
    });
    await page.waitForFunction(()=>!document.querySelector('#toast').classList.contains('show'),null,{timeout:5000});
    await touchMedia();
