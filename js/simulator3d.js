@@ -1016,7 +1016,7 @@
   async function loadCityNpcModels() {
     if(cityLoadPromise)return cityLoadPromise;
     cityLoadPromise=(async()=>{try {
-      [cityRosterModule,cityClipModule]=await Promise.all([import('../services/npc_city_roster.mjs'),import('../services/npc_clip_controller.mjs')]);
+      [cityRosterModule,cityClipModule]=await Promise.all([import('../services/npc_city_roster.mjs?v=20261023-world-fun'),import('../services/npc_clip_controller.mjs')]);
       if(!cityApproved){
         const publicResponse=await fetch('assets/models/npc/manifest.json');
         const publicRows=publicResponse.ok?await publicResponse.json():[];
@@ -3164,7 +3164,7 @@
 
   async function buildPlayableHub() {
     ({createNpcPatrol}=await import('../services/npc_patrol.mjs'));
-    ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs'));
+    ({deriveWorldDecisionState}=await import('../services/world_decision_state.mjs?v=20261023-world-fun'));
     const {createWorldEventVisuals}=await import('../services/world_event_visuals.mjs');
     worldEventVisuals=createWorldEventVisuals({THREE,scene,offsetX:HUB_OFFSET});
     const {createHubWorld,CITY_MAP}=await import('../services/hub_world.js?v=20261023-pedestrian-district');
@@ -3179,7 +3179,7 @@
     worldMinimapControl=createWorldMinimapControl({root:$3(rootId)});
     worldWayfinding=createWorldWayfinding({THREE,root:$3(rootId),zones:CITY_MAP.zones,offsetX:HUB_OFFSET});
     hubWorld.installOutdoorProps(outdoorPropTemplates,perfMode);
-    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-pedestrian-district');
+    const {createBusinessInteriors}=await import('../services/business_interiors.mjs?v=20261023-world-fun');
     businessInteriors=createBusinessInteriors({scene,offsetX:HUB_OFFSET,
       createNpc:createBusinessNpc,getNeighbors:npcNeighbors,onCollidersAdded:items=>{if(businessInteriors)hubWorld.colliders.push(...items);},
       animateNpc:(obj,dt,moving)=>setPersonPose(obj,0,moving,dt)});
