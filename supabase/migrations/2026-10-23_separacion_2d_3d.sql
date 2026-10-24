@@ -28,4 +28,3 @@ commit;
 -- commit;
 -- ADVERTENCIA: esa reversión vuelve a permitir que resultados históricos
 -- sobrescriban decisiones, ingresos y caja del modelo vigente.
-
