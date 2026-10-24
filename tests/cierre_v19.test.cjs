@@ -35,6 +35,14 @@ test('v19 physical resource failures report no production',()=>{
  for(const key of ['CUERO','HILO','ACCESORIOS','PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO']){const s=state();s[key].quantities={};const r=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(r.revenue,0,key);assert.ok(r.sales[0].reason);}
 });
 module.exports={state,catalog};
+test('CONS03 applies to planned quantity before stock and capacity limits',()=>{
+ const s=state();s.PRODUCCION_META.moldTargets={molde_1:10000};
+ const config={...E.config,consequences:{...E.config.consequences,lowEfficiency:11}};
+ const raw=require('../js/production_model.js').calculate({state:s,catalog,round:1});
+ const prepared=E.prepare({state:s,catalog,round:1},config);
+ assert.equal(prepared.plan.producibleUnits,Math.min(7000,raw.processCapacity,raw.materialCapacity));
+ assert.ok(prepared.messages.some(m=>m.id==='CONS-03'));
+});
 test('v19 reconstructed cost sections survive authoritative financial recalculation',()=>{
  const FIN=require('../js/financial_model.js'),input={state:state(2,state(1)),round:2,catalog,capital:200000,ledger:{},sectionsByRound:{}},r=cycle.close(input);
  assert.ok(Object.keys(r.financialSections[2]).length>0);

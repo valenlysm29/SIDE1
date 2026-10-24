@@ -36,13 +36,15 @@
   }
   function prepare(input,config=DEFAULT){
     const state=input.state||{},round=input.round||1,p=scores(state),c=config.consequences,messages=[],plan=clone(PRO.calculate({state,drafts:{},catalog:input.catalog||[],round})),price=prices(state,input.prices,config);
-    let factor=1+(config.training[chosen(state,'INV_RRHH')]||0);
-    if(p.efficiency<c.lowEfficiency){factor*=c.lowProduction;messages.push({id:'CONS-03',text:'Eficiencia menor a 4: producción al 70%.'});}
-    if(!plan.hasLeadership&&p.efficiency<c.noLeaderEfficiency){factor*=c.noLeaderProduction;messages.push({id:'CONS-08',text:'Sin jefatura y eficiencia menor a 5: producción adicional −5%.'});}
+    let plannedFactor=1;
+    if(p.efficiency<c.lowEfficiency){plannedFactor=c.lowProduction;messages.push({id:'CONS-03',text:'Eficiencia menor a 4: producción al 70% de lo planeado, limitada por recursos.'});}
+    const coordinationFactor=!plan.hasLeadership&&p.efficiency<c.noLeaderEfficiency?c.noLeaderProduction:1;
+    if(coordinationFactor<1)messages.push({id:'CONS-08',text:'Sin jefatura y eficiencia menor a 5: producción adicional −5%.'});
     // Recompute capacity gain and preserve physical material/target ceilings.
-    const max=Math.min(plan.target,Math.floor(plan.processCapacity*(1+(config.training[chosen(state,'INV_RRHH')]||0))),plan.materialCapacity),base=plan.producibleUnits;
+    const max=Math.min(plan.target,Math.floor(plan.processCapacity*(1+(config.training[chosen(state,'INV_RRHH')]||0))),plan.materialCapacity);
     if(plan.target>plan.processCapacity)messages.push({id:'CONS-06',text:'La meta supera la capacidad: las unidades excedentes quedan sin producir. El límite físico evita sobrecapacidad; no se cobran horas extra no autorizadas.'});
-    const wanted=Math.min(max,Math.floor(base*factor));let assigned=0;
+    // CONS-03 refers to planned quantity, not an already capacity-limited result.
+    const wanted=Math.floor(Math.min(max,Math.floor(plan.target*plannedFactor))*coordinationFactor);let assigned=0;
     const active=plan.productLines.filter(line=>line.available&&line.target>0),eligible=active.reduce((s,line)=>s+line.target,0);
     for(const line of plan.productLines){line.plannedUnits=!line.available?0:Math.min(line.target,Math.floor(wanted*line.target/(eligible||1)));assigned+=line.plannedUnits;}
     for(const line of active){const extra=Math.min(line.target-line.plannedUnits,wanted-assigned);line.plannedUnits+=extra;assigned+=extra;}

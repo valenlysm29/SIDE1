@@ -1,6 +1,10 @@
 /* Excel v19. SUPUESTOS pendientes de aprobación: los valores sin fórmula fuente
  * permanecen aquí para poder cambiarlos sin alterar el orden del cierre. */
-(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_ECONOMIC_CONFIG=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else{
+  root.SIDE_ECONOMIC_CONFIG=api;
+  // The existing menu reads these costs; keep assumptions editable here.
+  for(const item of (root.SIDE_DECISION_CATALOG||[]).flatMap(category=>category.items||[]))for(const option of item.options||[])if(Object.hasOwn(api.optionCosts,option.id))option.cost=api.optionCosts[option.id];
+}})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   return Object.freeze({version:'excel-v19',products:['esencial','urbano','premium'],
     segments:{esencial:{code:'SEG-01',min:40,max:45,defaultPrice:42.5,market:3500,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:120,max:200,defaultPrice:160,ideal:100,market:3500,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:220,max:400,defaultPrice:250,ideal:250,market:800,weights:[.1,.5,.4],quality:7}},
@@ -11,6 +15,8 @@
     marketing:{mkt_baja:0,mkt_media:.12,mkt_alta:.2},
     // SUPUESTO: cobertura base neutral; cada tienda adicional +5%, tope +25%.
     channels:{web:1,physical:1,mixed:1,extraStore:.05,maxExtra:.25},
+    // SUPUESTOS heredados del menú, sin tarifa equivalente en el libro.
+    optionCosts:{los_olivos:1800,miraflores:3500,sjl:2200,si_analista:5000},
     // SUPUESTOS heredados: almacenaje S/2/u, horas extra 25%, tasa +3 pp.
     storagePerUnit:2,overtimeRate:.25,nextLoanRatePP:3,
     credit:{initial:.2,step:.05,analystBonus:.05,max:.7},commission:.01,
