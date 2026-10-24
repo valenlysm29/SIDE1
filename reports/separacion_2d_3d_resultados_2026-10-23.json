@@ -1,0 +1,419 @@
+{
+  "date": "2026-10-23",
+  "baselineRef": "18d88e7",
+  "node": {
+    "tests": 634,
+    "passed": 634,
+    "failed": 0,
+    "skipped": 0
+  },
+  "oracle": {
+    "comparisons": 3104,
+    "differences": 0,
+    "expectedRegenerated": false
+  },
+  "syntaxFiles": 82,
+  "baselineBrowser": {
+    "total": 20,
+    "passed": 10,
+    "failed": 10
+  },
+  "verification": {
+    "present": 40,
+    "passed": 40,
+    "failed": 0,
+    "optionalMissing": [
+      "side_full_flow.cjs"
+    ]
+  },
+  "results": [
+    {
+      "suite": "local_server_test.py",
+      "kind": "server",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 1671,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\local_server_test.py.log"
+    },
+    {
+      "suite": "node-completa",
+      "passed": true,
+      "status": "passed",
+      "tests": 634,
+      "log": "tests/output/separacion-20261023/node-definitive.log"
+    },
+    {
+      "suite": "decision_options_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2081,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\decision_options_db.cjs.log"
+    },
+    {
+      "suite": "student_admission_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 4195,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\student_admission_db.cjs.log"
+    },
+    {
+      "suite": "student_admission_matrix_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 5859,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\student_admission_matrix_db.cjs.log"
+    },
+    {
+      "suite": "teacher_history_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2565,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\teacher_history_db.cjs.log"
+    },
+    {
+      "suite": "game_lifecycle_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2579,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\game_lifecycle_db.cjs.log"
+    },
+    {
+      "suite": "game_observations_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2519,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\game_observations_db.cjs.log"
+    },
+    {
+      "suite": "waiting_room_db.cjs",
+      "kind": "db",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2839,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\waiting_room_db.cjs.log"
+    },
+    {
+      "suite": "playable_hub.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 39685,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\playable_hub.cjs.log"
+    },
+    {
+      "suite": "continuous_world.cjs",
+      "passed": true,
+      "durationMs": 126361,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-final.log"
+    },
+    {
+      "suite": "gameplay_hud.cjs",
+      "passed": true,
+      "durationMs": 18295,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/mobile-layout-final-summary.json"
+    },
+    {
+      "suite": "world_business_ui.cjs",
+      "passed": true,
+      "durationMs": 40174,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-final.log"
+    },
+    {
+      "suite": "world_cycle_restart.cjs",
+      "passed": true,
+      "durationMs": 85886,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-final.log"
+    },
+    {
+      "suite": "world_startup.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 44677,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\world_startup.cjs.log"
+    },
+    {
+      "suite": "world_loading.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 20790,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\world_loading.cjs.log"
+    },
+    {
+      "suite": "world_entry_assets.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 20974,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\world_entry_assets.cjs.log"
+    },
+    {
+      "suite": "supplied_npcs.cjs",
+      "passed": true,
+      "durationMs": 125255,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-recheck-summary.json"
+    },
+    {
+      "suite": "mona_npc.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 65150,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\mona_npc.cjs.log"
+    },
+    {
+      "suite": "npc_locomotion.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 13381,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\npc_locomotion.cjs.log"
+    },
+    {
+      "suite": "game_lifecycle_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 65923,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\game_lifecycle_ui.cjs.log"
+    },
+    {
+      "suite": "decisions_cycle_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 27594,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\decisions_cycle_ui.cjs.log"
+    },
+    {
+      "suite": "teacher_lifecycle_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 15175,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\teacher_lifecycle_ui.cjs.log"
+    },
+    {
+      "suite": "tablet_return_browser.cjs",
+      "passed": true,
+      "durationMs": 48441,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-final.log"
+    },
+    {
+      "suite": "npc_world_fixes_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 81326,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\npc_world_fixes_browser.cjs.log"
+    },
+    {
+      "suite": "world_orientation_mobile.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 132850,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\world_orientation_mobile.cjs.log"
+    },
+    {
+      "suite": "teacher_history_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 6138,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\teacher_history_ui.cjs.log"
+    },
+    {
+      "suite": "teacher_report_pdf_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 12690,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\teacher_report_pdf_ui.cjs.log"
+    },
+    {
+      "suite": "character_selection_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2542,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\character_selection_ui.cjs.log"
+    },
+    {
+      "suite": "decision_interiors_browser.cjs",
+      "passed": true,
+      "durationMs": 101233,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/interiors-final-summary.json"
+    },
+    {
+      "suite": "npc_navmesh_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 4627,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\npc_navmesh_browser.cjs.log"
+    },
+    {
+      "suite": "tablet_item_draft_ui.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 26921,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\tablet_item_draft_ui.cjs.log"
+    },
+    {
+      "suite": "mobile_integral_ui.cjs",
+      "passed": true,
+      "durationMs": 73916,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/mobile-layout-final-summary.json"
+    },
+    {
+      "suite": "side_full_flow.cjs",
+      "kind": "browser",
+      "status": "skipped",
+      "passed": false,
+      "reason": "Runner opcional aún no creado"
+    },
+    {
+      "suite": "world_population_flow_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 53891,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\world_population_flow_browser.cjs.log"
+    },
+    {
+      "suite": "world_separation_browser.cjs",
+      "passed": true,
+      "durationMs": 24708,
+      "status": "passed",
+      "log": "tests/output/separacion-20261023/browser-final.log"
+    },
+    {
+      "suite": "separacion_2d_3d_sql_db.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 7646,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\separacion_2d_3d_sql_db.cjs.log"
+    },
+    {
+      "suite": "business_closure_independent_db.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 2687,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\business_closure_independent_db.cjs.log"
+    },
+    {
+      "suite": "integral_cycle_ui_20261023.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 5010,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\integral_cycle_ui_20261023.cjs.log"
+    },
+    {
+      "suite": "clean_decisions_20261023_browser.cjs",
+      "kind": "browser",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 19040,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\clean_decisions_20261023_browser.cjs.log"
+    },
+    {
+      "suite": "npc_fps_benchmark.cjs",
+      "kind": "benchmark",
+      "status": "passed",
+      "passed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "durationMs": 108380,
+      "log": "tests\\output\\mejora-integral-2026-10-01\\separacion-final\\runs\\2026-10-23T23-49-40-626Z\\npc_fps_benchmark.cjs.log"
+    }
+  ],
+  "productionSqlExecuted": false,
+  "coordinatorEvidenceRestore": "EBUSY restoring a pre-existing locked log; test results retained in runs; final reruns use an isolated coordinator without restoring historical outputs",
+  "postCacheWebgl": {
+    "passed": true,
+    "log": "tests/output/separacion-20261023/cache-webgl.log"
+  },
+  "staticAssetChecks": {
+    "passed": 13,
+    "failed": 0,
+    "log": "tests/output/separacion-20261023/cache-assets.tap"
+  }
+}
