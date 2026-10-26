@@ -1006,11 +1006,39 @@
     const look=role==='cashier'?STAFF_LOOKS[0]:role==='salesperson'?STAFF_LOOKS[1]:{gender:Math.random()<.5?'female':'male',formal:role==='supervisor',shirt:[0x9c553e,0x4f7669,0xc29c52,0x657e9a,0x805e86][Math.floor(Math.random()*5)]};
     const serviceRoom=room&&['office','bank','suppliers'].includes(room.id);
     const nearby=serviceRoom?room.actors.filter(actor=>actor.object!==previous).map(actor=>actor.object.userData.cityNpcId).filter(Boolean):null;
-    if(serviceRoom)for(const actor of hubActors)if(Math.hypot(actor.obj.position.x-(room.layout.x+HUB_OFFSET),actor.obj.position.z-room.layout.z)<24&&actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
+    // Mobile actors can approach this room later. Reserve their identities
+    // regardless of their current distance, including the walking guide.
+    if(serviceRoom)for(const actor of [...hubActors,...animatedActors.filter(actor=>['guide','visitor'].includes(actor.type))])if(actor.obj.userData.cityNpcId)nearby.push(actor.obj.userData.cityNpcId);
     const config={...look,cityRole,cityScene:room?.id||'interiors',excludedCityIds:nearby};
     const obj=person(config);
     if(!obj)return null;
     obj.getObjectByName('NpcNameLabel')?.removeFromParent();Object.assign(obj.userData,{role});return obj;
+  }
+
+  function rebuildCityCharacters() {
+    // A smaller quality-tier roster may leave the guide holding the only
+    // cashier outfit. Release all mobile identities before assigning staff.
+    const mobile=animatedActors.filter(actor=>['guide','visitor'].includes(actor.type));
+    animatedActors=animatedActors.filter(actor=>!mobile.includes(actor));
+    interactables=interactables.filter(point=>!mobile.some(actor=>actor.obj===point.mesh));
+    for(const actor of hubActors){actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal);}
+    hubActors.length=0;
+    for(const actor of mobile){actor.obj.removeFromParent();if(actor.type==='guide')clearGroup(actor.obj);}
+    for(const room of businessInteriors?.rooms||[])for(const actor of room.actors){
+      const previous=actor.object,replacement=createBusinessNpc(previous.userData.role,room,previous);
+      if(!replacement)continue;
+      replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
+      replacement.visible=previous.visible;replacement.name=previous.name;
+      room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
+    }
+    for(const [index,actor] of mobile.filter(actor=>actor.type==='visitor').entries()){
+      const previous=actor.obj,object=person({cityRole:'cliente',cityScene:'outdoor',gender:index%2?'female':'male'});
+      if(!object)continue;
+      object.position.copy(previous.position);object.quaternion.copy(previous.quaternion);
+      object.visible=previous.visible;object.name=previous.name;object.userData.role='pedestrian';
+      actor.obj=object;scene.add(object);groundPerson(object);animatedActors.push(actor);clearGroup(previous);
+    }
+    ensureHubCharacters({allowFallback:true});
   }
 
   async function loadCityNpcModels() {
@@ -1034,20 +1062,7 @@
       const previousRosterIds=cityRoster?.models.map(model=>model.id).join('|')||'';
       cityRoster=cityRosterModule.createCityRoster(selected.filter(entry=>cityTemplates.has(entry.id)));
       if(previousRosterIds!==cityRoster.models.map(model=>model.id).join('|')&&cityRoster.models.length){
-        // Hub fallback actors may have been created before deferred model loading.
-        for(const actor of hubActors){actor.obj.removeFromParent();const disposal=new THREE.Group();disposal.add(actor.obj);clearGroup(disposal)}
-        hubActors.length=0;
-        for(const room of businessInteriors?.rooms||[]){
-          for(const actor of room.actors){
-            const previous=actor.object,role=previous.userData.role;
-            const replacement=createBusinessNpc(role,room,previous);
-            if(!replacement)continue;
-            replacement.position.copy(previous.position);replacement.quaternion.copy(previous.quaternion);
-            replacement.visible=previous.visible;replacement.name=previous.name;
-            room.detail.add(replacement);previous.removeFromParent();clearGroup(previous);actor.object=replacement;
-          }
-        }
-        ensureHubCharacters({allowFallback:true});
+        rebuildCityCharacters();
       }
     } catch(error){console.warn('No se pudo cargar el catálogo NPC; se mantiene el respaldo procedural.',error)}})()
       .finally(()=>{cityLoadPromise=null});
@@ -1293,7 +1308,10 @@
     for(const customer of npcs)if(customer.obj?.userData?.cityNpcId)nearby.push(customer.obj.userData.cityNpcId);
     for(const room of businessInteriors?.rooms||[])for(const actor of room.actors)if(actor.object.userData.cityNpcId)nearby.push(actor.object.userData.cityNpcId);
     if(cfg.excludedCityIds){nearby.splice(0,nearby.length,...cfg.excludedCityIds);if(!cityRoster.models.some(row=>cityRosterModule.npcHasRole(row,cfg.cityRole)&&!nearby.includes(row.id)))return null;}
-    const choice=cityRoster.draw(cfg.cityScene||'business',cfg.cityRole,nearby,{unique:Boolean(cfg.excludedCityIds)});
+    // Never recycle an occupied identity onto a mobile actor: moving it later
+    // would create twins beside an interior worker. person() supplies fallback.
+    const unique=Boolean(cfg.excludedCityIds)||['hub','outdoor'].includes(cfg.cityScene);
+    const choice=cityRoster.draw(cfg.cityScene||'business',cfg.cityRole,nearby,{unique});
     const template=choice&&cityTemplates.get(choice.model.id);
     if(!template)return null;
     const group=new THREE.Group(),avatar=SkeletonUtils.clone(template.scene);
@@ -2817,7 +2835,17 @@
     checkoutOpen = false;
     checkoutScanned = false;
     $3('simCheckout')?.classList.add('hidden');
-    if (resume && running) setTimeout(()=>$3('side3dCanvas')?.requestPointerLock?.(),60);
+    if (resume && running) setTimeout(requestPointerLockSafely,60);
+  }
+
+  // Pointer lock is rejected when a modal closes outside a user gesture. The
+  // rejection is harmless, but an unhandled Promise becomes a browser error
+  // and makes the world regression look like a gameplay failure.
+  function requestPointerLockSafely() {
+    try {
+      const request=$3('side3dCanvas')?.requestPointerLock?.();
+      request?.catch?.(()=>{});
+    } catch { /* browsers may reject pointer lock synchronously */ }
   }
 
   function scanCheckoutProduct() {
@@ -2833,7 +2861,7 @@
     if (!checkoutOpen || !checkoutScanned) return;
     if(!serveNextQueuedCustomer(false))return;
     closeCheckout(false);
-    setTimeout(()=>$3('side3dCanvas')?.requestPointerLock?.(),80);
+    setTimeout(requestPointerLockSafely,80);
   }
 
   function serveNextQueuedCustomer(autoServed = false) {
@@ -3584,7 +3612,7 @@
   function closeProductInspect() {
     productInspectOpen = false;
     $3('simProductInspect')?.classList.add('hidden');
-    if (running) setTimeout(()=>$3('side3dCanvas')?.requestPointerLock?.(),60);
+    if (running) setTimeout(requestPointerLockSafely,60);
   }
 
   function nearestInteractable() {
