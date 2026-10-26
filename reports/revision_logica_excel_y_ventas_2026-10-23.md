@@ -117,4 +117,8 @@ La repetición **del código entregado**, secuencial y sin compartir renderizado
 
 **Permanece un fallo: `decision_interiors_browser.cjs:119`, un NPC duplicado.** En la primera corrida fue banco, nivel medio (3identificadores únicos frente a4actores); en la última fue oficina, nivel medio (2identificadores frente a3actores, un `hub-pedestrian` comparte `city_woman_cardigan` con la oficina). La misma prueba pasó contra el código inicial; la causa de esa variación no quedó atribuida. No se cambió `simulator3d.js` ni se mezcló la corrección económica con el sistema de actores. Este resultado no se etiqueta como regresión económica ni como defecto preexistente confirmado. Se conserva como fallo abierto de navegador.
 
-**No se hizo push**, cumpliendo la condición explícita de que todas las pruebas estuvieran verdes. Los commits permanecen en la rama actual `main`; el remoto fue actualizado con fetch y no había commits remotos nuevos que integrar. El paquete SQL no se ejecutó en producción. El padre de SIDE1 sigue conteniendo únicamente SIDE1.
+### Adenda 2026-10-25 — fallo de identidad NPC resuelto
+
+La corrida posterior a la corrección de `js/simulator3d.js` ejecutó `decision_interiors_browser.cjs` completa y terminó **12/12 comprobaciones de sala × calidad** (low/medium/high/auto; office/bank/suppliers), con salidas de captura y sin excepciones ni activos locales fallidos. La corrección reserva las identidades de guía/peatones móviles al crear personal, fuerza selección única para hub/outdoor y reconstruye actores cuando cambia el roster por calidad; si el roster se agota, conserva el respaldo procedural en lugar de clonar una identidad ocupada. El 3D sigue fuera del cierre económico.
+
+La corrección NPC se validó en local antes de publicar; el SQL ya aplicado por el usuario no se volvió a ejecutar. El padre de SIDE1 sigue conteniendo únicamente SIDE1.

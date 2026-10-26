@@ -25,3 +25,7 @@ Los totales generales de 626 pruebas Node, 22 pruebas Chromium y 498 comparacion
 ## Límites confirmados que deben conservarse en la entrega
 
 CONS-01 se comprueba mediante lotes genéricos del oráculo: el flujo físico Premium de la UI alcanza como mínimo calidad 7 (molde 4 más materiales 1+1+1). CONS-06 conserva el límite físico y avisa, pero no implementa horas extra ni retraso económico. El cierre con docente desconectado queda pendiente hasta reconexión porque todavía no existe un ejecutor confiable desplegado. Ninguna de estas condiciones debe presentarse como funcionalidad terminada.
+
+## Adenda 2026-10-25 — identidad NPC
+
+La regresión de interiores que no estaba certificada en este dictamen se repitió después de la corrección de `js/simulator3d.js`: `decision_interiors_browser.cjs` terminó 12/12 comprobaciones para las cuatro calidades y las tres salas, sin duplicar `cityNpcId` entre actores visibles. La reconstrucción de actores libera las identidades móviles antes de reasignar personal y mantiene la separación 2D/3D del motor económico.
