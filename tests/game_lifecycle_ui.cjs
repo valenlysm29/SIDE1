@@ -164,12 +164,13 @@ function fixture(name){return execFileSync(process.env.PYTHON_BIN||'python',['-c
   await Promise.all([s1,s2].map(p=>p.evaluate(()=>refreshStudentGame())));
   for(const p of [s1,s2]){
    assert.equal(await p.locator('#profiles').isVisible(),true);assert.equal(await p.locator('#studentLobby').isVisible(),false);
-   assert.match(await p.locator('#roomCancellationNotice').innerText(),/cancelada por el profesor/);
-   assert.equal(await p.evaluate(()=>openDecisionMenu()),false);
+   assert.match(await p.locator('#toast.toast-cancellation').innerText(),/cancelada por el profesor/);
+   assert.equal(await p.locator('#roomCancellationNotice').isVisible(),false);
    assert.ok(await p.evaluate(()=>worldCalls.suspend)>0);
    assert.equal(await p.evaluate(()=>studentPoll===null&&studentTick===null),true);
   }
-  await s1.setViewportSize({width:390,height:844});await s1.evaluate(()=>$('toast').classList.remove('show'));assert.match(await s1.locator('#roomCancellationNotice').innerText(),/cancelada por el profesor/);await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
+  await s1.setViewportSize({width:390,height:844});assert.equal(await s1.locator('#roomCancellationNotice').isVisible(),false);await s1.screenshot({path:path.join(output,'observations-student-cancelled.png')});
+  for(const p of [s1,s2])assert.equal(await p.evaluate(()=>openDecisionMenu()),false);
   await t.evaluate(()=>{clearInterval(teacherPoll);teacherPoll=null;clearInterval(companiesPoll);companiesPoll=null;switchTab('empresas');});await t.waitForFunction(()=>!reportsBusy);await t.evaluate(()=>{state.reports=[{id:'sample',empresa:'Demo',nombre:'Jugador',partida:$('gameCode').value,fuente:'supabase',conectada:true,lastSeenAt:new Date(teacherNow()).toISOString(),caja:300000,progreso:0}];renderCompanies();});
   await t.setViewportSize({width:390,height:844});await t.evaluate(()=>$('toast').classList.remove('show'));await t.locator('.company-card').screenshot({path:path.join(output,'observations-company-mobile.png')});
   assert.match(await t.locator('.company-status-line').innerText(),/PRESENCIA SIN CONFIRMAR/);

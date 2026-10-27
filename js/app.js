@@ -94,7 +94,7 @@ function renderCredits(){
   }
   list.dataset.rendered='true';
 }
-function toast(msg,duration=2600){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(window.__sideToast);window.__sideToast=setTimeout(()=>t.classList.remove('show'),Math.max(2600,Number(duration)||2600))}
+function toast(msg,duration=2600,variant=''){const t=$('toast');if(!t)return;t.textContent=msg;t.classList.toggle('toast-cancellation',variant==='cancellation');t.classList.add('show');clearTimeout(window.__sideToast);window.__sideToast=setTimeout(()=>t.classList.remove('show'),Math.max(2600,Number(duration)||2600))}
 function message(id,msg,error=false){const el=$(id);if(!el)return;el.textContent=msg;el.style.color=error?'#ff9d9d':'#ffe06a'}
 function requireSupabase(){if(!supabaseClient){toast('Modo local activo: configura Supabase para sincronización.');return false}return true}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -237,7 +237,7 @@ function updateIntegrationUI(){
   }
   if(access.cancelled){
     autoEnterDecisions=false;
-    if(!cancellationShown){cancellationShown=true;toast('La partida ha sido cancelada por el profesor.');}
+    if(!cancellationShown){cancellationShown=true;toast('La partida ha sido cancelada por el profesor. Solicita el código de una nueva sala.',9000,'cancellation');}
     if(typeof closeCompanyReview==='function')closeCompanyReview();
     if($('studentLobby')?.classList.contains('hidden'))showScreen('studentLobby');
     playerIsDeciding=false;window.__SIDE_RETURN_TO_3D=false;
@@ -245,8 +245,7 @@ function updateIntegrationUI(){
     studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentSnapshotEpoch++;
     try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
     closeModal();showScreen('profiles');
-    const cancellationNotice=$('roomCancellationNotice');
-    if(cancellationNotice){cancellationNotice.textContent='La partida ha sido cancelada por el profesor. Solicita el código de una nueva sala.';cancellationNotice.classList.remove('hidden');}
+    $('roomCancellationNotice')?.classList.add('hidden');
     return;
   }
   if(access.integration){autoEnterDecisions=true;preloadStudentWorld();}
