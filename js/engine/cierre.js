@@ -1,7 +1,7 @@
-/* Cierre económico puro v19: capacidad -> producción -> calidad -> reputación ->
+/* Cierre económico según Costos De Producción (documento 27/10/2026): capacidad -> producción -> reputación -> calidad ->
  * demanda -> reparto -> MIN stock -> ingresos -> costos -> cobranza.
  * Sin DOM, red, reloj, aleatoriedad ni referencias al mundo recreativo. */
-(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(node?require('./config.js'):root.SIDE_ECONOMIC_CONFIG,node?require('./catalogo_excel.js'):root.SIDE_EXCEL_CATALOGO,node?require('../production_model.js'):root.SIDE_PRODUCTION_MODEL);if(node)module.exports=api;else root.SIDE_ECONOMIC_CLOSURE=api;})(typeof globalThis!=='undefined'?globalThis:this,function(DEFAULT,CATALOG,PRO){
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(node?require('./config.js'):root.SIDE_ECONOMIC_CONFIG,node?require('./catalogo_excel.js'):root.SIDE_EXCEL_CATALOGO,node?require('../production_model.js'):root.SIDE_PRODUCTION_MODEL,node?require('../business_rules.js'):root.SIDE_BUSINESS_RULES);if(node)module.exports=api;else root.SIDE_ECONOMIC_CLOSURE=api;})(typeof globalThis!=='undefined'?globalThis:this,function(DEFAULT,CATALOG,PRO,BUS){
   'use strict';
   const clone=v=>JSON.parse(JSON.stringify(v)),n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0,clamp=v=>Math.max(0,Math.min(10,Number(v)||0)),money=v=>Math.round(v*100)/100;
   const index=Object.fromEntries(CATALOG.map(row=>[row.codigo,row]));
@@ -23,57 +23,63 @@
     return [...new Set(result)];
   }
   function scores(state){const selected=codes(state);return {selected,efficiency:clamp(selected.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0)),reputation:clamp(selected.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0)),health:clamp(selected.reduce((s,id)=>s+Number(index[id]?.financiero||0),0))};}
-  function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(!Number.isFinite(value)||value<segment.min||value>segment.max)throw new RangeError(`Precio ${id}: debe estar entre ${segment.min} y ${segment.max}`);return [id,value];}));}
-  function quality(state,mold,round=state.PRODUCCION_META?.round||1,consumption=null){
-    let value=n(index[mapping.MOLDE[mold]]?.calidad);
-    for(const [family,map] of Object.entries(materialCodes)){
-      let pending=consumption?n(consumption[family]):Infinity;
-      const entries=Object.keys(map).map(id=>{const available=n(state[family]?.round===round?state[family]?.quantities?.[id]:0)+n(state.__inventarioMP?.[id]),qty=Math.min(available,pending);pending-=qty;return {id,qty};}),total=entries.reduce((s,row)=>s+row.qty,0);
-      // FIFO consumption order matches cycle_model inventory debit exactly.
-      value+=total?entries.reduce((s,row)=>s+row.qty*n(index[map[row.id]]?.calidad),0)/total:0;
+  function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(raw===''||!Number.isFinite(value)||value<segment.min||value>(segment.max??Infinity))throw new RangeError(`Precio ${id}: introduce un importe válido igual o mayor que ${segment.min}.`);return [id,value];}));}
+  function materialUse(state,plan,round){
+    const use={},ratios={};
+    for(const family of Object.keys(materialCodes)){
+      let need=n(plan.materials.find(m=>m.id===family)?.consumption),total=0,premium=0;
+      const ids=Object.keys(materialCodes[family]);
+      for(const id of ids){const available=n(state.__inventarioMP?.[id])+n(state[family]?.round===round?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
+      ratios[family]=total?premium/total:0;
     }
-    return clamp(value);
+    return {use,ratios};
+  }
+  function reputation(state,plan,round=1){
+    const materials=materialUse(state,plan,round),total=plan.producibleUnits;
+    const factorProduccion=total?plan.productLines[2].plannedUnits/total*10:0;
+    const workers=plan.processes.reduce((sum,p)=>sum+p.staff,0),factorMO=workers?plan.levelThree/workers*10:0;
+    const factorMP=Object.values(materials.ratios).reduce((a,v)=>a+v,0)/3*10;
+    const advertising=BUS.advertising({state}),factorPublicidad=advertising/10000*10;
+    const total40=factorProduccion+factorMO+factorMP+factorPublicidad;
+    return {valor:total40/4,total40,factorProduccion,factorMO,factorMP,factorPublicidad,advertising,consumo:materials.use,proporciones:materials.ratios};
+  }
+  function quality(state,mold,round=state.PRODUCCION_META?.round||1,consumption=null){
+    const plan=consumption&&consumption.productLines?consumption:PRO.calculate({state,catalog:[],round});
+    const rep=reputation(state,plan,round);
+    // Fórmula de calidad real sugerida por el documento, en escala 0–10.
+    return clamp((rep.factorMP+rep.factorProduccion)/2);
   }
   function prepare(input,config=DEFAULT){
-    const state=input.state||{},round=input.round||1,p=scores(state),c=config.consequences,messages=[],plan=clone(PRO.calculate({state,drafts:{},catalog:input.catalog||[],round})),price=prices(state,input.prices,config);
-    let plannedFactor=1;
-    if(p.efficiency<c.lowEfficiency){plannedFactor=c.lowProduction;messages.push({id:'CONS-03',text:'Eficiencia menor a 4: producción al 70% de lo planeado, limitada por recursos.'});}
-    const coordinationFactor=!plan.hasLeadership&&p.efficiency<c.noLeaderEfficiency?c.noLeaderProduction:1;
-    if(coordinationFactor<1)messages.push({id:'CONS-08',text:'Sin jefatura y eficiencia menor a 5: producción adicional −5%.'});
-    // Recompute capacity gain and preserve physical material/target ceilings.
-    const max=Math.min(plan.target,Math.floor(plan.processCapacity*(1+(config.training[chosen(state,'INV_RRHH')]||0))),plan.materialCapacity);
-    if(plan.target>plan.processCapacity)messages.push({id:'CONS-06',text:'La meta supera la capacidad: las unidades excedentes quedan sin producir. El límite físico evita sobrecapacidad; no se cobran horas extra no autorizadas.'});
-    // CONS-03 refers to planned quantity, not an already capacity-limited result.
-    const wanted=Math.floor(Math.min(max,Math.floor(plan.target*plannedFactor))*coordinationFactor);let assigned=0;
-    const active=plan.productLines.filter(line=>line.available&&line.target>0),eligible=active.reduce((s,line)=>s+line.target,0);
-    for(const line of plan.productLines){line.plannedUnits=!line.available?0:Math.min(line.target,Math.floor(wanted*line.target/(eligible||1)));assigned+=line.plannedUnits;}
-    for(const line of active){const extra=Math.min(line.target-line.plannedUnits,wanted-assigned);line.plannedUnits+=extra;assigned+=extra;}
-    for(const material of plan.materials){
-      const per=line=>line.target?n(line.requirements[material.id])/line.target:0;
-      let used=plan.productLines.reduce((s,line)=>s+line.plannedUnits*per(line),0);
-      for(const line of [...active].reverse())if(used>material.available+1e-9&&per(line)){const remove=Math.min(line.plannedUnits,Math.ceil((used-material.available)/per(line)));line.plannedUnits-=remove;used-=remove*per(line);}
-    }
-    plan.producibleUnits=plan.productLines.reduce((s,line)=>s+line.plannedUnits,0);
-    for(const material of plan.materials){material.consumption=plan.productLines.reduce((s,line)=>s+(line.target?n(line.requirements[material.id])/line.target:0)*line.plannedUnits,0);material.remaining=Math.max(0,material.available-material.consumption);}
-    let reputation=p.reputation;const lines=config.products.map((id,i)=>{
-      const line=plan.productLines[i],q=quality(state,line.id,round,Object.fromEntries(plan.materials.map(m=>[m.id,m.consumption]))),segment=config.segments[id];let effectivePrice=price[id];
-      if(line.plannedUnits>0&&id==='premium'){if(q<segment.quality){effectivePrice*=c.lowQualityPrice;reputation-=c.reputationChange;messages.push({id:'CONS-01',segment:id,text:'Calidad insuficiente para Premium: precio efectivo −35% y reputación −2.'});}else{effectivePrice*=c.premiumPrice;reputation+=c.reputationChange;messages.push({id:'CONS-02',segment:id,text:'Calidad Premium: precio efectivo +40% y reputación +2.'});}}
-      return {id,quality:q,price:price[id],effectivePrice:money(effectivePrice),produced:n(line.plannedUnits),available:n(line.plannedUnits)+n(state.__finishedGoods?.[id])};
+    const state=input.state||{},round=input.round||1,p=scores(state),messages=[];
+    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round}),price=prices(state,input.prices,config),rep=reputation(state,plan,round);
+    const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
+    const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
+      const oldQuality=Number.isFinite(Number(goodsQuality[id]))?clamp(goodsQuality[id]):qualityValue;
+      const q=available?(oldQuality*opening+qualityValue*produced)/available:0;
+      return {id,quality:q,price:price[id],effectivePrice:price[id],produced,available};
     });
-    reputation=clamp(reputation);const previous=state.__economicHistory||{},lowReputationCycles=reputation<c.lowReputation?n(previous.lowReputationCycles)+1:0;
-    const lowFactor=lowReputationCycles>=c.lowReputationCycles?c.lowDemand:1;
-    if(lowFactor<1)messages.push({id:'CONS-04',text:'Reputación baja durante dos ciclos: demanda −20%.'});
-    const channels=state.CANALES?.optionIds||[],stores=channels.filter(id=>id!=='web').reduce((s,id)=>s+Math.max(1,n(state.CANALES?.quantities?.[id])),0),hasChannel=channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
-    const demandFactor=lowFactor*(1+(config.marketing[chosen(state,'INV_MARKETING')]||0))*(1+Math.min(config.channels.maxExtra,Math.max(0,stores-1)*config.channels.extraStore))*(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    if(plan.productionGap)messages.push({id:'CAPACIDAD',text:'La producción respeta la capacidad disponible y los materiales, en orden N1, N2 y N3.'});
+    const channels=state.CANALES?.optionIds||[],hasChannel=channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
+    // Eventos externos permanecen explícitos; marketing y reputación ya entran en el puntaje.
+    const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,scores:{...p,reputation},lines,hasChannel,demandFactor,messages,lowReputationCycles,creditRate,nextLoanRatePP:p.health<c.lowHealth?config.nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
   function allocate(prepared,config=DEFAULT){
-    const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:{valor:p.scores.reputation},products:{}}]));
-    for(const id of config.products){const segment=config.segments[id],participants=prepared.filter(p=>p.hasChannel&&p.lines.find(line=>line.id===id)?.produced>0),allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
-      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*line.quality*10;return {p,line,score,total};}),sum=rows.reduce((s,row)=>s+row.total,0);
-      for(const row of rows){const share=sum?row.total/sum:1/(rows.length||1),assigned=Math.round(share*segment.market);result[row.p.id].products[id]={asignado:assigned,demandaAjustada:Math.floor(assigned*row.p.demandFactor),porcentaje:share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:row.line.quality*10,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:segment.market};}
+    const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:p.reputation||{valor:p.scores.reputation},products:{}}]));
+    for(const id of config.products){
+      const segment=config.segments[id],participants=prepared.filter(p=>p.hasChannel&&p.lines.find(line=>line.id===id)?.available>0);
+      const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const market=Math.max(0,Math.round(segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market));
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*line.quality*10;return {p,line,score,total};});
+      if(!rows.length)continue;
+      const sum=rows.reduce((s,row)=>s+row.total,0);let assignedTotal=0;
+      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.raw=row.share*market;row.assigned=Math.floor(row.raw);assignedTotal+=row.assigned;}
+      // Restos mayores. Un identificador estable desempata, sin depender del orden recibido.
+      const priority=[...rows].sort((a,b)=>(b.raw-b.assigned)-(a.raw-a.assigned)||String(a.p.id).localeCompare(String(b.p.id),'en'));
+      for(let i=0;i<market-assignedTotal;i++)priority[i].assigned++;
+      for(const row of rows)result[row.p.id].products[id]={asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:row.line.quality*10,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
     }return result;
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
@@ -89,13 +95,11 @@
   function settleMarketCompanies(companies,segment,config=DEFAULT){
     const id=config.products.find(product=>product===segment||config.segments[product].code===segment);
     if(!id)throw new RangeError('Segmento desconocido');
-    const c=config.consequences,prepared=companies.map(company=>{
-      let reputation=clamp(company.reputacion),price=Number(company.precio),effective=price;const q=clamp(company.calidad),produced=n(company.producido);
-      if(id==='premium'&&produced>0){if(q<7){effective*=c.lowQualityPrice;reputation-=c.reputationChange;}else{effective*=c.premiumPrice;reputation+=c.reputationChange;}}
-      reputation=clamp(reputation);const lowCycles=reputation<c.lowReputation?n(company.bajaPrevios)+1:0;
-      return {id:String(company.id),hasChannel:true,scores:{reputation},demandFactor:lowCycles>=c.lowReputationCycles?c.lowDemand:1,lines:[{id,price,quality:q,produced,available:n(company.stock)}],effective,reputationFinal:reputation};
+    const prepared=companies.map(company=>{
+      const rep=clamp(company.reputacion),price=Number(company.precio),q=clamp(company.calidad),produced=n(company.producido);
+      return {id:String(company.id),hasChannel:true,scores:{reputation:rep},demandFactor:1,lines:[{id,price,quality:q,produced,available:n(company.stock)}],effective:price,reputationFinal:rep};
     }),allocations=allocate(prepared,config);
     return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
   }
-  return {config:DEFAULT,codes,scores,prices,quality,prepare,allocate,closeMany,settleMarketCompanies};
+  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies};
 });

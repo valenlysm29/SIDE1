@@ -770,3 +770,8 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .segment-sales{padding:10px 0;border-bottom:1px solid #cbd5e1}
 .segment-sales span{display:flex;justify-content:space-between;gap:12px}
 @media(max-width:600px){.production-prices{grid-template-columns:1fr}}
+.machine-assignments{margin-top:16px;max-width:100%;overflow-x:auto}
+.machine-assignments p{font-size:.86rem;line-height:1.5}
+.machine-assignments table{width:100%;border-collapse:collapse;font-size:.85rem}
+.machine-assignments th,.machine-assignments td{padding:6px;text-align:left;border-bottom:1px solid #d7dee7}
+.machine-assignments input{width:100%;min-width:48px;max-width:84px;padding:8px;border:1px solid #aebbc9;border-radius:6px}

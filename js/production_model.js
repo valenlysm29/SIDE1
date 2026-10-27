@@ -1,12 +1,12 @@
 /* SIDE: autonomous production rules and physical inventory. */
 (function(root,factory){
-  const api=factory();
+  const api=factory(typeof module==='object'&&module.exports?require('./business_rules.js'):root.SIDE_BUSINESS_RULES);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_PRODUCTION_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(BUS){
   'use strict';
 
-  const WORKING_DAYS=24;
+  const WORKING_DAYS=30;
   const BASE_EFFICIENCY=0.90;
   const LEVEL_THREE_BONUS=0.01;
   const LEADERSHIP_BONUS=0.04;
@@ -15,9 +15,9 @@
   const sum=values=>values.reduce((total,value)=>total+n(value),0);
 
   const STAFF_RATES={
-    PERS_CORTE:{corte_basico:5,corte_exp:7,corte_maestro:9},
+    PERS_CORTE:{corte_basico:6,corte_exp:8,corte_maestro:12},
     PERS_ENSAMBLE:{ens_personal_basico:6,ens_personal_ind:8,ens_personal_esp:12},
-    PERS_ACABADO:{aca_personal_basico:6,aca_personal_tec:7,aca_personal_art:10}
+    PERS_ACABADO:{aca_personal_basico:6,aca_personal_tec:8,aca_personal_art:12}
   };
   const MACHINE_MULTIPLIERS={
     MESA_CORTE:{mesa:1},
@@ -49,7 +49,7 @@
     if(ctx.drafts?.[id])return ctx.drafts[id];
     const entry=ctx.state?.[id],definition=item(ctx,id),same=n(entry?.round)===n(ctx.round);
     if(definition?.asset)return {quantities:{...(entry?.purchases?.[ctx.round]||{})}};
-    if(definition?.type==='quantity'||definition?.type==='quantity-choice')return {quantities:same?{...(entry?.quantities||{})}:{}};
+    if(definition?.type==='quantity'||definition?.type==='quantity-choice')return {quantities:same?{...(entry?.quantities||{})}:{},...(same&&entry?.assignments?{assignments:entry.assignments}:{})};
     if(definition?.type==='number')return {value:same?n(entry?.value):0};
     if(definition?.type==='production-plan'){
       if(same&&entry?.moldTargets)return {moldTargets:{...entry.moldTargets}};
@@ -87,21 +87,24 @@
     }
     return targets;
   }
-  function pairedDailyCapacity(staffCounts,staffRates,machineCounts,machineMultipliers){
-    const staff=Object.entries(staffRates).map(([id,rate])=>({remaining:whole(staffCounts[id]),rate:n(rate)})).filter(x=>x.remaining).sort((a,b)=>b.rate-a.rate);
-    const machines=Object.entries(machineMultipliers).map(([id,multiplier])=>({remaining:whole(machineCounts[id]),multiplier:n(multiplier)})).filter(x=>x.remaining).sort((a,b)=>b.multiplier-a.multiplier);
-    let si=0,mi=0,capacity=0,pairs=0;
-    while(si<staff.length&&mi<machines.length){
-      const paired=Math.min(staff[si].remaining,machines[mi].remaining);
-      capacity+=paired*staff[si].rate*machines[mi].multiplier;pairs+=paired;
-      staff[si].remaining-=paired;machines[mi].remaining-=paired;
-      if(!staff[si].remaining)si++;if(!machines[mi].remaining)mi++;
+  function pairedDailyCapacity(staffCounts,staffRates,machineCounts,machineMultipliers,explicit){
+    const assignments={},preferred=Object.entries(machineMultipliers).filter(([id])=>whole(machineCounts[id])>0).sort((a,b)=>b[1]-a[1])[0];
+    let capacity=0,pairs=0;
+    for(const [id,rate] of Object.entries(staffRates)){
+      let remaining=whole(staffCounts[id]);assignments[id]={};
+      // Sin matriz previa se asigna el personal al tipo disponible de mayor productividad.
+      // La matriz editable define la distribución; el Excel no impone un operario por equipo.
+      for(const [machine,multiplier] of Object.entries(machineMultipliers)){
+        const desired=explicit?whole(explicit[id]?.[machine]):preferred?.[0]===machine?remaining:0;
+        const q=Math.min(remaining,desired),assigned=whole(machineCounts[machine])>0?q:0;
+        assignments[id][machine]=assigned;capacity+=assigned*rate*multiplier;pairs+=assigned;remaining-=q;
+      }
     }
-    return {capacity,pairs,staff:sum(Object.values(staffCounts)),machines:sum(Object.values(machineCounts))};
+    return {capacity,pairs,assignments,staff:sum(Object.values(staffCounts)),machines:sum(Object.values(machineCounts))};
   }
   function payroll(ctx,id){
     const definition=item(ctx,id),counts=quantityCounts(ctx,id);
-    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*n(option.cost)));
+    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.laborCost(option.id,BUS.regime(ctx),option.cost)));
   }
   function materialCost(ctx,id){
     const definition=item(ctx,id),counts=quantityCounts(ctx,id);
@@ -130,9 +133,9 @@
       ['finish','Acabado','PERS_ACABADO','ACABADOS']
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
-      const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId]);
+      const pairing=id==='cut'?{capacity:sum(Object.entries(staff[id]).map(([key,q])=>q*STAFF_RATES[staffId][key]))*(sum(Object.values(machines.cut))>0?1:0),pairs:sum(Object.values(staff[id])),staff:sum(Object.values(staff[id])),machines:sum(Object.values(machines.cut))}:pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
       const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
-      return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
+      return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
     const selectedMoldIds=selected(ctx,'MOLDE').filter(id=>MOLD_REQUIREMENTS[id]);
     const ownedIds=ownedMoldIds(ctx),availableMoldIds=[...new Set([...ownedIds,...selectedMoldIds])];
@@ -151,14 +154,13 @@
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
-    const materialCapacity=materials.length?Math.min(...materials.map(material=>material.supportedUnits)):0;
-    const producibleUnits=Math.max(0,Math.min(eligibleTarget,processCapacity,materialCapacity));
+    const remaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let capacityRemaining=processCapacity;
+    for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id];line.plannedUnits=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,capacityRemaining,...materials.map(m=>remaining[m.id]/spec[m.id])).toPrecision(15)))):0;capacityRemaining-=line.plannedUnits;for(const material of materials)remaining[material.id]=Number((remaining[material.id]-line.plannedUnits*spec[material.id]).toPrecision(15));line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}
+    const producibleUnits=sum(productLines.map(l=>l.plannedUnits));
+    const materialRemaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let materialCapacity=0;
+    for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id],units=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,...materials.map(m=>materialRemaining[m.id]/spec[m.id])).toPrecision(15)))):0;materialCapacity+=units;for(const m of materials)materialRemaining[m.id]=Number((materialRemaining[m.id]-units*spec[m.id]).toPrecision(15));}
     processes.forEach(process=>{process.plannedUnits=producibleUnits;process.shortfall=Math.max(0,target-process.cycleCapacity);});
-    materials.forEach(material=>{material.consumption=producibleUnits*material.perUnit;material.remaining=Math.max(0,material.available-material.consumption);material.shortfall=Math.max(0,material.neededForTarget-material.available);});
-    const activeLines=productLines.filter(line=>line.target>0&&line.available);let assigned=0;productLines.forEach(line=>{
-      line.plannedUnits=!line.target||!line.available?0:line===activeLines.at(-1)?Math.max(0,producibleUnits-assigned):Math.floor(producibleUnits*(line.target/eligibleTarget));assigned+=line.plannedUnits;
-      line.productionPercent=line.target?Math.min(100,Math.round(line.plannedUnits/line.target*100)):0;
-    });
+    materials.forEach(material=>{material.consumption=Number(sum(productLines.map(l=>l.plannedUnits*MOLD_REQUIREMENTS[l.id][material.id])).toPrecision(15));material.remaining=Math.max(0,Number((material.available-material.consumption).toPrecision(15)));material.shortfall=Math.max(0,material.neededForTarget-material.available);});
     const limitingProcesses=processes.filter(process=>process.cycleCapacity===processCapacity).map(process=>process.label);
     const limitingMaterials=materials.filter(material=>material.supportedUnits===materialCapacity).map(material=>material.label);
     const unavailablePlannedMolds=productLines.filter(line=>line.target>0&&!line.available).map(line=>line.id);

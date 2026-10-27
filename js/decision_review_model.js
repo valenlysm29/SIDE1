@@ -1,10 +1,10 @@
 /* SIDE V3: pure, read-only decision breakdowns. No storage or DOM side effects. */
 (function(root,factory){
   const productionModel=typeof module==='object'&&module.exports?require('./production_model'):root.SIDE_PRODUCTION_MODEL;
-  const api=factory(productionModel);
+  const api=factory(productionModel,typeof module==='object'&&module.exports?require('./business_rules.js'):root.SIDE_BUSINESS_RULES);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_REVIEW_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(productionModel){
+})(typeof globalThis!=='undefined'?globalThis:this,function(productionModel,BUS){
   'use strict';
   const n=value=>Number.isFinite(Number(value))?Number(value):0;
   const sum=values=>values.reduce((a,b)=>a+n(b),0);
@@ -14,12 +14,12 @@
     if(ctx.drafts?.[item.id])return ctx.drafts[item.id];
     const e=ctx.state?.[item.id],same=n(e?.round)===ctx.round;
     if(item.asset)return {quantities:{...(e?.purchases?.[ctx.round]||{})}};
-    if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{}};
+    if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{},...(same&&e?.assignments?{assignments:e.assignments}:{})};
     if(item.type==='production-plan'){
       if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets},prices:{...e.prices}};
       return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{},prices:{...(same?e?.prices:{})}};
     }
-    if(item.type==='number')return {value:same?n(e?.value):0};
+    if(item.type==='number')return {value:same?(item.id==='INV_MARKETING'?BUS.advertising(ctx):n(e?.value)):0};
     if(item.type==='loan')return {amount:same?n(e?.amount):0};
     if(item.type==='sales-staff')return {staff:same?{...(e?.staff||{})}:{}};
     return {optionIds:[...(e?.optionIds||item.defaultOptionIds||[])],quantities:{...(e?.quantities||{})}};
@@ -27,7 +27,7 @@
   function owned(item,id,ctx){return sum(Object.entries(ctx.state?.[item.id]?.purchases||{}).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
-  function unitCost(item,option,ctx){return n(option.cost)*(item.material?0.92*(1-discount(ctx)/100):1);}
+  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));return BUS.laborCost(option.id,BUS.regime(ctx),option.cost)*(item.material?0.92*(1-discount(ctx)/100):1);}
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
@@ -45,7 +45,8 @@
     const add=(label,quantity,unit,outflow=0,income=0,detail='')=>out.rows.push({label,quantity,unitCost:unit,outflow,income,detail});
     if(item.type==='info'){
       const channels=ctx.drafts?.CANALES||ctx.state?.CANALES,stores=ctx.rules.storeCount(channels);
-      if(item.id==='PERSONAL_VENTAS')add('Vendedores b\u00e1sicos',stores,null,0,0,'1 por tienda f\u00edsica. Comisi\u00f3n total: 1% de las ventas; sin sueldo fijo adicional.');
+      if(item.id==='MANTENIMIENTO'){const amount=roundMoney(BUS.maintenanceEstimate(ctx));add('Mantenimiento mensual de activos',1,amount,amount,0,'Porcentaje anual del costo de adquisición dividido entre 12.');}
+      else if(item.id==='PERSONAL_VENTAS')add('Vendedores b\u00e1sicos',stores,null,0,0,'1 por tienda f\u00edsica. Comisi\u00f3n total: 1% de las ventas; sin sueldo fijo adicional.');
       else if(item.id==='CREDITO_VENTAS'){
         const credit=Math.min(70,n(ctx.config?.creditPercentStart??20)+(ctx.round-1)*5+(discount(ctx)?5:0));
         add(`${credit}% a cr\u00e9dito / ${100-credit}% al contado`,null,null,0,0,'Regla autom\u00e1tica; no es una decisi\u00f3n editable.');
@@ -57,13 +58,12 @@
       for(const [id,label] of Object.entries(labels)){const quantity=n(d.moldTargets?.[id]);if(quantity)add(label,quantity,null,0,0,'Producción deseada para esta línea de molde.');}
       for(const [id,label] of Object.entries({esencial:'Económico',urbano:'Medio',premium:'Premium'}))if(d.prices?.[id]!=null)add(`Precio ${label}`,null,n(d.prices[id]),0,0,'Precio de venta elegido; no es un gasto.');
     }else if(item.type==='number'){
-      add('Meta del ciclo',n(d.value),null,0,0,item.unit||'unidades');
+      if(item.id==='INV_MARKETING'){const amount=BUS.advertising(ctx);add('Publicidad del ciclo',1,amount,amount,0,'Importe de publicidad; máximo S/10,000.');}else add('Meta del ciclo',n(d.value),null,0,0,item.unit||'unidades');
     }else if(item.type==='sales-staff'){
       Object.entries(d.staff||{}).forEach(([id,q])=>{if(n(q))add(id,n(q),n(item.costPerPerson),n(q)*n(item.costPerPerson));});
     }else if(item.id==='MOLDE'){
       const ownedIds=[];for(const [round,row] of Object.entries(e?.purchases||{}))if(n(round)<ctx.round)for(const [id,q] of Object.entries(row||{}))if(n(q)>0&&!ownedIds.includes(id))ownedIds.push(id);if(!ownedIds.length&&e&&n(e.round)<ctx.round)for(const id of e.optionIds||[])if(!ownedIds.includes(id))ownedIds.push(id);
-      const chosen=(d.optionIds||[])[0],opt=(item.options||[]).find(o=>o.id===chosen);
-      if(opt&&!ownedIds.includes(chosen))add(opt.label,1,n(opt.cost),n(opt.cost),0,'Compra nueva. Este tipo de molde queda disponible para los siguientes ciclos.');
+      for(const opt of item.options||[])if((d.optionIds||[]).includes(opt.id)&&!ownedIds.includes(opt.id))add(opt.label,1,unitCost(item,opt,ctx),unitCost(item,opt,ctx),0,'Compra nueva con capacitación. Disponible para los siguientes ciclos.');
       if(ownedIds.length)add('Moldes disponibles',ownedIds.length,null,0,0,ownedIds.map(id=>(item.options||[]).find(o=>o.id===id)?.label||id).join(', '));
     }else if(item.asset||item.type==='quantity'||item.type==='quantity-choice'){
       for(const opt of item.options||[]){
@@ -72,9 +72,9 @@
         let detail=item.material?`Insumos de este ciclo${discount(ctx)?`; descuento de compras: ${discount(ctx)}%`:''}.`:item.recurring?'Cantidad contratada para este ciclo.':'';
         let cost=Math.max(0,q)*price,income=0;
         if(item.asset){
-          income=q<0?-q*price*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
+          income=q<0?-q*n(opt.cost)*n(opt.liquidationRate??ctx.liquidationRate??0.4):0;
           if(q<0)out.bookValueDisposed+=-q*price;
-          detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
+          detail=`Antes: ${have}. ${q<0?'Liquidaci\u00f3n':q>0?'Compra nueva con instalación y capacitación':'Sin compra nueva'}: ${Math.abs(q)}. Total disponible: ${have+q}.`;
         }
         const historical=item.asset?have:sum(Object.entries(ctx.state?.[item.id]?.quantities||{}).filter(()=>false).map(()=>0));
         const cumulative=item.asset?have+q:q+sum(Object.entries(ctx.historyQuantities?.[item.id]?.[opt.id]||{}).map(([,v])=>n(v)));

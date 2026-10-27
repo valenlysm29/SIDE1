@@ -18,12 +18,12 @@ test('all three districts retain their quantities and cost',()=>{
 });
 test('asset acquisitions and disposals have separate gross flows',()=>{
  const ctx=context({round:2,state:{ENSAMBLE:{purchases:{1:{ens_basica:2}}}},drafts:{ENSAMBLE:{quantities:{ens_basica:-1,ens_semi:1}}}});
- const result=model.breakdown(item('ENSAMBLE'),ctx);assert.equal(result.outflow,7500);assert.equal(result.assetIncome,1400);assert.equal(result.net,-6100);
+ const result=model.breakdown(item('ENSAMBLE'),ctx);assert.equal(result.outflow,7875);assert.equal(result.assetIncome,1400);assert.equal(result.net,-6475);
  assert.match(result.rows[0].detail,/Total disponible: 1/);
 });
 test('same-round submitted mold still costs money; later cycles do not charge again',()=>{
  const state={MOLDE:{optionIds:['molde_2'],round:1}};
- assert.equal(model.breakdown(item('MOLDE'),context({state})).outflow,1200);
+ assert.equal(model.breakdown(item('MOLDE'),context({state})).outflow,1212);
  assert.equal(model.breakdown(item('MOLDE'),context({state,round:2})).outflow,0);
 });
 test('staff severance survives repeated saves in the same round',()=>{
@@ -51,10 +51,11 @@ test('review uses the nine full MYPE monthly wages recalculated in Excel v19',()
 test('asset purchases use their displayed price and persist across later cycles',()=>{
  const drafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_basica:1}},ACABADOS:{quantities:{aca_basica:1}},MOLDE:{optionIds:['molde_1']}};
  const ctx=context({drafts});
- assert.equal(model.breakdown(item('MESA_CORTE'),ctx).outflow,2500);
- assert.equal(model.breakdown(item('ENSAMBLE'),ctx).outflow,3500);
- assert.equal(model.breakdown(item('ACABADOS'),ctx).outflow,1200);
- assert.equal(model.breakdown(item('MOLDE'),ctx).outflow,300);
+ // MYPE acquisition includes 3% installation and 2% training; molds 1% training.
+ assert.equal(model.breakdown(item('MESA_CORTE'),ctx).outflow,2625);
+ assert.equal(model.breakdown(item('ENSAMBLE'),ctx).outflow,3675);
+ assert.equal(model.breakdown(item('ACABADOS'),ctx).outflow,1260);
+ assert.equal(model.breakdown(item('MOLDE'),ctx).outflow,303);
  assert.equal(model.breakdown(item('MESA_CORTE'),context({round:2,state:{MESA_CORTE:{purchases:{1:{mesa:1}}}}})).outflow,0);
 });
 test('loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved',()=>{

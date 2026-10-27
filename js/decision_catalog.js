@@ -10,6 +10,10 @@ window.SIDE_DECISION_CATALOG = [
     cat:'B', title:'Infraestructura', short:'Infraestructura', icon:'assets/icons/categories/infraestructura.svg',
     desc:'Compra activos, define el local de producción y administra el mantenimiento de la planta.',
     items:[
+      {id:'REGIMEN_LABORAL',name:'Régimen laboral',type:'choice',required:true,lockAfterPurchase:true,defaultOptionIds:['mype'],noCashEffect:true,options:[
+        {id:'mype',label:'MYPE',desc:'Pagos laborales y costos asociados MYPE. Se conserva después de enviar las decisiones.',cost:0},
+        {id:'no_mype',label:'No MYPE',desc:'Pagos laborales y costos asociados No MYPE. Se conserva después de enviar las decisiones.',cost:0}
+      ]},
       // dailyCapacity = unidades/día que aporta CADA equipo de esa opción (valor referencial,
       // ajustar al modelo real del curso). liquidationRate = % del costo original que se
       // recupera al vender/liquidar una unidad ya adquirida (ver "Despido y liquidación").
@@ -26,7 +30,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'aca_semi',label:'Semi-industrial',desc:'Pulido eléctrico y aplicación más uniforme.',cost:4500,dailyCapacity:30,liquidationRate:0.4},
         {id:'aca_ind',label:'Industrial',desc:'Línea de acabado para mayor volumen y consistencia.',cost:9500,dailyCapacity:55,liquidationRate:0.4}
       ]},
-      {id:'MOLDE',name:'Molde de producto',type:'choice',fixed:false,lockAfterPurchase:false,noDepreciation:true,required:true,options:[
+      {id:'MOLDE',name:'Molde de producto',type:'multi-choice',minSelections:1,fixed:false,lockAfterPurchase:false,required:true,options:[
         {id:'molde_1',label:'Molde básico',desc:'Patrón sencillo para una línea de entrada.',cost:300},
         {id:'molde_2',label:'Molde mejorado',desc:'Patrón técnico con mejor aprovechamiento del material.',cost:1200},
         {id:'molde_3',label:'Molde premium',desc:'Patrón propio orientado a diferenciación y detalle.',cost:3500}
@@ -34,9 +38,7 @@ window.SIDE_DECISION_CATALOG = [
       {id:'LOCAL_PROD',name:'Local de producción',type:'choice',required:true,recurring:true,mandatoryFixed:true,defaultOptionIds:['local_std'],options:[
         {id:'local_std',label:'Local de producción estándar',desc:'Costo operativo obligatorio para contar con un espacio de producción.',cost:2000}
       ]},
-      {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:[
-        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:1500}
-      ]}
+      {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'info',desc:'Se calcula automáticamente por mes: costo de adquisición × 5% anual (MYPE) u 8% anual (No MYPE), dividido entre 12.'}
     ]
   },
   {
@@ -127,11 +129,7 @@ window.SIDE_DECISION_CATALOG = [
         {id:'cap_media',label:'Media',desc:'Programa de capacitación técnica intermedia.',cost:6000},
         {id:'cap_alta',label:'Alta',desc:'Capacitación avanzada y especializada.',cost:12000}
       ]},
-      {id:'INV_MARKETING',name:'Inversión en marketing',type:'choice',recurring:true,required:false,options:[
-        {id:'mkt_baja',label:'Baja',desc:'Presencia básica de marca.',cost:1500},
-        {id:'mkt_media',label:'Media',desc:'Mayor alcance y frecuencia comercial.',cost:6000},
-        {id:'mkt_alta',label:'Alta',desc:'Campaña intensiva para acelerar visibilidad y demanda.',cost:12000}
-      ]},
+      {id:'INV_MARKETING',name:'Publicidad del ciclo',type:'number',recurring:true,required:false,min:0,max:10000,step:100,unit:'soles',desc:'Elige un importe entre S/0 y S/10,000. La publicidad suma hasta 10 puntos al factor de reputación; no multiplica la demanda.',cost:0},
       {id:'PRESTAMO',name:'Línea de crédito',type:'loan',required:false,desc:'La línea inicia en 70% de la caja. En los siguientes ciclos puede aumentar o disminuir según la caja y los activos; el monto utilizado reduce la línea disponible.'}
     ]
   }

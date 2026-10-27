@@ -30,7 +30,7 @@ test('legacy POS counts do not change the demand-based settlement',()=>{
  state.PRODUCCION_META.moldTargets={molde_1:10,molde_2:0,molde_3:10};
  const baseline=cycle.close({state,catalog:fixture.catalog,round:1});
  const r=cycle.close({state,catalog:fixture.catalog,round:1,ledger:{'1:SIM_VENTAS':1250},soldUnits:10,soldByProduct:{premium:10}});
- assert.deepEqual(r,baseline);assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],3925);assert.equal(r.receipt.goods.premium,0);
+ assert.deepEqual(r,baseline);assert.equal(r.receipt.sales[0].sold,10);assert.equal(r.receipt.sales[2].sold,10);assert.equal(r.ledger['1:SIM_VENTAS'],2925);assert.equal(r.receipt.goods.premium,0);
 });
 test('700 metres of thread cost S/1288.00 with retained volume discount',()=>{
  const ctx={catalog,state:{},drafts:{HILO:{quantities:{hilo_std:700}}},round:1,rules};const item=catalog.flatMap(c=>c.items||[]).find(i=>i.id==='HILO');assert.ok(Math.abs(review.breakdown(item,ctx).outflow-1288)<1e-9);

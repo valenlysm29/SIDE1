@@ -36,18 +36,22 @@
     ledger[`${round}:VENTAS_CREDITO`]=-economic.receivable;
     ledger[`${round}:COBRO_CREDITO`]=economic.collections;
     ledger[`${round}:ALMACENAJE`]=-economic.storage;
+    const businessRules=typeof module==='object'&&module.exports?require('./business_rules.js'):globalThis.SIDE_BUSINESS_RULES;
+    const maintenance=money(businessRules.maintenance(state,catalog,round));
+    const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO').reduce((s,i)=>s+n(i.outflow),0);
+    ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
     for(const material of plan.materials||[]){
       const definition=catalog.flatMap(c=>c.items||[]).find(item=>item.id===material.id),entries=definition?.options||[];
       let consumption=n(material.consumption);
-      for(const option of entries){const available=n(state.__inventarioMP?.[option.id])+n(state[material.id]?.round===round?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=money(available-used);consumption-=used;}
+      for(const option of entries){const available=n(state.__inventarioMP?.[option.id])+n(state[material.id]?.round===round?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=Number(Math.max(0,available-used).toPrecision(15));consumption=Number(Math.max(0,consumption-used).toPrecision(15));}
     }
     state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__accountsReceivable=economic.receivable;
     const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
     if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
-    state.__economicHistory={lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate)};
+    state.__economicHistory={lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
-    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};

@@ -54,10 +54,12 @@ function liveCompanyReview(){
 }
 function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
   const issues=[],ctx=review.context;
+  const regimeIssue=regimeChangeIssue(ctx);if(regimeIssue)issues.push({cat:'B',item:'REGIMEN_LABORAL',text:regimeIssue});
   for(const cat of decisionCategories().filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat))){
     for(const item of cat.items){
       if(item.type==='info')continue;
       const d=ctx.drafts[item.id]||{};
+      if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id)&&d.assignments)for(const o of item.options){const values=Object.values(d.assignments[o.id]||{});if(values.some(v=>!Number.isSafeInteger(Number(v))||Number(v)<0)||values.reduce((a,v)=>a+Number(v),0)!==Number(d.quantities?.[o.id]||0))issues.push({cat:cat.cat,item:item.id,text:`Distribuye el personal contratado de ${o.label} entre las máquinas.`});}
       if(itemRequired(item)&&!draftItemComplete(item))issues.push({cat:cat.cat,item:item.id,text:`Falta completar: ${item.name}.`});
       if(item.options){
         for(const id of d.optionIds||[])if(!item.options.some(o=>o.id===id))issues.push({cat:cat.cat,item:item.id,text:`Opci\u00f3n no v\u00e1lida en ${item.name}.`});
@@ -66,11 +68,11 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
           if(!(item.material?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
         }
       }
-      if(item.type==='number'&&draftItemComplete(item)&&(!Number.isSafeInteger(Number(d.value))||Number(d.value)<Number(item.min||0)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
+      if(item.type==='number'&&draftItemComplete(item)&&(!Number.isFinite(Number(d.value))||Number(d.value)<Number(item.min||0)||Number(d.value)>(item.max??Infinity)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
       if(item.type==='production-plan')for(const value of Object.values(d.moldTargets||{}))if(!Number.isSafeInteger(Number(value))||Number(value)<0)issues.push({cat:cat.cat,item:item.id,text:'Revisa las cantidades de producción por molde.'});
       if(item.type==='production-plan')for(const [id,segment] of Object.entries(window.SIDE_ECONOMIC_CONFIG.segments)){
         const value=d.prices?.[id]??segment.defaultPrice;
-        if(value===''||!Number.isFinite(Number(value))||Number(value)<segment.min||Number(value)>segment.max)issues.push({cat:cat.cat,item:item.id,text:`El precio de ${id} debe estar entre S/${segment.min} y S/${segment.max}.`});
+        if(value===''||!Number.isFinite(Number(value))||Number(value)<segment.min||Number(value)>(segment.max??Infinity))issues.push({cat:cat.cat,item:item.id,text:`Introduce un precio válido para ${id}, igual o mayor que S/${segment.min}.`});
       }
       if(item.type==='loan'&&(!Number.isFinite(Number(d.amount))||Number(d.amount)<0||Number(d.amount)>loanMaximum()))issues.push({cat:cat.cat,item:item.id,text:'El pr\u00e9stamo est\u00e1 fuera del l\u00edmite permitido.'});
       if(item.id==='CANALES')for(const id of RULES.STORE_IDS){try{RULES.nextStoreBatches(decisionState.CANALES,id,RULES.storeQuantity(d,id),ctx.round);}catch{issues.push({cat:'D',item:'CANALES',text:'No puedes reducir tiendas con un compromiso vigente.'});}}
@@ -186,6 +188,8 @@ function cumulativeResourceQuantity(review){
 }
 function productionSummaryHtml(review){
   const plan=window.SIDE_PRODUCTION_MODEL.calculate(review.context);
+  const previewState={...review.context.state,...Object.fromEntries(Object.entries(review.context.drafts||{}).map(([id,draft])=>[id,{...review.context.state[id],...draft,round:review.context.round}]))};
+  const reputation=window.SIDE_ECONOMIC_CLOSURE.reputation(previewState,plan,review.context.round);
   const materialCost=['CUERO','ACCESORIOS','HILO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
   const laborCost=['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
   const supportCost=['JEFATURA','LIMPIEZA','ANALISTA_COMPRAS','LOCAL_PROD','MANTENIMIENTO'].reduce((total,id)=>total+productionItemOutflow(review,id),0);
@@ -213,9 +217,10 @@ function productionSummaryHtml(review){
       <div><span>Personal directo</span><strong>${reviewMoney(laborCost)}</strong></div>
       <div><span>Soporte productivo</span><strong>${reviewMoney(supportCost)}</strong></div>
       <div><span>Inversión en planta</span><strong>${reviewMoney(investmentCost)}</strong><small>Se muestra aparte del costo operativo.</small></div>
-      <div class="cs-unit-cost"><span>Costo operativo por unidad posible</span><strong>${plan.producibleUnits?reviewMoney(unitCost):'No calculable'}</strong><small>${reviewMoney(cycleProductionCost)} / ${plan.producibleUnits.toLocaleString('es-PE')} unidades posibles.</small></div>
+      <div class="cs-unit-cost"><span>Desembolso operativo por unidad posible</span><strong>${plan.producibleUnits?reviewMoney(unitCost):'No calculable'}</strong><small>Incluye compras de materia prima; el consumo valorizado se reconoce al cierre.</small></div>
     </div>
-    <p class="cs-production-method">Modelo de producción: 24 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. El cálculo mezcla los requerimientos de cada molde según las cantidades elegidas.</p>
+    <p class="cs-production-method">Reputación prevista: <strong>${reputation.valor.toFixed(2)} / 10</strong>. Factores en escala 0–10: producción ${reputation.factorProduccion.toFixed(2)}, personal ${reputation.factorMO.toFixed(2)}, material consumido ${reputation.factorMP.toFixed(2)} y publicidad ${reputation.factorPublicidad.toFixed(2)}. La reputación es el promedio de estos cuatro factores.</p>
+    <p class="cs-production-method">Modelo de producción: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. Se fabrica primero el molde básico, después el mejorado y finalmente el premium, usando solo los materiales disponibles.</p>
   </section>`;
 
 }

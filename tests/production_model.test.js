@@ -5,7 +5,7 @@ const model=require('../js/production_model');
 const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../js/decision_catalog.js'),'utf8'),sandbox);
 const catalog=JSON.parse(JSON.stringify(sandbox.window.SIDE_DECISION_CATALOG));
 
-function context(drafts={},patch={}){return {catalog,state:{},drafts,round:1,workingDays:24,...patch};}
+function context(drafts={},patch={}){return {catalog,state:{},drafts,round:1,...patch};}
 function completeLine(extra={}){
   return {
     MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},
@@ -50,12 +50,11 @@ test('workers and machines are paired and the slowest process is the bottleneck'
     PERS_CORTE:{quantities:{corte_basico:1}},MESA_CORTE:{quantities:{mesa:1}},PRODUCCION_META:{value:500},
     CUERO:{quantities:{cuero_sint:200}},ACCESORIOS:{quantities:{acc_eco:500}},HILO:{quantities:{hilo_std:3000}}
   })));
-  // CAMBIOS_DOP_Y_PRODUCCION.md: 24 productive days; current basic cutting rate is 5/day.
-  // Two level-three workers and leadership yield 96%: round(5 * 24 * 0.96) = 115.
-  assert.equal(plan.days,24);
-  assert.equal(plan.processes.find(p=>p.id==='cut').dailyCapacity,5);
+  // Source Markdown: 30 days, basic cutting 6/day, two N3 and leadership = 96%.
+  assert.equal(plan.days,30);
+  assert.equal(plan.processes.find(p=>p.id==='cut').dailyCapacity,6);
   assert.equal(plan.efficiency,0.96);
-  assert.equal(plan.processCapacity,115);assert.equal(plan.producibleUnits,115);
+  assert.equal(plan.processCapacity,173);assert.equal(plan.producibleUnits,173);
 });
 
 test('level-three staff and production leadership reproduce the efficiency bonuses',()=>{
