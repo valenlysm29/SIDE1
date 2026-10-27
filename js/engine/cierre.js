@@ -51,7 +51,15 @@
   }
   function prepare(input,config=DEFAULT){
     const state=input.state||{},round=input.round||1,p=scores(state),messages=[];
-    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round}),price=prices(state,input.prices,config),rep=reputation(state,plan,round);
+    // Prices are resolved internally. Legacy hidden values must not prevent a
+    // saved plan (or another company in the shared close) from generating sales.
+    // Explicit caller overrides still pass through the strict price validator.
+    const storedPrices=Object.fromEntries(config.products.map(id=>{
+      const segment=config.segments[id],raw=state.PRODUCCION_META?.prices?.[id],value=Number(raw);
+      const numeric=typeof raw==='number'||(typeof raw==='string'&&raw.trim()!=='');
+      return [id,numeric&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];
+    }));
+    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round}),price=prices(state,{...storedPrices,...input.prices},config),rep=reputation(state,plan,round);
     const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
     const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
       const oldQuality=Number.isFinite(Number(goodsQuality[id]))?clamp(goodsQuality[id]):qualityValue;

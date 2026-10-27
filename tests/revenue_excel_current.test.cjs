@@ -9,7 +9,7 @@ test('current revenue adapter reproduces fresh v19 Excel market allocations',()=
  const rows=E.settleMarketCompanies(companies,'SEG-01');assert.equal(rows.reduce((s,r)=>s+r.vendidas,0),200);assert.ok(rows[0].demanda>rows[1].demanda);
 });
 test('catalog reputation is unique, bounded and independent from advertising spend proxy',()=>{
- const input=inputs()[0],profile=REVENUE.profile(input);assert.ok(profile.scores.reputation>=0&&profile.scores.reputation<=10);assert.equal(profile.scores.reputation,Math.min(10,E.scores(input.state).reputation+2));
+ const input=inputs()[0],profile=REVENUE.profile(input);assert.ok(profile.scores.reputation>=0&&profile.scores.reputation<=10);assert.ok(Math.abs(profile.scores.reputation-(1/3+1+1+0)*10/4)<1e-10);
  const changed=structuredClone(input);changed.state.__worldPublicity=999999;assert.deepEqual(REVENUE.profile(changed).scores,profile.scores);
 });
 test('shared closure competes across companies, caps sales at stock and ignores POS activity',()=>{
@@ -17,12 +17,12 @@ test('shared closure competes across companies, caps sales at stock and ignores 
  for(const input of group){const r=results[input.id];assert.ok(r.receipt.revenue>0);for(const row of r.receipt.sales){assert.ok(row.sold<=row.available);assert.equal(row.revenue,Math.round(row.sold*row.price*100)/100);}assert.equal(r.ledger['1:SIM_VENTAS'],r.receipt.revenue);assert.equal(CYCLE.close({...input,state:r.state,ledger:r.ledger}).reused,true);}
  const s=fixture.state();s.PRODUCCION_META.moldTargets={molde_1:12};s.PRODUCCION_META.prices.esencial=40;const short=CYCLE.close({state:s,catalog:fixture.catalog,round:1});assert.equal(short.receipt.sold,12);assert.equal(short.receipt.revenue,480);
 });
-test('unsold goods carry forward and companies without current production do not compete',()=>{
+test('unsold goods carry forward and opening stock can sell without current production',()=>{
  for(const optionIds of [[],['web'],['los_olivos','miraflores','sjl']]){const s=fixture.state(2);s.CANALES.optionIds=optionIds;s.__finishedGoods={esencial:10};const r=CYCLE.close({round:2,state:s,catalog:fixture.catalog});assert.equal(r.receipt.sold,optionIds.length?100:0);assert.equal(r.state.__finishedGoods.esencial,optionIds.length?0:100);}
- const r=CYCLE.close({state:{CANALES:{optionIds:['web']},__finishedGoods:{esencial:10}},round:2,catalog:fixture.catalog});assert.equal(r.receipt.sold,0);assert.equal(r.state.__finishedGoods.esencial,10);
+ const r=CYCLE.close({state:{CANALES:{optionIds:['web']},__finishedGoods:{esencial:10}},round:2,catalog:fixture.catalog});assert.equal(r.receipt.sold,10);assert.equal(r.state.__finishedGoods.esencial,0);
 });
 test('browser pages load the same revenue dependencies as Node',()=>{
- for(const page of ['index.html','docente.html']){const html=fs.readFileSync(path.join(__dirname,'..',page),'utf8'),context={};context.globalThis=context;vm.createContext(context);for(const name of ['production_model','engine/catalogo_excel','engine/config','engine/cierre','revenue_model']){assert.ok(html.indexOf(`js/${name}.js`)<html.indexOf('js/cycle_model.js'));vm.runInContext(fs.readFileSync(path.join(__dirname,'../js',name+'.js'),'utf8'),context);}assert.deepEqual(JSON.parse(JSON.stringify(context.SIDE_REVENUE_MODEL.allocate(inputs()))),REVENUE.allocate(inputs()));}
+ for(const page of ['index.html','docente.html']){const html=fs.readFileSync(path.join(__dirname,'..',page),'utf8'),context={};context.globalThis=context;vm.createContext(context);for(const name of ['business_rules','production_model','engine/catalogo_excel','engine/config','engine/cierre','revenue_model']){assert.ok(html.indexOf(`js/${name}.js`)<html.indexOf('js/cycle_model.js'));vm.runInContext(fs.readFileSync(path.join(__dirname,'../js',name+'.js'),'utf8'),context);}assert.deepEqual(JSON.parse(JSON.stringify(context.SIDE_REVENUE_MODEL.allocate(inputs()))),REVENUE.allocate(inputs()));}
 });
 test('remote service ignores world prices and preserves confirmed decision expenses',async()=>{
  const group=inputs(),companies=group.map(input=>({id:input.id,capital:input.capital,snapshot:{decision_state:{...input.state,__cyclePlans:{1:{state:input.state}},__cycleBusiness:{1:{prices:{esencial:99999}}}},cash_ledger:{'1:C':-1000}}}));let payload;

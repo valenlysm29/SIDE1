@@ -323,3 +323,7 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- ]
 -- La diferencia de capital se registra como aporte/retiro (financiamiento),
 -- nunca como ingreso operativo ni como sustitución del efectivo acumulado.
+
+-- Lógica de ventas (27/10/2026): aplicar después del cierre v19
+-- supabase/migrations/20261027_corregir_ventas_generales.sql. Alinea precios
+-- internos con el motor y prioriza snapshots definitivos sobre preliminares.

@@ -16,7 +16,7 @@ test('malformed confirmed plans still return an error',async()=>{
 test('cut, advance and pause controls can continue without submitted plans and never claim a persisted closure',async()=>{
  const source=fs.readFileSync(require.resolve('../js/docente.js'),'utf8');
  for(const action of ['cerrar','avanzar','pausar']){
-  const calls=[],status={textContent:''},context={teacherRead:Promise.resolve(),teacherBusy:false,state:{partidaId:'game',round:1,reports:[],authoritative:{runtime:{phase:'decisions'}}},
+  const calls=[],status={textContent:''},context={roomGeneration:0,teacherRead:Promise.resolve(),teacherBusy:false,state:{partidaId:'game',round:1,reports:[],authoritative:{runtime:{phase:'decisions'}}},
    window:{SIDE:{PartidaService:{controlar:async(id,command)=>{calls.push(command);return {success:true,data:{}};},cerrarNegocio:async()=>({success:true,pending:true,data:null})}}},
    $:()=>status,applyTeacherState(){},toast(){throw Error('unexpected failure toast');},persistReports(){throw Error('provisional closure persisted');},renderResults(){throw Error('provisional closure rendered as final');}};
   vm.createContext(context);

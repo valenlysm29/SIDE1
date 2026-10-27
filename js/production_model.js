@@ -92,12 +92,16 @@
     let capacity=0,pairs=0;
     for(const [id,rate] of Object.entries(staffRates)){
       let remaining=whole(staffCounts[id]);assignments[id]={};
-      // Sin matriz previa se asigna el personal al tipo disponible de mayor productividad.
-      // La matriz editable define la distribución; el Excel no impone un operario por equipo.
+      // Recover old saved matrices against the machines that are actually owned.
+      // Any unassigned staff use the most productive available machine type.
       for(const [machine,multiplier] of Object.entries(machineMultipliers)){
         const desired=explicit?whole(explicit[id]?.[machine]):preferred?.[0]===machine?remaining:0;
         const q=Math.min(remaining,desired),assigned=whole(machineCounts[machine])>0?q:0;
-        assignments[id][machine]=assigned;capacity+=assigned*rate*multiplier;pairs+=assigned;remaining-=q;
+        assignments[id][machine]=assigned;capacity+=assigned*rate*multiplier;pairs+=assigned;remaining-=assigned;
+      }
+      if(remaining&&preferred){
+        const [machine,multiplier]=preferred;
+        assignments[id][machine]+=remaining;capacity+=remaining*rate*multiplier;pairs+=remaining;
       }
     }
     return {capacity,pairs,assignments,staff:sum(Object.values(staffCounts)),machines:sum(Object.values(machineCounts))};

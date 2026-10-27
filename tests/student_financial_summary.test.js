@@ -44,7 +44,7 @@ test('office view uses financial model statements, including debt and assets',()
 
 test('student financial report uses the same ledger model as the teacher summary',()=>{
   const source=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
-  const start=source.indexOf('function financialReport(){'),end=source.indexOf('let financialSyncTimer=',start);
+  const start=source.indexOf('function financialReport('),end=source.indexOf('let financialSyncTimer=',start);
   const ledger={'1:SIM_VENTAS':2000,'2:SIM_GASTOS':-500},sections={};
   const context={decisionState:{},window:{SIDE_FINANCIAL_MODEL:model},teacherConfig:()=>({interest:20}),initialCapital:()=>100000,financialLedger:()=>ledger,recordedFinancialSections:()=>sections,DECISION_CATALOG:[],currentRound:()=>2};
   vm.createContext(context);vm.runInContext(source.slice(start,end),context);

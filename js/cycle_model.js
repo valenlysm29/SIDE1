@@ -13,6 +13,9 @@
     state=clone(state);ledger=economicLedger(ledger,state);
     const previous=state.__cycleSettlements?.[round];
     if(previous)return {state,ledger,receipt:previous,reused:true,financialSections:clone(sectionsByRound),financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
+    // Only a settled receipt makes a financial snapshot authoritative. An old
+    // preview for this open round must not mask the sales we are about to post.
+    if(state.__financialSnapshots)delete state.__financialSnapshots[round];
     // A replicated plan may arrive without a browser-generated section ledger.
     // Reconstruct each missing section once from the same decision cost model.
     sectionsByRound=clone(sectionsByRound);

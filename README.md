@@ -7,7 +7,9 @@ entrada siguen siendo `index.html` y `docente.html`.
 
 La versión activa `md-20261027` sigue [la explicación del Excel entregada por el usuario](docs/Logica_SIDE_Costos_de_Produccion.md): 30 días, producción N1→N2→N3, reputación de cuatro factores, reparto exacto del mercado y costos según régimen. Consulta [las reglas aplicadas y su validación](docs/actualizacion_logica_documento_20261027.md). El libro adaptado v19 se conserva como antecedente. El motor económico no recibe ventas ni precios del mundo 3D.
 
-Para una base SIDE existente, seguir [la guía v19](docs/despliegue_cierre_v19.md) y ejecutar manualmente el paquete completo [SQL v19](docs/sql/20261023_despliegue_cierre_v19.sql). Sustituye los paquetes anteriores e incluye los cinco bloques en orden. No se ha ejecutado en producción. El cierre sin navegador docente todavía requiere un ejecutor de servidor y su programación; la versión actual recupera los cierres al reconectar.
+Para una base SIDE existente, seguir [la guía v19](docs/despliegue_cierre_v19.md) y ejecutar manualmente el paquete completo [SQL v19](docs/sql/20261023_despliegue_cierre_v19.sql). Sustituye los paquetes anteriores e incluye los seis bloques en orden. No se ha ejecutado en producción. El cierre sin navegador docente todavía requiere un ejecutor de servidor y su programación; la versión actual recupera los cierres al reconectar.
+
+El paquete incorpora ahora un sexto bloque: [corrección general de ventas](supabase/migrations/20261027_corregir_ventas_generales.sql). Para bases que ya instalaron v19 basta aplicar ese archivo. Corrige los precios internos admitidos y evita que snapshots preliminares oculten ventas definitivas; conserva decisiones e históricos. Consulta [fallos reproducidos y pruebas](reports/chequeo_ventas_general_20261027.md).
 
 Las decisiones y opciones de Ventas y Finanzas se conservan como estaban antes de actualizar el motor. Si se aplicó la migración de catálogo del 27/10, ejecutar [la restauración de controles](supabase/migrations/20261027_restaurar_decisiones_interfaz.sql). Esta corrección se validó en PostgreSQL en memoria; no se aplicó a una base remota.
 

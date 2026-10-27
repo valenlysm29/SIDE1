@@ -9,6 +9,7 @@ En una base SIDE existente, pegar **todo** `docs/sql/20261023_despliegue_cierre_
 3. `supabase/migrations/20261023_corregir_contexto_cierre_estado.sql`.
 4. `supabase/migrations/2026-10-23_cierre_planes_v19.sql`.
 5. `supabase/migrations/2026-10-23_configuracion_version_v19.sql`.
+6. `supabase/migrations/20261027_corregir_ventas_generales.sql`.
 
 El último bloque añade `partidas.config_revision` y guardado de configuración con revisión esperada, bloqueo de fila y autorización de propietario. Dos pestañas no pueden guardar sobre la misma revisión: la segunda recibe un conflicto visible y conserva su formulario. El polling y las transiciones de reloj/eventos resueltos no incrementan la revisión. Para revertir sólo este bloque, retirar `side_guardar_configuracion_v19(uuid,jsonb,bigint)` y el trigger `side_config_revision_v19`; conservar la columna para auditoría. El cliente v19 requiere esta RPC para guardar configuración; reinstalar también el cliente anterior si se revierte.
 
@@ -18,7 +19,9 @@ El nuevo contexto bloquea partida/ciclo, congela snapshots con revisión, recupe
 
 En automático se esperan 30 segundos después del vencimiento antes de resolver faltantes. Es un **SUPUESTO** de tolerancia de red, configurable mediante `partidas.configuracion.planSyncGraceSeconds`, entre 0 y 300. El cierre manual explícito del docente resuelve los faltantes inmediatamente. Las confirmaciones que todavía no llegaron al servidor al terminar esa tolerancia no pueden distinguirse de una decisión no enviada.
 
-Los precios nuevos se validan también al escribir snapshots: Económico S/40–45, Medio S/120–200 y Premium S/220–400. Los planes antiguos sin campo de precio siguen siendo legibles y usan los valores predeterminados documentados en la configuración económica. No se reescriben cierres existentes.
+La corrección del 27/10 alinea la validación SQL con los precios internos del motor actual: importes numéricos no negativos, con S/42.50, S/100 y S/250 como valores predeterminados. Los rangos de la versión anterior podían rechazar el precio interno de S/100 del segmento medio. La cola de sincronización ya omite valores predeterminados para compatibilidad; el parche elimina también la discrepancia al guardar precios explícitos válidos del motor. No añade campos ni modifica decisiones del catálogo.
+
+Al guardar un cierre, el snapshot financiero definitivo del ciclo prevalece sobre una fotografía preliminar del mismo período. Se conservan los demás snapshots y los cierres existentes. En una base que ya tiene el paquete v19 instalado, aplicar únicamente `supabase/migrations/20261027_corregir_ventas_generales.sql`. Esta migración se validó dos veces en PostgreSQL local; no se ejecutó en Supabase remoto.
 
 ## Límite del cierre sin docente
 

@@ -32,7 +32,7 @@ async function main(){
   assert.equal(replica.source,'replicated');assert.equal(replica.state.CUERO.round,2);assert.deepEqual(replica.state.MESA_CORTE.purchases,{1:{mesa:1}});assert.equal(replica.state.__inventarioMP.cuero_sint,2);
   assert.equal(ctx.empresas.find(x=>String(x.id)===String(d)).snapshot.decision_state.__cyclePlans[2].source,'recovered-confirmation');
   assert.equal((await rpc(db,'side_contexto_cierre_negocio',args)).token,ctx.token,'resolving twice is stable');
-  await assert.rejects(write(a,{...state(2),PRODUCCION_META:{prices:{esencial:75}}}),/PRECIO_INVALIDO/);
+  await assert.rejects(write(a,{...state(2),PRODUCCION_META:{prices:{esencial:-1}}}),/PRECIO_INVALIDO/);
   await assert.rejects(write(a,{...state(2),PRODUCCION_META:{prices:{urbano:'150'}}}),/PRECIO_INVALIDO/);
   const sandbox={window:{}};vm.runInNewContext(load('js/decision_catalog.js'),sandbox);
   const CYCLE=require('../js/cycle_model.js'),catalog=JSON.parse(JSON.stringify(sandbox.window.SIDE_DECISION_CATALOG));

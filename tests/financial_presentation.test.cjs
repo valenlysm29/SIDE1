@@ -11,7 +11,7 @@ test('Estado de resultados conserva las doce filas obligatorias y valores realiz
 });
 test('DOM de alumno y profesor consume el mismo estado sin generar movimientos',()=>{
  const src=fs.readFileSync('js/app.js','utf8');const from=src.indexOf('function renderStudentStatus(){');const to=src.indexOf('\nfunction renderOfficeFinances()',from);
- const nodes={studentCashResult:{},studentIncomeStatement:{},studentEventImpactText:{}};
+ const nodes={studentCashResult:{parentElement:{querySelector:()=>null}},studentIncomeStatement:{},studentEventImpactText:{}};
  const report={round:1,estadoResultados:{ventasTotales:125,costoVentas:75,utilidadNeta:50},balanceCaja:{cajaFinal:125},flujoCaja:{},balanceGeneral:{}};
  const ctx={$:id=>nodes[id],applyEventCashEffects(){},financialReport:()=>report,money:String,window:{SIDE_STUDENT_FINANCIAL_VIEW:view},activeStudentEvents:()=>[],currentRound:()=>1,financialDetailsHtml:()=>'',escapeHtml:String};vm.createContext(ctx);vm.runInContext(src.slice(from,to),ctx);ctx.renderStudentStatus();assert.match(nodes.studentIncomeStatement.innerHTML,/Ventas Totales/);assert.match(nodes.studentIncomeStatement.innerHTML,/125\.00/);assert.doesNotMatch(nodes.studentEventImpactText.textContent,/sin depreciación/);
  const teacher=fs.readFileSync('js/docente.js','utf8');assert.match(teacher,/section\('Estado de resultados',window\.SIDE_STUDENT_FINANCIAL_VIEW\.incomeEntries\(er\)\)/);
