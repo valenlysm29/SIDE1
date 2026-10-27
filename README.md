@@ -9,7 +9,7 @@ La versión activa `md-20261027` sigue [la explicación del Excel entregada por 
 
 Para una base SIDE existente, seguir [la guía v19](docs/despliegue_cierre_v19.md) y ejecutar manualmente el paquete completo [SQL v19](docs/sql/20261023_despliegue_cierre_v19.sql). Sustituye los paquetes anteriores e incluye los cinco bloques en orden. No se ha ejecutado en producción. El cierre sin navegador docente todavía requiere un ejecutor de servidor y su programación; la versión actual recupera los cierres al reconectar.
 
-Sobre esa base, aplicar [la migración del catálogo del documento](supabase/migrations/20261027_logica_documento_costos.sql), que añade el régimen y actualiza publicidad, moldes y mantenimiento. Se validó en PostgreSQL en memoria; no se aplicó a una base remota.
+Las decisiones y opciones de Ventas y Finanzas se conservan como estaban antes de actualizar el motor. Si se aplicó la migración de catálogo del 27/10, ejecutar [la restauración de controles](supabase/migrations/20261027_restaurar_decisiones_interfaz.sql). Esta corrección se validó en PostgreSQL en memoria; no se aplicó a una base remota.
 
 ## Ubicación de los archivos
 

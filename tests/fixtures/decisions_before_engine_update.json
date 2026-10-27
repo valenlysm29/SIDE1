@@ -1,0 +1,156 @@
+{
+  "commit": "86a746e",
+  "categories": [
+    {
+      "cat": "D",
+      "title": "Canales y ventas",
+      "short": "Ventas",
+      "icon": "assets/icons/categories/canales_ventas.svg",
+      "desc": "Elige dónde vender. La demanda cambia por distrito y el equipo comercial se activa cuando existe una tienda física.",
+      "items": [
+        {
+          "id": "CANALES",
+          "name": "Canales de venta",
+          "type": "multi-choice",
+          "recurring": true,
+          "required": true,
+          "minSelections": 1,
+          "options": [
+            {
+              "id": "web",
+              "label": "Página web",
+              "desc": "Canal digital con cobertura amplia.",
+              "cost": 500,
+              "channel": "web"
+            },
+            {
+              "id": "los_olivos",
+              "label": "Tienda · Los Olivos",
+              "desc": "Punto físico con demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.",
+              "cost": 1800,
+              "channel": "store",
+              "district": "Los Olivos",
+              "demand": 1,
+              "minCommitCycles": 12
+            },
+            {
+              "id": "miraflores",
+              "label": "Tienda · Miraflores",
+              "desc": "Punto físico con mayor demanda potencial y mayor costo. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.",
+              "cost": 3500,
+              "channel": "store",
+              "district": "Miraflores",
+              "demand": 1.25,
+              "minCommitCycles": 12
+            },
+            {
+              "id": "sjl",
+              "label": "Tienda · San Juan de Lurigancho",
+              "desc": "Punto físico con alta base poblacional y demanda distrital propia. Compromiso mínimo de 12 meses: no se puede rescindir el contrato antes.",
+              "cost": 2200,
+              "channel": "store",
+              "district": "San Juan de Lurigancho",
+              "demand": 1.1,
+              "minCommitCycles": 12
+            }
+          ]
+        },
+        {
+          "id": "PERSONAL_VENTAS",
+          "name": "Personal básico de ventas",
+          "type": "info",
+          "desc": "Cada tienda física incluye automáticamente 1 vendedor básico. Su remuneración variable equivale al 1% de las ventas realizadas en el simulador."
+        },
+        {
+          "id": "CREDITO_VENTAS",
+          "name": "Ventas a crédito",
+          "type": "info",
+          "desc": "El porcentaje inicia fijo y aumenta según avanzan los ciclos. No es una decisión del jugador."
+        },
+        {
+          "id": "DEVOLUCIONES",
+          "name": "Producto fallado",
+          "type": "info",
+          "displayAsAsterisk": true,
+          "desc": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente."
+        }
+      ]
+    },
+    {
+      "cat": "E",
+      "title": "Inversiones y finanzas",
+      "short": "Finanzas",
+      "icon": "assets/icons/categories/finanzas.svg",
+      "desc": "Decide inversiones de crecimiento y, si lo necesitas, solicita financiamiento bancario.",
+      "items": [
+        {
+          "id": "INV_RRHH",
+          "name": "Capacitación del equipo",
+          "type": "choice",
+          "recurring": true,
+          "required": false,
+          "options": [
+            {
+              "id": "cap_no",
+              "label": "No capacitar este ciclo",
+              "desc": "No se realiza inversión en capacitación durante este ciclo.",
+              "cost": 0
+            },
+            {
+              "id": "cap_baja",
+              "label": "Baja",
+              "desc": "Capacitación técnica puntual.",
+              "cost": 1000
+            },
+            {
+              "id": "cap_media",
+              "label": "Media",
+              "desc": "Programa de capacitación técnica intermedia.",
+              "cost": 6000
+            },
+            {
+              "id": "cap_alta",
+              "label": "Alta",
+              "desc": "Capacitación avanzada y especializada.",
+              "cost": 12000
+            }
+          ]
+        },
+        {
+          "id": "INV_MARKETING",
+          "name": "Inversión en marketing",
+          "type": "choice",
+          "recurring": true,
+          "required": false,
+          "options": [
+            {
+              "id": "mkt_baja",
+              "label": "Baja",
+              "desc": "Presencia básica de marca.",
+              "cost": 1500
+            },
+            {
+              "id": "mkt_media",
+              "label": "Media",
+              "desc": "Mayor alcance y frecuencia comercial.",
+              "cost": 6000
+            },
+            {
+              "id": "mkt_alta",
+              "label": "Alta",
+              "desc": "Campaña intensiva para acelerar visibilidad y demanda.",
+              "cost": 12000
+            }
+          ]
+        },
+        {
+          "id": "PRESTAMO",
+          "name": "Línea de crédito",
+          "type": "loan",
+          "required": false,
+          "desc": "La línea inicia en 70% de la caja. En los siguientes ciclos puede aumentar o disminuir según la caja y los activos; el monto utilizado reduce la línea disponible."
+        }
+      ]
+    }
+  ]
+}

@@ -806,6 +806,9 @@ function nonnegativeDecisionNumber(value){const number=Number(value);return Numb
 function normalizeDecisionDraft(item,draft){
   const mapValues=values=>Object.fromEntries(Object.entries(values||{}).map(([key,value])=>[key,value===''?'':nonnegativeDecisionNumber(value)]));
   if(draft.quantities)draft.quantities=mapValues(draft.quantities);
+  if(item.id==='MOLDE'&&item.type==='choice'&&draft.optionIds)draft.optionIds=draft.optionIds.filter(id=>item.options.some(option=>option.id===id)).slice(0,1);
+  if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id))delete draft.assignments;
+  if(item.type==='production-plan')draft.prices=normalizedProductionPrices(draft.prices);
   if(draft.moldTargets)draft.moldTargets=mapValues(draft.moldTargets);
   if(draft.staff)draft.staff=mapValues(draft.staff);
   for(const key of ['value','amount'])if(Object.hasOwn(draft,key)&&draft[key]!=='')draft[key]=nonnegativeDecisionNumber(draft[key]);
@@ -818,12 +821,12 @@ function createDecisionDraft(item){
   }
   const e=savedEntry(item);
   if(item.asset){const quantities={};item.options.forEach(o=>quantities[o.id]=currentPurchase(item,o.id));return decisionDrafts[item.id]={quantities}}
-  if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities,...(e?.round===currentRound()&&e.assignments?{assignments:deepClone(e.assignments)}:{})}}
+  if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities}}
   if(item.type==='production-plan'){
     const moldTargets={molde_1:0,molde_2:0,molde_3:0};
     if(e?.round===currentRound()&&e.moldTargets)Object.keys(moldTargets).forEach(id=>moldTargets[id]=Number(e.moldTargets[id]||0));
     else if(e?.round===currentRound()&&e.value){const legacyId=e.moldId||'molde_1';moldTargets[legacyId]=Number(e.value||0);}
-    return decisionDrafts[item.id]={moldTargets,prices:{...defaultSegmentPrices(),...(e?.prices||{})}};
+    return decisionDrafts[item.id]={moldTargets,prices:normalizedProductionPrices(e?.prices)};
   }
   if(item.type==='number')return decisionDrafts[item.id]={value:item.id==='INV_MARKETING'?window.SIDE_BUSINESS_RULES.advertising({state:e?.round===currentRound()?decisionState:{}}):Number(e?.round===currentRound()?e.value:0)};
   if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:e?.round===currentRound()?(e.optionIds||[]):[]};
@@ -1000,16 +1003,12 @@ function calculatorMoldLine(plan,draft){
   return plan.productLines.find(line=>line.id===draft.viewMoldId)||plan.productLines.find(line=>line.selectedThisCycle)||plan.productLines.find(line=>line.target>0)||plan.productLines[0];
 }
 function defaultSegmentPrices(){return Object.fromEntries(Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,segment.defaultPrice]));}
-function productionPriceFields(draft,locked){
-  const labels={esencial:'Económico',urbano:'Medio',premium:'Premium'};
-  const segments=Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,labels[id],segment.min,segment.max]);
-  draft.prices={...defaultSegmentPrices(),...draft.prices};
-  return `<div class="production-prices"><strong>Precio de venta por segmento</strong>${segments.map(([id,label,min,max])=>`<label>${label} · S/<input type="number" inputmode="decimal" data-sale-price="${id}" min="${min}" step="0.01" value="${draft.prices[id]}" ${locked?'disabled':''}></label>`).join('')}</div>`;
+function normalizedProductionPrices(prices={}){
+  return Object.fromEntries(Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>{const raw=prices?.[id],value=Number(raw);return [id,raw!==''&&raw!=null&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];}));
 }
 function productionCalculatorHtml(plan,draft,locked){
   const line=calculatorMoldLine(plan,draft);draft.viewMoldId=line.id;
-  const priceFields=productionPriceFields(draft,locked);
-  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Indica tu meta por molde y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta total de todos los moldes</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields">${priceFields}<div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Cambia de molde para revisar otra meta; las cantidades anteriores se conservan.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
+  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Indica tu meta por molde y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta total de todos los moldes</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields"><div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Cambia de molde para revisar otra meta; las cantidades anteriores se conservan.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
 }
 function productionCalculatorRequirements(line){return `<span>Insumos para ${line.target.toLocaleString('es-PE')} unidades de ${escapeHtml(line.label)}</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b>`;}
 function normalizeProductionTargetInput(input){const value=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));if(input.value!=='')input.value=String(value);return value;}
@@ -1054,18 +1053,13 @@ function renderDecisionRow(item){
   if(item.id==='CANALES'){
     body=renderChannelChoices(item,locked);
   } else if(item.id==='MOLDE'){
-    const owned=ownedMolds(),ownedIds=owned.map(x=>x.id),selected=d.optionIds||[];
-    body=`<div class="choice-strip radio-options">${item.options.map(o=>{const already=ownedIds.includes(o.id),isSelected=selected.includes(o.id)&&!already;const disabled=locked||already;return `<label class="choice-pill ${isSelected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="checkbox" name="decision-${item.id}" ${isSelected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${already?'<span class="owned-badge">YA TIENES ESTE MOLDE · NO SE VUELVE A COMPRAR</span>':isSelected?'<span class="buying-badge">MOLDE ELEGIDO EN INFRAESTRUCTURA</span>':''}</label>`}).join('')}</div><div class="mandatory-note">Adquiere al menos un molde. Puedes comprar varios tipos en el mismo ciclo. Los moldes comprados permanecen disponibles y cada tipo se paga una sola vez.</div><div class="mold-owned-list"><strong>MOLDES DISPONIBLES</strong>${owned.length?owned.map(x=>{const o=item.options.find(v=>v.id===x.id);return `<span>${escapeHtml(o?.label||x.id)}</span>`}).join(''):'<span>Ninguno de ciclos anteriores</span>'}${selected.length?`<span>Elegidos ahora: ${selected.map(id=>escapeHtml(item.options.find(o=>o.id===id)?.label||id)).join(', ')}</span>`:''}</div>`;
+    const owned=ownedMolds(),ownedIds=owned.map(x=>x.id),selected=(d.optionIds||[])[0]||'';
+    body=`<div class="choice-strip radio-options">${item.options.map(o=>{const already=ownedIds.includes(o.id),isSelected=selected===o.id&&!already;const disabled=locked||already;return `<label class="choice-pill ${isSelected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="radio" name="decision-${item.id}" ${isSelected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong><em>${money(optionUnitCost(item,o))}</em><p>${escapeHtml(o.desc)}</p>${already?'<span class="owned-badge">YA TIENES ESTE MOLDE · NO SE VUELVE A COMPRAR</span>':isSelected?'<span class="buying-badge">MOLDE ELEGIDO EN INFRAESTRUCTURA</span>':''}</label>`}).join('')}</div><div class="mandatory-note">Por reglamento debes adquirir al menos un molde antes de enviar el ciclo. Los moldes comprados permanecen disponibles y cada tipo se paga una sola vez.</div><div class="mold-owned-list"><strong>MOLDES DISPONIBLES</strong>${owned.length?owned.map(x=>{const o=item.options.find(v=>v.id===x.id);return `<span>${escapeHtml(o?.label||x.id)}</span>`}).join(''):'<span>Ninguno de ciclos anteriores</span>'}${selected?`<span>Elegido ahora: ${escapeHtml(item.options.find(o=>o.id===selected)?.label||selected)}</span>`:''}</div>`;
   } else if(item.type==='choice'||item.type==='multi-choice'){
     const multi=item.type==='multi-choice';
     body=`<div class="choice-strip ${multi?'checkbox-options':'radio-options'}">${item.options.map(o=>{const selected=(d.optionIds||[]).includes(o.id);const extra=o.district?`<small>Demanda base: ${districtDemand(o.id).toLocaleString('es-PE')} u./ciclo</small>`:'';const commitRemaining=multi?optionCommitRemaining(item,o.id):0;const disabled=locked||item.mandatoryFixed||(selected&&commitRemaining>0);const showPrice=item.showPrice!==false;const lockNote=commitRemaining>0?`<span class="lock-note">🔒 Compromiso vigente: ${commitRemaining} ciclo(s) más antes de poder retirarlo</span>`:'';return `<label class="choice-pill ${selected?'selected':''} ${disabled?'fixed-choice':''}"><input data-choice="${item.id}" data-option="${o.id}" type="${multi?'checkbox':'radio'}" name="decision-${item.id}" ${selected?'checked':''} ${disabled?'disabled':''}><span class="choice-check"></span><strong>${escapeHtml(o.label)}</strong>${showPrice?`<em>${money(optionUnitCost(item,o))}</em>`:''}<p>${escapeHtml(o.desc)}</p>${extra}${lockNote}</label>`}).join('')}</div>${multi?'<div class="micro-caption">Casillas: puedes seleccionar una o varias opciones.</div>':`<div class="micro-caption">${!required&&!item.mandatoryFixed?'Selecciona una alternativa; vuelve a pulsarla para dejarla sin selección.':'Botón de opción: solo puedes seleccionar una alternativa.'}</div>`}${item.mandatoryFixed?'<div class="mandatory-note">Este costo es obligatorio y permanece marcado durante la simulación.</div>':''}`;
   } else if(item.type==='quantity'||item.type==='quantity-choice'){
-    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*Number(o.cost)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} ${item.material?'por '+escapeHtml(window.SIDE_PRODUCTION_MODEL.materialUnit(item.id)):'c/u'}${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" aria-label="${escapeHtml(o.label)}: cantidad${item.material?' en '+escapeHtml(window.SIDE_PRODUCTION_MODEL.materialUnit(item.id)):''}" type="number" min="${floor}" step="${item.material?'0.01':'1'}" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}${item.severanceEligible?'<div class="micro-caption">Reducir personal respecto al ciclo anterior genera un costo de indemnización por despido.</div>':''}`;
-    if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id)){
-      const processId=item.id==='PERS_ENSAMBLE'?'assembly':'finish',machineId=item.id==='PERS_ENSAMBLE'?'ENSAMBLE':'ACABADOS',machines=findDecisionItem(machineId).options;
-      const assignment=d.assignments||productionPlan().processes.find(p=>p.id===processId).assignments||{};
-      body+=`<div class="machine-assignments"><strong>Trabajadores por tipo de máquina</strong><p>Distribuye el personal contratado. Cada fila debe sumar la cantidad contratada de ese nivel. Solo producen con un tipo de máquina disponible.</p><table><thead><tr><th>Nivel</th>${machines.map(m=>`<th>${escapeHtml(m.label)}</th>`).join('')}</tr></thead><tbody>${item.options.map(o=>`<tr><th>${escapeHtml(o.label)}</th>${machines.map(m=>`<td><input type="number" min="0" step="1" data-worker-assignment="${item.id}" data-worker="${o.id}" data-machine="${m.id}" aria-label="${escapeHtml(o.label+' en '+m.label)}" value="${Number(assignment[o.id]?.[m.id]||0)}" ${locked?'disabled':''}></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-    }
+    body=`<div class="quantity-grid">${item.options.map(o=>{const q=Number(d.quantities?.[o.id]||0),owned=item.asset?getOwned(item,o.id):0;const floor=0;const sellValue=q<0?Math.abs(q)*Number(o.cost)*Number(o.liquidationRate??LIQUIDATION_RATE_DEFAULT):0;const prevHeadcount=item.severanceEligible?priorQuantity(item,o.id):0;const severance=item.severanceEligible&&q<prevHeadcount?(prevHeadcount-q)*optionUnitCost(item,o)*SEVERANCE_RATE:0;return `<div class="quantity-option"><div class="quantity-copy"><strong>${escapeHtml(o.label)}</strong><p>${escapeHtml(o.desc)}</p><small>${money(optionUnitCost(item,o))} ${item.material?'por '+escapeHtml(window.SIDE_PRODUCTION_MODEL.materialUnit(item.id)):'c/u'}${item.material&&analystDiscount()?` · −${analystDiscount()}% negociado`:''}</small>${item.asset?`<span class="owned-badge">YA TIENES: ${owned}</span>${q>0?`<span class="buying-badge">VAS A COMPRAR: ${q}</span>`:q<0?`<span class="selling-badge">VAS A VENDER (LIQUIDAR): ${Math.abs(q)} · recuperas ${money(sellValue)}</span>`:''}`:''}${item.material?`<span class="need-badge">${escapeHtml(materialYieldLabel(item.id,o.id))}</span>`:''}${severance>0?`<span class="severance-badge">DESPIDO: ${prevHeadcount-q} persona(s) · liquidación ${money(severance)}</span>`:''}</div><div class="stepper"><button data-step="${item.id}" data-option="${o.id}" data-delta="-1">−</button><input data-qty="${item.id}" data-option="${o.id}" aria-label="${escapeHtml(o.label)}: cantidad${item.material?' en '+escapeHtml(window.SIDE_PRODUCTION_MODEL.materialUnit(item.id)):''}" type="number" min="${floor}" step="${item.material?'0.01':'1'}" value="${q}"><button data-step="${item.id}" data-option="${o.id}" data-delta="1">+</button></div></div>`}).join('')}</div>${item.asset?'<div class="micro-caption">Ingresa cantidades iguales o mayores que cero.</div>':''}`;
   } else if(item.type==='production-plan'){
     body=productionCalculatorHtml(productionPlan(),d,locked);
   } else if(item.type==='number'){
@@ -1141,20 +1135,11 @@ function bindDecisionControls(){
     d.moldTargets[id]=Math.max(0,Math.trunc(Number(d.moldTargets[id]||0)+Number(button.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory();
     document.querySelector(`[data-mold-step="${id}"][data-delta="${button.dataset.delta}"]`)?.focus({preventScroll:true});
   }));
-  document.querySelectorAll('[data-sale-price]').forEach(input=>input.addEventListener('input',()=>{
-    if(decisionEditingBlocked())return;
-    const draft=initDraft(findDecisionItem('PRODUCCION_META'));
-    draft.prices={...draft.prices,[input.dataset.salePrice]:input.value===''?'':Number(input.value)};
-    input.setCustomValidity('');
-    input.setCustomValidity(input.value===''||!input.checkValidity()?'Introduce un precio dentro del rango del segmento.':'');
-    persistCurrentDraftOnly();
-  }));
   document.querySelectorAll('[data-mold-target]').forEach(input=>{
     input.addEventListener('beforeinput',event=>{if(!/[-−]/.test(event.data||''))return;event.preventDefault();input.value='0';input.dispatchEvent(new Event('input',{bubbles:true}));});
     input.addEventListener('input',()=>{const value=normalizeProductionTargetInput(input);if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META'));d.moldTargets[input.dataset.moldTarget]=value;persistCurrentDraftOnly();updateHud();refreshProductionDop();});
     input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=initDraft(findDecisionItem('PRODUCCION_META')),id=input.dataset.moldTarget;d.moldTargets[id]=Math.max(0,Math.trunc(Number(input.value)||0));input.value=String(d.moldTargets[id]);persistCurrentDraftOnly();updateHud();refreshProductionDop();});
   });
-  document.querySelectorAll('[data-worker-assignment]').forEach(input=>input.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(input.dataset.workerAssignment),d=initDraft(item);if(!d.assignments){const process=item.id==='PERS_ENSAMBLE'?'assembly':'finish';d.assignments=deepClone(productionPlan().processes.find(p=>p.id===process).assignments||{});}d.assignments[input.dataset.worker]={...d.assignments[input.dataset.worker],[input.dataset.machine]:Math.max(0,Math.trunc(Number(input.value)||0))};persistCurrentDraftOnly();refreshProductionDop();}));
   document.querySelectorAll('[data-number-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(b.dataset.numberStep),d=initDraft(item);d.value=Math.min(item.max??Infinity,Math.max(Number(item.min||0),Number(d.value||0)+Number(b.dataset.delta)));persistCurrentDraftOnly();renderDecisionCategory()}));
   document.querySelectorAll('[data-number]').forEach(i=>{
     i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.number),d=initDraft(item);const raw=i.value;d.value=raw===''?'':Math.min(item.max??Infinity,Math.max(Number(item.min||0),Number(raw)||0));persistCurrentDraftOnly();updateSectionCost();});
@@ -1184,7 +1169,16 @@ function updateSectionCost(){
   // conservar el avance del jugador como borrador.
   $('saveDecisionSection').disabled=locked;
   if(currentCategory==='A'&&$('companySummaryMount'))renderCompanySummary();
-  const send=$('sendDecisionSection');if(send){send.disabled=locked||projected<0||!sectionDraftReady(currentCategory);send.querySelector('strong').textContent=locked?'DECISIÓN ENVIADA':'ENVIAR DECISIÓN';send.querySelector('small').textContent=locked?'Editable en el próximo ciclo':'Confirmar; no editable en este ciclo'}
+  updateSectionSendButton();
+}
+function updateSectionSendButton(){
+  const send=$('sendDecisionSection');if(!send)return;
+  const category=categoryByCat(currentCategory),locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
+  const ready=!!category&&!category.summaryOnly&&sectionDraftReady(currentCategory),affordable=projectedCash()>=-0.005,access=studentAccess();
+  send.disabled=locked||!ready||!affordable||!access.canOperate;
+  send.classList.toggle('submitted',locked);
+  send.querySelector('strong').textContent=locked?'DECISIÓN ENVIADA':'ENVIAR DECISIÓN';
+  send.querySelector('small').textContent=locked?'Editable en el próximo ciclo':!access.canOperate?'Espera a que se habilite el ciclo':!ready?'Completa los datos obligatorios':!affordable?'Ajusta el presupuesto para enviar':'Confirmar; no editable en este ciclo';
 }
 function productionMaterialShortages(){
   if(!['C','F'].includes(currentCategory))return [];
@@ -1199,31 +1193,18 @@ function warnProductionMaterialShortage(){
   toast(`Advertencia: tu producción supera los insumos comprados. ${detail}. Puedes continuar.`);
 }
 function validateRequiredSection(cat){
-  const regimeIssue=regimeChangeIssue(decisionModelContext());if(regimeIssue){toast(regimeIssue);return false;}
   for(const item of cat.items){
     const preliminary=initDraft(item);
     if(item.type==='number'&&(!Number.isFinite(Number(preliminary.value))||Number(preliminary.value)<(item.min||0)||Number(preliminary.value)>(item.max??Infinity))){toast(`Revisa el importe de ${item.name}.`);return false;}
-    if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id)&&preliminary.assignments){for(const o of item.options){const assigned=Object.values(preliminary.assignments[o.id]||{}).reduce((a,v)=>a+Number(v||0),0);if(assigned!==Number(preliminary.quantities?.[o.id]||0)){toast(`Distribuye todo el personal de ${o.label} entre los tipos de máquina.`);return false;}}}
     if(!itemRequired(item)||item.type==='info'||(item.lockAfterPurchase&&isLocked(item)))continue;
     const d=initDraft(item);
     if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}
     if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}
     if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}
-    if(item.type==='production-plan'){
-      const ranges=Object.fromEntries(Object.entries(window.SIDE_ECONOMIC_CONFIG.segments).map(([id,segment])=>[id,[segment.min,segment.max]]));
-      for(const [id,[min,max]] of Object.entries(ranges)){
-        const value=d.prices?.[id];
-        if(value===''||!Number.isFinite(Number(value))||Number(value)<min||Number(value)>(max??Infinity)){toast(`Introduce un precio válido para ${id}, igual o mayor que S/${min}.`);return false;}
-      }
-    }
     if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}
     if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}
   }
   return true;
-}
-function regimeChangeIssue(ctx){
-  const saved=window.SIDE_BUSINESS_RULES.regime({state:decisionState}),chosen=window.SIDE_BUSINESS_RULES.regime(ctx);
-  return saved!==chosen&&(sectionSubmitted('B')||sectionSubmitted('C'))?'El régimen laboral se conserva después de enviar Infraestructura o Producción. Mantén el régimen con el que confirmaste esos costos.':'';
 }
 // Build entries before changing state so totals and severance are stable on re-save.
 function prepareSectionSave(cat,context=decisionModelContext()){
@@ -1238,7 +1219,7 @@ function prepareSectionSave(cat,context=decisionModelContext()){
       entries[item.id]={...deepClone(prev||{}),...common,purchases:{...deepClone(prev?.purchases||{}),[round]:deepClone(d.quantities||{})}};return;
     }
     if(item.type==='quantity'||item.type==='quantity-choice'){
-      entries[item.id]={...common,quantities:deepClone(d.quantities||{}),...(d.assignments?{assignments:deepClone(d.assignments)}:{})};
+      entries[item.id]={...common,quantities:deepClone(d.quantities||{})};
       if(item.severanceEligible)entries[item.id].previousQuantities=deepClone(Number(prev?.round)===round?prev?.previousQuantities||{}:prev?.quantities||{});
       return;
     }
@@ -1251,10 +1232,11 @@ function prepareSectionSave(cat,context=decisionModelContext()){
     if(item.type==='sales-staff'){entries[item.id]={...common,staff:deepClone(d.staff||{})};return;}
     if(item.type==='loan'){entries[item.id]={...common,amount:Number(d.amount||0),label:`Línea de crédito utilizada: ${money(d.amount||0)}`};return;}
     if(item.id==='MOLDE'){
-      const chosen=(d.optionIds||[]).filter(id=>item.options.some(o=>o.id===id)&&!ownedMolds().some(x=>x.id===id));
-      const purchases=deepClone(prev?.purchases||{});delete purchases[round];
-      if(chosen.length)purchases[round]=Object.fromEntries(chosen.map(id=>[id,1]));
-      entries[item.id]={...common,optionIds:chosen,optionRounds:{...(prev?.optionRounds||{}),...Object.fromEntries(chosen.map(id=>[id,round]))},purchases,label:chosen.length?chosen.map(id=>item.options.find(o=>o.id===id)?.label).join(' + '):(prev?.label||'Sin compra nueva')};
+      const chosen=(d.optionIds||[]).find(id=>item.options.some(o=>o.id===id)&&!ownedMolds().some(x=>x.id===id))||null;
+      const purchases=deepClone(prev?.purchases||{});
+      delete purchases[round];
+      if(chosen)purchases[round]={[chosen]:1};
+      entries[item.id]={...common,optionIds:chosen?[chosen]:[],optionRounds:{...(prev?.optionRounds||{}),...(chosen?{[chosen]:round}:{})},purchases,label:chosen?item.options.find(o=>o.id===chosen)?.label:(prev?.label||'Sin compra nueva')};
       return;
     }
     const optionRounds={};(d.optionIds||[]).forEach(id=>{optionRounds[id]=prev?.optionRounds?.[id]??round});
@@ -1309,11 +1291,11 @@ function saveCurrentSection(){
 }
 $('saveDecisionSection')?.addEventListener('click',saveCurrentSection);
 function sendCurrentSection(){
-  if(decisionsSubmitted()||sectionSubmitted(currentCategory)){toast('Esta seccion ya fue enviada.');return;}
-  if(!validateRequiredSection(categoryByCat(currentCategory))||!sectionReady(currentCategory)){
-    toast('Completa las decisiones obligatorias de esta pestana.');return;
-  }
-  commitReviewedSections([currentCategory],false);
+  if(decisionsSubmitted()||sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada.');return false;}
+  const category=categoryByCat(currentCategory);if(!category||category.summaryOnly)return false;
+  if(!validateRequiredSection(category))return false;
+  if(!sectionReady(currentCategory)){toast('Completa las decisiones obligatorias de esta pestaña.');return false;}
+  return commitReviewedSections([currentCategory],false);
 }
 $('sendDecisionSection')?.addEventListener('click',sendCurrentSection);
 
@@ -1413,7 +1395,8 @@ function updateHud(){
   $('decisionProgressText').textContent=`${submitted}/${sections.length} · ${submittedPct}%`;$('decisionProgressBar').style.width=submittedPct+'%';
   $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',`${submitted} de ${sections.length} apartados enviados, ${submittedPct}%`);
   const pct=decisionProgressPercent();
-  const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=simulationSubmissionComplete();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);if($('sendDecisionSection')){$('sendDecisionSection').disabled=sectionSubmitted(currentCategory)||submitted||!sectionDraftReady(currentCategory);$('sendDecisionSection').classList.toggle('submitted',sectionSubmitted(currentCategory))}}
+  const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=simulationSubmissionComplete();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);}
+  updateSectionSendButton();
 }
 function currentDecisionLabels(){return allDecisionItems().map(i=>savedEntry(i)?.label).filter(Boolean)}
 function eventStoreKey(){return `SIDE_STUDENT_EVENTS_${storageKey()}`}
@@ -1666,7 +1649,7 @@ function buildSupabaseDecision(item,st,round){
     push(null,total,0);
     return out[0];
   }
-  if(item.id==='INV_MARKETING'){const value=window.SIDE_BUSINESS_RULES.advertising({state:{INV_MARKETING:st}});push(null,1,value);return out[0];}
+  if(item.id==='INV_MARKETING'&&item.type==='number'){const value=window.SIDE_BUSINESS_RULES.advertising({state:{INV_MARKETING:st}});push(null,1,value);return out[0];}
   if(item.type==='choice'||item.type==='multi-choice'){
     if(!ids.length)return null;
     for(const opId of ids){

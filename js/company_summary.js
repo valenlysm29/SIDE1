@@ -54,12 +54,10 @@ function liveCompanyReview(){
 }
 function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
   const issues=[],ctx=review.context;
-  const regimeIssue=regimeChangeIssue(ctx);if(regimeIssue)issues.push({cat:'B',item:'REGIMEN_LABORAL',text:regimeIssue});
   for(const cat of decisionCategories().filter(c=>cats.includes(c.cat)&&!sectionSubmitted(c.cat))){
     for(const item of cat.items){
       if(item.type==='info')continue;
       const d=ctx.drafts[item.id]||{};
-      if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id)&&d.assignments)for(const o of item.options){const values=Object.values(d.assignments[o.id]||{});if(values.some(v=>!Number.isSafeInteger(Number(v))||Number(v)<0)||values.reduce((a,v)=>a+Number(v),0)!==Number(d.quantities?.[o.id]||0))issues.push({cat:cat.cat,item:item.id,text:`Distribuye el personal contratado de ${o.label} entre las máquinas.`});}
       if(itemRequired(item)&&!draftItemComplete(item))issues.push({cat:cat.cat,item:item.id,text:`Falta completar: ${item.name}.`});
       if(item.options){
         for(const id of d.optionIds||[])if(!item.options.some(o=>o.id===id))issues.push({cat:cat.cat,item:item.id,text:`Opci\u00f3n no v\u00e1lida en ${item.name}.`});
@@ -70,10 +68,6 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
       }
       if(item.type==='number'&&draftItemComplete(item)&&(!Number.isFinite(Number(d.value))||Number(d.value)<Number(item.min||0)||Number(d.value)>(item.max??Infinity)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
       if(item.type==='production-plan')for(const value of Object.values(d.moldTargets||{}))if(!Number.isSafeInteger(Number(value))||Number(value)<0)issues.push({cat:cat.cat,item:item.id,text:'Revisa las cantidades de producción por molde.'});
-      if(item.type==='production-plan')for(const [id,segment] of Object.entries(window.SIDE_ECONOMIC_CONFIG.segments)){
-        const value=d.prices?.[id]??segment.defaultPrice;
-        if(value===''||!Number.isFinite(Number(value))||Number(value)<segment.min||Number(value)>(segment.max??Infinity))issues.push({cat:cat.cat,item:item.id,text:`Introduce un precio válido para ${id}, igual o mayor que S/${segment.min}.`});
-      }
       if(item.type==='loan'&&(!Number.isFinite(Number(d.amount))||Number(d.amount)<0||Number(d.amount)>loanMaximum()))issues.push({cat:cat.cat,item:item.id,text:'El pr\u00e9stamo est\u00e1 fuera del l\u00edmite permitido.'});
       if(item.id==='CANALES')for(const id of RULES.STORE_IDS){try{RULES.nextStoreBatches(decisionState.CANALES,id,RULES.storeQuantity(d,id),ctx.round);}catch{issues.push({cat:'D',item:'CANALES',text:'No puedes reducir tiendas con un compromiso vigente.'});}}
     }
@@ -105,7 +99,8 @@ function commitReviewedSections(cats,finalize){
       receipts[plan.cat]={...plan.model,drafts,submitted:true,sentAt,source:'local',company:currentStudent.company,game:currentStudent.game?.codigo,recordedNet:plan.net};
       delete draftStore[plan.cat];writes[sectionSubmissionKey(plan.cat)]='1';
     }
-    if(finalize)writes[submissionKey()]='1';
+    const complete=finalize||decisionCategories().every(category=>sectionSubmitted(category.cat)||plans.some(plan=>plan.cat===category.cat));
+    if(complete)writes[submissionKey()]='1';
     writes[decisionKey()]=JSON.stringify(state);writes[ledgerKey()]=JSON.stringify(ledger);writes[receiptKey()]=JSON.stringify(receipts);writes[draftKey]=JSON.stringify(draftStore);
     if(!writeDecisionBatch(writes))return false;
     const delta=Object.values(ledger).reduce((a,b)=>a+Number(b||0),0)-ledgerTotal();

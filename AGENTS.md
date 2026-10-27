@@ -27,3 +27,12 @@ Ejecutar los comandos de Git desde `SIDE1`, que es la raíz del repositorio.
   tenga nuevos archivos o carpetas de trabajo de SIDE fuera de `SIDE1`.
 - No modificar repositorios ni documentos ajenos que existan por encima de
   `SIDE1`; verificar que el remoto de Git sea el de este proyecto.
+
+## Motor económico y decisiones
+
+- Los documentos de lógica describen cómo funciona el motor. No autorizan a
+  agregar, retirar, mover o transformar decisiones ni controles de la interfaz.
+- Conservar las decisiones y opciones existentes de Ventas y Finanzas, salvo
+  que el usuario pida expresamente cambiarlas.
+- Los precios por segmento y la asignación de personal por tipo de máquina se
+  resuelven internamente; no añadir campos para editarlos sin petición expresa.

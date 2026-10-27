@@ -38,7 +38,7 @@
     ledger[`${round}:ALMACENAJE`]=-economic.storage;
     const businessRules=typeof module==='object'&&module.exports?require('./business_rules.js'):globalThis.SIDE_BUSINESS_RULES;
     const maintenance=money(businessRules.maintenance(state,catalog,round));
-    const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO').reduce((s,i)=>s+n(i.outflow),0);
+    const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
     for(const material of plan.materials||[]){

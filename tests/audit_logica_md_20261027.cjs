@@ -34,7 +34,7 @@ record('reputation_four_factors','MD 6: production + N3 staff + consumed premium
 record('reputation_material_sensitivity','MD 6: consuming all premium families raises reputation by 2.5 versus basic',2.5,prepare(premium).scores.reputation-prepare(cheap).scores.reputation);
 const moreStaff=clone(premium);for(const id of ['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO']){const q=Object.keys(moreStaff[id].quantities)[0];moreStaff[id].quantities[q]=1;const basic={PERS_CORTE:'corte_basico',PERS_ENSAMBLE:'ens_personal_basico',PERS_ACABADO:'aca_personal_basico'}[id];moreStaff[id].quantities[basic]=3;}
 record('reputation_staff_ratio_sensitivity','MD 6: reducing N3 ratio from 100% to 25% reduces reputation .75*10/4',1.875,prepare(premium).scores.reputation-prepare(moreStaff).scores.reputation);
-record('advertising_control','MD 4: player can choose S/3000 advertising',true,items.find(i=>i.id==='INV_MARKETING').type==='number'&&items.find(i=>i.id==='INV_MARKETING').max>=3000);
+record('advertising_factor','MD 6: S/3000 advertising contributes three points inside the engine',3,E.prepare({id:'A',state:{...base,INV_MARKETING:{round:1,value:3000}},catalog,round:1}).reputation.factorPublicidad);
 const rows=[0,1,2].map(i=>({id:String(i),hasChannel:true,scores:{reputation:7},demandFactor:1,lines:[{id:'premium',price:250,quality:7,produced:1000,available:1000}]}));
 const allocation=E.allocate(rows),assigned=Object.values(allocation).map(x=>x.products.premium.asignado);
 record('market_conservation','MD 7.4: largest remainder must allocate exactly the 800-unit market',800,assigned.reduce((a,b)=>a+b,0));

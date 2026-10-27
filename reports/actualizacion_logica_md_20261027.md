@@ -1,5 +1,7 @@
 # Validación de la actualización de lógica
 
+Este informe corresponde a la primera entrega. La [restauración posterior de los controles de Decisiones](restauracion_decisiones_20261027.md) reemplaza los cambios de interfaz descritos aquí y conserva el motor económico.
+
 Versión `md-20261027`, implementada el 27/10/2026 en SIDE1. Alcance y reglas: [guía de la actualización](../docs/actualizacion_logica_documento_20261027.md). La [auditoría previa](auditoria_logica_md_2026-10-27.md) conserva el diagnóstico anterior a estos cambios.
 
 ## Resultado

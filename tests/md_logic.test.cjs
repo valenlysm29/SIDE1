@@ -20,7 +20,7 @@ test('corrected actual consumption gives exact reputation and quality factors',(
  assert.deepEqual(r.reputation.consumo,{cuero_sint:60,cuero_std:95.6,cuero_prem:0,acc_eco:200,acc_prem:168,hilo_std:0,hilo_ref:1500,hilo_prem:1394});near(r.lines[0].quality,(r.reputation.factorProduccion+r.reputation.factorMP)/2);
 });
 test('advertising is capped, debited once and contributes only its reputation factor',()=>{
- const s=state();s.INV_MARKETING.value=20000;const r=E.prepare({id:'A',...context(s)});assert.equal(r.reputation.factorPublicidad,10);assert.equal(r.demandFactor,1);assert.equal(REVIEW.breakdown(item('INV_MARKETING'),context(s)).outflow,10000);
+ const s=state();s.INV_MARKETING={round:1,optionIds:['mkt_alta']};const r=E.prepare({id:'A',...context(s)});assert.equal(r.reputation.factorPublicidad,10);assert.equal(r.demandFactor,1);assert.equal(REVIEW.breakdown(item('INV_MARKETING'),context(s)).outflow,12000);
  s.INV_MARKETING={round:1,optionIds:['mkt_alta']};assert.equal(BUS.advertising({state:s}),10000);
 });
 test('full closure preserves chosen prices, inventory balances and corrected MP valuation',()=>{
@@ -37,12 +37,15 @@ test('MYPE and No MYPE labor, acquisition and maintenance follow the two source 
   near(BUS.maintenance({REGIMEN_LABORAL:{optionIds:[regimen]},MESA_CORTE:{purchases:{1:{mesa:1}}}},catalog),maintenance);
  }
 });
-test('maintenance is recurring, never duplicated between section payment and closing',()=>{
+test('base maintenance recurs in the engine while the optional decision keeps its original fee',()=>{
  const s=state(),ctx=context(s),b=REVIEW.section(catalog.find(c=>c.cat==='B'),ctx),r=CYCLE.close({...ctx,capital:200000,ledger:{'1:B':b.net},sectionsByRound:{1:{B:{...b,recordedNet:b.net}}}});
- const charge=b.items.find(i=>i.id==='MANTENIMIENTO').outflow;near(charge,r.receipt.maintenanceCost);assert.equal(r.ledger['1:MANTENIMIENTO_AUTO'],0);
+ assert.equal(b.items.find(i=>i.id==='MANTENIMIENTO').outflow,0);near(r.ledger['1:MANTENIMIENTO_AUTO'],-r.receipt.maintenanceCost);
+ const optional=state();optional.MANTENIMIENTO={round:1,optionIds:['correctivo']};const second=CYCLE.close({...context(optional),capital:200000});assert.equal(REVIEW.breakdown(item('MANTENIMIENTO'),context(optional)).outflow,1500);near(second.ledger['1:MANTENIMIENTO_AUTO'],-second.receipt.maintenanceCost);
+ const paid=Math.round(BUS.maintenance(s,catalog)*100)/100,old={...b,net:b.net-paid,items:b.items.map(i=>i.id==='MANTENIMIENTO'?{...i,type:'info',outflow:paid}:i)};
+ const compatible=CYCLE.close({...ctx,capital:200000,ledger:{'1:B':old.net},sectionsByRound:{1:{B:{...old,recordedNet:old.net}}}});assert.equal(compatible.ledger['1:MANTENIMIENTO_AUTO'],0);
 });
-test('multiple molds can be purchased together; legacy owned molds retain recurring maintenance',()=>{
- const ctx={...context({}),drafts:{MOLDE:{optionIds:['molde_1','molde_2','molde_3']}}};assert.equal(REVIEW.breakdown(item('MOLDE'),ctx).outflow,5050);near(BUS.maintenanceEstimate(ctx),5000*.05/12);
+test('the engine retains all owned mold types without adding a multi-purchase control',()=>{
+ const ctx={...context({MOLDE:{round:0,purchases:{0:{molde_1:1,molde_2:1,molde_3:1}}}}),drafts:{MOLDE:{optionIds:[]}}};assert.equal(REVIEW.breakdown(item('MOLDE'),ctx).outflow,0);near(BUS.maintenanceEstimate(ctx),5000*.05/12);
  const old={...context({MOLDE:{round:1,optionIds:['molde_1']}}),round:2,drafts:{MOLDE:{optionIds:[]}}};near(BUS.maintenanceEstimate(old),1.25);
 });
 function participants(count,product='premium'){return Array.from({length:count},(_,i)=>({id:String(i),hasChannel:true,scores:{reputation:5},demandFactor:1,lines:[{id:product,price:250,quality:5,produced:0,available:10000}]}));}

@@ -14,7 +14,7 @@
     if(ctx.drafts?.[item.id])return ctx.drafts[item.id];
     const e=ctx.state?.[item.id],same=n(e?.round)===ctx.round;
     if(item.asset)return {quantities:{...(e?.purchases?.[ctx.round]||{})}};
-    if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{},...(same&&e?.assignments?{assignments:e.assignments}:{})};
+    if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{}};
     if(item.type==='production-plan'){
       if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets},prices:{...e.prices}};
       return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{},prices:{...(same?e?.prices:{})}};
@@ -45,7 +45,7 @@
     const add=(label,quantity,unit,outflow=0,income=0,detail='')=>out.rows.push({label,quantity,unitCost:unit,outflow,income,detail});
     if(item.type==='info'){
       const channels=ctx.drafts?.CANALES||ctx.state?.CANALES,stores=ctx.rules.storeCount(channels);
-      if(item.id==='MANTENIMIENTO'){const amount=roundMoney(BUS.maintenanceEstimate(ctx));add('Mantenimiento mensual de activos',1,amount,amount,0,'Porcentaje anual del costo de adquisición dividido entre 12.');}
+      if(item.id==='MANTENIMIENTO'){out.automaticMaintenance=true;const amount=roundMoney(BUS.maintenanceEstimate(ctx));add('Mantenimiento mensual de activos',1,amount,amount,0,'Porcentaje anual del costo de adquisición dividido entre 12.');}
       else if(item.id==='PERSONAL_VENTAS')add('Vendedores b\u00e1sicos',stores,null,0,0,'1 por tienda f\u00edsica. Comisi\u00f3n total: 1% de las ventas; sin sueldo fijo adicional.');
       else if(item.id==='CREDITO_VENTAS'){
         const credit=Math.min(70,n(ctx.config?.creditPercentStart??20)+(ctx.round-1)*5+(discount(ctx)?5:0));
@@ -56,7 +56,6 @@
     }else if(item.type==='production-plan'){
       const labels={molde_1:'Molde básico',molde_2:'Molde mejorado',molde_3:'Molde premium'};
       for(const [id,label] of Object.entries(labels)){const quantity=n(d.moldTargets?.[id]);if(quantity)add(label,quantity,null,0,0,'Producción deseada para esta línea de molde.');}
-      for(const [id,label] of Object.entries({esencial:'Económico',urbano:'Medio',premium:'Premium'}))if(d.prices?.[id]!=null)add(`Precio ${label}`,null,n(d.prices[id]),0,0,'Precio de venta elegido; no es un gasto.');
     }else if(item.type==='number'){
       if(item.id==='INV_MARKETING'){const amount=BUS.advertising(ctx);add('Publicidad del ciclo',1,amount,amount,0,'Importe de publicidad; máximo S/10,000.');}else add('Meta del ciclo',n(d.value),null,0,0,item.unit||'unidades');
     }else if(item.type==='sales-staff'){
