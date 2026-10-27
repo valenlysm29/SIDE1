@@ -535,6 +535,9 @@ function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${curr
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}
 function worldAdmissionKey(){return `SIDE_WORLD_ADMITTED_${storageKey()}_${currentRound()}`;}
+function cyclePlanSyncPendingKey(round=currentRound()){return `SIDE_CYCLE_PLAN_SYNC_PENDING_${storageKey()}_${round}`;}
+function cyclePlanSyncPending(round=currentRound()){try{return localStorage.getItem(cyclePlanSyncPendingKey(round))==='1'}catch{return false}}
+function setCyclePlanSyncPending(pending,round=currentRound()){try{if(pending)localStorage.setItem(cyclePlanSyncPendingKey(round),'1');else localStorage.removeItem(cyclePlanSyncPendingKey(round))}catch{}}
 const CHARACTER_MODEL_IDS=Object.freeze({miguel:'chico2',joel:'chico3',gonzalo:'chico1',valeria:'mona'});
 const CHARACTER_SLUGS=Object.freeze(Object.fromEntries(Object.entries(CHARACTER_MODEL_IDS).map(([slug,id])=>[id,slug])));
 function characterSelectionKey(){return `SIDE_SELECTED_CHARACTER_${storageKey()}`}
@@ -553,7 +556,7 @@ function canOperateWorld(){
   const submitted=typeof simulationSubmissionComplete==='function'?simulationSubmissionComplete():true;
   return explore&&submitted;
 }
-function canStartSimulation(){return canVisitFunWorld()}
+function canStartSimulation(){return canVisitFunWorld()&&!cyclePlanSyncPending()}
 function setDecisionsSubmitted(v){if(v)localStorage.setItem(submissionKey(),'1');else localStorage.removeItem(submissionKey())}
 function sectionLedgerKey(cat){return `${currentRound()}:${cat}`}
 // Navigation is deliberately separate from the read-only world data boundary.
@@ -1332,6 +1335,7 @@ function openCharacterSelection(){
   return true;
 }
 function requestWorldEntry(){
+  if(cyclePlanSyncPending()){toast('El servidor aún no confirmó el plan de este ciclo. Reintenta la sincronización antes de entrar al mundo 3D.');return false;}
   if(admittedFunContext&&admittedFunContext===funAdmissionContext()&&canVisitFunWorld())return startSimulationLoading({selectedCharacter:selectedCharacterModel()||'chico2'});
   if(!simulationSubmissionComplete())return openDecisionMenu();
   const admitted=localStorage.getItem(worldAdmissionKey())==='1';
@@ -1519,6 +1523,7 @@ function renderStudentConnection(){
 }
 function showStudentSyncStatus(status,error){
   const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
+  if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
   if(error)console.warn('SIDE: sincronización pendiente',error);
 }
@@ -1552,6 +1557,7 @@ function getStudentOutbox(){
 function retryStudentSync(){
   const outbox=getStudentOutbox();
   if(!outbox||!studentConnected||navigator.onLine===false)return Promise.resolve(false);
+  if(!outbox.pending(studentIdentityKey()))return Promise.resolve(false);
   studentSnapshotQueue=outbox.flush();return studentSnapshotQueue;
 }
 function queueStudentSnapshot(snapshot,operation=null){
