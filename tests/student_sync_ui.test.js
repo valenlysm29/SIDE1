@@ -130,6 +130,59 @@ test('student synchronization and session recovery through the delivered UI',asy
       assert.equal(await p.locator('[data-sale-price]').count(),0);
       await p.context().close();
     });
+    await t.test('retry reconstructs a locally confirmed plan when the durable queue is empty without charging again',async()=>{
+      const p=await page();await draft(p);
+      const before=await p.evaluate(()=>{
+        stopStudentSync();
+        for(const category of decisionCategories())setSectionSubmitted(category.cat,true);
+        // Older sessions may have all five confirmations but no aggregate flag
+        // or queued payload. The button must actually send that saved plan.
+        setDecisionsSubmitted(false);setCyclePlanSyncPending(true);
+        currentCategory='A';companySummaryRound='current';renderTabs();renderDecisionCategory();updateHud();
+        return {cash:cashBalance(),ledger:JSON.stringify(cashLedger),writes:calls.filter(c=>c.type==='snapshot').length};
+      });
+      assert.equal(await p.locator('#retryCyclePlanSync').isVisible(),true);
+      assert.match(await p.locator('#decisionProgressHint').innerText(),/Esperando confirmación/);
+      assert.equal(await p.evaluate(()=>studentSyncPending()),false);
+      await p.locator('#retryCyclePlanSync').click();
+      await p.waitForFunction(()=>!cyclePlanSyncPending()&&!studentSyncPending());
+      const after=await p.evaluate(()=>({cash:cashBalance(),ledger:JSON.stringify(cashLedger),
+        writes:calls.filter(c=>c.type==='snapshot').length,plan:!!server.snapshot.decision_state.__cyclePlans?.[1],
+        flags:server.snapshot.section_submissions,submitted:server.snapshot.decisions_submitted}));
+      assert.equal(after.cash,before.cash);assert.equal(after.ledger,before.ledger);
+      assert.equal(after.writes,before.writes+1);assert.equal(after.plan,true);assert.equal(after.submitted,true);
+      assert.ok(Object.values(after.flags).every(Boolean));
+      assert.equal(await p.locator('#retryCyclePlanSync').count(),0);
+      assert.equal(await p.locator('[data-student-sync-status]').last().isVisible(),false);
+      assert.equal(await p.locator('#decisionProgressHint').innerText(),'Apartados confirmados');
+      await p.context().close();
+    });
+    await t.test('going offline with no unsent jobs does not invent a pending save',async()=>{
+      const p=await page();await draft(p);
+      assert.equal(await p.evaluate(()=>studentSyncPending()),false);
+      await p.context().setOffline(true);
+      assert.equal(await p.locator('[data-student-sync-status]').last().isVisible(),false);
+      await p.context().setOffline(false);
+      await p.context().close();
+    });
+    await t.test('reload recovers an orphaned local confirmation before hydrating the older server draft',async()=>{
+      const p=await page();await draft(p);
+      const before=await p.evaluate(()=>{
+        stopStudentSync();for(const category of decisionCategories())setSectionSubmitted(category.cat,true);
+        setDecisionsSubmitted(false);setCyclePlanSyncPending(true);persistGameState();persistStudentSession();
+        return {cash:cashBalance(),ledger:JSON.stringify(cashLedger)};
+      });
+      await p.reload();
+      await p.waitForFunction(()=>studentSessionRecoveryTask===null&&server.snapshot.decision_state.__cyclePlans?.[1]&&!studentSyncPending());
+      const after=await p.evaluate(()=>{
+        stopStudentSync();return {cash:cashBalance(),ledger:JSON.stringify(cashLedger),
+          pending:cyclePlanSyncPending(),submitted:server.snapshot.decisions_submitted,
+          web:decisionState.CANALES.optionIds.includes('web'),writes:calls.filter(c=>c.type==='snapshot').length};
+      });
+      assert.equal(after.cash,before.cash);assert.equal(after.ledger,before.ledger);
+      assert.equal(after.pending,false);assert.equal(after.submitted,true);assert.equal(after.web,true);assert.equal(after.writes,1);
+      await p.context().close();
+    });
     await t.test('pending decisions/report survive a reload and recover the latest offline draft',async()=>{
       const p=await page({TEST_WRITE_ERROR:'1'});await draft(p);
       await p.reload();await p.waitForFunction(()=>studentSessionRecoveryTask===null);

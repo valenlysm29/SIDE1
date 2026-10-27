@@ -51,3 +51,31 @@ La interfaz verifica que desaparece el aviso después de la confirmación, sin
 añadir controles de precios.
 
 El navegador del usuario debe cargar esta versión para reintentar su cola local.
+
+## Recuperación del plan con los cinco apartados confirmados
+
+Una segunda captura muestra los cinco apartados enviados, el aviso genérico y
+el botón de reintento del plan. Se corrigieron tres fallos reproducibles:
+
+- Con la marca local de plan pendiente pero sin entradas en la cola, Reintentar
+  devolvía `false` sin enviar nada. Ahora reconstruye el transporte desde las
+  decisiones guardadas, incluyendo el plan, reporte y decisiones normalizadas.
+  No vuelve a ejecutar el commit de decisiones ni a cargar sus costos.
+- La recuperación de sesión con cola vacía podía hidratar el borrador remoto
+  antes de rescatar esa confirmación local. Ahora intenta enviarla primero;
+  la revisión CAS conserva la protección frente a otros dispositivos y cierres.
+- El evento offline mostraba sincronización pendiente aun sin trabajos por
+  enviar. Ahora solo lo hace si la cola tiene escrituras pendientes; la pérdida
+  de conexión sigue reflejándose en el indicador de conexión.
+
+El texto del encabezado «Plan pendiente de confirmar» era estático. Ahora indica
+si faltan confirmaciones locales, si espera al servidor o si los apartados están
+confirmados. El snapshot reconoce como envío completo también las cinco marcas
+individuales de versiones anteriores, aunque les falte la marca agregada.
+
+Validación: 62 pruebas aprobadas. Las regresiones en Chromium pulsan el botón
+real con la cola vacía y también recargan una sesión con una confirmación local
+huérfana. Ambas comprueban que llega el plan, desaparece el aviso, se conservan
+las cantidades y la caja, y solo se escribe un snapshot. Otra prueba pierde
+conectividad sin trabajos pendientes y verifica que no se inventa un envío
+fallido. No se cambió el catálogo ni el motor.

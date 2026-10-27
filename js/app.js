@@ -1393,6 +1393,9 @@ function updateHud(){
   $('sendDecisionSection')?.classList.remove('hidden');
   const sections=decisionCategories(),submitted=sections.filter(category=>sectionSubmitted(category.cat)||decisionsSubmitted()).length,submittedPct=sections.length?Math.round(submitted/sections.length*100):0;
   $('decisionProgressText').textContent=`${submitted}/${sections.length} · ${submittedPct}%`;$('decisionProgressBar').style.width=submittedPct+'%';
+  if($('decisionProgressHint'))$('decisionProgressHint').textContent=simulationSubmissionComplete()
+    ?cyclePlanSyncPending()?'Esperando confirmación del servidor':'Apartados confirmados'
+    :'Plan pendiente de confirmar';
   $('decisionProgressText').closest('.mission-meter')?.setAttribute('aria-label',`${submitted} de ${sections.length} apartados enviados, ${submittedPct}%`);
   const pct=decisionProgressPercent();
   const launch=$('simulationLaunch');if(launch){const ready=pct===100;launch.classList.toggle('hidden',!ready);launch.classList.toggle('ready',ready);const submitted=simulationSubmissionComplete();$('submitAllDecisionsBtn')?.classList.toggle('hidden',submitted);$('startSimulationBtn')?.classList.toggle('hidden',!submitted);}
@@ -1501,7 +1504,7 @@ function buildStudentSnapshot(round=currentRound()){
     version:1,round,updated_at:new Date().toISOString(),
     decision_state:deepClone(decisionState),cash_ledger:deepClone(cashLedger),financial_sections:recordedFinancialSections(),
     section_submissions:Object.fromEntries(decisionCategories().map(category=>[category.cat,sectionSubmitted(category.cat)])),
-    decisions_submitted:decisionsSubmitted(),selected_character:selectedCharacterSlug()
+    decisions_submitted:simulationSubmissionComplete(),selected_character:selectedCharacterSlug()
   };
 }
 async function recoverStaleStudentState(){
@@ -1523,6 +1526,7 @@ function showStudentSyncStatus(status,error){
   if(status==='pending'&&window.SIDE?.StudentSync?.pendingMessage)labels.pending=window.SIDE.StudentSync.pendingMessage(error);
   if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
+  if(!$('decisionMenu')?.classList.contains('hidden'))updateHud();
   if(error)console.warn('SIDE: sincronización pendiente',error);
 }
 function rejectStudentSession(error){
@@ -1555,7 +1559,19 @@ function getStudentOutbox(){
 }
 function retryStudentSync({force=false}={}){
   const outbox=getStudentOutbox();
-  if(!outbox||!studentConnected||navigator.onLine===false)return Promise.resolve(false);
+  if(!outbox||!studentConnected||navigator.onLine===false){
+    if(force)showStudentSyncStatus('pending',{code:'FETCH_ERROR',error:'No se pudo conectar con el servidor.'});
+    return Promise.resolve(false);
+  }
+  // A legacy/local confirmation can outlive its outbox entry (for example
+  // after recovery). Rebuild the transport payload from the saved decisions;
+  // never call the decision commit again or charge its ledger a second time.
+  if(force&&!outbox.pending(studentIdentityKey())&&cyclePlanSyncPending()&&simulationSubmissionComplete()){
+    const round=currentRound();
+    queueStudentSnapshot(buildStudentSnapshot(round));
+    syncReportToSupabase(syncStudentReportPreview());
+    for(const category of decisionCategories())syncSectionToSupabase(category.cat);
+  }
   if(!outbox.pending(studentIdentityKey()))return Promise.resolve(false);
   studentSnapshotQueue=outbox.flush({force});return studentSnapshotQueue;
 }
@@ -1798,6 +1814,10 @@ function resumeStudentSession(){
   if(studentSessionRecoveryTask)return studentSessionRecoveryTask;
   studentSessionRecoveryTask=(async()=>{
     const epoch=studentSnapshotEpoch;
+    // Recover a confirmed local plan before a queue-empty remote hydration can
+    // replace it. CAS still protects changes made by the teacher/another device.
+    if(cyclePlanSyncPending()&&simulationSubmissionComplete()&&!studentSyncPending())await retryStudentSync({force:true});
+    if(epoch!==studentSnapshotEpoch||!studentConnected)return false;
     const validated=await refreshStudentGame({forceHydrate:!studentSyncPending()});
     if(epoch!==studentSnapshotEpoch||!studentConnected)return false;
     if(!validated&&currentStudent.empresaId){
@@ -1833,5 +1853,10 @@ if(invitationCode){
 $('gameCode')?.addEventListener('input',()=>{$('gameCode').value=String($('gameCode').value).replace(/\s+/g,'').toUpperCase();showAdmissionCodeError();message('studentMessage','');});
 $('gameCode')?.addEventListener('blur',()=>{$('gameCode').value=admissionCode($('gameCode').value);});
 window.addEventListener('online',()=>{renderStudentConnection();if(studentConnected)pollStudentGame();});
-window.addEventListener('offline',()=>{renderStudentConnection();showStudentSyncStatus('pending');});
+window.addEventListener('offline',()=>{
+  renderStudentConnection();
+  // Losing connectivity does not turn an already acknowledged save into an
+  // unsent one. The connection indicator handles offline state without jobs.
+  if(studentSyncPending())showStudentSyncStatus('pending',{code:'FETCH_ERROR',error:'Sin conexión con el servidor.'});
+});
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});
