@@ -50,6 +50,23 @@
     return Boolean(params.p_codigo && params.p_nombre_legal && params.p_nombre_comercial);
   }
 
+  // Keep transport errors distinct from an explicit rejection by the RPC.
+  // The outbox and its status message need the original PostgREST code.
+  function technicalFailure(error) {
+    const failure = { success: false, technical: true,
+      code: String(error?.code || 'RPC_DECISIONES_ERROR'),
+      error: String(error?.message || error || 'No se pudo comunicar con Supabase.') };
+    for (const key of ['details', 'hint', 'status']) if (error?.[key] != null) failure[key] = error[key];
+    return failure;
+  }
+
+  function writeResult(data, error) {
+    if (error) return technicalFailure(error);
+    if (data?.success === false || data?.error) return { success: false, code: data.code, error: data.error };
+    if (data?.success !== true) return technicalFailure({ code: 'RESPUESTA_GUARDADO_INVALIDA', message: 'El servidor no confirmó el guardado.' });
+    return { success: true, data };
+  }
+
   /**
    * Guarda (inserta o actualiza) las decisiones de una empresa en un ciclo.
    * @param {object} identidad { codigo, nombreLegal, nombreComercial }.
@@ -77,11 +94,9 @@
         p_decisiones: decisiones,
         p_expected_revision: revision
       });
-      if (error) return { success: false, error: error.message };
-      if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
-      return { success: true, data };
+      return writeResult(data, error);
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      return technicalFailure(err);
     }
   }
 
@@ -159,11 +174,9 @@
         p_reporte: reporte,
         p_expected_revision: revision
       });
-      if (error) return { success: false, error: error.message };
-      if (data && (data.success === false || data.error)) return { success: false, code: data.code, error: data.error };
-      return { success: true, data };
+      return writeResult(data, error);
     } catch (err) {
-      return { success: false, error: String((err && err.message) || err) };
+      return technicalFailure(err);
     }
   }
 

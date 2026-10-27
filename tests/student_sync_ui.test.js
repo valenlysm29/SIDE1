@@ -89,6 +89,27 @@ test('student synchronization and session recovery through the delivered UI',asy
       assert.equal(await p.evaluate(()=>server.revision),1);
       await p.context().close();
     });
+    await t.test('the top status explains a server rejection and manual retry really sends during backoff',async()=>{
+      const p=await page();
+      await p.evaluate(()=>{
+        const original=SIDE.DecisionesService.guardar;
+        SIDE.DecisionesService.guardar=async(...args)=>sessionStorage.TEST_OPERATION_ERROR==='1'
+          ?{success:false,technical:true,code:'42P10',error:'No hay restricción única para guardar las opciones.'}:original(...args);
+        sessionStorage.TEST_OPERATION_ERROR='1';
+      });
+      await draft(p);
+      const status=p.locator('[data-student-sync-status]').last();
+      assert.match(await status.innerText(),/No hay restricción única.*42P10/);
+      const recovered=await p.evaluate(async()=>{
+        stopStudentSync();sessionStorage.TEST_OPERATION_ERROR='0';
+        const before=calls.filter(c=>c.type==='snapshot').length;
+        const result=await retryStudentSync({force:true});
+        return {result,before,after:calls.filter(c=>c.type==='snapshot').length,web:decisionState.CANALES.optionIds.includes('web')};
+      });
+      assert.equal(recovered.result,true);assert.equal(recovered.after,recovered.before);assert.equal(recovered.web,true);
+      assert.equal(await status.isVisible(),false);
+      await p.context().close();
+    });
     await t.test('pending decisions/report survive a reload and recover the latest offline draft',async()=>{
       const p=await page({TEST_WRITE_ERROR:'1'});await draft(p);
       await p.reload();await p.waitForFunction(()=>studentSessionRecoveryTask===null);

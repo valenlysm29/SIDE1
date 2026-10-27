@@ -7,6 +7,16 @@
     const defaults={decision_state:{},cash_ledger:{},financial_sections:{},section_submissions:{},decisions_submitted:false,selected_character:null};
     return JSON.stringify(ordered(Object.fromEntries(Object.entries(defaults).map(([key,fallback])=>[key,value?.[key]??fallback]))));
   }
+  function pendingMessage(error){
+    const base='Cambios guardados en este dispositivo. Sincronización pendiente.';
+    if(!error)return base;
+    const code=String(error.code||'').trim(),detail=String(error.error||error.message||'').replace(/\s+/g,' ').trim();
+    if(code==='CICLO_PAUSADO')return base+' El docente debe reanudar el ciclo para recibir el envío.';
+    if(/PGRST202|PGRST204|42883|42703/.test(code))return base+' El servidor necesita una actualización ('+code+'). Comunícalo al docente.';
+    if(/CONEXION_TIMEOUT|FETCH_ERROR|CLIENTE_SUPABASE_NO_DISPONIBLE/.test(code)||/failed to fetch|network|timeout|conexión tardó|conexión con Supabase tardó/i.test(detail))return base+' No se pudo conectar con el servidor. Se reintentará automáticamente.';
+    if(detail)return base+' Motivo: '+detail.slice(0,240)+(code?' ('+code+')':'');
+    return base+(code?' Código: '+code+'.':'');
+  }
   function createQueue(options){
     const {storage,context,saveSnapshot,saveOperation,readSnapshot,onRevision=()=>{},onConflict=()=>{},onRejected=()=>{},onStatus=()=>{}}=options;
     const storageKey='SIDE_STUDENT_SYNC_OUTBOX';
@@ -50,10 +60,11 @@
       newer.operations=[...job.operations.filter(op=>!currentKeys.has(op.key)),...newer.operations];
       jobs=jobs.filter(j=>j!==job);persist();
     }
-    function flush(){
+    function flush({force=false}={}){
       if(task)return task;
       const c=context();
       if(!c.connected||!pending(c.identityKey))return Promise.resolve(!pending(c.identityKey));
+      if(force){nextAttempt=0;if(retryTimer!==null)cancel(retryTimer);retryTimer=null;}
       if(now()<nextAttempt)return Promise.resolve(false);
       const active=()=>{const next=context();return next.connected&&next.identityKey===c.identityKey&&next.epoch===c.epoch;};
       task=Promise.resolve().then(async()=>{
@@ -113,7 +124,7 @@
     if(typeof global.addEventListener==='function')global.addEventListener('online',()=>{attempts=0;nextAttempt=0;if(retryTimer!==null)cancel(retryTimer);retryTimer=null;void flush();});
     return {enqueue,flush,pending,discard};
   }
-  const api={createQueue};
+  const api={createQueue,pendingMessage};
   global.SIDE=global.SIDE||{};global.SIDE.StudentSync=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

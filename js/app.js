@@ -1520,6 +1520,7 @@ function renderStudentConnection(){
 }
 function showStudentSyncStatus(status,error){
   const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
+  if(status==='pending'&&window.SIDE?.StudentSync?.pendingMessage)labels.pending=window.SIDE.StudentSync.pendingMessage(error);
   if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
   if(error)console.warn('SIDE: sincronización pendiente',error);
@@ -1551,11 +1552,11 @@ function getStudentOutbox(){
   });
   return studentOutbox;
 }
-function retryStudentSync(){
+function retryStudentSync({force=false}={}){
   const outbox=getStudentOutbox();
   if(!outbox||!studentConnected||navigator.onLine===false)return Promise.resolve(false);
   if(!outbox.pending(studentIdentityKey()))return Promise.resolve(false);
-  studentSnapshotQueue=outbox.flush();return studentSnapshotQueue;
+  studentSnapshotQueue=outbox.flush({force});return studentSnapshotQueue;
 }
 function queueStudentSnapshot(snapshot,operation=null){
   if(!window.SIDE?.EmpresaService?.guardarEstado||!currentStudent.empresaId||!studentConnected)return Promise.resolve(false);

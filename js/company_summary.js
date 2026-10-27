@@ -277,7 +277,7 @@ function renderCompanySummary(){
 
   mount.querySelector('#retryCyclePlanSync')?.addEventListener('click',async event=>{
     const button=event.currentTarget;button.disabled=true;button.textContent='ENVIANDO…';
-    const synced=await retryStudentSync();
+    const synced=await retryStudentSync({force:true});
     if(synced){setCyclePlanSyncPending(false);toast('El servidor confirmó las decisiones del ciclo.',8000);renderCompanySummary();}
     else{toast('El Servidor todavía no confirmó el envío. Se conservaron tus decisiones; vuelve a intentarlo cuando haya conexión.',8000);renderCompanySummary();}
   });
