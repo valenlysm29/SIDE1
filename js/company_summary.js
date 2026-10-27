@@ -127,26 +127,23 @@ function commitReviewedSections(cats,finalize){
         if(synced){
           setCyclePlanSyncPending(false);
           toast('El servidor confirmó las decisiones del ciclo.',8000);
-          enterWorldAfterConfirmation();
+          showCompanyAfterConfirmation();
         }else{
           toast('El servidor aún no confirmó el plan. Tus decisiones siguen en este equipo; reintenta la sincronización antes de entrar al mundo 3D.',8000);
           currentCategory='A';companySummaryRound='current';
           renderTabs();renderDecisionCategory();
         }
       }).catch(error=>console.error('SIDE: verificación de plan pendiente',error));
-    }else if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete())enterWorldAfterConfirmation();
+    }else if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete())showCompanyAfterConfirmation();
     return true;
   }catch(error){console.error('SIDE: review confirmation failed',error);toast('No se pudo confirmar. Revisa tus decisiones e intenta nuevamente.');return false;}
   finally{reviewCommitBusy=false;}
 }
-function enterWorldAfterConfirmation(){
+function showCompanyAfterConfirmation(){
   if(!simulationSubmissionComplete())return;
   closeCompanyReview();
-  queueMicrotask(()=>{
-    if(!simulationSubmissionComplete()||!canExploreWorld()||cyclePlanSyncPending())return;
-    playerIsDeciding=false;
-    Promise.resolve().then(()=>requestWorldEntry()).catch(error=>console.error('SIDE: entrada automática al mundo',error));
-  });
+  currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';
+  renderTabs();renderDecisionCategory();
 }
 function summaryStatus(section){return section.submitted?'ENVIADA':section.status==='draft'?'BORRADOR SIN GUARDAR':section.status==='saved'?'GUARDADA, NO ENVIADA':'PENDIENTE';}
 function summaryDate(section){
@@ -266,7 +263,7 @@ function renderCompanySummary(){
   const heading=history?`Decisiones enviadas \u00b7 ciclo ${companySummaryRound}`:'Resumen de decisiones de tu empresa';
   mount.innerHTML=`<section class="company-summary" aria-labelledby="companySummaryTitle"><header class="cs-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${history?companySummaryRound:currentRound()}</span><h2 id="companySummaryTitle">${heading}</h2><p>Decisiones, proceso productivo, compras, costos y financiamiento en un solo lugar.</p></div><span class="cs-progress">${sent} / ${decisionCategories().length}<small>apartados enviados</small></span></header>
       ${!history&&currentStudent.empresaId&&cyclePlanSyncPending()?'<div class="cs-notice cs-notice-error" role="status"><p>El Servidor todavía no confirmó el plan de este ciclo. Reintenta el envío para que pueda calcular las ventas al cierre.</p><button id="retryCyclePlanSync" type="button" class="cs-secondary">REINTENTAR ENVÍO AL SERVIDOR</button></div>':''}
-      ${!history&&canStartSimulation()&&simulationSubmissionComplete()?'<div class="cs-world-ready"><div><strong>Tu empresa está lista para abrir</strong><p>Las decisiones están enviadas. Entra al mundo 3D para gestionar el turno.</p></div><button id="companyStartWorld" data-start-world type="button" class="cs-primary">INICIAR MUNDO 3D</button></div>':''}
+      ${!history&&canStartSimulation()&&simulationSubmissionComplete()?'<div class="cs-world-ready"><div><strong>Decisiones del ciclo enviadas</strong><p>Puedes quedarte en este resumen o entrar al mundo 3D. Entrar es opcional.</p></div><button id="companyStartWorld" data-start-world type="button" class="cs-primary">ENTRAR AL MUNDO 3D</button></div>':''}
       <div class="cs-toolbar"><div class="cs-filters" role="group" aria-label="Filtrar decisiones"><button type="button" data-summary-filter="all" aria-pressed="${companySummaryFilter==='all'}">Todas las decisiones</button><button type="button" data-summary-filter="sent" aria-pressed="${companySummaryFilter==='sent'}">Solo enviadas</button></div><label>Ciclo <select id="companySummaryCycle"><option value="current">Actual \u00b7 ciclo ${currentRound()}</option>${rounds.map(r=>`<option value="${r}" ${history&&Number(companySummaryRound)===r?'selected':''}>Ciclo ${r} \u00b7 historial enviado</option>`).join('')}</select></label></div>
     ${!history&&decisionState.__cycleSettlements?.[currentRound()]?`<div class="cs-financial-scope"><strong>Ingresos del ciclo: ${reviewMoney(financialReport().estadoResultados.ingresos)}</strong><p>Ventas registradas al cierre. Caja final: ${reviewMoney(financialReport().balanceCaja.cajaFinal)}.</p></div>`:''}
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
@@ -281,7 +278,7 @@ function renderCompanySummary(){
   mount.querySelector('#retryCyclePlanSync')?.addEventListener('click',async event=>{
     const button=event.currentTarget;button.disabled=true;button.textContent='ENVIANDO…';
     const synced=await retryStudentSync();
-    if(synced){setCyclePlanSyncPending(false);toast('El servidor confirmó las decisiones del ciclo.',8000);renderCompanySummary();requestWorldEntry();}
+    if(synced){setCyclePlanSyncPending(false);toast('El servidor confirmó las decisiones del ciclo.',8000);renderCompanySummary();}
     else{toast('El Servidor todavía no confirmó el envío. Se conservaron tus decisiones; vuelve a intentarlo cuando haya conexión.',8000);renderCompanySummary();}
   });
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
