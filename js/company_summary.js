@@ -121,15 +121,15 @@ function commitReviewedSections(cats,finalize){
     // Fire-and-forget con guard: syncSectionToSupabase nunca rechaza.
     try{if(typeof syncSectionToSupabase==='function'){for(const plan of plans){syncSectionToSupabase(plan.cat);}}}catch(error){console.error('SIDE: supabase round sync failed',error);}
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
-    toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`);
+    toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`,6000);
     if(planSync){
       Promise.resolve(planSync).then(synced=>{
         if(synced){
           setCyclePlanSyncPending(false);
-          toast('El servidor confirmó las decisiones del ciclo.');
+          toast('El servidor confirmó las decisiones del ciclo.',8000);
           enterWorldAfterConfirmation();
         }else{
-          toast('El servidor aún no confirmó el plan. Tus decisiones siguen en este equipo; reintenta la sincronización antes de entrar al mundo 3D.');
+          toast('El servidor aún no confirmó el plan. Tus decisiones siguen en este equipo; reintenta la sincronización antes de entrar al mundo 3D.',8000);
           currentCategory='A';companySummaryRound='current';
           renderTabs();renderDecisionCategory();
         }
@@ -281,8 +281,8 @@ function renderCompanySummary(){
   mount.querySelector('#retryCyclePlanSync')?.addEventListener('click',async event=>{
     const button=event.currentTarget;button.disabled=true;button.textContent='ENVIANDO…';
     const synced=await retryStudentSync();
-    if(synced){setCyclePlanSyncPending(false);toast('El servidor confirmó las decisiones del ciclo.');renderCompanySummary();requestWorldEntry();}
-    else{toast('El Servidor todavía no confirmó el envío. Se conservaron tus decisiones; vuelve a intentarlo cuando haya conexión.');renderCompanySummary();}
+    if(synced){setCyclePlanSyncPending(false);toast('El servidor confirmó las decisiones del ciclo.',8000);renderCompanySummary();requestWorldEntry();}
+    else{toast('El Servidor todavía no confirmó el envío. Se conservaron tus decisiones; vuelve a intentarlo cuando haya conexión.',8000);renderCompanySummary();}
   });
   mount.querySelector('#companySummaryCycle').addEventListener('change',e=>{companySummaryRound=e.target.value;renderCompanySummary();});
     mount.querySelector('#companyReviewAll')?.addEventListener('click',openCompanyReview);bindSummaryLinks(mount);
