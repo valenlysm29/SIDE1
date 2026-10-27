@@ -100,7 +100,7 @@ function commitReviewedSections(cats,finalize){
       Object.assign(state,plan.entries);ledger[sectionLedgerKey(plan.cat)]=plan.net;
       const drafts={};categoryByCat(plan.cat).items.forEach(i=>{drafts[i.id]=deepClone(review.context.drafts[i.id])});
       // Do not overwrite a prior submitted receipt. New cycles use a new key.
-      if(!receipts[plan.cat])receipts[plan.cat]={...plan.model,drafts,submitted:true,sentAt,source:'local',company:currentStudent.company,game:currentStudent.game?.codigo,recordedNet:plan.net};
+      receipts[plan.cat]={...plan.model,drafts,submitted:true,sentAt,source:'local',company:currentStudent.company,game:currentStudent.game?.codigo,recordedNet:plan.net};
       delete draftStore[plan.cat];writes[sectionSubmissionKey(plan.cat)]='1';
     }
     if(finalize)writes[submissionKey()]='1';
@@ -108,10 +108,11 @@ function commitReviewedSections(cats,finalize){
     if(!writeDecisionBatch(writes))return false;
     const delta=Object.values(ledger).reduce((a,b)=>a+Number(b||0),0)-ledgerTotal();
     decisionState=state;cashLedger=ledger;decisionDrafts={};restoreDraftsForRound();
+    let planSync=null;
     if(simulationSubmissionComplete()){
       captureCyclePlan();
       // Queue the confirmed plan before optional report rendering can fail.
-      try{if(currentStudent.empresaId)queueStudentSnapshot(buildStudentSnapshot(currentRound()));}
+      try{if(currentStudent.empresaId)planSync=queueStudentSnapshot(buildStudentSnapshot(currentRound()));}
       catch(error){console.error('SIDE: plan confirmado localmente; sincronización pendiente',error);}
     }
     if(finalize){currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';closeCompanyReview();}
@@ -120,7 +121,14 @@ function commitReviewedSections(cats,finalize){
     // Fire-and-forget con guard: syncSectionToSupabase nunca rechaza.
     try{if(typeof syncSectionToSupabase==='function'){for(const plan of plans){syncSectionToSupabase(plan.cat);}}}catch(error){console.error('SIDE: supabase round sync failed',error);}
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
-    toast(finalize?'Decisiones confirmadas en este equipo. Consulta el resumen en Empresa.':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`);
+    toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`);
+    if(planSync){
+      Promise.resolve(planSync).then(synced=>{
+        toast(synced
+          ?'El servidor confirmó las decisiones del ciclo.'
+          :'Las decisiones siguen guardadas en este equipo. Se reintentará el envío cuando vuelva la conexión.');
+      }).catch(error=>console.error('SIDE: verificación de plan pendiente',error));
+    }
     if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete()){
       closeCompanyReview();
       // Enter only after the complete decision batch has been persisted. Loading
@@ -213,19 +221,33 @@ function sectionSummaryHtml(section,{history=false,compact=false}={}){
   const hasSelection=section.items.some(i=>i.rows?.some(r=>r.outflow||r.income||Number(r.quantity)>0));
   return `<details class="cs-section cs-status-${section.submitted?'sent':section.status||'pending'}" data-summary-section="${section.cat}" ${!compact||hasSelection?'open':''}>
     <summary><img src="${escapeHtml(categoryByCat(section.cat)?.icon||'')}" alt=""><span class="cs-section-name"><b>${escapeHtml(section.title)}</b><small>${escapeHtml(summaryDate(section))}</small></span><span class="cs-badge">${summaryStatus(section)}</span><span class="cs-section-total">${reviewMoney(section.outflow)}<small>desembolso del ciclo</small></span></summary>
-    <div class="cs-section-body">${!history&&!section.submitted?`<button type="button" class="cs-link" data-summary-goto="${section.cat}">Revisar ${escapeHtml(section.title)}</button>`:''}
+    <div class="cs-section-body">${!history?section.submitted&&!decisionsSubmitted()?`<button type="button" class="cs-link" data-summary-reopen="${section.cat}">Corregir ${escapeHtml(section.title)}</button>`:!section.submitted?`<button type="button" class="cs-link" data-summary-goto="${section.cat}">Revisar ${escapeHtml(section.title)}</button>`:'':''}
     <div class="cs-items">${section.items.map(item=>`<article class="cs-item" data-summary-item="${item.id}"><h4>${escapeHtml(item.name)}</h4>${item.rows.length?item.rows.map(row=>`<div class="cs-detail-row"><div><strong>${escapeHtml(row.label)}${row.quantity!==null?` <span class="cs-quantity">\u00d7 ${escapeHtml(row.quantity)}</span>`:''}</strong>${row.detail?`<p>${escapeHtml(row.detail)}</p>`:''}${row.unitCost>0?`<small>Referencia por unidad: ${reviewMoney(row.unitCost)}</small>`:''}</div><div class="cs-row-money">${row.outflow?reviewMoney(row.outflow):row.income?`+ ${reviewMoney(row.income)}`:'Sin desembolso'}</div></div>`).join(''):`<p class="cs-empty-item">${escapeHtml(item.note)}</p>`}</article>`).join('')}</div>
     <div class="cs-section-footer"><span>Desembolso: <b>${reviewMoney(section.outflow)}</b></span>${section.financing?`<span>Financiamiento: <b>+ ${reviewMoney(section.financing)}</b></span>`:''}${section.assetIncome?`<span>Liquidaci\u00f3n: <b>+ ${reviewMoney(section.assetIncome)}</b></span>`:''}</div></div></details>`;
 }
 function noticesHtml(problems,warnings){
-  return `${problems.length?`<div class="cs-notice cs-notice-error"><h3>Antes de enviar, completa lo siguiente</h3>${problems.map(p=>`<p>${escapeHtml(p.text)} <button class="cs-link" type="button" data-summary-goto="${p.cat}">Ir a ${escapeHtml(categoryByCat(p.cat)?.short||'la secci\u00f3n')}</button></p>`).join('')}</div>`:''}
+  return `${problems.length?`<div class="cs-notice cs-notice-error"><h3>Antes de enviar, completa lo siguiente</h3>${problems.map(p=>`<p>${escapeHtml(p.text)} <button class="cs-link" type="button" ${sectionSubmitted(p.cat)&&!decisionsSubmitted()?`data-summary-reopen="${p.cat}"`:`data-summary-goto="${p.cat}"`}>${sectionSubmitted(p.cat)&&!decisionsSubmitted()?'Corregir':'Ir a'} ${escapeHtml(categoryByCat(p.cat)?.short||'la sección')}</button></p>`).join('')}</div>`:''}
     ${warnings.length?`<details class="cs-notice cs-notice-warning"><summary>${warnings.length} advertencia(s) de operaci\u00f3n \u00b7 no bloquean el env\u00edo</summary>${warnings.map(w=>`<p>${escapeHtml(w.text)}</p>`).join('')}</details>`:''}`;
 }
-function navigateFromSummary(cat){
-  closeCompanyReview();persistCurrentDraftOnly();currentCategory=cat;renderTabs();renderDecisionCategory();
+function reopenSubmittedSection(cat){
+  if(!studentAccess().canOperate||decisionsSubmitted()||!sectionSubmitted(cat))return false;
+  if(!writeDecisionBatch({[sectionSubmissionKey(cat)]:null}))return false;
+  for(const item of categoryByCat(cat)?.items||[])delete decisionDrafts[item.id];
+  restoreDraftsForRound();
+  try{if(currentStudent.empresaId)queueStudentSnapshot(buildStudentSnapshot(currentRound()));}
+  catch(error){console.error('SIDE: corrección de sección pendiente de sincronización',error);}
+  return true;
+}
+function navigateFromSummary(cat,{reopen=false}={}){
+  closeCompanyReview();persistCurrentDraftOnly();
+  if(reopen&&!reopenSubmittedSection(cat))return;
+  currentCategory=cat;renderTabs();renderDecisionCategory();
   scrollDecisionContentToTop();
 }
-function bindSummaryLinks(root){root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));}
+function bindSummaryLinks(root){
+  root.querySelectorAll('[data-summary-goto]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryGoto)));
+  root.querySelectorAll('[data-summary-reopen]').forEach(b=>b.addEventListener('click',()=>navigateFromSummary(b.dataset.summaryReopen,{reopen:true})));
+}
 function renderCompanySummary(){
   const mount=$('companySummaryMount');if(!mount)return;
   const owner=`${storageKey()}_${currentRound()}`;if(summaryOwner!==owner){summaryOwner=owner;companySummaryRound='current';companySummaryFilter='all';}
@@ -243,7 +265,7 @@ function renderCompanySummary(){
     ${!history&&decisionState.__cycleSettlements?.[currentRound()]?`<div class="cs-financial-scope"><strong>Ingresos del ciclo: ${reviewMoney(financialReport().estadoResultados.ingresos)}</strong><p>Ventas registradas al cierre. Caja final: ${reviewMoney(financialReport().balanceCaja.cajaFinal)}.</p></div>`:''}
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
     ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+`<div class="cs-cumulative-resource"><span>CANTIDAD ACUMULADA</span><strong>${cumulativeResourceQuantity(review).toLocaleString('es-PE')}</strong><small>Suma de las cantidades registradas de ciclos anteriores y del ciclo actual.</small></div>`+productionSummaryHtml(review)+`<details class="financial-details"><summary>Reportes financieros guardados · ciclo ${currentRound()}</summary><p>Utilidad: ${reviewMoney(financialReport().estadoResultados.utilidad)} · Caja: ${reviewMoney(financialReport().balanceCaja.cajaFinal)}</p>${financialDetailsHtml(financialReport())}</details>`+futureHtml(review.financial)}
-    <p class="cs-local-note">Las etiquetas ENVIADA corresponden a confirmaciones guardadas en este navegador. No son un acuse de recibo de Supabase. Los borradores no se presentan como enviados.</p>
+    <p class="cs-local-note">Las etiquetas ENVIADA indican confirmación en este equipo. El aviso de envío indica cuándo el servidor la recibe. Los borradores no se presentan como enviados.</p>
     ${!history?`<div class="cs-status-strip">${review.sections.map(s=>`<span class="cs-mini-${s.submitted?'sent':'pending'}">${escapeHtml(s.title)}: ${s.submitted?'enviada':'pendiente de env\u00edo'}</span>`).join('')}</div>`:''}
     <div class="cs-sections">${sections.length?sections.map(s=>sectionSummaryHtml(s,{history})).join(''):'<div class="cs-empty"><h3>A\u00fan no hay decisiones enviadas</h3><p>Guardar borrador no confirma una decisi\u00f3n. Usa ENVIAR DECISI\u00d3N en cada apartado o revisa el env\u00edo completo.</p></div>'}</div>
     ${!history?`<footer class="cs-main-actions"><span>${decisionsSubmitted()?'Ciclo completo confirmado. Este resumen sigue disponible para consulta.':'Revisa lo elegido y los apartados pendientes antes de confirmar.'}</span><button id="companyReviewAll" type="button" class="cs-primary">${decisionsSubmitted()?'VER REVISI\u00d3N DEL CICLO':'REVISAR Y ENVIAR TODO'}</button></footer>`:''}
@@ -272,7 +294,7 @@ function paintReviewDialog(message=''){
   activeReview={fingerprint:reviewFingerprint(),round:currentRound()};
   dialog.innerHTML=`<div class="cs-dialog-frame"><header class="cs-dialog-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${currentRound()}</span><h2 id="companyReviewTitle">${complete?'Decisiones del ciclo confirmado':'Revisi\u00f3n final antes de enviar'}</h2><p id="companyReviewDescription">${complete?'Consulta las decisiones confirmadas en este equipo.':'Revisar no guarda, no cobra y no bloquea. Solo el bot\u00f3n de confirmaci\u00f3n env\u00eda el ciclo.'}</p></div><button type="button" id="closeCompanyReview" class="cs-close" aria-label="Cerrar revisi\u00f3n">\u00d7</button></header>
     <div class="cs-dialog-body" tabindex="0">${message?`<p class="cs-notice cs-notice-warning" role="status">${escapeHtml(message)}</p>`:''}${financialCardsHtml(review.financial)}${productionSummaryHtml(review)}${futureHtml(review.financial)}${noticesHtml(problems,review.warnings)}
-    <div class="cs-sections">${review.sections.map(s=>sectionSummaryHtml(s,{compact:true,history:complete})).join('')}</div><p class="cs-local-note">Confirmaci\u00f3n local: este proyecto no implementa a\u00fan un acuse de recepci\u00f3n del servidor para estas decisiones.</p></div>
+    <div class="cs-sections">${review.sections.map(s=>sectionSummaryHtml(s,{compact:true,history:complete})).join('')}</div><p class="cs-local-note">Las decisiones quedan guardadas en este equipo. Un aviso separado confirma cuándo el servidor recibe el plan del ciclo.</p></div>
     <footer class="cs-dialog-footer"><p>${complete?'Las decisiones no se vuelven a cobrar.':problems.length?`${problems.length} punto(s) por resolver antes de confirmar.`:'Se bloquear\u00e1n los apartados pendientes hasta el pr\u00f3ximo ciclo. Las advertencias no impiden continuar.'}</p><div><button type="button" id="cancelCompanyReview" class="cs-secondary">${complete?'CERRAR':'VOLVER A EDITAR'}</button>${!complete?`<button type="button" id="confirmCompanyReview" class="cs-primary" ${problems.length?'disabled':''}>CONFIRMAR Y ENVIAR TODO</button>`:''}</div></footer></div>`;
   dialog.querySelector('#closeCompanyReview').addEventListener('click',closeCompanyReview);dialog.querySelector('#cancelCompanyReview').addEventListener('click',closeCompanyReview);
   dialog.querySelector('#confirmCompanyReview')?.addEventListener('click',()=>{
@@ -294,5 +316,3 @@ window.addEventListener('storage',event=>{
     closeCompanyReview();loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory();
   }
 });
-
-

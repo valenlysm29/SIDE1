@@ -154,7 +154,17 @@ function creditApprovedLine(){
   const assets=creditAssetValue();
   return Math.floor((cash*CREDIT_INITIAL_PERCENT/100+assets*CREDIT_ASSET_PERCENT/100)/500)*500;
 }
-function creditAvailable(){return Math.max(0,creditApprovedLine()-creditOutstanding());}
+function currentCycleLoanReceipt(){
+  try{
+    const receipts=JSON.parse(localStorage.getItem(`SIDE_DECISION_RECEIPTS_${storageKey()}_${currentRound()}`)||'{}');
+    return Math.max(0,Number(receipts?.E?.items?.find(item=>item.id==='PRESTAMO')?.financing||0));
+  }catch{return 0;}
+}
+function creditAvailable(){
+  // When revising Finance, the loan already in its receipt can be replaced.
+  const replaceable=!sectionSubmitted('E')&&!decisionsSubmitted()?currentCycleLoanReceipt():0;
+  return Math.max(0,creditApprovedLine()-creditOutstanding()+replaceable);
+}
 function loanMaximum(){return creditAvailable()}
 function loanInitialReference(){return creditApprovedLine()}
 function currentRound(){const own=scopedStudentState();if(own)return Math.max(1,Number(own.runtime?.round||own.config?.round||1));const config=teacherConfig();const scheduled=config.cycleCloseMode==='automatic'?readRoundRuntime()?.round:null;return Math.max(1,Number(scheduled||localStorage.getItem('SIDE_ACTIVE_ROUND')||config.round||1))}
