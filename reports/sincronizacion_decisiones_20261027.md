@@ -23,5 +23,31 @@ Validación: 38 pruebas aprobadas entre admisión, cola de sincronización,
 errores de los servicios, reintentos, interfaz en Chromium y estabilidad del
 catálogo. No se cambiaron controles, opciones, precios ni reglas del motor.
 
-Pendiente: obtener el motivo que devuelve la sesión afectada con el nuevo aviso.
-No se afirma que el último envío del usuario esté confirmado en Supabase.
+## Corrección del rechazo PRECIO_INVALIDO
+
+El usuario aportó el error `22023 / PRECIO_INVALIDO`. El motor del documento
+usa S/100 como precio predeterminado de Medio. El trigger v19 todavía valida
+precios explícitos entre S/120 y S/200. El contrato acepta precios omitidos,
+que el motor resuelve mediante su configuración vigente.
+
+La serialización ahora omite únicamente las claves de precios que son idénticas
+a los valores predeterminados del motor. Así no presenta parámetros internos
+como elecciones del estudiante. El precio efectivo sigue siendo S/100; no se
+cambia el motor ni se fuerza S/120. Los precios históricos distintos de los
+predeterminados permanecen explícitos.
+
+Se aplica tanto al estado actual como a los planes guardados. Antes de reintentar
+se reparan también los snapshots sin confirmar que ya estaban en la cola local,
+conservando metas, caja, operaciones pendientes y revisión CAS. Los snapshots
+ya confirmados no se vuelven a escribir para esta reparación.
+
+Evidencia: el RPC puro `side_precios_v19_validos` del servidor real devuelve
+`false` para los predeterminados explícitos (42.5/100/250) y `true` cuando son
+implícitos. No se escribieron datos de la empresa para esa comprobación.
+La prueba PostgreSQL con el trigger original reproduce el mismo error y luego
+confirma un envío restaurado desde la cola. También se comprueba que el motor
+resuelve exactamente los mismos precios antes y después de la serialización.
+La interfaz verifica que desaparece el aviso después de la confirmación, sin
+añadir controles de precios.
+
+El navegador del usuario debe cargar esta versión para reintentar su cola local.

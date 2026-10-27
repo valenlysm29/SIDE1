@@ -1537,6 +1537,7 @@ function getStudentOutbox(){
   studentOutbox=S.StudentSync.createQueue({
     storage:localStorage,
     context:()=>({connected:studentConnected,identity:studentIdentity(),identityKey:studentIdentityKey(),revision:Math.max(0,Number(currentStudent.snapshotRevision)||0),epoch:studentSnapshotEpoch}),
+    prepareSnapshot:snapshot=>S.StudentSync.withImplicitPrices(snapshot,defaultSegmentPrices()),
     saveSnapshot:async(identity,snapshot,expectedRevision)=>{
       const epoch=studentSnapshotEpoch;
       if(remoteStateBusy)await remoteStateTask;

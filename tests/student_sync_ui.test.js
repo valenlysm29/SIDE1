@@ -110,6 +110,26 @@ test('student synchronization and session recovery through the delivered UI',asy
       assert.equal(await status.isVisible(),false);
       await p.context().close();
     });
+    await t.test('internal Medio default syncs with the old server contract without a new price control',async()=>{
+      const p=await page();await draft(p);
+      const result=await p.evaluate(async()=>{
+        const save=SIDE.EmpresaService.guardarEstado;
+        SIDE.EmpresaService.guardarEstado=async(identity,snapshot,revision)=>{
+          if(snapshot.decision_state.PRODUCCION_META?.prices?.urbano===100)
+            return {success:false,technical:true,code:'22023',error:'PRECIO_INVALIDO: Medio 120–200.'};
+          return save(identity,snapshot,revision);
+        };
+        decisionState.PRODUCCION_META={round:1,value:75,moldTargets:{molde_1:75},prices:defaultSegmentPrices()};
+        const success=await queueStudentSnapshot(buildStudentSnapshot());
+        return {success,pending:studentSyncPending(),local:decisionState.PRODUCCION_META.prices.urbano,
+          wire:server.snapshot.decision_state.PRODUCCION_META.prices,
+          price:SIDE_ECONOMIC_CLOSURE.prices(server.snapshot.decision_state).urbano};
+      });
+      assert.deepEqual(result,{success:true,pending:false,local:100,wire:undefined,price:100});
+      assert.equal(await p.locator('[data-student-sync-status]').last().isVisible(),false);
+      assert.equal(await p.locator('[data-sale-price]').count(),0);
+      await p.context().close();
+    });
     await t.test('pending decisions/report survive a reload and recover the latest offline draft',async()=>{
       const p=await page({TEST_WRITE_ERROR:'1'});await draft(p);
       await p.reload();await p.waitForFunction(()=>studentSessionRecoveryTask===null);
