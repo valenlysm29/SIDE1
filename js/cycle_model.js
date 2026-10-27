@@ -63,6 +63,16 @@
     const economics=ECON.closeMany(active);
     return Object.fromEntries(prepared.map(input=>[input.id,close({...input,economicResult:economics[input.id]})]));
   }
+  // Estimate a confirmed plan without exposing a state/ledger to persist.
+  // Final sales still use closeMany and its shared market at the cycle close.
+  function project(input={}){
+    const round=input.round||1;
+    if(input.state?.__cycleSettlements?.[round])return null;
+    const state=clone(input.state||{});
+    if(state.__financialSnapshots)delete state.__financialSnapshots[round];
+    const result=close({...input,state,ledger:clone(input.ledger||{}),sectionsByRound:clone(input.sectionsByRound||{})});
+    return {provisional:true,marketScope:'individual',receipt:result.receipt,financial:result.financial};
+  }
   function closeReports({reports=[],game,round,catalog=[],financialPolicy={}}={}){
     const active=reports.filter(report=>report.partida===game&&report.estado!=='eliminada'&&report.enviado&&report.gameState);
     const results=closeMany(active.map(report=>{
@@ -111,5 +121,5 @@
     if(closedRound){state.__cycleSettlements={...state.__cycleSettlements,[closedRound]:{round:closedRound,produced:n(result.produccion?.totalProducido),revenue:n(result.ingresos),migrated:true}};state.__cycleCosts={...state.__cycleCosts,[closedRound]:{round:closedRound,total:0,acknowledged:true}};}
     delete state[key];state.__migrationVersion=1;return {state,ledger,migrated:true,archive:old,closedRound};
   }
-  return {economicLedger,close,closeMany,closeReports,migrate,restoreState};
+  return {economicLedger,close,closeMany,project,closeReports,migrate,restoreState};
 });

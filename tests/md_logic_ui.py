@@ -73,6 +73,23 @@ with sync_playwright() as p:
         assert page.evaluate("decisionCategories().every(c=>sectionSubmitted(c.cat))")
         assert page.evaluate('decisionsSubmitted()')
         assert page.evaluate('buildStudentSnapshot().decisions_submitted')
+        original=page.evaluate('JSON.stringify({state:decisionState,ledger:cashLedger,cash:cashBalance()})')
+        projection=page.evaluate("""() => ({
+          units:cycleSalesProjection().receipt.sold,
+          income:financialReport({projection:true}).estadoResultados.ingresos,
+          recorded:financialReport().estadoResultados.ingresos,
+          closed:!!decisionState.__cycleSettlements?.[currentRound()],
+          html:cycleSalesHtml()
+        })""")
+        assert projection['units']==100 and projection['income']==4250
+        assert projection['recorded']==0 and projection['closed']==False
+        assert 'Unidades vendidas estimadas' in projection['html']
+        assert 'Ingresos estimados del ciclo' in page.locator('#companySummaryMount').inner_text()
+        assert 'Unidades vendidas estimadas: 100' in page.locator('#companySummaryMount').inner_text()
+        page.evaluate('cycleSalesProjection();financialReport({projection:true});renderCompanySummary()')
+        assert page.evaluate('JSON.stringify({state:decisionState,ledger:cashLedger,cash:cashBalance()})')==original
+        assert page.evaluate('syncStudentReportPreview().ingresos')==0
+        page.screenshot(path=str(OUT/'ventas-estimadas-ciclo-abierto.png'),full_page=True)
         result=page.evaluate("""() => {
           const closed=SIDE_CYCLE_MODEL.close({state:decisionState,ledger:cashLedger,catalog:DECISION_CATALOG,round:currentRound(),capital:initialCapital(),sectionsByRound:recordedFinancialSections()});
           return {receipt:closed.receipt,financial:closed.financial};
@@ -81,6 +98,13 @@ with sync_playwright() as p:
         assert result['receipt']['produced']==100 and result['receipt']['revenue']==4250
         assert result['receipt']['reputation']['factorPublicidad']==10
         assert abs(result['financial']['balanceGeneral']['activos']-result['financial']['balanceGeneral']['pasivoPatrimonio'])<.02
+        final=page.evaluate("""() => {
+          const closed=SIDE_CYCLE_MODEL.close({state:decisionState,ledger:cashLedger,catalog:DECISION_CATALOG,round:currentRound(),capital:initialCapital(),sectionsByRound:recordedFinancialSections()});
+          decisionState=closed.state;cashLedger=closed.ledger;
+          return {projection:cycleSalesProjection(),income:financialReport({projection:true}).estadoResultados.ingresos,html:cycleSalesHtml()};
+        }""")
+        assert final['projection']==None and final['income']==4250
+        assert 'Ventas por segmento' in final['html'] and 'Unidades vendidas estimadas' not in final['html']
         page.evaluate(SETUP)
         page.locator('[data-cat="D"]').click()
         page.locator('[data-choice="CANALES"][data-option="web"]').locator('..').click()

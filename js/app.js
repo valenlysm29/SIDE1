@@ -1434,8 +1434,21 @@ function recordedFinancialSections(){
   if(typeof receiptRounds==='function')for(const round of receiptRounds())sections[round]={...(sections[round]||{}),...readReviewReceipts(round)};
   return sections;
 }
-function financialReport(){
-  return window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance,state:decisionState,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),currentRound())||teacherConfig()});
+let salesProjectionCache=null;
+function cycleSalesProjection(round=currentRound()){
+  if(round!==currentRound()||!simulationSubmissionComplete()||decisionState.__cycleSettlements?.[round])return null;
+  const model=window.SIDE_CYCLE_MODEL;if(!model?.project)return null;
+  const saved=decisionState.__cyclePlans?.[round],state=saved?model.restoreState(saved.state,decisionState):decisionState;
+  const input={state,ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round,capital:initialCapital(),financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig(),events:cycleBusinessData(round).events};
+  const key=JSON.stringify([storageKey(),input]);
+  if(salesProjectionCache?.key===key)return salesProjectionCache.value;
+  try{const value=model.project(input);salesProjectionCache={key,value};return value;}
+  catch(error){salesProjectionCache={key,value:null};console.warn('SIDE: no se pudo estimar el plan confirmado',error);return null;}
+}
+function financialReport({projection=false}={}){
+  const actual=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance,state:decisionState,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),currentRound())||teacherConfig()});
+  const estimate=projection?cycleSalesProjection():null;
+  return estimate?{...estimate.financial,history:actual.history,provisional:true,projectionReceipt:estimate.receipt}:actual;
 }
 let financialSyncTimer=null;
 function queueFinancialSync(){
@@ -1743,11 +1756,14 @@ function syncStudentTimer(){
 }
 function renderStudentStatus(){
   if(!$('studentCashResult'))return;
-  applyEventCashEffects();const f=financialReport(),er=f.estadoResultados,bc=f.balanceCaja,fc=f.flujoCaja;
+  applyEventCashEffects();const f=financialReport({projection:true}),er=f.estadoResultados,bc=f.balanceCaja,fc=f.flujoCaja;
   const set=(id,val)=>{if($(id))$(id).textContent=money(val)};
   set('studentIncomeResult',er.utilidad);set('studentCashResult',bc.cajaFinal);set('studentFlowResult',fc.flujoNeto);
+  for(const [id,normal,estimated]of [['studentIncomeResult','Utilidad del ciclo','Utilidad estimada del ciclo'],['studentCashResult','Caja disponible','Caja estimada al cierre'],['studentFlowResult','Flujo neto del ciclo','Flujo neto estimado']]){
+    const label=$(id)?.parentElement.querySelector('small');if(label)label.textContent=f.provisional?estimated:normal;
+  }
   for(const [id,val] of Object.entries({studentERIngresos:er.ingresos,studentERCostos:er.costos,studentEREventos:er.impactoEventos,studentERUtilidad:er.utilidad,studentERDevoluciones:er.devoluciones,studentERActivos:er.resultadoVentaActivos,studentEROtros:er.otros,studentBCInicial:bc.cajaInicial,studentBCPrestamos:bc.prestamos,studentBCEntradas:bc.entradas,studentBCSalidas:bc.salidas,studentBCFinal:bc.cajaFinal,studentFCOperacion:fc.operacion,studentFCFinanciamiento:fc.financiamiento,studentFCEventos:fc.eventos,studentFCInversion:fc.inversion,studentFCNeto:fc.flujoNeto}))set(id,val);
-  if($('studentIncomeStatement')&&window.SIDE_STUDENT_FINANCIAL_VIEW)$('studentIncomeStatement').innerHTML='<strong>ESTADO DE RESULTADOS</strong>'+window.SIDE_STUDENT_FINANCIAL_VIEW.incomeHtml(er);
+  if($('studentIncomeStatement')&&window.SIDE_STUDENT_FINANCIAL_VIEW)$('studentIncomeStatement').innerHTML='<strong>'+(f.provisional?'ESTADO DE RESULTADOS ESTIMADO':'ESTADO DE RESULTADOS')+'</strong>'+window.SIDE_STUDENT_FINANCIAL_VIEW.incomeHtml(er);
   if($('studentFinancialDetail'))$('studentFinancialDetail').innerHTML=financialDetailsHtml(f);
   const historyMount=$('studentCycleHistory');
   if(historyMount&&window.SIDE_STUDENT_FINANCIAL_VIEW){
@@ -1756,7 +1772,7 @@ function renderStudentStatus(){
     if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
   }
   const events=activeStudentEvents();
-  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. El costo de ventas corresponde a unidades vendidas; inventarios y activos conservan su valor pendiente de consumo o depreciación. Préstamos como deuda.`;
+  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.provisional?`Ciclo ${currentRound()}: proyección individual con las decisiones confirmadas. Las ventas definitivas dependen del reparto entre empresas al cierre; tu caja guardada aún no recibe estos cobros.`:f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. El costo de ventas corresponde a unidades vendidas; inventarios y activos conservan su valor pendiente de consumo o depreciación. Préstamos como deuda.`;
   const news=$('studentNewsList');if(news)news.innerHTML=events.length?events.map(e=>`<article><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span></article>`).join(''):'<p>Sin eventos activos en este ciclo.</p>';
 }
 function renderOfficeFinances(){
@@ -1768,14 +1784,14 @@ function renderOfficeFinances(){
 }
 function financialDetailsHtml(f){
   const fc=f.flujoCaja,bg=f.balanceGeneral,row=(label,value)=>`<span>${label}<b>${money(value)}</b></span>`;
-  return `${cycleSalesHtml(f.round)}<details class="financial-details"><summary>Flujo de caja detallado · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
-  <div class="financial-details"><strong>BALANCE GENERAL · ${f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Inventarios',bg.inventarios)}${row('Equipos, moldes y mejoras (netos)',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
+  return `${f.provisional?'<p>Proyección individual del ciclo. El reparto definitivo de ventas entre empresas se consolida al cierre.</p>':''}${cycleSalesHtml(f.round)}<details class="financial-details"><summary>Flujo de caja ${f.provisional?'estimado':'detallado'} · ciclo ${f.round}</summary>${row('Caja al inicio',fc.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Reembolsos',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos registrados',fc.otros)}${row('Flujo de operación',fc.operacion)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Flujo de inversión',fc.inversion)}${row('Préstamos recibidos',fc.financiamiento)}${row('Variación neta de caja',fc.flujoNeto)}${row('Caja al cierre',fc.cajaFinal)}</details>
+  <div class="financial-details"><strong>BALANCE GENERAL · ${f.provisional?'ESTIMADO AL CICLO '+f.round:f.pendiente?(f.balanceGeneralRound?'ÚLTIMO CIERRE: CICLO '+f.balanceGeneralRound:'INICIAL'):'AL CICLO '+f.round}</strong>${f.pendiente?'<p>El ciclo actual está pendiente de cierre.</p>':''}${row('Efectivo',bg.efectivo)}${row('Inventarios',bg.inventarios)}${row('Equipos, moldes y mejoras (netos)',bg.activosFijos)}${row('Total activos',bg.activos)}${row('Deuda financiera',bg.deuda)}${row('Capital aportado',bg.capital)}${row('Resultados acumulados',bg.resultadosAcumulados)}${row('Patrimonio',bg.patrimonio)}${row('Pasivo + patrimonio',bg.pasivoPatrimonio)}</div>`;
 }
 function cycleSalesHtml(round=currentRound()){
-  const receipt=decisionState.__cycleSettlements?.[round];
+  const actual=decisionState.__cycleSettlements?.[round],estimate=actual?null:cycleSalesProjection(round),receipt=actual||estimate?.receipt;
   if(!receipt?.sales)return '<section class="financial-details"><strong>Ventas por segmento</strong><p>El reparto estará disponible cuando se sincronice el cierre del ciclo.</p></section>';
   const labels={esencial:'Económico',urbano:'Medio',premium:'Premium'};
-  return `<section class="financial-details"><strong>Ventas por segmento · ciclo ${round}</strong>${receipt.sales.map(sale=>{
+  return `<section class="financial-details"><strong>Ventas ${estimate?'estimadas ':''}por segmento · ciclo ${round}</strong>${estimate?'<p>Estimación individual. El reparto definitivo depende de las empresas del ciclo.</p>':''}${receipt.sales.map(sale=>{
     const assigned=Number(sale.demand??receipt.marketAllocation?.products?.[sale.id]?.asignado??0);
     const plan=receipt.production||{},causes=[];
     if(!sale.sold&&!sale.produced){
@@ -1784,7 +1800,7 @@ function cycleSalesHtml(round=currentRound()){
       for(const material of plan.materials||[])if(!material.supportedUnits)causes.push(`Sin ${material.label} suficiente`);
     }
     const reason=causes.join('. ')||sale.reason||sale.zeroReason||(!sale.sold?(!sale.available?'Sin stock: revisa insumos, personal, equipos y molde.':!assigned?'Sin demanda asignada en este segmento.':'Sin ventas en este ciclo.'):'');
-    return `<div class="segment-sales"><h4>${labels[sale.id]||escapeHtml(sale.id)}</h4><span>Precio elegido <b>${money(sale.chosenPrice??sale.price)}</b></span><span>Precio efectivo <b>${money(sale.price)}</b></span><span>Demanda asignada efectiva <b>${assigned}</b></span><span>Unidades disponibles <b>${Number(sale.available||0)}</b></span><span>Unidades vendidas <b>${Number(sale.sold||0)}</b></span><span>Ingresos <b>${money(sale.revenue||0)}</b></span>${reason?`<p>${escapeHtml(reason)}</p>`:''}</div>`;
+    return `<div class="segment-sales"><h4>${labels[sale.id]||escapeHtml(sale.id)}</h4><span>Precio elegido <b>${money(sale.chosenPrice??sale.price)}</b></span><span>Precio efectivo <b>${money(sale.price)}</b></span><span>Demanda asignada ${estimate?'estimada':'efectiva'} <b>${assigned}</b></span><span>Unidades disponibles <b>${Number(sale.available||0)}</b></span><span>Unidades vendidas${estimate?' estimadas':''} <b>${Number(sale.sold||0)}</b></span><span>Ingresos${estimate?' estimados':''} <b>${money(sale.revenue||0)}</b></span>${reason?`<p>${escapeHtml(reason)}</p>`:''}</div>`;
   }).join('')}</section>`;
 }
 let lastObservedRound=currentRound();
