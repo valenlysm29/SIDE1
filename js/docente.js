@@ -57,6 +57,7 @@ function creationError(result){
 }
 function clearRoomLink(){
   roomGeneration++;
+  confirmedReportClosures.clear();
   ownConfigRevisions.clear();
   stopLiveCompanies();
   sharedRoom=null;
@@ -841,7 +842,8 @@ async function supabaseReports(reportsBase=state.reports){
       const qty=Number(d.cantidad)||1;
       return op?`${codeName} · ${op.etiqueta}${qty>1?` ×${qty}`:''}`:`${codeName}${qty>1?` ×${qty}`:''}`;
     });
-    const local=localBase.find(x=>x.empresaId===p.empresa_id)||localBase.find(x=>!x.empresaId&&x.empresa===(emp.nombre_comercial||p.empresa));
+    // Financial fallbacks belong to this exact company and cycle.
+    const local=localBase.find(x=>x.empresaId===p.empresa_id&&Number(x.ronda)===cicloActual);
     const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
     const rep=((info?.reportes)||[]).find(r=>Number(r.ciclo)===cicloActual)||null;
     out.push({
@@ -871,28 +873,44 @@ async function supabaseReports(reportsBase=state.reports){
     });
   }
   if(failures.length)rosterSyncError='Reportes pendientes de sincronizar: '+failures.join('; ');
+  const ids=new Set(out.map(r=>r.empresaId));
   const names=new Set(out.map(r=>r.empresa));
-  for(const l of localBase){if(!names.has(l.empresa))out.push(l)}
+  for(const l of localBase){if(l.empresaId?!ids.has(l.empresaId):!names.has(l.empresa))out.push(l)}
   return out;
 }
-let rosterSyncError='',reportsBusy=false,reportsAgain=false;
+// Closed financial results are authoritative for their room, company and cycle.
+// Keep them across roster refreshes, which may still return an older snapshot.
+const confirmedReportClosures=new Map();
+function applyConfirmedReportClosures(reports){
+  for(const report of reports){
+    const key=JSON.stringify([roomGeneration,state.partidaId,Number(report.ronda),String(report.empresaId)]);
+    const financial=confirmedReportClosures.get(key);
+    if(!financial)continue;
+    const f=JSON.parse(JSON.stringify(financial));
+    Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
+  }
+  return reports;
+}
+let rosterSyncError='',reportsBusy=false,reportsAgain=false,reportsRevision=0;
 async function loadReports(){
   if(reportsBusy){reportsAgain=true;return;}reportsBusy=true;
-  const partidaId=state.partidaId,generation=roomGeneration,code=$('gameCode').value;
+  const partidaId=state.partidaId,generation=roomGeneration,code=$('gameCode').value,revision=reportsRevision;
   const stillCurrent=()=>partidaId===state.partidaId&&generation===roomGeneration&&code===$('gameCode').value;
   try{
   const cached=state.reports;
   let local=[];try{local=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{}
   local=local.filter(r=>r.partida===code);
   const base=partidaId?cached.filter(r=>r.fuente==='supabase'&&r.partida===code):[];
-  const names=new Set(base.map(r=>r.empresa));
-  base.push(...local.filter(r=>!names.has(r.empresa)));
+  const keys=new Set(base.map(r=>r.empresaId||r.id));
+  base.push(...local.filter(r=>!keys.has(r.empresaId||r.id)));
   // Keep the displayed roster intact until the whole next snapshot is ready.
   // Replacing it with localStorage while awaiting Supabase made the lobby blink.
   try{
     const remote=await supabaseReports(base);
     if(!stillCurrent())return;
-    state.reports=remote||base;
+    // A closure received while this read was pending owns the newer results.
+    if(revision!==reportsRevision){reportsAgain=true;return;}
+    state.reports=applyConfirmedReportClosures(remote||base);
   }catch(error){if(!stillCurrent())return;rosterSyncError=error.message;console.error('SIDE: no se pudieron cargar reportes de Supabase',error)}
   renderCompanies();renderResults();renderWinnerSelect();renderTeacherLobby();
   }finally{reportsBusy=false;if(reportsAgain){reportsAgain=false;setTimeout(loadReports,100);}}
@@ -1074,7 +1092,9 @@ function closeBusinessLocalRound(){
 }
 async function closeBusinessRemoteRound(ciclo){
   if(!state.partidaId)return true;
-  const response=await window.SIDE.PartidaService.cerrarNegocio(state.partidaId,ciclo);
+  const partidaId=state.partidaId,generation=roomGeneration;
+  const response=await window.SIDE.PartidaService.cerrarNegocio(partidaId,ciclo);
+  if(partidaId!==state.partidaId||generation!==roomGeneration)return false;
   if(!response.success){
     toast(response.migrationMissing?'Aplica la migración 20261023_cierre_negocio.sql para habilitar el cierre de ciclos.':response.error||'No se pudo guardar el cierre del ciclo.');
     const status=$('roundState');if(status)status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;
@@ -1084,7 +1104,14 @@ async function closeBusinessRemoteRound(ciclo){
     const status=$('roundState');if(status)status.textContent=response.code==='PLANES_EN_GRACIA'?`Ciclo ${ciclo}: esperando confirmaciones en tránsito; el cierre se reintentará automáticamente.`:`Ciclo ${ciclo} sin planes confirmados sincronizados; cierre pendiente. Puedes continuar.`;
     return true;
   }
-  for(const report of state.reports){const result=response.data?.resultadosPorEmpresa?.[String(report.empresaId)];if(!result)continue;const f=result.financial;Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});}
+  reportsRevision++;
+  for(const [empresaId,result] of Object.entries(response.data?.resultadosPorEmpresa||{})){
+    const f=result.financial;
+    if(!f?.estadoResultados||!f?.balanceCaja)continue;
+    const key=JSON.stringify([generation,partidaId,Number(ciclo),String(empresaId)]);
+    confirmedReportClosures.set(key,JSON.parse(JSON.stringify(f)));
+  }
+  applyConfirmedReportClosures(state.reports);
   persistReports();renderResults();return true;
 }
 function renderWinnerSelect(){renderPodium();
