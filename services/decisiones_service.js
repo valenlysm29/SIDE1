@@ -24,9 +24,9 @@
   'use strict';
 
   /** @returns {object|null} Cliente Supabase o null si offline. */
-  function client() {
+  function client(student=false) {
     const c = global.SIDE && global.SIDE.SupabaseClient
-      ? global.SIDE.SupabaseClient.get()
+      ? (student && global.SIDE.SupabaseClient.getStudent ? global.SIDE.SupabaseClient.getStudent() : global.SIDE.SupabaseClient.get())
       : null;
     return c;
   }
@@ -77,7 +77,7 @@
    *   data = { success: true, guardadas: number }.
    */
   async function guardar(identidad, ciclo, decisiones, expectedRevision) {
-    const sb = client();
+    const sb = client(true);
     if (!sb) return offline();
     const identidadRpc = identityParams(identidad);
     const revision = Number(expectedRevision);
@@ -158,7 +158,7 @@
    * @returns {Promise<{success: boolean, data?: object, error?: string}>}
    */
   async function guardarReporte(identidad, ciclo, reporte, expectedRevision) {
-    const sb = client();
+    const sb = client(true);
     if (!sb) return offline();
     const identidadRpc = identityParams(identidad);
     const revision = Number(expectedRevision);
@@ -168,17 +168,9 @@
     if (!reporte || typeof reporte !== 'object') {
       return { success: false, error: 'Reporte vacío.' };
     }
-    try {
-      const { data, error } = await sb.rpc('guardar_reporte_estudiante', {
-        ...identidadRpc,
-        p_ciclo: ciclo,
-        p_reporte: reporte,
-        p_expected_revision: revision
-      });
-      return writeResult(data, error);
-    } catch (err) {
-      return technicalFailure(err);
-    }
+    // Las proyecciones siguen en la interfaz local. El cierre de servidor es
+    // el único que persiste reportes, para impedir resultados falsificados.
+    return { success: true, data: { provisional: true, persisted: false } };
   }
 
   global.SIDE = global.SIDE || {};

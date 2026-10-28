@@ -17,6 +17,7 @@
 
   /** @type {object|null} Cliente Supabase (singleton). */
   let client = null;
+  let studentClient = null;
 
   // A stalled HTTP response must release polling/queue locks. Do not retry
   // writes here: a timeout does not prove that the server rejected the write.
@@ -93,6 +94,20 @@
     return client;
   }
 
+  // Una sesión del estudiante no debe compartir almacenamiento con la sesión
+  // del docente: ambas pueden coexistir en el mismo navegador.
+  function getStudent() {
+    if (studentClient) return studentClient;
+    const cfg=readConfig();
+    if (!cfg || !global.supabase || typeof global.supabase.createClient !== 'function') return null;
+    try {
+      const options={auth:{storageKey:'side-student-auth',persistSession:true,autoRefreshToken:true}};
+      if(typeof global.fetch==='function' && typeof global.AbortController==='function')options.global={fetch:boundedFetch};
+      studentClient=global.supabase.createClient(cfg.url,cfg.key,options);
+    } catch(err) { console.error('SIDE: no se pudo crear la sesión de estudiante',err); }
+    return studentClient;
+  }
+
   /**
    * Indica si el cliente está inicializado; no prueba la conexión de red.
    * @returns {boolean} true si el cliente existe.
@@ -103,5 +118,5 @@
 
   // Expone el módulo en el namespace global SIDE.
   global.SIDE = global.SIDE || {};
-  global.SIDE.SupabaseClient = { init, get, isReady };
+  global.SIDE.SupabaseClient = { init, get, getStudent, isReady };
 })(window);
