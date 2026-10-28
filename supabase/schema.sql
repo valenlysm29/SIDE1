@@ -327,3 +327,8 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- Lógica de ventas (27/10/2026): aplicar después del cierre v19
 -- supabase/migrations/20261027_corregir_ventas_generales.sql. Alinea precios
 -- internos con el motor y prioriza snapshots definitivos sobre preliminares.
+
+-- Resultados en vivo del docente (27/10/2026): después de las migraciones de
+-- admisión y cierre v19, aplicar supabase/migrations/20261027_resultados_en_vivo.sql.
+-- Amplía obtener_reporte_empresa con el plan confirmado y el ciclo de la sala,
+-- conservando la lectura exclusiva del profesor propietario.

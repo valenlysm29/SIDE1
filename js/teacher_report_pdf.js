@@ -162,6 +162,7 @@
       table('1. Identificación',null,[112,tableWidth/2-112,100,tableWidth/2-100],identity,{size:9,minHeight:23});
       if(text(config.docente))note('Docente: '+text(config.docente));
       if(text(config.nombre)||text(config.curso))note([text(config.nombre),text(config.curso)].filter(Boolean).join(' · '));
+      if(r.provisional)note('Estimación individual del ciclo en juego. El reparto definitivo de ventas se consolida al cierre.');
       const summary=[data.sales,data.profit,data.cash,data.assets,data.debt,data.equity];
       table('2. Resumen de resultados',['Ventas netas','Utilidad del ciclo','Caja final','Total de activos','Deuda','Patrimonio'],Array(6).fill(tableWidth/6),[
         {cells:summary.map(money),bold:true,center:[0,1,2,3,4,5],negative:summary.map((n,i)=>numeric(n)<0?i:-1).filter(i=>i>=0)}

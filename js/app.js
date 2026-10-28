@@ -1485,12 +1485,16 @@ function syncStudentReportPreview(){
   applyEventCashEffects();
   const entries=allDecisionItems().filter(i=>savedEntry(i));
   const financial=financialReport(),er=financial.estadoResultados;
+  const estimate=cycleSalesProjection();
   const utilidad=er.utilidad,cajaFinal=financial.balanceCaja.cajaFinal;
   const events=activeStudentEvents();
   const report={
     id:currentStudent.participantId||('local-'+storageKey()),nombre:'Jugador',empresa:currentStudent.company,legalName:currentStudent.legalName,
     partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:initialCapital(),
     ingresos:er.ingresos,costos:er.costos,utilidad,rondasActivas:currentRound(),actividad:entries.length,
+    cycleReceipt:deepClone(decisionState.__cycleSettlements?.[currentRound()]||null),
+    unidadesVendidas:Number(decisionState.__cycleSettlements?.[currentRound()]?.sold||0),
+    liveProjection:estimate?{...estimate,round:currentRound(),game:currentStudent.game?.codigo,company:String(currentStudent.empresaId||''),financial:{...estimate.financial,history:undefined}}:null,
     canalesVenta:{cantidades:deepClone(savedEntry(findDecisionItem('CANALES'))?.quantities||{}),tiendasFisicas:RULES.storeCount(savedEntry(findDecisionItem('CANALES')))},
     produccion:productionPlan(),
     resumenEnviado:typeof readReviewReceipts==='function'?readReviewReceipts():null,
@@ -1608,7 +1612,7 @@ function syncReportToSupabase(report){
       capital:report.capital,ingresos:report.ingresos,costos:report.costos,
       utilidad:report.utilidad,caja_final:report.caja,
       balance_caja:report.balanceCaja||{},flujo_caja:report.flujoCaja||{},
-      estado_resultados:report.estadoResultados||{},
+      estado_resultados:{...report.estadoResultados,...(report.cycleReceipt?{cycleReceipt:report.cycleReceipt}:{}),...(report.liveProjection?{liveProjection:report.liveProjection}:{})},
       decisiones:report.decisiones||[],eventos:report.eventos||[],
       score:report.score||0,progreso:report.progreso||0
     };

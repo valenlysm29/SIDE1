@@ -117,6 +117,7 @@
         p_ciclo: ciclo || null
       });
       if (error) return { success: false, error: error.message };
+      if (data?.success === false || data?.error) return { success: false, code: data?.code, error: data?.error || 'No se pudo consultar el reporte.' };
       return { success: true, data };
     } catch (err) {
       return { success: false, error: String((err && err.message) || err) };

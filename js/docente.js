@@ -125,7 +125,7 @@ async function recoverServerRoom(){
   if(generation!==roomGeneration||result.data.id!==state.partidaId)return false;
   $('creationFeedback')?.classList.add('hidden');previousRoom=null;return true;
 }
-function money(n){return 'S/ '+Math.round(Number(n)||0).toLocaleString('es-PE')}
+function money(n){return 'S/ '+(Number(n)||0).toLocaleString('es-PE',{maximumFractionDigits:2})}
 function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0));return `${String(Math.floor(s/3600)).padStart(2,'0')}:${String(Math.floor((s%3600)/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function escapeAttr(v){return escapeHtml(v)}
@@ -210,10 +210,10 @@ function scheduleRosterRefresh(){
   companiesRefresh=setTimeout(()=>{companiesRefresh=null;void loadReports();},250);
 }
 function startLiveCompanies(){
-  // Realtime carries roster/presence. Slow reconciliation still discovers
-  // financial writes on tables not included in the roster publication.
+  // Financial snapshots are not in the roster publication. Reconcile every
+  // three seconds even with Realtime connected so sales follow confirmations.
   if(!companiesPoll){let last=0;companiesPoll=setInterval(()=>{
-    const interval=companiesRealtime?30000:Math.min(60000,3000*2**Math.min(companiesFailures,4));
+    const interval=companiesRealtime?3000:Math.min(60000,3000*2**Math.min(companiesFailures,4));
     if(!document.hidden&&Date.now()-last>=interval){last=Date.now();void loadReports();}
   },1000);}
   gradeQueue?.flush();
@@ -833,7 +833,9 @@ async function supabaseReports(reportsBase=state.reports){
     if(!stillCurrent())return null;
     const info=rr.success?rr.data:null;
     const emp=info?.empresa||p.empresas||{};
-    const cicloActual=Number(emp.ciclo_actual)||1;
+    const context=info?.contexto_juego;
+    const scopedContext=context&&context.partida_id===partidaId&&context.codigo===code?context:null;
+    const cicloActual=Number(scopedContext?.ciclo||runtime()?.round||emp.ciclo_actual)||1;
     const rows=(info?.decisiones||[]).filter(d=>Number(d.ciclo)===cicloActual);
     const labels=rows.map(d=>{
       const dd=cat?.decById.get(d.decision_id);
@@ -843,7 +845,7 @@ async function supabaseReports(reportsBase=state.reports){
       return op?`${codeName} · ${op.etiqueta}${qty>1?` ×${qty}`:''}`:`${codeName}${qty>1?` ×${qty}`:''}`;
     });
     // Financial fallbacks belong to this exact company and cycle.
-    const local=localBase.find(x=>x.empresaId===p.empresa_id&&Number(x.ronda)===cicloActual);
+    const local=localBase.find(x=>x.empresaId===p.empresa_id&&Number(x.ronda)===cicloActual&&!x.provisional);
     const prog=rows.length?remoteProgress(cat,rows):{apartados:{},progreso:0,total:0};
     const rep=((info?.reportes)||[]).find(r=>Number(r.ciclo)===cicloActual)||null;
     out.push({
@@ -856,6 +858,8 @@ async function supabaseReports(reportsBase=state.reports){
       capital:rep?Number(rep.capital):(emp.caja_inicial??local?.capital??0),
       caja:rep?Number(rep.caja_final):(emp.caja_actual??local?.caja??0),
       ingresos:rep?Number(rep.ingresos):(local?.ingresos??0),
+      cycleReceipt:rep?.estado_resultados?.cycleReceipt||local?.cycleReceipt||null,
+      unidadesVendidas:Number(rep?.estado_resultados?.cycleReceipt?.sold??local?.unidadesVendidas??0),provisional:false,
       costos:rep?Number(rep.costos):(local?.costos??0),
       utilidad:rep?Number(rep.utilidad):(local?.utilidad??0),
       decisiones:labels.length?labels:(local?.decisiones||[]),
@@ -871,6 +875,24 @@ async function supabaseReports(reportsBase=state.reports){
       conectada:Boolean(p.last_seen_at),lastSeenAt:p.last_seen_at||null,integracion:runtime()?.phase==='integration',
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
+    const report=out[out.length-1];
+    // A report can precede the durable plan or lag behind it. Calculate from
+    // the same confirmed snapshot as the student, scoped to this room/cycle.
+    if(scopedContext&&window.SIDE_LIVE_RESULTS&&!p.expulsada_at&&emp.estado!=='eliminada'){
+      try{
+        const result=window.SIDE_LIVE_RESULTS.calculate({snapshot:scopedContext.snapshot,round:cicloActual,capital:Number(emp.caja_inicial)||0,
+          catalog:window.SIDE_DECISION_CATALOG,config:scopedContext.configuracion,id:p.empresa_id,
+          phase:scopedContext.estado==='activa'?scopedContext.phase:'integration'});
+        if(result&&(!report.cycleReceipt||!result.provisional)){
+          window.SIDE_LIVE_RESULTS.apply(report,result);
+          report.updatedAt=scopedContext.updated_at||report.updatedAt;
+        }
+      }catch(error){failures.push(`${report.empresa}: no se pudo calcular el plan confirmado`);console.warn('SIDE: resultados en vivo pendientes',error);}
+    }else if(info&&!context){
+      const compatible=window.SIDE_LIVE_RESULTS?.fromReport(rep,{game:code,company:p.empresa_id,round:cicloActual,phase:runtime()?.phase});
+      if(compatible&&!p.expulsada_at&&emp.estado!=='eliminada')window.SIDE_LIVE_RESULTS.apply(report,compatible);
+      else failures.push('Aplica supabase/migrations/20261027_resultados_en_vivo.sql para leer el plan en vivo');
+    }
   }
   if(failures.length)rosterSyncError='Reportes pendientes de sincronizar: '+failures.join('; ');
   const ids=new Set(out.map(r=>r.empresaId));
@@ -887,7 +909,7 @@ function applyConfirmedReportClosures(reports){
     const financial=confirmedReportClosures.get(key);
     if(!financial)continue;
     const f=JSON.parse(JSON.stringify(financial));
-    Object.assign(report,{ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
+    Object.assign(report,{provisional:false,cycleReceipt:f.cycleReceipt||report.cycleReceipt,unidadesVendidas:Number(f.cycleReceipt?.sold??report.cycleReceipt?.sold??0),ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
   }
   return reports;
 }
@@ -900,6 +922,14 @@ async function loadReports(){
   const cached=state.reports;
   let local=[];try{local=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{}
   local=local.filter(r=>r.partida===code);
+  if(!partidaId&&window.SIDE_LIVE_RESULTS)for(const report of local){
+    try{
+      const result=window.SIDE_LIVE_RESULTS.calculate({snapshot:{decision_state:report.gameState,cash_ledger:report.cashLedger,financial_sections:report.financialSections},
+        round:Number(report.ronda),capital:report.capital,catalog:window.SIDE_DECISION_CATALOG,config:state.authoritative||{},id:report.empresaId||report.id,
+        phase:runtime()?.phase||'integration'});
+      window.SIDE_LIVE_RESULTS.apply(report,result);
+    }catch(error){console.warn('SIDE: resultados locales pendientes',error);}
+  }
   const base=partidaId?cached.filter(r=>r.fuente==='supabase'&&r.partida===code):[];
   const keys=new Set(base.map(r=>r.empresaId||r.id));
   base.push(...local.filter(r=>!keys.has(r.empresaId||r.id)));
@@ -986,7 +1016,7 @@ function saveCompanyGrade(id,value){
   renderCompanies();renderResults();renderWinnerSelect();return true;
 }
 function renderCompanies(force=false){
-  if($('companiesLiveStatus'))$('companiesLiveStatus').textContent=`${state.reports.filter(r=>r.estado!=='eliminada').length} empresa(s) en partida · ${state.reports.filter(r=>r.estado==='eliminada').length} eliminada(s) · ${rosterSyncError?'Sincronización pendiente; mostrando los últimos datos. Reintentando…':'actualización automática cada 3 segundos'}`;
+  if($('companiesLiveStatus'))$('companiesLiveStatus').textContent=`${state.reports.filter(r=>r.estado!=='eliminada').length} empresa(s) en partida · ${state.reports.filter(r=>r.estado==='eliminada').length} eliminada(s) · ${rosterSyncError?'Sincronización pendiente: '+rosterSyncError+' · Reintentando…':'actualización automática cada 3 segundos'}`;
   const grid=$('companiesGrid');
   const expelledGrid=$('companiesExpelledGrid'),expelledCount=state.reports.filter(r=>r.estado==='eliminada').length;
   $('expelledCompanies')?.classList.toggle('hidden',!expelledCount);
@@ -998,7 +1028,7 @@ function renderCompanies(force=false){
     const key=companyNodeKey(r);let card=current.get(key);
     if(!card){
       card=document.createElement('article');card.className='company-card';card.dataset.companyId=key;
-      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${escapeAttr(key)}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${escapeAttr(key)}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
+      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><div class="metric"><span>Ingresos</span><b data-field="income"></b></div><div class="metric"><span>Unidades vendidas</span><b data-field="sold"></b></div><small data-field="resultScope"></small><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${escapeAttr(key)}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${escapeAttr(key)}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
       card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>companyNodeKey(x)===key)));
       card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=card.dataset.reportId;switchTab('resultados');renderResults();});
       const form=card.querySelector('[data-grade-form]'),input=form.querySelector('input');
@@ -1021,6 +1051,9 @@ function renderCompanies(force=false){
     setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
     setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
     setText('cash',money(r.caja??r.capital));setText('profit',money(r.utilidad));
+    setText('income',money(r.ingresos));setText('sold',String(r.unidadesVendidas??r.cycleReceipt?.sold??0));
+    setText('resultScope',r.provisional?'Estimación individual · ciclo en juego':r.cycleReceipt?'Resultado definitivo del ciclo':'Esperando plan confirmado o cierre del ciclo');
+    for(const [field,label]of [['cash',r.provisional?'Caja estimada al cierre':'Caja'],['profit',r.provisional?'Utilidad estimada':'Utilidad del ciclo'],['income',r.provisional?'Ingresos estimados':'Ingresos'],['sold',r.provisional?'Unidades vendidas estimadas':'Unidades vendidas']])card.querySelector(`[data-field="${field}"]`).previousElementSibling.textContent=label;
     const sections=sectionBadges(r),sectionEl=card.querySelector('[data-field="sections"]');if(sectionEl.innerHTML!==sections)sectionEl.innerHTML=sections;
     const input=card.querySelector('[data-grade]'),value=gradeValue(r);
     if(document.activeElement!==input&&input.dataset.dirty!=='true'&&input.value!==String(value??''))input.value=value??'';
@@ -1071,9 +1104,16 @@ function teacherFinancialDetail(r){
   const row=(label,value)=>`<div class="metric"><span>${label}</span><b>${money(value)}</b></div>`;
   return `<details><summary>Flujo de caja y balance general</summary>${row('Caja al inicio',fc.cajaInicial??r.balanceCaja?.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Devoluciones',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos',fc.otros)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Préstamos recibidos',fc.financiamiento)}${row('Caja al cierre',fc.cajaFinal??r.caja)}<h4>Balance general</h4>${bg?row('Efectivo',bg.efectivo)+row('Inventarios',bg.inventarios)+row('Equipos, moldes y mejoras (netos)',bg.activosFijos)+row('Total activos',bg.activos)+row('Deuda financiera',bg.deuda)+row('Patrimonio',bg.patrimonio)+row('Pasivo + patrimonio',bg.pasivoPatrimonio):'<p>El alumno aún no ha sincronizado este balance.</p>'}</details>`;
 }
+function teacherSalesDetail(r){
+  const receipt=r.cycleReceipt;
+  if(!receipt)return '<p class="hint">Ventas pendientes: esperando el plan confirmado o el cierre del ciclo.</p>';
+  const labels={esencial:'Básico',urbano:'Medio',premium:'Premium'};
+  const detail=(receipt.sales||[]).map(s=>`<div class="metric"><span>${labels[s.id]||escapeHtml(s.id)} · ${Number(s.sold||0)} unidades × ${money(s.price)}</span><b>${money(s.revenue)}</b></div>`).join('');
+  return `<section class="financial-section"><h4>Ventas ${r.provisional?'estimadas':'del ciclo'}</h4><p>${r.provisional?'Ciclo en juego: estimación individual con el plan confirmado. El reparto entre empresas se consolida al cierre.':'Resultado definitivo registrado al cierre.'}</p><div class="metric"><span>Unidades vendidas${r.provisional?' estimadas':''}</span><b>${Number(receipt.sold||0)}</b></div><div class="metric"><span>Ingresos${r.provisional?' estimados':''}</span><b>${money(receipt.revenue)}</b></div>${detail}</section>`;
+}
 function renderResults(){
   const active=state.reports.filter(r=>r.estado!=='eliminada'),totalProfit=active.reduce((s,r)=>s+Number(r.utilidad||0),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
-  $('resultStats').innerHTML=[['Empresas en partida',active.length],['Calificadas',graded.length],['Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+  $('resultStats').innerHTML=[['Empresas en partida',active.length],['Calificadas',graded.length],[active.some(r=>r.provisional)?'Utilidad estimada del ciclo':'Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
   const sel=$('resultCompanySelect');
   const selected=state.reports.find(r=>r.id===state.resultCompanyId)||state.reports[0];
   if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}
@@ -1081,7 +1121,7 @@ function renderResults(){
   sel.innerHTML=state.reports.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
   const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
-  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${section('Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er))}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er))}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
 }
 function closeBusinessLocalRound(){
   if(state.partidaId||!window.SIDE_CYCLE_MODEL)return null;
@@ -1109,7 +1149,7 @@ async function closeBusinessRemoteRound(ciclo){
     const f=result.financial;
     if(!f?.estadoResultados||!f?.balanceCaja)continue;
     const key=JSON.stringify([generation,partidaId,Number(ciclo),String(empresaId)]);
-    confirmedReportClosures.set(key,JSON.parse(JSON.stringify(f)));
+    confirmedReportClosures.set(key,JSON.parse(JSON.stringify({...f,cycleReceipt:result.receipt})));
   }
   applyConfirmedReportClosures(state.reports);
   persistReports();renderResults();return true;
