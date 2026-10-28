@@ -1352,7 +1352,7 @@
     "empresa_id": 1,
     "ciclo": 3,
     "ingresos": "21600",
-    "costos": "15383.36",
+    "costos": "12719.09",
     "utilidad": "6216.64",
     "caja_final": "205394.83",
     "balance_caja": {
@@ -1381,7 +1381,7 @@
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 15383.36,
+      "costos": 12719.09,
       "ingresos": 21600,
       "utilidad": 6216.64,
       "costoVentas": 9246.19,
@@ -3381,7 +3381,7 @@
     "empresa_id": 2,
     "ciclo": 3,
     "ingresos": "22500",
-    "costos": "15659.66",
+    "costos": "12728.09",
     "utilidad": "6840.34",
     "caja_final": "207530.53",
     "balance_caja": {
@@ -3410,7 +3410,7 @@
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 15659.66,
+      "costos": 12728.09,
       "ingresos": 22500,
       "utilidad": 6840.34,
       "costoVentas": 9246.19,
@@ -5410,7 +5410,7 @@
     "empresa_id": 3,
     "ciclo": 3,
     "ingresos": "23400",
-    "costos": "15935.96",
+    "costos": "12737.09",
     "utilidad": "7464.04",
     "caja_final": "209666.23",
     "balance_caja": {
@@ -5439,7 +5439,7 @@
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 15935.96,
+      "costos": 12737.09,
       "ingresos": 23400,
       "utilidad": 7464.04,
       "costoVentas": 9246.19,

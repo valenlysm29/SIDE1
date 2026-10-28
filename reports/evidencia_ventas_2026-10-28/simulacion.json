@@ -33,7 +33,7 @@
     "demanda": 199,
     "vendidas": 90,
     "ingresos": 21600,
-    "costos": 15383.36,
+    "costos": 12719.09,
     "utilidad": 6216.64,
     "caja": 205394.83,
     "impuesto": 2664.27
@@ -72,7 +72,7 @@
     "demanda": 201,
     "vendidas": 90,
     "ingresos": 22500,
-    "costos": 15659.66,
+    "costos": 12728.09,
     "utilidad": 6840.34,
     "caja": 207530.53,
     "impuesto": 2931.57
@@ -111,7 +111,7 @@
     "demanda": 199,
     "vendidas": 90,
     "ingresos": 23400,
-    "costos": 15935.96,
+    "costos": 12737.09,
     "utilidad": 7464.04,
     "caja": 209666.23,
     "impuesto": 3198.87
