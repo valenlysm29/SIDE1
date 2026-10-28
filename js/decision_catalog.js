@@ -1,6 +1,6 @@
 /* Costos v19: MP por unidad física (descuento separado); nómina MYPE con beneficios
  * según Costos De Producción y engine/costos.costoLaboral, no sueldo referencial. */
-window.SIDE_DECISION_CATALOG = [
+const SIDE_DECISION_CATALOG_DATA = [
   {
     cat:'A', title:'Resumen', short:'Resumen', icon:'assets/side_logo.png', summaryOnly:true,
     desc:'Consulta las decisiones del ciclo, el plan de producción por proceso y los costos estimados de tu empresa.',
@@ -136,3 +136,5 @@ window.SIDE_DECISION_CATALOG = [
     ]
   }
 ];
+if(typeof module==='object'&&module.exports)module.exports=SIDE_DECISION_CATALOG_DATA;
+else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;

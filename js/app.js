@@ -1472,7 +1472,8 @@ function cycleSalesProjection(round=currentRound()){
 function financialReport({projection=false}={}){
   const actual=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance,state:decisionState,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),currentRound())||teacherConfig()});
   const estimate=projection?cycleSalesProjection():null;
-  return estimate?{...estimate.financial,history:actual.history,provisional:true,projectionReceipt:estimate.receipt}:actual;
+  const history=actual.history.map(row=>({...row,cycleReceipt:decisionState.__cycleSettlements?.[row.round]||row.cycleReceipt||null,closureStatus:decisionState.__cycleSettlements?.[row.round]?'closed':'pending'}));
+  return estimate?{...estimate.financial,history,provisional:true,projectionReceipt:estimate.receipt}:{...actual,history,pendiente:!decisionState.__cycleSettlements?.[currentRound()]};
 }
 let financialSyncTimer=null;
 function queueFinancialSync(){
@@ -1489,7 +1490,7 @@ function captureCyclePlan(){
 }
 function settleCycle(round=currentRound()){
   if(!window.SIDE_CYCLE_MODEL||decisionState.__cycleSettlements?.[round])return false;
-  // Shared market is settled once by the teacher using every company snapshot.
+  // The trusted server worker settles the shared market even with all browsers closed.
   if(currentStudent.empresaId)return false;
   const saved=decisionState.__cyclePlans?.[round];
   if(!saved)return false;
@@ -1518,7 +1519,8 @@ function syncStudentReportPreview(){
     partida:currentStudent.game?.codigo||'SIDE-000',ronda:currentRound(),capital:initialCapital(),
     ingresos:er.ingresos,costos:er.costos,utilidad,rondasActivas:currentRound(),actividad:entries.length,
     cycleReceipt:deepClone(decisionState.__cycleSettlements?.[currentRound()]||null),
-    unidadesVendidas:Number(decisionState.__cycleSettlements?.[currentRound()]?.sold||0),
+    unidadesVendidas:decisionState.__cycleSettlements?.[currentRound()]?.sold??null,
+    cierrePendiente:!decisionState.__cycleSettlements?.[currentRound()],
     liveProjection:estimate?{...estimate,round:currentRound(),game:currentStudent.game?.codigo,company:String(currentStudent.empresaId||''),financial:{...estimate.financial,history:undefined}}:null,
     canalesVenta:{cantidades:deepClone(savedEntry(findDecisionItem('CANALES'))?.quantities||{}),tiendasFisicas:RULES.storeCount(savedEntry(findDecisionItem('CANALES')))},
     produccion:productionPlan(),

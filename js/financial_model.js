@@ -4,7 +4,7 @@
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100;
   function buildStatement(input={}){
     const ventasTotales=money(input.ventasTotales),costoVentas=money(input.costoVentas),gastosAdministrativos=money(input.gastosAdministrativos),gastosVentas=money(input.gastosVentas),ingresosFinancieros=money(input.ingresosFinancieros),gastosFinancieros=money(input.gastosFinancieros);
-    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(Math.max(0,utilidadAntesImpuestos*.295)),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
+    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*.295)),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
     return {...input,ventasTotales,costoVentas,utilidadBruta,gastosAdministrativos,gastosVentas,gastosOperacion,utilidadOperativa,ingresosFinancieros,gastosFinancieros,utilidadAntesImpuestos,impuestoRenta,utilidadNeta,ingresos:ventasTotales,ventasNetas:ventasTotales,costos:money(costoVentas+gastosOperacion+gastosFinancieros+impuestoRenta),utilidad:utilidadNeta};
   }
   function periodRate(tea,months=1){return Math.pow(1+n(tea)/100,n(months)/12)-1;}
@@ -86,7 +86,13 @@
       const interest=money((debt+p.prestamos)*baseRate+p.prestamos*(periodRate(Number(baseTEA)+n(policy.nextLoanPenaltyPP),months)-baseRate));
       const warrantyId=decisions.GARANTIA_PT?.optionIds?.[0],warrantyDays=items.get('GARANTIA_PT')?.options?.find(o=>o.id===warrantyId)?.value,warrantyRates={30:economicConfig?.warranty.pt_30??5,90:economicConfig?.warranty.pt_90??10,180:economicConfig?.warranty.pt_180??10,...policy.warrantyUnitCosts},warrantyRate=warrantyRates[warrantyDays],warranty=money(n(warrantyRate)*(receipt?.sales||[]).reduce((s,row)=>s+n(row.sold),0));warrantyPayable+=warranty;
       const policyWarnings=warrantyDays&&warrantyRate==null?[`Garantía ${warrantyDays} días sin costo unitario configurado; requiere definir financialPolicy.warrantyUnitCosts.${warrantyDays}.`]:[];
-      const er=buildStatement({criterioCostos:md?'produccion_ciclo':'ventas',ventasTotales:p.ventas-p.devoluciones,costoVentas:cogs,gastosAdministrativos:p.gastos-p.mp-p.mod-p.comercial+idle-p.eventos-p.otros-disposal,gastosVentas:p.comercial+warranty,gastosFinancieros:interest,gastoGarantias:warranty,policyWarnings,depreciacion:depreciation,costosProduccion:money(productionCost),devoluciones:money(p.devoluciones),impactoEventos:money(p.eventos),otros:money(p.otros),resultadoVentaActivos:money(disposal)});
+      let er=buildStatement({criterioCostos:md?'produccion_ciclo':'ventas',ventasTotales:p.ventas-p.devoluciones,costoVentas:cogs,gastosAdministrativos:p.gastos-p.mp-p.mod-p.comercial+idle-p.eventos-p.otros-disposal,gastosVentas:p.comercial+warranty,gastosFinancieros:interest,gastoGarantias:warranty,policyWarnings,depreciacion:depreciation,costosProduccion:money(productionCost),devoluciones:money(p.devoluciones),impactoEventos:money(p.eventos),otros:money(p.otros),resultadoVentaActivos:money(disposal)});
+      if(n(policy.cycles)>0){
+        const base=money(history.reduce((sum,row)=>sum+n(row.estadoResultados?.utilidadAntesImpuestos),0)+er.utilidadAntesImpuestos);
+        const priorTax=history.reduce((sum,row)=>sum+n(row.estadoResultados?.impuestoRenta),0);
+        const final=p.r===n(policy.cycles)&&!!receipt;
+        er=buildStatement({...er,impuestoRenta:final?money(Math.max(0,base)*.295-priorTax):0,baseImponibleAcumulada:Math.max(0,base),cicloImpuesto:n(policy.cycles),impuestoDiferido:!final});
+      }
       const profit=er.utilidadNeta;taxPayable+=er.impuestoRenta;interestPayable+=interest;
       cash+=p.neto;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
@@ -94,7 +100,7 @@
       const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
       const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
+      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
     }
     return {...history.at(-1),history};
   }

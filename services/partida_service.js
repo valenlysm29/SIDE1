@@ -361,6 +361,14 @@
     }catch(error){console.error('SIDE: cancelar partida:',error);return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
+  async function consultarCierreNegocio(partidaId,ciclo){
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_consultar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:/PGRST202|42883/.test(error?.code||'')?'Falta desplegar el cierre automático de servidor (20261028_cierre_servidor.sql).':error?.message||data.error,code:error?.code||data.code};
+      return {success:true,pending:!!data.pending,data:data.cierre};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function cerrarNegocio(partidaId,ciclo){
     const sb=client();if(!sb)return offline();
     try{
@@ -411,5 +419,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,podio };
 })(window);

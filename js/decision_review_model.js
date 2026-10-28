@@ -133,7 +133,12 @@
   }
   function warnings(ctx){
     const warnings=[],plan=productionModel?.calculate(ctx);
-    if(!plan||!plan.target)return warnings;
+    if(!plan)return warnings;
+    if(!plan.target)warnings.push({cat:'B',text:'Meta de producción en cero: este plan no fabricará unidades nuevas. Indica la cantidad deseada por molde para producir.'});
+    const channels=draft((ctx.catalog||[]).flatMap(c=>c.items||[]).find(i=>i.id==='CANALES')||{id:'CANALES'},ctx).optionIds||[];
+    if(!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))warnings.push({cat:'D',text:'Sin canal de venta: aunque produzcas, no habrá unidades vendidas ni ingresos por ventas.'});
+    if(plan.unavailablePlannedMolds.length)warnings.push({cat:'B',text:'Falta adquirir un molde incluido en la meta. Esas unidades no se producirán.'});
+    if(plan.target&&!plan.producibleUnits)warnings.push({cat:'B',text:'Producción posible: 0 unidades. Revisa los recursos indicados antes de confirmar; seleccionar opciones no garantiza cantidades suficientes.'});
     for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'F',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
     for(const process of plan.processes)if(process.shortfall>0)warnings.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad de ${process.cycleCapacity.toLocaleString('es-PE')} unidades frente a una meta de ${plan.target.toLocaleString('es-PE')}. Revisa personal y equipos del proceso.`});
     return warnings;

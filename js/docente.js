@@ -859,7 +859,7 @@ async function supabaseReports(reportsBase=state.reports){
       caja:rep?Number(rep.caja_final):(emp.caja_actual??local?.caja??0),
       ingresos:rep?Number(rep.ingresos):(local?.ingresos??0),
       cycleReceipt:rep?.estado_resultados?.cycleReceipt||local?.cycleReceipt||null,
-      unidadesVendidas:Number(rep?.estado_resultados?.cycleReceipt?.sold??local?.unidadesVendidas??0),provisional:false,
+      unidadesVendidas:rep?.estado_resultados?.cycleReceipt?.sold??local?.unidadesVendidas??null,provisional:false,
       costos:rep?Number(rep.costos):(local?.costos??0),
       utilidad:rep?Number(rep.utilidad):(local?.utilidad??0),
       decisiones:labels.length?labels:(local?.decisiones||[]),
@@ -1051,7 +1051,7 @@ function renderCompanies(force=false){
     setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
     setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
     setText('cash',money(r.caja??r.capital));setText('profit',money(r.utilidad));
-    setText('income',money(r.ingresos));setText('sold',String(r.unidadesVendidas??r.cycleReceipt?.sold??0));
+    setText('income',r.cycleReceipt||r.provisional?money(r.ingresos):'Pendiente');setText('sold',String(r.unidadesVendidas??r.cycleReceipt?.sold??'Pendiente'));
     setText('resultScope',r.provisional?'Estimación individual · ciclo en juego':r.cycleReceipt?'Resultado definitivo del ciclo':'Esperando plan confirmado o cierre del ciclo');
     for(const [field,label]of [['cash',r.provisional?'Caja estimada al cierre':'Caja'],['profit',r.provisional?'Utilidad estimada':'Utilidad del ciclo'],['income',r.provisional?'Ingresos estimados':'Ingresos'],['sold',r.provisional?'Unidades vendidas estimadas':'Unidades vendidas']])card.querySelector(`[data-field="${field}"]`).previousElementSibling.textContent=label;
     const sections=sectionBadges(r),sectionEl=card.querySelector('[data-field="sections"]');if(sectionEl.innerHTML!==sections)sectionEl.innerHTML=sections;
@@ -1133,7 +1133,7 @@ function closeBusinessLocalRound(){
 async function closeBusinessRemoteRound(ciclo){
   if(!state.partidaId)return true;
   const partidaId=state.partidaId,generation=roomGeneration;
-  const response=await window.SIDE.PartidaService.cerrarNegocio(partidaId,ciclo);
+  const response=await window.SIDE.PartidaService.consultarCierreNegocio(partidaId,ciclo);
   if(partidaId!==state.partidaId||generation!==roomGeneration)return false;
   if(!response.success){
     toast(response.migrationMissing?'Aplica la migración 20261023_cierre_negocio.sql para habilitar el cierre de ciclos.':response.error||'No se pudo guardar el cierre del ciclo.');
@@ -1141,7 +1141,7 @@ async function closeBusinessRemoteRound(ciclo){
     return false;
   }
   if(response.pending){
-    const status=$('roundState');if(status)status.textContent=response.code==='PLANES_EN_GRACIA'?`Ciclo ${ciclo}: esperando confirmaciones en tránsito; el cierre se reintentará automáticamente.`:`Ciclo ${ciclo} sin planes confirmados sincronizados; cierre pendiente. Puedes continuar.`;
+    const status=$('roundState');if(status)status.textContent=`Ciclo ${ciclo}: el servidor está procesando el cierre económico. Puedes continuar; los resultados se actualizarán automáticamente.`;
     return true;
   }
   reportsRevision++;

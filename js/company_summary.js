@@ -229,7 +229,7 @@ function sectionSummaryHtml(section,{history=false,compact=false}={}){
 }
 function noticesHtml(problems,warnings){
   return `${problems.length?`<div class="cs-notice cs-notice-error"><h3>Antes de enviar, completa lo siguiente</h3>${problems.map(p=>`<p>${escapeHtml(p.text)} <button class="cs-link" type="button" ${sectionSubmitted(p.cat)&&!decisionsSubmitted()?`data-summary-reopen="${p.cat}"`:`data-summary-goto="${p.cat}"`}>${sectionSubmitted(p.cat)&&!decisionsSubmitted()?'Corregir':'Ir a'} ${escapeHtml(categoryByCat(p.cat)?.short||'la sección')}</button></p>`).join('')}</div>`:''}
-    ${warnings.length?`<details class="cs-notice cs-notice-warning"><summary>${warnings.length} advertencia(s) de operaci\u00f3n \u00b7 no bloquean el env\u00edo</summary>${warnings.map(w=>`<p>${escapeHtml(w.text)}</p>`).join('')}</details>`:''}`;
+    ${warnings.length?`<details open class="cs-notice cs-notice-warning"><summary>${warnings.length} advertencia(s) de operaci\u00f3n \u00b7 no bloquean el env\u00edo</summary>${warnings.map(w=>`<p>${escapeHtml(w.text)}</p>`).join('')}</details>`:''}`;
 }
 function reopenSubmittedSection(cat){
   if(!studentAccess().canOperate||decisionsSubmitted()||!sectionSubmitted(cat))return false;
