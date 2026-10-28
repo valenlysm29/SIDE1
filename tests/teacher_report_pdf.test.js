@@ -27,7 +27,7 @@ test('report mapping keeps the model balances and presents outflows as deduction
   const report=financial.calculate({capital:1000,round:1,ledger:{'1:SIM_VENTAS':800.5,'1:SIM_GASTOS':-200.25,'1:SIM_INVERSION':-100}});
   const data=pdf.reportData(report,18);
   const er=data.statements[0][1],bc=data.statements[1][1],fc=data.statements[2][1],bg=data.statements[3][1];
-  assert.equal(er[0][1]+er[1][1]+er[2][1]+er[3][1],er[4][1]);
+  assert.equal(er[0][1]+er[1][1]+er[2][1]+er[3][1]+er[4][1],er[5][1]);
   assert.equal(bc[0][1]+bc[1][1]+bc[2][1],bc[3][1]);
   assert.equal(fc[0][1]+fc[1][1]+fc[2][1],fc[3][1]);
   assert.equal(bg[2][1],bg[5][1]);

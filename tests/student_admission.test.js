@@ -12,7 +12,7 @@ const decisionsServiceSource=fs.readFileSync(path.join(root,'services/decisiones
 const appSource=fs.readFileSync(path.join(root,'js/app.js'),'utf8');
 
 function loadService(source,rpc,serviceName,logger=console){
- const window={SIDE:{SupabaseClient:{get:()=>({rpc:(name,args)=>name==='side_admission_features'?Promise.resolve({data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null}):rpc(name,args)})}}};
+ const window={SIDE:{SupabaseClient:{get:()=>({auth:{getSession:async()=>({data:{session:{user:{id:'test'}}}}),signInAnonymously:async()=>{throw Error('sesión existente');}},rpc:(name,args)=>name==='side_admission_features'?Promise.resolve({data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null}):rpc(name,args)})}}};
  vm.runInNewContext(source,{window,console:logger},{filename:serviceName});
  return window.SIDE[serviceName];
 }
@@ -28,12 +28,20 @@ test('student service normalizes the three admission fields and preserves server
   nombreLegal:'  Compañía   Ágil  ',
   nombreComercial:'  Café   Norte '
  });
- assert.deepEqual(JSON.parse(JSON.stringify(calls.find(call=>call.name==='unirse_partida_por_codigo'))),{
-  name:'unirse_partida_por_codigo',
-  args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte'}
+ assert.deepEqual(JSON.parse(JSON.stringify(calls.find(call=>call.name==='side_ingresar_empresa_segura'))),{
+  name:'side_ingresar_empresa_segura',
+  args:{p_codigo:'SIDE-000',p_nombre_legal:'Compañía Ágil',p_nombre_comercial:'Café Norte',p_clave:null}
  });
  assert.equal(result.success,false);
  assert.equal(result.code,'PARTIDA_INICIADA');
+});
+
+test('admission creates an anonymous session before submitting the key',async()=>{
+ const calls=[];let sessions=0;
+ const window={SIDE:{SupabaseClient:{get:()=>({auth:{getSession:async()=>({data:{session:null}}),signInAnonymously:async()=>{sessions++;return {data:{session:{user:{id:'test'}}},error:null};}},rpc:async(name,args)=>{if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2}};calls.push({name,args});return {data:{success:false,code:'CLAVE_INVALIDA',error:'Clave inválida'}};}})}}};
+ vm.runInNewContext(serviceSource,{window,console});
+ const result=await window.SIDE.EmpresaService.ingresar({codigo:'SIDE-000',nombreLegal:'Legal',nombreComercial:'Marca',claveEmpresa:'ABC12345'});
+ assert.equal(sessions,1);assert.equal(calls[0].name,'side_ingresar_empresa_segura');assert.equal(calls[0].args.p_clave,'ABC12345');assert.equal(result.code,'CLAVE_INVALIDA');assert.equal(result.technical,false);
 });
 
 test('student service does not call the server with any missing identity field',async()=>{
@@ -109,7 +117,7 @@ test('real student form shows the server message for technical failures and busi
  };
  window.supabase={createClient:()=>({
   rpc:async(name)=>{window.__rpcCalls.push(name);if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2},error:null};if(window.__rpcThrow)throw window.__rpcThrow;return window.__rpcResult},
-  auth:{onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}
+  auth:{getSession:async()=>({data:{session:{user:{id:'test'}}}}),signInAnonymously:async()=>{throw Error('sesión existente');},onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}})}
  })};
  `;
  html=html.replace('window.SIDE_CONFIG = {',bootstrap+'window.SIDE_CONFIG = {');
@@ -239,8 +247,7 @@ test('student decision/report writes use identity wrappers, never empresaId RPCs
  assert.equal((await service.guardar(identity,1,[{decision_id:'PRECIO',cantidad:1}],4)).success,true);
  assert.equal((await service.guardarReporte(identity,1,{caja_final:100},4)).success,true);
  assert.deepEqual(JSON.parse(JSON.stringify(calls)),[
-  {name:'guardar_decisiones_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Legal',p_nombre_comercial:'Marca',p_ciclo:1,p_decisiones:[{decision_id:'PRECIO',cantidad:1}],p_expected_revision:4}},
-  {name:'guardar_reporte_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Legal',p_nombre_comercial:'Marca',p_ciclo:1,p_reporte:{caja_final:100},p_expected_revision:4}}
+  {name:'guardar_decisiones_estudiante',args:{p_codigo:'SIDE-000',p_nombre_legal:'Legal',p_nombre_comercial:'Marca',p_ciclo:1,p_decisiones:[{decision_id:'PRECIO',cantidad:1}],p_expected_revision:4}}
  ]);
 });
 
@@ -278,7 +285,7 @@ test('frontend maps safe errors, hydrates by identity and recovers stale revisio
 
 
 test('missing capability and missing server time require explicit migration, network remains technical',async()=>{
- const make=rpc=>{const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};vm.runInNewContext(serviceSource,{window,console});return window.SIDE.EmpresaService;};
+ const make=rpc=>{const window={SIDE:{SupabaseClient:{get:()=>({rpc,auth:{getSession:async()=>({data:{session:{user:{id:'test'}}}}),signInAnonymously:async()=>{throw Error('sesión existente');}}})}}};vm.runInNewContext(serviceSource,{window,console});return window.SIDE.EmpresaService;};
  const identity={codigo:'SIDE-SD7',nombreLegal:'demo1',nombreComercial:'demo1'};
  const missing=make(async()=>({data:null,error:{code:'PGRST202',message:'missing function'}}));
  assert.equal((await missing.ingresar(identity)).code,'MIGRACION_PENDIENTE');

@@ -19,7 +19,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
  await page.locator('#resultCompanySelect').selectOption('b');
  assert.match(await page.locator('#detailReports h3').innerText(),/Costa/);
  await page.evaluate(async()=>{
-  SIDE.PartidaService.cerrarNegocio=async()=>({success:true,data:{resultadosPorEmpresa:{b:{financial:{estadoResultados:{utilidad:700,ingresos:900,costos:200},balanceCaja:{cajaFinal:800},flujoCaja:{},balanceGeneral:{}}}}}});
+  SIDE.PartidaService.consultarCierreNegocio=async()=>({success:true,data:{resultadosPorEmpresa:{b:{receipt:{round:1,sold:9,revenue:900,sales:[]},financial:{estadoResultados:{utilidad:700,utilidadNeta:700,ingresos:900,costos:200},balanceCaja:{cajaFinal:800},flujoCaja:{},balanceGeneral:{}}}}}});
   await closeBusinessRemoteRound(1);
   // Even the follow-up query returns stale financials; roster fields stay fresh.
   window.queuedReads=0;
@@ -38,7 +38,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
  });
  assert.equal(await page.evaluate(()=>state.reports[1].utilidad),333,'cycle 1 closure must not overwrite cycle 2');
  await page.evaluate(async()=>{
-  SIDE.PartidaService.cerrarNegocio=()=>new Promise(resolve=>window.resolveClosure=resolve);
+  SIDE.PartidaService.consultarCierreNegocio=()=>new Promise(resolve=>window.resolveClosure=resolve);
   window.pendingClosure=closeBusinessRemoteRound(1);
   roomGeneration++;state.partidaId='other-room';state.reports=[{id:'b',empresaId:'b',empresa:'Nueva partida',utilidad:55}];
   resolveClosure({success:true,data:{resultadosPorEmpresa:{b:{financial:{estadoResultados:{utilidad:999},balanceCaja:{},flujoCaja:{},balanceGeneral:{}}}}}});

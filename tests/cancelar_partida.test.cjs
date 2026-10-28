@@ -9,7 +9,7 @@ function section(start,end){
 function deferred(){let resolve;const promise=new Promise(r=>resolve=r);return {promise,resolve};}
 function teacher(){
  const elements={},storage=new Map([['SIDE_PROFESOR_ID','owner']]),calls=[];
- const context={ownConfigRevisions:new Map(),stopLiveCompanies(){},sharedRoom:null,console:{error(){}},Promise,clearInterval(){},toast(){},
+ const context={confirmedReportClosures:new Map(),ownConfigRevisions:new Map(),stopLiveCompanies(){},sharedRoom:null,console:{error(){}},Promise,clearInterval(){},toast(){},
   state:{partidaId:null,lifecycleVersion:2,starting:false,cancelling:false,round:1},roomGeneration:0,
   teacherRead:Promise.resolve(),publishChain:Promise.resolve(),teacherBusy:false,
   teacherPoll:null,teacherTick:null,teacherClock:null,publishedState:'',

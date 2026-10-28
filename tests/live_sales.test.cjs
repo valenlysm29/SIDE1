@@ -33,9 +33,9 @@ test('compatible report transport requires the exact game, company, cycle and an
  for(const change of [{game:'OTHER'},{company:6},{round:2},{phase:'results'},{phase:'integration'}])assert.equal(LIVE.fromReport(report,{...scope,...change}),null);
  report.estado_resultados.cycleReceipt={sold:1};assert.equal(LIVE.fromReport(report,scope),null);
 });
-test('no materials or channel means no sale, and financial schedule is identical to student ledger',()=>{
+test('no materials means no sale and financial schedule is identical to student ledger',()=>{
  const snap=snapshot();snap.decision_state.__cyclePlans[1].state.CANALES.optionIds=[];
- assert.equal(LIVE.calculate({snapshot:snap,capital:200000,catalog}).receipt.sold,0);
+ assert.equal(LIVE.calculate({snapshot:snap,capital:200000,catalog}).receipt.sold,90);
  const empty=snapshot();empty.decision_state.__cyclePlans[1].state.CUERO.quantities={};
  assert.equal(LIVE.calculate({snapshot:empty,capital:200000,catalog}).receipt.sold,0);
  const config={financialSchedule:[{effectiveRound:1,capital:200000},{effectiveRound:2,capital:225000}]};
@@ -50,7 +50,7 @@ test('shared final closure replaces individual preview, survives reload and rema
  const final=CYCLE.closeMany([{id:'A',...input},{id:'B',...input}]);
  const closed={decision_state:final.A.state,cash_ledger:final.A.ledger,financial_sections:final.A.financialSections};
  const p=LIVE.calculate({snapshot:closed,catalog,capital:200000,phase:'results'});
- assert.equal(p.provisional,false);assert.equal(p.receipt.sold,1750);assert.equal(p.financial.estadoResultados.ingresos,74375);
+ assert.equal(p.provisional,false);assert.equal(p.receipt.sold,875);assert.equal(p.financial.estadoResultados.ingresos,37187.5);assert.equal(p.receipt.marketAllocation.products.esencial.simulatedCompetitors.length,2);
  assert.deepEqual(LIVE.calculate({snapshot:closed,catalog,capital:200000,phase:'finished'}),p);
  assert.equal(CYCLE.close({...input,state:closed.decision_state,ledger:closed.cash_ledger}).reused,true);
 });
@@ -62,8 +62,8 @@ function teacher(context,report={}){
 test('teacher follows server room cycle even when company report still names the previous cycle',async()=>{
  const c={partida_id:'room',codigo:'SIDE-QA',ciclo:2,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot(2)};
  const [r]=await teacher(c,{ciclo:1,ingresos:0}).supabaseReports();
- assert.equal(r.ronda,2);assert.equal(r.provisional,true);assert.equal(r.unidadesVendidas,90);assert.equal(r.ingresos,3825);
- const [foreign]=await teacher({...c,partida_id:'other'}).supabaseReports();assert.equal(foreign.ingresos,0);assert.equal(foreign.unidadesVendidas,0);
+ assert.equal(r.ronda,2);assert.equal(r.provisional,false);assert.equal(r.unidadesVendidas,null);assert.equal(r.ingresos,0);
+ const [foreign]=await teacher({...c,partida_id:'other'}).supabaseReports();assert.equal(foreign.ingresos,0);assert.equal(foreign.unidadesVendidas,null);
 });
 test('definitive report is never replaced by a provisional snapshot',async()=>{
  const c={partida_id:'room',codigo:'SIDE-QA',ciclo:1,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot()};
@@ -72,7 +72,7 @@ test('definitive report is never replaced by a provisional snapshot',async()=>{
 });
 test('a closure arriving during a roster read also replaces its cached sold units',async()=>{
  const c={partida_id:'room',codigo:'SIDE-QA',ciclo:1,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot()};
- const ctx=teacher(c);const [r]=await ctx.supabaseReports();assert.equal(r.provisional,true);
+ const ctx=teacher(c);const [r]=await ctx.supabaseReports();assert.equal(r.provisional,false);assert.equal(r.unidadesVendidas,null);
  ctx.rows=[r];ctx.final={...LIVE.calculate({snapshot:snapshot(),capital:200000,catalog}).financial,cycleReceipt:{round:1,sold:12,revenue:510}};
  ctx.final.estadoResultados.ingresos=510;
  vm.runInContext("confirmedReportClosures.set(JSON.stringify([roomGeneration,state.partidaId,1,'5']),final);applyConfirmedReportClosures(rows)",ctx);

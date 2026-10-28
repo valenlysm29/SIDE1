@@ -10,7 +10,7 @@ function fixture({failedWrite=false,explorable=true}={}){
     storageKey:()=> 'QA',currentRound:()=>1,localStorage:{getItem:key=>store.get(key)||null},sectionLedgerKey:cat=>cat,categoryByCat:cat=>cats.find(c=>c.cat===cat),
     sectionSubmissionKey:cat=>cat,submissionKey:()=> 'all',decisionKey:()=> 'state',ledgerKey:()=> 'ledger',receiptKey:()=> 'receipts',
     writeDecisionBatch:writes=>{if(failedWrite)return false;events.push('persist');Object.entries(writes).forEach(([k,v])=>store.set(k,v));return true;},
-    ledgerTotal:()=>0,restoreDraftsForRound(){},captureCyclePlan(){},closeCompanyReview:()=>events.push('close'),syncReportToSupabase(){},syncStudentReportPreview(){},
+    ledgerTotal:()=>0,restoreDraftsForRound(){},captureCyclePlan(){},setCyclePlanSyncPending(){},closeCompanyReview:()=>events.push('close'),syncReportToSupabase(){},syncStudentReportPreview(){},
     animateCash(){},renderTabs(){},renderDecisionCategory(){},updateHud(){},toast(){},queueMicrotask:fn=>tasks.push(fn),
     simulationSubmissionComplete:()=>cats.every(c=>store.get(c.cat)==='1'),canExploreWorld:()=>explorable,playerIsDeciding:true,
     requestWorldEntry:()=>events.push('world')};

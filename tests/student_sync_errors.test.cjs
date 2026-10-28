@@ -13,8 +13,8 @@ function service(reply){
 }
 const save=(s,method)=>method==='guardar'?s.guardar(identity,1,[{decision_id:'CANALES',opcion_id:'web',cantidad:1}],3):s.guardarReporte(identity,1,{capital:100000},3);
 
-test('both write services preserve technical errors and require an explicit acknowledgment',async()=>{
-  for(const method of ['guardar','guardarReporte']){
+test('decision writes preserve technical errors and require an explicit acknowledgment',async()=>{
+  for(const method of ['guardar']){
     const s=service({error:{code:'PGRST202',message:'Function missing',details:'signature',hint:'reload schema',status:404}});
     const result=await save(s,method);
     assert.equal(result.success,false);assert.equal(result.technical,true);
@@ -30,6 +30,8 @@ test('both write services preserve technical errors and require an explicit ackn
     assert.equal(exception.code,'FETCH_ERROR');assert.equal(exception.technical,true);
   }
 });
+
+test('report preview never writes a financial result from the client',async()=>{const result=await save(service({data:{success:false}}),'guardarReporte');assert.equal(result.success,true);assert.equal(result.data.persisted,false);assert.equal(result.data.provisional,true);});
 
 test('the status gives a useful reason without discarding the local save',()=>{
   assert.match(pendingMessage({code:'CICLO_PAUSADO'}),/docente debe reanudar/);

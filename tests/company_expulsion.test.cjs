@@ -38,7 +38,7 @@ for(const phase of ['snapshot','operation','conflict-read'])test(`expelled stude
 });
 
 test('expelled admission remains a user rejection rather than a technical retry',async()=>{
- const window={SIDE:{SupabaseClient:{get:()=>({rpc:async(name)=>name==='side_admission_features'?{data:{waitingRoomVersion:3,exactIdentityVersion:2}}:{data:{success:false,code:'EMPRESA_EXPULSADA',error:'Eliminada por inactividad'}}})}}};
+ const window={SIDE:{SupabaseClient:{get:()=>({auth:{getSession:async()=>({data:{session:{user:{id:'test'}}}}),signInAnonymously:async()=>{throw Error('sesión existente');}},rpc:async(name)=>name==='side_admission_features'?{data:{waitingRoomVersion:3,exactIdentityVersion:2}}:{data:{success:false,code:'EMPRESA_EXPULSADA',error:'Eliminada por inactividad'}}})}}};
  vm.runInNewContext(fs.readFileSync(require.resolve('../services/empresa_service.js'),'utf8'),{window,console});
  const result=await window.SIDE.EmpresaService.ingresar({codigo:'SIDE-AAA',nombreLegal:'Legal',nombreComercial:'Marca'});
  assert.equal(result.code,'EMPRESA_EXPULSADA');assert.equal(result.technical,false);

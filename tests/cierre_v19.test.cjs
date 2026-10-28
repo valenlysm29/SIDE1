@@ -19,7 +19,7 @@ test('document quality feeds market without changing the player price',()=>{
  s.MOLDE.optionIds=['molde_1'];s.PRODUCCION_META.moldTargets={molde_1:90};assert.equal(E.prepare({id:'x',state:s,catalog,round:1}).lines[0].quality,0);
  // A malformed source cannot choose an unowned Premium mold and invent units.
  s.PRODUCCION_META.moldTargets={molde_3:90};const missing=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(missing.revenue,0);
- const prepared=E.prepare({id:'x',state:state(1,{},2),round:1,catalog});prepared.lines[2].quality=5;const alloc=E.allocate([prepared]);assert.equal(alloc.x.products.premium.calidadMercado,50);
+ const prepared=E.prepare({id:'x',state:state(1,{},2),round:1,catalog});prepared.lines[2].quality=5;const alloc=E.allocate([prepared]);assert.equal(alloc.x.products.premium.calidadMercado,25);assert.equal(alloc.x.products.premium.simulatedCompetitors.length,3);
 });
 test('v19 price validation, scores bounded and nonnegative price score',()=>{
  const s=state();s.PRODUCCION_META.prices.esencial=-1;assert.throws(()=>E.prices(s),/Precio/);

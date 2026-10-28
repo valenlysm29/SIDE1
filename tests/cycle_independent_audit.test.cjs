@@ -28,7 +28,7 @@ test('teacher closure displays persisted revenue and stops on a rejected closure
   const report={empresaId:7,ronda:1},status={},calls=[];
   const financial={estadoResultados:{ingresos:750,costos:100,utilidad:650},balanceCaja:{cajaFinal:200650},flujoCaja:{},balanceGeneral:{}};
   let response={success:true,data:{resultadosPorEmpresa:{7:{financial}}}};
-  const ctx={state:{partidaId:'qa',reports:[report]},roomGeneration:0,reportsRevision:0,confirmedReportClosures:new Map(),window:{SIDE:{PartidaService:{cerrarNegocio:async()=>response}}},
+  const ctx={state:{partidaId:'qa',reports:[report]},roomGeneration:0,reportsRevision:0,confirmedReportClosures:new Map(),window:{SIDE:{PartidaService:{consultarCierreNegocio:async()=>response}}},
     toast:text=>calls.push(text),$:()=>status,persistReports:()=>calls.push('persist'),renderResults:()=>calls.push('render')};
   const apply=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf("\nlet rosterSyncError="));
   vm.createContext(ctx);vm.runInContext(apply+'\n'+fn,ctx);assert.equal(await ctx.closeBusinessRemoteRound(1),true);assert.equal(report.ingresos,750);assert.equal(report.caja,200650);

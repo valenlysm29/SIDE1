@@ -2,9 +2,9 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const CYCLE=require('../js/cycle_model.js'),{state,catalog}=require('./economic_v19_fixture.cjs');
 const input=(s=state(),round=1,extra={})=>({state:s,catalog,round,capital:200000,...extra});
-test('channel gate prevents fictitious revenue and commission even with finished stock',()=>{
+test('available stock sells even without a channel, with exactly one commission',()=>{
  const s=state();s.CANALES.optionIds=[];s.__finishedGoods={esencial:50};const r=CYCLE.close(input(s));
- assert.equal(r.receipt.revenue,0);assert.equal(r.state.__finishedGoods.esencial,r.receipt.produced+50);assert.equal(r.ledger['1:COMISION_VENTAS'],0);
+ assert.equal(r.receipt.revenue,5950);assert.equal(r.state.__finishedGoods.esencial,0);assert.equal(r.ledger['1:COMISION_VENTAS'],-59.5);
 });
 test('web sales earn exactly one percent commission and close is idempotent',()=>{
  const first=CYCLE.close(input());assert.ok(first.receipt.sold>0);assert.equal(first.ledger['1:COMISION_VENTAS'],-Math.round(first.receipt.revenue)/100);
@@ -22,7 +22,7 @@ test('material inventory preserves unrelated lots and consumes only available pu
 });
 test('shared closing keeps company stock and cash isolated',()=>{
  const a=state(),b=state();b.CANALES.optionIds=[];b.__finishedGoods={esencial:15};const r=CYCLE.closeMany([{id:'A',...input(a)},{id:'B',...input(b)}]);
- assert.ok(r.A.receipt.sold>0);assert.equal(r.B.receipt.sold,0);assert.equal(r.B.state.__finishedGoods.esencial,r.B.receipt.produced+15);assert.equal(r.B.ledger['1:SIM_VENTAS'],0);
+ assert.equal(r.A.receipt.sold,90);assert.equal(r.B.receipt.sold,105);assert.equal(r.B.state.__finishedGoods.esencial,0);assert.equal(r.A.ledger['1:SIM_VENTAS'],3825);assert.equal(r.B.ledger['1:SIM_VENTAS'],4462.5);
 });
 test('POS receipts never alter assigned demand or stock',()=>{
  const base=input(),baseline=CYCLE.close(base);const played=CYCLE.close({...base,soldByProduct:{esencial:99999},ledger:{'1:SIM_VENTAS':99999}});assert.deepEqual(played,baseline);

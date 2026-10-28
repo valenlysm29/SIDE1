@@ -14,7 +14,9 @@ test('active materials charge Excel physical unit cost with volume discount exac
  for(const [id,prices] of Object.entries(costs))item(id).options.forEach((o,i)=>{
   assert.equal(o.cost,prices[i]);
   const amount=REVIEW.breakdown(item(id),{state:{},drafts:{[id]:{quantities:{[o.id]:10}}},round:1,rules:RULES,catalog}).outflow;
-  assert.ok(Math.abs(amount-prices[i]*10*.92)<1e-8);
+  assert.ok(Math.abs(amount-prices[i]*10)<1e-8);
+  const volume=REVIEW.breakdown(item(id),{state:{},drafts:{[id]:{quantities:{[o.id]:100}}},round:1,rules:RULES,catalog}).outflow;
+  assert.ok(Math.abs(volume-prices[i]*100*.92)<1e-8);
  });
  assert.equal(item('MANTENIMIENTO').options[0].cost,1500); // original optional decision; automatic base maintenance lives in the engine
  assert.equal(item('LIMPIEZA').options[0].cost,712.32);

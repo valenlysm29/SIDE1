@@ -22,18 +22,18 @@ test('a live projection computes physical sales and price times units without se
   assert.equal(JSON.stringify(ctx),original);
   assert.deepEqual(CYCLE.project(ctx),p);assert.equal(JSON.stringify(ctx),original);
 });
-test('the projection honors inputs and channels instead of manufacturing sales',()=>{
+test('the projection honors materials and stock without requiring a channel',()=>{
   const missing=input();missing.state.HILO.quantities.hilo_std=3;
   assert.equal(CYCLE.project(missing).receipt.sold,0);
   const noChannel=input();noChannel.state.CANALES.optionIds=[];
-  assert.equal(CYCLE.project(noChannel).receipt.revenue,0);
+  assert.equal(CYCLE.project(noChannel).receipt.revenue,4250);
 });
 test('the final shared market replaces the individual reference and cannot sell stock twice',()=>{
   const a={id:'A',...input(5000)},b={id:'B',...input(5000)};
-  assert.equal(CYCLE.project(a).receipt.sold,3500);
+  assert.equal(CYCLE.project(a).receipt.sold,875);
   const closed=CYCLE.closeMany([a,b]);
-  assert.equal(closed.A.receipt.sold,1750);assert.equal(closed.B.receipt.sold,1750);
-  assert.equal(closed.A.receipt.revenue+closed.B.receipt.revenue,3500*42.5);
+  assert.equal(closed.A.receipt.sold,875);assert.equal(closed.B.receipt.sold,875);assert.equal(closed.A.receipt.marketAllocation.products.esencial.simulatedCompetitors.length,2);
+  assert.equal(closed.A.receipt.revenue+closed.B.receipt.revenue,1750*42.5);
   assert.equal(CYCLE.project({...a,state:closed.A.state,ledger:closed.A.ledger}),null);
   const again=CYCLE.close({...a,state:closed.A.state,ledger:closed.A.ledger});
   assert.equal(again.reused,true);assert.equal(again.receipt.revenue,closed.A.receipt.revenue);

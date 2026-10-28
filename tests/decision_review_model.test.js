@@ -38,7 +38,7 @@ test('analyst discount affects material prices, not wages',()=>{
 test('material purchases use physical units and the retained quantity discount',()=>{
  const ctx=context({drafts:{CUERO:{quantities:{cuero_sint:60,cuero_std:55,cuero_prem:15}},ACCESORIOS:{quantities:{acc_eco:200,acc_prem:190}},HILO:{quantities:{hilo_ref:6,hilo_prem:7}}}});
  const total=['CUERO','ACCESORIOS','HILO'].reduce((sum,id)=>sum+model.breakdown(item(id),ctx).outflow,0);
- assert.ok(Math.abs(total-(60*25+55*45+15*80+200*4+190*9+6*4+7*7)*.92)<1e-9);
+ assert.ok(Math.abs(total-(60*25+55*45+15*80+(200*4+190*9)*.92+6*4+7*7))<1e-9);
 });
 
 test('review uses the nine full MYPE monthly wages recalculated in Excel v19',()=>{

@@ -1,7 +1,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const source=fs.readFileSync(require.resolve('../services/empresa_service.js'),'utf8');
 function service(rpc,extra={}){
- const window={SIDE:{SupabaseClient:{get:()=>({rpc})}}};
+ const window={SIDE:{SupabaseClient:{get:()=>({rpc,auth:{getSession:async()=>({data:{session:{user:{id:"test"}}}}),signInAnonymously:async()=>{throw Error("sesión existente");}}})}}};
  vm.runInNewContext(source,{window,console:{error(){},warn(){}},...extra});
  return window.SIDE.EmpresaService;
 }
@@ -15,7 +15,7 @@ test('doble Supabase: ingreso/reingreso exige identidad registrada; cancelación
  const registered=new Set();let started=false,cancelled=false;
  const api=service(async(name,args)=>{
   if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2}};
-  assert.equal(name,'unirse_partida_por_codigo');
+  assert.equal(name,'side_ingresar_empresa_segura');
   assert.equal(args.p_codigo,identity.codigo);
   const key=JSON.stringify([args.p_nombre_legal,args.p_nombre_comercial]);
   if(cancelled)return {data:{success:false,code:'PARTIDA_CANCELADA',error:'Sala cancelada'}};

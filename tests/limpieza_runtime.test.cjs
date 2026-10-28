@@ -22,6 +22,7 @@ test('materials use physical units and bounded affordable thread purchases',()=>
  const catalog=ctx.window.SIDE_DECISION_CATALOG,review=require('../js/decision_review_model'),production=require('../js/production_model');
  const hilo=catalog.flatMap(c=>c.items).find(i=>i.id==='HILO');
  assert.equal(production.yieldFor('HILO','hilo_std'),1);
- const cost=review.unitCost(hilo,hilo.options[0],{state:{},drafts:{},round:1});
- assert.ok(Math.abs(700*cost-1288)<1e-8);
+ const noVolume={state:{},drafts:{HILO:{quantities:{hilo_std:10}}},round:1},volume={state:{},drafts:{HILO:{quantities:{hilo_std:700}}},round:1};
+ assert.equal(review.breakdown(hilo,noVolume).outflow,20);
+ assert.ok(Math.abs(review.breakdown(hilo,volume).outflow-1288)<1e-8);
 });
