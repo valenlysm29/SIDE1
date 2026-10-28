@@ -214,26 +214,24 @@ test('student synchronization and session recovery through the delivered UI',asy
       assert.equal(await p.evaluate(()=>calls.filter(c=>c.type==='report').length),1);
       await p.context().close();
     });
-    await t.test('network failure retains the session and retry button restores access without retyping identity',async()=>{
+    await t.test('network failure retains the session and admission identity without a retry button',async()=>{
       const p=await page({SIDE_STUDENT_SESSION:session,TEST_READ_ERROR:'network'});
       await p.waitForFunction(()=>studentSessionRecoveryTask===null&&studentSessionRecovering);
       await p.evaluate(()=>stopStudentSync());
       assert.equal(await p.evaluate(()=>Boolean(sessionStorage.SIDE_STUDENT_SESSION)),true);
       assert.match(await p.locator('#studentMessage').innerText(),/sesión se conserva/);
-      assert.equal(await p.locator('#studentReconnectBtn').isVisible(),true);
+      assert.equal(await p.locator('#studentReconnectBtn').count(),0);
+      assert.equal(await p.locator('#gameCode').inputValue(),'SIDE-418');
       assert.equal(await p.evaluate(()=>studentAccess().canOperate),false);
       await p.setViewportSize({width:390,height:844});
       assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-      await p.evaluate(()=>{sessionStorage.TEST_READ_ERROR='';});await p.locator('#studentReconnectBtn').click();
-      await p.waitForFunction(()=>!studentSessionRecovering&&studentAccess().canOperate);
-      assert.equal(await p.locator('#studentModal').isVisible(),false);
       await p.context().close();
     });
     await t.test('an explicit identity rejection clears the session instead of retrying indefinitely',async()=>{
       const p=await page({SIDE_STUDENT_SESSION:session,TEST_READ_ERROR:'invalid'});
       await p.waitForFunction(()=>!studentConnected&&studentSessionRecoveryTask===null);
       assert.equal(await p.evaluate(()=>Boolean(sessionStorage.SIDE_STUDENT_SESSION)),false);
-      assert.equal(await p.locator('#studentReconnectBtn').isVisible(),false);
+      assert.equal(await p.locator('#studentReconnectBtn').count(),0);
       assert.match(await p.locator('#studentMessage').innerText(),/Comprueba el código.*mayúsculas y tildes/i);
       await p.context().close();
     });

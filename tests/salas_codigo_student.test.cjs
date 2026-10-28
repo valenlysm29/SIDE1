@@ -36,7 +36,7 @@ test('timeout limita una RPC pendiente y permite repetir el ingreso',async()=>{
   if(stalled)return new Promise(()=>{});
   return {data:{success:true,partida:{estado:'esperando',configuracion:{},serverTime:'2026-10-12T12:00:00Z'}}};
  },{setTimeout:callback=>{timerCount++;return setTimeout(callback,5);},clearTimeout});
- const result=await api.ingresar(identity);assert.equal(result.code,'CONEXION_TIMEOUT');assert.equal(result.technical,true);assert.match(result.error,/Reintentar/);
+ const result=await api.ingresar(identity);assert.equal(result.code,'CONEXION_TIMEOUT');assert.equal(result.technical,true);assert.match(result.error,/Intenta ingresar nuevamente/);
  stalled=false;assert.equal((await api.ingresar(identity)).success,true);assert.ok(timerCount>=4);
 });
 test('estado cancelada basta para rechazar una respuesta de admisión exitosa antigua',async()=>{

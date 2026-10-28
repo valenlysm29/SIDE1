@@ -94,7 +94,7 @@
     const timeout = new Promise((_, reject) => {
       timer = setTimeout(() => {
         controller?.abort();
-        reject(Object.assign(new Error('La conexión tardó demasiado. Pulsa Reintentar conexión.'), {code:'CONEXION_TIMEOUT'}));
+        reject(Object.assign(new Error('La conexión tardó demasiado. Intenta ingresar nuevamente.'), {code:'CONEXION_TIMEOUT'}));
       }, 15000);
     });
     try { return await Promise.race([query, timeout]); }

@@ -629,7 +629,7 @@ function openStudentAdmission(){
   // Opening a new admission form supersedes a pending recovery of the last room.
   studentSnapshotEpoch++;studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentProgressHydrated=false;
   authoritativeStudentState=null;studentClock=null;studentStateFailure=null;autoEnterDecisions=false;stopStudentSync();
-  $('studentReconnectBtn')?.classList.add('hidden');message('studentMessage','');showModal('studentModal');
+  message('studentMessage','');showModal('studentModal');
 }
 document.querySelectorAll('.profile-card').forEach(card=>card.addEventListener('click',()=>{if(card.dataset.profile==='teacher')showModal('teacherLoginModal');else openStudentAdmission();}));
 document.addEventListener('keydown',e=>{
@@ -669,8 +669,8 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(!S.EmpresaService?.ingresar){const error={code:'SERVICIO_EMPRESA_NO_DISPONIBLE'};console.error('SIDE: no se pudo iniciar la validación de ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
     let ingreso;
     const joinButton=$('studentForm')?.querySelector?.('[type="submit"]');if(joinButton){joinButton.disabled=true;joinButton.setAttribute('aria-busy','true');}
-    $('studentReconnectBtn')?.classList.add('hidden');
-    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
+
+    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
     if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
       if(ingreso?.code==='ACCESO_RESERVADO'){message('studentMessage',ingreso.error||'Solicita al docente que libere el acceso.',true);return;}
@@ -685,8 +685,8 @@ $('studentForm')?.addEventListener('submit',async e=>{
       if(ingreso?.code==='SALA_LLENA'){message('studentMessage','La sala está llena. Pide al docente que revise su capacidad.',true);return}
       if(ingreso?.code==='CREDENCIALES_INVALIDAS'){message('studentMessage',JOIN_INVALID_MESSAGE,true);return}
       console.error('SIDE: error técnico al validar el ingreso',ingreso);
-      $('studentReconnectBtn')?.classList.remove('hidden');
-      message('studentMessage',ingreso?.code==='CONEXION_TIMEOUT'?'La conexión tardó demasiado. Pulsa Reintentar conexión.':/PGRST202|42883/.test(ingreso?.code||'')?'La sala requiere actualizar Supabase. El docente debe ejecutar 2026-10-12_salas_codigo.sql.':ingreso?.code==='42501'?'Supabase rechazó el permiso de ingreso. Pide al docente revisar la migración de salas.':JOIN_SERVER_MESSAGE,true);return
+
+      message('studentMessage',ingreso?.code==='anonymous_provider_disabled'?'El acceso de estudiantes no está habilitado. Pide al docente activar los inicios de sesión anónimos en Supabase.':ingreso?.code==='CONEXION_TIMEOUT'?'La conexión tardó demasiado. Intenta ingresar nuevamente.':/PGRST202|42883/.test(ingreso?.code||'')?'La sala requiere actualizar Supabase. El docente debe ejecutar 2026-10-12_salas_codigo.sql.':ingreso?.code==='42501'?'Supabase rechazó el permiso de ingreso. Pide al docente revisar la migración de salas.':JOIN_SERVER_MESSAGE,true);return
     }
     const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
     if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala');message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
@@ -796,7 +796,7 @@ function sectionSubmissionKey(cat=currentCategory){return `SIDE_DECISION_SECTION
 function sectionSubmitted(cat=currentCategory){return localStorage.getItem(sectionSubmissionKey(cat))==='1'}
 function setSectionSubmitted(cat,v=true){const k=sectionSubmissionKey(cat);if(v)localStorage.setItem(k,'1');else localStorage.removeItem(k)}
 function isLocked(item){const e=savedEntry(item);return sectionSubmitted(currentCategory) || decisionsSubmitted() || !!(item.lockAfterPurchase&&e&&Number(e.round)<currentRound())}
-function cycleDecisionsLocked(){return decisionsSubmitted()} 
+function cycleDecisionsLocked(){return decisionsSubmitted()}
 function decisionEditingBlocked(){if(decisionsSubmitted()){toast('Todas las decisiones de este ciclo ya fueron enviadas. Podrás modificarlas cuando comience el próximo ciclo.');return true}if(sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada y está bloqueada hasta el próximo ciclo.');return true}return false}
 function itemRequired(item){
   if(item?.id==='MOLDE')return ownedMolds().length===0;
@@ -1610,7 +1610,7 @@ function rejectStudentSession(error){
   if(error?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return;}
   studentConnected=false;renderStudentPodium(null);studentSessionRecovering=false;studentProgressHydrated=false;studentSnapshotEpoch++;stopStudentSync();
   try{sessionStorage.removeItem('SIDE_STUDENT_SESSION');}catch{}
-  showScreen('profiles');showModal('studentModal');$('studentReconnectBtn')?.classList.add('hidden');message('studentMessage',JOIN_INVALID_MESSAGE,true);
+  showScreen('profiles');showModal('studentModal');message('studentMessage',JOIN_INVALID_MESSAGE,true);
 }
 function getStudentOutbox(){
   if(studentOutbox)return studentOutbox;
@@ -1908,15 +1908,15 @@ function resumeStudentSession(){
       if(studentStateFailure?.code==='CREDENCIALES_INVALIDAS'&&!studentStateFailure.technical){rejectStudentSession();return false;}
       studentSessionRecovering=true;showScreen('profiles');showModal('studentModal');
       $('gameCode').value=currentStudent.game.codigo;$('companyLegalName').value=currentStudent.legalName||'';$('companyBrandName').value=currentStudent.company;
-      $('studentReconnectBtn')?.classList.remove('hidden');message('studentMessage',studentStateFailure?.code==='MIGRACION_PENDIENTE'?studentStateFailure.error:JOIN_SERVER_MESSAGE+' Tu sesión se conserva; volveremos a intentar la conexión.',true);
+      message('studentMessage',studentStateFailure?.code==='MIGRACION_PENDIENTE'?studentStateFailure.error:JOIN_SERVER_MESSAGE+' Tu sesión se conserva; volveremos a intentar la conexión.',true);
       return false;
     }
-    studentSessionRecovering=false;studentStateFailure=null;$('studentReconnectBtn')?.classList.add('hidden');message('studentMessage','');closeModal();
+    studentSessionRecovering=false;studentStateFailure=null;message('studentMessage','');closeModal();
     await prepareLobby();return true;
   })().finally(()=>{studentSessionRecoveryTask=null;});
   return studentSessionRecoveryTask;
 }
-$('studentReconnectBtn')?.addEventListener('click',()=>studentSessionRecovering?resumeStudentSession():$('studentForm')?.requestSubmit());
+
 (async function restoreStudentSession(){
   let saved;try{saved=JSON.parse(sessionStorage.getItem('SIDE_STUDENT_SESSION')||'null');}catch{}
   if(!saved?.game?.codigo||!saved.company)return;
