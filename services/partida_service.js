@@ -379,12 +379,105 @@
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
       if(!Number.isInteger(Number(ctx.financialConfig?.cycles))||Number(ctx.financialConfig.cycles)<1)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
+      // Prior economic state comes only from the immutable server closure. The
+      // snapshot is a transport for decisions, never an accounting authority.
+      let prior={};
+      if(Number(ciclo)>1){
+        const previous=await sb.rpc('side_contexto_cierre_negocio',{p_partida_id:partidaId,p_ciclo:Number(ciclo)-1});
+        if(previous.error||previous.data?.error||!previous.data?.cierre?.resultadosPorEmpresa)
+          return {success:false,code:'CIERRE_ANTERIOR_REQUERIDO',error:'El cierre anterior no está disponible para verificar los saldos.'};
+        prior=previous.data.cierre.resultadosPorEmpresa;
+      }
       const inputs=[];
       for(const company of ctx.empresas||[]){
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
         if(!saved)continue;
-        const business={events:state.__cycleBusiness?.[ciclo]?.events||[]};
-        inputs.push({id:company.id,state:global.SIDE_CYCLE_MODEL.restoreState(saved.state,state),ledger:snapshot.cash_ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:snapshot.financial_sections||{},production:saved.production,planSource:saved.source,fromRound:saved.fromRound,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},...business});
+        // Event effects and migrated opening balances currently lack an independent
+        // server-verifiable source. Refuse rather than discard legitimate amounts.
+        if((state.__cycleBusiness?.[ciclo]?.events||[]).length || (Number(ciclo)===1&&state.__openingBalance))
+          return {success:false,code:'DATOS_ECONOMICOS_NO_VERIFICADOS',error:'No se puede verificar el saldo inicial o los eventos de este ciclo.'};
+        const previous=prior[company.id];
+        if(Number(ciclo)>1&&!previous?.state)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'Falta el estado anterior de una empresa.'};
+        // Purchase entries from earlier cycles describe assets already owned, not
+        // decisions for this cycle. They may only reproduce the last closure.
+        // Unverifiable legacy histories require review instead of creating assets.
+        for(const item of global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[]).filter(item=>item.asset||item.id==='MOLDE')){
+          const submitted=saved.state?.[item.id]?.purchases||{}, authoritative=previous?.state?.[item.id]?.purchases||{};
+          if(Object.keys(submitted).some(r=>!/^[1-9]\d*$/.test(r)||!Number.isSafeInteger(Number(r))||String(Number(r))!==r))return {success:false,code:'DECISION_INVALIDA',error:'Ciclo de adquisición inválido.'};
+          const older=value=>Object.fromEntries(Object.entries(value).filter(([r])=>Number.isInteger(Number(r))&&Number(r)<Number(ciclo)).map(([r,rows])=>[String(Number(r)),Object.fromEntries(Object.entries(rows||{}).filter(([,v])=>Number(v)!==0).sort(([a],[b])=>a.localeCompare(b)))]).sort(([a],[b])=>Number(a)-Number(b)));
+          if(JSON.stringify(older(submitted))!==JSON.stringify(older(authoritative)))return {success:false,code:'HISTORIAL_ACTIVOS_NO_VERIFICADO',error:'El historial de adquisiciones no coincide con el último cierre y requiere revisión.'};
+        }
+        const decisions=Object.fromEntries(Object.entries(saved.state||{}).filter(([key])=>!key.startsWith('__')));
+        // Validate submitted decision inputs at the trusted worker boundary. Do
+        // not allow malformed quantities to be silently clamped by the model.
+        const invalid=(message)=>({success:false,code:'DECISION_INVALIDA',error:message});
+        const finiteNonnegative=value=>((typeof value==='number')||(typeof value==='string'&&value.trim()!==''))&&Number.isFinite(Number(value))&&Number(value)>=0&&Number(value)<=Number.MAX_SAFE_INTEGER/100;
+        const safeInteger=value=>((typeof value==='number')||(typeof value==='string'&&value.trim()!==''))&&Number.isSafeInteger(Number(value));
+        // Selection ids are decisions, not a trusted catalog: reject unknown or
+        // duplicate options before costs and production are evaluated.
+        for(const item of global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[])){
+          const selected=decisions[item.id]?.optionIds;if(selected==null)continue;
+          const allowed=new Set((item.options||[]).map(option=>option.id));
+          if(!Array.isArray(selected)||new Set(selected).size!==selected.length||selected.some(id=>!allowed.has(id)))return invalid('Selección inválida en '+item.id+'.');
+        }
+        for(const id of ['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO','CUERO','ACCESORIOS','HILO']){
+          const entry=decisions[id];if(!entry)continue;
+          const definition=global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[]).find(item=>item.id===id);
+          const allowed=new Set((definition?.options||[]).map(option=>option.id));
+          for(const [option,value] of Object.entries(entry.quantities||{}))if(!allowed.has(option)||!finiteNonnegative(value)||(!definition?.material&&!Number.isInteger(Number(value))))return invalid('Cantidad u opción inválida en '+id+'.');
+        }
+        // Validate the current asset ledger against the catalog and the previous
+        // server closure. Sales of owned machinery remain allowed, but may not
+        // dispose of more than the verified holdings.
+        for(const item of global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[]).filter(item=>item.asset||item.id==='MOLDE')){
+          const entry=decisions[item.id];if(!entry)continue;
+          const allowed=new Set((item.options||[]).map(option=>option.id));
+          if(!Array.isArray(entry.optionIds??[])||(entry.optionIds||[]).some(id=>!allowed.has(id)))return invalid('Opción de activo inválida en '+item.id+'.');
+          const previousPurchases=previous?.state?.[item.id]?.purchases||{};
+          const entryRound=Number(entry.round);
+          if(!Number.isInteger(entryRound)||entryRound<1||entryRound>Number(ciclo))return invalid('Ciclo de activo inválido en '+item.id+'.');
+          // Legacy entries without a purchase ledger must match the authoritative
+          // previous closure. Otherwise their old round could mint free assets.
+          if(entryRound<Number(ciclo)&&!entry.purchases){
+            const past=previous?.state?.[item.id];
+            if(!past||JSON.stringify(entry)!==JSON.stringify(past))return {success:false,code:'HISTORIAL_ACTIVOS_NO_VERIFICADO',error:'El activo antiguo requiere reconciliación.'};
+          }
+
+          for(const [round,rows] of Object.entries(entry.purchases||{})){
+            if(!/^[1-9]\d*$/.test(round)||!Number.isSafeInteger(Number(round))||String(Number(round))!==round||Number(round)>Number(ciclo)||!rows||typeof rows!=='object'||Array.isArray(rows))return invalid('Historial de activo inválido en '+item.id+'.');
+            for(const [option,value] of Object.entries(rows)){
+              if(!allowed.has(option)||!safeInteger(value))return invalid('Cantidad de activo inválida en '+item.id+'.');
+              if(Number(round)===Number(ciclo)){
+                const owned=Object.entries(previousPurchases).filter(([r])=>Number(r)<Number(ciclo)).reduce((sum,[,r])=>sum+Number(r?.[option]||0),0);
+                if(Number(value)<-Math.max(0,owned))return invalid('Venta de activo superior a la cantidad disponible.');
+                if(item.id==='MOLDE'&&Number(value)<0)return invalid('No se puede liquidar un molde.');
+              }
+            }
+          }
+          for(const [option,value] of Object.entries(entry.quantities||{}))if(!allowed.has(option)||!safeInteger(value))return invalid('Cantidad de activo inválida en '+item.id+'.');
+        }
+        for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.moldTargets||{}))if(!['molde_1','molde_2','molde_3'].includes(id)||!finiteNonnegative(value)||!Number.isInteger(Number(value)))return invalid('Plan de producción inválido.');
+        for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.prices||{}))if(!['esencial','urbano','premium'].includes(id)||!finiteNonnegative(value))return invalid('Precio de venta inválido.');
+        if(decisions.INV_MARKETING?.value!=null&&(!finiteNonnegative(decisions.INV_MARKETING.value)||Number(decisions.INV_MARKETING.value)>10000))return invalid('La publicidad debe estar entre S/ 0 y S/ 10,000.');
+        if(decisions.PRESTAMO?.amount!=null&&!finiteNonnegative(decisions.PRESTAMO.amount))return invalid('Préstamo inválido.');
+        // The initial credit line is an explicit existing game rule; the UI
+        // applies the same 70% of initial capital, rounded down to S/ 500.
+        if(Number(ciclo)===1&&decisions.PRESTAMO?.amount!=null){const credit=Math.floor(Math.max(0,Number(company.capital)||0)*0.7/500)*500;if(Number(decisions.PRESTAMO.amount)>credit)return invalid('El préstamo supera la línea inicial disponible.');}
+        const channels=decisions.CANALES||{},validPoints=new Set((channels.optionIds||[]).filter(x=>x==='web'));
+        for(const zone of ['miraflores','los_olivos','sjl'])if((channels.optionIds||[]).includes(zone)){
+          const quantity=channels.quantities?.[zone]??1;if(!finiteNonnegative(quantity)||!Number.isInteger(Number(quantity))||Number(quantity)<1)return invalid('Cantidad de tiendas inválida.');
+          validPoints.add(zone);
+        }
+        if((channels.optionIds||[]).some(x=>!['web','miraflores','los_olivos','sjl'].includes(x)))return invalid('Canal de venta inválido.');
+        for(const [product,rows] of Object.entries(channels.transfers||{})){
+          if(!['esencial','urbano','premium'].includes(product)||!rows||typeof rows!=='object'||Array.isArray(rows))return invalid('Distribución inválida.');
+          for(const [point,value] of Object.entries(rows)){const match=/^(miraflores|los_olivos|sjl):([1-9][0-9]*)$/.exec(point);const active=validPoints.has(point)||(match&&validPoints.has(match[1])&&Number(match[2])<=Number(channels.quantities?.[match[1]]??1));if(!active||!finiteNonnegative(value)||!Number.isInteger(Number(value)))return invalid('Transferencia inválida o punto inactivo.');}
+        }
+        const trusted=previous?.state||{};
+        const preparedState={...decisions,...Object.fromEntries(Object.entries(trusted).filter(([key])=>key.startsWith('__')))};
+        // This is a decision selection, not a financial balance.
+        if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},events:[]});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){

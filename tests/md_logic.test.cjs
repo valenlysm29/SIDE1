@@ -27,7 +27,7 @@ test('full closure preserves chosen prices, inventory balances and corrected MP 
  const r=CYCLE.close({...context(),capital:200000});assert.equal(r.receipt.produced,368);assert.equal(r.receipt.sold,368);assert.equal(r.receipt.revenue,42300);assert.equal(r.receipt.sales[2].price,250);
  near(r.state.__inventarioMP.cuero_std,14.4);assert.equal(r.state.__inventarioMP.acc_prem,22);assert.equal(r.state.__inventarioMP.hilo_prem,6);
  near(r.financial.balanceGeneral.inventarioMP,14.4*45*.92+22*9*.92+6*7*.92+30*80);const er=r.financial.estadoResultados;near(er.costosProduccion,22082.24+21749.12+er.depreciacion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
- assert.match(require('../js/student_financial_view').incomeHtml(er),/Costos de producción del ciclo/);
+ assert.match(require('../js/student_financial_view').incomeHtml(er),/Costo de Ventas/);
  assert.equal(r.receipt.modelVersion,'md-20261027');assert.equal(CYCLE.close({...context(r.state),ledger:r.ledger,capital:200000}).reused,true);
 });
 test('MYPE and No MYPE labor, acquisition and maintenance follow the two source columns',()=>{
@@ -50,14 +50,14 @@ test('the engine retains all owned mold types without adding a multi-purchase co
 });
 const realOnly={...E.config,simulatedCompetitors:{...E.config.simulatedCompetitors,enabled:false}};
 function participants(count,product='premium'){return Array.from({length:count},(_,i)=>({id:String(i),hasChannel:true,scores:{reputation:5},demandFactor:1,lines:[{id:product,price:250,quality:5,produced:0,available:10000}]}));}
-test('ROUND is independent of input order and differs from the market only by rounding',()=>{
- for(const id of E.config.products)for(const count of [1,2,3,7,13,99]){const rows=participants(count,id),a=E.allocate(rows,realOnly),b=E.allocate([...rows].reverse(),realOnly);assert.ok(Math.abs(Object.values(a).reduce((sum,r)=>sum+r.products[id].asignado,0)-E.config.segments[id].totalMarket*E.config.segments[id].penetration)<=count/2);assert.deepEqual(a,b);}
- assert.deepEqual(Object.values(E.allocate(participants(3),realOnly)).map(x=>x.products.premium.asignado),[267,267,267]);assert.deepEqual(E.allocate([]),{});
+test('largest remainders preserve the market and are independent of input order',()=>{
+ for(const id of E.config.products)for(const count of [1,2,3,7,13,99]){const rows=participants(count,id),a=E.allocate(rows,realOnly),b=E.allocate([...rows].reverse(),realOnly);assert.ok(Math.abs(Object.values(a).reduce((sum,r)=>sum+r.products[id].asignado,0)-E.config.segments[id].totalMarket*E.config.segments[id].penetration)===0);assert.deepEqual(a,b);}
+ assert.deepEqual(Object.values(E.allocate(participants(3),realOnly)).map(x=>x.products.premium.asignado),[267,267,266]);assert.deepEqual(E.allocate([]),{});
 });
 test('price guards support identical prices, arbitrary chosen prices and zero total scores',()=>{
  const same=participants(3,'esencial');for(const r of Object.values(E.allocate(same,realOnly)))assert.equal(r.products.esencial.puntajePrecio,100);
  const rows=participants(3,'urbano').map(r=>({...r,scores:{reputation:0},lines:[{...r.lines[0],price:500,quality:0}]}));for(const r of Object.values(E.allocate(rows,realOnly)))assert.equal(r.products.urbano.puntajePrecio,0);
- assert.equal(Object.values(E.allocate(rows,realOnly)).reduce((s,r)=>s+r.products.urbano.asignado,0),3501);
+ assert.equal(Object.values(E.allocate(rows,realOnly)).reduce((s,r)=>s+r.products.urbano.asignado,0),3500);
 });
 test('opening finished stock sells without new labor, material or production plan',()=>{
  const s={CANALES:{optionIds:['web']},__finishedGoods:{esencial:10},__economicHistory:{goodsQuality:{esencial:8}},PRODUCCION_META:{round:2,moldTargets:{}}};
@@ -70,7 +70,7 @@ test('sub-cent physical material balances survive repeated closures',()=>{
  const s=state();s.PRODUCCION_META.moldTargets={molde_1:1};s.CUERO.quantities={cuero_sint:.305};s.ACCESORIOS.quantities={acc_eco:1};s.HILO.quantities={hilo_std:6};
  const r=CYCLE.close({...context(s),capital:200000});near(r.state.__inventarioMP.cuero_sint,.005);
 });
-test('all production costs are recognized in the cycle while unsold PT units carry forward',()=>{
- const s=state();s.__finishedGoods={esencial:5000};const r=CYCLE.close({...context(s),capital:200000});assert.ok(r.receipt.sales[0].sold<r.receipt.sales[0].available);assert.equal(r.state.__finishedGoods.esencial,5150-r.receipt.sales[0].sold);assert.equal(r.financial.balanceGeneral.inventarioPT,0);assert.equal(r.financial.estadoResultados.costoVentas,r.financial.estadoResultados.costosProduccion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
+test('unsold production costs remain in inventory and sold costs are recognized once',()=>{
+ const s=state();s.__finishedGoods={esencial:5000};const r=CYCLE.close({...context(s),capital:200000});assert.ok(r.receipt.sales[0].sold<r.receipt.sales[0].available);assert.equal(r.state.__finishedGoods.esencial,5150-r.receipt.sales[0].sold);assert.ok(r.financial.balanceGeneral.inventarioPT>0);near(r.financial.balanceGeneral.inventarioPT+r.financial.estadoResultados.costoVentas,r.financial.estadoResultados.costosProduccion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
  const saved=clone(r.state);saved.__financialSnapshots[1].estadoResultados.ingresos=123;const retry=CYCLE.close({...context(saved),capital:200000,ledger:r.ledger});assert.equal(retry.financial.estadoResultados.ingresos,123);
 });

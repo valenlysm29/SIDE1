@@ -135,3 +135,10 @@ test('visual DOP handles empty, zero and valid targets and updates from active d
   r.run("localStorage.setItem('SIDE_ACTIVE_ROUND','2');decisionDrafts={};");
   assert.equal(r.run('productionPlan().target'),0);
 });
+test('manual transfers show central and store stock, persist in sales decision and reject excess',()=>{
+ const r=runtime();r.run("decisionState.__finishedGoods={esencial:30};decisionState.__storeInventory={esencial:{'miraflores:1':10}};decisionDrafts.CANALES={optionIds:['miraflores'],quantities:{miraflores:1},transfers:{esencial:{'miraflores:1':15},urbano:{},premium:{}}}");
+ const detail=r.json('manualDistributionData()[0]');assert.equal(detail.central,20);assert.equal(detail.assigned,15);assert.equal(detail.locations['miraflores:1'],10);
+ assert.match(r.run('manualDistributionHtml()'),/almacén disponible 20/);
+ const entry=r.json("prepareSectionSave(DECISION_CATALOG.find(c=>c.cat==='D')).entries.CANALES");assert.equal(entry.transfers.esencial['miraflores:1'],15);
+ r.run("decisionDrafts.CANALES.transfers.esencial['miraflores:1']=21;toast=()=>{};");assert.equal(r.run("validateRequiredSection(DECISION_CATALOG.find(c=>c.cat==='D'))"),false);
+});

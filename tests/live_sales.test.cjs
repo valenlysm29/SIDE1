@@ -35,7 +35,7 @@ test('compatible report transport requires the exact game, company, cycle and an
 });
 test('no materials means no sale and financial schedule is identical to student ledger',()=>{
  const snap=snapshot();snap.decision_state.__cyclePlans[1].state.CANALES.optionIds=[];
- assert.equal(LIVE.calculate({snapshot:snap,capital:200000,catalog}).receipt.sold,90);
+ assert.equal(LIVE.calculate({snapshot:snap,capital:200000,catalog}).receipt.sold,0);
  const empty=snapshot();empty.decision_state.__cyclePlans[1].state.CUERO.quantities={};
  assert.equal(LIVE.calculate({snapshot:empty,capital:200000,catalog}).receipt.sold,0);
  const config={financialSchedule:[{effectiveRound:1,capital:200000},{effectiveRound:2,capital:225000}]};
@@ -50,7 +50,7 @@ test('shared final closure replaces individual preview, survives reload and rema
  const final=CYCLE.closeMany([{id:'A',...input},{id:'B',...input}]);
  const closed={decision_state:final.A.state,cash_ledger:final.A.ledger,financial_sections:final.A.financialSections};
  const p=LIVE.calculate({snapshot:closed,catalog,capital:200000,phase:'results'});
- assert.equal(p.provisional,false);assert.equal(p.receipt.sold,875);assert.equal(p.financial.estadoResultados.ingresos,37187.5);assert.equal(p.receipt.marketAllocation.products.esencial.simulatedCompetitors.length,2);
+ assert.equal(p.provisional,false);assert.equal(p.receipt.sold,1750);assert.equal(p.financial.estadoResultados.ingresos,74375);assert.equal(p.receipt.marketAllocation.products.esencial.simulatedCompetitors.length,0);
  assert.deepEqual(LIVE.calculate({snapshot:closed,catalog,capital:200000,phase:'finished'}),p);
  assert.equal(CYCLE.close({...input,state:closed.decision_state,ledger:closed.cash_ledger}).reused,true);
 });

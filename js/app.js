@@ -862,7 +862,7 @@ function createDecisionDraft(item){
   if(item.id==='CANALES'){
     const optionIds=(e?.optionIds||[]).slice(),quantities={};
     RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});
-    return decisionDrafts[item.id]={optionIds,quantities};
+    return decisionDrafts[item.id]={optionIds,quantities,...(sameRound&&e.transfers?{transfers:deepClone(e.transfers)}:{})};
   }
   const ids=(e?.optionIds||item.defaultOptionIds||[]).slice();return decisionDrafts[item.id]={optionIds:ids};
 }
@@ -1075,17 +1075,32 @@ function renderDecisionCategory(){
   const totalCycles=Number(teacherConfig().cycles);
   if(totalCycles>0&&currentRound()>=Math.max(1,totalCycles-1)&&currentRound()<=totalCycles)lead+=`<aside class="event-clue" role="note"><strong>Impuesto a la renta</strong><small>En el ciclo ${totalCycles} se descontará el impuesto a la renta sobre tu utilidad acumulada.</small></aside>`;
   if(cat.cat==='C'&&window.SIDE_PRODUCTION_MODEL)lead+=productionChecklistHtml(productionPlan());
-  if(['B','C','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
+  if(['B','C','D','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
     const warnings=window.SIDE_REVIEW_MODEL.warnings(decisionModelContext()).filter(w=>w.cat===cat.cat);
     if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;
   }
 
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
-  $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
+  $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?manualDistributionHtml()+cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
+}
+function manualDistributionData(){
+  const channels=channelDraft(),plan=productionPlan(),points=window.SIDE_ECONOMIC_CLOSURE.points({CANALES:channels}),ids=['esencial','urbano','premium'];
+  return ids.map((id,i)=>{const locations=decisionState.__storeInventory?.[id]||{},held=Object.values(locations).reduce((a,v)=>a+Math.max(0,Number(v)||0),0),total=Math.max(0,Number(decisionState.__finishedGoods?.[id]||0))+Number(plan.productLines?.[i]?.plannedUnits||0);return {id,points,locations,central:Math.max(0,Math.floor(total-held)),assigned:Object.values(channels.transfers?.[id]||{}).reduce((a,v)=>a+Math.max(0,Number(v)||0),0)};});
+}
+function manualPointLabel(id){
+  if(id==='web')return 'Canal web';
+  const [optionId,number]=String(id).split(':');
+  const option=findDecisionItem('CANALES')?.options?.find(row=>row.id===optionId);
+  return option?`${option.label} · tienda ${number||'1'}`:String(id);
+}
+function manualDistributionHtml(){
+  const d=channelDraft(),enabled=!!d.transfers,locked=cycleDecisionsLocked()||sectionSubmitted('D')||decisionsSubmitted(),labels={esencial:'Económico',urbano:'Medio',premium:'Premium'};
+  const rows=manualDistributionData();
+  return `<section class="decision-row"><h3>Distribución a puntos de venta</h3><p>La distribución automática cubre la demanda prevista. Activa la asignación manual para decidir cuánto sale del almacén a cada punto.</p><label><input type="checkbox" data-transfer-mode ${enabled?'checked':''} ${locked?'disabled':''}> Usar distribución manual</label>${enabled?rows.map(r=>`<div class="quantity-option"><strong>${labels[r.id]} · almacén disponible ${r.central} · asignado ${r.assigned}</strong>${r.assigned>r.central?'<p role="alert">La asignación supera el stock disponible.</p>':''}${r.points.map(p=>`<label>${escapeHtml(manualPointLabel(p.id))} · stock actual ${Number(r.locations[p.id]||0)} <input type="number" min="0" step="1" data-transfer-product="${r.id}" data-transfer-point="${escapeHtml(p.id)}" value="${Number(d.transfers?.[r.id]?.[p.id]||0)}" ${locked?'disabled':''}></label>`).join('')||'<p>Selecciona primero una tienda o canal web.</p>'}</div>`).join(''):''}</section>`;
 }
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
@@ -1135,6 +1150,8 @@ document.addEventListener('paste',event=>{
 document.addEventListener('input',event=>normalizeStudentNumberInput(event.target),true);
 document.addEventListener('change',event=>normalizeStudentNumberInput(event.target,true),true);
 function bindDecisionControls(){
+  document.querySelector('[data-transfer-mode]')?.addEventListener('change',event=>{if(decisionEditingBlocked())return;const d=channelDraft();if(event.target.checked)d.transfers={esencial:{},urbano:{},premium:{}};else delete d.transfers;persistCurrentDraftOnly();renderDecisionCategory();});
+  document.querySelectorAll('[data-transfer-product]').forEach(input=>input.addEventListener('change',()=>{if(decisionEditingBlocked())return;const d=channelDraft(),product=input.dataset.transferProduct,point=input.dataset.transferPoint;d.transfers=d.transfers||{};d.transfers[product]=d.transfers[product]||{};d.transfers[product][point]=Math.max(0,Math.floor(Number(input.value)||0));persistCurrentDraftOnly();renderDecisionCategory();}));
   document.querySelectorAll('[data-choice]').forEach(input=>{
     input.addEventListener('click',event=>{
       const item=findDecisionItem(input.dataset.choice);
@@ -1233,6 +1250,7 @@ function warnProductionMaterialShortage(){
   toast(`Advertencia: tu producción supera los insumos comprados. ${detail}. Puedes continuar.`);
 }
 function validateRequiredSection(cat){
+  if(cat.cat==='D'&&channelDraft().transfers){const rows=manualDistributionData(),invalid=rows.find(r=>r.assigned>r.central||Object.entries(channelDraft().transfers[r.id]||{}).some(([id,q])=>Number(q)>0&&!r.points.some(p=>p.id===id)));if(invalid){toast('Revisa la distribución: supera el stock o incluye un punto de venta inactivo.');return false;}}
   for(const item of cat.items){
     const preliminary=initDraft(item);
     if(item.type==='number'&&(!Number.isFinite(Number(preliminary.value))||Number(preliminary.value)<(item.min||0)||Number(preliminary.value)>(item.max??Infinity))){toast(`Revisa el importe de ${item.name}.`);return false;}
@@ -1283,7 +1301,7 @@ function prepareSectionSave(cat,context=decisionModelContext()){
     if(item.id==='CANALES'){
       const quantities={},storeContracts={};
       RULES.STORE_IDS.forEach(id=>{const q=RULES.storeQuantity(d,id);if(q){quantities[id]=q;storeContracts[id]=RULES.nextStoreBatches(prev,id,q,round);optionRounds[id]=Math.min(...storeContracts[id].map(b=>b.round));}});
-      entries[item.id]={...common,optionIds:[...(d.optionIds||[])],quantities,storeContracts,optionRounds,
+      entries[item.id]={...common,optionIds:[...(d.optionIds||[])],quantities,storeContracts,optionRounds,...(d.transfers?{transfers:deepClone(d.transfers)}:{}),
         label:item.options.filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.channel==='store'?`${o.label} x ${quantities[o.id]}`:o.label).join(' + ')};return;
     }
     entries[item.id]={...common,optionIds:[...(d.optionIds||[])],optionRounds,label:(item.options||[]).filter(o=>(d.optionIds||[]).includes(o.id)).map(o=>o.label).join(' + ')};

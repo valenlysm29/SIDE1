@@ -1,0 +1,40 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');const {runOnce}=require('../services/business_runtime.cjs');
+async function run(snapshot,cycle=1,previous=null){let posted;
+ const rpc=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[cycle]}]};if(name==='side_contexto_cierre_negocio')return {data:args.p_ciclo===cycle?{empresas:[{id:'1',capital:1000,snapshot}],financialConfig:{cycles:3},token:'t'}:{cierre:previous}};if(name==='side_guardar_cierre_negocio'){posted=args.p_cierre;return {data:{cierre:posted}};}throw Error(name)};
+ const results=await runOnce(rpc);return {results,posted};}
+const makeSnapshot=()=>({decision_state:{__cyclePlans:{1:{state:{}}}},cash_ledger:{},financial_sections:{}});
+test('worker ignores forged current ledger, valid section and financial snapshot',async()=>{const a=makeSnapshot(),b=makeSnapshot();b.cash_ledger={'1:FORGED':900000,'1:B':900000};b.financial_sections={1:{B:{net:900000,recordedNet:900000,items:[]}}};b.decision_state.__financialSnapshots={1:{balanceGeneral:{efectivo:900000}}};const plain=await run(a),attack=await run(b);assert.equal(plain.posted.resultadosPorEmpresa['1'].financial.balanceCaja.cajaFinal,attack.posted.resultadosPorEmpresa['1'].financial.balanceCaja.cajaFinal);assert.ok(!('1:FORGED' in attack.posted.resultadosPorEmpresa['1'].ledger));});
+test('worker restores previous immutable closure, rejecting forged current opening cash',async()=>{const first=await run(makeSnapshot()),previous=first.posted;const snapshot={decision_state:{__cyclePlans:{2:{state:{}}},__financialSnapshots:{1:{balanceGeneral:{efectivo:900000}}},__finishedGoods:{premium:999}},cash_ledger:{'1:FORGED':900000,'2:FORGED':900000}};const next=await run(snapshot,2,previous);assert.equal(next.results[0].success,true);assert.ok(next.posted.resultadosPorEmpresa['1'].financial.balanceCaja.cajaFinal<10000);});
+test('unverifiable events fail closed',async()=>{const s=makeSnapshot();s.decision_state.__cycleBusiness={1:{events:[{effect:{revenuePct:50}}]}};const r=await run(s);assert.equal(r.results[0].success,false);assert.equal(r.results[0].code,'DATOS_ECONOMICOS_NO_VERIFICADOS');assert.equal(r.posted,undefined);});
+
+test('legitimate loan is reconstructed from confirmed decision, not client ledger',async()=>{const s=makeSnapshot();s.decision_state.__cyclePlans[1].state.PRESTAMO={round:1,amount:500};s.cash_ledger={'1:F':900000};const r=await run(s);assert.equal(r.results[0].success,true);const f=r.posted.resultadosPorEmpresa['1'].financial;assert.equal(f.balanceCaja.prestamos,500);assert.ok(f.balanceCaja.cajaFinal<2000);assert.equal(f.balanceGeneral.deuda,500);});
+test('missing prior immutable closure fails closed',async()=>{const s={decision_state:{__cyclePlans:{2:{state:{}}}}};const r=await run(s,2,null);assert.equal(r.results[0].success,false);assert.equal(r.results[0].code,'CIERRE_ANTERIOR_REQUERIDO');assert.equal(r.posted,undefined);});
+test('forged past acquisitions cannot create assets in a later cycle',async()=>{const first=await run(makeSnapshot());const s={decision_state:{__cyclePlans:{2:{state:{MESA_CORTE:{round:2,purchases:{1:{mesa:1000}}}}}}}};const result=await run(s,2,first.posted);assert.equal(result.results[0].success,false);assert.equal(result.results[0].code,'HISTORIAL_ACTIVOS_NO_VERIFICADO');assert.equal(result.posted,undefined);});
+
+test('worker rejects invalid decisions before calculating or persisting',async()=>{
+ for(const state of [
+  {MESA_CORTE:{round:1,purchases:{1:{mesa:'invalid'}}}},
+  {MESA_CORTE:{round:1,purchases:{1:{mesa:true}}}},
+  {MESA_CORTE:{round:1,purchases:{1:{mesa:[]}}}},
+  {MESA_CORTE:{round:1,purchases:{1:{mesa:1e20}}}},
+  {MESA_CORTE:{round:1,purchases:{2:{mesa:1}}}},
+  {MESA_CORTE:{round:1,purchases:{'01':{mesa:1}}}},
+  {MESA_CORTE:{round:1,purchases:{'0':{mesa:1}}}},
+  {MESA_CORTE:{round:1,purchases:{1:{mesa:-10}}}},
+  {MOLDE:{round:1,optionIds:['falso']}},
+  {JEFATURA:{round:1,optionIds:['falso']}},
+  {CANALES:{round:1,optionIds:['web','web']}},
+  {PERS_CORTE:{round:1,quantities:{inventado:1}}},
+  {HILO:{round:1,quantities:{hilo_std:-5}}},
+  {PRODUCCION_META:{round:1,moldTargets:{molde_1:-2}}},
+  {PRODUCCION_META:{round:1,prices:{premium:-1}}},
+  {PRODUCCION_META:{round:1,prices:{premium:true}}},
+  {PRODUCCION_META:{round:1,prices:{premium:'   '}}},
+  {PRODUCCION_META:{round:1,prices:{premium:1e100}}},
+  {HILO:{round:1,quantities:{hilo_std:[]}}},
+  {INV_MARKETING:{round:1,value:10001}},
+  {PRESTAMO:{round:1,amount:900000}},
+  {CANALES:{round:1,optionIds:['web'],transfers:{premium:{'miraflores:1':2}}}}
+ ]){const snapshot=makeSnapshot();snapshot.decision_state.__cyclePlans[1].state=state;const result=await run(snapshot);assert.equal(result.results[0].code,'DECISION_INVALIDA');assert.equal(result.posted,undefined);}
+});

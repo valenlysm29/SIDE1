@@ -1,0 +1,330 @@
+[
+  {
+    "relname": "decisiones_catalogo",
+    "columns": [
+      {
+        "type": "integer",
+        "column": "id",
+        "default": "nextval('decisiones_catalogo_id_seq'::regclass)",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "categoria",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "categoria_nombre",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "decision_id",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "decision_nombre",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "tipo",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "boolean",
+        "column": "es_recurrente",
+        "default": "false",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "boolean",
+        "column": "es_obligatoria",
+        "default": "false",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "numeric(12,2)",
+        "column": "costo_base",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "descripcion",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "boolean",
+        "column": "activo",
+        "default": "true",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "timestamp with time zone",
+        "column": "created_at",
+        "default": "now()",
+        "notnull": true,
+        "identity": ""
+      }
+    ]
+  },
+  {
+    "relname": "decisiones_opciones",
+    "columns": [
+      {
+        "type": "integer",
+        "column": "id",
+        "default": "nextval('decisiones_opciones_id_seq'::regclass)",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "decision_id",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "opcion_id",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "etiqueta",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "descripcion",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "numeric(12,2)",
+        "column": "costo",
+        "default": "0",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "capacidad_diaria",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "numeric(5,2)",
+        "column": "tasa_liquidacion",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "canal",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "distrito",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "numeric(5,2)",
+        "column": "demanda_factor",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "compromiso_ciclos",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "boolean",
+        "column": "activo",
+        "default": "true",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "timestamp with time zone",
+        "column": "created_at",
+        "default": "now()",
+        "notnull": true,
+        "identity": ""
+      }
+    ]
+  },
+  {
+    "relname": "empresas",
+    "columns": [
+      {
+        "type": "bigint",
+        "column": "id",
+        "default": null,
+        "notnull": true,
+        "identity": "d"
+      },
+      {
+        "type": "text",
+        "column": "nombre_legal",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "text",
+        "column": "nombre_comercial",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "numeric(12,2)",
+        "column": "caja_inicial",
+        "default": "100000",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "numeric(12,2)",
+        "column": "caja_actual",
+        "default": "100000",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "ciclo_actual",
+        "default": "1",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "numeric(5,2)",
+        "column": "reputacion",
+        "default": "80",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "timestamp with time zone",
+        "column": "created_at",
+        "default": "now()",
+        "notnull": true,
+        "identity": ""
+      }
+    ]
+  },
+  {
+    "relname": "empresas_decisiones",
+    "columns": [
+      {
+        "type": "integer",
+        "column": "id",
+        "default": "nextval('empresas_decisiones_id_seq'::regclass)",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "empresa_id",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "ciclo",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "decision_id",
+        "default": null,
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "opcion_id",
+        "default": null,
+        "notnull": false,
+        "identity": ""
+      },
+      {
+        "type": "integer",
+        "column": "cantidad",
+        "default": "1",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "numeric(12,2)",
+        "column": "costo_total",
+        "default": "0",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "boolean",
+        "column": "enviada",
+        "default": "false",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "timestamp with time zone",
+        "column": "created_at",
+        "default": "now()",
+        "notnull": true,
+        "identity": ""
+      },
+      {
+        "type": "timestamp with time zone",
+        "column": "updated_at",
+        "default": "now()",
+        "notnull": true,
+        "identity": ""
+      }
+    ]
+  }
+]

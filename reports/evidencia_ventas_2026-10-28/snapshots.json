@@ -51,12 +51,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -68,12 +84,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -84,22 +116,38 @@
             "id": "premium",
             "sold": 90,
             "price": 240,
-            "demand": 199,
+            "demand": 266,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 21600,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 176,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 240,
-            "assignedDemand": 199,
+            "assignedDemand": 266,
             "effectivePrice": 240,
-            "potentialRevenue": 47760
+            "potentialRevenue": 63840
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -547,6 +595,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -561,25 +691,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 266,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -636,7 +756,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 8880.91
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 716,
@@ -647,8 +767,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -720,12 +842,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -737,12 +875,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -753,22 +907,38 @@
             "id": "premium",
             "sold": 90,
             "price": 240,
-            "demand": 199,
+            "demand": 266,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 21600,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 176,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 240,
-            "assignedDemand": 199,
+            "assignedDemand": 266,
             "effectivePrice": 240,
-            "potentialRevenue": 47760
+            "potentialRevenue": 63840
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -1218,6 +1388,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -1232,25 +1484,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 266,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -1316,7 +1558,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 17761.82
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 716,
@@ -1327,8 +1569,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -1400,12 +1644,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -1417,12 +1677,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -1433,22 +1709,38 @@
             "id": "premium",
             "sold": 90,
             "price": 240,
-            "demand": 199,
+            "demand": 266,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 21600,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 176,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 240,
-            "assignedDemand": 199,
+            "assignedDemand": 266,
             "effectivePrice": 240,
-            "potentialRevenue": 47760
+            "potentialRevenue": 63840
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -1898,6 +2190,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 266,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 21600,
+                "received": 90,
+                "available": 90,
+                "lostSales": 176
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -1912,25 +2286,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 266,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -1996,7 +2360,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 23978.46
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 716,
@@ -2007,8 +2371,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -2080,12 +2446,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -2097,12 +2479,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -2113,22 +2511,38 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 201,
+            "demand": 269,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 111,
+            "lostSales": 179,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 201,
+            "assignedDemand": 269,
             "effectivePrice": 250,
-            "potentialRevenue": 50250
+            "potentialRevenue": 67250
           }
         ],
         "events": [],
-        "market": 201,
+        "market": 269,
         "scores": {
           "health": 1,
           "selected": [
@@ -2576,6 +2990,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -2590,25 +3086,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 201,
-              "porcentaje": 0.2515479876160991,
+              "asignado": 269,
+              "porcentaje": 0.33584195672624645,
               "mercadoReal": 800,
-              "puntajeTotal": 32.5,
+              "puntajeTotal": 35.7,
               "puntajePrecio": 100,
-              "calidadMercado": 25,
-              "demandaAjustada": 201,
+              "calidadMercado": 33,
+              "demandaAjustada": 269,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -2665,7 +3151,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 9771.91
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 725,
@@ -2676,8 +3162,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -2749,12 +3237,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -2766,12 +3270,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -2782,22 +3302,38 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 201,
+            "demand": 269,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 111,
+            "lostSales": 179,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 201,
+            "assignedDemand": 269,
             "effectivePrice": 250,
-            "potentialRevenue": 50250
+            "potentialRevenue": 67250
           }
         ],
         "events": [],
-        "market": 201,
+        "market": 269,
         "scores": {
           "health": 1,
           "selected": [
@@ -3247,6 +3783,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -3261,25 +3879,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 201,
-              "porcentaje": 0.2515479876160991,
+              "asignado": 269,
+              "porcentaje": 0.33584195672624645,
               "mercadoReal": 800,
-              "puntajeTotal": 32.5,
+              "puntajeTotal": 35.7,
               "puntajePrecio": 100,
-              "calidadMercado": 25,
-              "demandaAjustada": 201,
+              "calidadMercado": 33,
+              "demandaAjustada": 269,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -3345,7 +3953,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 19543.82
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 725,
@@ -3356,8 +3964,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -3429,12 +4039,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -3446,12 +4072,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -3462,22 +4104,38 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 201,
+            "demand": 269,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 111,
+            "lostSales": 179,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 201,
+            "assignedDemand": 269,
             "effectivePrice": 250,
-            "potentialRevenue": 50250
+            "potentialRevenue": 67250
           }
         ],
         "events": [],
-        "market": 201,
+        "market": 269,
         "scores": {
           "health": 1,
           "selected": [
@@ -3927,6 +4585,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 269,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 22500,
+                "received": 90,
+                "available": 90,
+                "lostSales": 179
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -3941,25 +4681,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 201,
-              "porcentaje": 0.2515479876160991,
+              "asignado": 269,
+              "porcentaje": 0.33584195672624645,
               "mercadoReal": 800,
-              "puntajeTotal": 32.5,
+              "puntajeTotal": 35.7,
               "puntajePrecio": 100,
-              "calidadMercado": 25,
-              "demandaAjustada": 201,
+              "calidadMercado": 33,
+              "demandaAjustada": 269,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -4025,7 +4755,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 26384.16
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 725,
@@ -4036,8 +4766,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -4109,12 +4841,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -4126,12 +4874,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -4142,22 +4906,38 @@
             "id": "premium",
             "sold": 90,
             "price": 260,
-            "demand": 199,
+            "demand": 265,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 23400,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 175,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 260,
-            "assignedDemand": 199,
+            "assignedDemand": 265,
             "effectivePrice": 260,
-            "potentialRevenue": 51740
+            "potentialRevenue": 68900
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 265,
         "scores": {
           "health": 1,
           "selected": [
@@ -4605,6 +5385,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -4619,25 +5481,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 265,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 265,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -4694,7 +5546,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 10662.91
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 734,
@@ -4705,8 +5557,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -4778,12 +5632,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -4795,12 +5665,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -4811,22 +5697,38 @@
             "id": "premium",
             "sold": 90,
             "price": 260,
-            "demand": 199,
+            "demand": 265,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 23400,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 175,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 260,
-            "assignedDemand": 199,
+            "assignedDemand": 265,
             "effectivePrice": 260,
-            "potentialRevenue": 51740
+            "potentialRevenue": 68900
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 265,
         "scores": {
           "health": 1,
           "selected": [
@@ -5276,6 +6178,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -5290,25 +6274,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 265,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 265,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -5374,7 +6348,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 21325.82
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 734,
@@ -5385,8 +6359,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -5458,12 +6434,28 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -5475,12 +6467,28 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
+            "points": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
             "reason": "No planificó producción en este segmento",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -5491,22 +6499,38 @@
             "id": "premium",
             "sold": 90,
             "price": 260,
-            "demand": 199,
+            "demand": 265,
+            "points": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
             "reason": "",
             "quality": 5,
             "revenue": 23400,
             "produced": 90,
             "available": 90,
-            "lostSales": 109,
+            "lostSales": 175,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 260,
-            "assignedDemand": 199,
+            "assignedDemand": 265,
             "effectivePrice": 260,
-            "potentialRevenue": 51740
+            "potentialRevenue": 68900
           }
         ],
         "events": [],
-        "market": 199,
+        "market": 265,
         "scores": {
           "health": 1,
           "selected": [
@@ -5956,6 +6980,88 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "urbano",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 90,
+                "zone": "web",
+                "demand": 265,
+                "closing": 0,
+                "opening": 0,
+                "product": "premium",
+                "revenue": 23400,
+                "received": 90,
+                "available": 90,
+                "lostSales": 175
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [
+              {
+                "id": "web",
+                "sold": 0,
+                "zone": "web",
+                "demand": 0,
+                "closing": 0,
+                "opening": 0,
+                "product": "esencial",
+                "revenue": 0,
+                "received": 0,
+                "available": 0,
+                "lostSales": 0
+              }
+            ],
+            "central": 0,
+            "locations": {
+              "web": 0
+            },
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {
+            "web": 0
+          },
+          "premium": {
+            "web": 0
+          },
+          "esencial": {
+            "web": 0
+          }
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -5970,25 +7076,15 @@
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 199,
-              "porcentaje": 0.24845201238390097,
+              "asignado": 265,
+              "porcentaje": 0.33207902163687675,
               "mercadoReal": 800,
-              "puntajeTotal": 32.1,
+              "puntajeTotal": 35.300000000000004,
               "puntajePrecio": 96,
-              "calidadMercado": 25,
-              "demandaAjustada": 199,
+              "calidadMercado": 33,
+              "demandaAjustada": 265,
               "reputacionEscalada": 25,
-              "simulatedCompetitors": [
-                {
-                  "id": "simulado-premium-1",
-                  "stock": 800,
-                  "precio": 250,
-                  "demanda": 201,
-                  "puntaje": 32.5,
-                  "reputacion": 2.5,
-                  "participacion": 0.2515479876160991
-                }
-              ]
+              "simulatedCompetitors": []
             }
           },
           "reputation": {
@@ -6054,7 +7150,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": 28789.86
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
         "otros": 734,
@@ -6065,8 +7161,10 @@
         "maquinaria": 159.37,
         "materiales": 4059,
         "publicidad": 0,
+        "costoVentas": 9246.19,
         "depreciacion": 114.79,
-        "mantenimiento": 44.58
+        "mantenimiento": 44.58,
+        "costoProduccionCiclo": 9246.19
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -6138,12 +7236,14 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -6155,12 +7255,14 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -6172,12 +7274,14 @@
             "sold": 0,
             "price": 250,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
             "assignedDemand": 0,
@@ -6497,6 +7601,34 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {},
+          "premium": {},
+          "esencial": {}
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -6564,7 +7696,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": -712.32
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 712.32,
         "otros": 0,
@@ -6575,8 +7707,10 @@
         "maquinaria": 0,
         "materiales": 0,
         "publicidad": 0,
+        "costoVentas": 0,
         "depreciacion": 0,
-        "mantenimiento": 0
+        "mantenimiento": 0,
+        "costoProduccionCiclo": 0
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -6648,12 +7782,14 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -6665,12 +7801,14 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -6682,12 +7820,14 @@
             "sold": 0,
             "price": 250,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
             "assignedDemand": 0,
@@ -7007,6 +8147,34 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {},
+          "premium": {},
+          "esencial": {}
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -7083,7 +8251,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": -1424.64
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 712.32,
         "otros": 0,
@@ -7094,8 +8262,10 @@
         "maquinaria": 0,
         "materiales": 0,
         "publicidad": 0,
+        "costoVentas": 0,
         "depreciacion": 0,
-        "mantenimiento": 0
+        "mantenimiento": 0,
+        "costoProduccionCiclo": 0
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,
@@ -7167,12 +8337,14 @@
             "sold": 0,
             "price": 42.5,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 42.5,
             "assignedDemand": 0,
@@ -7184,12 +8356,14 @@
             "sold": 0,
             "price": 100,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 100,
             "assignedDemand": 0,
@@ -7201,12 +8375,14 @@
             "sold": 0,
             "price": 250,
             "demand": 0,
-            "reason": "No planificó producción en este segmento",
+            "points": [],
+            "reason": "Sin canal de venta",
             "quality": 0,
             "revenue": 0,
             "produced": 0,
             "available": 0,
             "lostSales": 0,
+            "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
             "assignedDemand": 0,
@@ -7526,6 +8702,34 @@
         "consequences": [],
         "demandFactor": 1,
         "modelVersion": "md-20261027",
+        "distributions": {
+          "urbano": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "premium": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          },
+          "esencial": {
+            "rows": [],
+            "central": 0,
+            "locations": {},
+            "assignment": "automatic",
+            "unservedWithoutChannel": 0
+          }
+        },
+        "storeInventory": {
+          "urbano": {},
+          "premium": {},
+          "esencial": {}
+        },
         "financialPolicy": {
           "cycles": 3,
           "capital": 200000,
@@ -7602,7 +8806,7 @@
         "provisionGarantias": 0,
         "resultadosAcumulados": -2136.96
       },
-      "criterioCostos": "produccion_ciclo",
+      "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 712.32,
         "otros": 0,
@@ -7613,8 +8817,10 @@
         "maquinaria": 0,
         "materiales": 0,
         "publicidad": 0,
+        "costoVentas": 0,
         "depreciacion": 0,
-        "mantenimiento": 0
+        "mantenimiento": 0,
+        "costoProduccionCiclo": 0
       },
       "gastoGarantias": 0,
       "impactoEventos": 0,

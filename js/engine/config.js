@@ -12,7 +12,10 @@
     tax:{uit:5500,mypeLimitUit:15,mypeRate:.10,generalRate:.295},
     reputation:{smoothWithPrevious:false},
     // Empresas sintéticas derivan precio y reputación del promedio de empresas reales.
-    simulatedCompetitors:{enabled:true,target:4},
+    simulatedCompetitors:{enabled:false,target:4},
+    // Nueva regla comercial SIDE, no procedente del Excel.
+    commercialAffinity:{esencial:{alta:.6,media:1,baja:1.4,web:1},urbano:{alta:.9,media:1.3,baja:.8,web:1},premium:{alta:1.5,media:1,baja:.5,web:1}},
+    storeZones:{miraflores:'alta',los_olivos:'media',sjl:'baja'},
     // Cantidades de compra se expresan en m², unidades y metros.
     materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
     products:['esencial','urbano','premium'],

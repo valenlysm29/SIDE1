@@ -96,17 +96,43 @@
       const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0);return {p,line,score,total};});
       if(!rows.length)continue;
       const sum=rows.reduce((s,row)=>s+row.total,0);
-      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.assigned=roundDemand(row.share,market);}
+      for(const row of rows)row.share=sum?row.total/sum:1/rows.length;
+      const rounded=apportion(market,Object.fromEntries(rows.map(row=>[String(row.p.id),row.share])));
+      for(const row of rows)row.assigned=rounded[String(row.p.id)];
       for(const row of rows)if(!row.p.simulated)result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
     }return result;
   }
+  // Reparto entero determinista; cada punto conserva su identidad.
+  function apportion(total,weights){
+    total=Math.floor(n(total));const entries=Object.entries(weights).filter(([,w])=>n(w)>0),sum=entries.reduce((a,[,w])=>a+n(w),0),out=Object.fromEntries(Object.keys(weights).map(id=>[id,0]));
+    if(!sum)return out;const rows=entries.map(([id,w])=>{const raw=total*n(w)/sum,base=Math.floor(raw);out[id]=base;return {id,rem:raw-base};});
+    const left=total-Object.values(out).reduce((a,v)=>a+v,0);rows.sort((a,b)=>b.rem-a.rem||a.id.localeCompare(b.id,'en'));for(let i=0;i<left;i++)out[rows[i].id]++;return out;
+  }
+  function points(state,config=DEFAULT){
+    const entry=state.CANALES||{},ids=entry.optionIds||[],out=[];
+    if(ids.includes('web'))out.push({id:'web',zone:'web'});
+    for(const id of Object.keys(config.storeZones||{})){if(!ids.includes(id))continue;const count=Math.max(1,Math.floor(n(entry.quantities?.[id])||1));for(let i=1;i<=count;i++)out.push({id:`${id}:${i}`,zone:config.storeZones[id]});}
+    return out;
+  }
+  function distributeProduct({id,demand,price,available,openingLocations={},activePoints=[],affinity={},manualTransfers=null}){
+    const stocks=Object.fromEntries(Object.entries(openingLocations).map(([key,value])=>[key,Math.floor(n(value))]));
+    const stored=Object.values(stocks).reduce((a,v)=>a+v,0);if(stored>Math.floor(n(available)))throw new RangeError('Inventario por punto supera inventario total');
+    let central=Math.floor(n(available))-stored;
+    const weights=Object.fromEntries(activePoints.map(p=>[p.id,n(affinity[p.zone])]));const demandByPoint=apportion(demand,weights);
+    const needs=Object.fromEntries(activePoints.map(p=>[p.id,Math.max(0,(demandByPoint[p.id]||0)-(stocks[p.id]||0))]));
+    let transfers;if(manualTransfers){transfers={};for(const p of [...activePoints].sort((a,b)=>a.id.localeCompare(b.id,'en'))){const raw=Number(manualTransfers[p.id]??0);if(!Number.isInteger(raw)||raw<0||raw>central)throw new RangeError('Transferencia manual inválida o superior al stock central');const q=raw;transfers[p.id]=q;central-=q;}}
+    else {const totalNeed=Object.values(needs).reduce((a,v)=>a+v,0);transfers=totalNeed<=central?needs:apportion(central,needs);central-=Object.values(transfers).reduce((a,v)=>a+v,0);}
+    const rows=activePoints.map(p=>{const opening=stocks[p.id]||0,received=transfers[p.id]||0,stock=opening+received,assigned=demandByPoint[p.id]||0,sold=Math.min(assigned,stock);stocks[p.id]=stock-sold;return {id:p.id,zone:p.zone,product:id,opening,received,available:stock,demand:assigned,sold,lostSales:assigned-sold,revenue:money(sold*price),closing:stocks[p.id]};});
+    return {rows,central,locations:stocks,assignment:manualTransfers?'manual':'automatic',unservedWithoutChannel:activePoints.length?0:Math.floor(n(demand))};
+  }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
+    const pointList=points(p.state,config),locationInventory=clone(p.state.__storeInventory||{}),distributions={};
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.price,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
     const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));
     if(p.nextLoanRatePP)p.messages.push({id:'CONS-05',text:`Salud financiera baja: próximo préstamo +${p.nextLoanRatePP} puntos porcentuales.`});
-    return [p.id,{...p,sales,revenue,goods,storage,receivable,collections,cashRevenue:money(revenue-receivable+collections),allocation:allocations[p.id]}];
+    return [p.id,{...p,sales,revenue,goods,storeInventory:locationInventory,distributions,storage,receivable,collections,cashRevenue:money(revenue-receivable+collections),allocation:allocations[p.id]}];
   }));}
   // Cell-level Excel oracle entry point. Same allocation function as runtime;
   // inputs represent lots already processed through physical production.
@@ -119,5 +145,5 @@
     }),allocations=allocate(prepared,{...config,simulatedCompetitors:{...config.simulatedCompetitors,enabled:false}});
     return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
   }
-  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies,roundDemand};
+  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies,roundDemand,apportion,points,distributeProduct};
 });

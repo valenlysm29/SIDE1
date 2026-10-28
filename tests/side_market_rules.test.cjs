@@ -28,15 +28,15 @@ test('reputación del ciclo por defecto; suavizado opcional',()=>{
 test('participantes sintéticos configurables se registran en el reparto',()=>{
  const line={id:'esencial',price:40,available:10000};
  const p={id:'real',scores:{reputation:5},lines:[line]};
- const withSynthetic=C.allocate([p]).real.products.esencial;
+ const withSynthetic=C.allocate([p],{...config,simulatedCompetitors:{enabled:true,target:4}}).real.products.esencial;
  assert.equal(withSynthetic.asignado,875);
  assert.equal(withSynthetic.simulatedCompetitors.length,3);
  assert.equal(withSynthetic.simulatedCompetitors[0].precio,40);
  const actualOnly=C.allocate([p],{...config,simulatedCompetitors:{enabled:false,target:4}}).real.products.esencial;
  assert.equal(actualOnly.asignado,3500);
 });
-test('sin canal no se advierte falsamente que las ventas serán cero',()=>{
+test('sin canal se advierte que no habrá ventas',()=>{
  const review=require('../js/decision_review_model.js');
  const messages=review.warnings({state:{},drafts:{},catalog:[],round:1});
- assert.ok(!messages.some(w=>/sin canal de venta/i.test(w.text)));
+ assert.ok(messages.some(w=>/sin canal de venta activo/i.test(w.text)));
 });

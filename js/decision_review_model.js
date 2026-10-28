@@ -134,6 +134,8 @@
   function warnings(ctx){
     const warnings=[],plan=productionModel?.calculate(ctx);
     if(!plan)return warnings;
+    const channels=(ctx.drafts?.CANALES||ctx.state?.CANALES)?.optionIds||[];
+    if(!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))warnings.push({cat:'D',text:'Sin canal de venta activo no se venderán unidades; selecciona una tienda o el canal web.'});
     if(!plan.target)warnings.push({cat:'B',text:'Meta de producción en cero: este plan no fabricará unidades nuevas. Indica la cantidad deseada por molde para producir.'});
     if(plan.unavailablePlannedMolds.length)warnings.push({cat:'B',text:'Falta adquirir un molde incluido en la meta. Esas unidades no se producirán.'});
     if(plan.target&&!plan.producibleUnits)warnings.push({cat:'B',text:'Producción posible: 0 unidades. Revisa los recursos indicados antes de confirmar; seleccionar opciones no garantiza cantidades suficientes.'});
