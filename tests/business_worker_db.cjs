@@ -28,12 +28,14 @@ function plan(round){
   const results=await runOnce(call);assert.equal(results.length,2);assert.ok(results.every(r=>r.success&&!r.pending),JSON.stringify(results));
   assert.deepEqual(await runOnce(call),[],'restart/retry must not duplicate any closure');
   await db.exec('reset role');
-  const rows=(await db.query('select ciclo,ingresos,estado_resultados from reportes_ciclo where empresa_id=$1 order by ciclo',[id])).rows;
+  const rows=(await db.query('select ciclo,ingresos,estado_resultados,balance_caja from reportes_ciclo where empresa_id=$1 order by ciclo',[id])).rows;
   assert.equal(rows.length,2);
   for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);}
   assert.equal(rows[0].estado_resultados.impuestoRenta,0);
-  const preTax=rows.reduce((s,row)=>s+row.estado_resultados.utilidadAntesImpuestos,0),expected=Math.round(preTax*.295*100)/100;
+  const preTax=rows.reduce((s,row)=>s+row.estado_resultados.utilidadAntesImpuestos,0),expected=Math.round((Math.min(preTax,82500)*.10+Math.max(0,preTax-82500)*.295)*100)/100;
   assert.ok(expected>0);assert.equal(rows[1].estado_resultados.impuestoRenta,expected);
+  assert.equal(rows[1].balance_caja.cajaFinal,Math.round((rows[1].balance_caja.cajaInicial+rows[1].balance_caja.entradas-rows[1].balance_caja.salidas)*100)/100);
+  assert.ok(rows[1].balance_caja.salidas>=expected);
   const saved=(await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot;
   const restored=require('../js/financial_model.js').calculate({round:2,state:saved.decision_state,ledger:saved.cash_ledger});
   assert.equal(restored.estadoResultados.impuestoRenta,expected);

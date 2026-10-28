@@ -1,0 +1,42 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const BUS=require('../js/business_rules.js');
+const config=require('../js/engine/config.js');
+const PRO=require('../js/production_model.js');
+const C=require('../js/engine/cierre.js');
+test('descuento por cantidad se aplica al superar umbral configurable',()=>{
+ const item={cost:45};
+ assert.equal(BUS.materialUnitPrice(item,99,0,config),45);
+ assert.equal(BUS.materialUnitPrice(item,100,0,config),45*.92);
+ assert.equal(BUS.materialUnitPrice(item,100,0,{materials:{quantityDiscountThreshold:101,quantityDiscountRate:.08}}),45);
+});
+test('unidades de producción en el formulario no se convierten dos veces',()=>{
+ assert.equal(PRO.yieldFor('CUERO','cuero_std'),1);
+ assert.equal(PRO.yieldFor('HILO','hilo_prem'),1);
+});
+test('redondeo individual Excel',()=>{
+ assert.equal(C.roundDemand(0.5,3),2);
+ assert.equal(C.roundDemand(1/3,3500),1167);
+});
+test('reputación del ciclo por defecto; suavizado opcional',()=>{
+ const state={__economicHistory:{reputation:8}};
+ const a=C.prepare({id:'a',state,catalog:[],round:1});
+ const b=C.prepare({id:'a',state,catalog:[],round:1},{...config,reputation:{smoothWithPrevious:true}});
+ assert.equal(a.reputation.valor,0);
+ assert.equal(b.reputation.valor,4);
+});
+test('participantes sintéticos configurables se registran en el reparto',()=>{
+ const line={id:'esencial',price:40,available:10000};
+ const p={id:'real',scores:{reputation:5},lines:[line]};
+ const withSynthetic=C.allocate([p]).real.products.esencial;
+ assert.equal(withSynthetic.asignado,875);
+ assert.equal(withSynthetic.simulatedCompetitors.length,3);
+ assert.equal(withSynthetic.simulatedCompetitors[0].precio,40);
+ const actualOnly=C.allocate([p],{...config,simulatedCompetitors:{enabled:false,target:4}}).real.products.esencial;
+ assert.equal(actualOnly.asignado,3500);
+});
+test('sin canal no se advierte falsamente que las ventas serán cero',()=>{
+ const review=require('../js/decision_review_model.js');
+ const messages=review.warnings({state:{},drafts:{},catalog:[],round:1});
+ assert.ok(!messages.some(w=>/sin canal de venta/i.test(w.text)));
+});
