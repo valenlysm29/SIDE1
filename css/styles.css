@@ -1099,8 +1099,9 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 /* Panel financiero: tres estados visibles completos, sin scroll horizontal. */
 .student-result-breakdown{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;box-sizing:border-box;overflow:hidden}
 .student-result-breakdown>div{min-width:0;box-sizing:border-box;overflow:hidden}
-.student-result-breakdown span{min-width:0;white-space:nowrap}
-.student-result-breakdown span b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.student-result-breakdown>div>span{min-width:0;white-space:normal;align-items:baseline}
+.student-result-breakdown>div>span>span{display:block;min-width:0;overflow-wrap:anywhere;border:0;padding:0;font-size:inherit}
+.student-result-breakdown>div>span>b{flex-shrink:0;white-space:nowrap}
 .student-finance-mini{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .student-finance-mini>div{min-width:0;overflow:hidden}
 
