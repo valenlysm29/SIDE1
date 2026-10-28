@@ -45,3 +45,15 @@ test('numeric and text cycle identifiers preserve identical material consumption
   assert.deepEqual(b.state.__inventarioMP,a.state.__inventarioMP);
   assert.deepEqual(b.financial,a.financial);
 });
+
+test('a current-cycle mold purchase remains available when synchronized optionIds are missing',()=>{
+  const s=state();
+  s.MOLDE={round:1,optionIds:[],purchases:{1:{molde_1:1}}};
+  const result=CYCLE.close(context(s));
+  assert.equal(result.receipt.produced,90);
+  assert.equal(result.receipt.sold,90);
+  assert.equal(result.receipt.revenue,3825);
+  assert.deepEqual(result.receipt.production.unavailablePlannedMolds,[]);
+  const draftPlan=PRO.calculate({...context(s),drafts:{MOLDE:{optionIds:[]}}});
+  assert.equal(draftPlan.producibleUnits,0);
+});

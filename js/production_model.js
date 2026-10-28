@@ -148,7 +148,10 @@
       const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
       return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
-    const selectedMoldIds=selected(ctx,'MOLDE').filter(id=>MOLD_REQUIREMENTS[id]);
+    // Saved purchases are authoritative even when a synchronized record omits
+    // optionIds. A live draft replaces the current cycle's saved selection.
+    const currentPurchases=ctx.drafts?.MOLDE?[]:Object.entries(ctx.state?.MOLDE?.purchases?.[ctx.round]||{}).filter(([id,q])=>MOLD_REQUIREMENTS[id]&&whole(q)>0).map(([id])=>id);
+    const selectedMoldIds=[...new Set([...selected(ctx,'MOLDE').filter(id=>MOLD_REQUIREMENTS[id]),...currentPurchases])];
     const ownedIds=ownedMoldIds(ctx),availableMoldIds=[...new Set([...ownedIds,...selectedMoldIds])];
     const moldId=selectedMoldIds[0]||ownedIds.at(-1)||'molde_1',requirements=MOLD_REQUIREMENTS[moldId]||MOLD_REQUIREMENTS.molde_1;
     const processCapacity=processes.length?Math.min(...processes.map(process=>process.cycleCapacity)):0;

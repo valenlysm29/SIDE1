@@ -1863,7 +1863,8 @@ function cycleSalesHtml(round=currentRound()){
     const assigned=Number(sale.demand??receipt.marketAllocation?.products?.[sale.id]?.asignado??0);
     const plan=receipt.production||{},causes=[];
     if(!sale.sold&&!sale.produced){
-      if(plan.unavailablePlannedMolds?.length)causes.push('Falta el molde elegido');
+      const moldId={esencial:'molde_1',urbano:'molde_2',premium:'molde_3'}[sale.id];
+      if(plan.unavailablePlannedMolds?.includes(moldId))causes.push('Falta el molde elegido');
       for(const process of plan.processes||[])if(!process.cycleCapacity)causes.push(`Sin personal o equipo operativo en ${process.label}`);
       for(const material of plan.materials||[])if(!material.supportedUnits)causes.push(`Sin ${material.label} suficiente`);
     }
