@@ -349,18 +349,26 @@ function remoteSnapshot(data){
 function legacyRemoteDecisionState(data){
   const rows=data?.decisiones_historial||data?.decisionesHistorial||data?.decisiones_ciclo||[];
   if(!Array.isArray(rows)||!rows.length)return {};
-  const state={};
-  for(const row of rows){
+  const activeRound=Number(data?.ciclo_partida||data?.ciclo_inicial||data?.empresa?.ciclo_actual)||Infinity;
+  const history=rows.filter(row=>Number(row.ciclo||1)<=activeRound),latest=new Map(),state={};
+  for(const row of history){
+    const id=row.decision_key||row.decisionKey||row.decision_codigo;
+    latest.set(id,Math.max(latest.get(id)||0,Math.max(1,Number(row.ciclo)||1)));
+  }
+  for(const row of history){
     const itemId=row.decision_key||row.decisionKey||row.decision_codigo;
     const optionId=row.option_key||row.optionKey||row.opcion_key;
     const item=findDecisionItem(itemId);if(!item)continue;
     const round=Math.max(1,Number(row.ciclo)||1),quantity=Number(row.cantidad)||0,cost=Number(row.costo_total)||0;
+    // Normalized RPC history contains every cycle. Only assets accumulate;
+    // a new material/staff/channel/target selection replaces its older cycle.
+    if(!item.asset&&item.id!=='MOLDE'&&round!==latest.get(itemId))continue;
     const entry=state[item.id]||(state[item.id]={round,label:item.name,cost:0});
     entry.round=Math.max(Number(entry.round)||1,round);entry.cost=Number(entry.cost||0)+cost;
     if(item.asset||item.id==='MOLDE'){
       if(!optionId)continue;
       entry.purchases=entry.purchases||{};entry.purchases[round]=entry.purchases[round]||{};entry.purchases[round][optionId]=quantity||1;
-      if(item.id==='MOLDE'){entry.optionIds=entry.optionIds||[];if(!entry.optionIds.includes(optionId))entry.optionIds.push(optionId);entry.optionRounds={...(entry.optionRounds||{}),[optionId]:round};}
+      if(item.id==='MOLDE'){entry.optionIds=entry.optionIds||[];if(!entry.optionIds.includes(optionId))entry.optionIds.push(optionId);entry.optionRounds={...(entry.optionRounds||{}),[optionId]:Math.min(Number(entry.optionRounds?.[optionId])||round,round)};}
     }else if(item.type==='production-plan'){
       entry.value=Number(entry.value||0)+Math.max(0,quantity);
       if(optionId)entry.moldTargets={...(entry.moldTargets||{}),[optionId]:Math.max(0,quantity)};
@@ -379,10 +387,24 @@ function hydrateRemoteProgress(data){
   const snapshot=remoteSnapshot(data);
   if(!data?.partida||!data?.empresa||!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot))return false;
   if(data.expulsada_at||data.empresa.expulsada_at||data.empresa.estado==='eliminada'){showStudentExpulsion();return false;}
-  const round=Math.max(1,Number(snapshot?.round||snapshot?.ciclo||data?.ciclo_partida||data?.empresa?.ciclo_actual||currentRound()));
   const rawDecisionSnapshot=snapshot?.decision_state||snapshot?.decisionState,rawLedgerSnapshot=snapshot?.cash_ledger||snapshot?.cashLedger,rawSectionsSnapshot=snapshot?.financial_sections||snapshot?.financialSections;
   let decisionSnapshot=rawDecisionSnapshot;
   if(!decisionSnapshot||typeof decisionSnapshot!=='object'||!Object.keys(decisionSnapshot).length)decisionSnapshot=legacyRemoteDecisionState(data);
+  const entryRounds=state=>Object.entries(state||{}).filter(([key,value])=>!key.startsWith('__')&&value&&typeof value==='object').map(([,value])=>Number(value.round)).filter(value=>Number.isSafeInteger(value)&&value>0);
+  const activeRound=currentRound(),activePlan=decisionSnapshot?.__cyclePlans?.[activeRound],planRound=Math.max(0,...entryRounds(activePlan?.state));
+  // A previous client could confirm cycle 2 using only cycle-1 decisions after
+  // restoring unscoped flags. Recover that open plan; final receipts stay intact.
+  const stalePlan=activePlan?.state&&planRound>0&&planRound<activeRound&&!decisionSnapshot.__cycleSettlements?.[activeRound];
+  if(stalePlan){
+    decisionSnapshot=deepClone(decisionSnapshot);
+    delete decisionSnapshot.__cyclePlans[activeRound];
+    decisionSnapshot.__snapshotRound=planRound;
+  }
+  // Older databases remove snapshot.round but retain its submission flags.
+  // Attribute those flags to the saved decisions, never to the newer room clock.
+  const decisionRounds=entryRounds(decisionSnapshot);
+  const savedRound=stalePlan?planRound:Number(snapshot.round||snapshot.ciclo||decisionSnapshot?.__snapshotRound)||Math.max(0,...decisionRounds);
+  const round=savedRound||Math.max(1,Number(data?.ciclo_partida||data?.empresa?.ciclo_actual||currentRound()));
   const ledgerSnapshot=rawLedgerSnapshot;
   const sectionsSnapshot=rawSectionsSnapshot;
   const writes={
@@ -390,11 +412,16 @@ function hydrateRemoteProgress(data){
     [ledgerKey()]:JSON.stringify(ledgerSnapshot&&typeof ledgerSnapshot==='object'?ledgerSnapshot:{}),
     [financialSectionsKey()]:JSON.stringify(sectionsSnapshot&&typeof sectionsSnapshot==='object'?sectionsSnapshot:{})
   };
+  if(stalePlan)writes[`SIDE_STALE_CYCLE_PLAN_BACKUP_${storageKey()}_${activeRound}`]=JSON.stringify(activePlan);
   const submissions=snapshot?.section_submissions||snapshot?.sectionSubmissions;
   for(const category of decisionCategories())writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${category.cat}`]=null;
   if(Array.isArray(submissions))for(const cat of submissions)writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${cat}`]='1';
   else if(submissions&&typeof submissions==='object')for(const [cat,submitted] of Object.entries(submissions))writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${round}_${cat}`]=submitted?'1':null;
   writes[`SIDE_DECISIONS_SUBMITTED_${storageKey()}_${round}`]=(snapshot.decisions_submitted??snapshot.decisionsSubmitted)?'1':null;
+  if(round<currentRound()){
+    for(const category of decisionCategories())writes[`SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${currentRound()}_${category.cat}`]=null;
+    writes[submissionKey()]=null;
+  }
   const character=snapshot?.selected_character||snapshot?.selectedCharacter;writes[characterSelectionKey()]=character?String(character):null;
   if(!ledgerSnapshot||typeof ledgerSnapshot!=='object'||!Object.keys(ledgerSnapshot).length){
     const caja=Number(data?.empresa?.caja_actual??data?.reporte_ciclo?.caja_final??data?.reporteCiclo?.caja_final);
@@ -788,10 +815,10 @@ function itemComplete(item){
   return (e.optionIds||[]).length>0 || Object.values(e.quantities||{}).some(q=>Number(q)>0);
 }
 function getOwned(item,optId){
-  const e=savedEntry(item);if(!e?.purchases)return 0;
-  return Object.entries(e.purchases).reduce((s,[round,row])=>s+(Number(round)<currentRound()?(Number(row?.[optId])||0):0),0);
+  const purchases=window.SIDE_PRODUCTION_MODEL.assetPurchaseHistory(savedEntry(item),item);
+  return Object.entries(purchases).reduce((s,[round,row])=>s+(Number(round)<currentRound()?(Number(row?.[optId])||0):0),0);
 }
-function currentPurchase(item,optId){return Number(savedEntry(item)?.purchases?.[currentRound()]?.[optId]||0)}
+function currentPurchase(item,optId){return Number(window.SIDE_PRODUCTION_MODEL.assetPurchaseHistory(savedEntry(item),item)[currentRound()]?.[optId]||0)}
 function ownedMolds(){
   const item=findDecisionItem('MOLDE'),e=savedEntry(item),owned=[];
   for(const [round,row] of Object.entries(e?.purchases||{})){
@@ -818,19 +845,17 @@ function createDecisionDraft(item){
   if(decisionDrafts[item.id]){
     return decisionDrafts[item.id];
   }
-  const e=savedEntry(item);
+  const e=savedEntry(item),sameRound=Number(e?.round)===currentRound();
   if(item.asset){const quantities={};item.options.forEach(o=>quantities[o.id]=currentPurchase(item,o.id));return decisionDrafts[item.id]={quantities}}
-  if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(e?.round===currentRound()?e.quantities?.[o.id]:0));return decisionDrafts[item.id]={quantities}}
+  if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(sameRound?e.quantities?.[o.id]||0:0));return decisionDrafts[item.id]={quantities}}
   if(item.type==='production-plan'){
-    const moldTargets={molde_1:0,molde_2:0,molde_3:0};
-    if(e?.round===currentRound()&&e.moldTargets)Object.keys(moldTargets).forEach(id=>moldTargets[id]=Number(e.moldTargets[id]||0));
-    else if(e?.round===currentRound()&&e.value){const legacyId=e.moldId||'molde_1';moldTargets[legacyId]=Number(e.value||0);}
+    const moldTargets=window.SIDE_PRODUCTION_MODEL.resolveProductionTargets({state:decisionState,drafts:decisionDrafts,round:currentRound()});
     return decisionDrafts[item.id]={moldTargets,prices:normalizedProductionPrices(e?.prices)};
   }
-  if(item.type==='number')return decisionDrafts[item.id]={value:item.id==='INV_MARKETING'?window.SIDE_BUSINESS_RULES.advertising({state:e?.round===currentRound()?decisionState:{}}):Number(e?.round===currentRound()?e.value:0)};
-  if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:e?.round===currentRound()?(e.optionIds||[]):[]};
-  if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(e?.round===currentRound()?e.amount:0)};
-  if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(e?.round===currentRound()?e.staff:{})};
+  if(item.type==='number')return decisionDrafts[item.id]={value:item.id==='INV_MARKETING'?window.SIDE_BUSINESS_RULES.advertising({state:sameRound?decisionState:{}}):Number(sameRound?e.value:0)};
+  if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:sameRound?(e.optionIds||[]):[]};
+  if(item.type==='loan')return decisionDrafts[item.id]={amount:Number(sameRound?e.amount:0)};
+  if(item.type==='sales-staff')return decisionDrafts[item.id]={staff:deepClone(sameRound?e.staff:{})};
   if(item.id==='CANALES'){
     const optionIds=(e?.optionIds||[]).slice(),quantities={};
     RULES.STORE_IDS.forEach(id=>{if(optionIds.includes(id))quantities[id]=RULES.storeQuantity(e,id)});
@@ -1215,7 +1240,7 @@ function prepareSectionSave(cat,context=decisionModelContext()){
     if(item.lockAfterPurchase&&prev&&Number(prev.round)<round)return;
     const common={round,label:item.name,cost:detail.outflow-detail.assetIncome};
     if(item.asset){
-      entries[item.id]={...deepClone(prev||{}),...common,purchases:{...deepClone(prev?.purchases||{}),[round]:deepClone(d.quantities||{})}};return;
+      entries[item.id]={...deepClone(prev||{}),...common,purchases:{...deepClone(window.SIDE_PRODUCTION_MODEL.assetPurchaseHistory(prev,item)),[round]:deepClone(d.quantities||{})}};return;
     }
     if(item.type==='quantity'||item.type==='quantity-choice'){
       entries[item.id]={...common,quantities:deepClone(d.quantities||{})};
@@ -1516,6 +1541,8 @@ function buildStudentSnapshot(round=currentRound()){
   // Recover a confirmation interrupted before its plan reached the durable outbox.
   if(round===currentRound()&&simulationSubmissionComplete()&&!decisionState.__cyclePlans?.[round])captureCyclePlan();
   decisionState.__cycleBusiness={...decisionState.__cycleBusiness,[round]:cycleBusinessData(round)};
+  // This marker survives the whitelist used by already deployed databases.
+  decisionState.__snapshotRound=round;
   return {
     version:1,round,updated_at:new Date().toISOString(),
     decision_state:deepClone(decisionState),cash_ledger:deepClone(cashLedger),financial_sections:recordedFinancialSections(),
@@ -1564,9 +1591,13 @@ function getStudentOutbox(){
       if(epoch!==studentSnapshotEpoch||!studentConnected||JSON.stringify(identity)!==studentIdentityKey())return {success:false,offline:true};
       return S.EmpresaService.guardarEstado(identity,snapshot,expectedRevision);
     },
-    saveOperation:(identity,round,operation,newRevision)=>operation.type==='decisions'
-      ?S.DecisionesService.guardar(identity,round,operation.payload,newRevision)
-      :S.DecisionesService.guardarReporte(identity,round,operation.payload,newRevision),
+    saveOperation:(identity,round,operation,newRevision)=>{
+      if(operation.type==='decisions')return S.DecisionesService.guardar(identity,round,operation.payload,newRevision);
+      // The teacher already persisted the final report. Never resend an older
+      // queued preview over that closure, even against an older SQL deployment.
+      if(decisionState.__cycleSettlements?.[round])return Promise.resolve({success:true,closed:true});
+      return S.DecisionesService.guardarReporte(identity,round,operation.payload,newRevision);
+    },
     readSnapshot:identity=>S.EmpresaService.obtenerEstado(identity),
     onRevision:revision=>{currentStudent.snapshotRevision=revision;persistStudentSession();},
     onConflict:recoverStaleStudentState,onRejected:rejectStudentSession,onStatus:showStudentSyncStatus

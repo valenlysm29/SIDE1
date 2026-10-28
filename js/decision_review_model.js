@@ -11,20 +11,19 @@
   const roundMoney=value=>Math.round((n(value)+Number.EPSILON)*100)/100;
   const KEEP_COSTS=new Set(['LOCAL_PROD','LIMPIEZA','PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO','JEFATURA','ANALISTA_COMPRAS','CANALES']);
   function draft(item,ctx){
-    if(ctx.drafts?.[item.id])return ctx.drafts[item.id];
+    if(ctx.drafts?.[item.id])return item.type==='production-plan'?{...ctx.drafts[item.id],moldTargets:productionModel.resolveProductionTargets(ctx)}:ctx.drafts[item.id];
     const e=ctx.state?.[item.id],same=n(e?.round)===ctx.round;
-    if(item.asset)return {quantities:{...(e?.purchases?.[ctx.round]||{})}};
+    if(item.asset)return {quantities:{...(productionModel.assetPurchaseHistory(e,item)[ctx.round]||{})}};
     if(item.type==='quantity'||item.type==='quantity-choice')return {quantities:same?{...(e?.quantities||{})}:{}};
     if(item.type==='production-plan'){
-      if(same&&e?.moldTargets)return {moldTargets:{...e.moldTargets},prices:{...e.prices}};
-      return {moldTargets:same&&n(e?.value)?{[e?.moldId||'molde_1']:n(e.value)}:{},prices:{...(same?e?.prices:{})}};
+      return {moldTargets:productionModel.resolveProductionTargets(ctx),prices:{...(same?e?.prices:{})}};
     }
     if(item.type==='number')return {value:same?(item.id==='INV_MARKETING'?BUS.advertising(ctx):n(e?.value)):0};
     if(item.type==='loan')return {amount:same?n(e?.amount):0};
     if(item.type==='sales-staff')return {staff:same?{...(e?.staff||{})}:{}};
     return {optionIds:[...(e?.optionIds||item.defaultOptionIds||[])],quantities:{...(e?.quantities||{})}};
   }
-  function owned(item,id,ctx){return sum(Object.entries(ctx.state?.[item.id]?.purchases||{}).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
+  function owned(item,id,ctx){return sum(Object.entries(productionModel.assetPurchaseHistory(ctx.state?.[item.id],item)).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
   function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));return BUS.laborCost(option.id,BUS.regime(ctx),option.cost)*(item.material?0.92*(1-discount(ctx)/100):1);}

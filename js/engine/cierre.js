@@ -29,7 +29,7 @@
     for(const family of Object.keys(materialCodes)){
       let need=n(plan.materials.find(m=>m.id===family)?.consumption),total=0,premium=0;
       const ids=Object.keys(materialCodes[family]);
-      for(const id of ids){const available=n(state.__inventarioMP?.[id])+n(state[family]?.round===round?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
+      for(const id of ids){const available=n(state.__inventarioMP?.[id])+n(Number(state[family]?.round)===Number(round)?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
       ratios[family]=total?premium/total:0;
     }
     return {use,ratios};

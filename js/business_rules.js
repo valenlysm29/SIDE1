@@ -12,13 +12,20 @@
   }
   function assetCost(item,option,regimen='MYPE'){const r=regimes[regimen]||regimes.MYPE,base=n(option.cost),mold=item.id==='MOLDE';return base*(1+(mold?0:r.installation)+(mold?r.moldTraining:r.training));}
   function advertising(ctx={}){const entry=ctx.drafts?.INV_MARKETING??ctx.state?.INV_MARKETING??{};if(Object.hasOwn(entry,'value'))return Math.min(10000,n(entry.value));const legacy={mkt_baja:1500,mkt_media:6000,mkt_alta:10000};return legacy[entry.optionIds?.[0]]||0;}
-  function quantity(state,id,option,round){const entry=state[id]||{};if(entry.purchases)return Math.max(0,Object.entries(entry.purchases).filter(([r])=>Number(r)<=round).reduce((s,[,row])=>s+(Number(row?.[option])||0),0));return n(entry.quantities?.[option])||Number(entry.optionIds?.includes(option)||false);}
+  function assetPurchaseHistory(entry,definition){
+    if(entry?.purchases&&typeof entry.purchases==='object'&&!Array.isArray(entry.purchases))return entry.purchases;
+    const round=Number(entry?.round);
+    if(!Number.isSafeInteger(round)||round<1)return {};
+    const quantities=Object.fromEntries((definition?.options||[]).map(option=>[option.id,Math.floor(n(entry?.quantities?.[option.id]))||Number(entry?.optionIds?.includes(option.id)||false)]).filter(([,quantity])=>quantity>0));
+    return Object.keys(quantities).length?{[round]:quantities}:{};
+  }
+  function quantity(state,id,option,round){return Math.max(0,Object.entries(assetPurchaseHistory(state[id],{options:[{id:option}]})).filter(([r])=>Number(r)<=round).reduce((s,[,row])=>s+(Number(row?.[option])||0),0));}
   function maintenance(state,catalog,round=1){const r=regimes[regime({state})];return (catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset||i.id==='MOLDE').reduce((s,item)=>s+(item.options||[]).reduce((t,o)=>t+quantity(state,item.id,o.id,round)*n(o.cost)*r.maintenance/12,0),0);}
   function maintenanceEstimate(ctx={}){
     const state={...ctx.state},round=ctx.round||1;
     for(const item of (ctx.catalog||[]).flatMap(c=>c.items||[])){
       const d=ctx.drafts?.[item.id];if(!d)continue;
-      if(item.asset)state[item.id]={...state[item.id],purchases:{...state[item.id]?.purchases,[round]:d.quantities||{}}};
+      if(item.asset)state[item.id]={...state[item.id],purchases:{...assetPurchaseHistory(state[item.id],item),[round]:d.quantities||{}}};
       if(item.id==='MOLDE'){
         const entry=state.MOLDE||{},old={...entry.purchases};
         if(!Object.keys(old).length&&Number(entry.round)<round)old[entry.round]=Object.fromEntries((entry.optionIds||[]).map(id=>[id,1]));
@@ -31,5 +38,5 @@
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,regimes,regime,laborCost,assetCost,advertising,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,regimes,regime,laborCost,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
 });

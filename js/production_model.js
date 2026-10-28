@@ -45,21 +45,22 @@
 
   function items(ctx){return (ctx.catalog||[]).flatMap(category=>category.items||[]);}
   function item(ctx,id){return items(ctx).find(entry=>entry.id===id);}
+  function assetPurchaseHistory(entry,definition){
+    return BUS.assetPurchaseHistory(entry,definition);
+  }
   function draft(ctx,id){
     if(ctx.drafts?.[id])return ctx.drafts[id];
     const entry=ctx.state?.[id],definition=item(ctx,id),same=n(entry?.round)===n(ctx.round);
-    if(definition?.asset)return {quantities:{...(entry?.purchases?.[ctx.round]||{})}};
+    if(definition?.asset)return {quantities:{...(assetPurchaseHistory(entry,definition)[ctx.round]||{})}};
     if(definition?.type==='quantity'||definition?.type==='quantity-choice')return {quantities:same?{...(entry?.quantities||{})}:{},...(same&&entry?.assignments?{assignments:entry.assignments}:{})};
     if(definition?.type==='number')return {value:same?n(entry?.value):0};
     if(definition?.type==='production-plan'){
-      if(same&&entry?.moldTargets)return {moldTargets:{...entry.moldTargets}};
-      const legacy=same?whole(entry?.value):0,legacyMold=(entry?.moldId||entry?.optionIds?.[0]||'molde_1');
-      return {moldTargets:legacy?{[legacyMold]:legacy}:{}};
+      return {moldTargets:resolveProductionTargets(ctx)};
     }
     return {optionIds:[...(entry?.optionIds||definition?.defaultOptionIds||[])],quantities:{...(entry?.quantities||{})}};
   }
   function owned(ctx,id,optionId){
-    return sum(Object.entries(ctx.state?.[id]?.purchases||{}).filter(([round])=>n(round)<n(ctx.round)).map(([,row])=>row?.[optionId]));
+    return sum(Object.entries(assetPurchaseHistory(ctx.state?.[id],item(ctx,id))).filter(([round])=>n(round)<n(ctx.round)).map(([,row])=>row?.[optionId]));
   }
   function assetCounts(ctx,id){
     const definition=item(ctx,id),current=draft(ctx,id).quantities||{},out={};
@@ -78,11 +79,16 @@
     if(!ids.length&&entry&&n(entry.round)<n(ctx.round))for(const id of entry.optionIds||[])if(MOLD_REQUIREMENTS[id]&&!ids.includes(id))ids.push(id);
     return ids;
   }
-  function productionTargets(ctx){
-    const d=draft(ctx,'PRODUCCION_META'),targets={};
-    for(const id of Object.keys(MOLD_REQUIREMENTS))targets[id]=whole(d.moldTargets?.[id]);
-    if(!sum(Object.values(targets))&&d.value){
-      const legacyId=selected(ctx,'MOLDE')[0]||ownedMoldIds(ctx).at(-1)||'molde_1';
+  function resolveProductionTargets(ctx={}){
+    const entry=ctx.state?.PRODUCCION_META;
+    const d=ctx.drafts?.PRODUCCION_META??(n(entry?.round)===n(ctx.round)?entry:{}),targets={};
+    for(const id of Object.keys(MOLD_REQUIREMENTS))targets[id]=whole(d?.moldTargets?.[id]);
+    // A per-mold plan, including an explicit all-zero plan, is authoritative.
+    // Older numeric plans did not store a moldId: recover their selected mold
+    // instead of assigning every such plan to the basic mold.
+    if(!d?.moldTargets&&whole(d?.value)){
+      const explicit=[d.moldId,...(d.optionIds||[])].find(id=>MOLD_REQUIREMENTS[id]);
+      const legacyId=explicit||selected(ctx,'MOLDE').find(id=>MOLD_REQUIREMENTS[id])||ownedMoldIds(ctx).at(-1)||'molde_1';
       targets[legacyId]=whole(d.value);
     }
     return targets;
@@ -117,7 +123,7 @@
     return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*n(option.cost)*0.92*(1-discount/100)));
   }
   function calculate(ctx={}){
-    const targets=productionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
+    const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
     const staff={
       cut:quantityCounts(ctx,'PERS_CORTE'),
       assembly:quantityCounts(ctx,'PERS_ENSAMBLE'),
@@ -185,5 +191,5 @@
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });

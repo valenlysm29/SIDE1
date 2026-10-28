@@ -25,12 +25,13 @@ test('the last automatic cycle settles when its runtime reaches simulation-finis
 test('teacher closure displays persisted revenue and stops on a rejected closure',async()=>{
   const source=fs.readFileSync(path.join(__dirname,'../js/docente.js'),'utf8');
   const fn=source.slice(source.indexOf('async function closeBusinessRemoteRound('),source.indexOf('\nfunction renderWinnerSelect('));
-  const report={empresaId:7},status={},calls=[];
+  const report={empresaId:7,ronda:1},status={},calls=[];
   const financial={estadoResultados:{ingresos:750,costos:100,utilidad:650},balanceCaja:{cajaFinal:200650},flujoCaja:{},balanceGeneral:{}};
   let response={success:true,data:{resultadosPorEmpresa:{7:{financial}}}};
-  const ctx={state:{partidaId:'qa',reports:[report]},window:{SIDE:{PartidaService:{cerrarNegocio:async()=>response}}},
+  const ctx={state:{partidaId:'qa',reports:[report]},roomGeneration:0,reportsRevision:0,confirmedReportClosures:new Map(),window:{SIDE:{PartidaService:{cerrarNegocio:async()=>response}}},
     toast:text=>calls.push(text),$:()=>status,persistReports:()=>calls.push('persist'),renderResults:()=>calls.push('render')};
-  vm.createContext(ctx);vm.runInContext(fn,ctx);assert.equal(await ctx.closeBusinessRemoteRound(1),true);assert.equal(report.ingresos,750);assert.equal(report.caja,200650);
+  const apply=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf("\nlet rosterSyncError="));
+  vm.createContext(ctx);vm.runInContext(apply+'\n'+fn,ctx);assert.equal(await ctx.closeBusinessRemoteRound(1),true);assert.equal(report.ingresos,750);assert.equal(report.caja,200650);
   assert.deepEqual(calls,['persist','render']);calls.length=0;response={success:false,error:'Revision conflict'};
   assert.equal(await ctx.closeBusinessRemoteRound(1),false);assert.equal(calls.includes('persist'),false);assert.match(status.textContent,/pendiente/);
 });

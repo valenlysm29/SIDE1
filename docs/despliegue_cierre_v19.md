@@ -1,5 +1,17 @@
 # Despliegue manual del cierre Excel v19
 
+La referencia vigente del motor 2D es el documento de costos del 27/10/2026 y
+el [Excel original recibido](referencias/DECISIONES_SIDE_19_original.xlsx).
+`DECISIONES_SIDE_19.xlsx` es un libro adaptado anterior y no debe usarse como
+oráculo del motor actual. El contraste por hoja y celda está en
+[la auditoría de fuentes originales](../reports/auditoria_excel_documentos_2d_20261027.md).
+
+Para la sala indicada por el usuario, ejecutar primero el diagnóstico de solo
+lectura [SIDE-7DFR](sql/20261027_diagnostico_ventas_SIDE_7DFR.sql). Distingue
+ventas aún pendientes, reportes sobrescritos y cierres guardados con cero.
+La reparación incremental restaura reportes desde cierres existentes; no
+recalcula un cierre que ya se guardó con cero ni crea ventas sin recursos.
+
 No se ejecutó SQL en Supabase alojado. El push de Git tampoco instala funciones SQL.
 
 En una base SIDE existente, pegar **todo** `docs/sql/20261023_despliegue_cierre_v19.sql` en el SQL Editor. El archivo contiene exactamente, en orden:
@@ -10,8 +22,23 @@ En una base SIDE existente, pegar **todo** `docs/sql/20261023_despliegue_cierre_
 4. `supabase/migrations/2026-10-23_cierre_planes_v19.sql`.
 5. `supabase/migrations/2026-10-23_configuracion_version_v19.sql`.
 6. `supabase/migrations/20261027_corregir_ventas_generales.sql`.
+7. `supabase/migrations/20261027_resultados_en_vivo.sql`.
+8. `supabase/migrations/20261027_preservar_ciclo_snapshot.sql`.
+9. `supabase/migrations/20261027_proteger_reportes_cerrados.sql`.
 
-El último bloque añade `partidas.config_revision` y guardado de configuración con revisión esperada, bloqueo de fila y autorización de propietario. Dos pestañas no pueden guardar sobre la misma revisión: la segunda recibe un conflicto visible y conserva su formulario. El polling y las transiciones de reloj/eventos resueltos no incrementan la revisión. Para revertir sólo este bloque, retirar `side_guardar_configuracion_v19(uuid,jsonb,bigint)` y el trigger `side_config_revision_v19`; conservar la columna para auditoría. El cliente v19 requiere esta RPC para guardar configuración; reinstalar también el cliente anterior si se revierte.
+Los bloques 8 y 9 conservan el ciclo de las confirmaciones y protegen ingresos,
+unidades y caja de un cierre frente a reportes preliminares atrasados. En una
+instalación con los siete primeros bloques aplicados, basta aplicar las dos
+migraciones nuevas, en ese orden. No recalculan cierres históricos. El cliente
+también identifica snapshots antiguos sin `round` y omite reportes preliminares
+cuando ya recibió el cierre; estas defensas no requieren la migración nueva.
+La versión incremental en un solo archivo es
+`docs/sql/20261027_reparar_ventas_2d.sql`. Restaura reportes previamente
+sobrescritos exclusivamente desde cierres guardados que contienen sus estados
+financieros y recibos completos. No cambia la caja actual de la empresa, que
+puede contener movimientos posteriores, ni inventa ventas de ciclos sin cierre.
+
+El bloque 5 añade `partidas.config_revision` y guardado de configuración con revisión esperada, bloqueo de fila y autorización de propietario. Dos pestañas no pueden guardar sobre la misma revisión: la segunda recibe un conflicto visible y conserva su formulario. El polling y las transiciones de reloj/eventos resueltos no incrementan la revisión. Para revertir sólo este bloque, retirar `side_guardar_configuracion_v19(uuid,jsonb,bigint)` y el trigger `side_config_revision_v19`; conservar la columna para auditoría. El cliente v19 requiere esta RPC para guardar configuración; reinstalar también el cliente anterior si se revierte.
 
 Requiere las tablas y funciones SIDE anteriores de admisión/ciclo de vida, `participantes.expulsada_at`, `side_student_state` con revisiones y `reportes_ciclo`. No reconstruye una base vacía. El paquete completo se aplicó dos veces en PostgreSQL local PGlite y pasó las pruebas de cierre e idempotencia.
 

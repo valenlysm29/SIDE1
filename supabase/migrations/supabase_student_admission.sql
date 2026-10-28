@@ -682,6 +682,20 @@ begin
     );
   end if;
 
+  -- A final teacher closure owns its report and cash. A delayed preview with
+  -- a renewed CAS revision must not erase its sales or its settlement receipt.
+  -- The state row above serializes this check with the closure transaction.
+  if to_regclass('public.side_business_closures') is not null then
+    if exists (
+      select 1 from public.side_business_closures c
+      join public.participantes t on t.partida_id=c.partida_id
+      where t.id=v_participante_id and c.ciclo=p_ciclo
+        and (c.cierre->'resultadosPorEmpresa') ? v_empresa_id::text
+    ) then
+      return jsonb_build_object('success', true, 'closed', true);
+    end if;
+  end if;
+
   v_resultado := public.guardar_reporte(v_empresa_id, p_ciclo, p_reporte);
   if coalesce((v_resultado->>'success')::boolean, false) then
     update public.empresas
@@ -805,6 +819,7 @@ begin
 
   -- Lista blanca: no se conserva contenido arbitrario fuera del contrato.
   v_snapshot := jsonb_build_object(
+    'round', coalesce(p_snapshot->'round', p_snapshot#>'{decision_state,__snapshotRound}', 'null'::jsonb),
     'decision_state', coalesce(p_snapshot->'decision_state', '{}'::jsonb),
     'cash_ledger', coalesce(p_snapshot->'cash_ledger', '{}'::jsonb),
     'financial_sections', coalesce(p_snapshot->'financial_sections', '{}'::jsonb),
