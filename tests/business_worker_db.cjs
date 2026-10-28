@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
-const {runOnce}=require('../services/business_worker.cjs');
+const worker=require('../services/business_worker.cjs');
 const root=path.resolve(__dirname,'..'),load=p=>fs.readFileSync(path.join(root,p),'utf8');
 function plan(round){
  const state={};
@@ -10,6 +10,7 @@ function plan(round){
  state.MOLDE={round:1,optionIds:['molde_3']};state.PRODUCCION_META={round,moldTargets:{molde_3:90}};state.CANALES={round,optionIds:['web']};return state;
 }
 (async()=>{
+ const {runOnce}=process.argv.includes('--edge')?await import('../supabase/functions/side-business-close/runtime.mjs'):worker;
  const db=await database();
  try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");

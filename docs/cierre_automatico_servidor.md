@@ -1,8 +1,24 @@
 # Cierre económico automático
 
+**Estado del proyecto SIDE:** la opción Edge + Cron quedó desplegada y verificada el 27/10/2026. Véase `reports/despliegue_cierre_supabase_20261027.md`. No requiere servidor Node externo ni mantener una computadora encendida.
+
 El navegador del docente consulta resultados. `services/business_worker.cjs` ejecuta el motor económico en un servidor Node.js (22 o posterior), sin navegador ni mundo 3D. Consulta el reloj de PostgreSQL cada diez segundos, cierra los ciclos pendientes en orden y persiste resultados mediante las RPC existentes con bloqueo, revisión del estado e idempotencia.
 
 ## Activación obligatoria
+
+### Opción alojada íntegramente en Supabase
+
+Instalada en SIDE; estos pasos sirven para reproducir el despliegue:
+
+1. Generar `node tools/build_business_edge.cjs`. Produce el paquete local del mismo motor, sin dependencias npm ni lectura del repositorio en tiempo de ejecución.
+2. Desplegar `supabase/functions/side-business-close/index.ts` junto con `runtime.mjs`, nombre `side-business-close`. La configuración `verify_jwt=false` se acompaña de autenticación obligatoria mediante un token exclusivo del programador, validado en el servidor antes de procesar ciclos. No acepta invocaciones públicas sin ese token.
+3. Aplicar `supabase/migrations/20261028_programar_cierre_edge.sql` después del despliegue. Crea el token dentro de Vault, las funciones con permisos restringidos y un único trabajo Cron cada minuto. La URL corresponde al proyecto SIDE `plfuwfdpsagzrlveqkvl`; comprobarla antes de aplicar en otra base.
+4. Invocar `select public.side_invocar_cierre_programado();` desde SQL Editor y revisar la respuesta HTTP en `net._http_response`, los registros de la función y `side_business_closures`. El éxito del Cron por sí solo solo acredita el envío, no el cierre económico.
+5. Verificar que `cron.job` contiene `side-business-close` activo y confirmar un segundo disparo automático sin navegador docente. No ejecutar simultáneamente el servicio Node externo: la idempotencia protege datos, pero duplicaría trabajo.
+
+No se considera activado hasta completar esos pasos en el proyecto remoto. La función emplea las variables de servidor incorporadas de Supabase; no es necesario copiar la clave de servicio al frontend. El impuesto, las ventas y la persistencia se prueban con `node tests/business_worker_db.cjs --edge`; autenticación del manejador con `node --test tests/business_edge_auth.test.cjs`.
+
+### Alternativa: servidor Node externo
 
 El push de Git no instala el ejecutor ni aplica SQL. Desplegar conjuntamente:
 

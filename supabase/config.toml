@@ -1,0 +1,3 @@
+[functions.side-business-close]
+# The dedicated Vault token is checked server-side before any economic work.
+verify_jwt = false

@@ -1,5 +1,7 @@
 # SIDE1 — Simulador empresarial
 
+El cierre económico automático está desplegado en Supabase mediante la función `side-business-close` y Cron cada minuto. No depende del navegador docente ni del mundo 3D. Ver [configuración](docs/cierre_automatico_servidor.md) y [verificación remota](reports/despliegue_cierre_supabase_20261027.md).
+
 Para iniciar el juego en Windows, abre **INICIAR_JUEGO.bat**. Las páginas de
 entrada siguen siendo `index.html` y `docente.html`.
 

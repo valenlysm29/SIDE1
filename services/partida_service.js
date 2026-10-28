@@ -18,7 +18,7 @@
  *
  * @module services/partida_service
  */
-(function initPartidaService(global) {
+(function(factory){if(typeof module==='object'&&module.exports)module.exports=factory;else factory(window);})(function initPartidaService(global) {
   'use strict';
 
   /** @returns {object|null} Cliente Supabase o null si offline. */
@@ -420,4 +420,4 @@
     finally{clearTimeout(timer);}
   }
   global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,podio };
-})(window);
+});
