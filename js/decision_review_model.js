@@ -26,7 +26,7 @@
   function owned(item,id,ctx){return sum(Object.entries(productionModel.assetPurchaseHistory(ctx.state?.[item.id],item)).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
-  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));if(item.material){const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;return BUS.materialUnitPrice(option,n(draft(item,ctx).quantities?.[option.id]),discount(ctx),config);}return BUS.laborCost(option.id,BUS.regime(ctx),option.cost);}
+  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));if(item.material){const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;return BUS.materialUnitPrice(option,n(draft(item,ctx).quantities?.[option.id]),discount(ctx),{...config,materials:{...config?.materials,...ctx.config?.materials}});}return BUS.laborCost(option.id,BUS.regime(ctx),option.cost);}
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{

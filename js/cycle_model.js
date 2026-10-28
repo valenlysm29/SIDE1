@@ -61,7 +61,7 @@
     return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};
   }
   function closeMany(inputs=[]){
-    const prepared=inputs.map(input=>({...input,production:input.production||PRO.calculate({state:input.state||{},drafts:{},catalog:input.catalog||[],round:input.round})}));
+    const prepared=inputs.map(input=>({...input,production:input.production||PRO.calculate({state:input.state||{},drafts:{},catalog:input.catalog||[],round:input.round,config:input.financialPolicy})}));
     const active=prepared.filter(input=>!input.state?.__cycleSettlements?.[input.round]);
     const economics=ECON.closeMany(active);
     return Object.fromEntries(prepared.map(input=>[input.id,close({...input,economicResult:economics[input.id]})]));

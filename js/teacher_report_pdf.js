@@ -44,7 +44,7 @@
         ['3. Estado de resultados',[
           ['Ventas netas',values.sales],['Gastos operativos',expense(er.costos??r.costos)],
           ['Impacto de eventos',er.impactoEventos],['Otros resultados',combined(er.otros,er.resultadoVentaActivos)],
-          ['Utilidad del ciclo',values.profit,true]
+          ['Impuesto a la renta',expense(er.impuestoRenta)],['Utilidad del ciclo',values.profit,true]
         ]],
         ['4. Balance de caja',[
           ['Caja inicial',bc.cajaInicial??fc.cajaInicial??r.capital],['Entradas',bc.entradas],

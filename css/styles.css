@@ -1586,3 +1586,5 @@ button,.nav-btn,.sidebar-link,.primary,.secondary,.randomize,.mini{font-family:M
 #studentWaiting #waitingBackToProfiles{flex:none;margin:0 0 0 auto;min-height:40px;padding:8px 14px;font-size:12px}
 #studentWaiting button:focus-visible{outline:2px solid #ffd329;outline-offset:2px}
 .result-warning{margin:10px 0;padding:12px;border-left:4px solid #ff747d;background:#321820;color:#ffe4e6;border-radius:6px;line-height:1.5}.result-warning p{margin:6px 0}.student-segment-result{padding:10px 0;border-top:1px solid #52647a}.student-segment-result h5{margin:0 0 4px;color:#ffe080;font-size:14px}.student-segment-result p{margin:4px 0;line-height:1.55;overflow-wrap:anywhere}
+
+.production-readiness{margin:1rem 0;padding:1rem;border:1px solid #a47b37;border-radius:.65rem;background:rgba(164,123,55,.08)}.production-readiness ul{display:grid;gap:.3rem;padding-left:1.2rem}.production-readiness p{margin:.5rem 0 0;font-weight:600}

@@ -194,6 +194,7 @@ function productionSummaryHtml(review){
   const stateClass=plan.productionGap?'limited':'ready';
   return `<section class="cs-production cs-production-${stateClass}" aria-labelledby="companyProductionTitle">
     <header class="cs-production-heading"><div><span class="cs-kicker">PLAN PRODUCTIVO DEL CICLO</span><h3 id="companyProductionTitle">De la compra a la producción terminada</h3><p>La cantidad final depende del menor resultado entre corte, ensamblado, acabado y materia prima disponible.</p></div><span class="cs-production-state">${plan.productionGap?'CAPACIDAD INSUFICIENTE':'META CUBIERTA'}</span></header>
+    ${typeof productionChecklistHtml==='function'?productionChecklistHtml(plan):''}
     <div class="cs-production-kpis">
       <div><span>Meta elegida</span><strong>${plan.target.toLocaleString('es-PE')} u.</strong></div>
       <div><span>Producción posible</span><strong>${plan.producibleUnits.toLocaleString('es-PE')} u.</strong></div>

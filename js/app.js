@@ -670,9 +670,10 @@ $('studentForm')?.addEventListener('submit',async e=>{
     let ingreso;
     const joinButton=$('studentForm')?.querySelector?.('[type="submit"]');if(joinButton){joinButton.disabled=true;joinButton.setAttribute('aria-busy','true');}
     $('studentReconnectBtn')?.classList.add('hidden');
-    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
+    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName,claveEmpresa:$('studentCompanyKey')?.value.trim().toUpperCase()||''})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
     if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
+      if(['CLAVE_REQUERIDA','CLAVE_INVALIDA','INTENTOS_AGOTADOS'].includes(ingreso?.code)){message('studentMessage',ingreso.error||'Ingresa la clave de empresa para recuperar el acceso.',true);$('studentCompanyKey')?.focus();return;}
       if(ingreso?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return;}
       if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO','CODIGO_RETIRADO'].includes(ingreso?.code)){
         const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_RETIRADO'?'Este código pertenece a una sala anterior y ya no se puede utilizar. Pide al docente el código de una sala nueva.':ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
@@ -688,9 +689,11 @@ $('studentForm')?.addEventListener('submit',async e=>{
       message('studentMessage',ingreso?.code==='CONEXION_TIMEOUT'?'La conexión tardó demasiado. Pulsa Reintentar conexión.':/PGRST202|42883/.test(ingreso?.code||'')?'La sala requiere actualizar Supabase. El docente debe ejecutar 2026-10-12_salas_codigo.sql.':ingreso?.code==='42501'?'Supabase rechazó el permiso de ingreso. Pide al docente revisar la migración de salas.':JOIN_SERVER_MESSAGE,true);return
     }
     const data=ingreso.data||{},found=data.partida||{},empresa=data.empresa||{};
-    if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala',ingreso);message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
+    if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala');message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
     const empresaId=data.empresa_id||empresa.id||null,participantId=data.participante_id||null,returning=Boolean(data.reingreso);
-    if(!empresaId||!found.id){console.error('SIDE: respuesta incompleta de ingresar_empresa',ingreso);message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    if(!empresaId||!found.id){console.error('SIDE: respuesta incompleta de ingresar_empresa');message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
+    if(data.clave_empresa){window.alert('Guarda esta clave de empresa; solo se mostrará una vez. La necesitarás para recuperar el acceso desde otro dispositivo o si pierdes la sesión: '+data.clave_empresa);delete data.clave_empresa;}
+    if($('studentCompanyKey'))$('studentCompanyKey').value='';
     const canonicalBrand=cleanText(empresa.nombre_comercial||data.nombre_comercial||brandName),canonicalLegal=cleanText(empresa.nombre_legal||data.nombre_legal||legalName);
     const capitalSource=empresa.caja_inicial??data.caja_inicial,currentCapital=Number(capitalSource);
     currentStudent={name:'Jugador',company:canonicalBrand,legalName:canonicalLegal,participantId,empresaId,snapshotRevision:Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0),...(capitalSource!==null&&capitalSource!==undefined&&Number.isFinite(currentCapital)?{initialCapital:currentCapital}:{}),game:{...found,codigo:cleanCode(found.codigo||code)},returning};
@@ -1052,6 +1055,11 @@ function refreshProductionDop(){
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
 }
 
+function productionChecklistHtml(plan){
+  const prices=window.SIDE_ECONOMIC_CONFIG?.segments||{};
+  const checks=[['Molde comprado',!!plan.availableMoldIds?.length],['Plan de producción mayor que cero',Number(plan.target)>0],['Materiales suficientes para el plan',Number(plan.target)>0&&(plan.materials||[]).every(m=>Number(m.available)>=Number(m.neededForTarget))],['Personal y capacidad en las tres áreas',(plan.processes||[]).length===3&&(plan.processes||[]).every(p=>Number(p.staff)>0&&Number(p.cycleCapacity)>0)],['Precio definido internamente',Object.values(prices).length>0&&Object.values(prices).every(p=>Number.isFinite(Number(p.defaultPrice))&&Number(p.defaultPrice)>0)]];
+  return `<aside class="production-readiness" aria-label="Listo para producir"><strong>Listo para producir</strong><ul>${checks.map(([label,ok])=>`<li><span aria-hidden="true">${ok?'✓':'○'}</span> ${label}: ${ok?'listo':'revisar'}</li>`).join('')}</ul>${Number(plan.producibleUnits)===0?'<p role="status">Con estas decisiones la producción posible es cero. Revisa los puntos pendientes; puedes enviar igualmente.</p>':''}</aside>`;
+}
 function renderDecisionCategory(){
   disposeProductionDop();
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
@@ -1066,6 +1074,7 @@ function renderDecisionCategory(){
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const totalCycles=Number(teacherConfig().cycles);
   if(totalCycles>0&&currentRound()>=Math.max(1,totalCycles-1)&&currentRound()<=totalCycles)lead+=`<aside class="event-clue" role="note"><strong>Impuesto a la renta</strong><small>En el ciclo ${totalCycles} se descontará el impuesto a la renta sobre tu utilidad acumulada.</small></aside>`;
+  if(cat.cat==='C'&&window.SIDE_PRODUCTION_MODEL)lead+=productionChecklistHtml(productionPlan());
   if(['B','C','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
     const warnings=window.SIDE_REVIEW_MODEL.warnings(decisionModelContext()).filter(w=>w.cat===cat.cat);
     if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;

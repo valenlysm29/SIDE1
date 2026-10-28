@@ -75,7 +75,7 @@
         </article>
         <article class="card">
           <div class="card-title"><h3>Financiamiento</h3><span>Regla automática</span></div>
-          <label>TEA inicial (%)<input id="interest" type="number" step="0.1" value="20" min="0"></label>
+          <label>Régimen tributario de la sala<select id="taxRegime"><option value="AUTO">Según régimen de cada empresa (valor anterior)</option><option value="NO_MYPE">General: 29.5 %</option><option value="MYPE">MYPE tributario: 10 % hasta 15 UIT y 29.5 % sobre el exceso</option></select></label><p class="hint">Se calcula sobre la utilidad acumulada al final de la partida. UIT 2026: S/ 5,500.</p><label>Umbral para descuento de materiales<input id="quantityDiscountThreshold" type="number" min="0" step="1" value="100"></label><p class="hint">El descuento de 8 % se aplica por opción cuando la compra alcanza este número de unidades de producción (m², unidades o metros). Valor inicial: 100.</p><label>TEA inicial (%)<input id="interest" type="number" step="0.1" value="20" min="0"></label>
           <div class="rule-box"><strong>Línea de crédito inicial: 70% de la caja</strong><span>La línea puede aumentar o disminuir según caja y activos; el uso reduce el disponible.</span><small>El docente fija únicamente la TEA inicial; los montos se calculan automáticamente para cada empresa.</small></div>
           <label>% inicial de ventas a crédito<input id="creditPercentStart" type="number" value="20" min="0" max="100"></label>
         </article>

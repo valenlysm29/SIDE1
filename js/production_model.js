@@ -121,7 +121,7 @@
     const hasAnalyst=selected(ctx,'ANALISTA_COMPRAS').includes('si_analista');
     const discount=hasAnalyst?Math.max(2,12-(n(ctx.round)-1)*2):0;
     const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;
-    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,config)));
+    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,{...config,materials:{...config?.materials,...ctx.config?.materials}})));
   }
   function calculate(ctx={}){
     const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
