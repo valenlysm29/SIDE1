@@ -1064,6 +1064,13 @@ function renderDecisionCategory(){
     lead+=`<aside class="event-clue" aria-label="Costos obligatorios previstos"><span>COSTOS OBLIGATORIOS PREVISTOS</span><strong>${fixed.map(item=>`${escapeHtml(item.name)}: − ${money(computeItemCost(item))}`).join(' · ')}</strong><small>Caja inicial del ciclo: ${money(financialReport().balanceCaja.cajaInicial)}. Los costos registrados al inicio ya están incluidos en tu caja; guardar después no los cobra otra vez.</small></aside>`;
   }
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
+  const totalCycles=Number(teacherConfig().cycles);
+  if(totalCycles>0&&currentRound()>=Math.max(1,totalCycles-1)&&currentRound()<=totalCycles)lead+=`<aside class="event-clue" role="note"><strong>Impuesto a la renta</strong><small>En el ciclo ${totalCycles} se descontará el impuesto a la renta sobre tu utilidad acumulada.</small></aside>`;
+  if(['B','C','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
+    const warnings=window.SIDE_REVIEW_MODEL.warnings(decisionModelContext()).filter(w=>w.cat===cat.cat);
+    if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;
+  }
+
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
@@ -1836,7 +1843,7 @@ function cycleSalesHtml(round=currentRound()){
       for(const material of plan.materials||[])if(!material.supportedUnits)causes.push(`Sin ${material.label} suficiente`);
     }
     const reason=causes.join('. ')||sale.reason||sale.zeroReason||(!sale.sold?(!sale.available?'Sin stock: revisa insumos, personal, equipos y molde.':!assigned?'Sin demanda asignada en este segmento.':'Sin ventas en este ciclo.'):'');
-    return `<div class="segment-sales"><h4>${labels[sale.id]||escapeHtml(sale.id)}</h4><span>Precio elegido <b>${money(sale.chosenPrice??sale.price)}</b></span><span>Precio efectivo <b>${money(sale.price)}</b></span><span>Demanda asignada ${estimate?'estimada':'efectiva'} <b>${assigned}</b></span><span>Unidades disponibles <b>${Number(sale.available||0)}</b></span><span>Unidades vendidas${estimate?' estimadas':''} <b>${Number(sale.sold||0)}</b></span><span>Ingresos${estimate?' estimados':''} <b>${money(sale.revenue||0)}</b></span>${reason?`<p>${escapeHtml(reason)}</p>`:''}</div>`;
+    return `<div class="segment-sales"><h4>${labels[sale.id]||escapeHtml(sale.id)}</h4><span>Precio elegido <b>${money(sale.chosenPrice??sale.price)}</b></span><span>Precio efectivo <b>${money(sale.price)}</b></span><span>Demanda asignada ${estimate?'estimada':'efectiva'} <b>${assigned}</b></span><span>Unidades disponibles <b>${Number(sale.available||0)}</b></span><span>Unidades vendidas${estimate?' estimadas':''} <b>${Number(sale.sold||0)}</b></span><span>Ventas perdidas <b>${Math.max(0,Number(sale.lostSales??assigned-Number(sale.sold||0)))}</b></span><span>Stock final <b>${Number(receipt.goods?.[sale.id]??Math.max(0,Number(sale.available||0)-Number(sale.sold||0)))}</b></span><span>Participación <b>${(Number(receipt.marketAllocation?.products?.[sale.id]?.porcentaje||0)*100).toLocaleString('es-PE',{maximumFractionDigits:2})}%</b></span><span>Ingresos${estimate?' estimados':''} <b>${money(sale.revenue||0)}</b></span>${reason?`<p>${escapeHtml(reason)}</p>`:''}</div>`;
   }).join('')}</section>`;
 }
 let lastObservedRound=currentRound();

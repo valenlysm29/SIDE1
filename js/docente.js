@@ -859,6 +859,7 @@ async function supabaseReports(reportsBase=state.reports){
       caja:rep?Number(rep.caja_final):(emp.caja_actual??local?.caja??0),
       ingresos:rep?Number(rep.ingresos):(local?.ingresos??0),
       cycleReceipt:rep?.estado_resultados?.cycleReceipt||local?.cycleReceipt||null,
+      cycleHistory:(info?.reportes||[]).map(h=>({round:Number(h.ciclo),closureStatus:h.estado_resultados?.cycleReceipt?'closed':'pending',cycleReceipt:h.estado_resultados?.cycleReceipt||null,estadoResultados:h.estado_resultados||{},balanceCaja:h.balance_caja||{},flujoCaja:h.flujo_caja||{},balanceGeneral:h.estado_resultados?.balanceGeneral||{}})).filter(h=>h.cycleReceipt).sort((a,b)=>a.round-b.round),
       unidadesVendidas:rep?.estado_resultados?.cycleReceipt?.sold??local?.unidadesVendidas??null,provisional:false,
       costos:rep?Number(rep.costos):(local?.costos??0),
       utilidad:rep?Number(rep.utilidad):(local?.utilidad??0),
@@ -883,7 +884,7 @@ async function supabaseReports(reportsBase=state.reports){
         const result=window.SIDE_LIVE_RESULTS.calculate({snapshot:scopedContext.snapshot,round:cicloActual,capital:Number(emp.caja_inicial)||0,
           catalog:window.SIDE_DECISION_CATALOG,config:scopedContext.configuracion,id:p.empresa_id,
           phase:scopedContext.estado==='activa'?scopedContext.phase:'integration'});
-        if(result&&(!report.cycleReceipt||!result.provisional)){
+        if(result&&!result.provisional&&!report.cycleReceipt){
           window.SIDE_LIVE_RESULTS.apply(report,result);
           report.updatedAt=scopedContext.updated_at||report.updatedAt;
         }
@@ -897,7 +898,7 @@ async function supabaseReports(reportsBase=state.reports){
   if(failures.length)rosterSyncError='Reportes pendientes de sincronizar: '+failures.join('; ');
   const ids=new Set(out.map(r=>r.empresaId));
   const names=new Set(out.map(r=>r.empresa));
-  for(const l of localBase){if(l.empresaId?!ids.has(l.empresaId):!names.has(l.empresa))out.push(l)}
+  for(const l of localBase){if(l.empresaId?!ids.has(l.empresaId):!names.has(l.empresa))out.push({...l,localOnly:true})}
   return out;
 }
 // Closed financial results are authoritative for their room, company and cycle.
@@ -1028,7 +1029,7 @@ function renderCompanies(force=false){
     const key=companyNodeKey(r);let card=current.get(key);
     if(!card){
       card=document.createElement('article');card.className='company-card';card.dataset.companyId=key;
-      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><div class="metric"><span>Ingresos</span><b data-field="income"></b></div><div class="metric"><span>Unidades vendidas</span><b data-field="sold"></b></div><small data-field="resultScope"></small><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${escapeAttr(key)}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${escapeAttr(key)}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
+      card.innerHTML=`<div class="company-status-line"><span class="live-dot"></span><b data-field="presence"></b></div><h3 data-field="company"></h3><small data-field="student"></small><div class="section-status-row" data-field="sections"></div><div class="score" data-field="progress"></div><div class="metric"><span>Caja</span><b data-field="cash"></b></div><div class="metric"><span>Utilidad del ciclo</span><b data-field="profit"></b></div><div class="metric"><span>Ingresos</span><b data-field="income"></b></div><div class="metric"><span>Unidades vendidas</span><b data-field="sold"></b></div><small data-field="resultScope"></small><p class="company-result-alert" data-field="resultAlert" role="status" hidden></p><form class="company-grade" data-grade-form="${escapeAttr(r.id)}"><label for="grade-${escapeAttr(key)}">Puntaje del profesor · 0 a 20</label><div><input id="grade-${escapeAttr(key)}" data-grade type="number" min="0" max="20" step="0.01" required placeholder="Sin calificar"><button class="secondary" type="submit">Guardar nota</button></div><small data-grade-status></small></form><button class="secondary company-results-button" type="button" data-view-results="${escapeAttr(r.id)}">Ver resultados</button><button class="eliminate" type="button" data-eliminate></button>`;
       card.querySelector('[data-eliminate]').addEventListener('click',()=>toggleElimination(state.reports.findIndex(x=>companyNodeKey(x)===key)));
       card.querySelector('[data-view-results]').addEventListener('click',()=>{state.resultCompanyId=card.dataset.reportId;switchTab('resultados');renderResults();});
       const form=card.querySelector('[data-grade-form]'),input=form.querySelector('input');
@@ -1050,9 +1051,16 @@ function renderCompanies(force=false){
     setText('company',r.empresa);
     setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
     setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
-    setText('cash',money(r.caja??r.capital));setText('profit',money(r.utilidad));
-    setText('income',r.cycleReceipt||r.provisional?money(r.ingresos):'Pendiente');setText('sold',String(r.unidadesVendidas??r.cycleReceipt?.sold??'Pendiente'));
+    const remotePending=state.partidaId&&(!r.cycleReceipt||r.provisional);
+    setText('cash',remotePending?'Pendiente':money(r.caja??r.capital));setText('profit',remotePending?'Pendiente':money(r.utilidad));
+    setText('income',!remotePending&&(r.cycleReceipt||r.provisional)?money(r.ingresos):'Pendiente');setText('sold',remotePending?'Pendiente':String(r.unidadesVendidas??r.cycleReceipt?.sold??'Pendiente'));
     setText('resultScope',r.provisional?'Estimación individual · ciclo en juego':r.cycleReceipt?'Resultado definitivo del ciclo':'Esperando plan confirmado o cierre del ciclo');
+    const rec=r.cycleReceipt, reasons=window.SIDE_STUDENT_FINANCIAL_VIEW?.zeroReasons(rec)||[];
+    const purchases=Number(rec?.production?.costs?.materials||0)>0||Number(rec?.production?.costs?.labor||0)>0||(rec?.production?.materials||[]).some(m=>Number(m.purchasesAvailable)>0)||(rec?.production?.processes||[]).some(p=>Number(p.machines)>0)||Number(rec?.production?.availableMoldIds?.length)>0;
+    const warning=rec&&((purchases&&!Number(rec.produced))||(Number(rec.produced)>0&&!Number(rec.revenue)));
+    const alert=card.querySelector('[data-field="resultAlert"]');alert.hidden=!warning;
+    if(warning)setText('resultAlert',`${!Number(rec.produced)?'Compras o plan sin producción':'Producción sin ingresos'}: ${reasons.join(' ')||'Revisa el detalle del cierre.'}`);
+
     for(const [field,label]of [['cash',r.provisional?'Caja estimada al cierre':'Caja'],['profit',r.provisional?'Utilidad estimada':'Utilidad del ciclo'],['income',r.provisional?'Ingresos estimados':'Ingresos'],['sold',r.provisional?'Unidades vendidas estimadas':'Unidades vendidas']])card.querySelector(`[data-field="${field}"]`).previousElementSibling.textContent=label;
     const sections=sectionBadges(r),sectionEl=card.querySelector('[data-field="sections"]');if(sectionEl.innerHTML!==sections)sectionEl.innerHTML=sections;
     const input=card.querySelector('[data-grade]'),value=gradeValue(r);
@@ -1105,23 +1113,28 @@ function teacherFinancialDetail(r){
   return `<details><summary>Flujo de caja y balance general</summary>${row('Caja al inicio',fc.cajaInicial??r.balanceCaja?.cajaInicial)}${row('Cobros por ventas',fc.cobrosVentas)}${row('Devoluciones',fc.reembolsos)}${row('Pagos operativos',fc.pagosOperacion)}${row('Eventos',fc.eventos)}${row('Otros movimientos',fc.otros)}${row('Compra de activos',fc.compraActivos)}${row('Venta de activos',fc.ventaActivos)}${row('Préstamos recibidos',fc.financiamiento)}${row('Caja al cierre',fc.cajaFinal??r.caja)}<h4>Balance general</h4>${bg?row('Efectivo',bg.efectivo)+row('Inventarios',bg.inventarios)+row('Equipos, moldes y mejoras (netos)',bg.activosFijos)+row('Total activos',bg.activos)+row('Deuda financiera',bg.deuda)+row('Patrimonio',bg.patrimonio)+row('Pasivo + patrimonio',bg.pasivoPatrimonio):'<p>El alumno aún no ha sincronizado este balance.</p>'}</details>`;
 }
 function teacherSalesDetail(r){
-  const receipt=r.cycleReceipt;
-  if(!receipt)return '<p class="hint">Ventas pendientes: esperando el plan confirmado o el cierre del ciclo.</p>';
-  const labels={esencial:'Básico',urbano:'Medio',premium:'Premium'};
-  const detail=(receipt.sales||[]).map(s=>`<div class="metric"><span>${labels[s.id]||escapeHtml(s.id)} · ${Number(s.sold||0)} unidades × ${money(s.price)}</span><b>${money(s.revenue)}</b></div>`).join('');
-  return `<section class="financial-section"><h4>Ventas ${r.provisional?'estimadas':'del ciclo'}</h4><p>${r.provisional?'Ciclo en juego: estimación individual con el plan confirmado. El reparto entre empresas se consolida al cierre.':'Resultado definitivo registrado al cierre.'}</p><div class="metric"><span>Unidades vendidas${r.provisional?' estimadas':''}</span><b>${Number(receipt.sold||0)}</b></div><div class="metric"><span>Ingresos${r.provisional?' estimados':''}</span><b>${money(receipt.revenue)}</b></div>${detail}</section>`;
+  if(!r.cycleReceipt)return '<p class="hint">Ciclo no cerrado: resultados pendientes.</p>';
+  return `<section class="financial-section"><h4>Ventas del ciclo</h4>${window.SIDE_STUDENT_FINANCIAL_VIEW.salesHtml({round:r.ronda,cycleReceipt:r.cycleReceipt})}</section>`;
 }
+let resultSort='empresa';
 function renderResults(){
-  const active=state.reports.filter(r=>r.estado!=='eliminada'),totalProfit=active.reduce((s,r)=>s+Number(r.utilidad||0),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
+  const active=state.reports.filter(r=>r.estado!=='eliminada'&&(!state.partidaId||!r.localOnly)),totalProfit=active.reduce((s,r)=>s+(state.partidaId&&(!r.cycleReceipt||r.provisional)?0:Number(r.utilidad||0)),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
   $('resultStats').innerHTML=[['Empresas en partida',active.length],['Calificadas',graded.length],[active.some(r=>r.provisional)?'Utilidad estimada del ciclo':'Utilidad del ciclo',money(totalProfit)],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+  const compare=[...active].sort((a,b)=>resultSort==='empresa'?String(a.empresa).localeCompare(String(b.empresa),'es'):Number(b[resultSort]||0)-Number(a[resultSort]||0));
+  let table=$('resultComparison');if(!table&&typeof document!=='undefined'&&$('resultStats')?.after){table=document.createElement('section');table.id='resultComparison';$('resultStats').after(table);}
+  if(table){
+  table.className='financial-section';table.innerHTML=`<h3>Comparación por empresa</h3><label>Ordenar por <select id="resultComparisonSort"><option value="empresa">Empresa</option><option value="ingresos">Ingresos</option><option value="costos">Costos</option><option value="utilidad">Utilidad</option></select></label><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ciclo</th><th>Vendidas</th><th>Ingresos</th><th>Costos</th><th>Utilidad</th><th>Impuesto</th><th>Caja</th></tr></thead><tbody>${compare.map(r=>r.cycleReceipt?`<tr><td>${escapeHtml(r.empresa)}</td><td>${Number(r.ronda)||0}</td><td>${Number(r.cycleReceipt.sold||0)}</td><td>${money(r.ingresos)}</td><td>${money(r.costos)}</td><td>${money(r.utilidad)}</td><td>${money(r.estadoResultados?.impuestoRenta)}</td><td>${money(r.caja)}</td></tr>`:`<tr><td>${escapeHtml(r.empresa)}</td><td colspan="7">Ciclo pendiente de cierre</td></tr>`).join('')}</tbody></table></div>`;
+  table.querySelector('#resultComparisonSort').value=resultSort;table.querySelector('#resultComparisonSort').onchange=e=>{resultSort=e.target.value;renderResults();};}
+
   const sel=$('resultCompanySelect');
-  const selected=state.reports.find(r=>r.id===state.resultCompanyId)||state.reports[0];
+  const selectable=state.partidaId?state.reports.filter(r=>!r.localOnly):state.reports;
+  const selected=selectable.find(r=>r.id===state.resultCompanyId)||selectable[0];
   if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}
   state.resultCompanyId=selected.id;
-  sel.innerHTML=state.reports.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
-  const r=selected,er=r.estadoResultados||{},bc=r.balanceCaja||{},fc=r.flujoCaja||{},bg=r.balanceGeneral||bc.balanceGeneral||{};
+  sel.innerHTML=selectable.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
+  const r=selected,pending=state.partidaId&&(!r.cycleReceipt||r.provisional),er=pending?{}:r.estadoResultados||{},bc=pending?{}:r.balanceCaja||{},fc=pending?{}:r.flujoCaja||{},bg=pending?{}:r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value])=>`<div><span>${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
-  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er))}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${r.cycleHistory?.length?window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml({history:r.cycleHistory},false):teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er))}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
 }
 function closeBusinessLocalRound(){
   if(state.partidaId||!window.SIDE_CYCLE_MODEL)return null;
