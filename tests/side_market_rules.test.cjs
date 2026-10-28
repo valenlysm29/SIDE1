@@ -25,6 +25,13 @@ test('reputación del ciclo por defecto; suavizado opcional',()=>{
  assert.equal(a.reputation.valor,0);
  assert.equal(b.reputation.valor,4);
 });
+test('cierre autorizado ignora precios inyectados y usa configuración interna',()=>{
+ const input={id:'a',round:1,catalog:[],state:{PRODUCCION_META:{round:1,prices:{esencial:900000,urbano:1,premium:1}}},prices:{premium:900000},financialPolicy:{authoritativePrices:true}};
+ const profile=C.prepare(input);
+ assert.deepEqual(profile.lines.map(line=>line.price),[42.5,100,250]);
+ const changed={...config,segments:{...config.segments,premium:{...config.segments.premium,defaultPrice:275}}};
+ assert.equal(C.prepare(input,changed).lines[2].price,275);
+});
 test('participantes sintéticos configurables se registran en el reparto',()=>{
  const line={id:'esencial',price:40,available:10000};
  const p={id:'real',scores:{reputation:5},lines:[line]};

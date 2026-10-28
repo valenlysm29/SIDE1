@@ -2,14 +2,14 @@
   {
     "empresa_id": 1,
     "ciclo": 1,
-    "ingresos": "21600",
-    "costos": "12719.09",
-    "utilidad": "8880.91",
-    "caja_final": "193129.7",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "9771.91",
+    "caja_final": "193840.7",
     "balance_caja": {
-      "salidas": 24150.3,
-      "entradas": 17280,
-      "cajaFinal": 193129.7,
+      "salidas": 24159.3,
+      "entradas": 18000,
+      "cajaFinal": 193840.7,
       "prestamos": 0,
       "cajaInicial": 200000,
       "aportesCapital": 0
@@ -17,26 +17,26 @@
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 193129.7,
-      "flujoNeto": -6870.3,
+      "cajaFinal": 193840.7,
+      "flujoNeto": -6159.3,
       "inversion": -11095,
-      "operacion": 4224.7,
+      "operacion": 4935.7,
       "reembolsos": 0,
       "cajaInicial": 200000,
-      "cobrosVentas": 17280,
+      "cobrosVentas": 18000,
       "ventaActivos": 0,
       "compraActivos": -11095,
       "impuestoRenta": 0,
       "financiamiento": 0,
-      "pagosOperacion": -13055.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12719.09,
-      "ingresos": 21600,
-      "utilidad": 8880.91,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 9771.91,
       "costoVentas": 9246.19,
-      "ventasNetas": 21600,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -115,39 +115,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 240,
-            "demand": 266,
+            "price": 250,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 21600,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 176,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 240,
-            "assignedDemand": 266,
-            "effectivePrice": 240,
-            "potentialRevenue": 63840
+            "chosenPrice": 250,
+            "assignedDemand": 267,
+            "effectivePrice": 250,
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 266,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -164,7 +164,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 21600,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -590,7 +590,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 17280,
+        "cashRevenue": 18000,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -625,14 +625,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -684,20 +684,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 266,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 266,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -729,38 +730,38 @@
         },
         "openingInventory": {},
         "creditCollections": 0,
-        "accountsReceivable": 4320
+        "accountsReceivable": 4500
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 716,
-      "utilidadNeta": 8880.91,
+      "gastosVentas": 725,
+      "utilidadNeta": 9771.91,
       "cicloImpuesto": 3,
       "impuestoRenta": 0,
-      "utilidadBruta": 12353.81,
-      "ventasTotales": 21600,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 208880.91,
+        "activos": 209771.91,
         "capital": 200000,
-        "efectivo": 193129.7,
-        "patrimonio": 208880.91,
+        "efectivo": 193840.7,
+        "patrimonio": 209771.91,
         "inventarios": 451,
         "activosFijos": 10980.21,
         "inventarioMP": 451,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 4320,
-        "pasivoPatrimonio": 208880.91,
+        "cuentasPorCobrar": 4500,
+        "pasivoPatrimonio": 209771.91,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 8880.91
+        "resultadosAcumulados": 9771.91
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 716,
-        "total": 12719.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -775,59 +776,59 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3472.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": true,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
       "utilidadNetaFinal": null,
-      "utilidadOperativa": 8880.91,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 8880.91,
-      "utilidadAntesImpuestos": 8880.91,
-      "utilidadAntesImpuestosAcumulada": 8880.91
+      "baseImponibleAcumulada": 9771.91,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 9771.91
     }
   },
   {
     "empresa_id": 1,
     "ciclo": 2,
-    "ingresos": "21600",
-    "costos": "12719.09",
-    "utilidad": "8880.91",
-    "caja_final": "200594.4",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "9771.91",
+    "caja_final": "202151.4",
     "balance_caja": {
-      "salidas": 13055.3,
-      "entradas": 20520,
-      "cajaFinal": 200594.4,
+      "salidas": 13064.3,
+      "entradas": 21375,
+      "cajaFinal": 202151.4,
       "prestamos": 0,
-      "cajaInicial": 193129.7,
+      "cajaInicial": 193840.7,
       "aportesCapital": 0
     },
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 200594.4,
-      "flujoNeto": 7464.7,
+      "cajaFinal": 202151.4,
+      "flujoNeto": 8310.7,
       "inversion": 0,
-      "operacion": 7464.7,
+      "operacion": 8310.7,
       "reembolsos": 0,
-      "cajaInicial": 193129.7,
-      "cobrosVentas": 20520,
+      "cajaInicial": 193840.7,
+      "cobrosVentas": 21375,
       "ventaActivos": 0,
       "compraActivos": 0,
       "impuestoRenta": 0,
       "financiamiento": 0,
-      "pagosOperacion": -13055.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12719.09,
-      "ingresos": 21600,
-      "utilidad": 8880.91,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 9771.91,
       "costoVentas": 9246.19,
-      "ventasNetas": 21600,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -906,39 +907,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 240,
-            "demand": 266,
+            "price": 250,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 21600,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 176,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 240,
-            "assignedDemand": 266,
-            "effectivePrice": 240,
-            "potentialRevenue": 63840
+            "chosenPrice": 250,
+            "assignedDemand": 267,
+            "effectivePrice": 250,
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 266,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -955,7 +956,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 21600,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -1383,7 +1384,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 20520,
+        "cashRevenue": 21375,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -1418,14 +1419,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -1477,20 +1478,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 266,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 266,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -1530,39 +1532,39 @@
           "cuero_prem": 0,
           "cuero_sint": 7
         },
-        "creditCollections": 4320,
-        "accountsReceivable": 5400
+        "creditCollections": 4500,
+        "accountsReceivable": 5625
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 716,
-      "utilidadNeta": 8880.91,
+      "gastosVentas": 725,
+      "utilidadNeta": 9771.91,
       "cicloImpuesto": 3,
       "impuestoRenta": 0,
-      "utilidadBruta": 12353.81,
-      "ventasTotales": 21600,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 217761.82,
+        "activos": 219543.82,
         "capital": 200000,
-        "efectivo": 200594.4,
-        "patrimonio": 217761.82,
+        "efectivo": 202151.4,
+        "patrimonio": 219543.82,
         "inventarios": 902,
         "activosFijos": 10865.42,
         "inventarioMP": 902,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 5400,
-        "pasivoPatrimonio": 217761.82,
+        "cuentasPorCobrar": 5625,
+        "pasivoPatrimonio": 219543.82,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 17761.82
+        "resultadosAcumulados": 19543.82
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 716,
-        "total": 12719.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -1577,59 +1579,59 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3472.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": true,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
       "utilidadNetaFinal": null,
-      "utilidadOperativa": 8880.91,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 17761.82,
-      "utilidadAntesImpuestos": 8880.91,
-      "utilidadAntesImpuestosAcumulada": 17761.82
+      "baseImponibleAcumulada": 19543.82,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 19543.82
     }
   },
   {
     "empresa_id": 1,
     "ciclo": 3,
-    "ingresos": "21600",
-    "costos": "12719.09",
-    "utilidad": "6216.64",
-    "caja_final": "205394.83",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "6840.34",
+    "caja_final": "207530.53",
     "balance_caja": {
-      "salidas": 15719.57,
-      "entradas": 20520,
-      "cajaFinal": 205394.83,
+      "salidas": 15995.87,
+      "entradas": 21375,
+      "cajaFinal": 207530.53,
       "prestamos": 0,
-      "cajaInicial": 200594.4,
+      "cajaInicial": 202151.4,
       "aportesCapital": 0
     },
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 205394.83,
-      "flujoNeto": 4800.43,
+      "cajaFinal": 207530.53,
+      "flujoNeto": 5379.13,
       "inversion": 0,
-      "operacion": 4800.43,
+      "operacion": 5379.13,
       "reembolsos": 0,
-      "cajaInicial": 200594.4,
-      "cobrosVentas": 20520,
+      "cajaInicial": 202151.4,
+      "cobrosVentas": 21375,
       "ventaActivos": 0,
       "compraActivos": 0,
-      "impuestoRenta": -2664.27,
+      "impuestoRenta": -2931.57,
       "financiamiento": 0,
-      "pagosOperacion": -13055.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12719.09,
-      "ingresos": 21600,
-      "utilidad": 6216.64,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 6840.34,
       "costoVentas": 9246.19,
-      "ventasNetas": 21600,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -1708,39 +1710,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 240,
-            "demand": 266,
+            "price": 250,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 21600,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 176,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 240,
-            "assignedDemand": 266,
-            "effectivePrice": 240,
-            "potentialRevenue": 63840
+            "chosenPrice": 250,
+            "assignedDemand": 267,
+            "effectivePrice": 250,
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 266,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -1757,7 +1759,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 21600,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -2185,7 +2187,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 20520,
+        "cashRevenue": 21375,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -2220,14 +2222,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 266,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 21600,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 176
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -2279,20 +2281,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 266,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 266,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -2332,39 +2335,39 @@
           "cuero_prem": 0,
           "cuero_sint": 14
         },
-        "creditCollections": 5400,
-        "accountsReceivable": 6480
+        "creditCollections": 5625,
+        "accountsReceivable": 6750
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 716,
-      "utilidadNeta": 6216.64,
+      "gastosVentas": 725,
+      "utilidadNeta": 6840.34,
       "cicloImpuesto": 3,
-      "impuestoRenta": 2664.27,
-      "utilidadBruta": 12353.81,
-      "ventasTotales": 21600,
+      "impuestoRenta": 2931.57,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 223978.46,
+        "activos": 226384.16,
         "capital": 200000,
-        "efectivo": 205394.83,
-        "patrimonio": 223978.46,
+        "efectivo": 207530.53,
+        "patrimonio": 226384.16,
         "inventarios": 1353,
         "activosFijos": 10750.63,
         "inventarioMP": 1353,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 6480,
-        "pasivoPatrimonio": 223978.46,
+        "cuentasPorCobrar": 6750,
+        "pasivoPatrimonio": 226384.16,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 23978.46
+        "resultadosAcumulados": 26384.16
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 716,
-        "total": 12719.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -2379,19 +2382,19 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3472.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": false,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
-      "utilidadNetaFinal": 23978.46,
-      "utilidadOperativa": 8880.91,
+      "utilidadNetaFinal": 26384.16,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 26642.73,
-      "utilidadAntesImpuestos": 8880.91,
-      "utilidadAntesImpuestosAcumulada": 26642.73
+      "baseImponibleAcumulada": 29315.73,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 29315.73
     }
   },
   {
@@ -2511,20 +2514,20 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 269,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "reason": "",
@@ -2532,17 +2535,17 @@
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 179,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 269,
+            "assignedDemand": 267,
             "effectivePrice": 250,
-            "potentialRevenue": 67250
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 269,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -3020,14 +3023,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -3079,20 +3082,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 269,
-              "porcentaje": 0.33584195672624645,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
               "puntajeTotal": 35.7,
               "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 269,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -3302,20 +3306,20 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 269,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "reason": "",
@@ -3323,17 +3327,17 @@
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 179,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 269,
+            "assignedDemand": 267,
             "effectivePrice": 250,
-            "potentialRevenue": 67250
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 269,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -3813,14 +3817,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -3872,20 +3876,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 269,
-              "porcentaje": 0.33584195672624645,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
               "puntajeTotal": 35.7,
               "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 269,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -4104,20 +4109,20 @@
             "id": "premium",
             "sold": 90,
             "price": 250,
-            "demand": 269,
+            "demand": 267,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "reason": "",
@@ -4125,17 +4130,17 @@
             "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 179,
+            "lostSales": 177,
             "assignment": "automatic",
             "alreadySold": 0,
             "chosenPrice": 250,
-            "assignedDemand": 269,
+            "assignedDemand": 267,
             "effectivePrice": 250,
-            "potentialRevenue": 67250
+            "potentialRevenue": 66750
           }
         ],
         "events": [],
-        "market": 269,
+        "market": 267,
         "scores": {
           "health": 1,
           "selected": [
@@ -4615,14 +4620,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 269,
+                "demand": 267,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
                 "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 179
+                "lostSales": 177
               }
             ],
             "central": 0,
@@ -4674,20 +4679,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 269,
-              "porcentaje": 0.33584195672624645,
+              "asignado": 267,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
               "puntajeTotal": 35.7,
               "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 269,
+              "demandaAjustada": 267,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -4792,14 +4798,14 @@
   {
     "empresa_id": 3,
     "ciclo": 1,
-    "ingresos": "23400",
-    "costos": "12737.09",
-    "utilidad": "10662.91",
-    "caja_final": "194551.7",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "9771.91",
+    "caja_final": "193840.7",
     "balance_caja": {
-      "salidas": 24168.3,
-      "entradas": 18720,
-      "cajaFinal": 194551.7,
+      "salidas": 24159.3,
+      "entradas": 18000,
+      "cajaFinal": 193840.7,
       "prestamos": 0,
       "cajaInicial": 200000,
       "aportesCapital": 0
@@ -4807,26 +4813,26 @@
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 194551.7,
-      "flujoNeto": -5448.3,
+      "cajaFinal": 193840.7,
+      "flujoNeto": -6159.3,
       "inversion": -11095,
-      "operacion": 5646.7,
+      "operacion": 4935.7,
       "reembolsos": 0,
       "cajaInicial": 200000,
-      "cobrosVentas": 18720,
+      "cobrosVentas": 18000,
       "ventaActivos": 0,
       "compraActivos": -11095,
       "impuestoRenta": 0,
       "financiamiento": 0,
-      "pagosOperacion": -13073.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12737.09,
-      "ingresos": 23400,
-      "utilidad": 10662.91,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 9771.91,
       "costoVentas": 9246.19,
-      "ventasNetas": 23400,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -4905,39 +4911,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 260,
-            "demand": 265,
+            "price": 250,
+            "demand": 266,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 23400,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 175,
+            "lostSales": 176,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 260,
-            "assignedDemand": 265,
-            "effectivePrice": 260,
-            "potentialRevenue": 68900
+            "chosenPrice": 250,
+            "assignedDemand": 266,
+            "effectivePrice": 250,
+            "potentialRevenue": 66500
           }
         ],
         "events": [],
-        "market": 265,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -4954,7 +4960,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 23400,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -5380,7 +5386,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 18720,
+        "cashRevenue": 18000,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -5415,14 +5421,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "central": 0,
@@ -5474,20 +5480,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 265,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 266,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 265,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -5519,38 +5526,38 @@
         },
         "openingInventory": {},
         "creditCollections": 0,
-        "accountsReceivable": 4680
+        "accountsReceivable": 4500
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 734,
-      "utilidadNeta": 10662.91,
+      "gastosVentas": 725,
+      "utilidadNeta": 9771.91,
       "cicloImpuesto": 3,
       "impuestoRenta": 0,
-      "utilidadBruta": 14153.81,
-      "ventasTotales": 23400,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 210662.91,
+        "activos": 209771.91,
         "capital": 200000,
-        "efectivo": 194551.7,
-        "patrimonio": 210662.91,
+        "efectivo": 193840.7,
+        "patrimonio": 209771.91,
         "inventarios": 451,
         "activosFijos": 10980.21,
         "inventarioMP": 451,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 4680,
-        "pasivoPatrimonio": 210662.91,
+        "cuentasPorCobrar": 4500,
+        "pasivoPatrimonio": 209771.91,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 10662.91
+        "resultadosAcumulados": 9771.91
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 734,
-        "total": 12737.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -5565,59 +5572,59 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3490.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": true,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
       "utilidadNetaFinal": null,
-      "utilidadOperativa": 10662.91,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 10662.91,
-      "utilidadAntesImpuestos": 10662.91,
-      "utilidadAntesImpuestosAcumulada": 10662.91
+      "baseImponibleAcumulada": 9771.91,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 9771.91
     }
   },
   {
     "empresa_id": 3,
     "ciclo": 2,
-    "ingresos": "23400",
-    "costos": "12737.09",
-    "utilidad": "10662.91",
-    "caja_final": "203708.4",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "9771.91",
+    "caja_final": "202151.4",
     "balance_caja": {
-      "salidas": 13073.3,
-      "entradas": 22230,
-      "cajaFinal": 203708.4,
+      "salidas": 13064.3,
+      "entradas": 21375,
+      "cajaFinal": 202151.4,
       "prestamos": 0,
-      "cajaInicial": 194551.7,
+      "cajaInicial": 193840.7,
       "aportesCapital": 0
     },
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 203708.4,
-      "flujoNeto": 9156.7,
+      "cajaFinal": 202151.4,
+      "flujoNeto": 8310.7,
       "inversion": 0,
-      "operacion": 9156.7,
+      "operacion": 8310.7,
       "reembolsos": 0,
-      "cajaInicial": 194551.7,
-      "cobrosVentas": 22230,
+      "cajaInicial": 193840.7,
+      "cobrosVentas": 21375,
       "ventaActivos": 0,
       "compraActivos": 0,
       "impuestoRenta": 0,
       "financiamiento": 0,
-      "pagosOperacion": -13073.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12737.09,
-      "ingresos": 23400,
-      "utilidad": 10662.91,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 9771.91,
       "costoVentas": 9246.19,
-      "ventasNetas": 23400,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -5696,39 +5703,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 260,
-            "demand": 265,
+            "price": 250,
+            "demand": 266,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 23400,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 175,
+            "lostSales": 176,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 260,
-            "assignedDemand": 265,
-            "effectivePrice": 260,
-            "potentialRevenue": 68900
+            "chosenPrice": 250,
+            "assignedDemand": 266,
+            "effectivePrice": 250,
+            "potentialRevenue": 66500
           }
         ],
         "events": [],
-        "market": 265,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -5745,7 +5752,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 23400,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -6173,7 +6180,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 22230,
+        "cashRevenue": 21375,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -6208,14 +6215,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "central": 0,
@@ -6267,20 +6274,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 265,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 266,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 265,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -6320,39 +6328,39 @@
           "cuero_prem": 0,
           "cuero_sint": 7
         },
-        "creditCollections": 4680,
-        "accountsReceivable": 5850
+        "creditCollections": 4500,
+        "accountsReceivable": 5625
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 734,
-      "utilidadNeta": 10662.91,
+      "gastosVentas": 725,
+      "utilidadNeta": 9771.91,
       "cicloImpuesto": 3,
       "impuestoRenta": 0,
-      "utilidadBruta": 14153.81,
-      "ventasTotales": 23400,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 221325.82,
+        "activos": 219543.82,
         "capital": 200000,
-        "efectivo": 203708.4,
-        "patrimonio": 221325.82,
+        "efectivo": 202151.4,
+        "patrimonio": 219543.82,
         "inventarios": 902,
         "activosFijos": 10865.42,
         "inventarioMP": 902,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 5850,
-        "pasivoPatrimonio": 221325.82,
+        "cuentasPorCobrar": 5625,
+        "pasivoPatrimonio": 219543.82,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 21325.82
+        "resultadosAcumulados": 19543.82
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 734,
-        "total": 12737.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -6367,59 +6375,59 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3490.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": true,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
       "utilidadNetaFinal": null,
-      "utilidadOperativa": 10662.91,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 21325.82,
-      "utilidadAntesImpuestos": 10662.91,
-      "utilidadAntesImpuestosAcumulada": 21325.82
+      "baseImponibleAcumulada": 19543.82,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 19543.82
     }
   },
   {
     "empresa_id": 3,
     "ciclo": 3,
-    "ingresos": "23400",
-    "costos": "12737.09",
-    "utilidad": "7464.04",
-    "caja_final": "209666.23",
+    "ingresos": "22500",
+    "costos": "12728.09",
+    "utilidad": "6840.34",
+    "caja_final": "207530.53",
     "balance_caja": {
-      "salidas": 16272.17,
-      "entradas": 22230,
-      "cajaFinal": 209666.23,
+      "salidas": 15995.87,
+      "entradas": 21375,
+      "cajaFinal": 207530.53,
       "prestamos": 0,
-      "cajaInicial": 203708.4,
+      "cajaInicial": 202151.4,
       "aportesCapital": 0
     },
     "flujo_caja": {
       "otros": 0,
       "eventos": 0,
-      "cajaFinal": 209666.23,
-      "flujoNeto": 5957.83,
+      "cajaFinal": 207530.53,
+      "flujoNeto": 5379.13,
       "inversion": 0,
-      "operacion": 5957.83,
+      "operacion": 5379.13,
       "reembolsos": 0,
-      "cajaInicial": 203708.4,
-      "cobrosVentas": 22230,
+      "cajaInicial": 202151.4,
+      "cobrosVentas": 21375,
       "ventaActivos": 0,
       "compraActivos": 0,
-      "impuestoRenta": -3198.87,
+      "impuestoRenta": -2931.57,
       "financiamiento": 0,
-      "pagosOperacion": -13073.3
+      "pagosOperacion": -13064.3
     },
     "estado_resultados": {
       "otros": 0,
-      "costos": 12737.09,
-      "ingresos": 23400,
-      "utilidad": 7464.04,
+      "costos": 12728.09,
+      "ingresos": 22500,
+      "utilidad": 6840.34,
       "costoVentas": 9246.19,
-      "ventasNetas": 23400,
+      "ventasNetas": 22500,
       "cycleReceipt": {
         "sold": 90,
         "goods": {
@@ -6498,39 +6506,39 @@
           {
             "id": "premium",
             "sold": 90,
-            "price": 260,
-            "demand": 265,
+            "price": 250,
+            "demand": 266,
             "points": [
               {
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "reason": "",
             "quality": 5,
-            "revenue": 23400,
+            "revenue": 22500,
             "produced": 90,
             "available": 90,
-            "lostSales": 175,
+            "lostSales": 176,
             "assignment": "automatic",
             "alreadySold": 0,
-            "chosenPrice": 260,
-            "assignedDemand": 265,
-            "effectivePrice": 260,
-            "potentialRevenue": 68900
+            "chosenPrice": 250,
+            "assignedDemand": 266,
+            "effectivePrice": 250,
+            "potentialRevenue": 66500
           }
         ],
         "events": [],
-        "market": 265,
+        "market": 266,
         "scores": {
           "health": 1,
           "selected": [
@@ -6547,7 +6555,7 @@
           "reputation": 2.5
         },
         "regimen": "MYPE",
-        "revenue": 23400,
+        "revenue": 22500,
         "produced": 90,
         "decisions": {
           "HILO": {
@@ -6975,7 +6983,7 @@
           "factorProduccion": 10,
           "factorPublicidad": 0
         },
-        "cashRevenue": 22230,
+        "cashRevenue": 21375,
         "storageCost": 0,
         "consequences": [],
         "demandFactor": 1,
@@ -7010,14 +7018,14 @@
                 "id": "web",
                 "sold": 90,
                 "zone": "web",
-                "demand": 265,
+                "demand": 266,
                 "closing": 0,
                 "opening": 0,
                 "product": "premium",
-                "revenue": 23400,
+                "revenue": 22500,
                 "received": 90,
                 "available": 90,
-                "lostSales": 175
+                "lostSales": 176
               }
             ],
             "central": 0,
@@ -7069,20 +7077,21 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 44.58,
         "catalogSelection": [],
         "marketAllocation": {
           "products": {
             "premium": {
-              "asignado": 265,
-              "porcentaje": 0.33207902163687675,
+              "asignado": 266,
+              "porcentaje": 0.3333333333333333,
               "mercadoReal": 800,
-              "puntajeTotal": 35.300000000000004,
-              "puntajePrecio": 96,
+              "puntajeTotal": 35.7,
+              "puntajePrecio": 100,
               "calidadMercado": 33,
-              "demandaAjustada": 265,
+              "demandaAjustada": 266,
               "reputacionEscalada": 25,
               "simulatedCompetitors": []
             }
@@ -7122,39 +7131,39 @@
           "cuero_prem": 0,
           "cuero_sint": 14
         },
-        "creditCollections": 5850,
-        "accountsReceivable": 7020
+        "creditCollections": 5625,
+        "accountsReceivable": 6750
       },
       "depreciacion": 114.79,
       "devoluciones": 0,
-      "gastosVentas": 734,
-      "utilidadNeta": 7464.04,
+      "gastosVentas": 725,
+      "utilidadNeta": 6840.34,
       "cicloImpuesto": 3,
-      "impuestoRenta": 3198.87,
-      "utilidadBruta": 14153.81,
-      "ventasTotales": 23400,
+      "impuestoRenta": 2931.57,
+      "utilidadBruta": 13253.81,
+      "ventasTotales": 22500,
       "balanceGeneral": {
         "deuda": 0,
-        "activos": 228789.86,
+        "activos": 226384.16,
         "capital": 200000,
-        "efectivo": 209666.23,
-        "patrimonio": 228789.86,
+        "efectivo": 207530.53,
+        "patrimonio": 226384.16,
         "inventarios": 1353,
         "activosFijos": 10750.63,
         "inventarioMP": 1353,
         "inventarioPT": 0,
-        "cuentasPorCobrar": 7020,
-        "pasivoPatrimonio": 228789.86,
+        "cuentasPorCobrar": 6750,
+        "pasivoPatrimonio": 226384.16,
         "impuestosPorPagar": 0,
         "interesesPorPagar": 0,
         "provisionGarantias": 0,
-        "resultadosAcumulados": 28789.86
+        "resultadosAcumulados": 26384.16
       },
       "criterioCostos": "ventas",
       "desgloseCostos": {
         "fijos": 2712.32,
-        "otros": 734,
-        "total": 12737.09,
+        "otros": 725,
+        "total": 12728.09,
         "manoObra": 5072.4,
         "intereses": 0,
         "almacenaje": 0,
@@ -7169,19 +7178,19 @@
       "gastoGarantias": 0,
       "impactoEventos": 0,
       "policyWarnings": [],
-      "gastosOperacion": 3490.9,
+      "gastosOperacion": 3481.9,
       "costosProduccion": 9246.19,
       "impuestoDiferido": false,
       "gastosFinancieros": 0,
       "regimenTributario": "MYPE",
-      "utilidadNetaFinal": 28789.86,
-      "utilidadOperativa": 10662.91,
+      "utilidadNetaFinal": 26384.16,
+      "utilidadOperativa": 9771.91,
       "ingresosFinancieros": 0,
       "gastosAdministrativos": 2756.9,
       "resultadoVentaActivos": 0,
-      "baseImponibleAcumulada": 31988.73,
-      "utilidadAntesImpuestos": 10662.91,
-      "utilidadAntesImpuestosAcumulada": 31988.73
+      "baseImponibleAcumulada": 29315.73,
+      "utilidadAntesImpuestos": 9771.91,
+      "utilidadAntesImpuestosAcumulada": 29315.73
     }
   },
   {
@@ -7636,7 +7645,8 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 0,
         "catalogSelection": [],
@@ -8182,7 +8192,8 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 0,
         "catalogSelection": [],
@@ -8737,7 +8748,8 @@
           "capitalMax": 120000,
           "capitalMin": 80000,
           "capitalMode": "fixed",
-          "incomeTaxTiming": "final-cycle"
+          "incomeTaxTiming": "final-cycle",
+          "authoritativePrices": true
         },
         "maintenanceCost": 0,
         "catalogSelection": [],

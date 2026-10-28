@@ -24,8 +24,9 @@ for sess,expected,forbidden in [(a,ra,rb),(b,rb,ra)]:
  st,out=req('/rest/v1/rpc/obtener_estado_estudiante',payload,sess['access_token']);assert not out.get('success') and out.get('code')=='CREDENCIALES_INVALIDAS',(st,out)
  st,out=req('/rest/v1/side_student_state?select=empresa_id',token=sess['access_token']);assert st in (200,401,403),(st,out)
  if st==200:assert not any(x['empresa_id']==forbidden['empresa_id'] for x in out),out
-st,out=join(b,'TEST-A');assert out.get('code')=='CLAVE_REQUERIDA',out
-st,out=join(b,'TEST-A',ra['clave_empresa']);assert out.get('success'),out
+st,out=join(a,'TEST-A');assert out.get('success') and 'clave_empresa' not in out,out
+st,out=join(b,'TEST-A');assert out.get('code')=='ACCESO_RESERVADO',out
+st,out=join(b,'TEST-A','12345678');assert out.get('code')=='ACCESO_RESERVADO',out
 
 args={'p_partida_id':game,'p_empresa_id':ra['empresa_id'],'p_expulsar':True}
 st,out=req('/rest/v1/rpc/side_expulsar_empresa',args,a['access_token']);assert not out.get('success') and out.get('code')=='NO_AUTORIZADO',(st,out)
@@ -33,10 +34,14 @@ st,out=req('/rest/v1/rpc/side_expulsar_empresa',args,t['access_token']);assert o
 st,out=join(b,'TEST-A');assert out.get('code')=='EMPRESA_EXPULSADA',(st,out)
 args['p_expulsar']=False
 st,out=req('/rest/v1/rpc/side_expulsar_empresa',args,t['access_token']);assert out.get('success') and out.get('expulsada_at') is None,(st,out)
+st,out=join(b,'TEST-A');assert out.get('code')=='ACCESO_RESERVADO',(st,out)
+st,out=req('/rest/v1/rpc/side_liberar_empresa',{'p_partida_id':game,'p_empresa_id':ra['empresa_id']},a['access_token']);assert not out.get('success'),(st,out)
+st,out=req('/rest/v1/rpc/side_liberar_empresa',{'p_partida_id':game,'p_empresa_id':ra['empresa_id']},t['access_token']);assert out.get('success'),(st,out)
 st,out=join(b,'TEST-A');assert out.get('success'),(st,out)
+st,out=join(a,'TEST-A');assert out.get('code')=='ACCESO_RESERVADO',(st,out)
 st,out=req('/rest/v1/rpc/side_ingresar_empresa_segura',{'p_codigo':code,'p_nombre_legal':'TEST-B','p_nombre_comercial':'TEST-B'});assert st in (401,403) or not out.get('success'),(st,out)
 
-# Usuario B ahora posee empresa A por recuperación; A no puede consultar ni modificar B.
+# Usuario B ahora posee empresa A tras liberación docente; A no puede consultar ni modificar B.
 foreign={'p_codigo':code,'p_nombre_legal':'TEST-B','p_nombre_comercial':'TEST-B'}
 st,out=req('/rest/v1/rpc/guardar_estado_estudiante',{**foreign,'p_snapshot':{'decision_state':{}},'p_expected_revision':0},a['access_token']);assert not out.get('success') and out.get('code')=='CREDENCIALES_INVALIDAS',(st,out)
 st,out=req('/rest/v1/side_student_state?empresa_id=eq.'+str(rb['empresa_id']),{'snapshot':{}},a['access_token'],method='PATCH');assert st in (401,403) or (st in (200,204) and not out),(st,out)

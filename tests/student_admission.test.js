@@ -36,12 +36,12 @@ test('student service normalizes the three admission fields and preserves server
  assert.equal(result.code,'PARTIDA_INICIADA');
 });
 
-test('admission creates an anonymous session before submitting the key',async()=>{
+test('admission creates an anonymous session and never forwards an old company key',async()=>{
  const calls=[];let sessions=0;
- const window={SIDE:{SupabaseClient:{get:()=>({auth:{getSession:async()=>({data:{session:null}}),signInAnonymously:async()=>{sessions++;return {data:{session:{user:{id:'test'}}},error:null};}},rpc:async(name,args)=>{if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2}};calls.push({name,args});return {data:{success:false,code:'CLAVE_INVALIDA',error:'Clave inválida'}};}})}}};
+ const window={SIDE:{SupabaseClient:{get:()=>({auth:{getSession:async()=>({data:{session:null}}),signInAnonymously:async()=>{sessions++;return {data:{session:{user:{id:'test'}}},error:null};}},rpc:async(name,args)=>{if(name==='side_admission_features')return {data:{waitingRoomVersion:3,exactIdentityVersion:2}};calls.push({name,args});return {data:{success:false,code:'ACCESO_RESERVADO',error:'Solicita al docente liberar acceso'}};}})}}};
  vm.runInNewContext(serviceSource,{window,console});
  const result=await window.SIDE.EmpresaService.ingresar({codigo:'SIDE-000',nombreLegal:'Legal',nombreComercial:'Marca',claveEmpresa:'ABC12345'});
- assert.equal(sessions,1);assert.equal(calls[0].name,'side_ingresar_empresa_segura');assert.equal(calls[0].args.p_clave,'ABC12345');assert.equal(result.code,'CLAVE_INVALIDA');assert.equal(result.technical,false);
+ assert.equal(sessions,1);assert.equal(calls[0].name,'side_ingresar_empresa_segura');assert.equal(calls[0].args.p_clave,null);assert.equal(result.code,'ACCESO_RESERVADO');assert.equal(result.technical,false);
 });
 
 test('student service does not call the server with any missing identity field',async()=>{

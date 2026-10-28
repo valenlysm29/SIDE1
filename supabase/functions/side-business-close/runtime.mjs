@@ -92,6 +92,14 @@ module.exports={runOnce,remoteRpc};
     if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
     state.__economicHistory={reputation:economic.reputation.valor,lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
+    // Canonicalize legacy acquisition history and numeric cycle identifiers so
+    // equivalent saved decisions produce identical, reproducible receipts.
+    for(const [key,entry] of Object.entries(decisions)){
+      if(!entry||typeof entry!=='object'||Array.isArray(entry))continue;
+      if(Number.isSafeInteger(Number(entry.round))&&Number(entry.round)>0)entry.round=Number(entry.round);
+      const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
+      if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
+    }
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
@@ -653,7 +661,12 @@ module.exports={runOnce,remoteRpc};
       const numeric=typeof raw==='number'||(typeof raw==='string'&&raw.trim()!=='');
       return [id,numeric&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];
     }));
-    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,{...storedPrices,...input.prices},config),rep=reputation(state,plan,round);
+    // The trusted closure supplies this flag: prices are internal model
+    // parameters, never a value chosen in the student snapshot.
+    const authorizedPrices=input.financialPolicy?.authoritativePrices
+      ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
+      : {...storedPrices,...input.prices};
+    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
     rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
     const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
@@ -2800,12 +2813,31 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         const preparedState={...decisions,...Object.fromEntries(Object.entries(trusted).filter(([key])=>key.startsWith('__')))};
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
-        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},events:[]});
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true},events:[]});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
         if(!resultadosPorEmpresa[company.id])continue;
         const snapshot=company.snapshot||{},result=resultadosPorEmpresa[company.id],financialLedger={...result.ledger};let previous=0;
+        // Rebuild the current-cycle line from server-generated section entries,
+        // never from the snapshot ledger. The previous debt is from the sealed
+        // closure; amounts from current sales/collections have not been made
+        // when the financing decision is submitted.
+        if(Number(ciclo)>1){
+          const request=Number(result.receipt?.decisions?.PRESTAMO?.amount||0);
+          const debt=Number(prior[company.id]?.financial?.balanceGeneral?.deuda);
+          if(!Number.isFinite(debt)||debt<0)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'La deuda anterior requiere reconciliación.'};
+          const items=global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[]);
+          const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((sum,id)=>{
+            const definition=items.find(item=>item.id===id),purchases=result.receipt?.decisions?.[id]?.purchases||{};
+            return sum+(definition?.options||[]).reduce((a,option)=>a+Math.max(0,Object.values(purchases).reduce((v,row)=>v+Number(row?.[option.id]||0),0))*Number(option.cost||0),0);
+          },0);
+          const excluded=new Set(['SIM_VENTAS','COMISION_VENTAS','VENTAS_CREDITO','COBRO_CREDITO','ALMACENAJE','MANTENIMIENTO_AUTO']);
+          const beforeSales=Object.entries(financialLedger).reduce((sum,[key,value])=>{const [r,kind]=key.split(':');return sum+(Number(r)===Number(ciclo)&&excluded.has(kind)?0:Number(value||0));},Number(company.capital)||0);
+          const ownCash=Math.max(0,beforeSales-debt-request);
+          const approved=Math.floor((ownCash*.70+assets*.20)/500)*500;
+          if(request>Math.max(0,approved-debt))return {success:false,code:'DECISION_INVALIDA',error:'El préstamo supera la línea disponible verificada.'};
+        }
         for(let round=1;round<=ciclo;round++){
           const adjustment=global.SIDE_FINANCE_CONFIG?.adjustment(ctx.financialConfig||{},round,company.id,Number(company.capital))||0;
           if(adjustment!==previous)financialLedger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;

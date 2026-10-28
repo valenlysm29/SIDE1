@@ -477,12 +477,31 @@
         const preparedState={...decisions,...Object.fromEntries(Object.entries(trusted).filter(([key])=>key.startsWith('__')))};
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
-        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{},events:[]});
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true},events:[]});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
         if(!resultadosPorEmpresa[company.id])continue;
         const snapshot=company.snapshot||{},result=resultadosPorEmpresa[company.id],financialLedger={...result.ledger};let previous=0;
+        // Rebuild the current-cycle line from server-generated section entries,
+        // never from the snapshot ledger. The previous debt is from the sealed
+        // closure; amounts from current sales/collections have not been made
+        // when the financing decision is submitted.
+        if(Number(ciclo)>1){
+          const request=Number(result.receipt?.decisions?.PRESTAMO?.amount||0);
+          const debt=Number(prior[company.id]?.financial?.balanceGeneral?.deuda);
+          if(!Number.isFinite(debt)||debt<0)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'La deuda anterior requiere reconciliación.'};
+          const items=global.SIDE_DECISION_CATALOG.flatMap(category=>category.items||[]);
+          const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((sum,id)=>{
+            const definition=items.find(item=>item.id===id),purchases=result.receipt?.decisions?.[id]?.purchases||{};
+            return sum+(definition?.options||[]).reduce((a,option)=>a+Math.max(0,Object.values(purchases).reduce((v,row)=>v+Number(row?.[option.id]||0),0))*Number(option.cost||0),0);
+          },0);
+          const excluded=new Set(['SIM_VENTAS','COMISION_VENTAS','VENTAS_CREDITO','COBRO_CREDITO','ALMACENAJE','MANTENIMIENTO_AUTO']);
+          const beforeSales=Object.entries(financialLedger).reduce((sum,[key,value])=>{const [r,kind]=key.split(':');return sum+(Number(r)===Number(ciclo)&&excluded.has(kind)?0:Number(value||0));},Number(company.capital)||0);
+          const ownCash=Math.max(0,beforeSales-debt-request);
+          const approved=Math.floor((ownCash*.70+assets*.20)/500)*500;
+          if(request>Math.max(0,approved-debt))return {success:false,code:'DECISION_INVALIDA',error:'El préstamo supera la línea disponible verificada.'};
+        }
         for(let round=1;round<=ciclo;round++){
           const adjustment=global.SIDE_FINANCE_CONFIG?.adjustment(ctx.financialConfig||{},round,company.id,Number(company.capital))||0;
           if(adjustment!==previous)financialLedger[`${round}:CAPITAL_ADJUSTMENT`]=adjustment-previous;

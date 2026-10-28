@@ -54,6 +54,14 @@
     if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
     state.__economicHistory={reputation:economic.reputation.valor,lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
+    // Canonicalize legacy acquisition history and numeric cycle identifiers so
+    // equivalent saved decisions produce identical, reproducible receipts.
+    for(const [key,entry] of Object.entries(decisions)){
+      if(!entry||typeof entry!=='object'||Array.isArray(entry))continue;
+      if(Number.isSafeInteger(Number(entry.round))&&Number(entry.round)>0)entry.round=Number(entry.round);
+      const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
+      if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
+    }
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});

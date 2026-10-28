@@ -1,6 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const source=fs.readFileSync(path.join(__dirname,'../js/company_summary.js'),'utf8');
+// The production flow intentionally keeps 3D optional (commit 86a746e).
 const commit=source.slice(source.indexOf('function commitReviewedSections('),source.indexOf('function summaryStatus('));
 function fixture({failedWrite=false,explorable=true}={}){
   const store=new Map(),events=[],tasks=[],cats=['B','C'].map(cat=>({cat,short:cat,items:[]}));
@@ -12,7 +13,7 @@ function fixture({failedWrite=false,explorable=true}={}){
     writeDecisionBatch:writes=>{if(failedWrite)return false;events.push('persist');Object.entries(writes).forEach(([k,v])=>store.set(k,v));return true;},
     ledgerTotal:()=>0,restoreDraftsForRound(){},captureCyclePlan(){},setCyclePlanSyncPending(){},closeCompanyReview:()=>events.push('close'),syncReportToSupabase(){},syncStudentReportPreview(){},
     animateCash(){},renderTabs(){},renderDecisionCategory(){},updateHud(){},toast(){},queueMicrotask:fn=>tasks.push(fn),
-    simulationSubmissionComplete:()=>cats.every(c=>store.get(c.cat)==='1'),canExploreWorld:()=>explorable,playerIsDeciding:true,
+    simulationSubmissionComplete:()=>cats.every(c=>store.get(c.cat)==='1'),canExploreWorld:()=>explorable,playerIsDeciding:true,currentCategory:'B',companySummaryRound:null,companySummaryFilter:null,
     requestWorldEntry:()=>events.push('world')};
   vm.createContext(ctx);vm.runInContext(commit,ctx);
   return {ctx,events,async drain(){tasks.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();}};
@@ -27,13 +28,13 @@ test('confirmed remote plan enters the durable snapshot queue even if report ren
   assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);
   assert.equal(queued.decision_state.__cyclePlans[1].production.producibleUnits,10);
 });
-test('the final individual section enters the world after the whole batch is saved',async()=>{
+test('the final individual section opens the company summary without entering 3D',async()=>{
   const f=fixture();assert.equal(f.ctx.commitReviewedSections(['B'],false),true);await f.drain();assert.deepEqual(f.events,['persist']);
-  assert.equal(f.ctx.commitReviewedSections(['C'],false),true);await f.drain();assert.deepEqual(f.events,['persist','persist','close','world']);assert.equal(f.ctx.playerIsDeciding,false);
+  assert.equal(f.ctx.commitReviewedSections(['C'],false),true);await f.drain();assert.deepEqual(f.events,['persist','persist','close']);assert.equal(f.ctx.currentCategory,'A');assert.equal(f.ctx.companySummaryFilter,'sent');assert.equal(f.ctx.playerIsDeciding,true);
 });
-test('send all enters automatically once and duplicate confirmation cannot charge again',async()=>{
-  const f=fixture();assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);await f.drain();assert.equal(f.events.at(-1),'world');
-  assert.equal(f.ctx.commitReviewedSections(['B','C'],true),false);await f.drain();assert.equal(f.events.filter(e=>e==='world').length,1);assert.equal(f.events.filter(e=>e==='persist').length,1);
+test('send all opens the summary and duplicate confirmation cannot charge again',async()=>{
+  const f=fixture();assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);await f.drain();assert.equal(f.events.at(-1),'close');assert.equal(f.ctx.currentCategory,'A');
+  assert.equal(f.ctx.commitReviewedSections(['B','C'],true),false);await f.drain();assert.equal(f.events.filter(e=>e==='world').length,0);assert.equal(f.events.filter(e=>e==='persist').length,1);
 });
 test('failed persistence and a cycle paused before entry never open the world',async()=>{
   const failed=fixture({failedWrite:true});assert.equal(failed.ctx.commitReviewedSections(['B','C'],true),false);await failed.drain();assert.deepEqual(failed.events,[]);

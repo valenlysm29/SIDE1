@@ -59,7 +59,12 @@
       const numeric=typeof raw==='number'||(typeof raw==='string'&&raw.trim()!=='');
       return [id,numeric&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];
     }));
-    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,{...storedPrices,...input.prices},config),rep=reputation(state,plan,round);
+    // The trusted closure supplies this flag: prices are internal model
+    // parameters, never a value chosen in the student snapshot.
+    const authorizedPrices=input.financialPolicy?.authoritativePrices
+      ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
+      : {...storedPrices,...input.prices};
+    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
     rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
     const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};

@@ -38,7 +38,7 @@
     };
   }
 
-  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA','CODIGO_RETIRADO','EMPRESA_EXPULSADA','CLAVE_REQUERIDA','CLAVE_INVALIDA','INTENTOS_AGOTADOS','SESION_REQUERIDA']);
+  const ADMISSION_REJECTION_CODES = new Set(['CREDENCIALES_INVALIDAS', 'PARTIDA_INICIADA', 'CODIGO_INVALIDO', 'PARTIDA_NO_ENCONTRADA', 'CODIGO_AMBIGUO', 'PARTIDA_CANCELADA', 'PARTIDA_FINALIZADA','CODIGO_RETIRADO','EMPRESA_EXPULSADA','ACCESO_RESERVADO','SESION_REQUERIDA']);
   const CODE_MESSAGES={PARTIDA_CANCELADA:'La partida fue cancelada. Solicita el código de la nueva sala al docente.',PARTIDA_FINALIZADA:'La partida ya finalizó. Solicita el código de la nueva sala al docente.',CODIGO_RETIRADO:'Este código pertenece a una sala anterior y ya no puede utilizarse. Solicita el código de la nueva sala.',PARTIDA_NO_ENCONTRADA:'No existe una partida con ese código. Comprueba el código que compartió tu docente.',CODIGO_AMBIGUO:'Este código está duplicado en la base de datos. El docente debe revisar los códigos de las salas.'};
   async function rejectedCodeStatus(sb,codigo){
     try{
@@ -129,7 +129,7 @@
         p_codigo: codigo,
         p_nombre_legal: nombreLegal,
         p_nombre_comercial: nombreComercial,
-        p_clave: String(d.claveEmpresa||'').trim()||null
+        p_clave: null
       });
       if (error) {
         console.error('SIDE EmpresaService: fallo tecnico en unirse_partida_por_codigo', error);

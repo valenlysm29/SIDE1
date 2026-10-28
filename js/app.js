@@ -670,10 +670,10 @@ $('studentForm')?.addEventListener('submit',async e=>{
     let ingreso;
     const joinButton=$('studentForm')?.querySelector?.('[type="submit"]');if(joinButton){joinButton.disabled=true;joinButton.setAttribute('aria-busy','true');}
     $('studentReconnectBtn')?.classList.add('hidden');
-    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName,claveEmpresa:$('studentCompanyKey')?.value.trim().toUpperCase()||''})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
+    try{ingreso=await S.EmpresaService.ingresar({codigo:code,nombreLegal:legalName,nombreComercial:brandName})}catch(error){console.error('SIDE: error técnico no controlado al validar el ingreso',error);message('studentMessage',JOIN_SERVER_MESSAGE,true);$('studentReconnectBtn')?.classList.remove('hidden');return}finally{if(joinButton){joinButton.disabled=false;joinButton.removeAttribute('aria-busy');}}
     if(joinEpoch!==studentSnapshotEpoch)return;
     if(!ingreso?.success){
-      if(['CLAVE_REQUERIDA','CLAVE_INVALIDA','INTENTOS_AGOTADOS'].includes(ingreso?.code)){message('studentMessage',ingreso.error||'Ingresa la clave de empresa para recuperar el acceso.',true);$('studentCompanyKey')?.focus();return;}
+      if(ingreso?.code==='ACCESO_RESERVADO'){message('studentMessage',ingreso.error||'Solicita al docente que libere el acceso.',true);return;}
       if(ingreso?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return;}
       if(['CODIGO_INVALIDO','PARTIDA_NO_ENCONTRADA','CODIGO_AMBIGUO','CODIGO_RETIRADO'].includes(ingreso?.code)){
         const text=ingreso.code==='CODIGO_INVALIDO'?JOIN_CODE_MESSAGE:ingreso.code==='CODIGO_RETIRADO'?'Este código pertenece a una sala anterior y ya no se puede utilizar. Pide al docente el código de una sala nueva.':ingreso.code==='CODIGO_AMBIGUO'?'El código corresponde a más de una partida. Pide al docente el código de una sala nueva.':'No existe una partida con ese código. Revisa el código de la sala con tu docente.';
@@ -692,8 +692,6 @@ $('studentForm')?.addEventListener('submit',async e=>{
     if(admissionCode(found.codigo)!==code){console.error('SIDE: ingresar_empresa devolvió otra sala');message('studentMessage','El servidor devolvió otra sala. Revisa el código e intenta nuevamente.',true);return}
     const empresaId=data.empresa_id||empresa.id||null,participantId=data.participante_id||null,returning=Boolean(data.reingreso);
     if(!empresaId||!found.id){console.error('SIDE: respuesta incompleta de ingresar_empresa');message('studentMessage',JOIN_SERVER_MESSAGE,true);return}
-    if(data.clave_empresa){window.alert('Guarda esta clave de empresa; solo se mostrará una vez. La necesitarás para recuperar el acceso desde otro dispositivo o si pierdes la sesión: '+data.clave_empresa);delete data.clave_empresa;}
-    if($('studentCompanyKey'))$('studentCompanyKey').value='';
     const canonicalBrand=cleanText(empresa.nombre_comercial||data.nombre_comercial||brandName),canonicalLegal=cleanText(empresa.nombre_legal||data.nombre_legal||legalName);
     const capitalSource=empresa.caja_inicial??data.caja_inicial,currentCapital=Number(capitalSource);
     currentStudent={name:'Jugador',company:canonicalBrand,legalName:canonicalLegal,participantId,empresaId,snapshotRevision:Math.max(0,Number(data.snapshot_revision??data.snapshotRevision??0)||0),...(capitalSource!==null&&capitalSource!==undefined&&Number.isFinite(currentCapital)?{initialCapital:currentCapital}:{}),game:{...found,codigo:cleanCode(found.codigo||code)},returning};
