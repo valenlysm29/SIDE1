@@ -6,7 +6,16 @@
   for(const item of (root.SIDE_DECISION_CATALOG||[]).flatMap(category=>category.items||[]))for(const option of item.options||[])if(Object.hasOwn(api.optionCosts,option.id))option.cost=api.optionCosts[option.id];
 }})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
-  return Object.freeze({version:'md-20261027',products:['esencial','urbano','premium'],
+  return Object.freeze({version:'md-20261027',
+    // SUNAT tasas RMT: https://orientacion.sunat.gob.pe/7037-03-tasa-del-impuesto
+    // UIT 2026, MEF: https://www.gob.pe/institucion/mef/noticias/1314665-mef-establece-en-s-5500-el-valor-de-la-uit-para-el-ano-2026 (consulta 2026-10-28).
+    tax:{uit:5500,mypeLimitUit:15,mypeRate:.10,generalRate:.295},
+    reputation:{smoothWithPrevious:false},
+    // Empresas sintéticas derivan precio y reputación del promedio de empresas reales.
+    simulatedCompetitors:{enabled:true,target:4},
+    // Cantidades de compra se expresan en m², unidades y metros.
+    materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
+    products:['esencial','urbano','premium'],
     segments:{esencial:{code:'SEG-01',min:0,defaultPrice:42.5,totalMarket:7000,penetration:.5,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:0,defaultPrice:100,totalMarket:5000,penetration:.7,ideal:100,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:0,defaultPrice:250,totalMarket:2000,penetration:.4,ideal:250,weights:[.1,.5,.4],quality:7}},
     consequences:{lowQualityPrice:.65,premiumPrice:1.4,reputationChange:2,lowEfficiency:4,lowProduction:.7,noLeaderEfficiency:5,noLeaderProduction:.95,lowReputation:3,lowReputationCycles:2,lowDemand:.8,lowHealth:3},
     // SUPUESTO: capacitación baja/alta 0%/12%; media +8% figura en Excel.

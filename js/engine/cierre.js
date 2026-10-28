@@ -60,6 +60,8 @@
       return [id,numeric&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];
     }));
     const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round}),price=prices(state,{...storedPrices,...input.prices},config),rep=reputation(state,plan,round);
+    const prior=state.__economicHistory?.reputation;
+    rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
     const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
     const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
       const oldQuality=Number.isFinite(Number(goodsQuality[id]))?clamp(goodsQuality[id]):qualityValue;
@@ -74,24 +76,32 @@
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
     return {id:input.id,state,round,plan,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
+  // Excel ROUND: each company's share is rounded independently.
+  function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
   function allocate(prepared,config=DEFAULT){
     const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:p.reputation||{valor:p.scores.reputation},products:{}}]));
     for(const id of config.products){
-      const segment=config.segments[id],participants=prepared.filter(p=>p.hasChannel&&p.lines.find(line=>line.id===id)?.available>0);
-      const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const segment=config.segments[id],participants=prepared.filter(p=>p.lines.find(line=>line.id===id)?.available>0);
       const market=Math.max(0,Math.round(segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market));
-      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*line.quality*10;return {p,line,score,total};});
+      const simulated=[];
+      if(participants.length && config.simulatedCompetitors?.enabled){
+        const count=Math.max(0,Math.floor(Number(config.simulatedCompetitors.target)||0)-participants.length);
+        const averagePrice=participants.reduce((sum,p)=>sum+p.lines.find(line=>line.id===id).price,0)/participants.length;
+        const averageRep=participants.reduce((sum,p)=>sum+p.scores.reputation,0)/participants.length;
+        for(let i=0;i<count;i++)simulated.push({id:`simulado-${id}-${i+1}`,simulated:true,scores:{reputation:averageRep},demandFactor:1,lines:[{id,price:averagePrice,available:market}]});
+        participants.push(...simulated);
+      }
+      const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const repSum=participants.reduce((sum,p)=>sum+Math.max(0,Number(p.scores.reputation)||0),0);
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0);return {p,line,score,total};});
       if(!rows.length)continue;
-      const sum=rows.reduce((s,row)=>s+row.total,0);let assignedTotal=0;
-      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.raw=row.share*market;row.assigned=Math.floor(row.raw);assignedTotal+=row.assigned;}
-      // Restos mayores. Un identificador estable desempata, sin depender del orden recibido.
-      const priority=[...rows].sort((a,b)=>(b.raw-b.assigned)-(a.raw-a.assigned)||String(a.p.id).localeCompare(String(b.p.id),'en'));
-      for(let i=0;i<market-assignedTotal;i++)priority[i].assigned++;
-      for(const row of rows)result[row.p.id].products[id]={asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:row.line.quality*10,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      const sum=rows.reduce((s,row)=>s+row.total,0);
+      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.assigned=roundDemand(row.share,market);}
+      for(const row of rows)if(!row.p.simulated)result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
     }return result;
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!p.hasChannel?'Sin canal de venta':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,revenue:money(sold*line.effectivePrice),reason};});
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
     const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));
@@ -104,10 +114,10 @@
     const id=config.products.find(product=>product===segment||config.segments[product].code===segment);
     if(!id)throw new RangeError('Segmento desconocido');
     const prepared=companies.map(company=>{
-      const rep=clamp(company.reputacion),price=Number(company.precio),q=clamp(company.calidad),produced=n(company.producido);
+      const rep=n(company.reputacion),price=Number(company.precio),q=clamp(company.calidad),produced=n(company.producido);
       return {id:String(company.id),hasChannel:true,scores:{reputation:rep},demandFactor:1,lines:[{id,price,quality:q,produced,available:n(company.stock)}],effective:price,reputationFinal:rep};
-    }),allocations=allocate(prepared,config);
+    }),allocations=allocate(prepared,{...config,simulatedCompetitors:{...config.simulatedCompetitors,enabled:false}});
     return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
   }
-  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies};
+  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies,roundDemand};
 });

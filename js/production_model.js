@@ -120,7 +120,8 @@
     const definition=item(ctx,id),counts=quantityCounts(ctx,id);
     const hasAnalyst=selected(ctx,'ANALISTA_COMPRAS').includes('si_analista');
     const discount=hasAnalyst?Math.max(2,12-(n(ctx.round)-1)*2):0;
-    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*n(option.cost)*0.92*(1-discount/100)));
+    const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;
+    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,config)));
   }
   function calculate(ctx={}){
     const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
@@ -136,7 +137,7 @@
     };
     const levelThree=sum(Object.values(staff).flatMap(counts=>Object.entries(counts).filter(([id])=>LEVEL_THREE_IDS.has(id)).map(([,value])=>value)));
     const hasLeadership=selected(ctx,'JEFATURA').includes('si_jefatura');
-    const efficiency=Math.min(1,Math.round((BASE_EFFICIENCY+levelThree*LEVEL_THREE_BONUS+(hasLeadership?LEADERSHIP_BONUS:0))*100)/100);
+    const efficiency=Math.round((BASE_EFFICIENCY+levelThree*LEVEL_THREE_BONUS+(hasLeadership?LEADERSHIP_BONUS:0))*100)/100;
     const specs=[
       ['cut','Corte','PERS_CORTE','MESA_CORTE'],
       ['assembly','Ensamblado','PERS_ENSAMBLE','ENSAMBLE'],

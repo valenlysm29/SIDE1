@@ -52,7 +52,7 @@
     state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__accountsReceivable=economic.receivable;
     const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
     if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
-    state.__economicHistory={lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
+    state.__economicHistory={reputation:economic.reputation.valor,lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};

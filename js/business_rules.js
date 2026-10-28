@@ -10,6 +10,11 @@
     const cts=option==='corte_exp'?base*(regimen==='NO_MYPE'?1:.5):r.cts;
     return (base*12+base*.09+base*r.grati+cts+base*r.vacation)/r.divisor;
   }
+  function materialUnitPrice(option,quantity,analystDiscount=0,config={}){
+    const rules=config.materials||{},threshold=Number(rules.quantityDiscountThreshold??100),rate=Number(rules.quantityDiscountRate??.08);
+    const quantityRate=n(quantity)>=Math.max(0,threshold)?Math.min(1,Math.max(0,rate)):0;
+    return n(option.cost)*(1-quantityRate)*(1-Math.min(100,n(analystDiscount))/100);
+  }
   function assetCost(item,option,regimen='MYPE'){const r=regimes[regimen]||regimes.MYPE,base=n(option.cost),mold=item.id==='MOLDE';return base*(1+(mold?0:r.installation)+(mold?r.moldTraining:r.training));}
   function advertising(ctx={}){const entry=ctx.drafts?.INV_MARKETING??ctx.state?.INV_MARKETING??{};if(Object.hasOwn(entry,'value'))return Math.min(10000,n(entry.value));const legacy={mkt_baja:1500,mkt_media:6000,mkt_alta:10000};return legacy[entry.optionIds?.[0]]||0;}
   function assetPurchaseHistory(entry,definition){
@@ -38,5 +43,5 @@
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,regimes,regime,laborCost,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
 });

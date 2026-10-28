@@ -21,3 +21,5 @@ tests/.python-deps/
 /assets/models/incoming/mixamo/
 /assets/models/npc/private/
 /tools/model-pipeline/.tmp/
+
+/supabase/.temp/

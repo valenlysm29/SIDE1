@@ -26,7 +26,7 @@
   function owned(item,id,ctx){return sum(Object.entries(productionModel.assetPurchaseHistory(ctx.state?.[item.id],item)).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
-  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));return BUS.laborCost(option.id,BUS.regime(ctx),option.cost)*(item.material?0.92*(1-discount(ctx)/100):1);}
+  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));if(item.material){const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;return BUS.materialUnitPrice(option,n(draft(item,ctx).quantities?.[option.id]),discount(ctx),config);}return BUS.laborCost(option.id,BUS.regime(ctx),option.cost);}
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
@@ -135,8 +135,6 @@
     const warnings=[],plan=productionModel?.calculate(ctx);
     if(!plan)return warnings;
     if(!plan.target)warnings.push({cat:'B',text:'Meta de producción en cero: este plan no fabricará unidades nuevas. Indica la cantidad deseada por molde para producir.'});
-    const channels=draft((ctx.catalog||[]).flatMap(c=>c.items||[]).find(i=>i.id==='CANALES')||{id:'CANALES'},ctx).optionIds||[];
-    if(!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))warnings.push({cat:'D',text:'Sin canal de venta: aunque produzcas, no habrá unidades vendidas ni ingresos por ventas.'});
     if(plan.unavailablePlannedMolds.length)warnings.push({cat:'B',text:'Falta adquirir un molde incluido en la meta. Esas unidades no se producirán.'});
     if(plan.target&&!plan.producibleUnits)warnings.push({cat:'B',text:'Producción posible: 0 unidades. Revisa los recursos indicados antes de confirmar; seleccionar opciones no garantiza cantidades suficientes.'});
     for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'F',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
