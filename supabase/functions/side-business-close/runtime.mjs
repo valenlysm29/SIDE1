@@ -90,7 +90,7 @@ module.exports={runOnce,remoteRpc};
     state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__accountsReceivable=economic.receivable;
     const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
     if(newLoan&&pendingRate)financialPolicy={...financialPolicy,nextLoanPenaltyPP:pendingRate};
-    state.__economicHistory={lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
+    state.__economicHistory={reputation:economic.reputation.valor,lowReputationCycles:economic.lowReputationCycles,nextLoanRatePP:Math.max(economic.nextLoanRatePP,newLoan?0:pendingRate),goodsQuality:Object.fromEntries(sales.map(line=>[line.id,line.quality]))};
     const decisions=clone(state);for(const key of Object.keys(decisions))if(key.startsWith('__'))delete decisions[key];
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
@@ -289,7 +289,8 @@ module.exports={runOnce,remoteRpc};
     const definition=item(ctx,id),counts=quantityCounts(ctx,id);
     const hasAnalyst=selected(ctx,'ANALISTA_COMPRAS').includes('si_analista');
     const discount=hasAnalyst?Math.max(2,12-(n(ctx.round)-1)*2):0;
-    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*n(option.cost)*0.92*(1-discount/100)));
+    const config=typeof module==='object'&&module.exports?load("js/engine/config.js"):globalThis.SIDE_ECONOMIC_CONFIG;
+    return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,config)));
   }
   function calculate(ctx={}){
     const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
@@ -305,7 +306,7 @@ module.exports={runOnce,remoteRpc};
     };
     const levelThree=sum(Object.values(staff).flatMap(counts=>Object.entries(counts).filter(([id])=>LEVEL_THREE_IDS.has(id)).map(([,value])=>value)));
     const hasLeadership=selected(ctx,'JEFATURA').includes('si_jefatura');
-    const efficiency=Math.min(1,Math.round((BASE_EFFICIENCY+levelThree*LEVEL_THREE_BONUS+(hasLeadership?LEADERSHIP_BONUS:0))*100)/100);
+    const efficiency=Math.round((BASE_EFFICIENCY+levelThree*LEVEL_THREE_BONUS+(hasLeadership?LEADERSHIP_BONUS:0))*100)/100;
     const specs=[
       ['cut','Corte','PERS_CORTE','MESA_CORTE'],
       ['assembly','Ensamblado','PERS_ENSAMBLE','ENSAMBLE'],
@@ -377,6 +378,11 @@ module.exports={runOnce,remoteRpc};
     const cts=option==='corte_exp'?base*(regimen==='NO_MYPE'?1:.5):r.cts;
     return (base*12+base*.09+base*r.grati+cts+base*r.vacation)/r.divisor;
   }
+  function materialUnitPrice(option,quantity,analystDiscount=0,config={}){
+    const rules=config.materials||{},threshold=Number(rules.quantityDiscountThreshold??100),rate=Number(rules.quantityDiscountRate??.08);
+    const quantityRate=n(quantity)>=Math.max(0,threshold)?Math.min(1,Math.max(0,rate)):0;
+    return n(option.cost)*(1-quantityRate)*(1-Math.min(100,n(analystDiscount))/100);
+  }
   function assetCost(item,option,regimen='MYPE'){const r=regimes[regimen]||regimes.MYPE,base=n(option.cost),mold=item.id==='MOLDE';return base*(1+(mold?0:r.installation)+(mold?r.moldTraining:r.training));}
   function advertising(ctx={}){const entry=ctx.drafts?.INV_MARKETING??ctx.state?.INV_MARKETING??{};if(Object.hasOwn(entry,'value'))return Math.min(10000,n(entry.value));const legacy={mkt_baja:1500,mkt_media:6000,mkt_alta:10000};return legacy[entry.optionIds?.[0]]||0;}
   function assetPurchaseHistory(entry,definition){
@@ -405,7 +411,48 @@ module.exports={runOnce,remoteRpc};
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,regimes,regime,laborCost,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+});
+
+},
+"js/engine/config.js":(module,exports,load)=>{
+/* Mercados del documento Costos De Producción (27/10/2026).
+ * Se conservan tarifas de canales, crédito y garantía de las funciones existentes. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else{
+  root.SIDE_ECONOMIC_CONFIG=api;
+  // The existing menu reads these costs; keep assumptions editable here.
+  for(const item of (root.SIDE_DECISION_CATALOG||[]).flatMap(category=>category.items||[]))for(const option of item.options||[])if(Object.hasOwn(api.optionCosts,option.id))option.cost=api.optionCosts[option.id];
+}})(typeof globalThis!=='undefined'?globalThis:this,function(){
+  'use strict';
+  return Object.freeze({version:'md-20261027',
+    // SUNAT tasas RMT: https://orientacion.sunat.gob.pe/7037-03-tasa-del-impuesto
+    // UIT 2026, MEF: https://www.gob.pe/institucion/mef/noticias/1314665-mef-establece-en-s-5500-el-valor-de-la-uit-para-el-ano-2026 (consulta 2026-10-28).
+    tax:{uit:5500,mypeLimitUit:15,mypeRate:.10,generalRate:.295},
+    reputation:{smoothWithPrevious:false},
+    // Empresas sintéticas derivan precio y reputación del promedio de empresas reales.
+    simulatedCompetitors:{enabled:true,target:4},
+    // Cantidades de compra se expresan en m², unidades y metros.
+    materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
+    products:['esencial','urbano','premium'],
+    segments:{esencial:{code:'SEG-01',min:0,defaultPrice:42.5,totalMarket:7000,penetration:.5,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:0,defaultPrice:100,totalMarket:5000,penetration:.7,ideal:100,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:0,defaultPrice:250,totalMarket:2000,penetration:.4,ideal:250,weights:[.1,.5,.4],quality:7}},
+    consequences:{lowQualityPrice:.65,premiumPrice:1.4,reputationChange:2,lowEfficiency:4,lowProduction:.7,noLeaderEfficiency:5,noLeaderProduction:.95,lowReputation:3,lowReputationCycles:2,lowDemand:.8,lowHealth:3},
+    // SUPUESTO: capacitación baja/alta 0%/12%; media +8% figura en Excel.
+    training:{cap_no:0,cap_baja:0,cap_media:.08,cap_alta:.12},
+    // SUPUESTO: solo marketing medio tiene +12% explícito; extremos 0/20%.
+    marketing:{mkt_baja:0,mkt_media:.12,mkt_alta:.2},
+    // SUPUESTO: cobertura base neutral; cada tienda adicional +5%, tope +25%.
+    channels:{web:1,physical:1,mixed:1,extraStore:.05,maxExtra:.25},
+    // SUPUESTOS heredados del menú, sin tarifa equivalente en el libro.
+    optionCosts:{los_olivos:1800,miraflores:3500,sjl:2200,si_analista:5000},
+    // No hay cargos ni penalizaciones de estos tipos en el documento base.
+    storagePerUnit:0,overtimeRate:0,nextLoanRatePP:0,
+    credit:{initial:.2,step:.05,analystBonus:.05,max:.7},commission:.01,
+    warranty:{pt_30:5,pt_90:10,pt_180:10},
+    // SUPUESTO: vida productiva100000u, acelerada doble línea recta; solo devengo.
+    depreciation:{productiveLife:100000,acceleratedFactor:2},
+    // SUPUESTO: mantenimiento evita penalidad; inventarios no crean stock gratuito.
+    maintenanceCapacity:0,inventoryCapacity:0,unservedDemand:'lost'
+  });
 });
 
 },
@@ -416,15 +463,20 @@ module.exports={runOnce,remoteRpc};
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100;
   function buildStatement(input={}){
     const ventasTotales=money(input.ventasTotales),costoVentas=money(input.costoVentas),gastosAdministrativos=money(input.gastosAdministrativos),gastosVentas=money(input.gastosVentas),ingresosFinancieros=money(input.ingresosFinancieros),gastosFinancieros=money(input.gastosFinancieros);
-    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*.295)),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
+    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*n(getEconomicConfig().tax.generalRate))),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
     return {...input,ventasTotales,costoVentas,utilidadBruta,gastosAdministrativos,gastosVentas,gastosOperacion,utilidadOperativa,ingresosFinancieros,gastosFinancieros,utilidadAntesImpuestos,impuestoRenta,utilidadNeta,ingresos:ventasTotales,ventasNetas:ventasTotales,costos:money(costoVentas+gastosOperacion+gastosFinancieros+impuestoRenta),utilidad:utilidadNeta};
   }
   function periodRate(tea,months=1){return Math.pow(1+n(tea)/100,n(months)/12)-1;}
+  function incomeTax(base,regimen,overrides={}){
+    const config={...getEconomicConfig().tax,...overrides},positive=Math.max(0,n(base));
+    const general=n(config.generalRate),limit=n(config.uit)*n(config.mypeLimitUit);
+    return money(regimen==='MYPE' ? Math.min(positive,limit)*n(config.mypeRate)+Math.max(0,positive-limit)*general : positive*general);
+  }
   function calculate({capital=0,ledger={},sectionsByRound={},catalog=[],round=1,openingBalance=null,state={},financialPolicy={}}={}){
     const seed=openingBalance||{},seedRound=Math.max(0,n(seed.round)),seedBG=seed.balanceGeneral||{};
     const items=new Map(catalog.flatMap(c=>c.items||[]).map(i=>[i.id,i]));
     const periods=new Map();
-    function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,mp:0,mod:0,comercial:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[]});return periods.get(r);}
+    function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,mp:0,mod:0,comercial:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[],fijos:0,publicidad:0,mantenimiento:0,almacenaje:0});return periods.get(r);}
     for(const [key,value] of Object.entries(ledger)){
       const [cycle,kind]=key.split(':'),r=Number(cycle);if(!Number.isInteger(r)||r<1||r>round||r<=seedRound)continue;
       const p=period(r),amount=n(value);p.neto+=amount;
@@ -432,7 +484,7 @@ module.exports={runOnce,remoteRpc};
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
-      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
+      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
       else if(kind==='SIM_DEVOLUCIONES')p.devoluciones-=amount;
       else if(kind==='EVENT')p.eventos+=amount;
       else if(kind==='SIM_INVERSION')p.comprasActivos-=amount;
@@ -448,7 +500,7 @@ module.exports={runOnce,remoteRpc};
             if(item.asset||entry.id==='MOLDE'){
               p.comprasActivos+=out;p.ventaActivos+=income;
               p.bajaActivos+=entry.bookValueDisposed!=null?n(entry.bookValueDisposed):(entry.rows||[]).reduce((s,row)=>s+n(row.income)/n(item.options?.find(o=>o.label===row.label)?.liquidationRate||0.4),0);
-            }else{p.gastos+=out;if(item.material)p.mp+=out;else if(['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].includes(entry.id))p.mod+=out;else if(['CANALES','INV_MARKETING','GARANTIA_PT'].includes(entry.id))p.comercial+=out;if(out)p.detalle.push({concepto:entry.name||entry.id,importe:out});}
+            }else{p.gastos+=out;if(['LOCAL_PROD','JEFATURA','LIMPIEZA'].includes(entry.id))p.fijos+=out;if(entry.id==='INV_MARKETING')p.publicidad+=out;if(entry.id==='MANTENIMIENTO')p.mantenimiento+=out;if(item.material)p.mp+=out;else if(['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].includes(entry.id))p.mod+=out;else if(['CANALES','INV_MARKETING','GARANTIA_PT'].includes(entry.id))p.comercial+=out;if(out)p.detalle.push({concepto:entry.name||entry.id,importe:out});}
             p.prestamos+=loan;classified+=loan+income-out;
           }
           p.otros+=amount-classified;
@@ -503,52 +555,25 @@ module.exports={runOnce,remoteRpc};
         const base=money(history.reduce((sum,row)=>sum+n(row.estadoResultados?.utilidadAntesImpuestos),0)+er.utilidadAntesImpuestos);
         const priorTax=history.reduce((sum,row)=>sum+n(row.estadoResultados?.impuestoRenta),0);
         const final=p.r===n(policy.cycles)&&!!receipt;
-        er=buildStatement({...er,impuestoRenta:final?money(Math.max(0,base)*.295-priorTax):0,baseImponibleAcumulada:Math.max(0,base),cicloImpuesto:n(policy.cycles),impuestoDiferido:!final});
+        const regime=receipt?.regimen||policy.taxRegime||'NO_MYPE';
+        const tax=final?Math.max(0,money(incomeTax(base,regime,policy.tax)-priorTax)):0;
+        er=buildStatement({...er,impuestoRenta:tax,baseImponibleAcumulada:Math.max(0,base),utilidadAntesImpuestosAcumulada:base,utilidadNetaFinal:final?money(base-priorTax-tax):null,regimenTributario:regime,cicloImpuesto:n(policy.cycles),impuestoDiferido:!final});
       }
-      const profit=er.utilidadNeta;taxPayable+=er.impuestoRenta;interestPayable+=interest;
-      cash+=p.neto;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
+      // El desglose se conserva en el snapshot y distingue compras de activos de su depreciación.
+      const identifiable=consumedMaterial+p.mod+depreciation+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
+      er.desgloseCostos={materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-er.impuestoRenta-identifiable),total:money(er.costos-er.impuestoRenta)};
+      const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
+      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
-      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto),cajaInicial:money(initial),cajaFinal:money(cash)};
-      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
+      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
+      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
       const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
       history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
     }
     return {...history.at(-1),history};
   }
-  return Object.freeze({calculate,buildStatement,periodRate});
-});
-
-},
-"js/engine/config.js":(module,exports,load)=>{
-/* Mercados del documento Costos De Producción (27/10/2026).
- * Se conservan tarifas de canales, crédito y garantía de las funciones existentes. */
-(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else{
-  root.SIDE_ECONOMIC_CONFIG=api;
-  // The existing menu reads these costs; keep assumptions editable here.
-  for(const item of (root.SIDE_DECISION_CATALOG||[]).flatMap(category=>category.items||[]))for(const option of item.options||[])if(Object.hasOwn(api.optionCosts,option.id))option.cost=api.optionCosts[option.id];
-}})(typeof globalThis!=='undefined'?globalThis:this,function(){
-  'use strict';
-  return Object.freeze({version:'md-20261027',products:['esencial','urbano','premium'],
-    segments:{esencial:{code:'SEG-01',min:0,defaultPrice:42.5,totalMarket:7000,penetration:.5,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:0,defaultPrice:100,totalMarket:5000,penetration:.7,ideal:100,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:0,defaultPrice:250,totalMarket:2000,penetration:.4,ideal:250,weights:[.1,.5,.4],quality:7}},
-    consequences:{lowQualityPrice:.65,premiumPrice:1.4,reputationChange:2,lowEfficiency:4,lowProduction:.7,noLeaderEfficiency:5,noLeaderProduction:.95,lowReputation:3,lowReputationCycles:2,lowDemand:.8,lowHealth:3},
-    // SUPUESTO: capacitación baja/alta 0%/12%; media +8% figura en Excel.
-    training:{cap_no:0,cap_baja:0,cap_media:.08,cap_alta:.12},
-    // SUPUESTO: solo marketing medio tiene +12% explícito; extremos 0/20%.
-    marketing:{mkt_baja:0,mkt_media:.12,mkt_alta:.2},
-    // SUPUESTO: cobertura base neutral; cada tienda adicional +5%, tope +25%.
-    channels:{web:1,physical:1,mixed:1,extraStore:.05,maxExtra:.25},
-    // SUPUESTOS heredados del menú, sin tarifa equivalente en el libro.
-    optionCosts:{los_olivos:1800,miraflores:3500,sjl:2200,si_analista:5000},
-    // No hay cargos ni penalizaciones de estos tipos en el documento base.
-    storagePerUnit:0,overtimeRate:0,nextLoanRatePP:0,
-    credit:{initial:.2,step:.05,analystBonus:.05,max:.7},commission:.01,
-    warranty:{pt_30:5,pt_90:10,pt_180:10},
-    // SUPUESTO: vida productiva100000u, acelerada doble línea recta; solo devengo.
-    depreciation:{productiveLife:100000,acceleratedFactor:2},
-    // SUPUESTO: mantenimiento evita penalidad; inventarios no crean stock gratuito.
-    maintenanceCapacity:0,inventoryCapacity:0,unservedDemand:'lost'
-  });
+  return Object.freeze({calculate,buildStatement,periodRate,incomeTax});
 });
 
 },
@@ -625,6 +650,8 @@ module.exports={runOnce,remoteRpc};
       return [id,numeric&&Number.isFinite(value)&&value>=segment.min&&value<=(segment.max??Infinity)?value:segment.defaultPrice];
     }));
     const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round}),price=prices(state,{...storedPrices,...input.prices},config),rep=reputation(state,plan,round);
+    const prior=state.__economicHistory?.reputation;
+    rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
     const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
     const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
       const oldQuality=Number.isFinite(Number(goodsQuality[id]))?clamp(goodsQuality[id]):qualityValue;
@@ -639,24 +666,32 @@ module.exports={runOnce,remoteRpc};
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
     return {id:input.id,state,round,plan,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
+  // Excel ROUND: each company's share is rounded independently.
+  function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
   function allocate(prepared,config=DEFAULT){
     const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:p.reputation||{valor:p.scores.reputation},products:{}}]));
     for(const id of config.products){
-      const segment=config.segments[id],participants=prepared.filter(p=>p.hasChannel&&p.lines.find(line=>line.id===id)?.available>0);
-      const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const segment=config.segments[id],participants=prepared.filter(p=>p.lines.find(line=>line.id===id)?.available>0);
       const market=Math.max(0,Math.round(segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market));
-      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*line.quality*10;return {p,line,score,total};});
+      const simulated=[];
+      if(participants.length && config.simulatedCompetitors?.enabled){
+        const count=Math.max(0,Math.floor(Number(config.simulatedCompetitors.target)||0)-participants.length);
+        const averagePrice=participants.reduce((sum,p)=>sum+p.lines.find(line=>line.id===id).price,0)/participants.length;
+        const averageRep=participants.reduce((sum,p)=>sum+p.scores.reputation,0)/participants.length;
+        for(let i=0;i<count;i++)simulated.push({id:`simulado-${id}-${i+1}`,simulated:true,scores:{reputation:averageRep},demandFactor:1,lines:[{id,price:averagePrice,available:market}]});
+        participants.push(...simulated);
+      }
+      const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
+      const repSum=participants.reduce((sum,p)=>sum+Math.max(0,Number(p.scores.reputation)||0),0);
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0);return {p,line,score,total};});
       if(!rows.length)continue;
-      const sum=rows.reduce((s,row)=>s+row.total,0);let assignedTotal=0;
-      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.raw=row.share*market;row.assigned=Math.floor(row.raw);assignedTotal+=row.assigned;}
-      // Restos mayores. Un identificador estable desempata, sin depender del orden recibido.
-      const priority=[...rows].sort((a,b)=>(b.raw-b.assigned)-(a.raw-a.assigned)||String(a.p.id).localeCompare(String(b.p.id),'en'));
-      for(let i=0;i<market-assignedTotal;i++)priority[i].assigned++;
-      for(const row of rows)result[row.p.id].products[id]={asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:row.line.quality*10,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      const sum=rows.reduce((s,row)=>s+row.total,0);
+      for(const row of rows){row.share=sum?row.total/sum:1/rows.length;row.assigned=roundDemand(row.share,market);}
+      for(const row of rows)if(!row.p.simulated)result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
     }return result;
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!p.hasChannel?'Sin canal de venta':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,revenue:money(sold*line.effectivePrice),reason};});
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),sold=Math.floor(Math.min(line.available,demand));let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
     const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));
@@ -669,12 +704,12 @@ module.exports={runOnce,remoteRpc};
     const id=config.products.find(product=>product===segment||config.segments[product].code===segment);
     if(!id)throw new RangeError('Segmento desconocido');
     const prepared=companies.map(company=>{
-      const rep=clamp(company.reputacion),price=Number(company.precio),q=clamp(company.calidad),produced=n(company.producido);
+      const rep=n(company.reputacion),price=Number(company.precio),q=clamp(company.calidad),produced=n(company.producido);
       return {id:String(company.id),hasChannel:true,scores:{reputation:rep},demandFactor:1,lines:[{id,price,quality:q,produced,available:n(company.stock)}],effective:price,reputationFinal:rep};
-    }),allocations=allocate(prepared,config);
+    }),allocations=allocate(prepared,{...config,simulatedCompetitors:{...config.simulatedCompetitors,enabled:false}});
     return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
   }
-  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies};
+  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies,roundDemand};
 });
 
 },
@@ -1801,7 +1836,7 @@ module.exports={runOnce,remoteRpc};
   function owned(item,id,ctx){return sum(Object.entries(productionModel.assetPurchaseHistory(ctx.state?.[item.id],item)).filter(([r])=>n(r)<ctx.round).map(([,v])=>v[id]));}
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
-  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));return BUS.laborCost(option.id,BUS.regime(ctx),option.cost)*(item.material?0.92*(1-discount(ctx)/100):1);}
+  function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));if(item.material){const config=typeof module==='object'&&module.exports?load("js/engine/config.js"):globalThis.SIDE_ECONOMIC_CONFIG;return BUS.materialUnitPrice(option,n(draft(item,ctx).quantities?.[option.id]),discount(ctx),config);}return BUS.laborCost(option.id,BUS.regime(ctx),option.cost);}
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
@@ -1910,8 +1945,6 @@ module.exports={runOnce,remoteRpc};
     const warnings=[],plan=productionModel?.calculate(ctx);
     if(!plan)return warnings;
     if(!plan.target)warnings.push({cat:'B',text:'Meta de producción en cero: este plan no fabricará unidades nuevas. Indica la cantidad deseada por molde para producir.'});
-    const channels=draft((ctx.catalog||[]).flatMap(c=>c.items||[]).find(i=>i.id==='CANALES')||{id:'CANALES'},ctx).optionIds||[];
-    if(!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))warnings.push({cat:'D',text:'Sin canal de venta: aunque produzcas, no habrá unidades vendidas ni ingresos por ventas.'});
     if(plan.unavailablePlannedMolds.length)warnings.push({cat:'B',text:'Falta adquirir un molde incluido en la meta. Esas unidades no se producirán.'});
     if(plan.target&&!plan.producibleUnits)warnings.push({cat:'B',text:'Producción posible: 0 unidades. Revisa los recursos indicados antes de confirmar; seleccionar opciones no garantiza cantidades suficientes.'});
     for(const material of plan.materials)if(material.shortfall>0)warnings.push({cat:'F',text:`${material.label}: compras convertidas en ${material.available.toLocaleString('es-PE')} ${material.unit}; la meta requiere ${material.neededForTarget.toLocaleString('es-PE')}. Faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit}.`});
@@ -2094,7 +2127,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);
@@ -2636,6 +2669,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       if(!context.error&&['SIN_PLANES_CONFIRMADOS','PLANES_EN_GRACIA'].includes(context.data?.code))return {success:true,pending:true,data:null,code:context.data.code};
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
+      if(!Number.isInteger(Number(ctx.financialConfig?.cycles))||Number(ctx.financialConfig.cycles)<1)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
       const inputs=[];
       for(const company of ctx.empresas||[]){
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
