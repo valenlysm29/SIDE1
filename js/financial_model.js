@@ -4,15 +4,20 @@
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100;
   function buildStatement(input={}){
     const ventasTotales=money(input.ventasTotales),costoVentas=money(input.costoVentas),gastosAdministrativos=money(input.gastosAdministrativos),gastosVentas=money(input.gastosVentas),ingresosFinancieros=money(input.ingresosFinancieros),gastosFinancieros=money(input.gastosFinancieros);
-    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*.295)),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
+    const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*n(getEconomicConfig().tax.generalRate))),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
     return {...input,ventasTotales,costoVentas,utilidadBruta,gastosAdministrativos,gastosVentas,gastosOperacion,utilidadOperativa,ingresosFinancieros,gastosFinancieros,utilidadAntesImpuestos,impuestoRenta,utilidadNeta,ingresos:ventasTotales,ventasNetas:ventasTotales,costos:money(costoVentas+gastosOperacion+gastosFinancieros+impuestoRenta),utilidad:utilidadNeta};
   }
   function periodRate(tea,months=1){return Math.pow(1+n(tea)/100,n(months)/12)-1;}
+  function incomeTax(base,regimen,overrides={}){
+    const config={...getEconomicConfig().tax,...overrides},positive=Math.max(0,n(base));
+    const general=n(config.generalRate),limit=n(config.uit)*n(config.mypeLimitUit);
+    return money(regimen==='MYPE' ? Math.min(positive,limit)*n(config.mypeRate)+Math.max(0,positive-limit)*general : positive*general);
+  }
   function calculate({capital=0,ledger={},sectionsByRound={},catalog=[],round=1,openingBalance=null,state={},financialPolicy={}}={}){
     const seed=openingBalance||{},seedRound=Math.max(0,n(seed.round)),seedBG=seed.balanceGeneral||{};
     const items=new Map(catalog.flatMap(c=>c.items||[]).map(i=>[i.id,i]));
     const periods=new Map();
-    function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,mp:0,mod:0,comercial:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[]});return periods.get(r);}
+    function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,mp:0,mod:0,comercial:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[],fijos:0,publicidad:0,mantenimiento:0,almacenaje:0});return periods.get(r);}
     for(const [key,value] of Object.entries(ledger)){
       const [cycle,kind]=key.split(':'),r=Number(cycle);if(!Number.isInteger(r)||r<1||r>round||r<=seedRound)continue;
       const p=period(r),amount=n(value);p.neto+=amount;
@@ -20,7 +25,7 @@
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
-      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
+      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
       else if(kind==='SIM_DEVOLUCIONES')p.devoluciones-=amount;
       else if(kind==='EVENT')p.eventos+=amount;
       else if(kind==='SIM_INVERSION')p.comprasActivos-=amount;
@@ -36,7 +41,7 @@
             if(item.asset||entry.id==='MOLDE'){
               p.comprasActivos+=out;p.ventaActivos+=income;
               p.bajaActivos+=entry.bookValueDisposed!=null?n(entry.bookValueDisposed):(entry.rows||[]).reduce((s,row)=>s+n(row.income)/n(item.options?.find(o=>o.label===row.label)?.liquidationRate||0.4),0);
-            }else{p.gastos+=out;if(item.material)p.mp+=out;else if(['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].includes(entry.id))p.mod+=out;else if(['CANALES','INV_MARKETING','GARANTIA_PT'].includes(entry.id))p.comercial+=out;if(out)p.detalle.push({concepto:entry.name||entry.id,importe:out});}
+            }else{p.gastos+=out;if(['LOCAL_PROD','JEFATURA','LIMPIEZA'].includes(entry.id))p.fijos+=out;if(entry.id==='INV_MARKETING')p.publicidad+=out;if(entry.id==='MANTENIMIENTO')p.mantenimiento+=out;if(item.material)p.mp+=out;else if(['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'].includes(entry.id))p.mod+=out;else if(['CANALES','INV_MARKETING','GARANTIA_PT'].includes(entry.id))p.comercial+=out;if(out)p.detalle.push({concepto:entry.name||entry.id,importe:out});}
             p.prestamos+=loan;classified+=loan+income-out;
           }
           p.otros+=amount-classified;
@@ -91,18 +96,23 @@
         const base=money(history.reduce((sum,row)=>sum+n(row.estadoResultados?.utilidadAntesImpuestos),0)+er.utilidadAntesImpuestos);
         const priorTax=history.reduce((sum,row)=>sum+n(row.estadoResultados?.impuestoRenta),0);
         const final=p.r===n(policy.cycles)&&!!receipt;
-        er=buildStatement({...er,impuestoRenta:final?money(Math.max(0,base)*.295-priorTax):0,baseImponibleAcumulada:Math.max(0,base),cicloImpuesto:n(policy.cycles),impuestoDiferido:!final});
+        const regime=receipt?.regimen||policy.taxRegime||'NO_MYPE';
+        const tax=final?Math.max(0,money(incomeTax(base,regime,policy.tax)-priorTax)):0;
+        er=buildStatement({...er,impuestoRenta:tax,baseImponibleAcumulada:Math.max(0,base),utilidadAntesImpuestosAcumulada:base,utilidadNetaFinal:final?money(base-priorTax-tax):null,regimenTributario:regime,cicloImpuesto:n(policy.cycles),impuestoDiferido:!final});
       }
-      const profit=er.utilidadNeta;taxPayable+=er.impuestoRenta;interestPayable+=interest;
-      cash+=p.neto;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
+      // El desglose se conserva en el snapshot y distingue compras de activos de su depreciación.
+      const identifiable=consumedMaterial+p.mod+depreciation+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
+      er.desgloseCostos={materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-er.impuestoRenta-identifiable),total:money(er.costos-er.impuestoRenta)};
+      const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
+      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
-      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto),cajaInicial:money(initial),cajaFinal:money(cash)};
-      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
+      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
+      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
       const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
       history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
     }
     return {...history.at(-1),history};
   }
-  return Object.freeze({calculate,buildStatement,periodRate});
+  return Object.freeze({calculate,buildStatement,periodRate,incomeTax});
 });

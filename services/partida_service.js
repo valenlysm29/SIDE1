@@ -378,6 +378,7 @@
       if(!context.error&&['SIN_PLANES_CONFIRMADOS','PLANES_EN_GRACIA'].includes(context.data?.code))return {success:true,pending:true,data:null,code:context.data.code};
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
+      if(!Number.isInteger(Number(ctx.financialConfig?.cycles))||Number(ctx.financialConfig.cycles)<1)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
       const inputs=[];
       for(const company of ctx.empresas||[]){
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
