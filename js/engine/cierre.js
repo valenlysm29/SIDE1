@@ -84,24 +84,67 @@
     const authorizedPrices=input.financialPolicy?.authoritativePrices
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
-    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy});
+    const originalPlan=calc(), rules=config.consequences;
+    let plan=originalPlan;
+    // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
+    // entre moldes sigue la prioridad histórica de SIDE.
+    if(p.efficiency<rules.lowEfficiency){
+      let remaining=Math.floor(originalPlan.target*rules.lowProduction);
+      const moldTargets=Object.fromEntries(originalPlan.productLines.map(line=>{const q=Math.min(line.target,remaining);remaining-=q;return [line.id,q];}));
+      plan=calc({PRODUCCION_META:{moldTargets}});messages.push({id:'CONS-03',text:'La producción se limita al 70 % de la meta por baja eficiencia.'});
+    }
+    if(!originalPlan.hasLeadership&&p.efficiency<rules.noLeaderEfficiency){
+      let remaining=Math.floor(plan.producibleUnits*rules.noLeaderProduction);
+      const moldTargets=Object.fromEntries(plan.productLines.map(line=>{const q=Math.min(line.plannedUnits,remaining);remaining-=q;return [line.id,q];}));
+      plan=calc({PRODUCCION_META:{moldTargets}});messages.push({id:'CONS-08',text:'Sin jefatura y con baja eficiencia, la producción se reduce un 5 % adicional.'});
+    }
+    // El cierre conserva la meta original; solo plannedUnits representa lo ejecutado.
+    if(plan!==originalPlan){
+      plan.target=originalPlan.target;plan.targets=originalPlan.targets;
+      plan.productLines.forEach((line,i)=>{line.target=originalPlan.productLines[i].target;line.requirements=originalPlan.productLines[i].requirements;line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;});
+      plan.materials.forEach((material,i)=>{material.neededForTarget=originalPlan.materials[i].neededForTarget;material.shortfall=Math.max(0,material.neededForTarget-material.available);});
+      plan.productionGap=Math.max(0,plan.target-plan.producibleUnits);
+    }
+    const price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
     const prior40=prior==null?null:(state.__economicHistory?.reputationScale===40?n(prior):n(prior)*4);
     rep.valor=config.reputation?.smoothWithPrevious && prior40 != null ? Math.min(40,(prior40+rep.valor)/2) : Math.min(40,rep.valor);
     rep.valorMercado=rep.valor/4;
     const lots=materialLots(state,plan,round),qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
-    const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
-      const oldQuality=Number.isFinite(Number(goodsQuality[id]))?n(goodsQuality[id]):qualityValue,lot=lots.find(item=>item.mold===line.id),newQuality=lot?.excelQuality??qualityValue;
-      const q=available?(oldQuality*opening+newQuality*produced)/available:0;
-      return {id,quality:q,price:price[id],effectivePrice:price[id],produced,available};
+    const lines=config.products.map((id,i)=>{
+      const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]);
+      const saved=(state.__goodsLots||[]).filter(l=>l.segment===id&&n(l.available)>0).map(clone);
+      const tracked=saved.reduce((sum,l)=>sum+n(l.available),0);
+      if(tracked>opening+1e-8)throw new RangeError('Lotes superiores al inventario '+id);
+      // Un saldo antiguo agregado se conserva explícitamente como tal: no se
+      // atribuyen materiales, fecha ni calidad que el historial no registró.
+      if(opening>tracked)saved.unshift({id:`legacy-${id}`,segment:id,mold:line.id,cycle:null,produced:null,available:opening-tracked,quality:goodsQuality[id]!=null&&Number.isFinite(Number(goodsQuality[id]))?Number(goodsQuality[id]):null,legacy:true});
+      const materialLot=lots.find(item=>item.mold===line.id);
+      if(produced)saved.push({id:`${round}-${id}`,segment:id,mold:line.id,cycle:round,produced,available:produced,quality:materialLot.excelQuality,materials:materialLot.materials});
+      const available=opening+produced,quality=available?saved.reduce((sum,l)=>sum+n(l.available)*n(l.quality),0)/available:0;
+      return {id,quality,price:price[id],effectivePrice:price[id],produced,available,lots:saved};
     });
     if(plan.productionGap)messages.push({id:'CAPACIDAD',text:'La producción respeta la capacidad disponible y los materiales, en orden N1, N2 y N3.'});
+    const premium=lines.find(line=>line.id==='premium'),activeConsequences=new Set();
+    for(const lot of premium?.lots||[]){
+      if(lot.quality==null)continue;
+      if(lot.quality<4)activeConsequences.add('CONS-01');
+      else if(lot.quality>=7)activeConsequences.add('CONS-02');
+    }
+    let reputationChange=0;
+    if(activeConsequences.has('CONS-01')){reputationChange-=rules.reputationChange;messages.push({id:'CONS-01',text:'La calidad prémium reduce precio y reputación.'});}
+    if(activeConsequences.has('CONS-02')){reputationChange+=rules.reputationChange;messages.push({id:'CONS-02',text:'La calidad prémium aumenta precio y reputación.'});}
+    // Motor_Puntajes y la reputación operativa son indicadores distintos.
+    const matrixReputation=p.reputation+reputationChange;
+    rep.valorMercado=clamp(rep.valorMercado+reputationChange);
+    const lowReputationCycles=matrixReputation<rules.lowReputation?n(state.__economicHistory?.lowReputationCycles)+1:0;
     const channels=state.CANALES?.optionIds||[],hasChannel=channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
-    // Eventos externos permanecen explícitos; marketing y reputación ya entran en el puntaje.
-    const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    let demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    if(lowReputationCycles>=rules.lowReputationCycles){demandFactor*=rules.lowDemand;messages.push({id:'CONS-04',text:'Dos ciclos con reputación baja reducen la demanda.'});}
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -154,7 +197,11 @@
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
     const pointList=points(p.state,config),locationInventory=clone(p.state.__storeInventory||{}),distributions={};
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.price,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let pending=sold;
+      const lotSales=line.lots.map(lot=>{const units=Math.min(n(lot.available),pending);pending-=units;let factor=1;if(line.id==='premium'&&lot.quality!=null){if(lot.quality<4)factor=config.consequences.lowQualityPrice;else if(lot.quality>=7)factor=config.consequences.premiumPrice;}return {id:lot.id,units,price:money(line.price*factor),revenue:money(units*line.price*factor)};});
+      const lotRevenue=money(lotSales.reduce((sum,lot)=>sum+lot.revenue,0));
+      let unassigned=lotSales.map(l=>({...l}));for(const point of distribution.rows){let left=point.sold,rev=0;point.lotSales=[];for(const part of unassigned){const q=Math.min(left,part.units);left-=q;part.units-=q;rev+=q*part.price;if(q)point.lotSales.push({id:part.id,units:q,price:part.price,revenue:money(q*part.price)});}point.revenue=money(rev);}
+      let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:sold?money(lotRevenue/sold):line.price,lotSales,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:lotRevenue,reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
     const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));

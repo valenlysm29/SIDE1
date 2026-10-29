@@ -1,0 +1,93 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "arrastre_2",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "M5":  0.92,
+                    "N5":  386,
+                    "E46":  50,
+                    "E47":  30,
+                    "E48":  20,
+                    "L49":  41,
+                    "M49":  100,
+                    "N49":  770,
+                    "G54":  0,
+                    "G55":  88,
+                    "G56":  30,
+                    "G57":  0,
+                    "G58":  190,
+                    "G59":  0,
+                    "G60":  0,
+                    "G61":  1360
+                },
+    "celdas":  {
+                   "M5":  [
+                              "Costos De Producción",
+                              "M5"
+                          ],
+                   "N5":  [
+                              "Costos De Producción",
+                              "N5"
+                          ],
+                   "E46":  [
+                               "Costos De Producción",
+                               "E46"
+                           ],
+                   "E47":  [
+                               "Costos De Producción",
+                               "E47"
+                           ],
+                   "E48":  [
+                               "Costos De Producción",
+                               "E48"
+                           ],
+                   "L49":  [
+                               "Costos De Producción",
+                               "L49"
+                           ],
+                   "M49":  [
+                               "Costos De Producción",
+                               "M49"
+                           ],
+                   "N49":  [
+                               "Costos De Producción",
+                               "N49"
+                           ],
+                   "G54":  [
+                               "Costos De Producción",
+                               "G54"
+                           ],
+                   "G55":  [
+                               "Costos De Producción",
+                               "G55"
+                           ],
+                   "G56":  [
+                               "Costos De Producción",
+                               "G56"
+                           ],
+                   "G57":  [
+                               "Costos De Producción",
+                               "G57"
+                           ],
+                   "G58":  [
+                               "Costos De Producción",
+                               "G58"
+                           ],
+                   "G59":  [
+                               "Costos De Producción",
+                               "G59"
+                           ],
+                   "G60":  [
+                               "Costos De Producción",
+                               "G60"
+                           ],
+                   "G61":  [
+                               "Costos De Producción",
+                               "G61"
+                           ]
+               }
+}

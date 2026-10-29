@@ -1534,7 +1534,7 @@ function settleCycle(round=currentRound()){
   });
   inputs.push({id,state:window.SIDE_CYCLE_MODEL.restoreState(saved.state,live),ledger:cashLedger,catalog:DECISION_CATALOG,round,capital:initialCapital(),sectionsByRound:recordedFinancialSections(),production:saved.production,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig(),...ctx});
   const result=window.SIDE_CYCLE_MODEL.closeMany(inputs)[id];
-  decisionState={...live,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
+  decisionState={...live,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__goodsLots:result.state.__goodsLots,__inventarioMP:result.state.__inventarioMP};cashLedger=result.ledger;persistGameState();
   try{queueStudentSnapshot(buildStudentSnapshot(currentRound()));syncReportToSupabase(syncStudentReportPreview());}catch(error){console.warn('SIDE: cierre guardado; sincronización pendiente',error);}
   return true;
 }

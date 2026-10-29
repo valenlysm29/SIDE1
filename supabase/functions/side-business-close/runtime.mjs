@@ -103,6 +103,7 @@ module.exports={runOnce,remoteRpc};
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
+    state.__goodsLots=clone(financial.goodsLots||[]);receipt.lotMovements=clone(financial.lotMovements||[]);
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
     return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};
   }
@@ -131,7 +132,7 @@ module.exports={runOnce,remoteRpc};
     }));
     for(const report of active){
       const result=results[report.id],f=result.financial;
-      Object.assign(report,{gameState:{...report.gameState,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__storeInventory:result.state.__storeInventory,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
+      Object.assign(report,{gameState:{...report.gameState,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__goodsLots:result.state.__goodsLots,__storeInventory:result.state.__storeInventory,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
     }return reports;
   }
   function migrate({state={},ledger={},catalog=[],capital=0,round=1}={}){
@@ -365,6 +366,21 @@ module.exports={runOnce,remoteRpc};
   }
 
   function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
+  // Independent reference scenario: one basic machine per level-one worker.
+  // Use the same capacity and rounding rules as calculate(), with no state writes.
+  function planResources(target){
+    target=whole(target);
+    const specs=[['cut','Corte','PERS_CORTE','corte_basico','MESA_CORTE','mesa'],['assembly','Ensamblado','PERS_ENSAMBLE','ens_personal_basico','ENSAMBLE','ens_basica'],['finish','Acabado','PERS_ACABADO','aca_personal_basico','ACABADOS','aca_basica']];
+    const processes=specs.map(([id,label,staffId,staffOption,machineId,machineOption])=>{
+      const rate=STAFF_RATES[staffId][staffOption]*MACHINE_MULTIPLIERS[machineId][machineOption];
+      let workers=target?Math.max(1,Math.ceil((target-0.5)/(rate*WORKING_DAYS*BASE_EFFICIENCY))):0;
+      while(Math.round(workers*rate*WORKING_DAYS*BASE_EFFICIENCY)<target)workers++;
+      while(workers>0&&Math.round((workers-1)*rate*WORKING_DAYS*BASE_EFFICIENCY)>=target)workers--;
+      return {id,label,workers,machines:workers,cycleCapacity:Math.round(workers*rate*WORKING_DAYS*BASE_EFFICIENCY)};
+    });
+    const capacity=Math.min(...processes.map(p=>p.cycleCapacity));
+    return {target,days:WORKING_DAYS,efficiency:BASE_EFFICIENCY,capacity,processes,limitingProcesses:processes.filter(p=>p.cycleCapacity===capacity).map(p=>p.label)};
+  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){
     const target=Number(plan?.target),value=record?.producedUnits;
@@ -372,7 +388,7 @@ module.exports={runOnce,remoteRpc};
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,planResources,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });
 
 },
@@ -539,11 +555,11 @@ module.exports={runOnce,remoteRpc};
         if(weight){for(const o of options){materialValues[o.id]=unallocatedSeed*n(opening[o.id])*n(o.cost)/weight;materialQuantities[o.id]=n(opening[o.id]);}unallocatedSeed=0;}
       }
       const purchases=Object.entries(sectionsByRound[p.r]||{}).filter(([kind,s])=>Object.hasOwn(ledger,`${p.r}:${kind}`)&&Math.abs(n(s.recordedNet??s.net)-n(ledger[`${p.r}:${kind}`]))<.02).flatMap(([,s])=>s.items||[]).filter(e=>items.get(e.id)?.material);
-      let consumedMaterial=0,closingMaterial=0;const consumedByFamily={};
+      let consumedMaterial=0,closingMaterial=0;const consumedByFamily={},materialUnitCosts={};
       for(const item of items.values())if(item.material)for(const option of item.options||[]){
         const rows=purchases.filter(e=>e.id===item.id).flatMap(e=>e.rows||[]).filter(row=>row.label===option.label),qty=rows.reduce((s,row)=>s+n(row.quantity),0),cost=rows.reduce((s,row)=>s+n(row.outflow),0),opening=n(materialQuantities[option.id]);
         const available=opening+qty,value=n(materialValues[option.id])+cost,remaining=receipt?n(inventory[option.id]):available;
-        const closing=available?value*Math.min(1,remaining/available):value;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
+        const closing=available?value*Math.min(1,remaining/available):value;materialUnitCosts[option.id]=available?value/available:0;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
       }
       // Preserve explicitly valued migrated stock until its valuation is available.
       materialValue=money(closingMaterial+unallocatedSeed);
@@ -554,9 +570,27 @@ module.exports={runOnce,remoteRpc};
       depreciation=money(Math.min(Math.max(0,assets+p.comprasActivos-p.bajaActivos),depreciation));
       const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+(produced?p.mod+depreciation:0);
       const lines=receipt?.production?.productLines||[];
-      let cogs=0;for(const [index,row] of (receipt?.sales||[]).entries()){
-        let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
-        const assignedCost=lineMaterial+(produced?(p.mod+depreciation)*n(row.produced)/produced:0),availableValue=n(goodsValues[row.id])+assignedCost,soldCost=n(row.available)?availableValue*n(row.sold)/n(row.available):0;cogs+=soldCost;goodsValues[row.id]=availableValue-soldCost;
+      let cogs=0,goodsLots=[],lotMovements=[];
+      for(const [index,row] of (receipt?.sales||[]).entries()){
+        if(Array.isArray(row.lots)&&Array.isArray(row.lotSales)){
+          const lots=row.lots.map(l=>({...l})),newLot=lots.find(l=>Number(l.cycle)===p.r&&!l.legacy);
+          const legacy=lots.find(l=>l.legacy),openingKnown=lots.filter(l=>l!==newLot&&!l.legacy).reduce((sum,l)=>sum+n(l.available)*n(l.unitCost),0);
+          // El valor agregado heredado se mantiene como una sola partida, sin
+          // suponer composición o ciclos de fabricación inexistentes.
+          if(legacy){const value=Math.max(0,n(goodsValues[row.id])-openingKnown);legacy.unitCost=n(legacy.available)?value/n(legacy.available):0;}
+          if(newLot){
+            let materials=0;for(const family of Object.values(newLot.materials||{}))for(const [id,qty] of Object.entries(family))materials+=n(qty)*n(materialUnitCosts[id]);
+            const assigned=materials+(produced?(p.mod+depreciation)*n(row.produced)/produced:0);
+            newLot.unitCost=n(newLot.produced)?assigned/n(newLot.produced):0;
+          }
+          let value=0;
+          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
+          goodsValues[row.id]=value;
+        }else{
+          // Cierres históricos se siguen calculando con la regla agregada original.
+          let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
+          const assignedCost=lineMaterial+(produced?(p.mod+depreciation)*n(row.produced)/produced:0),availableValue=n(goodsValues[row.id])+assignedCost,soldCost=n(row.available)?availableValue*n(row.sold)/n(row.available):0;cogs+=soldCost;goodsValues[row.id]=availableValue-soldCost;
+        }
       }
       // Finished goods remain an asset until sold; idle labor and depreciation
       // cannot be capitalized when no units were manufactured.
@@ -584,7 +618,7 @@ module.exports={runOnce,remoteRpc};
       const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
       const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
+      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
     }
     return {...history.at(-1),history};
   }
@@ -689,24 +723,67 @@ module.exports={runOnce,remoteRpc};
     const authorizedPrices=input.financialPolicy?.authoritativePrices
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
-    const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy});
+    const originalPlan=calc(), rules=config.consequences;
+    let plan=originalPlan;
+    // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
+    // entre moldes sigue la prioridad histórica de SIDE.
+    if(p.efficiency<rules.lowEfficiency){
+      let remaining=Math.floor(originalPlan.target*rules.lowProduction);
+      const moldTargets=Object.fromEntries(originalPlan.productLines.map(line=>{const q=Math.min(line.target,remaining);remaining-=q;return [line.id,q];}));
+      plan=calc({PRODUCCION_META:{moldTargets}});messages.push({id:'CONS-03',text:'La producción se limita al 70 % de la meta por baja eficiencia.'});
+    }
+    if(!originalPlan.hasLeadership&&p.efficiency<rules.noLeaderEfficiency){
+      let remaining=Math.floor(plan.producibleUnits*rules.noLeaderProduction);
+      const moldTargets=Object.fromEntries(plan.productLines.map(line=>{const q=Math.min(line.plannedUnits,remaining);remaining-=q;return [line.id,q];}));
+      plan=calc({PRODUCCION_META:{moldTargets}});messages.push({id:'CONS-08',text:'Sin jefatura y con baja eficiencia, la producción se reduce un 5 % adicional.'});
+    }
+    // El cierre conserva la meta original; solo plannedUnits representa lo ejecutado.
+    if(plan!==originalPlan){
+      plan.target=originalPlan.target;plan.targets=originalPlan.targets;
+      plan.productLines.forEach((line,i)=>{line.target=originalPlan.productLines[i].target;line.requirements=originalPlan.productLines[i].requirements;line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;});
+      plan.materials.forEach((material,i)=>{material.neededForTarget=originalPlan.materials[i].neededForTarget;material.shortfall=Math.max(0,material.neededForTarget-material.available);});
+      plan.productionGap=Math.max(0,plan.target-plan.producibleUnits);
+    }
+    const price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
     const prior40=prior==null?null:(state.__economicHistory?.reputationScale===40?n(prior):n(prior)*4);
     rep.valor=config.reputation?.smoothWithPrevious && prior40 != null ? Math.min(40,(prior40+rep.valor)/2) : Math.min(40,rep.valor);
     rep.valorMercado=rep.valor/4;
     const lots=materialLots(state,plan,round),qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
-    const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
-      const oldQuality=Number.isFinite(Number(goodsQuality[id]))?n(goodsQuality[id]):qualityValue,lot=lots.find(item=>item.mold===line.id),newQuality=lot?.excelQuality??qualityValue;
-      const q=available?(oldQuality*opening+newQuality*produced)/available:0;
-      return {id,quality:q,price:price[id],effectivePrice:price[id],produced,available};
+    const lines=config.products.map((id,i)=>{
+      const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]);
+      const saved=(state.__goodsLots||[]).filter(l=>l.segment===id&&n(l.available)>0).map(clone);
+      const tracked=saved.reduce((sum,l)=>sum+n(l.available),0);
+      if(tracked>opening+1e-8)throw new RangeError('Lotes superiores al inventario '+id);
+      // Un saldo antiguo agregado se conserva explícitamente como tal: no se
+      // atribuyen materiales, fecha ni calidad que el historial no registró.
+      if(opening>tracked)saved.unshift({id:`legacy-${id}`,segment:id,mold:line.id,cycle:null,produced:null,available:opening-tracked,quality:goodsQuality[id]!=null&&Number.isFinite(Number(goodsQuality[id]))?Number(goodsQuality[id]):null,legacy:true});
+      const materialLot=lots.find(item=>item.mold===line.id);
+      if(produced)saved.push({id:`${round}-${id}`,segment:id,mold:line.id,cycle:round,produced,available:produced,quality:materialLot.excelQuality,materials:materialLot.materials});
+      const available=opening+produced,quality=available?saved.reduce((sum,l)=>sum+n(l.available)*n(l.quality),0)/available:0;
+      return {id,quality,price:price[id],effectivePrice:price[id],produced,available,lots:saved};
     });
     if(plan.productionGap)messages.push({id:'CAPACIDAD',text:'La producción respeta la capacidad disponible y los materiales, en orden N1, N2 y N3.'});
+    const premium=lines.find(line=>line.id==='premium'),activeConsequences=new Set();
+    for(const lot of premium?.lots||[]){
+      if(lot.quality==null)continue;
+      if(lot.quality<4)activeConsequences.add('CONS-01');
+      else if(lot.quality>=7)activeConsequences.add('CONS-02');
+    }
+    let reputationChange=0;
+    if(activeConsequences.has('CONS-01')){reputationChange-=rules.reputationChange;messages.push({id:'CONS-01',text:'La calidad prémium reduce precio y reputación.'});}
+    if(activeConsequences.has('CONS-02')){reputationChange+=rules.reputationChange;messages.push({id:'CONS-02',text:'La calidad prémium aumenta precio y reputación.'});}
+    // Motor_Puntajes y la reputación operativa son indicadores distintos.
+    const matrixReputation=p.reputation+reputationChange;
+    rep.valorMercado=clamp(rep.valorMercado+reputationChange);
+    const lowReputationCycles=matrixReputation<rules.lowReputation?n(state.__economicHistory?.lowReputationCycles)+1:0;
     const channels=state.CANALES?.optionIds||[],hasChannel=channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
-    // Eventos externos permanecen explícitos; marketing y reputación ya entran en el puntaje.
-    const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    let demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
+    if(lowReputationCycles>=rules.lowReputationCycles){demandFactor*=rules.lowDemand;messages.push({id:'CONS-04',text:'Dos ciclos con reputación baja reducen la demanda.'});}
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -759,7 +836,11 @@ module.exports={runOnce,remoteRpc};
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
     const pointList=points(p.state,config),locationInventory=clone(p.state.__storeInventory||{}),distributions={};
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.price,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:line.effectivePrice,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:money(sold*line.effectivePrice),reason};});
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let pending=sold;
+      const lotSales=line.lots.map(lot=>{const units=Math.min(n(lot.available),pending);pending-=units;let factor=1;if(line.id==='premium'&&lot.quality!=null){if(lot.quality<4)factor=config.consequences.lowQualityPrice;else if(lot.quality>=7)factor=config.consequences.premiumPrice;}return {id:lot.id,units,price:money(line.price*factor),revenue:money(units*line.price*factor)};});
+      const lotRevenue=money(lotSales.reduce((sum,lot)=>sum+lot.revenue,0));
+      let unassigned=lotSales.map(l=>({...l}));for(const point of distribution.rows){let left=point.sold,rev=0;point.lotSales=[];for(const part of unassigned){const q=Math.min(left,part.units);left-=q;part.units-=q;rev+=q*part.price;if(q)point.lotSales.push({id:part.id,units:q,price:part.price,revenue:money(q*part.price)});}point.revenue=money(rev);}
+      let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:sold?money(lotRevenue/sold):line.price,lotSales,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:lotRevenue,reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});
     const receivable=money(revenue*p.creditRate),collections=money(n(p.state.__accountsReceivable));
@@ -2872,6 +2953,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         result.financialSections=result.financialSections||snapshot.financial_sections||{};
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
       const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});

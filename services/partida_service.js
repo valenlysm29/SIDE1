@@ -511,6 +511,7 @@
         result.financialSections=result.financialSections||snapshot.financial_sections||{};
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
       const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});

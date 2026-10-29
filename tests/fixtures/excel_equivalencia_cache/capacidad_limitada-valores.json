@@ -1,0 +1,188 @@
+﻿{
+    "metadatos":  {
+                      "escenario":  "capacidad_limitada",
+                      "motor":  "Microsoft Excel COM",
+                      "version":  "16.0",
+                      "estadoCalculo":  0,
+                      "nota":  "Diez hojas originales preservadas; errores heredados de CANTIDAD no se usan como salidas."
+                  },
+    "valores":  {
+                    "M5":  0.92,
+                    "N5":  386,
+                    "I8":  14,
+                    "I14":  31.4,
+                    "I20":  24,
+                    "E46":  300,
+                    "E47":  86,
+                    "E48":  0,
+                    "L49":  124.4,
+                    "M49":  386,
+                    "N49":  2402,
+                    "F54":  60,
+                    "F55":  64.4,
+                    "F56":  0,
+                    "F57":  200,
+                    "F58":  186,
+                    "F59":  0,
+                    "F60":  1500,
+                    "F61":  902,
+                    "G54":  0,
+                    "G55":  45.599999999999994,
+                    "G56":  30,
+                    "G57":  0,
+                    "G58":  4,
+                    "G59":  0,
+                    "G60":  0,
+                    "G61":  498,
+                    "AC88":  1380,
+                    "AC89":  2666.1600000000003,
+                    "AC90":  0,
+                    "AC91":  736,
+                    "AC92":  1540.08,
+                    "AC93":  0,
+                    "AC94":  5520,
+                    "AC95":  5808.88
+                },
+    "celdas":  {
+                   "M5":  [
+                              "Costos De Producción",
+                              "M5"
+                          ],
+                   "N5":  [
+                              "Costos De Producción",
+                              "N5"
+                          ],
+                   "I8":  [
+                              "Costos De Producción",
+                              "I8"
+                          ],
+                   "I14":  [
+                               "Costos De Producción",
+                               "I14"
+                           ],
+                   "I20":  [
+                               "Costos De Producción",
+                               "I20"
+                           ],
+                   "E46":  [
+                               "Costos De Producción",
+                               "E46"
+                           ],
+                   "E47":  [
+                               "Costos De Producción",
+                               "E47"
+                           ],
+                   "E48":  [
+                               "Costos De Producción",
+                               "E48"
+                           ],
+                   "L49":  [
+                               "Costos De Producción",
+                               "L49"
+                           ],
+                   "M49":  [
+                               "Costos De Producción",
+                               "M49"
+                           ],
+                   "N49":  [
+                               "Costos De Producción",
+                               "N49"
+                           ],
+                   "F54":  [
+                               "Costos De Producción",
+                               "F54"
+                           ],
+                   "F55":  [
+                               "Costos De Producción",
+                               "F55"
+                           ],
+                   "F56":  [
+                               "Costos De Producción",
+                               "F56"
+                           ],
+                   "F57":  [
+                               "Costos De Producción",
+                               "F57"
+                           ],
+                   "F58":  [
+                               "Costos De Producción",
+                               "F58"
+                           ],
+                   "F59":  [
+                               "Costos De Producción",
+                               "F59"
+                           ],
+                   "F60":  [
+                               "Costos De Producción",
+                               "F60"
+                           ],
+                   "F61":  [
+                               "Costos De Producción",
+                               "F61"
+                           ],
+                   "G54":  [
+                               "Costos De Producción",
+                               "G54"
+                           ],
+                   "G55":  [
+                               "Costos De Producción",
+                               "G55"
+                           ],
+                   "G56":  [
+                               "Costos De Producción",
+                               "G56"
+                           ],
+                   "G57":  [
+                               "Costos De Producción",
+                               "G57"
+                           ],
+                   "G58":  [
+                               "Costos De Producción",
+                               "G58"
+                           ],
+                   "G59":  [
+                               "Costos De Producción",
+                               "G59"
+                           ],
+                   "G60":  [
+                               "Costos De Producción",
+                               "G60"
+                           ],
+                   "G61":  [
+                               "Costos De Producción",
+                               "G61"
+                           ],
+                   "AC88":  [
+                                "Costos De Producción",
+                                "AC88"
+                            ],
+                   "AC89":  [
+                                "Costos De Producción",
+                                "AC89"
+                            ],
+                   "AC90":  [
+                                "Costos De Producción",
+                                "AC90"
+                            ],
+                   "AC91":  [
+                                "Costos De Producción",
+                                "AC91"
+                            ],
+                   "AC92":  [
+                                "Costos De Producción",
+                                "AC92"
+                            ],
+                   "AC93":  [
+                                "Costos De Producción",
+                                "AC93"
+                            ],
+                   "AC94":  [
+                                "Costos De Producción",
+                                "AC94"
+                            ],
+                   "AC95":  [
+                                "Costos De Producción",
+                                "AC95"
+                            ]
+               }
+}

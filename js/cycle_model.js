@@ -65,6 +65,7 @@
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
+    state.__goodsLots=clone(financial.goodsLots||[]);receipt.lotMovements=clone(financial.lotMovements||[]);
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
     return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};
   }
@@ -93,7 +94,7 @@
     }));
     for(const report of active){
       const result=results[report.id],f=result.financial;
-      Object.assign(report,{gameState:{...report.gameState,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__storeInventory:result.state.__storeInventory,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
+      Object.assign(report,{gameState:{...report.gameState,__economicHistory:result.state.__economicHistory,__accountsReceivable:result.state.__accountsReceivable,__financialSnapshots:result.state.__financialSnapshots,__cycleSettlements:result.state.__cycleSettlements,__finishedGoods:result.state.__finishedGoods,__goodsLots:result.state.__goodsLots,__storeInventory:result.state.__storeInventory,__inventarioMP:result.state.__inventarioMP},cashLedger:result.ledger,cycleReceipt:result.receipt,ingresos:f.estadoResultados.ingresos,costos:f.estadoResultados.costos,utilidad:f.estadoResultados.utilidad,caja:f.balanceCaja.cajaFinal,estadoResultados:f.estadoResultados,balanceCaja:f.balanceCaja,flujoCaja:f.flujoCaja,balanceGeneral:f.balanceGeneral});
     }return reports;
   }
   function migrate({state={},ledger={},catalog=[],capital=0,round=1}={}){

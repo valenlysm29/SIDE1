@@ -66,11 +66,11 @@
         if(weight){for(const o of options){materialValues[o.id]=unallocatedSeed*n(opening[o.id])*n(o.cost)/weight;materialQuantities[o.id]=n(opening[o.id]);}unallocatedSeed=0;}
       }
       const purchases=Object.entries(sectionsByRound[p.r]||{}).filter(([kind,s])=>Object.hasOwn(ledger,`${p.r}:${kind}`)&&Math.abs(n(s.recordedNet??s.net)-n(ledger[`${p.r}:${kind}`]))<.02).flatMap(([,s])=>s.items||[]).filter(e=>items.get(e.id)?.material);
-      let consumedMaterial=0,closingMaterial=0;const consumedByFamily={};
+      let consumedMaterial=0,closingMaterial=0;const consumedByFamily={},materialUnitCosts={};
       for(const item of items.values())if(item.material)for(const option of item.options||[]){
         const rows=purchases.filter(e=>e.id===item.id).flatMap(e=>e.rows||[]).filter(row=>row.label===option.label),qty=rows.reduce((s,row)=>s+n(row.quantity),0),cost=rows.reduce((s,row)=>s+n(row.outflow),0),opening=n(materialQuantities[option.id]);
         const available=opening+qty,value=n(materialValues[option.id])+cost,remaining=receipt?n(inventory[option.id]):available;
-        const closing=available?value*Math.min(1,remaining/available):value;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
+        const closing=available?value*Math.min(1,remaining/available):value;materialUnitCosts[option.id]=available?value/available:0;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
       }
       // Preserve explicitly valued migrated stock until its valuation is available.
       materialValue=money(closingMaterial+unallocatedSeed);
@@ -81,9 +81,27 @@
       depreciation=money(Math.min(Math.max(0,assets+p.comprasActivos-p.bajaActivos),depreciation));
       const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+(produced?p.mod+depreciation:0);
       const lines=receipt?.production?.productLines||[];
-      let cogs=0;for(const [index,row] of (receipt?.sales||[]).entries()){
-        let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
-        const assignedCost=lineMaterial+(produced?(p.mod+depreciation)*n(row.produced)/produced:0),availableValue=n(goodsValues[row.id])+assignedCost,soldCost=n(row.available)?availableValue*n(row.sold)/n(row.available):0;cogs+=soldCost;goodsValues[row.id]=availableValue-soldCost;
+      let cogs=0,goodsLots=[],lotMovements=[];
+      for(const [index,row] of (receipt?.sales||[]).entries()){
+        if(Array.isArray(row.lots)&&Array.isArray(row.lotSales)){
+          const lots=row.lots.map(l=>({...l})),newLot=lots.find(l=>Number(l.cycle)===p.r&&!l.legacy);
+          const legacy=lots.find(l=>l.legacy),openingKnown=lots.filter(l=>l!==newLot&&!l.legacy).reduce((sum,l)=>sum+n(l.available)*n(l.unitCost),0);
+          // El valor agregado heredado se mantiene como una sola partida, sin
+          // suponer composición o ciclos de fabricación inexistentes.
+          if(legacy){const value=Math.max(0,n(goodsValues[row.id])-openingKnown);legacy.unitCost=n(legacy.available)?value/n(legacy.available):0;}
+          if(newLot){
+            let materials=0;for(const family of Object.values(newLot.materials||{}))for(const [id,qty] of Object.entries(family))materials+=n(qty)*n(materialUnitCosts[id]);
+            const assigned=materials+(produced?(p.mod+depreciation)*n(row.produced)/produced:0);
+            newLot.unitCost=n(newLot.produced)?assigned/n(newLot.produced):0;
+          }
+          let value=0;
+          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
+          goodsValues[row.id]=value;
+        }else{
+          // Cierres históricos se siguen calculando con la regla agregada original.
+          let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
+          const assignedCost=lineMaterial+(produced?(p.mod+depreciation)*n(row.produced)/produced:0),availableValue=n(goodsValues[row.id])+assignedCost,soldCost=n(row.available)?availableValue*n(row.sold)/n(row.available):0;cogs+=soldCost;goodsValues[row.id]=availableValue-soldCost;
+        }
       }
       // Finished goods remain an asset until sold; idle labor and depreciation
       // cannot be capitalized when no units were manufactured.
@@ -111,7 +129,7 @@
       const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
       const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities}});
+      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
     }
     return {...history.at(-1),history};
   }

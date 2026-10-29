@@ -4,7 +4,7 @@ const E=require('../js/engine/cierre.js'),cycle=require('../js/cycle_model.js');
 const {state,catalog}=require('./economic_v19_fixture.cjs');
 test('v19 deterministic closure uses actual stock, segment eligibility and chosen price',()=>{
  const inputs=[0,1,2,3].map(type=>({id:String(type),state:state(1,{},type),round:1,catalog})),a=E.closeMany(inputs),b=E.closeMany(inputs);assert.deepEqual(a,b);
- assert.equal(a['0'].sales[0].price,42.5);assert.equal(a['2'].sales[2].quality,12);assert.equal(a['2'].sales[2].price,250);
+ assert.equal(a['0'].sales[0].price,42.5);assert.equal(a['2'].sales[2].quality,12);assert.equal(a['2'].sales[2].price,350);assert.equal(a['2'].sales[2].chosenPrice,250);assert.equal(a['2'].sales[2].revenue,a['2'].sales[2].sold*350);
  for(const result of Object.values(a)){assert.ok(result.revenue>0);for(const line of result.sales){assert.ok(line.sold<=line.available);assert.ok(line.assignedDemand>=0);}}
  assert.equal(a['0'].sales[1].sold,0);assert.equal(a['0'].allocation.products.urbano,undefined);
 });
@@ -13,9 +13,9 @@ test('v19 equal prices give price score 100 and preserve unserved demand',()=>{
  for(const x of Object.values(r)){assert.equal(x.allocation.products.esencial.puntajePrecio,100);assert.equal(x.sales[0].sold,90);assert.ok(x.sales[0].demand>x.sales[0].sold);}
  const empty=state();empty.HILO.quantities={};const z=E.closeMany([{id:'empty',state:empty,catalog,round:1},...inputs]);assert.equal(z.empty.revenue,0);assert.equal(z.empty.allocation.products.esencial,undefined);
 });
-test('document quality feeds market without changing the player price',()=>{
+test('la calidad premium modifica el precio efectivo conservando el precio base',()=>{
  const s=state(1,{},2);s.CUERO.quantities={cuero_sint:250};s.ACCESORIOS.quantities={acc_eco:1000};s.HILO.quantities={hilo_std:10000};
- const r=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(r.sales[2].quality,7);assert.equal(r.sales[2].price,250);
+ const r=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(r.sales[2].quality,7);assert.equal(r.sales[2].price,350);assert.equal(r.sales[2].chosenPrice,250);assert.equal(r.sales[2].revenue,r.sales[2].sold*350);
  s.MOLDE.optionIds=['molde_1'];s.PRODUCCION_META.moldTargets={molde_1:90};assert.equal(E.prepare({id:'x',state:s,catalog,round:1}).lines[0].quality,4);
  // A malformed source cannot choose an unowned Premium mold and invent units.
  s.PRODUCCION_META.moldTargets={molde_3:90};const missing=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(missing.revenue,0);
