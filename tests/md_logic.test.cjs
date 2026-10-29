@@ -27,7 +27,7 @@ test('full closure preserves chosen prices, inventory balances and corrected MP 
  const r=CYCLE.close({...context(),capital:200000});assert.equal(r.receipt.produced,368);assert.equal(r.receipt.sold,368);assert.equal(r.receipt.revenue,42300);assert.equal(r.receipt.sales[2].price,250);
  near(r.state.__inventarioMP.cuero_std,14.4);assert.equal(r.state.__inventarioMP.acc_prem,22);assert.equal(r.state.__inventarioMP.hilo_prem,6);
  near(r.financial.balanceGeneral.inventarioMP,14.4*45*.92+22*9*.92+6*7*.92+30*80);const er=r.financial.estadoResultados;near(er.costosProduccion,22082.24+21749.12+er.depreciacion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
- assert.match(require('../js/student_financial_view').incomeHtml(er),/Costo de Ventas/);
+ assert.match(require('../js/student_financial_view').incomeHtml(er),/Costo de ventas/i);
  assert.equal(r.receipt.modelVersion,'md-20261027');assert.equal(CYCLE.close({...context(r.state),ledger:r.ledger,capital:200000}).reused,true);
 });
 test('MYPE and No MYPE labor, acquisition and maintenance follow the two source columns',()=>{

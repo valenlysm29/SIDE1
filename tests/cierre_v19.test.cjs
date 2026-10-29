@@ -21,9 +21,9 @@ test('document quality feeds market without changing the player price',()=>{
  s.PRODUCCION_META.moldTargets={molde_3:90};const missing=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(missing.revenue,0);
  const prepared=E.prepare({id:'x',state:state(1,{},2),round:1,catalog});prepared.lines[2].quality=5;const alloc=E.allocate([prepared]);assert.equal(alloc.x.products.premium.calidadMercado,100);assert.equal(alloc.x.products.premium.simulatedCompetitors.length,0);
 });
-test('v19 price validation, scores bounded and nonnegative price score',()=>{
+test('v19 price validation and nonnegative price score',()=>{
  const s=state();s.PRODUCCION_META.prices.esencial=-1;assert.throws(()=>E.prices(s),/Precio/);
- const r=E.closeMany([{id:'x',state:state(1,{},1),round:1,catalog}]).x;assert.ok(r.scores.efficiency<=10);assert.ok(r.scores.reputation<=10);assert.ok(r.allocation.products.urbano.puntajePrecio>=0);
+ const r=E.closeMany([{id:'x',state:state(1,{},1),round:1,catalog}]).x;assert.ok(Number.isFinite(r.scores.efficiency));assert.ok(r.scores.reputation<=10);assert.ok(r.allocation.products.urbano.puntajePrecio>=0);
 });
 test('v19 three cycles four companies have sales, receivables collect next cycle, retries reuse',()=>{
  const previous={},ledgers={};for(let round=1;round<=3;round++){

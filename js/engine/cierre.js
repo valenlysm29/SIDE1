@@ -22,7 +22,8 @@
     for(const code of state.__catalogSelection||[])if(index[code]&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
     return [...new Set(result)];
   }
-  function scores(state){const selected=codes(state);return {selected,efficiency:clamp(selected.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0)),reputation:clamp(selected.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0)),health:clamp(selected.reduce((s,id)=>s+Number(index[id]?.financiero||0),0))};}
+  const scoreGroups=new Set(['Maquina de ensamblado','Maquina de acabados','Molde','Personal de corte','Personal de ensamble','Personal de acabados','Jefatura','Canal de venta','Acceso a prestamo bancario','Numero de proveedores','Politica de pago a proveedores','Lead time','Inversion en RR.HH.','Inversion en marketing']);
+  function scores(state){const selected=codes(state),scored=selected.filter(id=>scoreGroups.has(index[id]?.grupo));return {selected,efficiency:scored.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0),reputation:scored.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0),health:scored.reduce((s,id)=>s+Number(index[id]?.financiero||0),0)};}
   function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(raw===''||!Number.isFinite(value)||value<segment.min||value>(segment.max??Infinity))throw new RangeError(`Precio ${id}: introduce un importe válido igual o mayor que ${segment.min}.`);return [id,value];}));}
   function materialUse(state,plan,round){
     const use={},ratios={};
@@ -33,6 +34,20 @@
       ratios[family]=total?premium/total:0;
     }
     return {use,ratios};
+  }
+  // La distribución por lote solo es deducible si cada familia consumida usa una única calidad.
+  // En mezclas se conserva el total real y se indica que no existe detalle histórico por lote.
+  function materialLots(state,plan,round=1){
+    const consumed=materialUse(state,plan,round).use,lines=(plan.productLines||[]).filter(line=>n(line.plannedUnits)>0);
+    return lines.map(line=>{
+      const materials={},unknown=[];const spec=PRO.constants.MOLD_REQUIREMENTS[line.id]||{};
+      for(const [family,options] of Object.entries(materialCodes)){
+        const used=Object.keys(options).filter(id=>n(consumed[id])>0),amount=Number((n(line.plannedUnits)*n(spec[family])).toPrecision(15));
+        if(used.length===1)materials[family]={[used[0]]:amount};
+        else if(amount>0)unknown.push(family);
+      }
+      return {mold:line.id,units:n(line.plannedUnits),materials,unknown};
+    });
   }
   function reputation(state,plan,round=1){
     const materials=materialUse(state,plan,round),total=plan.producibleUnits;
@@ -79,7 +94,7 @@
     const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,materialLots:materialLots(state,plan,round),reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -150,5 +165,5 @@
     }),allocations=allocate(prepared,{...config,simulatedCompetitors:{...config.simulatedCompetitors,enabled:false}});
     return prepared.map(p=>{const allocation=allocations[p.id].products[id],sold=Math.min(n(p.lines[0].available),n(allocation?.demandaAjustada));return {id:p.id,precioScore:n(allocation?.puntajePrecio),puntaje:n(allocation?.puntajeTotal),participacion:n(allocation?.porcentaje),demanda:n(allocation?.demandaAjustada),vendidas:sold,precioEfectivo:money(p.effective),ingresos:money(sold*p.effective),reputacionFinal:p.reputationFinal};});
   }
-  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,prepare,allocate,closeMany,settleMarketCompanies,roundDemand,apportion,points,distributeProduct};
+  return {config:DEFAULT,codes,scores,prices,quality,reputation,materialUse,materialLots,prepare,allocate,closeMany,settleMarketCompanies,roundDemand,apportion,points,distributeProduct};
 });
