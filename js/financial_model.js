@@ -79,7 +79,7 @@
       let depreciation=0;
       for(const [id,years] of Object.entries(life)){const item=items.get(id);for(const option of item?.options||[]){const purchases=decisions[id]?.purchases,qty=purchases?Math.max(0,Object.entries(purchases).filter(([r])=>Number(r)<=p.r).reduce((sum,[,row])=>sum+n(row?.[option.id]),0)):(n(decisions[id]?.quantities?.[option.id])||Number(decisions[id]?.optionIds?.includes(option.id)||false)),base=qty*n(option.cost)*(1-n(residualRate)),linear=base/(n(policy.usefulLives?.[id])||years)/12*months,method=md?[]:decisions.__catalogSelection||receipt?.catalogSelection||[],annualized=method.includes('FIN-02B')?base*n(receipt?.produced)/(economicConfig?.depreciation?.productiveLife||100000):linear*(method.includes('FIN-02C')?(economicConfig?.depreciation?.acceleratedFactor||2):1),charge=Math.max(0,Math.min(base-n(depreciationValues[option.id]),annualized));depreciation+=charge;depreciationValues[option.id]=n(depreciationValues[option.id])+charge;}}
       depreciation=money(Math.min(Math.max(0,assets+p.comprasActivos-p.bajaActivos),depreciation));
-      const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+p.mod+depreciation;
+      const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+(produced?p.mod+depreciation:0);
       const lines=receipt?.production?.productLines||[];
       let cogs=0;for(const [index,row] of (receipt?.sales||[]).entries()){
         let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
@@ -103,7 +103,7 @@
       }
       // El desglose se conserva en el snapshot y distingue compras de activos de su depreciación.
       const identifiable=cogs+idle+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
-      er.desgloseCostos={costoVentas:money(cogs),costoProduccionCiclo:money(productionCost),materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-identifiable),total:money(er.costos)};
+      er.desgloseCostos={costoVentas:money(cogs),costoProduccionCiclo:money(productionCost),capacidadOciosa:money(idle),materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-identifiable),total:money(er.costos)};
       const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
       cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;

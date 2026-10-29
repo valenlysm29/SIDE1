@@ -72,6 +72,17 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
       if(item.id==='CANALES')for(const id of RULES.STORE_IDS){try{RULES.nextStoreBatches(decisionState.CANALES,id,RULES.storeQuantity(d,id),ctx.round);}catch{issues.push({cat:'D',item:'CANALES',text:'No puedes reducir tiendas con un compromiso vigente.'});}}
     }
   }
+  const completing=decisionCategories().every(category=>sectionSubmitted(category.cat)||cats.includes(category.cat));
+  const plan=window.SIDE_PRODUCTION_MODEL.calculate(ctx);
+  if(completing||plan.target){
+    if(completing&&!plan.target)issues.push({cat:'B',item:'PRODUCCION_META',text:'Indica una meta de producción mayor que cero.'});
+    for(const line of plan.productLines.filter(line=>line.target>0&&!line.available))issues.push({cat:'B',item:'MOLDE',text:`${line.label}: falta adquirir el molde para producir ${line.target} unidades.`});
+    for(const process of plan.processes.filter(process=>process.shortfall>0))issues.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad ${process.cycleCapacity} unidades; la meta requiere ${plan.target}. Revisa personal y equipos.`});
+    for(const material of plan.materials.filter(material=>material.shortfall>0))issues.push({cat:'F',item:material.id,text:`${material.label}: faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit} para la meta.`});
+    if(plan.target&&plan.producibleUnits<plan.target&&!issues.some(issue=>['B','C','F'].includes(issue.cat)))issues.push({cat:'B',text:`Solo se pueden producir ${plan.producibleUnits} de ${plan.target} unidades; revisa la meta y los recursos.`});
+    const channels=ctx.drafts.CANALES?.optionIds||[];
+    if(completing&&!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))issues.push({cat:'D',item:'CANALES',text:'Falta un canal de venta activo.'});
+  }
   const delta=review.sections.filter(s=>cats.includes(s.cat)&&!s.submitted).reduce((sum,s)=>sum+s.net-Number(cashLedger[`${ctx.round}:${s.cat}`]||0),0);
   if(review.financial.currentCash+delta<-0.005)issues.push({cat:'E',text:'La caja al confirmar ser\u00eda negativa. Reduce gastos o revisa el financiamiento.'});
   return issues.filter((x,index,array)=>array.findIndex(y=>y.text===x.text&&y.cat===x.cat)===index);

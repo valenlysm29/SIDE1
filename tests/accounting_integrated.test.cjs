@@ -13,6 +13,10 @@ test('unused MP and unsold finished goods stay capitalized; assets do not become
  assert.equal(b.inventarioMP,40);assert.equal(e.costosProduccion,89.5);assert.equal(e.costoVentas,59.67);assert.equal(b.inventarioPT,29.83);assert.equal(e.gastosAdministrativos,10);assert.equal(e.gastosVentas,4);assert.equal(e.depreciacion,9.5);assert.equal(b.activosFijos,1190.5);assert.equal(b.activos,b.pasivoPatrimonio);
 });
 test('no sales create no COGS, no commission, and preserve all finished goods',()=>{const f=run({sold:0});assert.equal(f.estadoResultados.costoVentas,0);assert.equal(f.estadoResultados.impuestoRenta,0);assert.equal(f.balanceGeneral.inventarioPT,89.5);assert.equal(f.estadoResultados.gastosVentas,0);});
+test('idle labor and depreciation are expenses, not production or inventory',()=>{
+ const f=run({sold:0,state:{__cycleSettlements:{1:{inventory:{leather:10},decisions:{ENSAMBLE:{quantities:{machine:1}}},sales:[{id:'esencial',produced:0,available:0,sold:0}],goods:{esencial:0}}}}});
+ assert.equal(f.estadoResultados.costosProduccion,0);assert.equal(f.estadoResultados.costoVentas,0);assert.equal(f.estadoResultados.desgloseCostos.capacidadOciosa,29.5);assert.equal(f.estadoResultados.gastosAdministrativos,39.5);assert.equal(f.balanceGeneral.inventarioMP,100);assert.equal(f.balanceGeneral.inventarioPT,0);assert.equal(f.balanceGeneral.activos,f.balanceGeneral.pasivoPatrimonio);
+});
 test('TEA uses effective monthly compounding and loan principal stays outside revenue',()=>{
  const f=F.calculate({capital:1000,ledger:{'1:E':1200},sectionsByRound:{1:{E:{recordedNet:1200,items:[{id:'PRESTAMO',financing:1200}]}}},financialPolicy:{tea:20,cycleMonths:2}});
  assert.equal(f.estadoResultados.ingresos,0);assert.equal(f.balanceGeneral.deuda,1200);assert.equal(f.estadoResultados.gastosFinancieros,Math.round(1200*(Math.pow(1.2,2/12)-1)*100)/100);assert.equal(f.balanceGeneral.activos,f.balanceGeneral.pasivoPatrimonio);
