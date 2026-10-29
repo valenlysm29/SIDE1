@@ -95,7 +95,7 @@
             newLot.unitCost=n(newLot.produced)?assigned/n(newLot.produced):0;
           }
           let value=0;
-          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
+          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;if(lot.closingLocations){lot.locations=lot.closingLocations;delete lot.closingLocations;}lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
           goodsValues[row.id]=value;
         }else{
           // Cierres históricos se siguen calculando con la regla agregada original.

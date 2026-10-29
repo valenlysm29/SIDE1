@@ -584,7 +584,7 @@ module.exports={runOnce,remoteRpc};
             newLot.unitCost=n(newLot.produced)?assigned/n(newLot.produced):0;
           }
           let value=0;
-          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
+          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;if(lot.closingLocations){lot.locations=lot.closingLocations;delete lot.closingLocations;}lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
           goodsValues[row.id]=value;
         }else{
           // Cierres históricos se siguen calculando con la regla agregada original.
@@ -834,12 +834,39 @@ module.exports={runOnce,remoteRpc};
     const rows=activePoints.map(p=>{const opening=stocks[p.id]||0,received=transfers[p.id]||0,stock=opening+received,assigned=demandByPoint[p.id]||0,sold=Math.min(assigned,stock);stocks[p.id]=stock-sold;return {id:p.id,zone:p.zone,product:id,opening,received,available:stock,demand:assigned,sold,lostSales:assigned-sold,revenue:money(sold*price),closing:stocks[p.id]};});
     return {rows,central,locations:stocks,assignment:manualTransfers?'manual':'automatic',unservedWithoutChannel:activePoints.length?0:Math.floor(n(demand))};
   }
+  // FIFO por ubicación: transferencias desde almacén y ventas desde el punto.
+  function locateLots(lots,distribution,openingLocations,product,basePrice,config,round){
+    const copies=lots.map(clone),unlocated=copies.filter(l=>!l.locations&&(l.legacy||Number(l.cycle)!==Number(round))),opening=Object.entries(openingLocations||{}).filter(([,q])=>n(q)>0);
+    const missing=opening.map(([id,q])=>[id,n(q)-copies.reduce((a,l)=>a+n(l.locations?.[id]),0)]).filter(([,q])=>q>0);
+    if(missing.length){
+      // El único saldo agregado histórico se asigna solo a las cantidades ya
+      // registradas por tienda. Con varios lotes no hay evidencia suficiente.
+      if(unlocated.length!==1||missing.reduce((sum,[,q])=>sum+q,0)>n(unlocated[0].available))throw new RangeError('Inventario histórico por lote y tienda sin atribución verificable: '+product);
+      unlocated[0].locations=Object.fromEntries(missing);
+    }
+    for(const lot of copies){lot.locations={...(lot.locations||{})};const held=Object.values(lot.locations).reduce((a,q)=>a+n(q),0);if(held>n(lot.available))throw new RangeError('Ubicaciones exceden el lote '+lot.id);}
+    for(const [id,q] of opening){const sum=copies.reduce((a,l)=>a+n(l.locations[id]),0);if(sum!==n(q))throw new RangeError('Inventario por tienda no coincide con lotes: '+id);}
+    for(const lot of copies)for(const [id,q] of Object.entries(lot.locations))if(n(q)>0&&!Object.hasOwn(openingLocations||{},id))throw new RangeError('Tienda de lote no reconocida: '+id);
+    const price=lot=>money(basePrice*(product==='premium'&&lot.quality!=null?(lot.quality<4?config.consequences.lowQualityPrice:lot.quality>=7?config.consequences.premiumPrice:1):1));
+    const soldById=Object.fromEntries(copies.map(l=>[l.id,0]));
+    for(const point of distribution.rows){
+      let needed=point.received;point.lotTransfers=[];
+      for(const lot of copies){const held=Object.values(lot.locations).reduce((a,q)=>a+n(q),0),q=Math.min(needed,n(lot.available)-held);if(q>0){lot.locations[point.id]=n(lot.locations[point.id])+q;point.lotTransfers.push({id:lot.id,units:q});needed-=q;}}
+      if(needed)throw new RangeError('Transferencia sin lotes suficientes: '+point.id);
+    }
+    for(const point of distribution.rows){let needed=point.sold;point.lotSales=[];let revenue=0;
+      for(const lot of copies){const q=Math.min(needed,n(lot.locations[point.id]));if(q>0){const unitPrice=price(lot);lot.locations[point.id]-=q;soldById[lot.id]+=q;point.lotSales.push({id:lot.id,units:q,price:unitPrice,revenue:money(q*unitPrice)});revenue+=q*unitPrice;needed-=q;}}
+      if(needed)throw new RangeError('Venta sin lote en el punto: '+point.id);point.revenue=money(revenue);
+    }
+    for(const lot of copies)lot.closingLocations=lot.locations;
+    const lotSales=copies.map(l=>({id:l.id,units:soldById[l.id],price:price(l),revenue:money(soldById[l.id]*price(l))}));
+    return {lots:copies,lotSales,revenue:money(lotSales.reduce((sum,l)=>sum+l.revenue,0))};
+  }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
     const pointList=points(p.state,config),locationInventory=clone(p.state.__storeInventory||{}),distributions={};
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;locationInventory[line.id]=distribution.locations;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);let pending=sold;
-      const lotSales=line.lots.map(lot=>{const units=Math.min(n(lot.available),pending);pending-=units;let factor=1;if(line.id==='premium'&&lot.quality!=null){if(lot.quality<4)factor=config.consequences.lowQualityPrice;else if(lot.quality>=7)factor=config.consequences.premiumPrice;}return {id:lot.id,units,price:money(line.price*factor),revenue:money(units*line.price*factor)};});
-      const lotRevenue=money(lotSales.reduce((sum,lot)=>sum+lot.revenue,0));
-      let unassigned=lotSales.map(l=>({...l}));for(const point of distribution.rows){let left=point.sold,rev=0;point.lotSales=[];for(const part of unassigned){const q=Math.min(left,part.units);left-=q;part.units-=q;rev+=q*part.price;if(q)point.lotSales.push({id:part.id,units:q,price:part.price,revenue:money(q*part.price)});}point.revenue=money(rev);}
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);
+      const located=locateLots(line.lots,distribution,locationInventory[line.id]||{},line.id,line.price,config,p.round);
+      line.lots=located.lots;locationInventory[line.id]=distribution.locations;const lotSales=located.lotSales,lotRevenue=located.revenue;
       let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:sold?money(lotRevenue/sold):line.price,lotSales,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:lotRevenue,reason};});
     const revenue=money(sales.reduce((s,line)=>s+line.revenue,0)),goods=Object.fromEntries(sales.map(line=>[line.id,line.available-line.sold])),storage=money(Object.values(goods).reduce((s,v)=>s+v,0)*config.storagePerUnit);
     if(storage)p.messages.push({id:'CONS-07',text:'Inventario sin vender: se conserva y genera almacenaje.'});

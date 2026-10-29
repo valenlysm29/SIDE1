@@ -39,3 +39,31 @@ test('varias tiendas concilian lotes FIFO, ingresos, inventario y cuentas por co
  for(const lot of line.lotSales)assert.equal(points.flatMap(p=>p.lotSales).filter(x=>x.id===lot.id).reduce((sum,x)=>sum+x.units,0),lot.units);
  assert.equal(line.lotSales.reduce((sum,l)=>sum+l.units,0),line.sold);assert.equal(line.lots.reduce((sum,l)=>sum+l.available,0),line.available);assert.equal(r.receivable,Math.round(r.revenue*r.creditRate*100)/100);assert.equal(r.goods.premium,line.available-line.sold);
 });
+test('cada tienda vende solo sus lotes y conserva los saldos por ubicación',()=>{
+ const s=F.state(3,{},2);s.PRODUCCION_META.moldTargets={};s.CANALES={round:3,optionIds:['los_olivos'],quantities:{los_olivos:1},transfers:{premium:{'los_olivos:1':0}}};
+ s.__finishedGoods={premium:10};s.__storeInventory={premium:{'miraflores:1':5,'los_olivos:1':5}};
+ s.__goodsLots=[{id:'a',segment:'premium',mold:'molde_3',cycle:1,produced:5,available:5,quality:3,unitCost:10,locations:{'miraflores:1':5}},{id:'b',segment:'premium',mold:'molde_3',cycle:2,produced:5,available:5,quality:7,unitCost:20,locations:{'los_olivos:1':5}}];
+ const result=E.closeMany([{id:'a',state:s,catalog:F.catalog,round:3}]).a,line=result.sales[2],point=line.points[0];
+ assert.equal(line.sold,5);assert.deepEqual(point.lotSales.map(x=>x.id),['b']);assert.equal(line.lotSales[0].units,0);assert.equal(line.lotSales[1].units,5);assert.equal(line.revenue,1750);assert.equal(result.goods.premium,5);assert.equal(result.storeInventory.premium['miraflores:1'],5);assert.equal(line.lots[0].closingLocations['miraflores:1'],5);
+});
+test('transferencias manuales no pueden superar el stock central',()=>{
+ const s=F.state(1,{},2);s.CANALES={round:1,optionIds:['web'],transfers:{premium:{web:10000}}};
+ assert.throws(()=>E.closeMany([{id:'a',state:s,catalog:F.catalog,round:1}]),/Transferencia manual inválida/);
+});
+test('múltiples lotes antiguos sin ubicación verificable se bloquean',()=>{
+ const s=F.state(3,{},2);s.PRODUCCION_META.moldTargets={};s.__finishedGoods={premium:2};s.__storeInventory={premium:{web:1}};s.__goodsLots=[{id:'a',segment:'premium',available:1,quality:3},{id:'b',segment:'premium',available:1,quality:9}];
+ assert.throws(()=>E.closeMany([{id:'a',state:s,catalog:F.catalog,round:3}]),/sin atribución verificable/);
+});
+test('tres ciclos con dos tiendas mantienen FIFO por ubicación y concilian el balance',()=>{
+ let s=F.state(1,{},2);s.CUERO.quantities={cuero_sint:63};s.ACCESORIOS.quantities={acc_eco:90};s.HILO.quantities={hilo_std:1170};s.CANALES={round:1,optionIds:['miraflores','los_olivos'],transfers:{premium:{'miraflores:1':30,'los_olivos:1':20}}};
+ const a=close(s,1,null,[{effect:{revenuePct:-100}}]);assert.deepEqual(a.state.__goodsLots[0].locations,{'los_olivos:1':20,'miraflores:1':30});assert.equal(a.receipt.sold,0);
+ s=F.state(2,a.state,2);s.CUERO.quantities={cuero_prem:63};s.ACCESORIOS.quantities={acc_prem:90};s.HILO.quantities={hilo_prem:1170};s.CANALES={round:2,optionIds:['miraflores','los_olivos'],transfers:{premium:{'miraflores:1':0,'los_olivos:1':0}}};
+ const b=close(s,2,a);for(const point of b.receipt.sales[2].points){assert.equal(point.sold,point.opening);assert.deepEqual(point.lotSales.map(x=>x.id),['1-premium']);}assert.equal(b.receipt.sales[2].sold,50);assert.equal(b.state.__goodsLots.find(x=>x.id==='1-premium').available,40);assert.equal(b.state.__goodsLots.find(x=>x.id==='2-premium').available,90);
+ s=F.state(3,b.state,2);s.PRODUCCION_META.moldTargets={};s.CUERO.quantities={};s.ACCESORIOS.quantities={};s.HILO.quantities={};s.CANALES={round:3,optionIds:['miraflores','los_olivos']};const c=close(s,3,b);
+ assert.equal(c.receipt.sales[2].sold,130);assert.equal(c.state.__goodsLots.length,0);for(const x of [a,b,c]){assert.equal(x.financial.balanceGeneral.activos,x.financial.balanceGeneral.pasivoPatrimonio);const physical=x.state.__goodsLots.reduce((sum,l)=>sum+l.available,0);assert.equal(physical,x.receipt.goods.premium);}
+ assert.equal(cents(a.financial.balanceGeneral.inventarioPT+b.financial.estadoResultados.costosProduccion-b.financial.estadoResultados.costoVentas),cents(b.financial.balanceGeneral.inventarioPT));assert.equal(cents(b.financial.balanceGeneral.inventarioPT-c.financial.estadoResultados.costoVentas),cents(c.financial.balanceGeneral.inventarioPT));
+});
+test('saldo agregado anterior conserva ubicación registrada y no inventa su composición',()=>{
+ const s=F.state(2,{},2);s.__finishedGoods={premium:10};s.__storeInventory={premium:{web:6,'miraflores:1':4}};s.__economicHistory={goodsQuality:{premium:7}};s.CANALES={round:2,optionIds:['web','miraflores'],transfers:{premium:{web:0,'miraflores:1':0}}};
+ const r=E.closeMany([{id:'a',state:s,catalog:F.catalog,round:2}]).a;const line=r.sales[2];assert.equal(line.sold,10);assert.ok(line.lotSales.find(x=>x.id==='legacy-premium'));assert.equal(line.lotSales.find(x=>x.id==='2-premium').units,0);assert.equal(line.lots[0].cycle,null);assert.equal(line.lots[0].legacy,true);
+});
