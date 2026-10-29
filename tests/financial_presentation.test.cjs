@@ -28,3 +28,8 @@ test('Advertencias de garantías son visibles y escapadas en alumno, historial y
  const ctx={state:{reports:[{id:'1',empresa:'Prueba',estadoResultados:{...er,ventasTotales:27000,cicloImpuesto:2,impuestoDiferido:false,utilidadAntesImpuestosAcumulada:-48600.27,baseImponibleAcumulada:0,impuestoRenta:0},flujoCaja:{cobrosVentas:18900},balanceGeneral:{cuentasPorCobrar:8100}}]},$:id=>nodes[id],gradeValue:()=>null,gradeLabel:()=>'',money:String,escapeHtml:String,escapeAttr:String,sectionBadges:()=>'',eventReportTable:()=>'',window:{SIDE_STUDENT_FINANCIAL_VIEW:view}};vm.createContext(ctx);vm.runInContext(src.slice(from,to),ctx);ctx.renderResults();assert.match(nodes.detailReports.innerHTML,/Garantía 180 días/);assert.doesNotMatch(nodes.detailReports.innerHTML,/<img/);assert.match(nodes.detailReports.innerHTML,/27000/);assert.doesNotMatch(nodes.detailReports.innerHTML,/18,900|8,100|Base acumulada/);
  assert.equal(view.policyWarningsHtml({}),'');
 });
+test('balance identifica las cuentas persistidas que explican los totales',()=>{
+ const pdf=require('../js/teacher_report_pdf'),bg={efectivo:174328.31,cuentasPorCobrar:531.25,inventarios:30.53,activosFijos:7734.74,activos:182624.83,deuda:0,impuestosPorPagar:0,interesesPorPagar:0,provisionGarantias:500,patrimonio:182124.83,pasivoPatrimonio:182624.83};
+ const rows=pdf.reportData({balanceGeneral:bg},null).statements.find(row=>row[0]==='6. Balance general')[1];for(const [label,val] of [['Cuentas por cobrar',531.25],['Inventarios',30.53],['Provisión por garantías',500]])assert.equal(rows.find(row=>row[0]===label)[1],val);
+ const html=view.officeHtml({round:2,balanceGeneral:bg});for(const value of ['531.25','30.53','500.00'])assert.ok(html.includes(value));
+});

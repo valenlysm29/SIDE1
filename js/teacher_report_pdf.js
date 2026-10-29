@@ -58,8 +58,8 @@
           ['Flujo de financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto,true]
         ],'Flujo neto = variación de caja del ciclo.'],
         ['6. Balance general',[
-          ['Efectivo',bg.efectivo??values.cash],['Activos fijos',bg.activosFijos],
-          ['Total de activos',values.assets,true],['Deuda',values.debt],['Patrimonio',values.equity],
+          ['Efectivo',bg.efectivo??values.cash],['Cuentas por cobrar',bg.cuentasPorCobrar],['Inventarios',bg.inventarios],['Activos fijos',bg.activosFijos],
+          ['Total de activos',values.assets,true],['Deuda',values.debt],['Impuestos por pagar',bg.impuestosPorPagar],['Intereses por pagar',bg.interesesPorPagar],['Provisión por garantías',bg.provisionGarantias],['Patrimonio',values.equity],
           ['Total de pasivo más patrimonio',bg.pasivoPatrimonio,true]
         ],'Total de activos = total de pasivo más patrimonio.']
       ]
