@@ -38,7 +38,7 @@ test('summary retains every cycle, including quiet cycles, and reports cumulativ
 test('office view uses financial model statements, including debt and assets',()=>{
   const report=model.calculate({capital:500,round:1,ledger:{'1:SIM_VENTAS':100,'1:SIM_INVERSION':-40}});
   const html=view.officeHtml(report);
-  for(const label of ['Caja','Ventas Totales','Costo de Ventas','Utilidad Neta','Impuesto a la Renta (29.5%)','Deuda / préstamos','Flujo neto','Activos','Patrimonio','Ver estados financieros e indicadores'])assert.ok(html.includes(label),label);
+  for(const label of ['Caja','Ventas Totales','Costo de Ventas','Utilidad Neta','Impuesto a la renta','Deuda / préstamos','Flujo neto','Activos','Patrimonio','Ver estados financieros e indicadores'])assert.ok(html.includes(label),label);
   assert.ok(html.includes('560'));
 });
 

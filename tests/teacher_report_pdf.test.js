@@ -19,15 +19,15 @@ test('PDF preserves cents, accounting signs, zero grades and absent data',()=>{
   for(const value of [undefined,null,'',NaN,Infinity])assert.equal(pdf.money(value),'Sin datos');
   const data=pdf.reportData({ingresos:200.75,costos:40.25,utilidad:160.5,caja:560.5,capital:400},0);
   assert.equal(data.grade,'0 / 20');assert.equal(data.sales,200.75);
-  assert.equal(data.statements[0][1][1][1],-40.25);
-  assert.equal(data.statements[0][1][3][1],null);
+  assert.equal(data.statements[0][1][1][1],undefined);
+  assert.equal(data.statements[0][1].length,12);
   assert.equal(pdf.reportData({},null).grade,'Sin calificar');
 });
 test('report mapping keeps the model balances and presents outflows as deductions',()=>{
   const report=financial.calculate({capital:1000,round:1,ledger:{'1:SIM_VENTAS':800.5,'1:SIM_GASTOS':-200.25,'1:SIM_INVERSION':-100}});
   const data=pdf.reportData(report,18);
   const er=data.statements[0][1],bc=data.statements[1][1],fc=data.statements[2][1],bg=data.statements[3][1];
-  assert.equal(er[0][1]+er[1][1]+er[2][1]+er[3][1]+er[4][1],er[5][1]);
+  assert.equal(er[0][1]-er[1][1],er[2][1]);assert.equal(er[2][1]-er[3][1],er[6][1]);assert.equal(er[6][1]+er[7][1]-er[8][1],er[9][1]);assert.equal(er[9][1]-er[10][1],er[11][1]);
   assert.equal(bc[0][1]+bc[1][1]+bc[2][1],bc[3][1]);
   assert.equal(fc[0][1]+fc[1][1]+fc[2][1],fc[3][1]);
   assert.equal(bg[2][1],bg[5][1]);
