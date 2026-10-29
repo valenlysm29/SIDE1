@@ -651,7 +651,8 @@ module.exports={runOnce,remoteRpc};
         if(used.length===1)materials[family]={[used[0]]:amount};
         else if(amount>0)unknown.push(family);
       }
-      return {mold:line.id,units:n(line.plannedUnits),materials,unknown};
+      const excelQuality=unknown.length ? null : Number(index[mapping.MOLDE[line.id]]?.calidad||0)+Object.entries(materials).reduce((sum,[family,options])=>sum+Number(index[materialCodes[family][Object.keys(options)[0]]]?.calidad||0),0);
+      return {mold:line.id,units:n(line.plannedUnits),materials,unknown,excelQuality};
     });
   }
   function reputation(state,plan,round=1){
@@ -687,10 +688,10 @@ module.exports={runOnce,remoteRpc};
     const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
     rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
-    const qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
+    const lots=materialLots(state,plan,round),qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
     const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
-      const oldQuality=Number.isFinite(Number(goodsQuality[id]))?clamp(goodsQuality[id]):qualityValue;
-      const q=available?(oldQuality*opening+qualityValue*produced)/available:0;
+      const oldQuality=Number.isFinite(Number(goodsQuality[id]))?n(goodsQuality[id]):qualityValue,lot=lots.find(item=>item.mold===line.id),newQuality=lot?.excelQuality??qualityValue;
+      const q=available?(oldQuality*opening+newQuality*produced)/available:0;
       return {id,quality:q,price:price[id],effectivePrice:price[id],produced,available};
     });
     if(plan.productionGap)messages.push({id:'CAPACIDAD',text:'La producción respeta la capacidad disponible y los materiales, en orden N1, N2 y N3.'});
@@ -699,7 +700,7 @@ module.exports={runOnce,remoteRpc};
     const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:materialLots(state,plan,round),reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}

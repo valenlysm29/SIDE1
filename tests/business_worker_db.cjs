@@ -30,7 +30,7 @@ function plan(round){
   await db.exec('reset role');
   const rows=(await db.query('select ciclo,ingresos,estado_resultados,balance_caja from reportes_ciclo where empresa_id=$1 order by ciclo',[id])).rows;
   assert.equal(rows.length,2);
-  for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);}
+  for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);const lots=row.estado_resultados.cycleReceipt.materialLots;assert.equal(lots.length,1);assert.deepEqual(lots[0].unknown,[]);assert.equal(lots[0].excelQuality,7);assert.equal(row.estado_resultados.cycleReceipt.sales[2].quality,7);}
   assert.equal(rows[0].estado_resultados.impuestoRenta,0);
   const preTax=rows.reduce((s,row)=>s+row.estado_resultados.utilidadAntesImpuestos,0),expected=Math.round((Math.min(preTax,82500)*.10+Math.max(0,preTax-82500)*.295)*100)/100;
   assert.ok(expected>0);assert.equal(rows[1].estado_resultados.impuestoRenta,expected);

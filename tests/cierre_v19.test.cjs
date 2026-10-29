@@ -4,7 +4,7 @@ const E=require('../js/engine/cierre.js'),cycle=require('../js/cycle_model.js');
 const {state,catalog}=require('./economic_v19_fixture.cjs');
 test('v19 deterministic closure uses actual stock, segment eligibility and chosen price',()=>{
  const inputs=[0,1,2,3].map(type=>({id:String(type),state:state(1,{},type),round:1,catalog})),a=E.closeMany(inputs),b=E.closeMany(inputs);assert.deepEqual(a,b);
- assert.equal(a['0'].sales[0].price,42.5);assert.equal(a['2'].sales[2].quality,10);assert.equal(a['2'].sales[2].price,250);
+ assert.equal(a['0'].sales[0].price,42.5);assert.equal(a['2'].sales[2].quality,12);assert.equal(a['2'].sales[2].price,250);
  for(const result of Object.values(a)){assert.ok(result.revenue>0);for(const line of result.sales){assert.ok(line.sold<=line.available);assert.ok(line.assignedDemand>=0);}}
  assert.equal(a['0'].sales[1].sold,0);assert.equal(a['0'].allocation.products.urbano,undefined);
 });
@@ -15,8 +15,8 @@ test('v19 equal prices give price score 100 and preserve unserved demand',()=>{
 });
 test('document quality feeds market without changing the player price',()=>{
  const s=state(1,{},2);s.CUERO.quantities={cuero_sint:250};s.ACCESORIOS.quantities={acc_eco:1000};s.HILO.quantities={hilo_std:10000};
- const r=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(r.sales[2].quality,5);assert.equal(r.sales[2].price,250);
- s.MOLDE.optionIds=['molde_1'];s.PRODUCCION_META.moldTargets={molde_1:90};assert.equal(E.prepare({id:'x',state:s,catalog,round:1}).lines[0].quality,0);
+ const r=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(r.sales[2].quality,7);assert.equal(r.sales[2].price,250);
+ s.MOLDE.optionIds=['molde_1'];s.PRODUCCION_META.moldTargets={molde_1:90};assert.equal(E.prepare({id:'x',state:s,catalog,round:1}).lines[0].quality,4);
  // A malformed source cannot choose an unowned Premium mold and invent units.
  s.PRODUCCION_META.moldTargets={molde_3:90};const missing=E.closeMany([{id:'x',state:s,catalog,round:1}]).x;assert.equal(missing.revenue,0);
  const prepared=E.prepare({id:'x',state:state(1,{},2),round:1,catalog});prepared.lines[2].quality=5;const alloc=E.allocate([prepared]);assert.equal(alloc.x.products.premium.calidadMercado,100);assert.equal(alloc.x.products.premium.simulatedCompetitors.length,0);
