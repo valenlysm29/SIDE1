@@ -1,9 +1,9 @@
 /* Presentation-only DOP: existing cycle data in, markup and measured SVG paths out. */
 (function(root,factory){
-  const api=factory();
+  const api=factory(typeof module==='object'&&module.exports?require('./production_model.js'):root.SIDE_PRODUCTION_MODEL);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_PRODUCTION_DOP=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(){
+})(typeof globalThis!=='undefined'?globalThis:this,function(model){
   'use strict';
   const EDGES=Object.freeze([
     ['leather','cut'],['accessories','classification'],['classification','preparation'],
@@ -21,23 +21,26 @@
     const step=(id,type,index,name,value,detail)=>`<article class="pd-node pd-${id}" data-pd-node="${id}"><div class="pd-node-title"><i class="pd-symbol pd-${type}" aria-label="${{operation:'Operación',inspection:'Inspección',combined:'Combinada'}[type]} ${index}"><span>${index}</span></i><h4>${name}</h4></div><strong class="pd-value">${value}</strong><span class="pd-state">${state}</span><p>${detail}</p></article>`;
     const lines=plan.productLines.filter(line=>line.target>0);
     const mix=lines.map(line=>`${escape(line.label)}: ${number(line.target)} u.`).join(' · ');
+    const reference=model.planResources(plan.target);
+    const resource=id=>reference.processes.find(p=>p.id===id);
+    const resourceText=(id,machine)=>{const p=resource(id);return `${number(p.machines)} ${machine} y ${number(p.workers)} operarios de nivel 1 · Capacidad: ${number(p.cycleCapacity)} u./ciclo`};
     return `<section class="production-dop pd-panel" data-production-target="${plan.target}" aria-labelledby="productionDopTitle">
-      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo ${round}. Numeración independiente por tipo de actividad.</p><p>Simulación referencial basada en la cantidad deseada. No representa producción ejecutada.</p></div><div class="pd-legend" aria-label="Leyenda de actividades">${[['operation','Operación'],['inspection','Inspección'],['combined','Combinada']].map(([type,label])=>`<span><i class="pd-symbol pd-${type}" aria-hidden="true"></i>${label}</span>`).join('')}</div></header>
+      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo ${round}. Numeración independiente por tipo de actividad.</p><p>Planificación referencial. La producción real dependerá de los recursos que adquieras y de las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades">${[['operation','Operación'],['inspection','Inspección'],['combined','Combinada']].map(([type,label])=>`<span><i class="pd-symbol pd-${type}" aria-hidden="true"></i>${label}</span>`).join('')}</div></header>
       <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>${mix||'Aún no hay producción para mostrar. Define una meta en la calculadora.'}</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>${number(plan.target)} u.</strong></div></div>
       <div class="pd-graph" data-pd-graph>
         <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>
         ${source('leather','MATERIA PRIMA PRINCIPAL','Cuero','CUERO')}
-        ${step('cut','operation',1,'Corte de piezas',`${number(plan.target)} juegos de piezas`, `Unidades proyectadas por operación`)}
+        ${step('cut','operation',1,'Corte de piezas',`${number(plan.target)} juegos de piezas`, `Entrada: ${number(material('CUERO')?.neededForTarget)} m² de cuero. Necesarios: ${resourceText('cut','mesas')}`)}
         ${source('accessories','MATERIA PRIMA SECUNDARIA','Accesorios','ACCESORIOS')}
         ${step('classification','inspection',1,'Clasificación',`${number(material('ACCESORIOS')?.neededForTarget)} accesorios`,'Selección y conteo')}
         ${step('preparation','operation',2,'Preparación',`${number(plan.target)} bolsos`,'Materiales preparados para ensamblado')}
-        ${step('assembly','combined',1,'Ensamblado y colocación de accesorios',`${number(plan.target)} bolsos`, `Hilo necesario: ${number(material('HILO')?.neededForTarget)} m`)}
-        ${step('finish','combined',2,'Acabado final',`${number(plan.target)} bolsos`, `Unidades proyectadas por operación`)}
+        ${step('assembly','combined',1,'Ensamblado y colocación de accesorios',`${number(plan.target)} bolsos`, `Piezas, accesorios e hilo: ${number(material('HILO')?.neededForTarget)} m. Necesarios: ${resourceText('assembly','máquinas básicas')}`)}
+        ${step('finish','combined',2,'Acabado final',`${number(plan.target)} bolsos`, `Necesarios: ${resourceText('finish','máquinas básicas')}`)}
         <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">
           <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FINAL PROYECTADA</span><strong>${number(plan.target)} unidades totales</strong><div class="pd-mix">${lines.map(line=>`<span><b>${escape(line.label)}</b> ${number(line.target)} u.</span>`).join('')}</div><p>Proyección consolidada de las metas por molde.</p></div>
         </section>
       </div>
-      <section class="pd-requirements-table"><h4>Materiales necesarios por molde</h4>${lines.map(line=>`<p><b>${escape(line.label)} (${number(line.target)} u.)</b>: Cuero ${number(line.requirements?.CUERO)} m² · Accesorios ${number(line.requirements?.ACCESORIOS)} unidades · Hilo ${number(line.requirements?.HILO)} metros</p>`).join('')}<h4>Insumos para la cantidad deseada</h4><div class="pd-table-scroll"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th></tr></thead><tbody>${plan.materials.filter(row=>Number.isFinite(row.neededForTarget)).map(row=>`<tr><th>${escape(row.label)}</th><td>${number(row.neededForTarget)} ${escape(row.unit)}</td></tr>`).join('')}</tbody></table></div></section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>${number(plan.target)} unidades</strong></div></div></footer>
+      <section class="pd-requirements-table"><h4>Recursos productivos recomendados</h4><p>Escenario: operarios de nivel 1, máquinas básicas, ${reference.days} días y eficiencia ${number(reference.efficiency*100)} %. Una máquina o mesa por operario.</p><p>Capacidad de la línea: ${number(reference.capacity)} unidades por ciclo · Cuello de botella: ${reference.limitingProcesses.join(', ')}.</p><h4>Materiales necesarios por molde</h4>${lines.map(line=>`<p><b>${escape(line.label)} (${number(line.target)} u.)</b>: Cuero ${number(line.requirements?.CUERO)} m² · Accesorios ${number(line.requirements?.ACCESORIOS)} unidades · Hilo ${number(line.requirements?.HILO)} metros</p>`).join('')}<h4>Insumos para la cantidad deseada</h4><div class="pd-table-scroll"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th></tr></thead><tbody>${plan.materials.filter(row=>Number.isFinite(row.neededForTarget)).map(row=>`<tr><th>${escape(row.label)}</th><td>${number(row.neededForTarget)} ${escape(row.unit)}</td></tr>`).join('')}</tbody></table></div></section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>${number(plan.target)} unidades</strong></div></div></footer>
     </section>`;
   }
   // Points are measured from card borders in the SVG's coordinate space, never viewport constants.

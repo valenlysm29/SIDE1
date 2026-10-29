@@ -188,6 +188,21 @@
   }
 
   function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
+  // Independent reference scenario: one basic machine per level-one worker.
+  // Use the same capacity and rounding rules as calculate(), with no state writes.
+  function planResources(target){
+    target=whole(target);
+    const specs=[['cut','Corte','PERS_CORTE','corte_basico','MESA_CORTE','mesa'],['assembly','Ensamblado','PERS_ENSAMBLE','ens_personal_basico','ENSAMBLE','ens_basica'],['finish','Acabado','PERS_ACABADO','aca_personal_basico','ACABADOS','aca_basica']];
+    const processes=specs.map(([id,label,staffId,staffOption,machineId,machineOption])=>{
+      const rate=STAFF_RATES[staffId][staffOption]*MACHINE_MULTIPLIERS[machineId][machineOption];
+      let workers=target?Math.max(1,Math.ceil((target-0.5)/(rate*WORKING_DAYS*BASE_EFFICIENCY))):0;
+      while(Math.round(workers*rate*WORKING_DAYS*BASE_EFFICIENCY)<target)workers++;
+      while(workers>0&&Math.round((workers-1)*rate*WORKING_DAYS*BASE_EFFICIENCY)>=target)workers--;
+      return {id,label,workers,machines:workers,cycleCapacity:Math.round(workers*rate*WORKING_DAYS*BASE_EFFICIENCY)};
+    });
+    const capacity=Math.min(...processes.map(p=>p.cycleCapacity));
+    return {target,days:WORKING_DAYS,efficiency:BASE_EFFICIENCY,capacity,processes,limitingProcesses:processes.filter(p=>p.cycleCapacity===capacity).map(p=>p.label)};
+  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){
     const target=Number(plan?.target),value=record?.producedUnits;
@@ -195,5 +210,5 @@
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,planResources,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });
