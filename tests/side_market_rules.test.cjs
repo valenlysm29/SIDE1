@@ -23,7 +23,7 @@ test('reputación del ciclo por defecto; suavizado opcional',()=>{
  const a=C.prepare({id:'a',state,catalog:[],round:1});
  const b=C.prepare({id:'a',state,catalog:[],round:1},{...config,reputation:{smoothWithPrevious:true}});
  assert.equal(a.reputation.valor,0);
- assert.equal(b.reputation.valor,4);
+ assert.equal(b.reputation.valor,16); assert.equal(b.reputation.valorMercado,4);
 });
 test('cierre autorizado ignora precios inyectados y usa configuración interna',()=>{
  const input={id:'a',round:1,catalog:[],state:{PRODUCCION_META:{round:1,prices:{esencial:900000,urbano:1,premium:1}}},prices:{premium:900000},financialPolicy:{authoritativePrices:true}};

@@ -226,7 +226,7 @@ function productionSummaryHtml(review){
       <div><span>Inversión en planta</span><strong>${reviewMoney(investmentCost)}</strong><small>Se muestra aparte del costo operativo.</small></div>
       <div class="cs-unit-cost"><span>Desembolso operativo por unidad posible</span><strong>${plan.producibleUnits?reviewMoney(unitCost):'No calculable'}</strong><small>Incluye compras de materia prima; el consumo valorizado se reconoce al cierre.</small></div>
     </div>
-    <p class="cs-production-method">Reputación prevista: <strong>${reputation.valor.toFixed(2)} / 10</strong>. Factores en escala 0–10: producción ${reputation.factorProduccion.toFixed(2)}, personal ${reputation.factorMO.toFixed(2)}, material consumido ${reputation.factorMP.toFixed(2)} y publicidad ${reputation.factorPublicidad.toFixed(2)}. La reputación es el promedio de estos cuatro factores.</p>
+    <p class="cs-production-method">Reputación prevista: <strong>${reputation.valor.toFixed(2)} / 40</strong>. Factores en escala 0–10: producción ${reputation.factorProduccion.toFixed(2)}, personal ${reputation.factorMO.toFixed(2)}, material consumido ${reputation.factorMP.toFixed(2)} y publicidad ${reputation.factorPublicidad.toFixed(2)}. La reputación es la suma de estos cuatro factores; para el reparto se expresa en escala 0–10.</p>
     <p class="cs-production-method">Modelo de producción: 30 días por ciclo, 90% de eficiencia base, +1 punto porcentual por trabajador de nivel 3 y +4 puntos con jefatura. Se fabrica primero el molde básico, después el mejorado y finalmente el premium, usando solo los materiales disponibles.</p>
   </section>`;
 

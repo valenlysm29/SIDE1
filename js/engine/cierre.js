@@ -57,7 +57,7 @@
     const factorMP=Object.values(materials.ratios).reduce((a,v)=>a+v,0)/3*10;
     const advertising=BUS.advertising({state}),factorPublicidad=advertising/10000*10;
     const total40=factorProduccion+factorMO+factorMP+factorPublicidad;
-    return {valor:total40/4,total40,factorProduccion,factorMO,factorMP,factorPublicidad,advertising,consumo:materials.use,proporciones:materials.ratios};
+    return {valor:total40,total40,factorProduccion,factorMO,factorMP,factorPublicidad,advertising,consumo:materials.use,proporciones:materials.ratios};
   }
   function quality(state,mold,round=state.PRODUCCION_META?.round||1,consumption=null){
     const plan=consumption&&consumption.productLines?consumption:PRO.calculate({state,catalog:[],round});
@@ -82,7 +82,9 @@
       : {...storedPrices,...input.prices};
     const plan=PRO.calculate({state,drafts:{},catalog:input.catalog||[],round,config:input.financialPolicy}),price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
     const prior=state.__economicHistory?.reputation;
-    rep.valor=config.reputation?.smoothWithPrevious && prior != null ? clamp((clamp(prior)+rep.valor)/2) : clamp(rep.valor);
+    const prior40=prior==null?null:(state.__economicHistory?.reputationScale===40?n(prior):n(prior)*4);
+    rep.valor=config.reputation?.smoothWithPrevious && prior40 != null ? Math.min(40,(prior40+rep.valor)/2) : Math.min(40,rep.valor);
+    rep.valorMercado=rep.valor/4;
     const lots=materialLots(state,plan,round),qualityValue=clamp((rep.factorMP+rep.factorProduccion)/2),goodsQuality=state.__economicHistory?.goodsQuality||{};
     const lines=config.products.map((id,i)=>{const line=plan.productLines[i],produced=n(line.plannedUnits),opening=n(state.__finishedGoods?.[id]),available=opening+produced;
       const oldQuality=Number.isFinite(Number(goodsQuality[id]))?n(goodsQuality[id]):qualityValue,lot=lots.find(item=>item.mold===line.id),newQuality=lot?.excelQuality??qualityValue;
@@ -95,7 +97,7 @@
     const demandFactor=(input.events||[]).reduce((f,e)=>f*Math.max(0,1+Number(e.effect?.revenuePct||0)/100),1);
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valor},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles:0,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
