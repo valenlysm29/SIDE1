@@ -640,18 +640,22 @@ module.exports={runOnce,remoteRpc};
     }
     return {use,ratios};
   }
-  // La distribución por lote solo es deducible si cada familia consumida usa una única calidad.
-  // En mezclas se conserva el total real y se indica que no existe detalle histórico por lote.
+  // SIDE asigna el consumo real en orden básico, mejorado y prémium.
   function materialLots(state,plan,round=1){
-    const consumed=materialUse(state,plan,round).use,lines=(plan.productLines||[]).filter(line=>n(line.plannedUnits)>0);
-    return lines.map(line=>{
-      const materials={},unknown=[];const spec=PRO.constants.MOLD_REQUIREMENTS[line.id]||{};
+    const remaining={...materialUse(state,plan,round).use};
+    return (plan.productLines||[]).filter(line=>n(line.plannedUnits)>0).map(line=>{
+      const materials={},unknown=[],spec=PRO.constants.MOLD_REQUIREMENTS[line.id]||{};
+      let excelQuality=Number(index[mapping.MOLDE[line.id]]?.calidad||0);
       for(const [family,options] of Object.entries(materialCodes)){
-        const used=Object.keys(options).filter(id=>n(consumed[id])>0),amount=Number((n(line.plannedUnits)*n(spec[family])).toPrecision(15));
-        if(used.length===1)materials[family]={[used[0]]:amount};
-        else if(amount>0)unknown.push(family);
+        let need=Number((n(line.plannedUnits)*n(spec[family])).toPrecision(15));
+        const total=need;let score=0;materials[family]={};
+        for(const [id,code] of Object.entries(options)){
+          const taken=Math.min(n(remaining[id]),need);
+          if(taken>0){materials[family][id]=taken;score+=taken*Number(index[code]?.calidad||0);remaining[id]=Math.max(0,Number((n(remaining[id])-taken).toPrecision(15)));need=Math.max(0,Number((need-taken).toPrecision(15)));}
+        }
+        if(need>1e-8)throw new RangeError('Insumos inconsistentes para '+line.id+': '+family);
+        if(total>0)excelQuality+=score/total;
       }
-      const excelQuality=unknown.length ? null : Number(index[mapping.MOLDE[line.id]]?.calidad||0)+Object.entries(materials).reduce((sum,[family,options])=>sum+Number(index[materialCodes[family][Object.keys(options)[0]]]?.calidad||0),0);
       return {mold:line.id,units:n(line.plannedUnits),materials,unknown,excelQuality};
     });
   }

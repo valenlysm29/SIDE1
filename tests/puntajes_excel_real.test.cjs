@@ -12,3 +12,11 @@ test('Motor de cierre: puntajes SUM del Excel con selección real, sin recortes'
  for(const state of [low,basic]){state.CUERO.quantities={cuero_sint:250};state.ACCESORIOS.quantities={acc_eco:1000};state.HILO.quantities={hilo_std:10000};}
  for(const [state,i,index] of [[premium,1,2],[low,2,2],[basic,3,0]])assert.equal(E.prepare({state,catalog:F.catalog,round:1}).lines[index].quality,excel.valores['calidad'+i]);
 },{timeout:100000,skip:!fs.existsSync(original)&&'Falta la fuente Excel para recalcular'});
+test('mezcla: promedio ponderado de calidades Excel y materiales del motor real',()=>{
+ const sheet='Lotes_Produccion',inputs={B2:'SEG-03',C2:9,D2:'INS-01',E2:'INS-05',F2:'INS-08',G2:'INF-10',B3:'SEG-03',C3:12,D3:'INS-03',E3:'INS-05',F3:'INS-08',G3:'INF-10',B4:'',C4:0,D4:'',E4:'',F4:'',G4:''};
+ const p={nombre:'calidad_mezcla',entradas:{[sheet]:inputs},salidas:{calidad:['Motor_Puntajes','B6']}},file=path.join(out,'mezcla.json'),res=path.join(out,'mezcla-resultado.json');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(file,JSON.stringify(p));
+ cp.execFileSync('powershell',['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tests/oracle/recalcular_com.ps1'),'-Plan',file,'-Modelo',original,'-LibroSalida',path.join(out,'mezcla.xlsx'),'-JsonSalida',res],{cwd:root,timeout:90000});
+ const x=JSON.parse(fs.readFileSync(res,'utf8').replace(/^\uFEFF/,''));assert.equal(x.metadatos.estadoCalculo,0);
+ const F=require('./economic_v19_fixture.cjs'),E=require('../js/engine/cierre'),state=F.state(1,{},3);state.CUERO.quantities={cuero_sint:30,cuero_prem:250};const lot=E.prepare({state,catalog:F.catalog,round:1}).materialLots[2];
+ assert.ok(Math.abs(lot.excelQuality-x.valores.calidad)<1e-8,`${lot.excelQuality} != ${x.valores.calidad}`);
+},{timeout:100000,skip:!fs.existsSync(original)&&'Falta la fuente Excel'});

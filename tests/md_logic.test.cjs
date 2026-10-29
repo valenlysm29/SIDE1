@@ -17,7 +17,7 @@ test('document example: matrix, all N3 efficiency, 30 days and sequential produc
 });
 test('corrected actual consumption gives exact reputation and quality factors',()=>{
  const r=E.prepare({id:'A',...context()});near(r.reputation.factorProduccion,78/368*10);near(r.reputation.factorMO,2/7*10);near(r.reputation.factorMP,((168/368)+(1394/2894))/3*10);assert.equal(r.reputation.factorPublicidad,3);near(r.scores.reputation,2.7760170074159287);
- assert.deepEqual(r.reputation.consumo,{cuero_sint:60,cuero_std:95.6,cuero_prem:0,acc_eco:200,acc_prem:168,hilo_std:0,hilo_ref:1500,hilo_prem:1394});near(r.lines[0].quality,(r.reputation.factorProduccion+r.reputation.factorMP)/2);
+ assert.deepEqual(r.reputation.consumo,{cuero_sint:60,cuero_std:95.6,cuero_prem:0,acc_eco:200,acc_prem:168,hilo_std:0,hilo_ref:1500,hilo_prem:1394});near(r.lines[0].quality,1+1+2+1);
 });
 test('advertising is capped, debited once and contributes only its reputation factor',()=>{
  const s=state();s.INV_MARKETING={round:1,optionIds:['mkt_alta']};const r=E.prepare({id:'A',...context(s)});assert.equal(r.reputation.factorPublicidad,10);assert.equal(r.demandFactor,1);assert.equal(REVIEW.breakdown(item('INV_MARKETING'),context(s)).outflow,12000);

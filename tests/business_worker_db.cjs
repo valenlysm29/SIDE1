@@ -5,7 +5,7 @@ const worker=require('../services/business_worker.cjs');
 const root=path.resolve(__dirname,'..'),load=p=>fs.readFileSync(path.join(root,p),'utf8');
 function plan(round){
  const state={};
- const counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1},ACABADOS:{aca_basica:1},PERS_CORTE:{corte_basico:1},PERS_ENSAMBLE:{ens_personal_basico:1},PERS_ACABADO:{aca_personal_basico:1},CUERO:{cuero_sint:70},ACCESORIOS:{acc_eco:100},HILO:{hilo_std:1300}};
+ const counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1},ACABADOS:{aca_basica:1},PERS_CORTE:{corte_basico:1},PERS_ENSAMBLE:{ens_personal_basico:1},PERS_ACABADO:{aca_personal_basico:1},CUERO:process.argv.includes('--mixed')?{cuero_sint:30,cuero_prem:40}:{cuero_sint:70},ACCESORIOS:{acc_eco:100},HILO:{hilo_std:1300}};
  for(const [id,quantities]of Object.entries(counts))state[id]={round,quantities,optionIds:Object.keys(quantities),...(['MESA_CORTE','ENSAMBLE','ACABADOS'].includes(id)?{purchases:{1:quantities}}:{})};
  state.MOLDE={round:1,optionIds:['molde_3']};state.PRODUCCION_META={round,moldTargets:{molde_3:90}};state.CANALES={round,optionIds:['web']};return state;
 }
@@ -30,7 +30,7 @@ function plan(round){
   await db.exec('reset role');
   const rows=(await db.query('select ciclo,ingresos,estado_resultados,balance_caja from reportes_ciclo where empresa_id=$1 order by ciclo',[id])).rows;
   assert.equal(rows.length,2);
-  for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);const lots=row.estado_resultados.cycleReceipt.materialLots;assert.equal(lots.length,1);assert.deepEqual(lots[0].unknown,[]);assert.equal(lots[0].excelQuality,7);assert.equal(row.estado_resultados.cycleReceipt.sales[2].quality,7);}
+  for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);const lots=row.estado_resultados.cycleReceipt.materialLots;assert.equal(lots.length,1);assert.deepEqual(lots[0].unknown,[]);const expectedQuality=process.argv.includes('--mixed')?4+1+1+(30+33*3)/63:7;assert.ok(Math.abs(lots[0].excelQuality-expectedQuality)<1e-8);assert.ok(Math.abs(row.estado_resultados.cycleReceipt.sales[2].quality-expectedQuality)<1e-8);}
   assert.equal(rows[0].estado_resultados.impuestoRenta,0);
   const preTax=rows.reduce((s,row)=>s+row.estado_resultados.utilidadAntesImpuestos,0),expected=Math.round((Math.min(preTax,82500)*.10+Math.max(0,preTax-82500)*.295)*100)/100;
   assert.ok(expected>0);assert.equal(rows[1].estado_resultados.impuestoRenta,expected);
