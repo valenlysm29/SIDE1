@@ -10,7 +10,14 @@
   function cycleRows(report){return Array.isArray(report?.history)?report.history.filter(row=>Number.isInteger(row.round)&&row.round>=1):[];}
   function incomeEntries(er={}){return groups[0][2].map(([label,field])=>[field==='impuestoRenta'&&er.cicloImpuesto?`(-) Impuesto a la renta · ${er.impuestoDiferido?'se calcula en el ciclo '+er.cicloImpuesto:'liquidación final acumulada'}`:field==='impuestoRenta'&&er.regimenTributario==='MYPE'?'(-) Impuesto a la renta MYPE':field==='costoVentas'&&er.criterioCostos==='produccion_ciclo'?'(-) Costos de producción del ciclo':label,er[field]??({ventasTotales:er.ventasNetas??er.ingresos,utilidadNeta:er.utilidad}[field])??0]);}
   function policyWarningsHtml(er={}){const warnings=Array.isArray(er.policyWarnings)?er.policyWarnings:[];const escape=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));return warnings.length?`<aside class="financial-policy-warnings" role="status" aria-label="Advertencias de política contable"><strong>Política contable pendiente</strong>${warnings.map(warning=>`<p>${escape(warning)}</p>`).join('')}</aside>`:'';}
-  function incomeHtml(er={}){return policyWarningsHtml(er)+incomeEntries(er).map(([label,value])=>`<span><span>${label}</span><b>${amount(value)}</b></span>`).join('');}
+  function incomeExplanationHtml(er={},fc={},bg={}){
+    const lines=[];
+    if(fc.cobrosVentas!=null)lines.push(`Ingresos por ventas: ${amount(er.ventasTotales??er.ventasNetas??er.ingresos)}. Cobros por ventas en caja: ${amount(fc.cobrosVentas)}${bg.cuentasPorCobrar!=null?`; cuentas por cobrar: ${amount(bg.cuentasPorCobrar)}`:''}. Los ingresos financieros son otra partida.`);
+    if(er.cicloImpuesto&&er.impuestoDiferido)lines.push(`El impuesto a la renta se calculará sobre el resultado acumulado al cerrar el ciclo ${Number(er.cicloImpuesto)}.`);
+    else if(er.cicloImpuesto&&!er.impuestoDiferido&&er.utilidadAntesImpuestosAcumulada!=null&&Number(er.utilidadAntesImpuestosAcumulada)<=0)lines.push(`Impuesto a la renta: ${amount(er.impuestoRenta)}. El resultado acumulado antes de impuestos es ${amount(er.utilidadAntesImpuestosAcumulada)}; la base imponible es ${amount(er.baseImponibleAcumulada)}.`);
+    return lines.length?`<div class="financial-policy-warnings" role="note">${lines.map(line=>`<p>${line}</p>`).join('')}</div>`:'';
+  }
+  function incomeHtml(er={},fc={},bg={}){return policyWarningsHtml(er)+incomeExplanationHtml(er,fc,bg)+incomeEntries(er).map(([label,value])=>`<span><span>${label}</span><b>${amount(value)}</b></span>`).join('');}
   const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const count=value=>Number(value||0).toLocaleString('es-PE');
   function zeroReasons(receipt={}){

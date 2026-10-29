@@ -1832,7 +1832,7 @@ function renderStudentStatus(){
     const label=$(id)?.parentElement.querySelector('small');if(label)label.textContent=f.provisional?estimated:normal;
   }
   for(const [id,val] of Object.entries({studentERIngresos:er.ingresos,studentERCostos:er.costos,studentEREventos:er.impactoEventos,studentERUtilidad:er.utilidad,studentERDevoluciones:er.devoluciones,studentERActivos:er.resultadoVentaActivos,studentEROtros:er.otros,studentBCInicial:bc.cajaInicial,studentBCPrestamos:bc.prestamos,studentBCEntradas:bc.entradas,studentBCSalidas:bc.salidas,studentBCFinal:bc.cajaFinal,studentFCOperacion:fc.operacion,studentFCFinanciamiento:fc.financiamiento,studentFCEventos:fc.eventos,studentFCInversion:fc.inversion,studentFCNeto:fc.flujoNeto}))set(id,val);
-  if($('studentIncomeStatement')&&window.SIDE_STUDENT_FINANCIAL_VIEW)$('studentIncomeStatement').innerHTML='<strong>'+(f.provisional?'ESTADO DE RESULTADOS ESTIMADO':'ESTADO DE RESULTADOS')+'</strong>'+window.SIDE_STUDENT_FINANCIAL_VIEW.incomeHtml(er);
+  if($('studentIncomeStatement')&&window.SIDE_STUDENT_FINANCIAL_VIEW)$('studentIncomeStatement').innerHTML='<strong>'+(f.provisional?'ESTADO DE RESULTADOS ESTIMADO':'ESTADO DE RESULTADOS')+'</strong>'+window.SIDE_STUDENT_FINANCIAL_VIEW.incomeHtml(er,fc,f.balanceGeneral);
   if($('studentFinancialDetail'))$('studentFinancialDetail').innerHTML=financialDetailsHtml(f);
   const historyMount=$('studentCycleHistory');
   if(historyMount&&window.SIDE_STUDENT_FINANCIAL_VIEW){
