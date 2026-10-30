@@ -23,3 +23,4 @@ tests/.python-deps/
 /tools/model-pipeline/.tmp/
 
 /supabase/.temp/
+/supabase_respaldo/.temp/

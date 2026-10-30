@@ -14,7 +14,12 @@
       previous=adjustment;
     }
     const input={state,ledger,round,capital,catalog,sectionsByRound:snapshot.financial_sections||{},financialPolicy:CONFIG.resolve(config,round),events:state.__cycleBusiness?.[round]?.events||[]};
-    if(receipt)return {round,provisional:false,receipt,financial:FIN.calculate({...input,openingBalance:state.__openingBalance})};
+    // A closed cycle is displayed from its sealed financial snapshot. Replaying
+    // the current model or mutable client ledger can change historical results.
+    if(receipt){
+      const financial=state.__financialSnapshots?.[round];
+      return financial?{round,provisional:false,receipt,financial}:null;
+    }
     const plan=state.__cyclePlans?.[round];
     if(phase!=='decisions'||!plan?.state||typeof plan.state!=='object')return null;
     return {...CYCLE.project({...input,state:CYCLE.restoreState(plan.state,state)}),round};

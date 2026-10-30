@@ -1,0 +1,7 @@
+# Verificación de publicación — 30 de octubre de 2026
+
+La suite `node --test` sobre los archivos `tests/*.test.js`, `*.test.mjs` y `*.test.cjs` produjo 849 pruebas: 832 aprobadas, 17 fallidas y ninguna omitida. Los nombres de las 17 coinciden con la lista de `docs/reporte_validacion_SIDE_6_ciclos.md`: una prueba de decisiones/DOP, seis comparaciones con Excel, una de metas históricas, tres de lógica documental, tres de presentación DOP y tres de reputación/mercado. Sus causas no están todas determinadas; no se han corregido ni ocultado. El registro local está en `tests/output/publicacion_suite_20261030.log`, carpeta ignorada por Git. Este resultado no acredita funcionamiento completo ni constituye un despliegue de Supabase.
+
+Las pruebas focales de producción, compras, inventarios, venta por canal, estados financieros y worker autoritativo dieron 50 aprobadas; las pruebas de seis ciclos, persistencia de recepción, crédito de proveedor, entrega y paridad Node/Edge dieron 10 aprobadas. La conciliación del escenario local y sus límites se documentan en `reports/diagnostico_financiero_20261030.md` y `reports/estados_financieros_seis_ciclos_20261030.md`.
+
+La rama conserva adaptaciones y limitaciones financieras pendientes, incluido el calendario de amortización e intereses. Las pruebas y evidencia no demuestran una partida real íntegra, ni autorizan a afirmar paridad total con el Excel o funcionamiento de un servicio remoto no desplegado.

@@ -103,6 +103,7 @@ for(const [mode,total] of [['credit',6]])test(`${total} ciclos ${mode}: arrastra
   assert.equal((await run(2))[0].success,true);assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:2})).cierre.resultadosPorEmpresa[String(id)],second);
   const rowFor=(r,prior)=>({ciclo:r.receipt.round,producido:r.receipt.produced,vendido:r.receipt.sold,pedidosPendientes:Object.fromEntries(r.receipt.production.materials.map(m=>[m.id,m.pending||0])),recibido:r.receipt.materialReceiptFacts.receivedBySku,consumido:r.receipt.production.temporal.consumedBySku,stockInicial:r.receipt.openingInventory,stockFinal:r.receipt.inventory,valorMP:r.financial.balanceGeneral.inventarioMP,anticipos:r.financial.balanceGeneral.anticiposMateriales,cxpInicial:prior?.financial.balanceGeneral.cuentasPorPagarProveedores||0,cxpNueva:r.receipt.materialReceiptFacts.paymentMode==='credit'?Object.values(r.receipt.materialReceiptFacts.receivedValueBySku).reduce((a,v)=>a+v,0):0,pago:r.financial.flujoCaja.pagosProveedores,cxpFinal:r.financial.balanceGeneral.cuentasPorPagarProveedores,inventarioPT:r.financial.balanceGeneral.inventarioPT,ventas:r.receipt.revenue,cxc:r.financial.balanceGeneral.cuentasPorCobrar,cajaInicial:r.financial.balanceCaja.cajaInicial,cajaFinal:r.financial.balanceCaja.cajaFinal,costoVentas:r.financial.estadoResultados.costoVentas,utilidad:r.financial.estadoResultados.utilidadNeta,impuesto:r.financial.estadoResultados.impuestoRenta});
   const rows=[rowFor(first,null),rowFor(second,first)];
+  const financialEvidence=[first,second].map(r=>({receipt:r.receipt,financial:r.financial}));
   let previous=second;
   for(let round=3;round<=total;round++){
    await db.exec('reset role');const current=(await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot;
@@ -125,10 +126,11 @@ for(const [mode,total] of [['credit',6]])test(`${total} ciclos ${mode}: arrastra
    if(round<total)assert.equal(result.financial.estadoResultados.impuestoRenta,0);
    assert.equal(result.financial.balanceCaja.cajaInicial,previous.financial.balanceCaja.cajaFinal);assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
    if(round===3&&mode==='credit'){assert.equal(result.financial.flujoCaja.pagosProveedores,2392);assert.ok(result.financial.balanceGeneral.cuentasPorPagarProveedores>0);}
-   assert.ok(result.receipt.produced>0,'Debe producir en ciclo '+round);assert.ok(result.receipt.sold>0,'Debe vender en ciclo '+round);rows.push(rowFor(result,previous));previous=result;
+   assert.ok(result.receipt.produced>0,'Debe producir en ciclo '+round);assert.ok(result.receipt.sold>0,'Debe vender en ciclo '+round);rows.push(rowFor(result,previous));financialEvidence.push({receipt:result.receipt,financial:result.financial});previous=result;
   }
   if(total===6){const out=await run(7);assert.equal(out[0].success,false);assert.equal((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:6})).cierre.resultadosPorEmpresa[String(id)].receipt.round,6);}
   console.log('CICLOS_ACTIVOS_'+mode.toUpperCase()+'_'+total+' '+JSON.stringify(rows));
+  if(process.env.SIDE_EVIDENCE_FILE)fs.writeFileSync(process.env.SIDE_EVIDENCE_FILE,JSON.stringify({rows,cycles:financialEvidence},null,2));
   await db.exec('reset role');
  }finally{await db.close();}
 });
