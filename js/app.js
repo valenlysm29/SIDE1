@@ -305,15 +305,24 @@ function studentMaterialPhase(){return String(scopedStudentState()?.runtime?.pha
 function validStudentMaterialBook(){return studentMaterialBook&&studentMaterialBook.gameId===currentStudent.game?.id&&String(studentMaterialBook.companyId)===String(currentStudent.empresaId)&&studentMaterialBook.cycle===currentRound()&&studentMaterialBook.phase===studentMaterialPhase()?studentMaterialBook.book:null;}
 async function refreshStudentMaterialBook(){
   const sequence=++studentMaterialSequence,gameId=currentStudent.game?.id,companyId=currentStudent.empresaId,cycle=currentRound(),phase=studentMaterialPhase();
-  studentMaterialBook=null;studentMaterialStatus='Verificando datos de recepción…';
+  const previous=validStudentMaterialBook();
+  if(!previous){studentMaterialBook=null;studentMaterialStatus='Verificando datos de recepción…';}
   if(!temporalStudentRoom())return true;
-  if(!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();
+  if(!previous)requestMaterialViewRefresh();
   const result=await window.SIDE?.DecisionesService?.obtenerContextoMaterial(gameId,companyId,cycle,true);
   if(sequence!==studentMaterialSequence||gameId!==currentStudent.game?.id||String(companyId)!==String(currentStudent.empresaId)||cycle!==currentRound()||phase!==studentMaterialPhase()||!studentConnected)return false;
-  if(!result?.success){studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';return false;}
+  if(!result?.success){studentMaterialBook=null;studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';requestMaterialViewRefresh();return false;}
   studentMaterialBook={gameId,companyId,cycle,phase,book:result.data};studentMaterialStatus=`Proyección provisional · revisión ${result.data.revision} · corte día ${result.data.cutoffDay}`;
+  if(JSON.stringify(previous)!==JSON.stringify(result.data))requestMaterialViewRefresh();
   return true;
 }
+let materialViewRefreshPending=false;
+function requestMaterialViewRefresh(){
+  if($('decisionMenu')?.classList.contains('hidden'))return;
+  if($('decisionCards')?.contains(document.activeElement)){materialViewRefreshPending=true;return;}
+  materialViewRefreshPending=false;renderDecisionCategory();
+}
+document.addEventListener('focusout',()=>{if(materialViewRefreshPending)setTimeout(()=>{if(materialViewRefreshPending)requestMaterialViewRefresh();},0);});
 function studentNow(){if(currentStudent.empresaId&&!studentClock)return NaN;return studentClock?studentClock.time+performance.now()-studentClock.at:Date.now();}
 function studentIdentity(student=currentStudent){return {codigo:student?.game?.codigo||'',nombreLegal:student?.legalName||'',nombreComercial:student?.company||''}}
 function studentIdentityKey(student=currentStudent){return JSON.stringify(studentIdentity(student))}
@@ -469,7 +478,7 @@ async function refreshStudentGame(options={}){
         const r=await S.EmpresaService.obtenerEstado(identity);
         if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
         if(r?.code==='EMPRESA_EXPULSADA'){showStudentExpulsion();return false;}
-        if(!r?.success||!r.data?.partida||!r.data?.empresa){studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';renderStudentPodium(null);studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};if(!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();return false;}
+        if(!r?.success||!r.data?.partida||!r.data?.empresa){studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';renderStudentPodium(null);studentStateFailure=r||{technical:true,error:JOIN_SERVER_MESSAGE};requestMaterialViewRefresh();return false;}
         studentStateFailure=null;studentConnectionConfirmedAt=performance.now();
         const data=r.data,partida=data.partida,empresa=data.empresa,config=partida.configuracion;
         if(data.expulsada_at||data.participante?.expulsada_at||empresa.expulsada_at||empresa.estado==='eliminada'){showStudentExpulsion();return false;}
@@ -490,10 +499,9 @@ async function refreshStudentGame(options={}){
         if(!forceHydrate&&studentSyncPending())studentProgressHydrated=true;
         else if(forceHydrate||!studentProgressHydrated||serverRevision!==previousRevision){studentProgressHydrated=false;if(!hydrateRemoteProgress(data))return false;}
         if(config?.lifecycleVersion===2)localStorage.setItem('SIDE_INDIVIDUAL_EVENTS_'+storageKey(),JSON.stringify(data.individualEvents||{}));
-        if(config?.materialRulesVersion==='receipts-v1'&&!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();
         try{sessionStorage.setItem('SIDE_STUDENT_SESSION',JSON.stringify(currentStudent));}catch{}
         return true;
-      }catch(error){studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';studentStateFailure={technical:true,error:error?.message||JOIN_SERVER_MESSAGE};if(!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();console.warn('SIDE: estado remoto pendiente',error);return false;}
+      }catch(error){studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Datos de recepción no verificados / proyección no disponible.';studentStateFailure={technical:true,error:error?.message||JOIN_SERVER_MESSAGE};requestMaterialViewRefresh();console.warn('SIDE: estado remoto pendiente',error);return false;}
     })();
     try{remoteValid=await remoteStateTask;}finally{remoteStateBusy=false;remoteStateTask=null;}
   }
@@ -1072,11 +1080,6 @@ function refreshProductionDop(){
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
 }
 
-function productionChecklistHtml(plan){
-  const prices=window.SIDE_ECONOMIC_CONFIG?.segments||{};
-  const checks=[['Molde comprado',!!plan.availableMoldIds?.length],['Plan de producción mayor que cero',Number(plan.target)>0],['Materiales suficientes para el plan',Number(plan.target)>0&&(plan.materials||[]).every(m=>Number(m.available)>=Number(m.neededForTarget))],['Personal y capacidad en las tres áreas',(plan.processes||[]).length===3&&(plan.processes||[]).every(p=>Number(p.staff)>0&&Number(p.cycleCapacity)>0)],['Precio definido internamente',Object.values(prices).length>0&&Object.values(prices).every(p=>Number.isFinite(Number(p.defaultPrice))&&Number(p.defaultPrice)>0)]];
-  return `<aside class="production-readiness" aria-label="Listo para producir"><strong>Listo para producir</strong><ul>${checks.map(([label,ok])=>`<li><span aria-hidden="true">${ok?'✓':'○'}</span> ${label}: ${ok?'listo':'revisar'}</li>`).join('')}</ul>${Number(plan.producibleUnits)===0?'<p role="status">Con estas decisiones la producción posible es cero. Revisa los puntos pendientes; puedes enviar igualmente.</p>':''}</aside>`;
-}
 function renderDecisionCategory(){
   disposeProductionDop();
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
@@ -1093,8 +1096,7 @@ function renderDecisionCategory(){
   if(cat.cat==='D')lead+=`<div class="required-alert"><strong>Canal de ventas obligatorio</strong><span>Debes marcar al menos un canal para poder enviar tus decisiones.</span></div>`;
   const totalCycles=Number(teacherConfig().cycles);
   if(totalCycles>0&&currentRound()>=Math.max(1,totalCycles-1)&&currentRound()<=totalCycles)lead+=`<aside class="event-clue" role="note"><strong>Impuesto a la renta</strong><small>En el ciclo ${totalCycles} se descontará el impuesto a la renta sobre tu utilidad acumulada.</small></aside>`;
-  if(cat.cat==='C'&&window.SIDE_PRODUCTION_MODEL)lead+=productionChecklistHtml(productionPlan());
-  if(['B','C','D','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
+  if(['B','D','F'].includes(cat.cat)&&window.SIDE_REVIEW_MODEL){
     const warnings=window.SIDE_REVIEW_MODEL.warnings(decisionModelContext()).filter(w=>w.cat===cat.cat);
     if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;
   }
@@ -1625,7 +1627,7 @@ function renderStudentConnection(){
 function showStudentSyncStatus(status,error){
   const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
   if(status==='pending'&&window.SIDE?.StudentSync?.pendingMessage)labels.pending=window.SIDE.StudentSync.pendingMessage(error);
-  if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(temporalStudentRoom())refreshStudentMaterialBook().then(()=>{if(!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();});else if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
+  if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(temporalStudentRoom())refreshStudentMaterialBook();else if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
   if(!$('decisionMenu')?.classList.contains('hidden'))updateHud();
   if(error)console.warn('SIDE: sincronización pendiente',error);
@@ -1962,7 +1964,7 @@ if(invitationCode){
 $('gameCode')?.addEventListener('input',()=>{$('gameCode').value=String($('gameCode').value).replace(/\s+/g,'').toUpperCase();showAdmissionCodeError();message('studentMessage','');});
 $('gameCode')?.addEventListener('blur',()=>{$('gameCode').value=admissionCode($('gameCode').value);});
 window.addEventListener('online',()=>{renderStudentConnection();if(studentConnected)pollStudentGame();});
-window.addEventListener('offline',()=>{studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Sin conexión. Datos de recepción no verificados / proyección no disponible.';if(studentConnected&&temporalStudentRoom()&&!$('decisionMenu')?.classList.contains('hidden'))renderDecisionCategory();});
+window.addEventListener('offline',()=>{studentMaterialSequence++;studentMaterialBook=null;studentMaterialStatus='Sin conexión. Datos de recepción no verificados / proyección no disponible.';if(studentConnected&&temporalStudentRoom())requestMaterialViewRefresh();});
 window.addEventListener('offline',()=>{
   renderStudentConnection();
   // Losing connectivity does not turn an already acknowledged save into an
