@@ -11,7 +11,7 @@ function read(row){
   const breakdownOk=!inconsistent&&parts.every(v=>v!==null)&&Math.abs(revenue+finIncome-salesCost-operating-finExpense-tax-profit)<=0.03;
   const planned=num(p.target),produced=num(r.produced);
   return {planned,produced,sold:num(r.sold),revenue,costs:num(e.costos),profit,cash:num(b.cajaFinal),inconsistent,
-    margin:!inconsistent&&revenue>0&&profit!==null?profit/revenue*100:null,
+    margin:!inconsistent&&revenue!==null&&revenue!==0&&profit!==null?profit/revenue*100:null,
     fulfillment:planned>0&&produced!==null?produced/planned*100:null,
     breakdown:breakdownOk?{revenue,salesCost,operating,finExpense,finIncome,tax,profit}:null};
 }
