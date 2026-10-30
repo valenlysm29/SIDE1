@@ -2,13 +2,13 @@
 
 El laboratorio ayuda al docente a explicar resultados oficiales de un ciclo cerrado, formular una decisión alternativa y comparar dos empresas de la misma partida. En el panel docente, abra **Laboratorio Estratégico**, elija una partida, empresa y ciclo y pulse **Actualizar datos**. Solo aparecen las partidas que permite consultar la sesión autenticada. Si el ciclo aún no está cerrado, se informa que el cierre está pendiente.
 
-En **Ver resultados**, producción, ventas y utilidad neta se muestran en tres indicadores. El selector cambia el gráfico entre unidades de producción, ventas y costos, y utilidad y caja. Las barras muestran sus valores y unidades; en valores negativos la longitud representa el valor absoluto y la etiqueta conserva el signo. Datos ausentes se indican como tales. Si se detectan inconsistencias financieras, los indicadores afectados se ocultan y aparece un aviso. La explicación no supone que una producción inferior equivalga a ventas perdidas ni atribuye causas no comprobadas.
+En **Ver resultados**, producción, ventas y utilidad neta se muestran en tres indicadores. El selector cambia el gráfico entre producción, finanzas y evolución. Finanzas compara ventas, costos y utilidad neta en soles; evolución consulta los ciclos cerrados disponibles y permite elegir ventas o utilidad. Las barras muestran sus valores y unidades; los importes negativos se dibujan a la izquierda del eje cero. Datos ausentes se indican como tales. Si se detectan inconsistencias financieras, los indicadores afectados se ocultan y aparece un aviso. La explicación no supone que una producción inferior equivalga a ventas perdidas ni atribuye causas no comprobadas.
 
 En **Probar otra decisión**, seleccione la decisión original, comprar más materiales o contratar más trabajadores. El gráfico muestra la producción real. Las dos alternativas adicionales son preguntas cualitativas: la estimación cuantitativa no está disponible porque no se ha validado una reproducción histórica aislada del motor y sus entradas. No se escriben decisiones, inventarios ni cierres. No se proyectan ventas ni ganancias.
 
 En **Comparar empresas**, seleccione una segunda empresa de la misma partida y un indicador. Se muestra el mismo ciclo cerrado para ambas. El margen neto es utilidad neta dividida entre ventas, expresada como porcentaje; si las ventas son cero o faltan datos no se calcula. Una diferencia entre empresas no demuestra causalidad. La participación de mercado no se calcula en esta versión.
 
-**Mostrar al estudiante** amplía el gráfico y oculta navegación y controles administrativos. Permite alternar resultados y decisiones; el texto ofrece preguntas breves para la clase. Salga del modo para cambiar partida, empresa o ciclo. No crea enlaces públicos.
+**Mostrar al estudiante** amplía el gráfico y oculta navegación y controles administrativos. Primero elija la vista, el gráfico y la alternativa que desea explicar. El modo muestra la empresa, el ciclo, el gráfico, una explicación y una pregunta; use «Volver al panel docente» para cambiar las opciones. No crea enlaces públicos.
 
 ## Procedencia y límites
 

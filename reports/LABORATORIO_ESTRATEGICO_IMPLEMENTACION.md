@@ -18,7 +18,7 @@ La inspección remota fue administrativa y de solo lectura; no se contó con una
 
 - RPC existente entrega el ciclo completo de la partida autorizada; no satisface el filtrado por empresa en servidor.
 - No se ha validado ejecución cuantitativa de escenarios ni comparativa de participación de mercado.
-- El modo estudiante oculta controles en pantalla; no es una frontera de seguridad frente a quien controle el navegador. No presenta la comparación de otras empresas en modo proyección.
+- El modo estudiante oculta controles en pantalla; no es una frontera de seguridad frente a quien controle el navegador. El rediseño posterior permite proyectar la comparación seleccionada por el docente.
 - Lista de partidas limitada a 100 y empresas a 200; paginación pendiente.
 - La verificación financiera no detecta todas las inconsistencias posibles.
 - No se ha probado el rechazo de partidas ajenas mediante una sesión real, aunque se inspeccionó el predicado del RPC y las políticas.
@@ -28,3 +28,11 @@ La inspección remota fue administrativa y de solo lectura; no se contó con una
 Chromium de escritorio (1365 × 900) y móvil (390 × 844): navegación, gráfico, selección de alternativa, comparación y modo explicación aprobados con datos sintéticos exclusivamente locales; se bloquearon peticiones externas. Capturas en tests/output/laboratorio_escritorio.png, laboratorio_movil.png y laboratorio_explicacion_*.png. No demuestran acceso autenticado real ni ausencia de parpadeos o carreras en todos los casos.
 
 En otras 14 pruebas focales hubo 11 aprobadas y 3 fallos: rendering an empty plan preserves inputs and shows zero output, percent and mold detail; material requirement labels are escaped and coverage is supplied by the model; persisted adapter plans render real comparison stock without mutating snapshots, todas de production_dop.test.js. Los archivos de producción y esas pruebas no se modificaron en esta rama. La auditoría histórica incluye fallos visuales de producción, pero no se ha demostrado aquí la identidad exacta con los 17 casos: requieren comparación individual con una ejecución limpia de la base.
+
+## Rediseño del dashboard
+
+El rediseño conserva la fuente oficial y las tres vistas. Se añadieron indicadores contrastados, gráficos con un eje cero para pérdidas, finanzas con utilidad neta, evolución de ventas o utilidad mediante hasta seis lecturas del RPC existente y una presentación simplificada. No se recalculan alternativas ni se guardan datos. Las respuestas antiguas se descartan con un contador; si la actualización no cambia los datos, no se reconstruye el contenido. La evolución muestra únicamente cierres disponibles y omite cifras financieras inconsistentes.
+
+El mensaje «No se pudo crear la sala: TypeError: Failed to fetch» observado en la captura se reprodujo en el navegador de prueba que bloqueaba todas las conexiones externas: la inicialización del panel intentaba recuperar la sala existente y reutilizaba erróneamente el mensaje de creación. La ruta de recuperación ahora presenta un mensaje específico dentro de configuración sin lanzar un aviso que tape el laboratorio. No se ha determinado que esa sea la causa de cada error de red que pueda experimentar un docente real. El laboratorio no invoca la creación de sala.
+
+Validación del rediseño: Chromium en 1365, 768 y 390 píxeles, con cierres simulados identificados, sin peticiones externas: navegación, producción 120/80/70, utilidad negativa con cero entre extremos, evolución, comparación, alternativa no disponible, presentación, ciclo no cerrado, error de conexión y ausencia de desbordamiento horizontal. 38 pruebas focales Node aprobadas, ninguna fallida. La conexión administrativa al proyecto se verificó con una consulta de metadatos de solo lectura; no se dispone de sesión docente autenticada para demostrar acceso de extremo a extremo ni coincidencia de una selección real con sus datos. Se comprobó también que una respuesta tardía de otro ciclo no sustituye el ciclo seleccionado. La prueba local no demuestra ausencia completa de parpadeo, accesibilidad con lector de pantalla ni todas las condiciones de carrera.

@@ -36,14 +36,14 @@ function newCreationRequest(){
   const hex=Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');
   return [hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join('-');
 }
-function creationFeedback(message,tone='error',conflict=null){
+function creationFeedback(message,tone='error',conflict=null,notify=true){
   previousRoom=conflict;
   const box=$('creationFeedback');if(!box)return;
   delete box.dataset.source;
   box.classList.remove('hidden');box.dataset.tone=tone;$('creationMessage').textContent=message;
   $('retryCreate').classList.toggle('hidden',tone!=='error'||!!conflict);
   $('cancelGame')?.classList.toggle('hidden',!canCancelRoom());
-  toast(message,tone);
+  if(notify)toast(message,tone);
 }
 function canCancelRoom(room=previousRoom||sharedRoom){
   const owner=localStorage.getItem('SIDE_PROFESOR_ID');
@@ -118,7 +118,7 @@ async function recoverServerRoom(){
   const generation=roomGeneration;
   const result=await loadUsableRoom();
   if(generation!==roomGeneration||state.cancelling)return false;
-  if(!result.success){creationError(result);return false;}
+  if(!result.success){console.error('SIDE: recuperación de sala',result);creationFeedback('No se pudo recuperar la sala. Comprueba la conexión e inténtalo de nuevo.','error',null,false);return false;}
   if(!result.data){clearRoomLink();refreshSetupSummary();return true;}
   state.partidaId=result.data.id;localStorage.setItem('SIDE_PARTIDA_ID',state.partidaId);applyTeacherState(result.data);loadConfig();paintTeacherClock();
   watchTeacherGame();startLiveCompanies();await loadReports();refreshSetupSummary();
@@ -1434,7 +1434,7 @@ $('backHome')?.addEventListener('click',()=>window.location.href='index.html');
   if(r){state.round=Number(r.round||state.round);state.seconds=Number(r.remaining??roundSeconds());state.roundClosed=['finished','simulation-finished'].includes(r.status);}
   let game;try{game=JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{}
   if(window.SIDE?.SupabaseClient?.isReady()&&window.SIDE?.PartidaService?.obtenerActiva){
-    try{await recoverServerRoom();}catch(error){creationError({error:error.message});}
+    try{await recoverServerRoom();}catch(error){console.error('SIDE: recuperación de sala',error);creationFeedback('No se pudo recuperar la sala. Comprueba la conexión e inténtalo de nuevo.','error',null,false);}
   }
   else if(state.lifecycleVersion===2&&(game?.active||state.partidaId)){watchTeacherGame();await refreshTeacherGame();}
   else if(cycleMode()==='automatic'&&game?.active){scheduleAutomaticStart();}
