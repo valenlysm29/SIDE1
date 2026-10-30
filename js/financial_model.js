@@ -69,7 +69,7 @@
       const receipt=state.__cycleSettlements?.[p.r],decisions=receipt?.decisions||state.__cyclePlans?.[p.r]?.state||{},inventory=receipt?.inventory||materialQuantities;
       if(unallocatedSeed&&receipt?.openingInventory){
         const opening=receipt.openingInventory,options=[...items.values()].filter(i=>i.material).flatMap(i=>i.options||[]),weight=options.reduce((s,o)=>s+n(opening[o.id])*n(o.cost),0);
-        if(weight){for(const o of options){materialValues[o.id]=unallocatedSeed*n(opening[o.id])*n(o.cost)/weight;materialQuantities[o.id]=n(opening[o.id]);}unallocatedSeed=0;}
+        if(weight){for(const o of options){materialValues[o.id]=n(materialValues[o.id])+unallocatedSeed*n(opening[o.id])*n(o.cost)/weight;materialQuantities[o.id]=n(opening[o.id]);}unallocatedSeed=0;}
       }
       const purchases=Object.entries(sectionsByRound[p.r]||{}).filter(([kind,s])=>Object.hasOwn(ledger,`${p.r}:${kind}`)&&Math.abs(n(s.recordedNet??s.net)-n(ledger[`${p.r}:${kind}`]))<.02).flatMap(([,s])=>s.items||[]).filter(e=>items.get(e.id)?.material);
       let consumedMaterial=0,closingMaterial=0;const consumedByFamily={},materialUnitCosts={};
