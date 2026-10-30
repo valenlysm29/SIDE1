@@ -9,3 +9,5 @@
 
 .lab-secondary .lab-line-chart text{font-size:17px}.lab-secondary .lab-line-chart .lab-point-value{font-size:14px}.lab-secondary .lab-line-chart{min-height:175px}
 .lab #lab-demo[hidden]{display:none!important}
+
+.lab-controls label:has(#lab-game){min-width:0}.lab-controls #lab-game{display:block;max-width:100%;min-width:0;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
