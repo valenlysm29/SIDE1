@@ -8,3 +8,4 @@
 .lab-presenting #lab-demo{display:none}.lab-legend{display:flex;flex-wrap:wrap;gap:1rem;font-size:.75rem;font-weight:700}.lab .lab-context strong{color:#ffda76}@media(max-width:767px){.lab-metrics{grid-template-columns:1fr}.lab-presenting .lab-metrics{grid-template-columns:1fr 1fr 1fr}}
 
 .lab-secondary .lab-line-chart text{font-size:17px}.lab-secondary .lab-line-chart .lab-point-value{font-size:14px}.lab-secondary .lab-line-chart{min-height:175px}
+.lab #lab-demo[hidden]{display:none!important}
