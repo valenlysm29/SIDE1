@@ -1,0 +1,15 @@
+# SIDE | Laboratorio Estratégico
+
+El laboratorio ayuda al docente a explicar resultados oficiales de un ciclo cerrado, formular una decisión alternativa y comparar dos empresas de la misma partida. En el panel docente, abra **Laboratorio Estratégico**, elija una partida, empresa y ciclo y pulse **Actualizar datos**. Solo aparecen las partidas que permite consultar la sesión autenticada. Si el ciclo aún no está cerrado, se informa que el cierre está pendiente.
+
+En **Ver resultados**, producción, ventas y utilidad neta se muestran en tres indicadores. El selector cambia el gráfico entre unidades de producción, ventas y costos, y utilidad y caja. Las barras muestran sus valores y unidades; en valores negativos la longitud representa el valor absoluto y la etiqueta conserva el signo. Datos ausentes se indican como tales. Si se detectan inconsistencias financieras, los indicadores afectados se ocultan y aparece un aviso. La explicación no supone que una producción inferior equivalga a ventas perdidas ni atribuye causas no comprobadas.
+
+En **Probar otra decisión**, seleccione la decisión original, comprar más materiales o contratar más trabajadores. El gráfico muestra la producción real. Las dos alternativas adicionales son preguntas cualitativas: la estimación cuantitativa no está disponible porque no se ha validado una reproducción histórica aislada del motor y sus entradas. No se escriben decisiones, inventarios ni cierres. No se proyectan ventas ni ganancias.
+
+En **Comparar empresas**, seleccione una segunda empresa de la misma partida y un indicador. Se muestra el mismo ciclo cerrado para ambas. El margen neto es utilidad neta dividida entre ventas, expresada como porcentaje; si las ventas son cero o faltan datos no se calcula. Una diferencia entre empresas no demuestra causalidad. La participación de mercado no se calcula en esta versión.
+
+**Mostrar al estudiante** amplía el gráfico y oculta navegación y controles administrativos. Permite alternar resultados y decisiones; el texto ofrece preguntas breves para la clase. Salga del modo para cambiar partida, empresa o ciclo. No crea enlaces públicos.
+
+## Procedencia y límites
+
+La sesión de Supabase Auth consulta `partidas` y `participantes` con las políticas RLS existentes. `side_consultar_cierre_negocio` comprueba en PostgreSQL la propiedad de la partida y devuelve el cierre de `side_business_closures` para un ciclo. Las cifras provienen de `receipt` y `financial` de ese cierre, nunca de una reconstrucción con decisiones editables. Los cierres anteriores que no existan en esta fuente no se sustituyen por datos provisionales. La función existente devuelve todas las empresas del ciclo autorizado al navegador; una futura RPC de lectura filtrada por empresa reduciría los datos transferidos. No se instala ninguna migración. La revisión de consistencia comprueba ingresos frente al recibo y utilidad frente a resultado antes de impuestos menos impuesto; no constituye una auditoría contable completa. Los límites materiales y de capacidad requieren validación adicional antes de atribuirles una causa.
