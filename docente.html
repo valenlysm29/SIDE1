@@ -7,7 +7,7 @@
   <title>SIDE — Panel Docente</title>
   <link rel="stylesheet" href="css/design-system.css?v=20261001">
   <link rel="stylesheet" href="css/docente.css?v=20261028-statement">
-  <link rel="stylesheet" href="css/laboratorio.css?v=20261030-3">
+  <link rel="stylesheet" href="css/laboratorio.css?v=20261030-4">
   <link rel="stylesheet" href="css/responsive.css?v=20261009-mobile">
   <link rel="stylesheet" href="css/faculty-theme.css?v=20261022-cancelar-rojo">
 </head>
@@ -154,8 +154,8 @@
       <article class="card podium-publish"><div class="card-title"><h3>Podio final del profesor</h3><span>Solo notas docentes</span></div><p class="hint">Guarda las notas en Empresas, también después de terminar todos los ciclos. Al finalizar se evalúan todas las empresas participantes, aunque estén desconectadas o inactivas. La vista previa se actualiza con cada nota; pulsa PUBLICAR PODIO para elegir Ahora o Programar (de 1 minuto a 72 horas). La programación se cumple aunque cierres el panel. Las 24 horas empiezan al publicarse. En empates se ordena por nombre.</p><label>Justificación<textarea id="winnerReason" rows="3" placeholder="Criterios utilizados por el docente..."></textarea></label><button id="publishPodium" class="primary">PUBLICAR PODIO</button><div id="podiumSchedule" class="podium-schedule hidden"><span id="podiumScheduledAt"></span><strong id="podiumCountdown"></strong><div class="podium-actions"><button id="podiumPublishNow" class="primary" type="button">Publicar ahora</button><button id="podiumReschedule" class="secondary" type="button">Reprogramar</button><button id="podiumCancelSchedule" class="secondary" type="button">Cancelar programación</button></div></div><p id="publishStatus" class="publish-status" role="status"></p></article>
     </section>
     <section id="tab-laboratorio" class="tab-panel teacher-workspace" aria-labelledby="lab-heading">
-      <article class="card lab"><div class="section-head"><div><h2 id="lab-heading">Laboratorio Estratégico</h2><p>Explora decisiones y resultados de ciclos cerrados.</p></div><button type="button" id="lab-present" class="secondary" aria-pressed="false">Mostrar al estudiante</button></div>
-      <div class="lab-controls"><label>Partida<select id="lab-game"></select></label><label>Empresa<select id="lab-company"></select></label><label>Ciclo<select id="lab-cycle"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label><button type="button" id="lab-refresh" class="secondary">Actualizar datos</button></div>
+      <article class="card lab"><div class="section-head"><div><h2 id="lab-heading">Laboratorio Estratégico</h2><p>Explora decisiones y resultados de ciclos cerrados.</p></div></div>
+      <div class="lab-controls"><label>Partida<select id="lab-game"></select></label><label>Empresa<select id="lab-company"></select></label><label>Ciclo (verificar cierre)<select id="lab-cycle"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label><button type="button" id="lab-present" class="secondary" aria-pressed="false">Mostrar al estudiante</button><button type="button" id="lab-refresh" class="secondary">Actualizar datos</button><button type="button" id="lab-demo" class="secondary" hidden>Activar demostración local</button></div>
       <div class="lab-tabs" role="group" aria-label="Vistas del laboratorio"><button type="button" data-lab-tab="results" aria-pressed="true">Ver resultados</button><button type="button" data-lab-tab="scenario" aria-pressed="false">Probar otra decisión</button><button type="button" data-lab-tab="compare" aria-pressed="false">Comparar empresas</button></div>
       <p id="lab-status" role="status" aria-live="polite"></p><div id="lab-content"></div></article>
     </section>
@@ -247,9 +247,10 @@
 <script src="js/cycle_model.js?v=20261028-materiales"></script>
 <script src="services/live_results.js?v=20261027-live-sales"></script>
 <script src="js/student_financial_view.js?v=20261028-balance"></script>
-<script src="services/laboratorio_service.js"></script>
-<script src="js/laboratorio_model.js?v=20261030-3"></script>
-<script src="js/laboratorio.js?v=20261030-3"></script>
+<script src="services/laboratorio_service.js?v=20261030-4"></script>
+<script src="services/laboratorio_demo.js?v=1"></script>
+<script src="js/laboratorio_model.js?v=20261030-4"></script>
+<script src="js/laboratorio.js?v=20261030-4"></script>
 <script src="js/docente.js?v=20261030-lab"></script>
 </body>
 </html>

@@ -16,4 +16,5 @@ function read(row){
     breakdown:breakdownOk?{revenue,salesCost,operating,finExpense,finIncome,tax,profit}:null};
 }
 function diagnose(x){if(!x)return 'No hay datos de cierre para esta empresa.';if(x.planned!==null&&x.produced!==null){if(x.planned>0){const pct=(100*x.produced/x.planned).toLocaleString('es-PE',{maximumFractionDigits:1});const gap=x.planned-x.produced;return `Cumplió el ${pct} % de su meta. ${gap>0?`Produjo ${gap} unidades menos de lo planificado.`:gap<0?`Produjo ${-gap} unidades más de lo planificado.`:'Alcanzó su meta de producción.'}`;}return `La meta fue ${x.planned} y la producción fue ${x.produced} unidades.`;}return 'Faltan datos para comparar la producción con la meta.';}
-return {read,diagnose};});
+function delta(now,before,key){if(!now||!before||((key==='revenue'||key==='profit'||key==='margin')&&(now.inconsistent||before.inconsistent))||now[key]==null||before[key]==null)return null;return now[key]-before[key];}
+return {read,diagnose,delta};});
