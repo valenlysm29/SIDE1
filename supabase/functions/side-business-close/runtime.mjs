@@ -51,6 +51,11 @@ module.exports={runOnce,remoteRpc};
     state=clone(state);ledger=economicLedger(ledger,state);
     const previous=state.__cycleSettlements?.[round];
     if(previous)return {state,ledger,receipt:previous,reused:true,financialSections:clone(sectionsByRound),financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
+    if(state.__materialOrders&&(!financialPolicy.verifiedMaterialContext||!['cash','credit'].includes(financialPolicy.materialPaymentMode)))throw new Error('El cierre de pedidos temporales aún no admite valoración ni persistencia autoritativa.');
+    if(state.__materialOrders&&Object.values(state.__inventarioMP||{}).some(q=>n(q)>0)){
+      const previousFinancial=state.__financialSnapshots?.[Number(round)-1],quantities=previousFinancial?.inventoryQuantities,values=previousFinancial?.inventoryValues?.materials;
+      if(!quantities||!values||Object.entries(state.__inventarioMP||{}).some(([sku,q])=>n(q)>0&&(!Object.hasOwn(values,sku)||!Number.isFinite(Number(values[sku]))||Number(values[sku])<0||Math.abs(n(quantities[sku])-n(q))>1e-7)))throw new Error('Inventario inicial temporal sin valoración verificable.');
+    }
     // Only a settled receipt makes a financial snapshot authoritative. An old
     // preview for this open round must not mask the sales we are about to post.
     if(state.__financialSnapshots)delete state.__financialSnapshots[round];
@@ -82,10 +87,29 @@ module.exports={runOnce,remoteRpc};
     const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
+    const temporalFacts=state.__materialOrders?{receivedBySku:{},receivedValueBySku:{},ordersBySku:{},receipts:[],paymentMode:financialPolicy.materialPaymentMode,supplierCreditTermCycles:Number(financialPolicy.supplierCreditTermCycles??1)}:null;
+    if(temporalFacts){
+      const events=Object.values(state.__materialOrders.events||{}),allOrders=events.filter(e=>e.type==='order'),startDay=(Number(round)-1)*30,orders=allOrders.filter(e=>Number(e.orderedDay)===startDay),items=catalog.flatMap(c=>c.items||[]),seen=new Set();
+      const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
+      for(const order of orders){
+        const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
+        const expected=n(state[item?.id]?.quantities?.[order.sku]),price=businessRules.materialUnitPrice(option,expected,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}});
+        if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
+        seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
+      }
+      for(const item of items.filter(i=>i.material))for(const [sku,q] of Object.entries(state[item.id]?.quantities||{}))if(Number(state[item.id]?.round)===Number(round)&&n(q)>0&&!seen.has(sku))throw new Error('Falta una orden verificada para la compra.');
+      for(const event of events.filter(e=>e.type==='receipt'&&n(e.day)>=startDay&&n(e.day)<startDay+30)){
+        const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
+        temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
+        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+money(n(event.quantity)*n(order.unitCost)));
+        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value:money(n(event.quantity)*n(order.unitCost)),receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
+      }
+    }
+    if(temporalFacts?.paymentMode==='credit')ledger[`${round}:PROVEEDOR_CREDITO`]=money(Object.values(temporalFacts.ordersBySku).reduce((sum,o)=>sum+n(o.quantity)*n(o.unitCost),0));
     for(const material of plan.materials||[]){
       const definition=catalog.flatMap(c=>c.items||[]).find(item=>item.id===material.id),entries=definition?.options||[];
       let consumption=n(material.consumption);
-      for(const option of entries){const available=n(state.__inventarioMP?.[option.id])+n(Number(state[material.id]?.round)===Number(round)?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=Number(Math.max(0,available-used).toPrecision(15));consumption=Number(Math.max(0,consumption-used).toPrecision(15));}
+      for(const option of entries){if(plan.temporal){inventory[option.id]=n(plan.temporal.stockBySku?.[option.id]);continue;}const available=n(state.__inventarioMP?.[option.id])+n(Number(state[material.id]?.round)===Number(round)?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=Number(Math.max(0,available-used).toPrecision(15));consumption=Number(Math.max(0,consumption-used).toPrecision(15));}
     }
     state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__storeInventory=economic.storeInventory;state.__accountsReceivable=economic.receivable;
     const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
@@ -100,9 +124,10 @@ module.exports={runOnce,remoteRpc};
       const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
       if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
     }
-    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
+    if(temporalFacts)ledger[`${round}:PROVEEDOR_PAGO`]=-n(financial.flujoCaja?.pagosProveedores)||0;
     state.__goodsLots=clone(financial.goodsLots||[]);receipt.lotMovements=clone(financial.lotMovements||[]);
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
     return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};
@@ -178,10 +203,11 @@ module.exports={runOnce,remoteRpc};
 "js/production_model.js":(module,exports,load)=>{
 /* SIDE: autonomous production rules and physical inventory. */
 (function(root,factory){
-  const api=factory(typeof module==='object'&&module.exports?load("js/business_rules.js"):root.SIDE_BUSINESS_RULES);
+  const node=typeof module==='object'&&module.exports;
+  const api=factory(node?load("js/business_rules.js"):root.SIDE_BUSINESS_RULES,node?load("js/material_orders.js"):root.SIDE_MATERIAL_ORDERS,node?load("js/temporal_production.js"):root.SIDE_TEMPORAL_PRODUCTION);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_PRODUCTION_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(BUS){
+})(typeof globalThis!=='undefined'?globalThis:this,function(BUS,ORDERS,TEMP){
   'use strict';
 
   const WORKING_DAYS=30;
@@ -272,22 +298,21 @@ module.exports={runOnce,remoteRpc};
     return targets;
   }
   function pairedDailyCapacity(staffCounts,staffRates,machineCounts,machineMultipliers,explicit){
-    const assignments={},preferred=Object.entries(machineMultipliers).filter(([id])=>whole(machineCounts[id])>0).sort((a,b)=>b[1]-a[1])[0];
+    const assignments={},available=Object.fromEntries(Object.keys(machineMultipliers).map(id=>[id,whole(machineCounts[id])]));
+    const remaining=Object.fromEntries(Object.keys(staffRates).map(id=>[id,whole(staffCounts[id])]));
     let capacity=0,pairs=0;
-    for(const [id,rate] of Object.entries(staffRates)){
-      let remaining=whole(staffCounts[id]);assignments[id]={};
-      // Recover old saved matrices against the machines that are actually owned.
-      // Any unassigned staff use the most productive available machine type.
-      for(const [machine,multiplier] of Object.entries(machineMultipliers)){
-        const desired=explicit?whole(explicit[id]?.[machine]):preferred?.[0]===machine?remaining:0;
-        const q=Math.min(remaining,desired),assigned=whole(machineCounts[machine])>0?q:0;
-        assignments[id][machine]=assigned;capacity+=assigned*rate*multiplier;pairs+=assigned;remaining-=assigned;
-      }
-      if(remaining&&preferred){
-        const [machine,multiplier]=preferred;
-        assignments[id][machine]+=remaining;capacity+=remaining*rate*multiplier;pairs+=remaining;
-      }
+    for(const id of Object.keys(staffRates))assignments[id]=Object.fromEntries(Object.keys(machineMultipliers).map(machine=>[machine,0]));
+    function assign(id,machine,wanted){
+      const q=Math.min(remaining[id],available[machine],whole(wanted));
+      assignments[id][machine]+=q;remaining[id]-=q;available[machine]-=q;
+      capacity+=q*staffRates[id]*machineMultipliers[machine];pairs+=q;
     }
+    // Honor saved assignments first, subject to both staff and machine availability.
+    if(explicit)for(const id of Object.keys(staffRates))for(const machine of Object.keys(machineMultipliers))assign(id,machine,explicit[id]?.[machine]);
+    // Assign remaining staff deterministically to the most productive resources.
+    const staff=Object.keys(staffRates).sort((a,b)=>staffRates[b]-staffRates[a]);
+    const machines=Object.keys(machineMultipliers).sort((a,b)=>machineMultipliers[b]-machineMultipliers[a]);
+    for(const id of staff)for(const machine of machines)assign(id,machine,remaining[id]);
     return {capacity,pairs,assignments,staff:sum(Object.values(staffCounts)),machines:sum(Object.values(machineCounts))};
   }
   function payroll(ctx,id){
@@ -302,6 +327,8 @@ module.exports={runOnce,remoteRpc};
     return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,{...config,materials:{...config?.materials,...ctx.config?.materials}})));
   }
   function calculate(ctx={}){
+    const materialVersion=ctx.config?.materialRulesVersion||ctx.state?.__materialRulesVersion;
+    if(materialVersion&&materialVersion!=='legacy-instant'&&!ctx.state?.__materialOrders)throw new Error('La versión temporal requiere un libro de órdenes verificable.');
     const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
     const staff={
       cut:quantityCounts(ctx,'PERS_CORTE'),
@@ -322,7 +349,7 @@ module.exports={runOnce,remoteRpc};
       ['finish','Acabado','PERS_ACABADO','ACABADOS']
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
-      const pairing=id==='cut'?{capacity:sum(Object.entries(staff[id]).map(([key,q])=>q*STAFF_RATES[staffId][key]))*(sum(Object.values(machines.cut))>0?1:0),pairs:sum(Object.values(staff[id])),staff:sum(Object.values(staff[id])),machines:sum(Object.values(machines.cut))}:pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
+      const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
       const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
       return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
@@ -346,8 +373,36 @@ module.exports={runOnce,remoteRpc};
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
+    // Explicit, provisional receipt-ledger mode. Historical snapshots without a
+    // ledger retain their original calculation until a versioned migration exists.
+    let temporal=null;
+    if(ctx.state?.__materialOrders){
+      if(!ORDERS||!TEMP)throw new Error('El motor temporal de materiales no está disponible');
+      const events=Object.values(ctx.state.__materialOrders.events||{}),ordered=[...events.filter(e=>e.type==='order'),...events.filter(e=>e.type!=='order')];
+      let ledger={};for(const event of ordered)ledger=ORDERS.apply(ledger,event);
+      const owner=ctx.state.__materialOrders.companyId;
+      if(!owner||Object.values(ledger.orders||{}).some(order=>order.companyId!==owner))throw new RangeError('Órdenes de otra empresa o sin identidad');
+      const families={CUERO:'leather',ACCESORIOS:'accessories',HILO:'thread'},startDay=(whole(ctx.round||1)-1)*WORKING_DAYS;
+      const receipts=[];
+      for(const order of Object.values(ledger.orders||{})){
+        const family=Object.keys(MATERIALS).find(id=>Object.hasOwn(MATERIALS[id].yields,order.sku));
+        if(!family)throw new RangeError('Insumo desconocido en pedido');
+        for(const receipt of order.receipts){if(receipt.day>=startDay)receipts.push({id:receipt.id,day:receipt.day,material:families[family],sku:order.sku,quantity:receipt.quantity});}
+      }
+      const skuFamilies=Object.fromEntries(Object.entries(MATERIALS).flatMap(([family,spec])=>Object.keys(spec.yields).map(sku=>[sku,families[family]])));
+      const opening=Object.fromEntries(Object.keys(skuFamilies).map(sku=>[sku,Math.max(0,n(ctx.state?.__inventarioMP?.[sku]))]));
+      temporal=TEMP.calculateBySku({opening,receipts,skuFamilies,startDay,days,dailyCapacity:Math.min(...processes.map(p=>p.dailyCapacity)),efficiency,
+        targets:{basic:targets.molde_1,medium:targets.molde_2,premium:targets.molde_3},
+        molds:{basic:productLines[0].available,medium:productLines[1].available,premium:productLines[2].available}});
+      for(const m of materials){
+        const family=families[m.id],received=receipts.filter(r=>r.material===family&&r.day<startDay+days).reduce((sum,r)=>sum+r.quantity,0);
+        m.purchasesAvailable=received;m.available=m.inventoryAvailable+received;m.supportedUnits=m.perUnit>0?Math.floor(m.available/m.perUnit):0;
+        m.pending=Object.values(ledger.orders||{}).filter(o=>Object.hasOwn(MATERIALS[m.id].yields,o.sku)).reduce((sum,o)=>sum+o.quantity-o.cancelled-o.receipts.filter(r=>r.day<startDay+days).reduce((a,r)=>a+r.quantity,0),0);
+      }
+    }
     const remaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let capacityRemaining=processCapacity;
     for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id];line.plannedUnits=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,capacityRemaining,...materials.map(m=>remaining[m.id]/spec[m.id])).toPrecision(15)))):0;capacityRemaining-=line.plannedUnits;for(const material of materials)remaining[material.id]=Number((remaining[material.id]-line.plannedUnits*spec[material.id]).toPrecision(15));line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}
+    if(temporal){for(const [i,key] of ['basic','medium','premium'].entries()){const line=productLines[i];line.plannedUnits=temporal.produced[key];line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}}
     const producibleUnits=sum(productLines.map(l=>l.plannedUnits));
     const materialRemaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let materialCapacity=0;
     for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id],units=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,...materials.map(m=>materialRemaining[m.id]/spec[m.id])).toPrecision(15)))):0;materialCapacity+=units;for(const m of materials)materialRemaining[m.id]=Number((materialRemaining[m.id]-units*spec[m.id]).toPrecision(15));}
@@ -357,7 +412,7 @@ module.exports={runOnce,remoteRpc};
     const limitingMaterials=materials.filter(material=>material.supportedUnits===materialCapacity).map(material=>material.label);
     const unavailablePlannedMolds=productLines.filter(line=>line.target>0&&!line.available).map(line=>line.id);
     return {
-      target,targets,productLines,days,efficiency,levelThree,hasLeadership,moldId,moldLabel:requirements.label,selectedMoldIds,ownedMoldIds:ownedIds,availableMoldIds,unavailablePlannedMolds,
+      ...(temporal?{temporal}:{}),target,targets,productLines,days,efficiency,levelThree,hasLeadership,moldId,moldLabel:requirements.label,selectedMoldIds,ownedMoldIds:ownedIds,availableMoldIds,unavailablePlannedMolds,
       processes,materials,processCapacity,materialCapacity,producibleUnits,
       productionGap:Math.max(0,target-producibleUnits),limitingProcesses,limitingMaterials,
       dop:DOP_STEPS.map((step,index)=>({...step,sequence:index+1,units:producibleUnits})),
@@ -442,6 +497,106 @@ module.exports={runOnce,remoteRpc};
 });
 
 },
+"js/material_orders.js":(module,exports,load)=>{
+/* Deterministic receipt ledger. All quantities are in the SKU's physical unit. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_MATERIAL_ORDERS=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ const clone=value=>JSON.parse(JSON.stringify(value));
+ const validQuantity=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0;
+ function apply(state,event){
+  const next=clone(state||{orders:{},events:{},stock:{}});
+  next.orders=next.orders||{};next.events=next.events||{};next.stock=next.stock||{};
+  if(!event||typeof event.id!=='string'||!event.id||typeof event.orderId!=='string'||!event.orderId)throw new TypeError('Evento u orden sin identificador');
+  if(next.events[event.id]){
+   if(JSON.stringify(next.events[event.id])!==JSON.stringify(event))throw new RangeError('Identificador de evento reutilizado con otro contenido');
+   return next;
+  }
+  if(event.type==='order'){
+   if(next.orders[event.orderId])throw new RangeError('Orden duplicada');
+   if(typeof event.sku!=='string'||!event.sku||typeof event.companyId!=='string'||!event.companyId||!validQuantity(event.quantity)||event.quantity<=0||!validQuantity(event.unitCost)||!Number.isInteger(event.orderedDay)||event.orderedDay<0||!Number.isInteger(event.leadTimeDays)||event.leadTimeDays<0)throw new RangeError('Orden inválida');
+   next.orders[event.orderId]={id:event.orderId,companyId:event.companyId,sku:event.sku,quantity:event.quantity,unit:event.unit,unitCost:event.unitCost,orderedDay:event.orderedDay,leadTimeDays:event.leadTimeDays,expectedDay:event.orderedDay+event.leadTimeDays,received:0,cancelled:0,receipts:[]};
+  }else{
+   const order=next.orders[event.orderId];if(!order)throw new RangeError('Orden inexistente');
+   if(event.companyId!==order.companyId)throw new RangeError('Empresa distinta');
+   if(!validQuantity(event.quantity)||event.quantity<=0||event.quantity>order.quantity-order.received-order.cancelled+1e-9)throw new RangeError('Cantidad fuera del saldo pendiente');
+   if(event.type==='receipt'){
+    if(!Number.isInteger(event.day)||event.day<order.orderedDay)throw new RangeError('Fecha de recepción inválida');
+    order.received+=event.quantity;order.receipts.push({id:event.id,day:event.day,quantity:event.quantity});
+    next.stock[order.sku]=(next.stock[order.sku]||0)+event.quantity;
+   }else if(event.type==='cancel')order.cancelled+=event.quantity;
+   else throw new RangeError('Tipo de evento inválido');
+  }
+  next.events[event.id]=clone(event);return next;
+ }
+ return Object.freeze({apply});
+});
+
+},
+"js/temporal_production.js":(module,exports,load)=>{
+/* Inventory-aware deterministic production by productive day. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_TEMPORAL_PRODUCTION=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ const recipes={basic:{leather:0.3,accessories:1,thread:6},medium:{leather:0.4,accessories:1,thread:7},premium:{leather:0.7,accessories:1,thread:13}};
+ function calculate({opening={},receipts=[],targets={},molds={},dailyCapacity,efficiency=1,startDay=0,days=30}){
+  if(!Number.isFinite(dailyCapacity)||dailyCapacity<0||!Number.isFinite(efficiency)||efficiency<0||!Number.isInteger(days)||days<1||!Number.isInteger(startDay)||startDay<0)throw new RangeError('Capacidad o calendario inválido');
+  const stock=Object.fromEntries(['leather','accessories','thread'].map(k=>{const v=opening[k]??0;if(!Number.isFinite(v)||v<0)throw new RangeError('Inventario inválido');return [k,v];}));
+  const pending=[...receipts].sort((a,b)=>a.day-b.day||String(a.id).localeCompare(String(b.id),'en'));
+  const seen=new Set();for(const r of pending){if(!r.id||seen.has(r.id)||!Object.hasOwn(stock,r.material)||!Number.isInteger(r.day)||r.day<startDay||!Number.isFinite(r.quantity)||r.quantity<0)throw new RangeError('Recepción inválida');seen.add(r.id);}
+  const remaining={},produced={},consumed={leather:0,accessories:0,thread:0},windows=[];for(const k of Object.keys(recipes)){if(!Number.isInteger(targets[k]??0)||(targets[k]??0)<0)throw new RangeError('Meta inválida');remaining[k]=targets[k]??0;produced[k]=0;}
+  let usedCapacity=0;
+  for(let d=0;d<days;d++){
+   const day=startDay+d,arrivals=pending.filter(r=>r.day===day);for(const r of arrivals)stock[r.material]+=r.quantity;
+   const capacity=Math.max(0,Math.floor((d+1)*dailyCapacity*efficiency+1e-9)-usedCapacity);let free=capacity;
+   for(const [id,recipe] of Object.entries(recipes)){
+    if(!molds[id])continue;
+    const q=Math.max(0,Math.min(remaining[id],free,...Object.entries(recipe).map(([k,v])=>Math.floor((stock[k]+1e-9)/v))));
+    remaining[id]-=q;produced[id]+=q;free-=q;
+    for(const [k,v] of Object.entries(recipe)){const amount=q*v;stock[k]=Number((stock[k]-amount).toFixed(9));consumed[k]=Number((consumed[k]+amount).toFixed(9));}
+   }
+   // Unused capacity expires at the end of the day.
+   usedCapacity=Math.floor((d+1)*dailyCapacity*efficiency+1e-9);
+   windows.push({day,capacity,produced:capacity-free,receipts:arrivals.map(r=>r.id)});
+  }
+  return {produced,consumed,stock,windows,pending:pending.filter(r=>r.day>=startDay+days)};
+ }
+ // SKU-level physical accounting for the temporal preview. The configured
+ // SKU order is deterministic and matches the existing family substitution order.
+ function calculateBySku({opening={},receipts=[],skuFamilies={},targets={},molds={},dailyCapacity,efficiency=1,startDay=0,days=30}){
+  if(!Number.isFinite(dailyCapacity)||dailyCapacity<0||!Number.isFinite(efficiency)||efficiency<0||!Number.isInteger(days)||days<1||!Number.isInteger(startDay)||startDay<0)throw new RangeError('Capacidad o calendario inválido');
+  const skus=Object.keys(skuFamilies),stock={},consumedBySku=Object.fromEntries(skus.map(id=>[id,0]));
+  for(const sku of Object.keys(opening))if(!Object.hasOwn(skuFamilies,sku))throw new RangeError('SKU de inventario desconocido');
+  for(const sku of skus){const value=opening[sku]??0;if(!Number.isFinite(value)||value<0||!['leather','accessories','thread'].includes(skuFamilies[sku]))throw new RangeError('Inventario o familia inválida');stock[sku]=value;}
+  const arrivals=[...receipts].sort((a,b)=>a.day-b.day||String(a.id).localeCompare(String(b.id),'en')),seen=new Set();
+  for(const r of arrivals){if(!r.id||seen.has(r.id)||!Object.hasOwn(skuFamilies,r.sku)||!Number.isInteger(r.day)||r.day<startDay||!Number.isFinite(r.quantity)||r.quantity<0)throw new RangeError('Recepción inválida');seen.add(r.id);}
+  const remaining={},produced={},consumed={leather:0,accessories:0,thread:0},windows=[],consumedByModelSku=Object.fromEntries(Object.keys(recipes).map(id=>[id,{}]));
+  for(const id of Object.keys(recipes)){const q=targets[id]??0;if(!Number.isInteger(q)||q<0)throw new RangeError('Meta inválida');remaining[id]=q;produced[id]=0;}
+  let priorCapacity=0;
+  for(let d=0;d<days;d++){
+   const day=startDay+d,received=arrivals.filter(r=>r.day===day);for(const r of received)stock[r.sku]+=r.quantity;
+   const cumulative=Math.floor((d+1)*dailyCapacity*efficiency+1e-9),capacity=Math.max(0,cumulative-priorCapacity);priorCapacity=cumulative;let free=capacity;
+   const dailyConsumption={};
+   for(const [id,recipe] of Object.entries(recipes)){
+    if(!molds[id])continue;
+    const limits=Object.entries(recipe).map(([family,qty])=>Math.floor((skus.filter(sku=>skuFamilies[sku]===family).reduce((sum,sku)=>sum+stock[sku],0)+1e-9)/qty));
+    const q=Math.max(0,Math.min(remaining[id],free,...limits));remaining[id]-=q;produced[id]+=q;free-=q;
+    for(const [family,perUnit] of Object.entries(recipe)){
+     let need=Number((q*perUnit).toFixed(9));consumed[family]=Number((consumed[family]+need).toFixed(9));
+     for(const sku of skus.filter(sku=>skuFamilies[sku]===family)){
+      const used=Math.min(stock[sku],need);stock[sku]=Number((stock[sku]-used).toFixed(9));need=Number((need-used).toFixed(9));
+      consumedBySku[sku]=Number((consumedBySku[sku]+used).toFixed(9));if(used){dailyConsumption[sku]=Number(((dailyConsumption[sku]||0)+used).toFixed(9));consumedByModelSku[id][sku]=Number(((consumedByModelSku[id][sku]||0)+used).toFixed(9));}
+     }
+     if(need>1e-8)throw new RangeError('Consumo superior al inventario');
+    }
+   }
+   windows.push({day,capacity,produced:capacity-free,receipts:received.map(r=>r.id),consumedBySku:dailyConsumption});
+  }
+  const familyStock=Object.fromEntries(['leather','accessories','thread'].map(family=>[family,skus.filter(sku=>skuFamilies[sku]===family).reduce((sum,sku)=>sum+stock[sku],0)]));
+  return {produced,consumed,stock:familyStock,stockBySku:stock,consumedBySku,consumedByModelSku,windows,pending:arrivals.filter(r=>r.day>=startDay+days)};
+ }
+ return Object.freeze({calculate,calculateBySku,recipes});
+});
+
+},
 "js/engine/config.js":(module,exports,load)=>{
 /* Mercados del documento Costos De Producción (27/10/2026).
  * Se conservan tarifas de canales, crédito y garantía de las funciones existentes. */
@@ -509,9 +664,14 @@ module.exports={runOnce,remoteRpc};
     function period(r){if(!periods.has(r))periods.set(r,{r,ventas:0,devoluciones:0,gastos:0,mp:0,mod:0,comercial:0,eventos:0,comprasActivos:0,ventaActivos:0,bajaActivos:0,prestamos:0,aportes:0,otros:0,neto:0,detalle:[],fijos:0,publicidad:0,mantenimiento:0,almacenaje:0});return periods.get(r);}
     for(const [key,value] of Object.entries(ledger)){
       const [cycle,kind]=key.split(':'),r=Number(cycle);if(!Number.isInteger(r)||r<1||r>round||r<=seedRound)continue;
-      const p=period(r),amount=n(value);p.neto+=amount;
+      const p=period(r),amount=n(value);
+      // The receipt already deterministically derives this payment; retain its
+      // ledger entry for cash reconciliation without applying it a second time.
+      if(kind==='PROVEEDOR_PAGO')continue;
+      p.neto+=amount;
       if(kind==='CAPITAL_ADJUSTMENT')p.aportes+=amount;
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
+      else if(kind==='PROVEEDOR_CREDITO')p.supplierCredit=n(p.supplierCredit)+amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
       else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
@@ -540,12 +700,13 @@ module.exports={runOnce,remoteRpc};
     // Include quiet cycles so the student can review every played period.
     for(let r=Math.max(1,seedRound+1);r<=round;r++)period(r);
     let cash=openingBalance?n(seed.cash??seedBG.efectivo):n(capital),assets=n(seedBG.activosFijos),debt=n(seedBG.deuda),earnings=n(seedBG.resultadosAcumulados),equity=openingBalance?n(seedBG.capital??capital):n(capital);const otherAssets=Math.max(0,n(seedBG.activos)-n(seedBG.efectivo)-assets-n(seedBG.inventarioMP)-n(seedBG.inventarioPT)-n(seedBG.cuentasPorCobrar)),history=JSON.parse(JSON.stringify(seed.history||[])).filter(row=>Number(row.round)<=Math.min(round,seedRound));
-    let accountsReceivable=n(seedBG.cuentasPorCobrar),materialValue=n(seedBG.inventarioMP),goodsValues={...(seed.inventoryValues?.goods||{})},materialQuantities={...(seed.inventoryQuantities||{})},materialValues={...(seed.inventoryValues?.materials||{})},taxPayable=n(seedBG.impuestosPorPagar),interestPayable=n(seedBG.interesesPorPagar),warrantyPayable=n(seedBG.provisionGarantias);
+    let supplierPayable=n(seedBG.cuentasPorPagarProveedores),materialPrepayment=n(seedBG.anticiposMateriales),accountsReceivable=n(seedBG.cuentasPorCobrar),materialValue=n(seedBG.inventarioMP),goodsValues={...(seed.inventoryValues?.goods||{})},materialQuantities={...(seed.inventoryQuantities||{})},materialValues={...(seed.inventoryValues?.materials||{})},taxPayable=n(seedBG.impuestosPorPagar),interestPayable=n(seedBG.interesesPorPagar),warrantyPayable=n(seedBG.provisionGarantias);
+    let supplierPayableDetails=JSON.parse(JSON.stringify(seed.supplierPayables||[]));
     let depreciationValues={...seed.depreciationValues},unallocatedSeed=Object.keys(materialValues).length?0:n(seedBG.inventarioMP);
     for(const p of [...periods.values()].sort((a,b)=>a.r-b.r)){
       const frozen=state.__financialSnapshots?.[p.r];
-      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;cash=n(bg.efectivo);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
-      const initial=cash,operating=p.ventas-n(p.credito)+n(p.cobros)-p.devoluciones-p.gastos+p.eventos+p.otros;
+      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;cash=n(bg.efectivo);supplierPayable=n(bg.cuentasPorPagarProveedores);supplierPayableDetails=JSON.parse(JSON.stringify(frozen.cuentasPorPagarDetalle||[]));materialPrepayment=n(bg.anticiposMateriales);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
+      const initial=cash;let operating=p.ventas-n(p.credito)+n(p.cobros)-p.devoluciones-p.gastos+n(p.supplierCredit)+p.eventos+p.otros;
       accountsReceivable+=n(p.credito)-n(p.cobros);
       const investing=p.ventaActivos-p.comprasActivos,financing=p.prestamos+p.aportes;
       const disposal=p.ventaActivos-p.bajaActivos;
@@ -557,12 +718,13 @@ module.exports={runOnce,remoteRpc};
       const purchases=Object.entries(sectionsByRound[p.r]||{}).filter(([kind,s])=>Object.hasOwn(ledger,`${p.r}:${kind}`)&&Math.abs(n(s.recordedNet??s.net)-n(ledger[`${p.r}:${kind}`]))<.02).flatMap(([,s])=>s.items||[]).filter(e=>items.get(e.id)?.material);
       let consumedMaterial=0,closingMaterial=0;const consumedByFamily={},materialUnitCosts={};
       for(const item of items.values())if(item.material)for(const option of item.options||[]){
-        const rows=purchases.filter(e=>e.id===item.id).flatMap(e=>e.rows||[]).filter(row=>row.label===option.label),qty=rows.reduce((s,row)=>s+n(row.quantity),0),cost=rows.reduce((s,row)=>s+n(row.outflow),0),opening=n(materialQuantities[option.id]);
+        const rows=purchases.filter(e=>e.id===item.id).flatMap(e=>e.rows||[]).filter(row=>row.label===option.label),qty=receipt?.materialReceiptFacts?n(receipt.materialReceiptFacts.receivedBySku?.[option.id]):rows.reduce((s,row)=>s+n(row.quantity),0),cost=receipt?.materialReceiptFacts?n(receipt.materialReceiptFacts.receivedValueBySku?.[option.id]):rows.reduce((s,row)=>s+n(row.outflow),0),opening=n(materialQuantities[option.id]);
         const available=opening+qty,value=n(materialValues[option.id])+cost,remaining=receipt?n(inventory[option.id]):available;
         const closing=available?value*Math.min(1,remaining/available):value;materialUnitCosts[option.id]=available?value/available:0;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
       }
       // Preserve explicitly valued migrated stock until its valuation is available.
       materialValue=money(closingMaterial+unallocatedSeed);
+      if(receipt?.materialReceiptFacts){const facts=receipt.materialReceiptFacts,ordered=Object.values(facts.ordersBySku).reduce((sum,v)=>sum+n(v.quantity)*n(v.unitCost),0),received=Object.values(facts.receivedValueBySku).reduce((sum,v)=>sum+n(v),0);if(Math.abs(money(ordered)-money(p.mp))>0.02)throw new Error('Pago de materiales no coincide con las órdenes verificadas.');if(facts.paymentMode==='credit'){if(Math.abs(money(ordered)-money(p.supplierCredit))>0.02)throw new Error('Crédito de proveedor inconsistente.');supplierPayable=money(supplierPayable+received);for(const item of facts.receipts){if(supplierPayableDetails.some(row=>row.receiptId===item.receiptId))throw new Error('Obligación de proveedor duplicada.');supplierPayableDetails.push({...item,paid:0,outstanding:item.value});}}else{materialPrepayment=money(materialPrepayment+p.mp-received);if(materialPrepayment < -0.01)throw new Error('Anticipo de materiales inconsistente.');}}
       const economicConfig=getEconomicConfig(),policy={...financialPolicy,...receipt?.financialPolicy},life={MESA_CORTE:10,ENSAMBLE:10,ACABADOS:8,MOLDE:5},months=n(policy.cycleMonths)||1;
       const md=receipt?.modelVersion==='md-20261027',residualRate=policy.residualRate??(receipt?.regimen==='NO_MYPE' ? .10 : .05);
       let depreciation=0;
@@ -612,13 +774,27 @@ module.exports={runOnce,remoteRpc};
       const identifiable=cogs+idle+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
       er.desgloseCostos={costoVentas:money(cogs),costoProduccionCiclo:money(productionCost),capacidadOciosa:money(idle),materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-identifiable),total:money(er.costos)};
       const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
+      let supplierPaid=0;const supplierPayments=[];
+      if(receipt?.materialReceiptFacts){
+        if(Math.abs(money(supplierPayableDetails.reduce((sum,row)=>sum+n(row.outstanding),0))-money(supplierPayable))>0.01)throw new Error('Detalle de cuentas por pagar no verificable.');
+        let available=money(cash+p.neto-paidTax);if(available<0)throw new Error('Caja insuficiente para el cierre temporal.');
+        // Nuevo supuesto receipts-v1: al cierre se paga por orden de vencimiento
+        // hasta donde alcance la caja; cualquier saldo queda pendiente.
+        for(const debtRow of [...supplierPayableDetails].sort((a,b)=>n(a.dueCycle)-n(b.dueCycle)||String(a.receiptId).localeCompare(String(b.receiptId),'en'))){
+          if(n(debtRow.dueCycle)>p.r||available<=0)continue;
+          const paid=money(Math.min(available,n(debtRow.outstanding)));if(paid<=0)continue;
+          debtRow.paid=money(n(debtRow.paid)+paid);debtRow.outstanding=money(n(debtRow.outstanding)-paid);available=money(available-paid);supplierPaid=money(supplierPaid+paid);
+          supplierPayments.push({paymentId:`${debtRow.receiptId}:cycle:${p.r}`,receiptId:debtRow.receiptId,orderId:debtRow.orderId,cycle:p.r,amount:paid});
+        }
+        supplierPayable=money(supplierPayable-supplierPaid);p.neto-=supplierPaid;operating-=supplierPaid;
+      }
       cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
-      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
-      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
-      const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets);
-      const bg={cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
+      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos+n(p.supplierCredit)-supplierPaid),...(receipt?.materialReceiptFacts?{pagosProveedores:money(supplierPaid)}:{}),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
+      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos-n(p.supplierCredit)+supplierPaid+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
+      const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets+materialPrepayment);
+      const bg={...(receipt?.materialReceiptFacts||materialPrepayment||supplierPayable?{anticiposMateriales:money(materialPrepayment),cuentasPorPagarProveedores:money(supplierPayable)}:{}),cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+supplierPayable+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
+      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,...(receipt?.materialReceiptFacts?{cuentasPorPagarDetalle:JSON.parse(JSON.stringify(supplierPayableDetails)),pagosProveedores:supplierPayments}:{}),estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
     }
     return {...history.at(-1),history};
   }
@@ -669,7 +845,7 @@ module.exports={runOnce,remoteRpc};
     for(const family of Object.keys(materialCodes)){
       let need=n(plan.materials.find(m=>m.id===family)?.consumption),total=0,premium=0;
       const ids=Object.keys(materialCodes[family]);
-      for(const id of ids){const available=n(state.__inventarioMP?.[id])+n(Number(state[family]?.round)===Number(round)?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
+      for(const id of ids){const available=plan.temporal?n(plan.temporal.consumedBySku?.[id]):n(state.__inventarioMP?.[id])+n(Number(state[family]?.round)===Number(round)?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
       ratios[family]=total?premium/total:0;
     }
     return {use,ratios};
@@ -684,7 +860,8 @@ module.exports={runOnce,remoteRpc};
         let need=Number((n(line.plannedUnits)*n(spec[family])).toPrecision(15));
         const total=need;let score=0;materials[family]={};
         for(const [id,code] of Object.entries(options)){
-          const taken=Math.min(n(remaining[id]),need);
+          const modelKey={molde_1:'basic',molde_2:'medium',molde_3:'premium'}[line.id];
+          const taken=plan.temporal?Math.min(n(plan.temporal.consumedByModelSku?.[modelKey]?.[id]),need):Math.min(n(remaining[id]),need);
           if(taken>0){materials[family][id]=taken;score+=taken*Number(index[code]?.calidad||0);remaining[id]=Math.max(0,Number((n(remaining[id])-taken).toPrecision(15)));need=Math.max(0,Number((need-taken).toPrecision(15)));}
         }
         if(need>1e-8)throw new RangeError('Insumos inconsistentes para '+line.id+': '+family);
@@ -2154,7 +2331,7 @@ module.exports={runOnce,remoteRpc};
   }
   function cycleSchedule(config) {
     const count = Number(config.cycles), hours = Number(config.roundHours), minutes = Number(config.roundMinutes);
-    if (!Number.isInteger(count) || count < 1 || count > 20) return {error: 'El n\u00famero de ciclos debe ser un entero entre 1 y 20.', cycles: []};
+    if ((typeof config.cycles !== 'number' && typeof config.cycles !== 'string') || !Number.isInteger(count) || count < 1 || count > 6) return {error: 'El n\u00famero de ciclos debe ser un entero entre 1 y 6.', cycles: []};
     if (!Number.isSafeInteger(hours) || hours < 0 || !Number.isInteger(minutes) || minutes < 0 || minutes > 59 || hours*60+minutes < 1) {
       return {error: 'Indica una duraci\u00f3n de al menos 1 minuto; los minutos deben estar entre 0 y 59.', cycles: []};
     }
@@ -2847,7 +3024,22 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       if(!context.error&&['SIN_PLANES_CONFIRMADOS','PLANES_EN_GRACIA'].includes(context.data?.code))return {success:true,pending:true,data:null,code:context.data.code};
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
-      if(!Number.isInteger(Number(ctx.financialConfig?.cycles))||Number(ctx.financialConfig.cycles)<1)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
+      if(!['number','string'].includes(typeof ctx.financialConfig?.cycles)||!Number.isInteger(Number(ctx.financialConfig.cycles))||Number(ctx.financialConfig.cycles)<1||Number(ctx.financialConfig.cycles)>6)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
+      if(!Number.isInteger(Number(ciclo))||Number(ciclo)<1||Number(ciclo)>Number(ctx.financialConfig.cycles))return {success:false,code:'CICLO_INVALIDO',error:'El ciclo solicitado está fuera de la duración configurada.'};
+      // No temporal game may silently fall back to instant purchases while
+      // verified order persistence and financial settlement are unavailable.
+      const temporal=!!ctx.financialConfig?.materialRulesVersion&&ctx.financialConfig.materialRulesVersion!=='legacy-instant',materialBooks={};
+      if(temporal){
+        if(ctx.financialConfig.materialRulesVersion!=='receipts-v1')return {success:false,code:'VERSION_MATERIALES_INVALIDA',error:'Versión de materiales desconocida.'};
+        if(!['cash','credit'].includes(ctx.financialConfig.materialPaymentMode))return {success:false,code:'RECEPCIONES_NO_DISPONIBLES',error:'La modalidad de compra de materiales no está configurada.'};
+        if(ctx.financialConfig.supplierCreditTermCycles!=null&&(!Number.isInteger(Number(ctx.financialConfig.supplierCreditTermCycles))||Number(ctx.financialConfig.supplierCreditTermCycles)<1))return {success:false,code:'PLAZO_PROVEEDOR_INVALIDO',error:'El plazo de crédito a proveedores debe ser un entero positivo.'};
+        for(const company of ctx.empresas||[]){
+          const facts=await sb.rpc('side_material_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_cutoff_day:Number(ciclo)*30-1});
+          if(facts.error||facts.data?.error||!facts.data?.revision||String(facts.data.companyId)!==String(company.id)||!facts.data.events||typeof facts.data.events!=='object'||Array.isArray(facts.data.events))return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'No se pudo recuperar el libro de órdenes verificado para la empresa.'};
+          if(Object.values(facts.data.events).some(e=>e?.type==='order'&&e.paymentMode!==ctx.financialConfig.materialPaymentMode))return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'La modalidad de pago de la orden no coincide con la configuración.'};
+          materialBooks[String(company.id)]=facts.data;
+        }
+      }
       // Prior economic state comes only from the immutable server closure. The
       // snapshot is a transport for decisions, never an accounting authority.
       let prior={};
@@ -2867,6 +3059,12 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
           return {success:false,code:'DATOS_ECONOMICOS_NO_VERIFICADOS',error:'No se puede verificar el saldo inicial o los eventos de este ciclo.'};
         const previous=prior[company.id];
         if(Number(ciclo)>1&&!previous?.state)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'Falta el estado anterior de una empresa.'};
+        if(temporal&&Number(ciclo)>1){
+          const oldBook=previous?.state?.__materialOrders,currentBook=materialBooks[String(company.id)],start=(Number(ciclo)-1)*30;
+          if(!oldBook?.events||!currentBook?.events)return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'Falta el libro de órdenes del cierre anterior.'};
+          const past=book=>Object.fromEntries(Object.entries(book.events).filter(([,e])=>e?.type==='order'?Number(e.orderedDay)<start:e?.type==='receipt'&&Number(e.day)<start).sort(([a],[b])=>a.localeCompare(b)).map(([id,e])=>[id,Object.fromEntries(Object.entries(e).sort(([a],[b])=>a.localeCompare(b)))]));
+          if(JSON.stringify(past(oldBook))!==JSON.stringify(past(currentBook)))return {success:false,code:'RECEPCIONES_ANTERIORES_NO_VERIFICADAS',error:'El libro contiene cambios para un ciclo ya cerrado; requiere reconciliación.'};
+        }
         // Purchase entries from earlier cycles describe assets already owned, not
         // decisions for this cycle. They may only reproduce the last closure.
         // Unverifiable legacy histories require review instead of creating assets.
@@ -2944,9 +3142,10 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         }
         const trusted=previous?.state||{};
         const preparedState={...decisions,...Object.fromEntries(Object.entries(trusted).filter(([key])=>key.startsWith('__')))};
+        if(temporal)preparedState.__materialOrders=materialBooks[String(company.id)];
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
-        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true},events:[]});
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:[]});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
@@ -2980,11 +3179,14 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         result.financialSections=result.financialSections||snapshot.financial_sections||{};
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        if(temporal)result.ledger[`${ciclo}:PROVEEDOR_PAGO`]=-Number(result.financial.flujoCaja?.pagosProveedores||0)||0;
         result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
-      const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
-      if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data.code};
+      const closeArgs={p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}};
+      if(temporal)closeArgs.p_revisiones=Object.fromEntries(Object.entries(materialBooks).map(([id,book])=>[id,book.revision]));
+      const response=await sb.rpc(temporal?'side_guardar_cierre_temporal_v1':'side_guardar_cierre_negocio',closeArgs);
+      if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data?.code};
       return {success:true,data:response.data.cierre,reused:!!response.data.reused};
     }catch(error){return {success:false,error:error.message};}
   }

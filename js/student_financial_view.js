@@ -15,6 +15,7 @@
   const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const count=value=>Number(value||0).toLocaleString('es-PE');
   function zeroReasons(receipt={}){
+    receipt=receipt||{};
     if(Number(receipt.revenue)>0)return [];
     const plan=receipt.production||{}, reasons=[];
     if(!Number(plan.target))reasons.push('No se indicó una meta de producción. Define las unidades deseadas por molde.');

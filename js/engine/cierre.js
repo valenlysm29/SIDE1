@@ -30,7 +30,7 @@
     for(const family of Object.keys(materialCodes)){
       let need=n(plan.materials.find(m=>m.id===family)?.consumption),total=0,premium=0;
       const ids=Object.keys(materialCodes[family]);
-      for(const id of ids){const available=n(state.__inventarioMP?.[id])+n(Number(state[family]?.round)===Number(round)?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
+      for(const id of ids){const available=plan.temporal?n(plan.temporal.consumedBySku?.[id]):n(state.__inventarioMP?.[id])+n(Number(state[family]?.round)===Number(round)?state[family]?.quantities?.[id]:0),used=Math.min(available,need);use[id]=used;need=Math.max(0,Number((need-used).toPrecision(15)));total+=used;if(id===ids.at(-1))premium=used;}
       ratios[family]=total?premium/total:0;
     }
     return {use,ratios};
@@ -45,7 +45,8 @@
         let need=Number((n(line.plannedUnits)*n(spec[family])).toPrecision(15));
         const total=need;let score=0;materials[family]={};
         for(const [id,code] of Object.entries(options)){
-          const taken=Math.min(n(remaining[id]),need);
+          const modelKey={molde_1:'basic',molde_2:'medium',molde_3:'premium'}[line.id];
+          const taken=plan.temporal?Math.min(n(plan.temporal.consumedByModelSku?.[modelKey]?.[id]),need):Math.min(n(remaining[id]),need);
           if(taken>0){materials[family][id]=taken;score+=taken*Number(index[code]?.calidad||0);remaining[id]=Math.max(0,Number((n(remaining[id])-taken).toPrecision(15)));need=Math.max(0,Number((need-taken).toPrecision(15)));}
         }
         if(need>1e-8)throw new RangeError('Insumos inconsistentes para '+line.id+': '+family);

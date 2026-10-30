@@ -378,7 +378,22 @@
       if(!context.error&&['SIN_PLANES_CONFIRMADOS','PLANES_EN_GRACIA'].includes(context.data?.code))return {success:true,pending:true,data:null,code:context.data.code};
       if(context.error||context.data?.error)return {success:false,error:context.error?.message||context.data.error,code:context.error?.code||context.data.code,migrationMissing:/PGRST202|42883/.test(context.error?.code||'')};
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
-      if(!Number.isInteger(Number(ctx.financialConfig?.cycles))||Number(ctx.financialConfig.cycles)<1)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
+      if(!['number','string'].includes(typeof ctx.financialConfig?.cycles)||!Number.isInteger(Number(ctx.financialConfig.cycles))||Number(ctx.financialConfig.cycles)<1||Number(ctx.financialConfig.cycles)>6)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
+      if(!Number.isInteger(Number(ciclo))||Number(ciclo)<1||Number(ciclo)>Number(ctx.financialConfig.cycles))return {success:false,code:'CICLO_INVALIDO',error:'El ciclo solicitado está fuera de la duración configurada.'};
+      // No temporal game may silently fall back to instant purchases while
+      // verified order persistence and financial settlement are unavailable.
+      const temporal=!!ctx.financialConfig?.materialRulesVersion&&ctx.financialConfig.materialRulesVersion!=='legacy-instant',materialBooks={};
+      if(temporal){
+        if(ctx.financialConfig.materialRulesVersion!=='receipts-v1')return {success:false,code:'VERSION_MATERIALES_INVALIDA',error:'Versión de materiales desconocida.'};
+        if(!['cash','credit'].includes(ctx.financialConfig.materialPaymentMode))return {success:false,code:'RECEPCIONES_NO_DISPONIBLES',error:'La modalidad de compra de materiales no está configurada.'};
+        if(ctx.financialConfig.supplierCreditTermCycles!=null&&(!Number.isInteger(Number(ctx.financialConfig.supplierCreditTermCycles))||Number(ctx.financialConfig.supplierCreditTermCycles)<1))return {success:false,code:'PLAZO_PROVEEDOR_INVALIDO',error:'El plazo de crédito a proveedores debe ser un entero positivo.'};
+        for(const company of ctx.empresas||[]){
+          const facts=await sb.rpc('side_material_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_cutoff_day:Number(ciclo)*30-1});
+          if(facts.error||facts.data?.error||!facts.data?.revision||String(facts.data.companyId)!==String(company.id)||!facts.data.events||typeof facts.data.events!=='object'||Array.isArray(facts.data.events))return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'No se pudo recuperar el libro de órdenes verificado para la empresa.'};
+          if(Object.values(facts.data.events).some(e=>e?.type==='order'&&e.paymentMode!==ctx.financialConfig.materialPaymentMode))return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'La modalidad de pago de la orden no coincide con la configuración.'};
+          materialBooks[String(company.id)]=facts.data;
+        }
+      }
       // Prior economic state comes only from the immutable server closure. The
       // snapshot is a transport for decisions, never an accounting authority.
       let prior={};
@@ -398,6 +413,12 @@
           return {success:false,code:'DATOS_ECONOMICOS_NO_VERIFICADOS',error:'No se puede verificar el saldo inicial o los eventos de este ciclo.'};
         const previous=prior[company.id];
         if(Number(ciclo)>1&&!previous?.state)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'Falta el estado anterior de una empresa.'};
+        if(temporal&&Number(ciclo)>1){
+          const oldBook=previous?.state?.__materialOrders,currentBook=materialBooks[String(company.id)],start=(Number(ciclo)-1)*30;
+          if(!oldBook?.events||!currentBook?.events)return {success:false,code:'ORDENES_NO_VERIFICADAS',error:'Falta el libro de órdenes del cierre anterior.'};
+          const past=book=>Object.fromEntries(Object.entries(book.events).filter(([,e])=>e?.type==='order'?Number(e.orderedDay)<start:e?.type==='receipt'&&Number(e.day)<start).sort(([a],[b])=>a.localeCompare(b)).map(([id,e])=>[id,Object.fromEntries(Object.entries(e).sort(([a],[b])=>a.localeCompare(b)))]));
+          if(JSON.stringify(past(oldBook))!==JSON.stringify(past(currentBook)))return {success:false,code:'RECEPCIONES_ANTERIORES_NO_VERIFICADAS',error:'El libro contiene cambios para un ciclo ya cerrado; requiere reconciliación.'};
+        }
         // Purchase entries from earlier cycles describe assets already owned, not
         // decisions for this cycle. They may only reproduce the last closure.
         // Unverifiable legacy histories require review instead of creating assets.
@@ -475,9 +496,10 @@
         }
         const trusted=previous?.state||{};
         const preparedState={...decisions,...Object.fromEntries(Object.entries(trusted).filter(([key])=>key.startsWith('__')))};
+        if(temporal)preparedState.__materialOrders=materialBooks[String(company.id)];
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
-        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true},events:[]});
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:[]});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
@@ -511,11 +533,14 @@
         result.financialSections=result.financialSections||snapshot.financial_sections||{};
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
+        if(temporal)result.ledger[`${ciclo}:PROVEEDOR_PAGO`]=-Number(result.financial.flujoCaja?.pagosProveedores||0)||0;
         result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
-      const response=await sb.rpc('side_guardar_cierre_negocio',{p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}});
-      if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data.code};
+      const closeArgs={p_partida_id:partidaId,p_ciclo:ciclo,p_token:ctx.token,p_cierre:{ciclo,resultadosPorEmpresa}};
+      if(temporal)closeArgs.p_revisiones=Object.fromEntries(Object.entries(materialBooks).map(([id,book])=>[id,book.revision]));
+      const response=await sb.rpc(temporal?'side_guardar_cierre_temporal_v1':'side_guardar_cierre_negocio',closeArgs);
+      if(response.error||response.data?.error)return {success:false,error:response.error?.message||response.data.error,code:response.error?.code||response.data?.code};
       return {success:true,data:response.data.cierre,reused:!!response.data.reused};
     }catch(error){return {success:false,error:error.message};}
   }

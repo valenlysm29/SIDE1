@@ -1,0 +1,11 @@
+# Contrato de cierre empresarial SIDE: alcance observado
+
+Este documento recoge solo lo inspeccionado; no constituye una certificación del flujo completo. El cierre definitivo debe consumir decisiones y estado persistidos en servidor y conservar snapshots históricos. La ejecución local existente está en `services/business_runtime.cjs` y la función empaquetada en `supabase/functions/side-business-close/runtime.mjs`.
+
+La capacidad física observada utiliza 30 días, tasas N1/N2/N3 de 6/8/12 y multiplicadores 1/1,2/1,5 en ensamblado y acabado. La eficiencia base es 0,90, más 0,01 por operario N3 y 0,04 por jefatura; la capacidad de cada etapa se redondea y se toma el mínimo. Cada recurso físico se empareja con como máximo un trabajador. Se respetan las asignaciones guardadas viables; el resto se distribuye de forma determinista. La prioridad de lotes es básico, mejorado y premium; sus recetas de cuero/accesorios/hilo son 0,3/1/6, 0,4/1/7 y 0,7/1/13.
+
+El modelo financiero contempla impuesto acumulado en el último ciclo configurado. Las pruebas seleccionadas cubren FIFO, consecuencias, ventas y equivalencia de implementaciones, pero no prueban la totalidad de las reglas de recepción, obligaciones, concurrencia o continuidad. En particular, la previsualización actual suma compras del ciclo sin verificar fecha de recepción: no debe interpretarse como disponibilidad física autoritativa hasta corregir e integrar esa etapa. Véase `auditoria_logica_empresarial_SIDE_6_ciclos.md` para pendientes y evidencia.
+
+El calendario compartido admite 1–6 ciclos y el worker rechaza configuraciones con más de seis antes de registrar el cierre. La validación de base de datos no se ha actualizado y no debe considerarse cubierta. Los recibos nuevos contienen `capacityRulesVersion=one-worker-per-resource-20261029`; los cierres previos se reutilizan sin alterarlos, pero aún no hay selección de implementación histórica por versión.
+
+La migración local `20261029221607_side_limite_seis_ciclos.sql` limita la duración de nuevas partidas y cambios explícitos de duración; no modifica partidas anteriores. Los componentes experimentales `material_orders.js` y `temporal_production.js` no son parte todavía del cierre ni de la previsualización y no cambian el comportamiento real de compras.

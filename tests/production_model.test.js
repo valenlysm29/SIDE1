@@ -104,3 +104,28 @@ test('DOP data includes purchased material qualities and cycle yield by mold',()
 });
 
 test('no available mold means no production despite complete staff and stock',()=>{const plan=model.calculate(context(completeLine({MOLDE:{optionIds:[]}})));assert.equal(plan.producibleUnits,0);assert.ok(plan.productLines.every(line=>line.plannedUnits===0));});
+
+test('each table and machine serves at most one worker, including saved assignments',()=>{
+  const plan=model.calculate(context(completeLine({
+    PERS_CORTE:{quantities:{corte_basico:3}},
+    PERS_ENSAMBLE:{quantities:{ens_personal_basico:3},assignments:{ens_personal_basico:{ens_ind:3}}},
+    PERS_ACABADO:{quantities:{aca_personal_basico:3}}
+  })));
+  assert.deepEqual(plan.processes.map(p=>p.pairs),[1,1,1]);
+  assert.deepEqual(plan.processes.map(p=>p.dailyCapacity),[6,9,9]);
+  assert.equal(plan.processes[1].assignments.ens_personal_basico.ens_ind,1);
+});
+
+test('mixed equipment and workers never exceed resources and idle workers retain payroll',()=>{
+ const plan=model.calculate(context(completeLine({
+   MESA_CORTE:{quantities:{mesa:2}}, ENSAMBLE:{quantities:{ens_basica:1,ens_ind:1}}, ACABADOS:{quantities:{}},
+   PERS_CORTE:{quantities:{corte_basico:1,corte_exp:1,corte_maestro:1}},
+   PERS_ENSAMBLE:{quantities:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1}},
+   PERS_ACABADO:{quantities:{aca_personal_basico:1}}
+ })));
+ assert.deepEqual(plan.processes.map(p=>p.pairs),[2,2,0]);
+ assert.equal(plan.processes[0].dailyCapacity,20);
+ assert.equal(plan.processes[1].dailyCapacity,26);
+ assert.equal(plan.processCapacity,0);
+ assert.ok(plan.processes[2].payroll>0);
+});

@@ -51,3 +51,11 @@ test('accounting opening seed preserves debt, assets, equity and visible past re
  assert.equal(result.history[0].estadoResultados.ingresos,12000);assert.equal(result.balanceCaja.cajaInicial,175000);assert.equal(result.balanceCaja.cajaFinal,181500);
  assert.equal(result.balanceGeneral.activosFijos,20000);assert.equal(result.balanceGeneral.deuda,30000);assert.equal(result.balanceGeneral.capital,150000);assert.equal(result.balanceGeneral.resultadosAcumulados,20000+result.estadoResultados.utilidadNeta);assert.equal(result.estadoResultados.gastosFinancieros,459.28);assert.equal(result.estadoResultados.impuestoRenta,1782.01);assert.equal(result.balanceGeneral.activos,result.balanceGeneral.pasivoPatrimonio);
 });
+
+test('new receipts identify capacity rules and historical receipts remain unchanged',()=>{
+ const result=cycle.close({state:decisions(1),catalog,round:1,capital:200000});
+ assert.equal(result.receipt.capacityRulesVersion,'one-worker-per-resource-20261029');
+ const historical={round:1,produced:7,sold:0,inventory:{}};
+ const reused=cycle.close({state:{__cycleSettlements:{1:historical}},catalog,round:1});
+ assert.equal(reused.reused,true);assert.deepEqual(reused.receipt,historical);
+});

@@ -1,9 +1,10 @@
 /* SIDE: autonomous production rules and physical inventory. */
 (function(root,factory){
-  const api=factory(typeof module==='object'&&module.exports?require('./business_rules.js'):root.SIDE_BUSINESS_RULES);
+  const node=typeof module==='object'&&module.exports;
+  const api=factory(node?require('./business_rules.js'):root.SIDE_BUSINESS_RULES,node?require('./material_orders.js'):root.SIDE_MATERIAL_ORDERS,node?require('./temporal_production.js'):root.SIDE_TEMPORAL_PRODUCTION);
   if(typeof module==='object'&&module.exports)module.exports=api;
   else root.SIDE_PRODUCTION_MODEL=api;
-})(typeof globalThis!=='undefined'?globalThis:this,function(BUS){
+})(typeof globalThis!=='undefined'?globalThis:this,function(BUS,ORDERS,TEMP){
   'use strict';
 
   const WORKING_DAYS=30;
@@ -94,22 +95,21 @@
     return targets;
   }
   function pairedDailyCapacity(staffCounts,staffRates,machineCounts,machineMultipliers,explicit){
-    const assignments={},preferred=Object.entries(machineMultipliers).filter(([id])=>whole(machineCounts[id])>0).sort((a,b)=>b[1]-a[1])[0];
+    const assignments={},available=Object.fromEntries(Object.keys(machineMultipliers).map(id=>[id,whole(machineCounts[id])]));
+    const remaining=Object.fromEntries(Object.keys(staffRates).map(id=>[id,whole(staffCounts[id])]));
     let capacity=0,pairs=0;
-    for(const [id,rate] of Object.entries(staffRates)){
-      let remaining=whole(staffCounts[id]);assignments[id]={};
-      // Recover old saved matrices against the machines that are actually owned.
-      // Any unassigned staff use the most productive available machine type.
-      for(const [machine,multiplier] of Object.entries(machineMultipliers)){
-        const desired=explicit?whole(explicit[id]?.[machine]):preferred?.[0]===machine?remaining:0;
-        const q=Math.min(remaining,desired),assigned=whole(machineCounts[machine])>0?q:0;
-        assignments[id][machine]=assigned;capacity+=assigned*rate*multiplier;pairs+=assigned;remaining-=assigned;
-      }
-      if(remaining&&preferred){
-        const [machine,multiplier]=preferred;
-        assignments[id][machine]+=remaining;capacity+=remaining*rate*multiplier;pairs+=remaining;
-      }
+    for(const id of Object.keys(staffRates))assignments[id]=Object.fromEntries(Object.keys(machineMultipliers).map(machine=>[machine,0]));
+    function assign(id,machine,wanted){
+      const q=Math.min(remaining[id],available[machine],whole(wanted));
+      assignments[id][machine]+=q;remaining[id]-=q;available[machine]-=q;
+      capacity+=q*staffRates[id]*machineMultipliers[machine];pairs+=q;
     }
+    // Honor saved assignments first, subject to both staff and machine availability.
+    if(explicit)for(const id of Object.keys(staffRates))for(const machine of Object.keys(machineMultipliers))assign(id,machine,explicit[id]?.[machine]);
+    // Assign remaining staff deterministically to the most productive resources.
+    const staff=Object.keys(staffRates).sort((a,b)=>staffRates[b]-staffRates[a]);
+    const machines=Object.keys(machineMultipliers).sort((a,b)=>machineMultipliers[b]-machineMultipliers[a]);
+    for(const id of staff)for(const machine of machines)assign(id,machine,remaining[id]);
     return {capacity,pairs,assignments,staff:sum(Object.values(staffCounts)),machines:sum(Object.values(machineCounts))};
   }
   function payroll(ctx,id){
@@ -124,6 +124,8 @@
     return sum((definition?.options||[]).map(option=>Math.max(0,n(counts[option.id]))*BUS.materialUnitPrice(option,counts[option.id],discount,{...config,materials:{...config?.materials,...ctx.config?.materials}})));
   }
   function calculate(ctx={}){
+    const materialVersion=ctx.config?.materialRulesVersion||ctx.state?.__materialRulesVersion;
+    if(materialVersion&&materialVersion!=='legacy-instant'&&!ctx.state?.__materialOrders)throw new Error('La versión temporal requiere un libro de órdenes verificable.');
     const targets=resolveProductionTargets(ctx),target=sum(Object.values(targets)),days=whole(ctx.workingDays||WORKING_DAYS)||WORKING_DAYS;
     const staff={
       cut:quantityCounts(ctx,'PERS_CORTE'),
@@ -144,7 +146,7 @@
       ['finish','Acabado','PERS_ACABADO','ACABADOS']
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
-      const pairing=id==='cut'?{capacity:sum(Object.entries(staff[id]).map(([key,q])=>q*STAFF_RATES[staffId][key]))*(sum(Object.values(machines.cut))>0?1:0),pairs:sum(Object.values(staff[id])),staff:sum(Object.values(staff[id])),machines:sum(Object.values(machines.cut))}:pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
+      const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
       const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
       return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
@@ -168,8 +170,36 @@
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
+    // Explicit, provisional receipt-ledger mode. Historical snapshots without a
+    // ledger retain their original calculation until a versioned migration exists.
+    let temporal=null;
+    if(ctx.state?.__materialOrders){
+      if(!ORDERS||!TEMP)throw new Error('El motor temporal de materiales no está disponible');
+      const events=Object.values(ctx.state.__materialOrders.events||{}),ordered=[...events.filter(e=>e.type==='order'),...events.filter(e=>e.type!=='order')];
+      let ledger={};for(const event of ordered)ledger=ORDERS.apply(ledger,event);
+      const owner=ctx.state.__materialOrders.companyId;
+      if(!owner||Object.values(ledger.orders||{}).some(order=>order.companyId!==owner))throw new RangeError('Órdenes de otra empresa o sin identidad');
+      const families={CUERO:'leather',ACCESORIOS:'accessories',HILO:'thread'},startDay=(whole(ctx.round||1)-1)*WORKING_DAYS;
+      const receipts=[];
+      for(const order of Object.values(ledger.orders||{})){
+        const family=Object.keys(MATERIALS).find(id=>Object.hasOwn(MATERIALS[id].yields,order.sku));
+        if(!family)throw new RangeError('Insumo desconocido en pedido');
+        for(const receipt of order.receipts){if(receipt.day>=startDay)receipts.push({id:receipt.id,day:receipt.day,material:families[family],sku:order.sku,quantity:receipt.quantity});}
+      }
+      const skuFamilies=Object.fromEntries(Object.entries(MATERIALS).flatMap(([family,spec])=>Object.keys(spec.yields).map(sku=>[sku,families[family]])));
+      const opening=Object.fromEntries(Object.keys(skuFamilies).map(sku=>[sku,Math.max(0,n(ctx.state?.__inventarioMP?.[sku]))]));
+      temporal=TEMP.calculateBySku({opening,receipts,skuFamilies,startDay,days,dailyCapacity:Math.min(...processes.map(p=>p.dailyCapacity)),efficiency,
+        targets:{basic:targets.molde_1,medium:targets.molde_2,premium:targets.molde_3},
+        molds:{basic:productLines[0].available,medium:productLines[1].available,premium:productLines[2].available}});
+      for(const m of materials){
+        const family=families[m.id],received=receipts.filter(r=>r.material===family&&r.day<startDay+days).reduce((sum,r)=>sum+r.quantity,0);
+        m.purchasesAvailable=received;m.available=m.inventoryAvailable+received;m.supportedUnits=m.perUnit>0?Math.floor(m.available/m.perUnit):0;
+        m.pending=Object.values(ledger.orders||{}).filter(o=>Object.hasOwn(MATERIALS[m.id].yields,o.sku)).reduce((sum,o)=>sum+o.quantity-o.cancelled-o.receipts.filter(r=>r.day<startDay+days).reduce((a,r)=>a+r.quantity,0),0);
+      }
+    }
     const remaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let capacityRemaining=processCapacity;
     for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id];line.plannedUnits=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,capacityRemaining,...materials.map(m=>remaining[m.id]/spec[m.id])).toPrecision(15)))):0;capacityRemaining-=line.plannedUnits;for(const material of materials)remaining[material.id]=Number((remaining[material.id]-line.plannedUnits*spec[material.id]).toPrecision(15));line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}
+    if(temporal){for(const [i,key] of ['basic','medium','premium'].entries()){const line=productLines[i];line.plannedUnits=temporal.produced[key];line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}}
     const producibleUnits=sum(productLines.map(l=>l.plannedUnits));
     const materialRemaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let materialCapacity=0;
     for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id],units=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,...materials.map(m=>materialRemaining[m.id]/spec[m.id])).toPrecision(15)))):0;materialCapacity+=units;for(const m of materials)materialRemaining[m.id]=Number((materialRemaining[m.id]-units*spec[m.id]).toPrecision(15));}
@@ -179,7 +209,7 @@
     const limitingMaterials=materials.filter(material=>material.supportedUnits===materialCapacity).map(material=>material.label);
     const unavailablePlannedMolds=productLines.filter(line=>line.target>0&&!line.available).map(line=>line.id);
     return {
-      target,targets,productLines,days,efficiency,levelThree,hasLeadership,moldId,moldLabel:requirements.label,selectedMoldIds,ownedMoldIds:ownedIds,availableMoldIds,unavailablePlannedMolds,
+      ...(temporal?{temporal}:{}),target,targets,productLines,days,efficiency,levelThree,hasLeadership,moldId,moldLabel:requirements.label,selectedMoldIds,ownedMoldIds:ownedIds,availableMoldIds,unavailablePlannedMolds,
       processes,materials,processCapacity,materialCapacity,producibleUnits,
       productionGap:Math.max(0,target-producibleUnits),limitingProcesses,limitingMaterials,
       dop:DOP_STEPS.map((step,index)=>({...step,sequence:index+1,units:producibleUnits})),

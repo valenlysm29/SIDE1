@@ -19,3 +19,8 @@ const old={optionIds:['los_olivos'],quantities:{los_olivos:3},round:1,optionRoun
 test('Same-cycle drafts editable, prior contracts enforced',()=>{assert.equal(R.committedQuantity(old,'los_olivos',1),0);assert.deepEqual(R.nextStoreBatches(old,'los_olivos',2,1),[{round:1,quantity:2}]);assert.equal(R.committedQuantity(old,'los_olivos',2),3);assert.throws(()=>R.nextStoreBatches(old,'los_olivos',2,2),RangeError);assert.equal(R.remainingCommitment(old,'los_olivos',2),11)});
 test('Openings expire independently after 12 cycles',()=>{const batches=R.nextStoreBatches(old,'los_olivos',5,2);assert.deepEqual(batches,[{round:1,quantity:3},{round:2,quantity:2}]);const e={...old,round:2,quantities:{los_olivos:5},storeContracts:{los_olivos:batches}};assert.equal(R.committedQuantity(e,'los_olivos',13),2);assert.deepEqual(R.nextStoreBatches(e,'los_olivos',2,13),[{round:2,quantity:2}]);assert.equal(R.committedQuantity(e,'los_olivos',14),0);assert.deepEqual(R.nextStoreBatches(e,'los_olivos',0,14),[])});
 test('Repeated saves do not duplicate openings',()=>{const e={...old,round:2,quantities:{los_olivos:5},storeContracts:{los_olivos:[{round:1,quantity:3},{round:2,quantity:2}]}};assert.deepEqual(R.nextStoreBatches(e,'los_olivos',4,2),[{round:1,quantity:3},{round:2,quantity:1}])});
+
+test('cycle schedules reject invalid totals and never include cycle seven',()=>{
+  for(const cycles of [0,7,-1,1.5,null,true,[], 'invalid'])assert.ok(R.cycleSchedule({...config,cycles}).error);
+  for(let cycles=1;cycles<=6;cycles++)assert.deepEqual(R.cycleSchedule({...config,cycles}).cycles.map(c=>c.round),Array.from({length:cycles},(_,i)=>i+1));
+});

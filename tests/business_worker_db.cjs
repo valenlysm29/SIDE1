@@ -30,7 +30,7 @@ function plan(round){
   await db.exec('reset role');
   const rows=(await db.query('select ciclo,ingresos,estado_resultados,balance_caja from reportes_ciclo where empresa_id=$1 order by ciclo',[id])).rows;
   assert.equal(rows.length,2);
-  for(const row of rows){assert.equal(Number(row.ingresos),22500);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);const lots=row.estado_resultados.cycleReceipt.materialLots;assert.equal(lots.length,1);assert.deepEqual(lots[0].unknown,[]);const expectedQuality=process.argv.includes('--mixed')?4+1+1+(30+33*3)/63:7;assert.ok(Math.abs(lots[0].excelQuality-expectedQuality)<1e-8);assert.ok(Math.abs(row.estado_resultados.cycleReceipt.sales[2].quality-expectedQuality)<1e-8);}
+  for(const row of rows){assert.equal(Number(row.ingresos),31500);assert.equal(row.estado_resultados.cycleReceipt.sales[2].price,350);assert.equal(row.estado_resultados.cycleReceipt.sold,90);assert.equal(row.estado_resultados.cycleReceipt.produced,90);const lots=row.estado_resultados.cycleReceipt.materialLots;assert.equal(lots.length,1);assert.deepEqual(lots[0].unknown,[]);const expectedQuality=process.argv.includes('--mixed')?4+1+1+(30+33*3)/63:7;assert.ok(Math.abs(lots[0].excelQuality-expectedQuality)<1e-8);assert.ok(Math.abs(row.estado_resultados.cycleReceipt.sales[2].quality-expectedQuality)<1e-8);}
   assert.equal(rows[0].estado_resultados.impuestoRenta,0);
   const preTax=rows.reduce((s,row)=>s+row.estado_resultados.utilidadAntesImpuestos,0),expected=Math.round((Math.min(preTax,82500)*.10+Math.max(0,preTax-82500)*.295)*100)/100;
   assert.ok(expected>0);assert.equal(rows[1].estado_resultados.impuestoRenta,expected);
@@ -42,8 +42,11 @@ function plan(round){
   assert.equal(restored.balanceGeneral.activos,restored.balanceGeneral.pasivoPatrimonio);
   await db.query("select set_config('test.role','authenticated',false)");await db.exec('set role authenticated');
   await assert.rejects(()=>rpc(db,'side_cierres_pendientes',{}));
-  await assert.rejects(()=>rpc(db,'side_guardar_cierre_negocio',{p_partida_id:game.id,p_ciclo:1,p_token:'fake',p_cierre:{}}));
+  const forged={ciclo:1,resultadosPorEmpresa:{[String(id)]:{receipt:{round:1,produced:999999},state:{__inventarioMP:{hilo_std:999999}},ledger:{},financial:{balanceCaja:{cajaFinal:999999},estadoResultados:{ingresos:999999,costos:0,utilidad:999999}}}}};
+  await assert.rejects(()=>rpc(db,'side_guardar_cierre_negocio',{p_partida_id:game.id,p_ciclo:1,p_token:'fake',p_cierre:forged}),/permission denied/i);
   await db.exec('reset role');
+  assert.deepEqual((await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot,saved);
+  assert.equal((await db.query('select count(*)::int as n from reportes_ciclo where empresa_id=$1',[id])).rows[0].n,2);
   const evidence=rows.map(row=>({cycle:row.ciclo,sold:row.estado_resultados.cycleReceipt.sold,revenue:Number(row.ingresos),preTax:row.estado_resultados.utilidadAntesImpuestos,tax:row.estado_resultados.impuestoRenta}));
   fs.mkdirSync(path.join(__dirname,'output'),{recursive:true});fs.writeFileSync(path.join(__dirname,'output/business-worker-two-cycles.json'),JSON.stringify(evidence,null,2));
   fs.writeFileSync(path.join(__dirname,'output/business-worker-state.json'),JSON.stringify(saved));

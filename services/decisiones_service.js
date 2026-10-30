@@ -173,6 +173,45 @@
     return { success: true, data: { provisional: true, persisted: false } };
   }
 
+  // Solo lectura: el servidor decide si el usuario tiene derecho a la empresa.
+  async function obtenerContextoMaterial(partidaId, empresaId, ciclo, estudiante = false) {
+    const sb = client(estudiante);
+    if (!sb) return offline();
+    if (!partidaId || !empresaId || !Number.isInteger(Number(ciclo)) || Number(ciclo) < 1 || Number(ciclo) > 6)
+      return { success: false, code: 'CONTEXTO_INVALIDO', error: 'Datos de recepción no verificados / proyección no disponible.' };
+    try {
+      const { data, error } = await sb.rpc('side_material_preview_v1', { p_partida_id: partidaId, p_empresa_id: empresaId, p_ciclo: Number(ciclo) });
+      if (error) return technicalFailure(error);
+      if (!data || data.version !== 'receipts-v1' || String(data.companyId) !== String(empresaId) ||
+          Number(data.cycle) !== Number(ciclo) || Number(data.cutoffDay) !== Number(ciclo) * 30 - 1 ||
+          !/^[a-f0-9]{32}$/.test(String(data.revision || '')) || !data.events || typeof data.events !== 'object' || Array.isArray(data.events))
+        return { success: false, code: 'CONTEXTO_INVALIDO', error: 'Datos de recepción no verificados / proyección no disponible.' };
+      return { success: true, data };
+    } catch (error) { return technicalFailure(error); }
+  }
+
+  async function registrarEntregaProveedor(partidaId, orderId, receiptId, cantidad) {
+    const sb=client();
+    if(!sb)return offline();
+    const quantity=Number(cantidad);
+    if(!partidaId||!orderId||!receiptId||!Number.isFinite(quantity)||quantity<=0)return {success:false,error:'Entrega inválida.'};
+    try {
+      const args={p_partida_id:partidaId,p_order_id:orderId,p_receipt_id:receiptId,p_quantity:quantity};
+      // 55P03 aborts the database statement. Reuse the event identity so a
+      // retry cannot create a second delivery even if the first result is lost.
+      let result;
+      for(let attempt=0;attempt<3;attempt++){
+        result=await sb.rpc('side_registrar_entrega_proveedor_v1',args);
+        if(result?.error?.code!=='55P03'||attempt===2)break;
+        await new Promise(resolve=>global.setTimeout(resolve,100*(attempt+1)));
+      }
+      const {data,error}=result;
+      if(error)return technicalFailure(error);
+      if(!data||data.receiptId!==receiptId||!Number.isInteger(Number(data.day)))return {success:false,error:'El servidor no confirmó la entrega.'};
+      return {success:true,data};
+    } catch(error){return technicalFailure(error);}
+  }
+
   global.SIDE = global.SIDE || {};
-  global.SIDE.DecisionesService = { guardar, obtenerReporte, obtenerCatalogo, guardarReporte };
+  global.SIDE.DecisionesService = { guardar, obtenerReporte, obtenerCatalogo, guardarReporte, obtenerContextoMaterial, registrarEntregaProveedor };
 })(window);

@@ -13,6 +13,11 @@
     state=clone(state);ledger=economicLedger(ledger,state);
     const previous=state.__cycleSettlements?.[round];
     if(previous)return {state,ledger,receipt:previous,reused:true,financialSections:clone(sectionsByRound),financial:FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy})};
+    if(state.__materialOrders&&(!financialPolicy.verifiedMaterialContext||!['cash','credit'].includes(financialPolicy.materialPaymentMode)))throw new Error('El cierre de pedidos temporales aún no admite valoración ni persistencia autoritativa.');
+    if(state.__materialOrders&&Object.values(state.__inventarioMP||{}).some(q=>n(q)>0)){
+      const previousFinancial=state.__financialSnapshots?.[Number(round)-1],quantities=previousFinancial?.inventoryQuantities,values=previousFinancial?.inventoryValues?.materials;
+      if(!quantities||!values||Object.entries(state.__inventarioMP||{}).some(([sku,q])=>n(q)>0&&(!Object.hasOwn(values,sku)||!Number.isFinite(Number(values[sku]))||Number(values[sku])<0||Math.abs(n(quantities[sku])-n(q))>1e-7)))throw new Error('Inventario inicial temporal sin valoración verificable.');
+    }
     // Only a settled receipt makes a financial snapshot authoritative. An old
     // preview for this open round must not mask the sales we are about to post.
     if(state.__financialSnapshots)delete state.__financialSnapshots[round];
@@ -44,10 +49,29 @@
     const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
+    const temporalFacts=state.__materialOrders?{receivedBySku:{},receivedValueBySku:{},ordersBySku:{},receipts:[],paymentMode:financialPolicy.materialPaymentMode,supplierCreditTermCycles:Number(financialPolicy.supplierCreditTermCycles??1)}:null;
+    if(temporalFacts){
+      const events=Object.values(state.__materialOrders.events||{}),allOrders=events.filter(e=>e.type==='order'),startDay=(Number(round)-1)*30,orders=allOrders.filter(e=>Number(e.orderedDay)===startDay),items=catalog.flatMap(c=>c.items||[]),seen=new Set();
+      const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
+      for(const order of orders){
+        const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
+        const expected=n(state[item?.id]?.quantities?.[order.sku]),price=businessRules.materialUnitPrice(option,expected,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}});
+        if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
+        seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
+      }
+      for(const item of items.filter(i=>i.material))for(const [sku,q] of Object.entries(state[item.id]?.quantities||{}))if(Number(state[item.id]?.round)===Number(round)&&n(q)>0&&!seen.has(sku))throw new Error('Falta una orden verificada para la compra.');
+      for(const event of events.filter(e=>e.type==='receipt'&&n(e.day)>=startDay&&n(e.day)<startDay+30)){
+        const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
+        temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
+        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+money(n(event.quantity)*n(order.unitCost)));
+        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value:money(n(event.quantity)*n(order.unitCost)),receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
+      }
+    }
+    if(temporalFacts?.paymentMode==='credit')ledger[`${round}:PROVEEDOR_CREDITO`]=money(Object.values(temporalFacts.ordersBySku).reduce((sum,o)=>sum+n(o.quantity)*n(o.unitCost),0));
     for(const material of plan.materials||[]){
       const definition=catalog.flatMap(c=>c.items||[]).find(item=>item.id===material.id),entries=definition?.options||[];
       let consumption=n(material.consumption);
-      for(const option of entries){const available=n(state.__inventarioMP?.[option.id])+n(Number(state[material.id]?.round)===Number(round)?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=Number(Math.max(0,available-used).toPrecision(15));consumption=Number(Math.max(0,consumption-used).toPrecision(15));}
+      for(const option of entries){if(plan.temporal){inventory[option.id]=n(plan.temporal.stockBySku?.[option.id]);continue;}const available=n(state.__inventarioMP?.[option.id])+n(Number(state[material.id]?.round)===Number(round)?state[material.id]?.quantities?.[option.id]:0),used=Math.min(available,consumption);inventory[option.id]=Number(Math.max(0,available-used).toPrecision(15));consumption=Number(Math.max(0,consumption-used).toPrecision(15));}
     }
     state.__inventarioMP=inventory;state.__finishedGoods=goods;state.__storeInventory=economic.storeInventory;state.__accountsReceivable=economic.receivable;
     const pendingRate=n(state.__economicHistory?.nextLoanRatePP),newLoan=n(state.PRESTAMO?.amount||state.PRESTAMO?.value);
@@ -62,9 +86,10 @@
       const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
       if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
     }
-    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
+    if(temporalFacts)ledger[`${round}:PROVEEDOR_PAGO`]=-n(financial.flujoCaja?.pagosProveedores)||0;
     state.__goodsLots=clone(financial.goodsLots||[]);receipt.lotMovements=clone(financial.lotMovements||[]);
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
     return {state,ledger,receipt,reused:false,financial,financialSections:sectionsByRound};

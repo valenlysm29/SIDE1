@@ -879,9 +879,32 @@ async function supabaseReports(reportsBase=state.reports){
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
     const report=out[out.length-1];
+    if(scopedContext?.configuracion?.materialRulesVersion==='receipts-v1'){
+      report.materialPreview='<p role="status">Datos de recepción no verificados / proyección no disponible.</p>';
+      try{
+        const context=await S.DecisionesService.obtenerContextoMaterial(partidaId,p.empresa_id,cicloActual,false);
+        if(!stillCurrent())return null;
+        const latestRuntime=runtime();
+        if(latestRuntime?.round!=null&&Number(latestRuntime.round)!==cicloActual)return null;
+        if(latestRuntime?.phase&&scopedContext.phase&&latestRuntime.phase!==scopedContext.phase)return null;
+        const snap=scopedContext.snapshot,plan=snap?.decision_state?.__cyclePlans?.[cicloActual]?.state;
+        if(context?.success&&snap?.decisions_submitted===true&&plan){
+          const restored=window.SIDE_CYCLE_MODEL.restoreState(plan,snap.decision_state);
+          const production=window.SIDE_PRODUCTION_MODEL.calculate({state:{...restored,__materialOrders:context.data},catalog:window.SIDE_DECISION_CATALOG,round:cicloActual,config:scopedContext.configuracion});
+          report.materialPreview=window.SIDE_MATERIAL_PREVIEW.html(context.data,production);
+          if(scopedContext.configuracion.deliveryPolicy==='explicit_provider_event_v1'){
+            const events=Object.values(context.data.events||{});
+            report.materialDeliveryForms=events.filter(e=>e.type==='order').map(o=>{
+              const received=events.filter(e=>e.type==='receipt'&&e.orderId===o.orderId).reduce((sum,e)=>sum+Number(e.quantity||0),0),pending=Number(o.quantity)-received;
+              return pending>0?`<form data-provider-delivery="${escapeAttr(o.orderId)}"><label>Entrega efectiva de ${escapeHtml(o.sku)} (pendiente ${escapeHtml(pending)} ${escapeHtml(o.unit)}): <input type="number" min="0.01" max="${escapeAttr(pending)}" step="0.01" required></label><button type="submit">Registrar entrega del proveedor</button><span role="status"></span></form>`:'';
+            }).join('');
+          }
+        }
+      }catch(error){console.warn('SIDE: previsualización de recepción no disponible',error);}
+    }
     // A report can precede the durable plan or lag behind it. Calculate from
     // the same confirmed snapshot as the student, scoped to this room/cycle.
-    if(scopedContext&&window.SIDE_LIVE_RESULTS&&!p.expulsada_at&&emp.estado!=='eliminada'){
+    if(scopedContext&&scopedContext.configuracion?.materialRulesVersion!=='receipts-v1'&&window.SIDE_LIVE_RESULTS&&!p.expulsada_at&&emp.estado!=='eliminada'){
       try{
         const result=window.SIDE_LIVE_RESULTS.calculate({snapshot:scopedContext.snapshot,round:cicloActual,capital:Number(emp.caja_inicial)||0,
           catalog:window.SIDE_DECISION_CATALOG,config:scopedContext.configuracion,id:p.empresa_id,
@@ -916,13 +939,16 @@ function applyConfirmedReportClosures(reports){
   }
   return reports;
 }
-let rosterSyncError='',reportsBusy=false,reportsAgain=false,reportsRevision=0;
+let rosterSyncError='',reportsBusy=false,reportsAgain=false,reportsRevision=0,providerDeliveryPending=0;
+function providerDeliveryEditing(){return !!document.activeElement?.closest?.('[data-provider-delivery]');}
 async function loadReports(){
+  if(providerDeliveryPending||providerDeliveryEditing()){reportsAgain=true;return;}
   if(reportsBusy){reportsAgain=true;return;}reportsBusy=true;
   const partidaId=state.partidaId,generation=roomGeneration,code=$('gameCode').value,revision=reportsRevision;
   const stillCurrent=()=>partidaId===state.partidaId&&generation===roomGeneration&&code===$('gameCode').value;
   try{
   const cached=state.reports;
+  if(state.authoritative?.materialRulesVersion==='receipts-v1'){for(const report of cached){report.materialPreview='<p role="status">Datos de recepción no verificados / proyección no disponible.</p>';report.materialDeliveryForms='';}renderResults();}
   let local=[];try{local=JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')||[]}catch{}
   local=local.filter(r=>r.partida===code);
   if(!partidaId&&window.SIDE_LIVE_RESULTS)for(const report of local){
@@ -941,6 +967,7 @@ async function loadReports(){
   try{
     const remote=await supabaseReports(base);
     if(!stillCurrent())return;
+    if(providerDeliveryPending||providerDeliveryEditing()){reportsAgain=true;return;}
     // A closure received while this read was pending owns the newer results.
     if(revision!==reportsRevision){reportsAgain=true;return;}
     state.reports=applyConfirmedReportClosures(remote||base);
@@ -1147,7 +1174,21 @@ function renderResults(){
   sel.innerHTML=selectable.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join('');
   const r=selected,pending=state.partidaId&&(!r.cycleReceipt||r.provisional),er=pending?{}:r.estadoResultados||{},bc=pending?{}:r.balanceCaja||{},fc=pending?{}:r.flujoCaja||{},bg=pending?{}:r.balanceGeneral||bc.balanceGeneral||{};
   const section=(title,entries,income=false)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value],i)=>`<div class="${income?window.SIDE_STUDENT_FINANCIAL_VIEW.incomeRowClass(i):''}"><span class="financial-row-label">${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
-  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${r.cycleHistory?.length?window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml({history:r.cycleHistory},false):teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er),true)}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Cuentas por cobrar',bg.cuentasPorCobrar],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Impuestos por pagar',bg.impuestosPorPagar],['Intereses por pagar',bg.interesesPorPagar],['Provisión por garantías',bg.provisionGarantias],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  $('detailReports').innerHTML=`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${r.materialPreview||''}${r.cycleHistory?.length?window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml({history:r.cycleHistory},false):teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er),true)}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Cuentas por cobrar',bg.cuentasPorCobrar],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Impuestos por pagar',bg.impuestosPorPagar],['Intereses por pagar',bg.interesesPorPagar],['Provisión por garantías',bg.provisionGarantias],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}</div>`;
+  if(r.materialDeliveryForms)$('detailReports').querySelector('.individual-report').insertAdjacentHTML('beforeend',r.materialDeliveryForms);
+  ($('detailReports').querySelectorAll?.('[data-provider-delivery]')||[]).forEach(form=>form.addEventListener('submit',async event=>{
+    event.preventDefault();const button=form.querySelector('button'),status=form.querySelector('[role=status]'),quantity=Number(form.querySelector('input').value),game=state.partidaId,generation=roomGeneration,order=form.dataset.providerDelivery;
+    if(button.disabled||!Number.isFinite(quantity)||quantity<=0)return;
+    const key=`SIDE_DELIVERY_${game}_${order}_${quantity}`;let receiptId;
+    try{receiptId=sessionStorage.getItem(key);if(!receiptId){receiptId=crypto.randomUUID();sessionStorage.setItem(key,receiptId);}}catch{status.textContent='No se pudo conservar el identificador de la entrega.';return;}
+    button.disabled=true;status.textContent='Registrando entrega…';providerDeliveryPending++;
+    let result;try{result=await window.SIDE.DecisionesService.registrarEntregaProveedor(game,order,receiptId,quantity);}
+    finally{providerDeliveryPending--;}
+    if(game!==state.partidaId||generation!==roomGeneration)return;
+    if(!result?.success){button.disabled=false;status.textContent=result?.error||'No se pudo registrar la entrega.';return;}
+    try{sessionStorage.removeItem(key);}catch{}
+    status.textContent=`Entrega confirmada en el día ${result.data.day}.`;button.blur();await loadReports();
+  }));
 }
 function closeBusinessLocalRound(){
   if(state.partidaId||!window.SIDE_CYCLE_MODEL)return null;

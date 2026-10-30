@@ -18,7 +18,7 @@
   }
   function cycleSchedule(config) {
     const count = Number(config.cycles), hours = Number(config.roundHours), minutes = Number(config.roundMinutes);
-    if (!Number.isInteger(count) || count < 1 || count > 20) return {error: 'El n\u00famero de ciclos debe ser un entero entre 1 y 20.', cycles: []};
+    if ((typeof config.cycles !== 'number' && typeof config.cycles !== 'string') || !Number.isInteger(count) || count < 1 || count > 6) return {error: 'El n\u00famero de ciclos debe ser un entero entre 1 y 6.', cycles: []};
     if (!Number.isSafeInteger(hours) || hours < 0 || !Number.isInteger(minutes) || minutes < 0 || minutes > 59 || hours*60+minutes < 1) {
       return {error: 'Indica una duraci\u00f3n de al menos 1 minuto; los minutos deben estar entre 0 y 59.', cycles: []};
     }

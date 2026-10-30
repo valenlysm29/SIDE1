@@ -52,3 +52,38 @@ test('later credit line rejects fabricated loan and permits verified available l
  const forged=await run(snapshot(900000),2,previous);assert.equal(forged.results[0].code,'DECISION_INVALIDA');assert.equal(forged.posted,undefined);
  const allowed=await run(snapshot(500),2,previous);assert.equal(allowed.results[0].success,true);assert.equal(allowed.posted.resultadosPorEmpresa['1'].financial.balanceCaja.prestamos,500);
 });
+
+test('worker rejects cycle totals above six before persisting a closure',async()=>{
+ let posted=false;
+ const rpc=async(name)=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[1]}]};
+  if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:1000,snapshot:makeSnapshot()}],financialConfig:{cycles:7},token:'t'}};
+  if(name==='side_guardar_cierre_negocio'){posted=true;return {data:{}};}
+  throw Error(name);
+ };
+ const result=await runOnce(rpc);
+ assert.equal(result[0].code,'DURACION_INVALIDA');assert.equal(posted,false);
+});
+
+test('worker rejects an out-of-range cycle even when a context is returned',async()=>{
+ let posted=false;
+ const rpc=async(name)=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[4]}]};
+  if(name==='side_contexto_cierre_negocio')return {data:{empresas:[],financialConfig:{cycles:3},token:'t'}};
+  if(name==='side_guardar_cierre_negocio'){posted=true;return {data:{}};}
+  throw Error(name);
+ };
+ const result=await runOnce(rpc);assert.equal(result[0].code,'CICLO_INVALIDO');assert.equal(posted,false);
+});
+
+test('worker no convierte compras en stock cuando la sala requiere recepción temporal',async()=>{
+ let posted=false;
+ const rpc=async(name)=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[1]}]};
+  if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:1000,snapshot:makeSnapshot()}],financialConfig:{cycles:3,materialRulesVersion:'receipts-v1'},token:'t'}};
+  if(name==='side_material_context_v1')return {data:{companyId:'1',events:{},revision:'verified'}};
+  if(name==='side_guardar_cierre_negocio'){posted=true;return {data:{}};}
+  throw Error(name);
+ };
+ const result=await runOnce(rpc);assert.equal(result[0].code,'RECEPCIONES_NO_DISPONIBLES');assert.equal(posted,false);
+});

@@ -1,0 +1,115 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
+const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
+const ORDERS=require('../js/material_orders'),PRO=require('../js/production_model'),fixture=require('./economic_v19_fixture.cjs');
+test('órdenes derivadas de decisiones confirmadas y recepciones idempotentes en PGlite local',async()=>{
+ const db=await database();
+ try{
+  await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$;");
+  const migration=fs.readFileSync(require.resolve('../supabase/migrations/20261030162649_side_pedidos_autoritativos.sql'),'utf8');await db.exec(migration);await db.exec(migration);
+  const game=await createGame(db,config({cycles:2,materialRulesVersion:'receipts-v1',materialLeadTimeDays:7,materialPaymentMode:'cash'}));
+  const a=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa A',p_nombre_comercial:'Empresa A'});
+  const b=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa B',p_nombre_comercial:'Empresa B'});
+  const id=Number(a.empresa_id),other=Number(b.empresa_id);assert.ok(id&&other);
+  const snap={decisions_submitted:true,decision_state:{__cyclePlans:{1:{state:{HILO:{round:1,quantities:{hilo_std:1300}}}}}}};
+  await db.query('update side_student_state set snapshot=$2 where empresa_id=$1',[id,snap]);
+  await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=$1",[game.id]);
+  await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
+  const args={p_partida_id:game.id,p_empresa_id:id,p_ciclo:1,p_sku:'hilo_std'};
+  const first=await rpc(db,'side_confirm_material_order_v1',args);assert.equal(Number(first.quantity),1300);assert.equal(Number(first.unitCost),1.84);assert.equal(first.expectedDay,7);
+  assert.deepEqual(await rpc(db,'side_confirm_material_order_v1',args),first);
+  await assert.rejects(()=>rpc(db,'side_confirm_material_order_v1',{...args,p_empresa_id:other}),/confirmada/);
+  const receipt={p_order_id:first.orderId,p_receipt_id:'r1',p_quantity:300,p_day:7};
+  assert.equal((await rpc(db,'side_record_material_receipt_v1',receipt)).reused,false);
+  assert.equal((await rpc(db,'side_record_material_receipt_v1',receipt)).reused,true);
+  await assert.rejects(()=>rpc(db,'side_record_material_receipt_v1',{...receipt,p_receipt_id:'r2',p_quantity:1001}),/superior/);
+  await assert.rejects(()=>rpc(db,'side_record_material_receipt_v1',{...receipt,p_receipt_id:'r3',p_day:30}),/alcanzado/);
+  const before=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:6});
+  const after=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:7});
+  assert.equal(Object.keys(before.events).length,1);assert.equal(Object.keys(after.events).length,2);assert.notEqual(before.revision,after.revision);
+  let ledger={};for(const event of Object.values(after.events).sort((x,y)=>x.type==='order'?-1:y.type==='order'?1:0))ledger=ORDERS.apply(ledger,event);
+  assert.equal(ledger.stock.hilo_std,300);
+  const state=fixture.state(1,{},2);state.__inventarioMP={cuero_prem:70,acc_prem:100};state.CUERO.quantities={};state.ACCESORIOS.quantities={};state.HILO.quantities={hilo_std:1300};state.PRODUCCION_META.moldTargets={molde_1:0,molde_2:0,molde_3:100};
+  const pending=PRO.calculate({state:{...state,__materialOrders:before},catalog:fixture.catalog,round:1});
+  const partial=PRO.calculate({state:{...state,__materialOrders:after},catalog:fixture.catalog,round:1});
+  assert.equal(pending.producibleUnits,0);assert.equal(partial.producibleUnits,23);assert.equal(partial.temporal.consumedBySku.hilo_std,299);
+  assert.equal((await rpc(db,'side_record_material_receipt_v1',{...receipt,p_receipt_id:'r4',p_quantity:1000})).reused,false);
+  const complete=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:29});
+  const preview=PRO.calculate({state:{...state,__materialOrders:complete},catalog:fixture.catalog,round:1});
+  assert.equal(preview.producibleUnits,100);assert.equal(preview.temporal.consumedBySku.hilo_std,1300);
+  assert.deepEqual((await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:other,p_cutoff_day:7})).events,{});
+  await db.exec('reset role');await db.query("select set_config('test.role','authenticated',false)");await db.exec('set role authenticated');
+  await assert.rejects(()=>rpc(db,'side_record_material_receipt_v1',receipt),/permission denied/i);
+  await assert.rejects(()=>rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:7}),/permission denied/i);
+  await db.exec('reset role');
+ }finally{await db.close();}
+});
+
+test('libro leído de PGlite alimenta preview con recepción día 7 y capacidad no retroactiva',async()=>{
+ const db=await database();
+ try{
+  await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$;");
+  await db.exec('alter table participantes add column if not exists expulsada_at timestamptz');
+  for(const name of ['../docs/sql/20261023_despliegue_cierre_v19.sql','../supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','../supabase/migrations/20261027_corregir_ventas_generales.sql','../supabase/migrations/20261028_cierre_servidor.sql'])await db.exec(fs.readFileSync(require.resolve(name),'utf8'));
+  await db.exec(fs.readFileSync(require.resolve('../supabase/migrations/20261030162649_side_pedidos_autoritativos.sql'),'utf8'));
+  const revisionMigration=fs.readFileSync(require.resolve('../supabase/migrations/20261030165204_side_cierre_revision_pedidos.sql'),'utf8');await db.exec(revisionMigration);await db.exec(revisionMigration);
+  const game=await createGame(db,config({cycles:1,materialRulesVersion:'receipts-v1',materialLeadTimeDays:7,materialPaymentMode:'cash'}));
+  const entry=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Temporal QA',p_nombre_comercial:'Temporal QA'}),id=Number(entry.empresa_id);
+  const state=fixture.state(1,{},2);state.__inventarioMP={};state.CUERO={round:1,quantities:{cuero_prem:140}};state.ACCESORIOS={round:1,quantities:{acc_prem:200}};state.HILO={round:1,quantities:{hilo_std:2600}};state.PRODUCCION_META.moldTargets={molde_1:0,molde_2:0,molde_3:200};state.JEFATURA={round:1,optionIds:['no_jefatura']};
+  for(const [key,opt] of [['MESA_CORTE','mesa'],['ENSAMBLE','ens_basica'],['ACABADOS','aca_basica'],['PERS_CORTE','corte_basico'],['PERS_ENSAMBLE','ens_personal_basico'],['PERS_ACABADO','aca_personal_basico']])state[key]={round:1,quantities:{[opt]:1},...(['MESA_CORTE','ENSAMBLE','ACABADOS'].includes(key)?{purchases:{1:{[opt]:1}}}:{})};
+  await db.query('update side_student_state set snapshot=$2 where empresa_id=$1',[id,{decisions_submitted:true,decision_state:{__cyclePlans:{1:{state}}}}]);
+  await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=$1",[game.id]);
+  await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
+  const order=await rpc(db,'side_confirm_material_order_v1',{p_partida_id:game.id,p_empresa_id:id,p_ciclo:1,p_sku:'hilo_std'});
+  for(const [sku,quantity] of [['cuero_prem',140],['acc_prem',200]]){
+   const item=await rpc(db,'side_confirm_material_order_v1',{p_partida_id:game.id,p_empresa_id:id,p_ciclo:1,p_sku:sku});
+   await rpc(db,'side_record_material_receipt_v1',{p_order_id:item.orderId,p_receipt_id:'r-'+sku,p_quantity:quantity,p_day:0});
+  }
+  const without=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:29});
+  assert.equal(PRO.calculate({state:{...state,__materialOrders:without},catalog:fixture.catalog,round:1}).producibleUnits,0);
+  await rpc(db,'side_record_material_receipt_v1',{p_order_id:order.orderId,p_receipt_id:'r-2600',p_quantity:2600,p_day:7});
+  const context=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:29});
+  const plan=PRO.calculate({state:{...state,__materialOrders:context},catalog:fixture.catalog,round:1});
+  assert.equal(plan.processCapacity,162);assert.equal(plan.producibleUnits,125);assert.equal(plan.temporal.consumedBySku.hilo_std,1625);assert.equal(plan.temporal.stockBySku.hilo_std,975);
+  assert.equal(plan.temporal.windows.slice(0,7).reduce((sum,row)=>sum+row.produced,0),0);
+  const closeContext=await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1});
+  const payload={p_partida_id:game.id,p_ciclo:1,p_token:closeContext.token,p_revisiones:{[id]:without.revision},p_cierre:{}};
+  const stale=await rpc(db,'side_guardar_cierre_temporal_v1',payload);assert.equal(stale.code,'ORDENES_DESACTUALIZADAS');
+  const validRevision=await rpc(db,'side_guardar_cierre_temporal_v1',{...payload,p_revisiones:{[id]:context.revision}});assert.ok(validRevision.error);assert.notEqual(validRevision.code,'ORDENES_DESACTUALIZADAS');
+  const calls=[],worker=require('../services/business_runtime.cjs');
+  await db.exec('begin');
+  const result=await worker.runOnce(async(name,args)=>{calls.push(name);if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args),error:null};}catch(error){return {data:null,error:{message:error.message}};}});
+  assert.equal(result[0].success,true,JSON.stringify(result));
+  assert.ok(calls.includes('side_material_context_v1'));assert.ok(calls.includes('side_guardar_cierre_temporal_v1'));
+  const saved=await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1});
+  const closed=saved.cierre.resultadosPorEmpresa[String(id)];
+  assert.equal(closed.receipt.produced,125);assert.equal(closed.receipt.production.temporal.consumedBySku.hilo_std,1625);assert.equal(closed.receipt.inventory.hilo_std,975);
+  assert.deepEqual(closed.receipt.production.temporal,plan.temporal);
+  assert.equal(closed.financial.balanceGeneral.inventarioMP,closed.financial.inventoryValues.materials.hilo_std+closed.financial.inventoryValues.materials.cuero_prem+closed.financial.inventoryValues.materials.acc_prem);
+  assert.equal(closed.financial.inventoryValues.materials.hilo_std,1794);
+  assert.equal(closed.receipt.materialReceiptFacts.receivedValueBySku.hilo_std,4784);
+  assert.equal(closed.financial.estadoResultados.desgloseCostos.materiales,10465);
+  assert.equal(closed.financial.balanceGeneral.inventarioMP,6279);
+  assert.equal(closed.financial.balanceGeneral.anticiposMateriales,0);
+  assert.equal(closed.financial.balanceCaja.cajaFinal,Math.round((closed.financial.balanceCaja.cajaInicial+closed.financial.balanceCaja.entradas-closed.financial.balanceCaja.salidas)*100)/100);
+  assert.equal(closed.financial.balanceGeneral.activos,closed.financial.balanceGeneral.pasivoPatrimonio);
+  console.log('CIERRE_TEMPORAL_QA '+JSON.stringify({produccion:closed.receipt.produced,vendidas:closed.receipt.sold,hiloRecibido:closed.receipt.materialReceiptFacts.receivedBySku.hilo_std,hiloConsumido:closed.receipt.production.temporal.consumedBySku.hilo_std,hiloFinal:closed.receipt.inventory.hilo_std,valorHiloRecibido:closed.receipt.materialReceiptFacts.receivedValueBySku.hilo_std,valorHiloFinal:closed.financial.inventoryValues.materials.hilo_std,anticipos:closed.financial.balanceGeneral.anticiposMateriales,cajaInicial:closed.financial.balanceCaja.cajaInicial,cajaFinal:closed.financial.balanceCaja.cajaFinal,ventas:closed.receipt.revenue,costoVentas:closed.financial.estadoResultados.costoVentas,utilidad:closed.financial.estadoResultados.utilidadNeta}));
+  await db.exec('rollback');
+  const edge=await import(require('node:url').pathToFileURL(require('node:path').resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);
+  const edgeResult=await edge.runOnce(async(name,args)=>name==='side_cierres_pendientes'?{data:[{id:game.id,cycles:[1]}]}:{data:await rpc(db,name,args),error:null});
+  assert.equal(edgeResult[0].success,true,JSON.stringify(edgeResult));
+  const edgeSaved=await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1});assert.deepEqual(edgeSaved.cierre,saved.cierre);
+  const again=await edge.runOnce(async(name,args)=>name==='side_cierres_pendientes'?{data:[{id:game.id,cycles:[1]}]}:{data:await rpc(db,name,args),error:null});
+  assert.equal(again[0].success,true);assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre,edgeSaved.cierre);
+  await db.exec('reset role');
+  assert.equal(Number((await db.query('select count(*) as n from side_business_closures where partida_id=$1',[game.id])).rows[0].n),1);
+  const stored=(await db.query('select ingresos,caja_final,estado_resultados from reportes_ciclo where empresa_id=$1 and ciclo=1',[id])).rows[0];
+  assert.equal(Number(stored.caja_final),closed.financial.balanceCaja.cajaFinal);assert.equal(Number(stored.ingresos),closed.receipt.revenue);
+  assert.deepEqual(stored.estado_resultados.cycleReceipt,closed.receipt);
+  assert.equal(Number((await db.query('select caja_actual from empresas where id=$1',[id])).rows[0].caja_actual),closed.financial.balanceCaja.cajaFinal);
+  await db.query("select set_config('test.role','authenticated',false)");await db.exec('set role authenticated');
+  await assert.rejects(()=>rpc(db,'side_guardar_cierre_temporal_v1',{...payload,p_revisiones:{[id]:context.revision},p_cierre:{ciclo:1,resultadosPorEmpresa:{[id]:{financial:{balanceCaja:{cajaFinal:999999}}}}}}),/permission denied/i);
+  await db.exec('reset role');assert.deepEqual((await db.query('select cierre from side_business_closures where partida_id=$1 and ciclo=1',[game.id])).rows[0].cierre,edgeSaved.cierre);
+
+ }finally{await db.close();}
+});

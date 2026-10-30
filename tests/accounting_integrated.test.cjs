@@ -30,3 +30,13 @@ test('warranty uses source rates and explicit v19 180-day assumption',()=>{
  const covered=close('pt_30');assert.equal(covered.estadoResultados.gastoGarantias,10);assert.equal(covered.balanceGeneral.provisionGarantias,10);assert.equal(covered.balanceGeneral.activos,covered.balanceGeneral.pasivoPatrimonio);assert.equal(close('pt_180').estadoResultados.policyWarnings.length,0);assert.equal(close('pt_180').estadoResultados.gastoGarantias,20);
 });
 test('migrated MP aggregate is consumed using explicit opening quantities',()=>{const f=F.calculate({round:2,catalog,openingBalance:{round:1,cash:900,balanceGeneral:{efectivo:900,inventarioMP:100,activos:1000,capital:1000}},state:{__cycleSettlements:{2:{openingInventory:{leather:10},inventory:{leather:4},sales:[{id:'esencial',produced:6,available:6,sold:0}]}}}});assert.equal(f.balanceGeneral.inventarioMP,40);assert.equal(f.balanceGeneral.inventarioPT,60);assert.equal(f.balanceGeneral.activos,f.balanceGeneral.pasivoPatrimonio);});
+
+test('paga parcialmente un vencimiento solo hasta la caja y conserva el saldo',()=>{
+ const openingBalance={round:1,cash:100,balanceGeneral:{efectivo:100,activos:100,cuentasPorPagarProveedores:200,capital:0,resultadosAcumulados:-100},supplierPayables:[{receiptId:'r1',orderId:'o1',value:200,paid:0,outstanding:200,dueCycle:2}]};
+ const state={__cycleSettlements:{2:{round:2,inventory:{},sales:[],decisions:{},materialReceiptFacts:{paymentMode:'credit',ordersBySku:{},receivedBySku:{},receivedValueBySku:{},receipts:[]}}}};
+ const result=F.calculate({openingBalance,state,round:2,financialPolicy:{cycles:2}});
+ assert.equal(result.flujoCaja.pagosProveedores,100);assert.equal(result.balanceCaja.cajaFinal,0);
+ assert.equal(result.balanceGeneral.cuentasPorPagarProveedores,100);assert.equal(result.cuentasPorPagarDetalle[0].outstanding,100);
+ assert.equal(result.balanceGeneral.activos,result.balanceGeneral.pasivoPatrimonio);
+ assert.equal(openingBalance.supplierPayables[0].outstanding,200);
+});
