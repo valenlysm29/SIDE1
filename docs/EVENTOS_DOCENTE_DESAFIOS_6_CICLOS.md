@@ -103,4 +103,4 @@ La migración adicional `20261031055001_mercado_global_escenarios_v2.sql` incorp
 
 `20261031055442_eventos_productivos_v2.sql` incorpora PE26 y PE39 como capacidad de planta y PE38/PE44 como gastos condicionados a personal o producción. Pendiente la aceptación integral de los modos y observaciones Word no excluidas.
 
-La migración `20261031060031_eventos_atractivo_duracion_v2.sql` programa PE70, PE91 y PE92 por dos ciclos; no permite iniciar el efecto si falta el ciclo siguiente. Pendiente aceptación integral de todos los modos y verificación de continuidad del efecto con dos cierres reales.
+La migración `20261031060031_eventos_atractivo_duracion_v2.sql` programa PE70, PE91 y PE92 por dos ciclos; no permite iniciar el efecto si falta el ciclo siguiente. La prueba aislada de tres empresas y seis ciclos verifica ambos cierres, inventarios, balances, arrastre y reintentos. `20261031060810_proteger_programacion_desafios.sql` rechaza programar efectos sobre decisiones confirmadas. Pendiente aceptación integral de los tres modos y ejecución en PostgreSQL/Auth real del entorno local completo.

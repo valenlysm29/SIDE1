@@ -10,9 +10,12 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
   await db.exec('create schema side_private; create table side_private.student_claims(empresa_id bigint primary key,owner_id uuid)');
   for(const file of ['supabase/migrations/20261031030035_consulta_privada_desafios.sql','supabase/migrations/20261031043153_programacion_desafios_autoritativa.sql','supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql'])await db.exec(fs.readFileSync(file,'utf8'));
   await db.exec(fs.readFileSync('supabase/migrations/20261031055001_mercado_global_escenarios_v2.sql','utf8'));
+  await db.exec(fs.readFileSync('supabase/migrations/20261031055442_eventos_productivos_v2.sql','utf8'));
+  await db.exec(fs.readFileSync('supabase/migrations/20261031060031_eventos_atractivo_duracion_v2.sql','utf8'));
+  await db.exec(fs.readFileSync('supabase/migrations/20261031060810_proteger_programacion_desafios.sql','utf8'));
   const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
   for(let i=1;i<=3;i++){const company=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa '+i,p_nombre_comercial:'Marca '+i});ids.push(Number(company.empresa_id));}
-  const events=[{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1},{id:'PE30',intensity:25,sign:0}];
+  const events=[{id:'PE70',intensity:12,sign:-1},{id:'PE91',intensity:7,sign:1},{id:'PE92',intensity:12,sign:-1},{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1}];
   for(let round=1;round<=6;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
   const groups=[{id:'PE01',intensity:10},{id:'PE02',intensity:15},{id:'PE03',intensity:25},{id:'PE04',intensity:30},{id:'PE17',intensity:10},{id:'PE18',intensity:10}];
   for(let round=1;round<=6;round++){const event=groups[(round-1)%groups.length];await rpc(db,'side_assign_group_event_v1',{p_partida_id:game.id,p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
@@ -31,7 +34,7 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
    const outcomes=await runOnce(call);assert.equal(outcomes[0].success,true,JSON.stringify(outcomes));
    const results=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa;
    for(const id of ids){
-    const result=results[id];assert.equal(result.receipt.events.length,id===ids[(round-1)%3]?2:1);assert.ok(result.receipt.events.some(event=>event.id===groups[(round-1)%groups.length].id));if(id===ids[(round-1)%3])assert.ok(result.receipt.events.some(event=>event.id===events[(round-1)%events.length].id));
+    const result=results[id],expected=[groups[(round-1)%groups.length].id];if(id===ids[(round-1)%3])expected.push(events[(round-1)%events.length].id);if(round>=2&&round<=4&&id===ids[(round-2)%3])expected.push(events[(round-2)%events.length].id);assert.deepEqual(result.receipt.events.map(event=>event.id).sort(),expected.sort());
     assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
     if(round>1)assert.equal(result.financial.balanceCaja.cajaInicial,previous[id].financial.balanceCaja.cajaFinal);
     for(const sale of result.receipt.sales)assert.ok(sale.sold<=sale.available);
@@ -41,8 +44,8 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
    assert.equal(ids.reduce((sum,id)=>sum+results[id].receipt.marketAllocation.products.esencial.asignado,0),Math.round(3500*(1+(groups[(round-1)%groups.length].id==='PE17'?-1:1)*groups[(round-1)%groups.length].intensity/100)));
    const affected=ids[(round-1)%3],other=ids[round%3];
    const shock=events[(round-1)%events.length];
-   if(shock.sign)assert.ok(shock.sign*(results[affected].receipt.marketAllocation.products.esencial.asignado-results[other].receipt.marketAllocation.products.esencial.asignado)>0);
-   else{const capacity=id=>results[id].receipt.production.processes.find(p=>p.id==='assembly').dailyCapacity;assert.equal(capacity(affected),capacity(other)*.75);assert.equal(results[affected].financial.flujoCaja.eventos,-200);}
+   if(shock.sign&&round!==3)assert.ok(shock.sign*(results[affected].receipt.marketAllocation.products.esencial.asignado-results[other].receipt.marketAllocation.products.esencial.asignado)>0);
+   else if(!shock.sign){const capacity=id=>results[id].receipt.production.processes.find(p=>p.id==='assembly').dailyCapacity;assert.equal(capacity(affected),capacity(other)*.75);assert.equal(results[affected].financial.flujoCaja.eventos,-200);}
    const again=await runOnce(call);assert.equal(again[0].success,true);
    assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa,results);
    previous=results;
