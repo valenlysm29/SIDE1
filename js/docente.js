@@ -274,7 +274,7 @@ function renderTeacherChallengeControls(){
   updateChallengeV1Preview();
   $('challengeV1Assign').disabled=!companies.length;
   if($('challengeV1Draw'))$('challengeV1Draw').disabled=!companies.length;
-  if($('challengeV1Balanced'))$('challengeV1Balanced').disabled=companies.length!==3;
+  if($('challengeV1Balanced'))$('challengeV1Balanced').disabled=companies.length<2;
 }
 function updateChallengeV1Preview(){
   const limits={PE01:10,PE02:15,PE03:25,PE04:30,PE17:10,PE18:10,PE23:1,PE26:10,PE30:25,PE38:1,PE39:6,PE44:1,PE68:1,PE69:20,PE70:12,PE71:15,PE74:12,PE75:6,PE77:1,PE91:7,PE92:12},event=$('challengeV1Event')?.value,intensity=$('challengeV1Intensity'),preview=$('challengeV1Preview');

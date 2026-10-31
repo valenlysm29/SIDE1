@@ -54,3 +54,21 @@ test('rotación programada llega a noticias privadas, cierre e historial de las 
   }
  }finally{await db.close();}
 });
+test('rotación experimental admite plantillas de dos a seis empresas sin repetir empresas y conserva exposición nominal',async()=>{
+ const db=await database();try{
+  await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz; create table public.side_business_closures(partida_id uuid,ciclo integer,cierre jsonb,primary key(partida_id,ciclo))");
+  for(const name of ['20261031025358_desafios_autoritativos_v1','20261031043153_programacion_desafios_autoritativa','20261031050037_eventos_grupales_mercado_v1','20261031055001_mercado_global_escenarios_v2','20261031055442_eventos_productivos_v2','20261031060031_eventos_atractivo_duracion_v2','20261031060810_proteger_programacion_desafios','20261031144757_programacion_equilibrada_v2','20261031150305_ampliar_rotacion_empresas'])await db.exec(fs.readFileSync(`supabase/migrations/${name}.sql`,'utf8'));
+  const migration=fs.readFileSync('supabase/migrations/20261031150305_ampliar_rotacion_empresas.sql','utf8');await db.exec(migration);
+  for(const size of [2,4,5,6]){
+   const game=await createGame(db,config({cycles:6,economicEventsVersion:'demand-share-v1',enabledEvents:['PE69','PE71','PE75']})),ids=[];
+   for(let i=0;i<size;i++)ids.push(String((await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:`Empresa ${size}-${i}`,p_nombre_comercial:`Marca ${size}-${i}`})).empresa_id));
+   const totals=Object.fromEntries(ids.map(id=>[id,{}]));
+   for(let round=1;round<=6;round++){
+    const args={p_partida_id:game.id,p_ciclo:round},draw=await rpc(db,'side_schedule_balanced_v1',args);assert.equal(draw.events.length,size);assert.equal(new Set(draw.events.map(e=>e.companyId)).size,size);
+    const repeat=await rpc(db,'side_schedule_balanced_v1',args);assert.equal(repeat.reused,true);assert.deepEqual(repeat.events,draw.events);
+    for(const event of draw.events)totals[event.companyId][event.eventId]=(totals[event.companyId][event.eventId]||0)+event.intensity;
+   }
+   for(const value of Object.values(totals))for(const event of ['PE69','PE71','PE75'])assert.equal(value[event],8);
+  }
+ }finally{await db.close();}
+});

@@ -14,6 +14,8 @@ test('el servicio acepta solo sorteos confirmados para el ciclo solicitado',asyn
 test('la programación equilibrada solo acepta tres asignaciones distintas confirmadas para el ciclo',async()=>{
  const events=['PE69','PE71','PE75'].map((eventId,i)=>({eventId,companyId:String(i+1),round:2,intensity:2}));
  assert.equal((await service({data:{round:2,reused:false,events},error:null}).programarDesafiosEquilibrados('game',2)).success,true);
- const bad=[{round:2,reused:false,events:events.slice(0,2)},{round:2,reused:false,events:events.map(e=>({...e,companyId:'1'}))},{round:2,reused:false,events:events.map(e=>({...e,intensity:6}))}];
+ assert.equal((await service({data:{round:2,reused:false,events:events.slice(0,2)},error:null}).programarDesafiosEquilibrados('game',2)).success,true);
+ assert.equal((await service({data:{round:2,reused:false,events:[...events,{...events[0],companyId:'4'}]},error:null}).programarDesafiosEquilibrados('game',2)).success,true);
+ const bad=[{round:2,reused:false,events:events.slice(0,1)},{round:2,reused:false,events:events.map(e=>({...e,companyId:'1'}))},{round:2,reused:false,events:events.map(e=>({...e,intensity:6}))}];
  for(const data of bad)assert.equal((await service({data,error:null}).programarDesafiosEquilibrados('game',2)).code,'EVENTOS_NO_VERIFICADOS');
 });
