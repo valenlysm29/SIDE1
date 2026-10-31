@@ -267,7 +267,7 @@
       drafts=best.drafts;scenario=best.plan;totalCost+=best.cost;
       additions.push({stage,quantity:best.quantity,worker:best.worker?.label||null,machine:best.machine?.label||null,cost:best.cost});
     }
-    return {additions,cost:totalCost,capacity:scenario.processCapacity,complete:complete&&scenario.processCapacity>=plan.target,
+    return {additions,cost:totalCost,capacity:scenario.processCapacity,producibleUnits:scenario.producibleUnits,materialShortfalls:scenario.materials.filter(m=>m.shortfall>0).map(m=>({id:m.id,label:m.label,unit:m.unit,shortfall:m.shortfall})),unavailablePlannedMolds:scenario.unavailablePlannedMolds,complete:complete&&scenario.processCapacity>=plan.target,
       budget:Number.isFinite(ctx.availableCash)?ctx.availableCash:null,affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null};
   }
   function threadAlternatives(ctx={},plan=calculate(ctx)){
@@ -279,7 +279,34 @@
       const quantity=Math.ceil(shortage/packs[o.id]),meters=quantity*packs[o.id];
       return {id:o.id,label:o.label,quantity,meters,remaining:thread.available+meters-thread.neededForTarget};
     });
-    return {needed:thread.neededForTarget,available:thread.available,shortage,options,temporal:!!plan.temporal};
+    // Enumerate mixed whole spools when the bounded search is small enough.
+    // The catalog prices purchases in physical units in legacy mode and in
+    // packs only in the explicitly versioned pack mode, as materialCost does.
+    const ordered=['hilo_std','hilo_ref','hilo_prem'].map(id=>definition.options.find(o=>o.id===id));
+    let purchase=null,exhaustive=false;
+    if(ordered.every(Boolean)){
+      const quantities=quantityCounts(ctx,'HILO'),packMode=ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1';
+      const hasAnalyst=selected(ctx,'ANALISTA_COMPRAS').includes('si_analista'),discount=hasAnalyst?Math.max(2,12-(n(ctx.round)-1)*2):0;
+      const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;
+      const priceConfig={...config,materials:{...config?.materials,...ctx.config?.materials}};
+      const value=(o,q)=>q*BUS.materialUnitPrice(o,q,discount,priceConfig);
+      const base=ordered.reduce((v,o)=>v+value(o,n(quantities[o.id])),0);
+      const evaluate=counts=>{
+        const meters=counts.reduce((v,q,i)=>v+q*packs[ordered[i].id],0);
+        if(meters<shortage)return;
+        const cost=ordered.reduce((v,o,i)=>v+value(o,n(quantities[o.id])+counts[i]*(packMode?1:packs[o.id])),0)-base;
+        if(!purchase||cost<purchase.cost-1e-7||(Math.abs(cost-purchase.cost)<1e-7&&meters<purchase.meters))purchase={counts:Object.fromEntries(ordered.map((o,i)=>[o.id,counts[i]])),meters,cost,remaining:thread.available+meters-thread.neededForTarget};
+      };
+      const maxA=Math.ceil(shortage/packs.hilo_std),maxB=Math.ceil(shortage/packs.hilo_ref);
+      if((maxA+1)*(maxB+1)<=30000){
+        exhaustive=false; // Quantity discounts can make buying extra spools cheaper.
+        for(let a=0;a<=maxA;a++)for(let b=0;b<=maxB;b++){
+          const remaining=Math.max(0,shortage-a*packs.hilo_std-b*packs.hilo_ref);
+          evaluate([a,b,Math.ceil(remaining/packs.hilo_prem)]);
+        }
+      }else for(let i=0;i<3;i++){const c=[0,0,0];c[i]=Math.ceil(shortage/packs[ordered[i].id]);evaluate(c);}
+    }
+    return {needed:thread.neededForTarget,available:thread.available,shortage,options,purchase,exhaustive,temporal:!!plan.temporal};
   }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){

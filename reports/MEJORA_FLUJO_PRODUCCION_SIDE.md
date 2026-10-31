@@ -29,3 +29,15 @@ La expectativa S/ 22.500 era obsoleta: se producen y venden 90 unidades premium 
 ## Archivos
 
 `js/app.js`, `js/production_model.js`, `js/production_dop.js`, `tests/production_dop_target_ui.test.js`, `tests/production_recommendations.test.cjs`, `tests/legacy_production_targets.test.cjs` y este informe. Los otros informes no rastreados preexistentes se conservaron fuera del commit.
+
+## Continuación: capacidad, materiales y porcentaje
+
+El DOP ahora compara la capacidad de la alternativa con `producibleUnits` recalculado mediante el motor y con los materiales y moldes existentes: en el ejemplo, la capacidad de 3.024 no significa que ya se puedan producir 3.000; la estimación sigue en 833. Enumera los faltantes de material. Las compras sugeridas siguen sin simularse como recibidas.
+
+La búsqueda de hilo compara mezclas enteras hasta 30.000 combinaciones; para más combinaciones compara alternativas de un tipo. Usa los costos y descuentos del modelo según la modalidad de unidades físicas o presentaciones. No explora toda sobrecompra potencial que podría activar descuentos, ni optimiza conjuntamente insumos, recursos y presupuesto; no se afirma optimalidad. Para el ejemplo de 8.000 m faltantes, prueba 30 carretes estándar, 8.100 m, S/ 14.904 adicionales en la modalidad heredada y 100 m sobrantes. El consumo y almacenamiento no cambian. Las recepciones futuras y la caja conjunta deben resolverse antes de afirmar viabilidad.
+
+Las dos pruebas de porcentaje revelaban una omisión: el adaptador Excel suministra `producedPercent`, pero el DOP lo ignoraba. Se muestra ahora únicamente si se suministra y como porcentaje factible estimado. Las dos pruebas pasan sin cambiar sus expectativas.
+
+El servidor informa `origin/main` en `258c74a92b6b1f87eab73b49eed3cc3a0233e38a`; la referencia remota de `develop` es `00bdec4`, mientras la referencia local anterior es `cb5b209`. El fetch general notificó que la referencia ya existía; no se eliminó ni sobrescribió. La consulta directa y el fetch específico de main funcionaron.
+
+Siguen pendientes el óptimo global comprobado, la recomendación conjunta de todos los materiales con presupuesto y una validación integral de las vistas durante seis ciclos. Por esos motivos la rama se respalda, pero no se integra a main.
