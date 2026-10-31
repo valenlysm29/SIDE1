@@ -35,7 +35,16 @@
     return Object.keys(quantities).length?{[round]:quantities}:{};
   }
   function quantity(state,id,option,round){return Math.max(0,Object.entries(assetPurchaseHistory(state[id],{options:[{id:option}]})).filter(([r])=>Number(r)<=round).reduce((s,[,row])=>s+(Number(row?.[option])||0),0));}
-  function maintenance(state,catalog,round=1){const r=regimes[regime({state})];return (catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset||i.id==='MOLDE').reduce((s,item)=>s+(item.options||[]).reduce((t,o)=>t+quantity(state,item.id,o.id,round)*n(o.cost)*r.maintenance/12,0),0);}
+  function maintenance(state,catalog,round=1){
+    const machines=(catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset&&i.id!=='MOLDE');
+    const hasMachines=machines.some(item=>(item.options||[]).some(o=>quantity(state,item.id,o.id,round)>0));
+    if(!hasMachines)return 0;
+    const selected=Number(state.MANTENIMIENTO?.round)===Number(round)?(state.MANTENIMIENTO.optionIds||[]):[];
+    if(selected.length>1||selected.some(id=>!['correctivo','preventivo_basico','preventivo_integral'].includes(id)))throw new Error('Modalidad de mantenimiento inválida.');
+    const mode=selected[0]||'correctivo';
+    if(round<2&&mode!=='correctivo')throw new Error('El mantenimiento preventivo está disponible desde el ciclo 2.');
+    return {correctivo:1000,preventivo_basico:1500,preventivo_integral:3000}[mode];
+  }
   function maintenanceEstimate(ctx={}){
     const state={...ctx.state},round=ctx.round||1;
     for(const item of (ctx.catalog||[]).flatMap(c=>c.items||[])){
@@ -50,6 +59,7 @@
         state.MOLDE={...entry,purchases:old};
       }
       if(item.id==='REGIMEN_LABORAL')state[item.id]=d;
+      if(item.id==='MANTENIMIENTO')state[item.id]={...d,round};
     }
     return maintenance(state,ctx.catalog,round);
   }

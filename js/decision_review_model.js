@@ -42,7 +42,10 @@
     const d=draft(item,ctx),e=ctx.state?.[item.id];
     const out={id:item.id,name:item.name,type:item.type,rows:[],outflow:0,assetIncome:0,bookValueDisposed:0,financing:0,recurring:0,note:''};
     const add=(label,quantity,unit,outflow=0,income=0,detail='')=>out.rows.push({label,quantity,unitCost:unit,outflow,income,detail});
-    if(item.type==='info'){
+    if(item.id==='MANTENIMIENTO'){
+      const amount=roundMoney(BUS.maintenanceEstimate(ctx));
+      add((item.options||[]).find(o=>o.id===(d.optionIds||[])[0])?.label||'Mantenimiento Correctivo',1,amount,amount,0,'Costo por ciclo cuando existe maquinaria.');
+    }else if(item.type==='info'){
       const channels=ctx.drafts?.CANALES||ctx.state?.CANALES,stores=ctx.rules.storeCount(channels);
       if(item.id==='MANTENIMIENTO'){out.automaticMaintenance=true;const amount=roundMoney(BUS.maintenanceEstimate(ctx));add('Mantenimiento mensual de activos',1,amount,amount,0,'Porcentaje anual del costo de adquisición dividido entre 12.');}
       else if(item.id==='PERSONAL_VENTAS')add('Vendedores b\u00e1sicos',stores,null,0,0,'1 por tienda f\u00edsica. Comisi\u00f3n total: 1% de las ventas; sin sueldo fijo adicional.');
