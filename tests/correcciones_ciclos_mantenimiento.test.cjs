@@ -32,3 +32,11 @@ test('cierre registra mantenimiento una sola vez y reutiliza el cierre',()=>{
  const second=C.close({state:first.state,ledger:first.ledger,sectionsByRound:first.financialSections,catalog,round:1,capital:100000,financialPolicy:{cycles:3}});
  assert.equal(second.reused,true);assert.equal(second.receipt.maintenanceCost,1000);
 });
+test('un ciclo abierto no deprecia y ningún cargo excede los activos contabilizados',()=>{
+ const openingBalance={round:1,cash:0,balanceGeneral:{efectivo:0,activosFijos:100,activos:100,capital:100},depreciationValues:{}};
+ const plan={ENSAMBLE:{round:1,purchases:{1:{machine:1}}}};
+ const pending=F.calculate({openingBalance,catalog:items,round:2,state:{__cyclePlans:{2:{state:plan}}},financialPolicy:{cycles:3}});
+ assert.equal(pending.estadoResultados.depreciacion,0);assert.equal(pending.balanceGeneral.activosFijos,100);
+ const closed=F.calculate({openingBalance,catalog:items,round:2,state:{__cycleSettlements:{2:{round:2,modelVersion:'md-20261027',regimen:'MYPE',decisions:plan,inventory:{},sales:[],financialPolicy:{cycles:3}}}},financialPolicy:{cycles:3}});
+ assert.equal(closed.estadoResultados.depreciacion,100);assert.equal(closed.balanceGeneral.activosFijos,0);assert.equal(closed.depreciationValues.machine,100);
+});

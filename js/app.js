@@ -1276,6 +1276,7 @@ function warnProductionMaterialShortage(){
   toast(`Advertencia: tu producción supera los insumos comprados. ${detail}. Puedes continuar.`);
 }
 function validateRequiredSection(cat){
+  if(cat.cat==='D'&&!validateChannelQuantities())return false;
   if(cat.cat==='D'&&channelDraft().transfers){const rows=manualDistributionData(),invalid=rows.find(r=>r.assigned>r.central||Object.entries(channelDraft().transfers[r.id]||{}).some(([id,q])=>Number(q)>0&&!r.points.some(p=>p.id===id)));if(invalid){toast('Revisa la distribución: supera el stock o incluye un punto de venta inactivo.');return false;}}
   for(const item of cat.items){
     const preliminary=initDraft(item);
@@ -1351,7 +1352,7 @@ function saveCurrentSection(){
 
   if(decisionEditingBlocked())return false;
   const cat=categoryByCat(currentCategory);if(!cat)return false;
-  if(currentCategory==='D'&&(!validateChannelQuantities()||!validateRequiredSection(cat)))return false;
+  if(currentCategory==='D'&&!validateRequiredSection(cat))return false;
   const context=decisionModelContext();let plan;
   try{plan=prepareSectionSave(cat,context);}catch(error){console.error('SIDE: no se pudo preparar el borrador',error);toast(`No se pudo preparar el borrador: ${error?.message||'revisa las opciones elegidas'}.`);return false;}
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0);

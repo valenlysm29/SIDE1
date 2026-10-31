@@ -772,10 +772,11 @@ module.exports={runOnce,remoteRpc};
       if(receipt?.materialReceiptFacts){const facts=receipt.materialReceiptFacts,ordered=Object.values(facts.ordersBySku).reduce((sum,v)=>sum+n(v.quantity)*n(v.unitCost),0),received=Object.values(facts.receivedValueBySku).reduce((sum,v)=>sum+n(v),0);if(Math.abs(money(ordered)-money(p.mp))>0.02)throw new Error('Pago de materiales no coincide con las órdenes verificadas.');if(facts.paymentMode==='credit'){if(Math.abs(money(ordered)-money(p.supplierCredit))>0.02)throw new Error('Crédito de proveedor inconsistente.');supplierPayable=money(supplierPayable+received);for(const item of facts.receipts){if(supplierPayableDetails.some(row=>row.receiptId===item.receiptId))throw new Error('Obligación de proveedor duplicada.');supplierPayableDetails.push({...item,paid:0,outstanding:item.value});}}else{materialPrepayment=money(materialPrepayment+p.mp-received);if(materialPrepayment < -0.01)throw new Error('Anticipo de materiales inconsistente.');}}
       const economicConfig=getEconomicConfig(),policy={...financialPolicy,...receipt?.financialPolicy},life={MESA_CORTE:10,ENSAMBLE:10,ACABADOS:8,MOLDE:5},months=n(policy.cycleMonths)||1;
       const md=receipt?.modelVersion==='md-20261027',residualRate=policy.residualRate??(receipt?.regimen==='NO_MYPE' ? .10 : .05);
-      let depreciation=0;
+      let depreciation=0,remainingAssetValue=Math.max(0,assets+p.comprasActivos-p.bajaActivos);
       for(const [id,years] of Object.entries(life)){
         const item=items.get(id);
         for(const option of item?.options||[]){
+          if(!receipt)continue;
           const entry=decisions[id]||{},purchases=entry.purchases;
           const cohorts=purchases?Object.entries(purchases).filter(([r])=>Number(r)>=1&&Number(r)<=p.r).map(([r,row])=>({round:Number(r),qty:Math.max(0,n(row?.[option.id]))})):[{round:Math.max(1,n(entry.round)||1),qty:n(entry.quantities?.[option.id])||Number(entry.optionIds?.includes(option.id)||false)}].filter(x=>x.round<=p.r);
           const qty=cohorts.reduce((sum,row)=>sum+row.qty,0),base=qty*n(option.cost)*(1-n(residualRate));
@@ -788,7 +789,8 @@ module.exports={runOnce,remoteRpc};
           else if(method.includes('FIN-02C'))scheduled*=economicConfig?.depreciation?.acceleratedFactor||2;
           const remaining=Math.max(0,base-n(depreciationValues[option.id]));
           if((cycles===3||cycles===6)&&p.r===cycles&&!method.includes('FIN-02B'))scheduled=remaining;
-          const charge=money(Math.max(0,Math.min(remaining,scheduled)));
+          const charge=money(Math.max(0,Math.min(remaining,scheduled,remainingAssetValue)));
+          remainingAssetValue=money(Math.max(0,remainingAssetValue-charge));
           depreciation+=charge;depreciationValues[option.id]=money(n(depreciationValues[option.id])+charge);
         }
       }
