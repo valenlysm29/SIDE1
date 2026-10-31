@@ -325,6 +325,7 @@ async function scheduleBalancedChallenges(){
 }
 function getConfig(){return {
   ...state.authoritative,lifecycleVersion:state.lifecycleVersion===2?2:undefined,
+  ...(window.SIDE_CONFIG?.LOCAL_EXPERIMENTAL_EVENTS===true?{economicEventsVersion:'demand-share-v1'}:{}),
   challengeModeV1:$('challengeV1Mode')?.value||state.authoritative?.challengeModeV1||'manual',
   integrationDurationMinutes:Number($('integrationDurationMinutes').value),
   integrationMinutes:state.integrationMinutes,gameStartedAt:gameStatus()?.startedAt||null,eventSchedule:eventSchedule(),
