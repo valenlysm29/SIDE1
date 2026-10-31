@@ -38,3 +38,20 @@ Se ejecutaron los archivos `tests/*.test.js` y `tests/*.test.cjs` con concurrenc
 
 Ningún modo está completamente validado según los criterios solicitados. Faltan los seis escenarios completos de 3 y 6 ciclos con al menos dos empresas en Supabase local, integración de compras, recepciones, Kardex, finanzas y finalización; faltan además cierre y avance completos mediante clics, y concurrencia de Edge en esos escenarios. Existe riesgo de divergencia entre las pruebas aisladas y el recorrido real. Los cierres históricos y las bases remotas no se alteraron; no se hizo push ni despliegue.
 
+
+## Continuación: seis salas reales aisladas
+
+Se creó el proyecto local `modos-e2e` en `127.0.0.1:62321`, con PostgreSQL, Auth y Edge, aplicando las migraciones de la rama a una base nueva. `python tests/modos_local_reales.py` crea cada sala mediante `crear_sala_docente`, reintenta la misma solicitud, integra tres sesiones estudiantiles mediante `side_ingresar_empresa_segura`, guarda el modo, programa el primer ciclo y consulta noticias. No usa PGlite ni escrituras SQL directas para crear salas o decisiones. El programa devuelve error mientras falte completar los ciclos; los resultados se guardaron en `tests/output/modos_local_reales.json`.
+
+| Modo | Duración | Empresas integradas | Ciclos completos | Compras/recepciones/producción | Finanzas/cierre/avance | Interfaz real |
+|---|---:|---:|---:|---|---|---|
+| Manual | 3 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+| Manual | 6 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+| Aleatorio | 3 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+| Aleatorio | 6 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+| Equilibrado | 3 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+| Equilibrado | 6 | 3 | 0 | Pendiente | Pendiente | Pendiente en esta sala |
+
+En las seis salas pasaron Auth docente, creación y reintento idempotente, ingreso de empresas, persistencia del modo, programación del primer ciclo y lectura de noticias. Aleatorio y Equilibrado también recuperaron el primer sorteo o programación en el reintento. La prueba no verifica todavía la semilla, los ciclos posteriores ni el contenido económico de las noticias. Todas estas operaciones se hicieron por HTTP autenticado, sin clics.
+
+La Edge local respondió 401 con token inválido y 200 con token válido y lista vacía de cierres. Esto verifica autorización y ejecución sin trabajo, no cierre ni concurrencia. La prueba no automatiza aún decisiones y compras mediante controles reales, recepciones, cierre Edge con trabajo, avance ni finalización. Por eso los seis escenarios siguen sin aprobarse; no se encontró un defecto funcional reproducible en los pasos ejecutados y no se cambió la lógica del producto. No se repitió la regresión general porque no se modificó el producto; se conserva la selección previa de 825 aprobadas y 17 fallidas. No hubo despliegue ni cambios en bases remotas.
