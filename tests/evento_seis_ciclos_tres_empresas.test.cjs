@@ -35,11 +35,16 @@ for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desaf
    const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[round]}]};try{return {data:await rpc(db,name,args)};}catch(e){return {error:{message:e.message}};}};
    const outcomes=await runOnce(call);assert.equal(outcomes[0].success,true,JSON.stringify(outcomes));
    const results=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa;
+   await db.exec('reset role');
    for(const id of ids){
     const result=results[id],expected=[groups[(round-1)%groups.length].id];if(id===ids[(round-1)%3])expected.push(events[(round-1)%events.length].id);if(round>=2&&['PE70','PE91','PE92'].includes(events[round-2].id)&&id===ids[(round-2)%3])expected.push(events[round-2].id);assert.deepEqual(result.receipt.events.map(event=>event.id).sort(),expected.sort());
     teacher.confirmedReportClosures.set(JSON.stringify([1,game.id,round,String(id)]),{...result.financial,cycleReceipt:result.receipt});
     const projected={empresaId:id,ronda:round};teacher.applyConfirmedReportClosures([projected]);const laboratory=lab.read(result);
     assert.equal(projected.ingresos,laboratory.revenue);assert.equal(projected.utilidad,laboratory.profit);assert.equal(projected.caja,laboratory.cash);assert.equal(projected.unidadesVendidas,laboratory.sold);assert.equal(projected.cycleHistory.length,round);
+    const student=(await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot.decision_state;
+    assert.deepEqual(student.__cycleSettlements[String(round)],result.receipt);
+    assert.equal(student.__financialSnapshots[String(round)].estadoResultados.ingresos,projected.ingresos);
+    assert.equal(student.__financialSnapshots[String(round)].balanceCaja.cajaFinal,projected.caja);
     assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
     if(round>1)assert.equal(result.financial.balanceCaja.cajaInicial,previous[id].financial.balanceCaja.cajaFinal);
     for(const sale of result.receipt.sales)assert.ok(sale.sold<=sale.available);
@@ -51,7 +56,7 @@ for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desaf
    const shock=events[(round-1)%events.length];
    if(shock.sign&&round!==3)assert.ok(shock.sign*(results[affected].receipt.marketAllocation.products.esencial.asignado-results[other].receipt.marketAllocation.products.esencial.asignado)>0);
    else if(!shock.sign){const capacity=id=>results[id].receipt.production.processes.find(p=>p.id==='assembly').dailyCapacity;assert.equal(capacity(affected),capacity(other)*.75);assert.equal(results[affected].financial.flujoCaja.eventos,-200);}
-   const again=await runOnce(call);assert.equal(again[0].success,true);
+   await db.exec('set role service_role');const again=await runOnce(call);assert.equal(again[0].success,true);
    assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa,results);
    previous=results;
   }
