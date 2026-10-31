@@ -34,3 +34,7 @@ En la rama se integraron compras por presentaciones, confirmación de pedidos, r
 ## Restricciones
 
 No modificar `main`, bases remotas ni cierres históricos; no desplegar ni hacer push sin autorización. Preservar respaldos y stashes. No alterar fórmulas económicas, mantenimiento, depreciación, opciones de decisiones ni funcionalidades experimentales sin un defecto reproducible y su prueba. Mantener claves de servicio y resultados privados fuera de Git. No usar el proyecto local sobre datos compartidos o históricos, ni reiniciarlo destructivamente.
+
+## Continuación posterior a c43154f
+
+APROBADO: se agregó `tests/modos_navegador_local.cjs`, que comprueba creación y persistencia de los tres modos mediante navegador y Auth local. NO EJECUTADO: decisiones, compras, recepciones, cierres y avance en los seis escenarios. Ver `reports/VALIDACION_FINAL_INTEGRAL_SIDE.md` y `reports/PENDIENTES_REALES_SIDE.md`.
