@@ -30,7 +30,7 @@
       else if(kind==='PROVEEDOR_CREDITO')p.supplierCredit=n(p.supplierCredit)+amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
-      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:money(-amount)});}
+      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento de maquinaria':'Almacenaje',importe:money(-amount)});}
       else if(kind==='SIM_DEVOLUCIONES')p.devoluciones-=amount;
       else if(kind==='EVENT')p.eventos+=amount;
       else if(kind==='SIM_INVERSION')p.comprasActivos-=amount;

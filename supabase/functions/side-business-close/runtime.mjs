@@ -510,14 +510,19 @@ module.exports={runOnce,remoteRpc};
     return Object.keys(quantities).length?{[round]:quantities}:{};
   }
   function quantity(state,id,option,round){return Math.max(0,Object.entries(assetPurchaseHistory(state[id],{options:[{id:option}]})).filter(([r])=>Number(r)<=round).reduce((s,[,row])=>s+(Number(row?.[option])||0),0));}
-  function maintenance(state,catalog,round=1){
-    const machines=(catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset&&i.id!=='MOLDE');
-    const hasMachines=machines.some(item=>(item.options||[]).some(o=>quantity(state,item.id,o.id,round)>0));
-    if(!hasMachines)return 0;
+  function maintenanceMode(state,round=1){
     const selected=Number(state.MANTENIMIENTO?.round)===Number(round)?(state.MANTENIMIENTO.optionIds||[]):[];
     if(selected.length>1||selected.some(id=>!['correctivo','preventivo_basico','preventivo_integral'].includes(id)))throw new Error('Modalidad de mantenimiento inválida.');
     const mode=selected[0]||'correctivo';
     if(round<2&&mode!=='correctivo')throw new Error('El mantenimiento preventivo está disponible desde el ciclo 2.');
+    return mode;
+  }
+  function maintenanceMitigation(state,round=1){return {correctivo:0,preventivo_basico:0.25,preventivo_integral:0.5}[maintenanceMode(state,round)];}
+  function maintenance(state,catalog,round=1){
+    const machines=(catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset&&i.id!=='MOLDE');
+    const hasMachines=machines.some(item=>(item.options||[]).some(o=>quantity(state,item.id,o.id,round)>0));
+    if(!hasMachines)return 0;
+    const mode=maintenanceMode(state,round);
     return {correctivo:1000,preventivo_basico:1500,preventivo_integral:3000}[mode];
   }
   function maintenanceEstimate(ctx={}){
@@ -538,7 +543,7 @@ module.exports={runOnce,remoteRpc};
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenanceMode,maintenanceMitigation,maintenance,maintenanceEstimate});
 });
 
 },
@@ -719,7 +724,7 @@ module.exports={runOnce,remoteRpc};
       else if(kind==='PROVEEDOR_CREDITO')p.supplierCredit=n(p.supplierCredit)+amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
-      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:money(-amount)});}
+      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento de maquinaria':'Almacenaje',importe:money(-amount)});}
       else if(kind==='SIM_DEVOLUCIONES')p.devoluciones-=amount;
       else if(kind==='EVENT')p.eventos+=amount;
       else if(kind==='SIM_INVERSION')p.comprasActivos-=amount;
@@ -966,7 +971,8 @@ module.exports={runOnce,remoteRpc};
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
+    const mitigation=breakdown?BUS.maintenanceMitigation(state,round):0;
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100*(1-mitigation)}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -986,6 +992,7 @@ module.exports={runOnce,remoteRpc};
       plan.target=originalPlan.target;plan.targets=originalPlan.targets;
       plan.productLines.forEach((line,i)=>{line.target=originalPlan.productLines[i].target;line.requirements=originalPlan.productLines[i].requirements;line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;});
       plan.materials.forEach((material,i)=>{material.neededForTarget=originalPlan.materials[i].neededForTarget;material.shortfall=Math.max(0,material.neededForTarget-material.available);});
+      plan.processes.forEach(process=>{process.shortfall=Math.max(0,plan.target-process.cycleCapacity);});
       plan.productionGap=Math.max(0,plan.target-plan.producibleUnits);
     }
     const price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
