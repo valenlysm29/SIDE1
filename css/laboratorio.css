@@ -13,3 +13,14 @@
 .lab-controls label:has(#lab-game){min-width:0}.lab-controls #lab-game{display:block;max-width:100%;min-width:0;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .lab-chart-grid.lab-chart-single{grid-template-columns:minmax(0,1fr)}
+/* Filtros: reservar espacio al ciclo antes de acomodar las acciones. */
+@media (min-width:1400px){
+  .lab:not(.lab-presenting) .lab-controls{grid-template-columns:minmax(160px,1.25fr) minmax(150px,1fr) minmax(205px,1fr) auto auto}
+}
+@media (min-width:768px) and (max-width:1399px){
+  .lab:not(.lab-presenting) .lab-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(205px,1fr)}
+}
+@media (max-width:767px){
+  .lab:not(.lab-presenting) .lab-controls label:has(#lab-cycle){grid-column:1/-1}
+}
+.lab-controls #lab-cycle{width:100%;min-width:0;max-width:100%}
