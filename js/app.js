@@ -831,8 +831,7 @@ function isLocked(item){const e=savedEntry(item);return sectionSubmitted(current
 function cycleDecisionsLocked(){return decisionsSubmitted()}
 function decisionEditingBlocked(){if(decisionsSubmitted()){toast('Todas las decisiones de este ciclo ya fueron enviadas. Podrás modificarlas cuando comience el próximo ciclo.');return true}if(sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada y está bloqueada hasta el próximo ciclo.');return true}return false}
 function itemRequired(item){
-  if(item?.id==='MOLDE')return ownedMolds().length===0;
-  if(item?.requiredWhenProduction){const plan=productionPlan();return plan.target>0&&(plan.materials.find(material=>material.id===item.id)?.shortfall??0)>0;}
+  if(item?.id==='MOLDE'||item?.requiredWhenProduction)return false;
   return item?.required===true;
 }
 function itemComplete(item){
@@ -1286,7 +1285,6 @@ function validateRequiredSection(cat){
     if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}
     if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}
     if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}
-    if(item.type==='production-plan'){const plan=productionPlan();if(plan.unavailablePlannedMolds.length){const names=plan.productLines.filter(line=>plan.unavailablePlannedMolds.includes(line.id)).map(line=>line.label).join(', ');toast(`No puedes enviar esta meta: falta adquirir ${names}. Cambia la meta o compra el molde.`);return false;}}
     if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}
     if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}
   }
