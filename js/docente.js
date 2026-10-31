@@ -266,6 +266,11 @@ function renderTeacherChallengeControls(){
   const key=JSON.stringify(companies.map(r=>[String(r.empresaId),r.empresa]));
   if(select.dataset.roster!==key){select.replaceChildren();for(const r of companies){const option=document.createElement('option');option.value=String(r.empresaId);option.textContent=r.empresa||'Empresa';select.appendChild(option);}select.dataset.roster=key;if(companies.some(r=>String(r.empresaId)===previous))select.value=previous;}
   $('challengeV1Round').max=String(Math.min(6,Number(state.authoritative.cycles)||6));
+  const mode=$('challengeV1Mode');if(mode&&mode.dataset.game!==state.partidaId){mode.value=state.authoritative.challengeModeV1||'manual';mode.dataset.game=state.partidaId;}
+  const selectedMode=mode?.value||'manual';
+  $('challengeV1Assign').hidden=selectedMode!=='manual';
+  $('challengeV1Draw').hidden=selectedMode!=='random';
+  $('challengeV1Balanced').hidden=selectedMode!=='balanced';
   updateChallengeV1Preview();
   $('challengeV1Assign').disabled=!companies.length;
   if($('challengeV1Draw'))$('challengeV1Draw').disabled=!companies.length;
@@ -320,6 +325,7 @@ async function scheduleBalancedChallenges(){
 }
 function getConfig(){return {
   ...state.authoritative,lifecycleVersion:state.lifecycleVersion===2?2:undefined,
+  challengeModeV1:$('challengeV1Mode')?.value||state.authoritative?.challengeModeV1||'manual',
   integrationDurationMinutes:Number($('integrationDurationMinutes').value),
   integrationMinutes:state.integrationMinutes,gameStartedAt:gameStatus()?.startedAt||null,eventSchedule:eventSchedule(),
   nombre:$('gameName').value.trim(),curso:$('gameCourse').value.trim(),codigo:$('gameCode').value,
@@ -1425,6 +1431,7 @@ $('openEventPicker')?.addEventListener('click',()=>{$('eventPicker').showModal()
 $('challengeV1Assign')?.addEventListener('click',()=>{void assignTeacherChallenge();});
 $('challengeV1Draw')?.addEventListener('click',()=>{void drawTeacherChallenges();});
 $('challengeV1Balanced')?.addEventListener('click',()=>{void scheduleBalancedChallenges();});
+$('challengeV1Mode')?.addEventListener('change',async()=>{const mode=$('challengeV1Mode'),game=state.partidaId,previous=state.authoritative?.challengeModeV1||'manual';renderTeacherChallengeControls();if(!await saveConfig(true)&&game===state.partidaId){mode.value=previous;renderTeacherChallengeControls();toast('No se pudo guardar el modo de desafíos.');}});
 $('challengeV1Refresh')?.addEventListener('click',()=>{void refreshTeacherChallenges();});
 $('challengeV1Event')?.addEventListener('change',updateChallengeV1Preview);
 $('closeEventPicker')?.addEventListener('click',()=>$('eventPicker').close());
