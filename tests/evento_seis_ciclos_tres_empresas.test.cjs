@@ -19,7 +19,7 @@ for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desaf
   for(let round=1;round<=cycles;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
   const groups=[{id:'PE01',intensity:10},{id:'PE02',intensity:15},{id:'PE03',intensity:25},{id:'PE04',intensity:30},{id:'PE17',intensity:10},{id:'PE18',intensity:10}];
   for(let round=1;round<=cycles;round++){const event=groups[(round-1)%groups.length];await rpc(db,'side_assign_group_event_v1',{p_partida_id:game.id,p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
-  const source=fs.readFileSync('js/docente.js','utf8'),project=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf('\nlet rosterSyncError=')),lab=require('../js/laboratorio_model.js');
+  const source=fs.readFileSync('js/docente.js','utf8'),project=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf('\nlet rosterSyncError=')),lab=require('../js/laboratorio_model.js'),podium=require('../js/teacher_podium.js');
   const teacher={state:{partidaId:game.id},roomGeneration:1,confirmedReportClosures:new Map()};vm.createContext(teacher);vm.runInContext(project,teacher);
   let previous={};
   for(let round=1;round<=cycles;round++){
@@ -41,6 +41,7 @@ for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desaf
     teacher.confirmedReportClosures.set(JSON.stringify([1,game.id,round,String(id)]),{...result.financial,cycleReceipt:result.receipt});
     const projected={empresaId:id,ronda:round};teacher.applyConfirmedReportClosures([projected]);const laboratory=lab.read(result);
     assert.equal(projected.ingresos,laboratory.revenue);assert.equal(projected.utilidad,laboratory.profit);assert.equal(projected.caja,laboratory.cash);assert.equal(projected.unidadesVendidas,laboratory.sold);assert.equal(projected.cycleHistory.length,round);
+    assert.equal(podium.suggestedPodium([{...projected,empresa:`Empresa ${id}`,fuente:'supabase'}]).length,1);
     const student=(await db.query('select snapshot from side_student_state where empresa_id=$1',[id])).rows[0].snapshot.decision_state;
     assert.deepEqual(student.__cycleSettlements[String(round)],result.receipt);
     assert.equal(student.__financialSnapshots[String(round)].estadoResultados.ingresos,projected.ingresos);

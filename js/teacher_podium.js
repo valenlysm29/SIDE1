@@ -4,7 +4,7 @@
   const clamp=value=>Math.max(0,Math.min(1,value));
   function suggestedScore(report){
     const er=report.estadoResultados||{},bg=report.balanceGeneral||report.balanceCaja?.balanceGeneral||{};
-    const sales=num(er.ventasNetas??er.ingresos??report.ingresos),profit=num(er.utilidad??report.utilidad);
+    const sales=num(er.ventasNetas??er.ingresos??report.ingresos),profit=num(er.utilidad??er.utilidadNeta??report.utilidad);
     const assets=num(bg.activos),cash=num(bg.efectivo??report.caja),debt=num(bg.deuda);
     // SIDE suggestion, 0–100: profit margin 35 points (20% = full),
     // return on assets 25 (15% = full), cash/assets 25 (30% = full),
@@ -17,7 +17,13 @@
     return Math.round((35*margin+25*roa+25*liquidity+15*leverage)*100)/100;
   }
   function eligibleReports(reports,{finished=false}={}){return reports.filter(r=>!r.expulsadaAt&&(finished||r.estado!=='eliminada'));}
-  function suggestedPodium(reports,options){return eligibleReports(reports,options).map(r=>({...r,sideScore:suggestedScore(r)})).sort((a,b)=>b.sideScore-a.sideScore||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
+  function hasVerifiedScoreInputs(report){
+    if(report.fuente!=='supabase')return true;
+    if(report.provisional||!report.cycleReceipt)return false;
+    const er=report.estadoResultados||{},bg=report.balanceGeneral||report.balanceCaja?.balanceGeneral||{};
+    return [er.ventasNetas??er.ingresos,er.utilidad??er.utilidadNeta,bg.activos,bg.efectivo,bg.deuda].every(value=>value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value)));
+  }
+  function suggestedPodium(reports,options){return eligibleReports(reports,options).filter(hasVerifiedScoreInputs).map(r=>({...r,sideScore:suggestedScore(r)})).sort((a,b)=>b.sideScore-a.sideScore||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
   function finalPodium(reports,gradeFor,options){return eligibleReports(reports,options).map(r=>({...r,grade:gradeFor(r)})).filter(r=>r.grade!=null&&Number.isFinite(Number(r.grade))&&Number(r.grade)>=0&&Number(r.grade)<=20).sort((a,b)=>Number(b.grade)-Number(a.grade)||String(a.empresa).localeCompare(String(b.empresa),'es')).slice(0,3);}
   return {suggestedScore,suggestedPodium,finalPodium,eligibleReports};
 });

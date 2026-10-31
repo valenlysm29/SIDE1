@@ -12,6 +12,13 @@ test('SIDE suggestion uses financial statements and remains separate from grades
   assert.equal(suggestedPodium(reports)[0].empresa,'Alta SIDE');
   assert.equal(suggestedScore({...reports[0],teacherScore:0}),100);
 });
+test('SIDE suggestion excludes pending remote closures and uses verified zero values',()=>{
+ const pending={empresa:'Pendiente',fuente:'supabase',caja:100000,estadoResultados:{},balanceGeneral:{}};
+ const incomplete={empresa:'Incompleta',fuente:'supabase',cycleReceipt:{round:1},estadoResultados:{ingresos:100,utilidad:0},balanceGeneral:{activos:100,efectivo:100}};
+ const closed={empresa:'Cerrada',fuente:'supabase',cycleReceipt:{round:1},estadoResultados:{ingresos:0,utilidadNeta:0},balanceGeneral:{activos:100,efectivo:100,deuda:0}};
+ assert.deepEqual(suggestedPodium([pending,incomplete,closed]).map(r=>r.empresa),['Cerrada']);assert.equal(suggestedScore(closed),40);
+ assert.equal(finalPodium([{...pending,teacherScore:18}],r=>r.teacherScore).length,1);
+});
 
 test('completed games grade all participants regardless of activity or presence',()=>{
   const participants=[
