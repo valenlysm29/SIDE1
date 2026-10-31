@@ -3,9 +3,9 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),CYCLE=require('../js/cycle_model.js');
 const scope={window:{}};vm.runInNewContext(fs.readFileSync(require.resolve('../js/decision_catalog.js'),'utf8'),scope);
 const catalog=JSON.parse(JSON.stringify(scope.window.SIDE_DECISION_CATALOG));
-function input(target=100){
+function input(target=100,machines=1){
   const state={};
-  const counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1},ACABADOS:{aca_basica:1},
+  const counts={MESA_CORTE:{mesa:machines},ENSAMBLE:{ens_basica:machines},ACABADOS:{aca_basica:machines},
     PERS_CORTE:{corte_basico:100},PERS_ENSAMBLE:{ens_personal_basico:100},PERS_ACABADO:{aca_personal_basico:100},
     CUERO:{cuero_sint:target*.3},ACCESORIOS:{acc_eco:target},HILO:{hilo_std:target*6}};
   for(const [id,quantities]of Object.entries(counts))state[id]={round:1,quantities,...(catalog.flatMap(c=>c.items).find(i=>i.id===id).asset?{purchases:{1:quantities}}:{})};
@@ -29,7 +29,8 @@ test('the projection requires a channel and preserves stock',()=>{
   assert.equal(CYCLE.project(noChannel).receipt.revenue,0);
 });
 test('the final shared market replaces the individual reference and cannot sell stock twice',()=>{
-  const a={id:'A',...input(5000)},b={id:'B',...input(5000)};
+  const a={id:'A',...input(5000,30)},b={id:'B',...input(5000,30)};
+  assert.ok(CYCLE.project(a).receipt.production.processCapacity>=3500);
   assert.equal(CYCLE.project(a).receipt.sold,3500);
   const closed=CYCLE.closeMany([a,b]);
   assert.equal(closed.A.receipt.sold,1750);assert.equal(closed.B.receipt.sold,1750);assert.equal(closed.A.receipt.marketAllocation.products.esencial.simulatedCompetitors.length,0);
