@@ -136,9 +136,13 @@ function commitReviewedSections(cats,finalize){
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
     toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`,6000);
     if(planSync){
+      const submittedOwner=storageKey(),submittedRound=currentRound(),pendingKey=cyclePlanSyncPendingKey(submittedRound);
       Promise.resolve(planSync).then(synced=>{
+        // The response may arrive after switching company or cycle. Clear only
+        // the original plan's flag and never change the current screen then.
+        if(synced){try{localStorage.removeItem(pendingKey);}catch{}}
+        if(storageKey()!==submittedOwner||currentRound()!==submittedRound)return;
         if(synced){
-          setCyclePlanSyncPending(false);
           toast('El servidor confirmó las decisiones del ciclo.',8000);
           showCompanyAfterConfirmation();
         }else{

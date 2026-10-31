@@ -8,7 +8,7 @@ function fixture({failedWrite=false,explorable=true}={}){
   const ctx={console,reviewCommitBusy:false,decisionState:{},cashLedger:{},decisionDrafts:{},currentStudent:{company:'QA',game:{codigo:'SIDE-1234'}},
     studentAccess:()=>({canOperate:true}),decisionsSubmitted:()=>store.get('all')==='1',liveCompanyReview:()=>({context:{drafts:{}}}),reviewProblems:()=>[],decisionCategories:()=>cats,
     sectionSubmitted:cat=>store.get(cat)==='1',prepareSectionSave:cat=>({cat:cat.cat,entries:{},net:-10,model:{}}),deepClone:structuredClone,readReviewReceipts:()=>({}),
-    storageKey:()=> 'QA',currentRound:()=>1,localStorage:{getItem:key=>store.get(key)||null},sectionLedgerKey:cat=>cat,categoryByCat:cat=>cats.find(c=>c.cat===cat),
+    storageKey:()=> 'QA',currentRound:()=>1,cyclePlanSyncPendingKey:round=>`pending:QA:${round}`,localStorage:{getItem:key=>store.get(key)||null,removeItem:key=>store.delete(key)},sectionLedgerKey:cat=>cat,categoryByCat:cat=>cats.find(c=>c.cat===cat),
     sectionSubmissionKey:cat=>cat,submissionKey:()=> 'all',decisionKey:()=> 'state',ledgerKey:()=> 'ledger',receiptKey:()=> 'receipts',
     writeDecisionBatch:writes=>{if(failedWrite)return false;events.push('persist');Object.entries(writes).forEach(([k,v])=>store.set(k,v));return true;},
     ledgerTotal:()=>0,restoreDraftsForRound(){},captureCyclePlan(){},setCyclePlanSyncPending(){},closeCompanyReview:()=>events.push('close'),syncReportToSupabase(){},syncStudentReportPreview(){},
@@ -16,8 +16,24 @@ function fixture({failedWrite=false,explorable=true}={}){
     simulationSubmissionComplete:()=>cats.every(c=>store.get(c.cat)==='1'),canExploreWorld:()=>explorable,playerIsDeciding:true,currentCategory:'B',companySummaryRound:null,companySummaryFilter:null,
     requestWorldEntry:()=>events.push('world')};
   vm.createContext(ctx);vm.runInContext(commit,ctx);
-  return {ctx,events,async drain(){tasks.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();}};
+  return {ctx,events,store,async drain(){tasks.splice(0).forEach(fn=>fn());await Promise.resolve();await Promise.resolve();}};
 }
+test('late confirmation clears only its original cycle and does not change the current screen',async()=>{
+ const f=fixture();let round=1,resolve;f.ctx.currentRound=()=>round;f.ctx.currentStudent.empresaId=42;
+ f.ctx.buildStudentSnapshot=()=>({});f.ctx.setCyclePlanSyncPending=()=>f.store.set('pending:QA:1','1');
+ f.ctx.queueStudentSnapshot=()=>new Promise(r=>{resolve=r});
+ assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);
+ f.store.set('pending:QA:2','1');round=2;f.ctx.currentCategory='D';resolve(true);await f.drain();
+ assert.equal(f.store.has('pending:QA:1'),false);assert.equal(f.store.get('pending:QA:2'),'1');assert.equal(f.ctx.currentCategory,'D');
+});
+test('a failed confirmation keeps the original pending flag after changing company',async()=>{
+ const f=fixture();let owner='QA',resolve;f.ctx.storageKey=()=>owner;f.ctx.currentStudent.empresaId=42;
+ f.ctx.buildStudentSnapshot=()=>({});f.ctx.setCyclePlanSyncPending=()=>f.store.set('pending:QA:1','1');
+ f.ctx.queueStudentSnapshot=()=>new Promise(r=>{resolve=r});
+ assert.equal(f.ctx.commitReviewedSections(['B','C'],true),true);
+ owner='OTRA';f.ctx.currentCategory='D';resolve(false);await f.drain();
+ assert.equal(f.store.get('pending:QA:1'),'1');assert.equal(f.ctx.currentCategory,'D');
+});
 test('confirmed remote plan enters the durable snapshot queue even if report rendering fails',()=>{
   const f=fixture();f.ctx.currentStudent.empresaId=42;
   f.ctx.captureCyclePlan=()=>{f.ctx.decisionState.__cyclePlans={1:{state:{confirmed:true},production:{producibleUnits:10}}};};
