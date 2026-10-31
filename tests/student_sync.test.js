@@ -100,3 +100,8 @@ test('an unavailable conflict check retains the job and does not adopt an unknow
   const f=fixture({saveSnapshot:async()=>({success:false,code:'ESTADO_DESACTUALIZADO'}),readSnapshot:async()=>({success:false,error:'offline'}),onConflict:()=>recovered++});
   await f.queue.enqueue(snapshot(),op());assert.equal(f.queue.pending(),true);assert.equal(recovered,0);assert.equal(f.current.revision,0);
 });
+test('fallo al guardar la cola informa el error y no confirma un envío no durable',async()=>{
+ const statuses=[],calls=[];const f=fixture({storage:{getItem:()=>null,setItem:()=>{throw Error('sin espacio');}},onStatus:(status)=>statuses.push(status),saveSnapshot:async()=>{calls.push('snapshot');return {success:true,data:{snapshot_revision:1}};}});
+ assert.equal(await f.queue.enqueue(snapshot(),op()),false);
+ assert.deepEqual(statuses,['storage-error']);assert.deepEqual(calls,[]);assert.equal(f.queue.pending(),true);
+});

@@ -103,7 +103,7 @@ module.exports={runOnce,remoteRpc};
     ledger[`${round}:COBRO_CREDITO`]=economic.collections;
     ledger[`${round}:ALMACENAJE`]=-economic.storage;
     const maintenance=money(businessRules.maintenance(state,catalog,round));
-    const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
+    const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO').reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
     const openingInventory=clone(state.__inventarioMP||{}),inventory={...state.__inventarioMP};
     const temporalFacts=state.__materialOrders?{receivedBySku:{},receivedValueBySku:{},ordersBySku:{},receipts:[],paymentMode:financialPolicy.materialPaymentMode,supplierCreditTermCycles:Number(financialPolicy.supplierCreditTermCycles??1)}:null;
@@ -516,7 +516,21 @@ module.exports={runOnce,remoteRpc};
     return Object.keys(quantities).length?{[round]:quantities}:{};
   }
   function quantity(state,id,option,round){return Math.max(0,Object.entries(assetPurchaseHistory(state[id],{options:[{id:option}]})).filter(([r])=>Number(r)<=round).reduce((s,[,row])=>s+(Number(row?.[option])||0),0));}
-  function maintenance(state,catalog,round=1){const r=regimes[regime({state})];return (catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset||i.id==='MOLDE').reduce((s,item)=>s+(item.options||[]).reduce((t,o)=>t+quantity(state,item.id,o.id,round)*n(o.cost)*r.maintenance/12,0),0);}
+  function maintenanceMode(state,round=1){
+    const selected=Number(state.MANTENIMIENTO?.round)===Number(round)?(state.MANTENIMIENTO.optionIds||[]):[];
+    if(selected.length>1||selected.some(id=>!['correctivo','preventivo_basico','preventivo_integral'].includes(id)))throw new Error('Modalidad de mantenimiento inválida.');
+    const mode=selected[0]||'correctivo';
+    if(round<2&&mode!=='correctivo')throw new Error('El mantenimiento preventivo está disponible desde el ciclo 2.');
+    return mode;
+  }
+  function maintenanceMitigation(state,round=1){return {correctivo:0,preventivo_basico:0.25,preventivo_integral:0.5}[maintenanceMode(state,round)];}
+  function maintenance(state,catalog,round=1){
+    const machines=(catalog||[]).flatMap(c=>c.items||[]).filter(i=>i.asset&&i.id!=='MOLDE');
+    const hasMachines=machines.some(item=>(item.options||[]).some(o=>quantity(state,item.id,o.id,round)>0));
+    if(!hasMachines)return 0;
+    const mode=maintenanceMode(state,round);
+    return {correctivo:1000,preventivo_basico:1500,preventivo_integral:3000}[mode];
+  }
   function maintenanceEstimate(ctx={}){
     const state={...ctx.state},round=ctx.round||1;
     for(const item of (ctx.catalog||[]).flatMap(c=>c.items||[])){
@@ -531,10 +545,11 @@ module.exports={runOnce,remoteRpc};
         state.MOLDE={...entry,purchases:old};
       }
       if(item.id==='REGIMEN_LABORAL')state[item.id]=d;
+      if(item.id==='MANTENIMIENTO')state[item.id]={...d,round};
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenanceMode,maintenanceMitigation,maintenance,maintenanceEstimate});
 });
 
 },
@@ -715,7 +730,7 @@ module.exports={runOnce,remoteRpc};
       else if(kind==='PROVEEDOR_CREDITO')p.supplierCredit=n(p.supplierCredit)+amount;
       else if(kind==='VENTAS_CREDITO')p.credito=n(p.credito)-amount;
       else if(kind==='COBRO_CREDITO')p.cobros=n(p.cobros)+amount;
-      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento anual / 12':'Almacenaje',importe:-amount});}
+      else if(kind==='ALMACENAJE'||kind==='MANTENIMIENTO_AUTO'){p.gastos-=amount;if(kind==='MANTENIMIENTO_AUTO')p.mantenimiento-=amount;else p.almacenaje-=amount;p.detalle.push({concepto:kind==='MANTENIMIENTO_AUTO'?'Mantenimiento de maquinaria':'Almacenaje',importe:money(-amount)});}
       else if(kind==='SIM_DEVOLUCIONES')p.devoluciones-=amount;
       else if(kind==='EVENT')p.eventos+=amount;
       else if(kind==='SIM_INVERSION')p.comprasActivos-=amount;
@@ -768,8 +783,28 @@ module.exports={runOnce,remoteRpc};
       if(receipt?.materialReceiptFacts){const facts=receipt.materialReceiptFacts,ordered=Object.values(facts.ordersBySku).reduce((sum,v)=>sum+n(v.quantity)*n(v.unitCost),0),received=Object.values(facts.receivedValueBySku).reduce((sum,v)=>sum+n(v),0);if(Math.abs(money(ordered)-money(p.mp))>0.02)throw new Error('Pago de materiales no coincide con las órdenes verificadas.');if(facts.paymentMode==='credit'){if(Math.abs(money(ordered)-money(p.supplierCredit))>0.02)throw new Error('Crédito de proveedor inconsistente.');supplierPayable=money(supplierPayable+received);for(const item of facts.receipts){if(supplierPayableDetails.some(row=>row.receiptId===item.receiptId))throw new Error('Obligación de proveedor duplicada.');supplierPayableDetails.push({...item,paid:0,outstanding:item.value});}}else{materialPrepayment=money(materialPrepayment+p.mp-received);if(materialPrepayment < -0.01)throw new Error('Anticipo de materiales inconsistente.');}}
       const economicConfig=getEconomicConfig(),policy={...financialPolicy,...receipt?.financialPolicy},life={MESA_CORTE:10,ENSAMBLE:10,ACABADOS:8,MOLDE:5},months=n(policy.cycleMonths)||1;
       const md=receipt?.modelVersion==='md-20261027',residualRate=policy.residualRate??(receipt?.regimen==='NO_MYPE' ? .10 : .05);
-      let depreciation=0;
-      for(const [id,years] of Object.entries(life)){const item=items.get(id);for(const option of item?.options||[]){const purchases=decisions[id]?.purchases,qty=purchases?Math.max(0,Object.entries(purchases).filter(([r])=>Number(r)<=p.r).reduce((sum,[,row])=>sum+n(row?.[option.id]),0)):(n(decisions[id]?.quantities?.[option.id])||Number(decisions[id]?.optionIds?.includes(option.id)||false)),base=qty*n(option.cost)*(1-n(residualRate)),linear=base/(n(policy.usefulLives?.[id])||years)/12*months,method=md?[]:decisions.__catalogSelection||receipt?.catalogSelection||[],annualized=method.includes('FIN-02B')?base*n(receipt?.produced)/(economicConfig?.depreciation?.productiveLife||100000):linear*(method.includes('FIN-02C')?(economicConfig?.depreciation?.acceleratedFactor||2):1),charge=Math.max(0,Math.min(base-n(depreciationValues[option.id]),annualized));depreciation+=charge;depreciationValues[option.id]=n(depreciationValues[option.id])+charge;}}
+      let depreciation=0,remainingAssetValue=Math.max(0,assets+p.comprasActivos-p.bajaActivos);
+      for(const [id,years] of Object.entries(life)){
+        const item=items.get(id);
+        for(const option of item?.options||[]){
+          if(!receipt)continue;
+          const entry=decisions[id]||{},purchases=entry.purchases;
+          const cohorts=purchases?Object.entries(purchases).filter(([r])=>Number(r)>=1&&Number(r)<=p.r).map(([r,row])=>({round:Number(r),qty:Math.max(0,n(row?.[option.id]))})):[{round:Math.max(1,n(entry.round)||1),qty:n(entry.quantities?.[option.id])||Number(entry.optionIds?.includes(option.id)||false)}].filter(x=>x.round<=p.r);
+          const qty=cohorts.reduce((sum,row)=>sum+row.qty,0),base=qty*n(option.cost)*(1-n(residualRate));
+          const method=md?[]:decisions.__catalogSelection||receipt?.catalogSelection||[],cycles=Number(policy.cycles);
+          let scheduled=base/(n(policy.usefulLives?.[id])||years)/12*months;
+          if((cycles===3||cycles===6)&&p.r<=cycles){
+            scheduled=cohorts.reduce((sum,row)=>sum+row.qty*n(option.cost)*(1-n(residualRate))/(cycles-row.round+1),0);
+          }
+          if(method.includes('FIN-02B'))scheduled=base*n(receipt?.produced)/(economicConfig?.depreciation?.productiveLife||100000);
+          else if(method.includes('FIN-02C'))scheduled*=economicConfig?.depreciation?.acceleratedFactor||2;
+          const remaining=Math.max(0,base-n(depreciationValues[option.id]));
+          if((cycles===3||cycles===6)&&p.r===cycles&&!method.includes('FIN-02B'))scheduled=remaining;
+          const charge=money(Math.max(0,Math.min(remaining,scheduled,remainingAssetValue)));
+          remainingAssetValue=money(Math.max(0,remainingAssetValue-charge));
+          depreciation+=charge;depreciationValues[option.id]=money(n(depreciationValues[option.id])+charge);
+        }
+      }
       depreciation=money(Math.min(Math.max(0,assets+p.comprasActivos-p.bajaActivos),depreciation));
       const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+(produced?p.mod+depreciation:0);
       const lines=receipt?.production?.productLines||[];
@@ -943,7 +978,8 @@ module.exports={runOnce,remoteRpc};
       : {...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
     const plantFactor=(input.events||[]).filter(e=>e.version==='plant-capacity-v1'&&['PE26','PE39'].includes(e.id)).reduce((v,e)=>v*(1-e.intensity/100),1);
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
+    const mitigation=breakdown?BUS.maintenanceMitigation(state,round):0;
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100*(1-mitigation)}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -963,6 +999,7 @@ module.exports={runOnce,remoteRpc};
       plan.target=originalPlan.target;plan.targets=originalPlan.targets;
       plan.productLines.forEach((line,i)=>{line.target=originalPlan.productLines[i].target;line.requirements=originalPlan.productLines[i].requirements;line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;});
       plan.materials.forEach((material,i)=>{material.neededForTarget=originalPlan.materials[i].neededForTarget;material.shortfall=Math.max(0,material.neededForTarget-material.available);});
+      plan.processes.forEach(process=>{process.shortfall=Math.max(0,plan.target-process.cycleCapacity);});
       plan.productionGap=Math.max(0,plan.target-plan.producibleUnits);
     }
     const price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);
@@ -2256,7 +2293,10 @@ module.exports={runOnce,remoteRpc};
     const d=draft(item,ctx),e=ctx.state?.[item.id];
     const out={id:item.id,name:item.name,type:item.type,rows:[],outflow:0,assetIncome:0,bookValueDisposed:0,financing:0,recurring:0,note:''};
     const add=(label,quantity,unit,outflow=0,income=0,detail='')=>out.rows.push({label,quantity,unitCost:unit,outflow,income,detail});
-    if(item.type==='info'){
+    if(item.id==='MANTENIMIENTO'){
+      const amount=roundMoney(BUS.maintenanceEstimate(ctx));
+      add((item.options||[]).find(o=>o.id===(d.optionIds||[])[0])?.label||'Mantenimiento Correctivo',1,amount,amount,0,'Costo por ciclo cuando existe maquinaria.');
+    }else if(item.type==='info'){
       const channels=ctx.drafts?.CANALES||ctx.state?.CANALES,stores=ctx.rules.storeCount(channels);
       if(item.id==='MANTENIMIENTO'){out.automaticMaintenance=true;const amount=roundMoney(BUS.maintenanceEstimate(ctx));add('Mantenimiento mensual de activos',1,amount,amount,0,'Porcentaje anual del costo de adquisición dividido entre 12.');}
       else if(item.id==='PERSONAL_VENTAS')add('Vendedores b\u00e1sicos',stores,null,0,0,'1 por tienda f\u00edsica. Comisi\u00f3n total: 1% de las ventas; sin sueldo fijo adicional.');
@@ -2534,7 +2574,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialRulesVersion?{materialRulesVersion:config.materialRulesVersion}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);
@@ -2590,7 +2630,9 @@ const SIDE_DECISION_CATALOG_DATA = [
         {id:'local_std',label:'Local de producción estándar',desc:'Costo operativo obligatorio para contar con un espacio de producción.',cost:2000}
       ]},
       {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:[
-        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:1500}
+        {id:'correctivo',label:'Mantenimiento Correctivo',desc:'Incluye mantenimiento correctivo; las reparaciones extraordinarias se registran cuando ocurren.',cost:1000},
+        {id:'preventivo_basico',label:'Mantenimiento Preventivo Básico',desc:'Mantenimiento preventivo disponible desde el ciclo 2.',cost:1500},
+        {id:'preventivo_integral',label:'Mantenimiento Preventivo Integral',desc:'Mantenimiento preventivo integral disponible desde el ciclo 2.',cost:3000}
       ]}
     ]
   },
@@ -3279,6 +3321,16 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function programarDesafiosEquilibrados(partidaId,ciclo){
+    if(!Number.isInteger(ciclo)||ciclo<1||ciclo>6)return {success:false,code:'CICLO_INVALIDO',error:'Ciclo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_schedule_balanced_v1',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.round)!==Number(ciclo)||typeof data?.reused!=='boolean'||!Array.isArray(data?.events)||data.events.length<2||data.events.some(e=>!e||!/^\d+$/.test(String(e.companyId))||BigInt(e.companyId)<1n||!['PE69','PE71','PE75'].includes(e.eventId)||Number(e.round)!==Number(ciclo)||Number(e.intensity)!==(ciclo<=2?2:ciclo<=4?4:6))||new Set(data.events.map(e=>String(e.companyId))).size!==data.events.length||new Set(data.events.map(e=>e.eventId)).size!==Math.min(3,data.events.length))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó la programación equilibrada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function consultarDesafios(partidaId){
     const sb=client();if(!sb)return offline();
     try{
@@ -3302,7 +3354,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,asignarEventoGrupal,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,asignarEventoGrupal,sortearDesafios,programarDesafiosEquilibrados,consultarDesafios,podio };
 });
 
 }

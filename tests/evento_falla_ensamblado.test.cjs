@@ -45,3 +45,27 @@ test('PE30 y recepciones tardías limitan producción sin consumir órdenes en t
  assert.equal(shock.plan.temporal.windows.slice(0,7).reduce((sum,window)=>sum+window.produced,0),0);
  for(const [sku,received] of [['cuero_prem',300],['acc_prem',1000],['hilo_prem',6000]])assert.ok(Math.abs(received-(shock.plan.temporal.consumedBySku[sku]||0)-(shock.plan.temporal.stockBySku[sku]||0))<1e-7,sku);
 });
+test('la modalidad confirmada mitiga la pérdida de capacidad sin cambiar reparaciones',()=>{
+ const s=state();for(const key of ['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO','CUERO','ACCESORIOS','HILO','JEFATURA','CANALES','PRODUCCION_META'])s[key].round=2;
+ const input={state:s,catalog:fixture.catalog,round:2,capital:1000000,financialPolicy:{cycles:3}},fallo={...event,round:2};
+ const base=cycle.close(input),daily=r=>r.receipt.production.processes.find(p=>p.id==='assembly').dailyCapacity;
+ for(const [mode,remaining,fee] of [['correctivo',.75,1000],['preventivo_basico',.8125,1500],['preventivo_integral',.875,3000]]){
+  const chosen={...s,MANTENIMIENTO:{round:2,optionIds:[mode]}};
+  const affected=cycle.close({...input,state:chosen,events:[fallo]});
+  assert.ok(Math.abs(daily(affected)-daily(base)*remaining)<1e-8);
+  assert.equal(affected.receipt.maintenanceCost,fee);assert.equal(affected.ledger['2:EVENT:PE30'],-200);
+  assert.equal(affected.financial.flujoCaja.eventos,-200);
+  assert.equal(affected.receipt.inventory.hilo_prem,6000-6*affected.receipt.produced);
+  const retry=cycle.close({...input,state:affected.state,ledger:affected.ledger,sectionsByRound:affected.financialSections,events:[fallo]});
+  assert.equal(retry.reused,true);assert.equal(retry.ledger['2:EVENT:PE30'],-200);
+ }
+ const expired=cycle.close({...input,state:{...s,MANTENIMIENTO:{round:1,optionIds:['preventivo_integral']}},events:[fallo]});
+ assert.equal(daily(expired),daily(base)*.75);
+});
+test('sin avería el preventivo no altera capacidad ni crea reparación',()=>{
+ const s=state();for(const key of ['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO','CUERO','ACCESORIOS','HILO','JEFATURA','CANALES','PRODUCCION_META'])s[key].round=2;
+ const input={state:s,catalog:fixture.catalog,round:2,capital:1000000};
+ const normal=cycle.close(input),preventivo=cycle.close({...input,state:{...s,MANTENIMIENTO:{round:2,optionIds:['preventivo_integral']}}});
+ assert.deepEqual(preventivo.receipt.production,normal.receipt.production);
+ assert.equal(preventivo.ledger['2:EVENT:PE30'],undefined);assert.equal(preventivo.receipt.maintenanceCost,3000);
+});

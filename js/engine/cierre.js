@@ -87,7 +87,8 @@
       : {...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
     const plantFactor=(input.events||[]).filter(e=>e.version==='plant-capacity-v1'&&['PE26','PE39'].includes(e.id)).reduce((v,e)=>v*(1-e.intensity/100),1);
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
+    const mitigation=breakdown?BUS.maintenanceMitigation(state,round):0;
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100*(1-mitigation)}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -107,6 +108,7 @@
       plan.target=originalPlan.target;plan.targets=originalPlan.targets;
       plan.productLines.forEach((line,i)=>{line.target=originalPlan.productLines[i].target;line.requirements=originalPlan.productLines[i].requirements;line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;});
       plan.materials.forEach((material,i)=>{material.neededForTarget=originalPlan.materials[i].neededForTarget;material.shortfall=Math.max(0,material.neededForTarget-material.available);});
+      plan.processes.forEach(process=>{process.shortfall=Math.max(0,plan.target-process.cycleCapacity);});
       plan.productionGap=Math.max(0,plan.target-plan.producibleUnits);
     }
     const price=prices(state,authorizedPrices,config),rep=reputation(state,plan,round);

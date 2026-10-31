@@ -8,7 +8,7 @@ function fixture({failedWrite=false,explorable=true}={}){
   const ctx={console,reviewCommitBusy:false,decisionState:{},cashLedger:{},decisionDrafts:{},currentStudent:{company:'QA',game:{codigo:'SIDE-1234'}},
     studentAccess:()=>({canOperate:true}),decisionsSubmitted:()=>store.get('all')==='1',liveCompanyReview:()=>({context:{drafts:{}}}),reviewProblems:()=>[],decisionCategories:()=>cats,
     sectionSubmitted:cat=>store.get(cat)==='1',prepareSectionSave:cat=>({cat:cat.cat,entries:{},net:-10,model:{}}),deepClone:structuredClone,readReviewReceipts:()=>({}),
-    storageKey:()=> 'QA',currentRound:()=>1,cyclePlanSyncPendingKey:round=>`pending:QA:${round}`,localStorage:{getItem:key=>store.get(key)||null,removeItem:key=>store.delete(key)},sectionLedgerKey:cat=>cat,categoryByCat:cat=>cats.find(c=>c.cat===cat),
+    storageKey:()=> 'QA',studentIdentityKey:()=> 'QA',currentRound:()=>1,cyclePlanSyncPendingKey:round=>`pending:QA:${round}`,localStorage:{getItem:key=>store.get(key)||null,removeItem:key=>store.delete(key)},sectionLedgerKey:cat=>cat,categoryByCat:cat=>cats.find(c=>c.cat===cat),
     sectionSubmissionKey:cat=>cat,submissionKey:()=> 'all',decisionKey:()=> 'state',ledgerKey:()=> 'ledger',receiptKey:()=> 'receipts',
     writeDecisionBatch:writes=>{if(failedWrite)return false;events.push('persist');Object.entries(writes).forEach(([k,v])=>store.set(k,v));return true;},
     ledgerTotal:()=>0,restoreDraftsForRound(){},captureCyclePlan(){},setCyclePlanSyncPending(){},closeCompanyReview:()=>events.push('close'),syncReportToSupabase(){},syncStudentReportPreview(){},
@@ -55,4 +55,21 @@ test('send all opens the summary and duplicate confirmation cannot charge again'
 test('failed persistence and a cycle paused before entry never open the world',async()=>{
   const failed=fixture({failedWrite:true});assert.equal(failed.ctx.commitReviewedSections(['B','C'],true),false);await failed.drain();assert.deepEqual(failed.events,[]);
   const paused=fixture({explorable:false});assert.equal(paused.ctx.commitReviewedSections(['B','C'],true),true);await paused.drain();assert.equal(paused.events.includes('world'),false);
+});
+
+test('una confirmación tardía no cambia la pestaña elegida mientras se sincroniza',async()=>{
+  const f=fixture();let resolve;f.ctx.currentStudent.empresaId=42;f.ctx.buildStudentSnapshot=()=>({});
+  f.ctx.queueStudentSnapshot=()=>new Promise(done=>{resolve=done;});
+  assert.equal(f.ctx.commitReviewedSections(['B','C'],false),true);
+  f.ctx.currentCategory='C';resolve(true);await f.drain();
+  assert.equal(f.ctx.currentCategory,'C');assert.equal(f.events.includes('close'),false);
+});
+test('la respuesta de otra empresa no altera el ciclo visible ni su estado de sincronización',async()=>{
+  const f=fixture();let resolve,identity='empresa-1',cleared=0;
+  f.ctx.currentStudent.empresaId=42;f.ctx.studentIdentityKey=()=>identity;f.ctx.buildStudentSnapshot=()=>({});
+  f.ctx.setCyclePlanSyncPending=value=>{if(!value)cleared++;};
+  f.ctx.queueStudentSnapshot=()=>new Promise(done=>{resolve=done;});
+  assert.equal(f.ctx.commitReviewedSections(['B','C'],false),true);
+  identity='empresa-2';f.ctx.currentCategory='C';resolve(true);await f.drain();
+  assert.equal(cleared,0);assert.equal(f.ctx.currentCategory,'C');assert.equal(f.events.includes('close'),false);
 });

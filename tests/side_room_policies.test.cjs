@@ -15,3 +15,10 @@ test('resultado explica demanda frente a stock aunque haya ventas',()=>{
  const text=view.salesHtml({round:1,cycleReceipt:{produced:20,sold:10,revenue:400,goods:{esencial:10},production:{target:20,productLines:[{target:20,available:true,plannedUnits:20}]},sales:[{id:'esencial',price:40,available:20,produced:20,sold:10,assignedDemand:10,revenue:400}],marketAllocation:{products:{esencial:{puntajePrecio:10}}}}});
  assert.match(text,/Por qué vendí lo que vendí/);assert.match(text,/demanda asignada fue menor/);assert.match(text,/puntaje competitivo bajo/);
 });
+test('la política conserva la versión de recepción al cambiar ciclos y programación financiera',()=>{
+ const base={cycles:6,materialRulesVersion:'receipts-v1',financialSchedule:[{effectiveRound:1,capital:100000,interest:20},{effectiveRound:3,capital:120000,interest:15}]};
+ assert.equal(CFG.resolve(base,1).materialRulesVersion,'receipts-v1');
+ assert.equal(CFG.resolve(base,4).materialRulesVersion,'receipts-v1');
+ assert.equal(CFG.resolve(base,4).capital,120000);
+ assert.equal(CFG.resolve({cycles:3},1).materialRulesVersion,undefined);
+});

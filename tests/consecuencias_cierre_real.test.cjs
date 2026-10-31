@@ -33,3 +33,11 @@ test('dos cierres conservan el contador de reputación y no reescriben el primer
  const second=C.close({state:next,ledger:first.ledger,catalog:F.catalog,round:2,capital:200000,sectionsByRound:first.financialSections});
  assert.equal(JSON.stringify(second.state.__cycleSettlements[1]),frozen);assert.ok(second.receipt.sold<=second.receipt.sales.reduce((sum,x)=>sum+x.available,0));
 });
+test('la brecha de capacidad conserva la meta original tras una consecuencia productiva',()=>{
+ const s=F.state();s.PRODUCCION_META.moldTargets={molde_1:2500,molde_2:0,molde_3:0};
+ const score=E.scores(s).efficiency,config={...E.config,consequences:{...E.config.consequences,lowEfficiency:score+1}};
+ const plan=E.closeMany([{id:'a',state:s,catalog:F.catalog,round:1}],config).a.plan;
+ assert.equal(plan.target,2500);
+ for(const process of plan.processes)assert.equal(process.shortfall,Math.max(0,2500-process.cycleCapacity));
+ assert.equal(plan.productionGap,2500-plan.producibleUnits);
+});

@@ -35,7 +35,9 @@ const SIDE_DECISION_CATALOG_DATA = [
         {id:'local_std',label:'Local de producción estándar',desc:'Costo operativo obligatorio para contar con un espacio de producción.',cost:2000}
       ]},
       {id:'MANTENIMIENTO',name:'Mantenimiento de maquinaria',type:'choice',required:false,options:[
-        {id:'correctivo',label:'Mantenimiento preventivo',desc:'Intervención opcional para prevenir fallas. Vuelve a pulsar para dejarla sin selección.',cost:1500}
+        {id:'correctivo',label:'Mantenimiento Correctivo',desc:'Incluye mantenimiento correctivo; las reparaciones extraordinarias se registran cuando ocurren.',cost:1000},
+        {id:'preventivo_basico',label:'Mantenimiento Preventivo Básico',desc:'Mantenimiento preventivo disponible desde el ciclo 2.',cost:1500},
+        {id:'preventivo_integral',label:'Mantenimiento Preventivo Integral',desc:'Mantenimiento preventivo integral disponible desde el ciclo 2.',cost:3000}
       ]}
     ]
   },

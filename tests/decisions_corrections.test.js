@@ -125,10 +125,10 @@ test('visual DOP handles empty, zero and valid targets and updates from active d
   assert.match(r.run('productionDopHtml()'),/Aún no hay producción para mostrar/);
   r.run(`decisionDrafts={MESA_CORTE:{quantities:{mesa:1}},ENSAMBLE:{quantities:{ens_ind:1}},ACABADOS:{quantities:{aca_ind:1}},PERS_CORTE:{quantities:{corte_maestro:1}},PERS_ENSAMBLE:{quantities:{ens_personal_esp:1}},PERS_ACABADO:{quantities:{aca_personal_art:1}},JEFATURA:{optionIds:['si_jefatura']},MOLDE:{optionIds:['molde_1']},PRODUCCION_META:{moldTargets:{molde_1:100}},CUERO:{quantities:{cuero_sint:30}},ACCESORIOS:{quantities:{acc_eco:100}},HILO:{quantities:{hilo_std:600}}};`);
   assert.equal(r.run('productionPlan().producibleUnits'),100);
-  assert.match(r.run('productionDopHtml()'),/<strong>100%<\/strong>/);
+  assert.match(r.run('productionDopHtml()'),/100 unidades totales/);
   r.run('decisionDrafts.CUERO.quantities.cuero_sint=15;');
   assert.equal(r.run('productionPlan().producibleUnits'),50);
-  assert.match(r.run('productionDopHtml()'),/<strong>50%<\/strong>/);
+  assert.match(r.run('productionDopHtml()'),/<td>15 m²<\/td><td>15 m²<\/td>/);
   r.run('decisionDrafts.PRODUCCION_META.moldTargets.molde_1=0;');
   assert.doesNotMatch(r.run('productionDopHtml()'),/NaN|Infinity/);
   assert.match(r.run('productionDopHtml()'),/Aún no hay producción para mostrar/);
@@ -141,4 +141,24 @@ test('manual transfers show central and store stock, persist in sales decision a
  assert.match(r.run('manualDistributionHtml()'),/almacén disponible 20/);
  const entry=r.json("prepareSectionSave(DECISION_CATALOG.find(c=>c.cat==='D')).entries.CANALES");assert.equal(entry.transfers.esencial['miraflores:1'],15);
  r.run("decisionDrafts.CANALES.transfers.esencial['miraflores:1']=21;toast=()=>{};");assert.equal(r.run("validateRequiredSection(DECISION_CATALOG.find(c=>c.cat==='D'))"),false);
+});
+
+
+test('DOP shortages never block saving or sending production and material sections',()=>{
+ const r=runtime();
+ r.run("currentCategory='C';for(const item of allDecisionItems().filter(i=>i.type==='choice'&&itemRequired(i)))decisionDrafts[item.id]={optionIds:[item.options[0].id]};decisionDrafts.PRODUCCION_META={moldTargets:{molde_1:2000,molde_2:300}};");
+ assert.equal(r.run('productionPlan().producibleUnits'),0);
+ assert.equal(r.run('validateRequiredSection(categoryByCat(currentCategory))'),true);
+ assert.equal(r.run('saveCurrentSection()'),true);
+ assert.equal(r.run('decisionState.PRODUCCION_META.moldTargets.molde_1'),2000);
+ assert.deepEqual(r.json("reviewProblems(liveCompanyReview(),['B','C','F']).filter(x=>x.item==='MOLDE'||x.item==='CUERO'||x.item==='HILO'||/capacidad|faltan|Solo se pueden/.test(x.text))"),[]);
+ assert.equal(r.run('sendCurrentSection()'),true);
+ assert.equal(r.run("sectionSubmitted('C')"),true);
+ r.run("currentCategory='F'");
+ assert.equal(r.run('sectionDraftReady()'),true);
+ assert.equal(r.run('sendCurrentSection()'),true);
+ assert.equal(r.run("sectionSubmitted('F')"),true);
+ assert.equal(r.run('decisionState.PRODUCCION_META.moldTargets.molde_1'),2000);
+ r.run("decisionDrafts.CANALES={optionIds:['web']}");
+ assert.deepEqual(r.json('reviewProblems(liveCompanyReview())'),[]);
 });

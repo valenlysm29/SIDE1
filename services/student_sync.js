@@ -68,7 +68,8 @@
       if(!job){job={identityKey:c.identityKey,identity:copy(c.identity),round,expectedRevision:c.revision,snapshot:copy(snapshot),operations:[],snapshotSaved:false};jobs.push(job);}
       job.snapshot=copy(prepareSnapshot(copy(snapshot)));job.snapshotSaved=false;
       if(operation){job.operations=job.operations.filter(op=>op.key!==operation.key);job.operations.push(copy(operation));}
-      persist();onStatus('saving');return flush();
+      if(!persist())return Promise.resolve(false);
+      onStatus('saving');return flush();
     }
     function mergeNewer(job){
       const newer=jobs.find(j=>j!==job&&j.identityKey===job.identityKey&&j.round===job.round);

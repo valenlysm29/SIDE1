@@ -76,15 +76,7 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
   const plan=window.SIDE_PRODUCTION_MODEL.calculate(ctx);
   if(completing||plan.target){
     if(completing&&!plan.target)issues.push({cat:'B',item:'PRODUCCION_META',text:'Indica una meta de producción mayor que cero.'});
-    for(const line of plan.productLines.filter(line=>line.target>0&&!line.available))issues.push({cat:'B',item:'MOLDE',text:`${line.label}: falta adquirir el molde para producir ${line.target} unidades.`});
-    // Temporal rooms must confirm the order before a provider can receive it.
-    // Capacity and received-stock shortfalls remain visible as warnings, but
-    // cannot make that confirmation impossible.
-    if(ctx.config?.materialRulesVersion!=='receipts-v1'){
-      for(const process of plan.processes.filter(process=>process.shortfall>0))issues.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad ${process.cycleCapacity} unidades; la meta requiere ${plan.target}. Revisa personal y equipos.`});
-      for(const material of plan.materials.filter(material=>material.shortfall>0))issues.push({cat:'F',item:material.id,text:`${material.label}: faltan ${material.shortfall.toLocaleString('es-PE')} ${material.unit} para la meta.`});
-      if(plan.target&&plan.producibleUnits<plan.target&&!issues.some(issue=>['B','C','F'].includes(issue.cat)))issues.push({cat:'B',text:`Solo se pueden producir ${plan.producibleUnits} de ${plan.target} unidades; revisa la meta y los recursos.`});
-    }
+    // Resource shortages are advisory; the cycle engine limits actual production.
     const channels=ctx.drafts.CANALES?.optionIds||[];
     if(completing&&!channels.some(id=>['web','los_olivos','miraflores','sjl'].includes(id)))issues.push({cat:'D',item:'CANALES',text:'Falta un canal de venta activo.'});
   }
@@ -136,21 +128,19 @@ function commitReviewedSections(cats,finalize){
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
     toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`,6000);
     if(planSync){
-      const submittedOwner=storageKey(),submittedRound=currentRound(),pendingKey=cyclePlanSyncPendingKey(submittedRound);
+      const submittedOwner=storageKey(),submittedRound=currentRound(),pendingKey=cyclePlanSyncPendingKey(submittedRound),confirmationCategory=currentCategory;
+      const sameContext=()=>storageKey()===submittedOwner&&currentRound()===submittedRound;
       Promise.resolve(planSync).then(synced=>{
-        // The response may arrive after switching company or cycle. Clear only
-        // the original plan's flag and never change the current screen then.
         if(synced){try{localStorage.removeItem(pendingKey);}catch{}}
-        if(storageKey()!==submittedOwner||currentRound()!==submittedRound)return;
+        if(!sameContext())return;
         if(synced){
           toast('El servidor confirmó las decisiones del ciclo.',8000);
-          showCompanyAfterConfirmation();
+          if(currentCategory===confirmationCategory)showCompanyAfterConfirmation();
         }else{
           toast('El servidor aún no confirmó el plan. Tus decisiones siguen en este equipo; reintenta la sincronización antes de entrar al mundo 3D.',8000);
-          currentCategory='A';companySummaryRound='current';
-          renderTabs();renderDecisionCategory();
+          if(currentCategory===confirmationCategory){currentCategory='A';companySummaryRound='current';renderTabs();renderDecisionCategory();}
         }
-      }).catch(error=>console.error('SIDE: verificación de plan pendiente',error));
+      }).catch(error=>{console.error('SIDE: verificación de plan pendiente',error);if(sameContext()){showStudentSyncStatus('pending',{error:error?.message||'No se pudo verificar el envío.'});toast('No se pudo verificar el envío. Tus decisiones permanecen en este equipo; reintenta la sincronización.',8000);}});
     }else if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete())showCompanyAfterConfirmation();
     return true;
   }catch(error){console.error('SIDE: review confirmation failed',error);toast('No se pudo confirmar. Revisa tus decisiones e intenta nuevamente.');return false;}
