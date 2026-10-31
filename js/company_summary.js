@@ -128,17 +128,19 @@ function commitReviewedSections(cats,finalize){
     animateCash(delta);renderTabs();renderDecisionCategory();updateHud();
     toast(finalize?'Decisiones confirmadas en este equipo. Verificando el envío al servidor…':`Secci\u00f3n ${categoryByCat(cats[0])?.short} enviada en este equipo.`,6000);
     if(planSync){
+      const confirmationIdentity=studentIdentityKey(),confirmationRound=currentRound(),confirmationCategory=currentCategory;
+      const sameContext=()=>studentIdentityKey()===confirmationIdentity&&currentRound()===confirmationRound;
       Promise.resolve(planSync).then(synced=>{
+        if(!sameContext())return;
         if(synced){
           setCyclePlanSyncPending(false);
           toast('El servidor confirmó las decisiones del ciclo.',8000);
-          showCompanyAfterConfirmation();
+          if(currentCategory===confirmationCategory)showCompanyAfterConfirmation();
         }else{
           toast('El servidor aún no confirmó el plan. Tus decisiones siguen en este equipo; reintenta la sincronización antes de entrar al mundo 3D.',8000);
-          currentCategory='A';companySummaryRound='current';
-          renderTabs();renderDecisionCategory();
+          if(currentCategory===confirmationCategory){currentCategory='A';companySummaryRound='current';renderTabs();renderDecisionCategory();}
         }
-      }).catch(error=>console.error('SIDE: verificación de plan pendiente',error));
+      }).catch(error=>{console.error('SIDE: verificación de plan pendiente',error);if(sameContext()){showStudentSyncStatus('pending',{error:error?.message||'No se pudo verificar el envío.'});toast('No se pudo verificar el envío. Tus decisiones permanecen en este equipo; reintenta la sincronización.',8000);}});
     }else if(typeof simulationSubmissionComplete==='function'&&simulationSubmissionComplete())showCompanyAfterConfirmation();
     return true;
   }catch(error){console.error('SIDE: review confirmation failed',error);toast('No se pudo confirmar. Revisa tus decisiones e intenta nuevamente.');return false;}

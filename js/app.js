@@ -1743,7 +1743,7 @@ async function syncSectionToSupabase(cat){
     if(!decisiones.length)return;
     const snapshot=buildStudentSnapshot(round);
     return await queueStudentSnapshot(snapshot,{key:'decisions:'+cat,type:'decisions',payload:decisiones});
-  }catch(error){console.error('SIDE: no se pudo sincronizar la sección',error)}
+  }catch(error){console.error('SIDE: no se pudo sincronizar la sección',error);showStudentSyncStatus('pending',{error:error?.message||'No se pudo preparar el envío de la sección.'});return false;}
 }
 /**
  * Convierte una decisión del estado local al formato del RPC guardar_decisiones.
