@@ -14,7 +14,7 @@ test('Autonomous migration retains paid assets, cash, debt and materials without
  const f=finance.calculate({state:r.state,ledger:r.ledger,catalog,capital:100000,round:2,openingBalance:r.state.__openingBalance});
  assert.equal(f.balanceCaja.cajaInicial,101500);assert.equal(f.balanceCaja.cajaFinal,101500);assert.equal(f.balanceGeneral.deuda,5000);assert.equal(f.balanceGeneral.activosFijos,3500);
  const closed=cycle.close({state:r.state,ledger:r.ledger,catalog,capital:100000,round:2,production:{producibleUnits:0,productLines:[],materials:[]}});
- assert.equal(closed.ledger['1:B'],-3500);assert.equal(closed.ledger['1:PRESTAMO'],5000);assert.equal(closed.ledger['2:B'],-2000,'only current local rent; paid migrated machine is not purchased twice');assert.equal(closed.ledger['2:PRESTAMO'],undefined);
+ assert.equal(closed.ledger['1:B'],-3500);assert.equal(closed.ledger['1:PRESTAMO'],5000);assert.equal(closed.ledger['2:B'],-3000,'local y mantenimiento correctivo; la máquina migrada no se compra de nuevo');assert.equal(closed.receipt.maintenanceCost,1000);assert.equal(closed.ledger['2:PRESTAMO'],undefined);
 });
 test('A paid current-cycle decision remains canonical and migration is idempotent across reloads',()=>{
  const canonical={ENSAMBLE:{purchases:{1:{ens_basica:1}}}},ledger={'1:B':-3500};

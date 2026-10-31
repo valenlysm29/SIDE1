@@ -18,7 +18,7 @@ test('active materials charge Excel physical unit cost with volume discount exac
   const volume=REVIEW.breakdown(item(id),{state:{},drafts:{[id]:{quantities:{[o.id]:100}}},round:1,rules:RULES,catalog}).outflow;
   assert.ok(Math.abs(volume-prices[i]*100*.92)<1e-8);
  });
- assert.equal(item('MANTENIMIENTO').options[0].cost,1500); // original optional decision; automatic base maintenance lives in the engine
+ assert.deepEqual(item('MANTENIMIENTO').options.map(o=>o.cost),[1000,1500,3000]); // modalidades autorizadas por ciclo
  assert.equal(item('LIMPIEZA').options[0].cost,712.32);
  assert.equal(item('JEFATURA').options.find(o=>o.id==='si_jefatura').cost,3321.6);
 });

@@ -41,7 +41,9 @@ const out=path.join(__dirname,'output/restaurar-decisiones');fs.mkdirSync(out,{r
       await numeric('[data-qty="'+item.id+'"][data-option="'+option.id+'"]',quantities[option.id],item.id,item.asset?{purchases:{1:quantities}}:{quantities});}
     }else if(['choice','multi-choice'].includes(item.type)){
      for(const option of item.options){const selector='[data-choice="'+item.id+'"][data-option="'+option.id+'"]',field=page.locator(selector);
-      assert.equal(await field.count(),1);assert.ok(await field.isEnabled(),item.id+'/'+option.id+' editable');
+      assert.equal(await field.count(),1);
+      if(item.id==='MANTENIMIENTO'&&option.id!=='correctivo'){assert.ok(await field.isDisabled(),item.id+'/'+option.id+' disponible desde ciclo 2');continue;}
+      assert.ok(await field.isEnabled(),item.id+'/'+option.id+' editable');
       const label=page.locator('label').filter({has:field});await label.scrollIntoViewIfNeeded();assert.ok(await label.isVisible());await label.click();
       assert.ok(await page.locator(selector).isChecked(),item.id+'/'+option.id+' selected');
       const optionIds=await page.evaluate(id=>[...initDraft(findDecisionItem(id)).optionIds],item.id);await saved(item.id,{optionIds});}
