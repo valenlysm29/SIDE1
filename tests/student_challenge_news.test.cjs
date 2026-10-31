@@ -19,6 +19,6 @@ test('sin V2 no consulta y el error no se muestra como ausencia de desafíos',as
 });
 test('rechaza noticias desconocidas o incompletas',async()=>{
  const ctx={gameId:'g',companyId:1,epoch:1,version:'demand-share-v1',connected:true};
- const ctl=create({context:()=>ctx,read:async()=>({success:true,data:[{...event,eventId:'PE70'}]})});
+ const ctl=create({context:()=>ctx,read:async()=>({success:true,data:[{...event,eventId:'PE89'}]})});
  assert.equal(await ctl.refresh(),false);assert.equal(ctl.state(),'error');assert.deepEqual(ctl.visible(),[]);
 });

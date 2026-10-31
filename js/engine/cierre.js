@@ -149,7 +149,7 @@
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
     // V1 adjusts relative attraction, not sales or inventories. PE75 is a
     // negative campaign shock; PE69 and PE71 increase attention.
-    const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
+    const signs={PE69:1,PE70:-1,PE71:1,PE74:1,PE75:-1,PE91:1,PE92:-1};
     const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
     const marketEvents=(input.events||[]).filter(e=>e.version==='market-expansion-v1'&&['PE01','PE02','PE03','PE04','PE17','PE18'].includes(e.id)).map(e=>({id:e.id,intensity:e.intensity})).sort((a,b)=>a.id.localeCompare(b.id,'en'));
     return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,marketEvents,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};

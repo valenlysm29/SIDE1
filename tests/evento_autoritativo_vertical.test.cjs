@@ -3,14 +3,14 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture.cjs');
 const {runOnce}=require('../services/business_runtime.cjs');const fixture=require('./economic_v19_fixture.cjs');
 const sql=name=>fs.readFileSync(name,'utf8');
-for(const [eventId,intensity,direction] of [['PE23',1,0],['PE26',10,0],['PE30',25,0],['PE38',1,0],['PE39',6,0],['PE44',1,0],['PE68',1,0],['PE69',20,1],['PE71',15,1],['PE74',12,1],['PE75',6,-1],['PE77',1,0]])test(`${eventId}: noticia y cierre persistido en PGlite con tres empresas`,async()=>{
+for(const [eventId,intensity,direction] of [['PE23',1,0],['PE26',10,0],['PE30',25,0],['PE38',1,0],['PE39',6,0],['PE44',1,0],['PE68',1,0],['PE69',20,1],['PE70',12,-1],['PE71',15,1],['PE74',12,1],['PE75',6,-1],['PE77',1,0],['PE91',7,1],['PE92',12,-1]])test(`${eventId}: noticia y cierre persistido en PGlite con tres empresas`,async()=>{
  const db=await database();
  try {
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
   for(const f of ['docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql'])await db.exec(sql(f));
   await db.exec('create schema side_private; create table side_private.student_claims(empresa_id bigint primary key,owner_id uuid); revoke all on schema side_private from public,anon,authenticated');
   await db.exec(sql('supabase/migrations/20261031030035_consulta_privada_desafios.sql'));
-  for(const f of ['supabase/migrations/20261031043153_programacion_desafios_autoritativa.sql','supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql','supabase/migrations/20261031055001_mercado_global_escenarios_v2.sql','supabase/migrations/20261031055442_eventos_productivos_v2.sql'])await db.exec(sql(f));
+  for(const f of ['supabase/migrations/20261031043153_programacion_desafios_autoritativa.sql','supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql','supabase/migrations/20261031055001_mercado_global_escenarios_v2.sql','supabase/migrations/20261031055442_eventos_productivos_v2.sql','supabase/migrations/20261031060031_eventos_atractivo_duracion_v2.sql'])await db.exec(sql(f));
   const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'}));const ids=[];
   for(let i=1;i<=3;i++){
    const joined=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Legal '+i,p_nombre_comercial:'Marca '+i});const id=Number(joined.empresa_id);ids.push(id);
@@ -22,6 +22,7 @@ for(const [eventId,intensity,direction] of [['PE23',1,0],['PE26',10,0],['PE30',2
    await db.query('update side_student_state set snapshot=$2 where empresa_id=$1',[id,{decisions_submitted:true,decision_state:{__cyclePlans:{1:{state}}}}]);
   }
   await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[0],p_ciclo:1,p_event_id:eventId,p_intensity:intensity});
+  if(['PE70','PE91','PE92'].includes(eventId)){const scheduled=await rpc(db,'side_teacher_events_v1',{p_partida_id:game.id});assert.deepEqual(scheduled.map(e=>e.round),[1,2]);await assert.rejects(()=>rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[1],p_ciclo:6,p_event_id:eventId,p_intensity:intensity}),/dos ciclos/);}
   const student='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';await db.query('insert into side_private.student_claims values($1,$2)',[ids[0],student]);
   await db.query("select set_config('test.uid',$1,false)",[student]);await db.exec('set role authenticated');
   const before=await rpc(db,'side_student_events_v1',{p_partida_id:game.id,p_empresa_id:ids[0]});assert.equal(before[0].status,'programado');assert.equal(before[0].eventId,eventId);

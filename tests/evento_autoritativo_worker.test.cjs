@@ -39,7 +39,7 @@ test('dos sorteos independientes afectan mercado y gasto sin duplicar unidades',
  for(const c of ['1','2','3'])for(const sale of event[c].receipt.sales)assert.ok(sale.sold<=sale.available);
 });
 
-for(const [id,intensity,direction] of [['PE71',15,1],['PE74',12,1],['PE75',6,-1]])test(`${id} cambia el atractivo y conserva la demanda y el stock`,async()=>{
+for(const [id,intensity,direction] of [['PE70',12,-1],['PE71',15,1],['PE74',12,1],['PE75',6,-1],['PE91',7,1],['PE92',12,-1]])test(`${id} cambia el atractivo y conserva la demanda y el stock`,async()=>{
  const base=await close(),event=await close('1',id,intensity);
  const allocation=(r,company)=>r[company].receipt.marketAllocation.products.esencial.asignado;
  assert.ok(direction*(allocation(event,'1')-allocation(base,'1'))>0);
@@ -87,6 +87,6 @@ test('Node y Edge aplican la misma asignación autoritativa',async()=>{
    throw Error(name);
   };const r=await worker(rpc);assert.equal(r[0].success,true);return posted;
  }
- for(const [eventId,intensity] of [['PE23',1],['PE30',25],['PE68',1],['PE69',20],['PE71',15],['PE74',12],['PE75',6],['PE77',1]])assert.deepEqual(await run(edge.runOnce,eventId,intensity),await run(runOnce,eventId,intensity));
+ for(const [eventId,intensity] of [['PE23',1],['PE30',25],['PE68',1],['PE69',20],['PE70',12],['PE71',15],['PE74',12],['PE75',6],['PE77',1],['PE91',7],['PE92',12]])assert.deepEqual(await run(edge.runOnce,eventId,intensity),await run(runOnce,eventId,intensity));
  assert.deepEqual(await run(edge.runOnce,[['PE68',1],['PE69',20]]),await run(runOnce,[['PE68',1],['PE69',20]]));
 });

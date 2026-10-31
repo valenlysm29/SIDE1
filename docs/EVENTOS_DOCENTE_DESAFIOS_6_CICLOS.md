@@ -1,8 +1,8 @@
 # Clasificación preliminar de los 92 eventos
 
-La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE17, PE18, PE23, PE26, PE30, PE38, PE39, PE44, PE68, PE69, PE71, PE74, PE75 y PE77. PE74 requiere inversión de marketing durante el ciclo.
+La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE17, PE18, PE23, PE26, PE30, PE38, PE39, PE44, PE68, PE69, PE70, PE71, PE74, PE75, PE77, PE91 y PE92. PE74 requiere inversión de marketing durante el ciclo.
 
-La asignación manual y el sorteo persistido cubren doce eventos individuales y seis eventos grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 74 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
+La asignación manual y el sorteo persistido cubren quince eventos individuales y seis eventos grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 71 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
 
 | ID | Evento | Alcance | Variable primaria propuesta | Estado |
 |---|---|---|---|---|
@@ -75,7 +75,7 @@ La asignación manual y el sorteo persistido cubren doce eventos individuales y 
 | PE67 | Caída de internet en el local | individual | atractivo_competitivo | pendiente |
 | PE68 | Ataque de phishing empresarial | individual | movimientos_financieros | experimental |
 | PE69 | Producto viral en TikTok | individual | atractivo_competitivo | experimental |
-| PE70 | Reseña negativa viral | individual | atractivo_competitivo | pendiente |
+| PE70 | Reseña negativa viral | individual | atractivo_competitivo | experimental |
 | PE71 | Recomendación de influencer peruano | individual | atractivo_competitivo | experimental |
 | PE72 | Aumento de comisión bancaria | group | costos_operacion | pendiente |
 | PE73 | Reducción de comisión bancaria | group | costos_operacion | pendiente |
@@ -96,9 +96,11 @@ La asignación manual y el sorteo persistido cubren doce eventos individuales y 
 | PE88 | Bonificación temporal de alquiler | individual | costos_operacion | pendiente |
 | PE89 | Cliente mayorista nuevo | individual | demanda_potencial | pendiente |
 | PE90 | Devoluciones superiores a lo normal | individual | inventario_calidad | pendiente |
-| PE91 | Reconocimiento a la marca local | individual | atractivo_competitivo | pendiente |
-| PE92 | Crisis reputacional | individual | atractivo_competitivo | pendiente |
+| PE91 | Reconocimiento a la marca local | individual | atractivo_competitivo | experimental |
+| PE92 | Crisis reputacional | individual | atractivo_competitivo | experimental |
 
 La migración adicional `20261031055001_mercado_global_escenarios_v2.sql` incorpora PE17 y PE18. La matriz recibida es guía, no autoriza inventar dependencias: faltan elegibilidad estacional, duración y mecanismos para varios eventos. No habilitar V2 hasta completar la aceptación.
 
 `20261031055442_eventos_productivos_v2.sql` incorpora PE26 y PE39 como capacidad de planta y PE38/PE44 como gastos condicionados a personal o producción. Pendiente la aceptación integral de los modos y observaciones Word no excluidas.
+
+La migración `20261031060031_eventos_atractivo_duracion_v2.sql` programa PE70, PE91 y PE92 por dos ciclos; no permite iniciar el efecto si falta el ciclo siguiente. Pendiente aceptación integral de todos los modos y verificación de continuidad del efecto con dos cierres reales.
