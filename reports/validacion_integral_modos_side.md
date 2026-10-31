@@ -55,3 +55,17 @@ Se creó el proyecto local `modos-e2e` en `127.0.0.1:62321`, con PostgreSQL, Aut
 En las seis salas pasaron Auth docente, creación y reintento idempotente, ingreso de empresas, persistencia del modo, programación del primer ciclo y lectura de noticias. Aleatorio y Equilibrado también recuperaron el primer sorteo o programación en el reintento. La prueba no verifica todavía la semilla, los ciclos posteriores ni el contenido económico de las noticias. Todas estas operaciones se hicieron por HTTP autenticado, sin clics.
 
 La Edge local respondió 401 con token inválido y 200 con token válido y lista vacía de cierres. Esto verifica autorización y ejecución sin trabajo, no cierre ni concurrencia. La prueba no automatiza aún decisiones y compras mediante controles reales, recepciones, cierre Edge con trabajo, avance ni finalización. Por eso los seis escenarios siguen sin aprobarse; no se encontró un defecto funcional reproducible en los pasos ejecutados y no se cambió la lógica del producto. No se repitió la regresión general porque no se modificó el producto; se conserva la selección previa de 825 aprobadas y 17 fallidas. No hubo despliegue ni cambios en bases remotas.
+
+## Pendientes por escenario y puntos de continuación
+
+| Modo | 3 ciclos cerrados | 6 ciclos cerrados |
+|---|---:|---:|
+| Manual | 0/3 | 0/6 |
+| Aleatorio | 0/3 | 0/6 |
+| Equilibrado | 0/3 | 0/6 |
+
+Para **cada una de las seis salas** faltan decisiones estudiantiles, compras por presentación mediante interfaz, confirmación de pedidos, recepciones parciales, inventarios y Kardex, producción y ventas, cierre oficial Edge, avance docente, conciliación financiera y finalización. Falta comprobar todo el recorrido mediante clics reales y cierres efectivos concurrentes, con reintentos y sin duplicación. Las pruebas parciales no aprueban ninguno de los modos.
+
+La prueba reproducible inicial es `python tests/modos_local_reales.py`: requiere la instancia aislada `.codex-work/modos-e2e` en `127.0.0.1:62321` y crea seis salas nuevas; devuelve código 1 deliberadamente mientras no cierre todos los ciclos. El registro `tests/output/modos_local_reales.json` es local e ignorado por Git. Las sesiones de los alumnos no se guardaron, por lo que no se dispone de credenciales para continuar esas sesiones originales; para el recorrido integral conviene recrear las salas conservando las sesiones de prueba de forma segura y sin publicarlas. La configuración `.codex-work/` y el script auxiliar local `tests/output/modos_e2e_setup.py` tampoco se publican; la preparación de una nueva instancia requiere seguir `docs/guia_continuidad_local_side.md` y aplicar explícitamente las migraciones de eventos y presentaciones en una base aislada.
+
+Puntos de inspección: `js/docente.js` y `services/partida_service.js` (modo, programación y control); `services/empresa_service.js` y `services/decisiones_service.js` (ingreso, decisiones y entregas); `supabase/migrations/20261031161309_presentaciones_confirmacion_atomica.sql` y `20261030180225_entrega_operativa_autorizada.sql` (pedidos y recepciones); `js/production_model.js`, `js/cycle_model.js`, `js/financial_model.js` y `services/laboratorio_service.js` (producción, cierre y consulta); `supabase/functions/side-business-close/` y `20261028_cierre_servidor.sql` (Edge y cierre). Para contrastar interfaz, `tests/p01_http_browser_admission.cjs` contiene un recorrido previo de referencia, pero usa SQL para preparar estado y un worker: no cumple la aceptación integral solicitada.
