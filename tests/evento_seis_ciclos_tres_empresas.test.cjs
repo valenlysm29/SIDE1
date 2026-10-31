@@ -1,8 +1,8 @@
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 const {runOnce}=require('../services/business_runtime.cjs');const fixture=require('./economic_v19_fixture.cjs');
-test('tres empresas durante seis ciclos con desafíos rotados y cierres persistidos',async()=>{
+for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desafíos rotados y cierres persistidos`,async()=>{
  const db=await database();
  try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
@@ -13,14 +13,16 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
   await db.exec(fs.readFileSync('supabase/migrations/20261031055442_eventos_productivos_v2.sql','utf8'));
   await db.exec(fs.readFileSync('supabase/migrations/20261031060031_eventos_atractivo_duracion_v2.sql','utf8'));
   await db.exec(fs.readFileSync('supabase/migrations/20261031060810_proteger_programacion_desafios.sql','utf8'));
-  const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
+  const game=await createGame(db,config({cycles,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
   for(let i=1;i<=3;i++){const company=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa '+i,p_nombre_comercial:'Marca '+i});ids.push(Number(company.empresa_id));}
-  const events=[{id:'PE70',intensity:12,sign:-1},{id:'PE91',intensity:7,sign:1},{id:'PE92',intensity:12,sign:-1},{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1}];
-  for(let round=1;round<=6;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
+  const events=cycles===3?[{id:'PE70',intensity:12,sign:-1},{id:'PE69',intensity:20,sign:1},{id:'PE75',intensity:6,sign:-1}]:[{id:'PE70',intensity:12,sign:-1},{id:'PE91',intensity:7,sign:1},{id:'PE92',intensity:12,sign:-1},{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1}];
+  for(let round=1;round<=cycles;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
   const groups=[{id:'PE01',intensity:10},{id:'PE02',intensity:15},{id:'PE03',intensity:25},{id:'PE04',intensity:30},{id:'PE17',intensity:10},{id:'PE18',intensity:10}];
-  for(let round=1;round<=6;round++){const event=groups[(round-1)%groups.length];await rpc(db,'side_assign_group_event_v1',{p_partida_id:game.id,p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
+  for(let round=1;round<=cycles;round++){const event=groups[(round-1)%groups.length];await rpc(db,'side_assign_group_event_v1',{p_partida_id:game.id,p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
+  const source=fs.readFileSync('js/docente.js','utf8'),project=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf('\nlet rosterSyncError=')),lab=require('../js/laboratorio_model.js');
+  const teacher={state:{partidaId:game.id},roomGeneration:1,confirmedReportClosures:new Map()};vm.createContext(teacher);vm.runInContext(project,teacher);
   let previous={};
-  for(let round=1;round<=6;round++){
+  for(let round=1;round<=cycles;round++){
    await db.exec('reset role');
    for(const id of ids){
     const state=fixture.state(round,previous[id]?.state||{},0);
@@ -34,7 +36,10 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
    const outcomes=await runOnce(call);assert.equal(outcomes[0].success,true,JSON.stringify(outcomes));
    const results=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa;
    for(const id of ids){
-    const result=results[id],expected=[groups[(round-1)%groups.length].id];if(id===ids[(round-1)%3])expected.push(events[(round-1)%events.length].id);if(round>=2&&round<=4&&id===ids[(round-2)%3])expected.push(events[(round-2)%events.length].id);assert.deepEqual(result.receipt.events.map(event=>event.id).sort(),expected.sort());
+    const result=results[id],expected=[groups[(round-1)%groups.length].id];if(id===ids[(round-1)%3])expected.push(events[(round-1)%events.length].id);if(round>=2&&['PE70','PE91','PE92'].includes(events[round-2].id)&&id===ids[(round-2)%3])expected.push(events[round-2].id);assert.deepEqual(result.receipt.events.map(event=>event.id).sort(),expected.sort());
+    teacher.confirmedReportClosures.set(JSON.stringify([1,game.id,round,String(id)]),{...result.financial,cycleReceipt:result.receipt});
+    const projected={empresaId:id,ronda:round};teacher.applyConfirmedReportClosures([projected]);const laboratory=lab.read(result);
+    assert.equal(projected.ingresos,laboratory.revenue);assert.equal(projected.utilidad,laboratory.profit);assert.equal(projected.caja,laboratory.cash);assert.equal(projected.unidadesVendidas,laboratory.sold);assert.equal(projected.cycleHistory.length,round);
     assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
     if(round>1)assert.equal(result.financial.balanceCaja.cajaInicial,previous[id].financial.balanceCaja.cajaFinal);
     for(const sale of result.receipt.sales)assert.ok(sale.sold<=sale.available);

@@ -33,7 +33,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/teacher-
  assert.match(await page.locator('#detailReports').innerText(),/700/);
  await page.evaluate(async()=>{
   // Replaying an earlier closure must not replace the next cycle's figures.
-  state.reports[1].ronda=2;state.reports[1].utilidad=333;state.reports[1].estadoResultados={utilidad:333};
+  state.reports[1].ronda=2;state.reports[1].cycleReceipt={round:2,sold:1,revenue:400};state.reports[1].utilidad=333;state.reports[1].estadoResultados={utilidad:333};
   await closeBusinessRemoteRound(1);
  });
  assert.equal(await page.evaluate(()=>state.reports[1].utilidad),333,'cycle 1 closure must not overwrite cycle 2');

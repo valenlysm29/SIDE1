@@ -78,3 +78,12 @@ test('a closure arriving during a roster read also replaces its cached sold unit
  vm.runInContext("confirmedReportClosures.set(JSON.stringify([roomGeneration,state.partidaId,1,'5']),final);applyConfirmedReportClosures(rows)",ctx);
  assert.equal(r.provisional,false);assert.equal(r.ingresos,510);assert.equal(r.unidadesVendidas,12);
 });
+test('docente conserva el ciclo en curso y muestra el último cierre oficial de la misma empresa',async()=>{
+ const c={partida_id:'room',codigo:'SIDE-QA',ciclo:2,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot(2)};
+ const ctx=teacher(c),[r]=await ctx.supabaseReports();ctx.rows=[r];ctx.final={...LIVE.calculate({snapshot:snapshot(),capital:200000,catalog}).financial,cycleReceipt:{round:1,sold:12,revenue:510}};
+ ctx.final.estadoResultados.ingresos=510;ctx.final.estadoResultados.utilidadNeta=-50;ctx.final.balanceCaja.cajaFinal=199950;
+ vm.runInContext("confirmedReportClosures.set(JSON.stringify([roomGeneration,state.partidaId,1,'5']),final);applyConfirmedReportClosures(rows)",ctx);
+ assert.equal(r.ronda,2);assert.equal(r.resultRound,1);assert.equal(r.cycleReceipt.sold,12);assert.equal(r.ingresos,510);assert.equal(r.utilidad,-50);assert.equal(r.caja,199950);assert.equal(r.cycleHistory[0].round,1);
+ const other={...r,empresaId:6,cycleReceipt:null,resultRound:null};ctx.rows=[other];vm.runInContext('applyConfirmedReportClosures(rows)',ctx);assert.equal(other.cycleReceipt,null);
+ ctx.state.partidaId='otra-partida';const foreign={...r,cycleReceipt:null,resultRound:null};ctx.rows=[foreign];vm.runInContext('applyConfirmedReportClosures(rows)',ctx);assert.equal(foreign.cycleReceipt,null);
+});
