@@ -112,7 +112,7 @@ module.exports={runOnce,remoteRpc};
       const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
       for(const order of orders){
         const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
-        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?businessRules.materialPackConversion(order.sku,chosen):null;
+        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=['excel-v2-packs-v1','side-packs-v1'].includes(financialPolicy.materialPurchaseVersion)?businessRules.materialPackConversion(order.sku,chosen):null;
         const expected=pack?pack.units:chosen,price=businessRules.materialUnitPrice(option,chosen,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}})/(pack?.unitsPerPack||1);
         if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
         seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
@@ -126,7 +126,7 @@ module.exports={runOnce,remoteRpc};
       for(const event of receipts){
         const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
         const before=n(receivedByOrder[event.orderId]);receivedByOrder[event.orderId]=before+n(event.quantity);
-        const value=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
+        const value=['excel-v2-packs-v1','side-packs-v1'].includes(financialPolicy.materialPurchaseVersion)?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
         if(n(event.day)<startDay)continue;
         temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
         temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+value);
@@ -399,7 +399,7 @@ module.exports={runOnce,remoteRpc};
     });
     const eligibleTarget=sum(productLines.filter(line=>line.available).map(line=>line.target));
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
-      const counts=quantityCounts(ctx,id),factor=optionId=>ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
+      const counts=quantityCounts(ctx,id),factor=optionId=>['excel-v2-packs-v1','side-packs-v1'].includes(ctx.config?.materialPurchaseVersion)?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=eligibleTarget?sum(productLines.filter(line=>line.available).map(line=>line.requirements[id]))/eligibleTarget:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(factor(option.id))})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
@@ -451,7 +451,7 @@ module.exports={runOnce,remoteRpc};
     };
   }
 
-  function yieldFor(materialId,optionId,version){return n(version==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
+  function yieldFor(materialId,optionId,version){return n(['excel-v2-packs-v1','side-packs-v1'].includes(version)?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
   // Independent reference scenario: one basic machine per level-one worker.
   // Use the same capacity and rounding rules as calculate(), with no state writes.
   function planResources(target){
@@ -3123,7 +3123,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       const eventVersion=ctx.financialConfig?.economicEventsVersion;
       if(eventVersion&&eventVersion!=='demand-share-v1')return {success:false,code:'VERSION_EVENTOS_INVALIDA',error:'Versión de eventos desconocida.'};
       const purchaseVersion=ctx.financialConfig?.materialPurchaseVersion;
-      if(purchaseVersion&&(purchaseVersion!=='excel-v2-packs-v1'||ctx.financialConfig?.materialRulesVersion!=='receipts-v1'))return {success:false,code:'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE',error:'La versión de compra requiere órdenes y recepciones verificadas.'};
+      if(purchaseVersion&&(!['excel-v2-packs-v1','side-packs-v1'].includes(purchaseVersion)||ctx.financialConfig?.materialRulesVersion!=='receipts-v1'))return {success:false,code:'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE',error:'La versión de compra requiere órdenes y recepciones verificadas.'};
       // No temporal game may silently fall back to instant purchases while
       // verified order persistence and financial settlement are unavailable.
       const temporal=!!ctx.financialConfig?.materialRulesVersion&&ctx.financialConfig.materialRulesVersion!=='legacy-instant',materialBooks={};

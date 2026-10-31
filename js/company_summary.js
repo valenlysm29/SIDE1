@@ -63,7 +63,7 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
         for(const id of d.optionIds||[])if(!item.options.some(o=>o.id===id))issues.push({cat:cat.cat,item:item.id,text:`Opci\u00f3n no v\u00e1lida en ${item.name}.`});
         for(const [id,value] of Object.entries(d.quantities||{})){
           const q=Number(value),floor=item.asset?-getOwned(item,id):item.id==='CANALES'?1:0;
-          if(!(item.material&&ctx.config?.materialPurchaseVersion!=='excel-v2-packs-v1'?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
+          if(!(item.material&&!['excel-v2-packs-v1','side-packs-v1'].includes(ctx.config?.materialPurchaseVersion)?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
         }
       }
       if(item.type==='number'&&draftItemComplete(item)&&(!Number.isFinite(Number(d.value))||Number(d.value)<Number(item.min||0)||Number(d.value)>(item.max??Infinity)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});

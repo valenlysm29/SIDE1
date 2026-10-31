@@ -383,7 +383,7 @@
       const eventVersion=ctx.financialConfig?.economicEventsVersion;
       if(eventVersion&&eventVersion!=='demand-share-v1')return {success:false,code:'VERSION_EVENTOS_INVALIDA',error:'Versión de eventos desconocida.'};
       const purchaseVersion=ctx.financialConfig?.materialPurchaseVersion;
-      if(purchaseVersion&&(purchaseVersion!=='excel-v2-packs-v1'||ctx.financialConfig?.materialRulesVersion!=='receipts-v1'))return {success:false,code:'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE',error:'La versión de compra requiere órdenes y recepciones verificadas.'};
+      if(purchaseVersion&&(!['excel-v2-packs-v1','side-packs-v1'].includes(purchaseVersion)||ctx.financialConfig?.materialRulesVersion!=='receipts-v1'))return {success:false,code:'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE',error:'La versión de compra requiere órdenes y recepciones verificadas.'};
       // No temporal game may silently fall back to instant purchases while
       // verified order persistence and financial settlement are unavailable.
       const temporal=!!ctx.financialConfig?.materialRulesVersion&&ctx.financialConfig.materialRulesVersion!=='legacy-instant',materialBooks={};

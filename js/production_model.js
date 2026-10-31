@@ -168,7 +168,7 @@
     });
     const eligibleTarget=sum(productLines.filter(line=>line.available).map(line=>line.target));
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
-      const counts=quantityCounts(ctx,id),factor=optionId=>ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
+      const counts=quantityCounts(ctx,id),factor=optionId=>['excel-v2-packs-v1','side-packs-v1'].includes(ctx.config?.materialPurchaseVersion)?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=eligibleTarget?sum(productLines.filter(line=>line.available).map(line=>line.requirements[id]))/eligibleTarget:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
       const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(factor(option.id))})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
@@ -220,7 +220,7 @@
     };
   }
 
-  function yieldFor(materialId,optionId,version){return n(version==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
+  function yieldFor(materialId,optionId,version){return n(['excel-v2-packs-v1','side-packs-v1'].includes(version)?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
   // Independent reference scenario: one basic machine per level-one worker.
   // Use the same capacity and rounding rules as calculate(), with no state writes.
   function planResources(target){

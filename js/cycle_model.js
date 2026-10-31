@@ -74,7 +74,7 @@
       const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
       for(const order of orders){
         const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
-        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?businessRules.materialPackConversion(order.sku,chosen):null;
+        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=['excel-v2-packs-v1','side-packs-v1'].includes(financialPolicy.materialPurchaseVersion)?businessRules.materialPackConversion(order.sku,chosen):null;
         const expected=pack?pack.units:chosen,price=businessRules.materialUnitPrice(option,chosen,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}})/(pack?.unitsPerPack||1);
         if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
         seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
@@ -88,7 +88,7 @@
       for(const event of receipts){
         const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
         const before=n(receivedByOrder[event.orderId]);receivedByOrder[event.orderId]=before+n(event.quantity);
-        const value=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
+        const value=['excel-v2-packs-v1','side-packs-v1'].includes(financialPolicy.materialPurchaseVersion)?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
         if(n(event.day)<startDay)continue;
         temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
         temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+value);
