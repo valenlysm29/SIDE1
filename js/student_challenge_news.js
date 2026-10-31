@@ -13,7 +13,7 @@
    if(token!==sequence||key(context())!==k)return false;
    if(!result?.success||!Array.isArray(result.data)){snapshot=null;status='error';onChange();return false;}
    const rows=result.data;
-   if(rows.some(e=>!e||!['PE01','PE02','PE03','PE04','PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'].includes(e.eventId)||!Number.isInteger(e.round)||e.round<1||e.round>6||!['programado','activo','aplicado','no_aplicado'].includes(e.status)||typeof e.title!=='string'||typeof e.description!=='string')){snapshot=null;status='error';onChange();return false;}
+   if(rows.some(e=>!e||!['PE01','PE02','PE03','PE04','PE17','PE18','PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'].includes(e.eventId)||!Number.isInteger(e.round)||e.round<1||e.round>6||!['programado','activo','aplicado','no_aplicado'].includes(e.status)||typeof e.title!=='string'||typeof e.description!=='string')){snapshot=null;status='error';onChange();return false;}
    snapshot={key:k,rows:rows.map(e=>({...e}))};status='ready';onChange();return true;
   }
   function clear(){sequence++;snapshot=null;status='idle';statusKey=null;onChange();}

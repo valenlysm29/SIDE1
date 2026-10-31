@@ -4,12 +4,13 @@ const {database,config,createGame,rpc,professor}=require('./lifecycle_db_fixture
 const {runOnce}=require('../services/business_runtime.cjs'),fixture=require('./economic_v19_fixture.cjs');
 const crypto=require('node:crypto');
 const sql=f=>fs.readFileSync(f,'utf8');
-for(const [eventId,intensity] of [['PE01',10],['PE02',15],['PE03',25],['PE04',30]])test(`${eventId}: mercado grupal, noticia privada y cierre único`,async()=>{
+for(const [eventId,intensity] of [['PE01',10],['PE02',15],['PE03',25],['PE04',30],['PE17',10],['PE18',10]])test(`${eventId}: mercado grupal, noticia privada y cierre único`,async()=>{
  const db=await database();try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
   for(const f of ['docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql'])await db.exec(sql(f));
   await db.exec('create schema side_private; create table side_private.student_claims(empresa_id bigint primary key,owner_id uuid); revoke all on schema side_private from public,anon,authenticated');
   await db.exec(sql('supabase/migrations/20261031030035_consulta_privada_desafios.sql'));await db.exec(sql('supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql'));
+  await db.exec(sql('supabase/migrations/20261031055001_mercado_global_escenarios_v2.sql'));
   const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[],states=[];
   for(let i=0;i<3;i++){
    const id=Number((await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Legal '+i,p_nombre_comercial:'Marca '+i})).empresa_id);ids.push(id);
@@ -26,7 +27,7 @@ for(const [eventId,intensity] of [['PE01',10],['PE02',15],['PE03',25],['PE04',30
   await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=$1",[game.id]);await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
   const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args)}}catch(e){return {error:{message:e.message}}}};
   assert.equal((await runOnce(call))[0].success,true);const results=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa;
-  const total=ids.reduce((sum,id)=>sum+results[id].receipt.marketAllocation.products.esencial.asignado,0);assert.equal(total,Math.round(3500*(1+intensity/100)));
+  const total=ids.reduce((sum,id)=>sum+results[id].receipt.marketAllocation.products.esencial.asignado,0);assert.equal(total,Math.round(3500*(1+(eventId==='PE17'?-1:1)*intensity/100)));
   for(const id of ids){const r=results[id];assert.equal(r.receipt.events[0].id,eventId);for(const sale of r.receipt.sales)assert.ok(sale.sold<=sale.available);assert.equal(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);}
   assert.equal((await runOnce(call))[0].success,true);assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa,results);
   await db.exec('reset role');await db.query("select set_config('test.uid',$1,false)",[professor]);await db.exec('set role authenticated');const history=await rpc(db,'side_teacher_events_v1',{p_partida_id:game.id});assert.equal(history.length,3);assert.ok(history.every(row=>row.status==='aplicado'));

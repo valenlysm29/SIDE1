@@ -1000,7 +1000,7 @@ module.exports={runOnce,remoteRpc};
     // negative campaign shock; PE69 and PE71 increase attention.
     const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
     const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
-    const marketEvents=(input.events||[]).filter(e=>e.version==='market-expansion-v1'&&['PE01','PE02','PE03','PE04'].includes(e.id)).map(e=>({id:e.id,intensity:e.intensity})).sort((a,b)=>a.id.localeCompare(b.id,'en'));
+    const marketEvents=(input.events||[]).filter(e=>e.version==='market-expansion-v1'&&['PE01','PE02','PE03','PE04','PE17','PE18'].includes(e.id)).map(e=>({id:e.id,intensity:e.intensity})).sort((a,b)=>a.id.localeCompare(b.id,'en'));
     return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,marketEvents,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
@@ -1009,7 +1009,7 @@ module.exports={runOnce,remoteRpc};
     const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:p.reputation||{valor:p.scores.reputation},products:{}}]));
     const group=prepared[0]?.marketEvents||[];
     if(prepared.some(p=>JSON.stringify(p.marketEvents||[])!==JSON.stringify(group)))throw new Error('Los eventos grupales no coinciden entre empresas.');
-    const marketFactor=group.reduce((factor,event)=>factor*(1+event.intensity/100),1);
+    const marketFactor=group.reduce((factor,event)=>factor*(1+(event.id==='PE17'?-1:1)*event.intensity/100),1);
     for(const id of config.products){
       const segment=config.segments[id],participants=prepared.filter(p=>p.lines.find(line=>line.id===id)?.available>0);
       const market=Math.max(0,Math.round((segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market)*marketFactor));
@@ -3197,9 +3197,9 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         let verifiedEvents=[];
         if(eventVersion==='demand-share-v1'){
           const response=await sb.rpc('side_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}), facts=response.data;
-          const eventLimits={PE01:10,PE02:15,PE03:25,PE04:30,PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
-          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>12||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
-          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:['PE01','PE02','PE03','PE04'].includes(e.id)?'market-expansion-v1':e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
+          const eventLimits={PE01:10,PE02:15,PE03:25,PE04:30,PE17:10,PE18:10,PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
+          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>14||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
+          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:['PE01','PE02','PE03','PE04','PE17','PE18'].includes(e.id)?'market-expansion-v1':e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
         }
         inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:verifiedEvents});
       }

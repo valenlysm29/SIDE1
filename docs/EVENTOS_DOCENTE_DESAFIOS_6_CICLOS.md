@@ -1,8 +1,8 @@
 # Clasificación preliminar de los 92 eventos
 
-La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE23, PE30, PE68, PE69, PE71, PE74, PE75 y PE77. PE74 requiere inversión de marketing durante el ciclo.
+La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE17, PE18, PE23, PE30, PE68, PE69, PE71, PE74, PE75 y PE77. PE74 requiere inversión de marketing durante el ciclo.
 
-La asignación manual y el sorteo persistido cubren ocho eventos individuales y cuatro campañas grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 80 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
+La asignación manual y el sorteo persistido cubren ocho eventos individuales y seis eventos grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 78 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
 
 | ID | Evento | Alcance | Variable primaria propuesta | Estado |
 |---|---|---|---|---|
@@ -22,8 +22,8 @@ La asignación manual y el sorteo persistido cubren ocho eventos individuales y 
 | PE14 | Feria de emprendedores peruanos | group | demanda_potencial | pendiente |
 | PE15 | Paro de transportistas | group | costos_operacion | pendiente |
 | PE16 | Bloqueo en la Carretera Central | group | costos_operacion | pendiente |
-| PE17 | Manifestaciones en el centro de Lima | group | demanda_potencial | pendiente |
-| PE18 | Bono del Estado a familias | group | demanda_potencial | pendiente |
+| PE17 | Manifestaciones en el centro de Lima | group | demanda_potencial | experimental |
+| PE18 | Bono del Estado a familias | group | demanda_potencial | experimental |
 | PE19 | Incertidumbre por elecciones | group | demanda_potencial | pendiente |
 | PE20 | Huelga portuaria | group | costos_operacion | pendiente |
 | PE21 | Tráfico extremo en Evitamiento/Panamericana | individual | costos_operacion | pendiente |
@@ -98,3 +98,5 @@ La asignación manual y el sorteo persistido cubren ocho eventos individuales y 
 | PE90 | Devoluciones superiores a lo normal | individual | inventario_calidad | pendiente |
 | PE91 | Reconocimiento a la marca local | individual | atractivo_competitivo | pendiente |
 | PE92 | Crisis reputacional | individual | atractivo_competitivo | pendiente |
+
+La migración adicional `20261031055001_mercado_global_escenarios_v2.sql` incorpora PE17 y PE18. La matriz recibida es guía, no autoriza inventar dependencias: faltan elegibilidad estacional, duración y mecanismos para varios eventos. No habilitar V2 hasta completar la aceptación.
