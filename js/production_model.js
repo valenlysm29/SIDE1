@@ -238,8 +238,9 @@
   }
   // Bounded advisory search. Each candidate adds one worker and/or equipment
   // type to one stage; calculate() remains the authority for pairing and bonuses.
-  function recommendResources(ctx={},plan=calculate(ctx)){
-    const specs=[['cut','PERS_CORTE','MESA_CORTE'],['assembly','PERS_ENSAMBLE','ENSAMBLE'],['finish','PERS_ACABADO','ACABADOS']];
+  function resourceCandidate(ctx={},plan=calculate(ctx),order=[0,1,2]){
+    let specs=[['cut','PERS_CORTE','MESA_CORTE'],['assembly','PERS_ENSAMBLE','ENSAMBLE'],['finish','PERS_ACABADO','ACABADOS']];
+    specs=order.map(i=>specs[i]);
     let drafts={...(ctx.drafts||{})};
     for(const [,staffId,machineId] of specs){drafts[staffId]={...draft(ctx,staffId),quantities:{...draft(ctx,staffId).quantities}};drafts[machineId]={...draft(ctx,machineId),quantities:{...draft(ctx,machineId).quantities}};}
     let scenario=plan,totalCost=0;const additions=[];let complete=true;
@@ -267,8 +268,19 @@
       drafts=best.drafts;scenario=best.plan;totalCost+=best.cost;
       additions.push({stage,quantity:best.quantity,worker:best.worker?.label||null,machine:best.machine?.label||null,cost:best.cost});
     }
-    return {additions,cost:totalCost,capacity:scenario.processCapacity,producibleUnits:scenario.producibleUnits,materialShortfalls:scenario.materials.filter(m=>m.shortfall>0).map(m=>({id:m.id,label:m.label,unit:m.unit,shortfall:m.shortfall})),unavailablePlannedMolds:scenario.unavailablePlannedMolds,complete:complete&&scenario.processCapacity>=plan.target,
+    return {drafts,additions,cost:totalCost,capacity:scenario.processCapacity,producibleUnits:scenario.producibleUnits,materialShortfalls:scenario.materials.filter(m=>m.shortfall>0).map(m=>({id:m.id,label:m.label,unit:m.unit,shortfall:m.shortfall})),unavailablePlannedMolds:scenario.unavailablePlannedMolds,complete:complete&&scenario.processCapacity>=plan.target,
       budget:Number.isFinite(ctx.availableCash)?ctx.availableCash:null,affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null};
+  }
+  // Global cross-stage search over six stage orders. Candidate generation is
+  // bounded and is not a proof of global optimality.
+  function recommendResources(ctx={},plan=calculate(ctx)){
+    const orders=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+    let best=null;
+    for(const order of orders){
+      const candidate=resourceCandidate(ctx,plan,order);
+      if(!best||(candidate.complete&&!best.complete)||(candidate.complete===best.complete&&candidate.cost<best.cost))best=candidate;
+    }
+    return {...best,optimal:false};
   }
   function threadAlternatives(ctx={},plan=calculate(ctx)){
     const thread=plan.materials.find(m=>m.id==='HILO'),definition=item(ctx,'HILO');
@@ -308,6 +320,40 @@
     }
     return {needed:thread.neededForTarget,available:thread.available,shortage,options,purchase,exhaustive,temporal:!!plan.temporal};
   }
+  // Advisory scenario only. No orders or decisions are persisted.
+  function recommendIntegrated(ctx={},plan=calculate(ctx),resources=recommendResources(ctx,plan)){
+    let drafts={...resources.drafts};const rows=[];let materialCostTotal=0,known=true;
+    const packMode=ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1';
+    for(const family of ['CUERO','ACCESORIOS','HILO']){
+      const material=plan.materials.find(m=>m.id===family),definition=item(ctx,family);
+      if(!material||!definition){known=false;continue;}
+      const shortage=Math.max(0,material.neededForTarget-material.available);
+      const original={...draft(ctx,family),quantities:{...draft(ctx,family).quantities}};
+      drafts[family]=original;
+      if(!shortage)continue;
+      const before=materialCost({...ctx,drafts},family);
+      let candidates=[];
+      if(family==='HILO'){
+        const thread=threadAlternatives(ctx,plan);
+        if(thread?.purchase){const quantities={...original.quantities};for(const [id,q] of Object.entries(thread.purchase.counts))quantities[id]=n(quantities[id])+q*(packMode?1:BUS.MATERIAL_PACKS_V2[id]);candidates.push({quantities,description:Object.entries(thread.purchase.counts).filter(([,q])=>q).map(([id,q])=>`${q} ${id}`).join(', ')});}
+      }else for(const option of definition.options||[]){
+        const units=packMode?n(BUS.MATERIAL_PACKS_V2[option.id]):1;if(!units)continue;
+        const q=packMode?Math.ceil(shortage/units):Math.ceil(shortage*100)/100;
+        candidates.push({quantities:{...original.quantities,[option.id]:n(original.quantities[option.id])+q},description:`${q} ${option.label}`});
+      }
+      let best=null;
+      for(const candidate of candidates){const d={...drafts,[family]:{...original,quantities:candidate.quantities}};const cost=materialCost({...ctx,drafts:d},family)-before;if(!best||cost<best.cost)best={...candidate,cost};}
+      if(!best){known=false;continue;}
+      drafts[family]={...original,quantities:best.quantities};materialCostTotal+=best.cost;
+      rows.push({id:family,label:material.label,shortfall:shortage,unit:material.unit,description:best.description,cost:best.cost});
+    }
+    const totalCost=resources.cost+materialCostTotal;
+    // Receipt-ledger mode requires actual receipt events; never fabricate them.
+    const scenario=known&&!plan.temporal?calculate({...ctx,drafts}):null;
+    return {rows,materialCost:materialCostTotal,totalCost,known,optimal:false,capacity:resources.capacity,
+      producibleUnits:scenario?.producibleUnits??null,unavailablePlannedMolds:plan.unavailablePlannedMolds,
+      affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null,temporal:!!plan.temporal};
+  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){
     const target=Number(plan?.target),value=record?.producedUnits;
@@ -315,5 +361,5 @@
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,planResources,recommendResources,threadAlternatives,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,planResources,recommendResources,recommendIntegrated,threadAlternatives,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });

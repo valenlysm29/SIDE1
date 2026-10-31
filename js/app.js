@@ -900,7 +900,7 @@ function analystSelected(){const item=findDecisionItem('ANALISTA_COMPRAS');retur
 function analystDiscount(){return analystSelected()?Math.max(2,12-(currentRound()-1)*2):0}
 function optionUnitCost(item,opt){return window.SIDE_REVIEW_MODEL.unitCost(item,opt,decisionModelContext())}
 function currentProductionTarget(){return Object.values(initDraft(findDecisionItem('PRODUCCION_META')).moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)}
-function productionPlan(){const ctx={...decisionModelContext(),availableCash:cashBalance()},plan=window.SIDE_PRODUCTION_MODEL.calculate(ctx);return {...plan,recommendation:window.SIDE_PRODUCTION_MODEL.recommendResources(ctx,plan),threadAlternatives:window.SIDE_PRODUCTION_MODEL.threadAlternatives(ctx,plan)}}
+function productionPlan(){const ctx={...decisionModelContext(),availableCash:cashBalance()},plan=window.SIDE_PRODUCTION_MODEL.calculate(ctx);const recommendation=window.SIDE_PRODUCTION_MODEL.recommendResources(ctx,plan);return {...plan,recommendation,integratedRecommendation:window.SIDE_PRODUCTION_MODEL.recommendIntegrated(ctx,plan,recommendation),threadAlternatives:window.SIDE_PRODUCTION_MODEL.threadAlternatives(ctx,plan)}}
 function materialYieldLabel(itemId,optionId){
   const amount=window.SIDE_PRODUCTION_MODEL.yieldFor(itemId,optionId,teacherConfig().materialPurchaseVersion),unit=window.SIDE_PRODUCTION_MODEL.materialUnit(itemId);
   return amount?`Cada compra aporta ${amount.toLocaleString('es-PE')} ${unit}`:'';
