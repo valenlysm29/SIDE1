@@ -2,6 +2,16 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_BUSINESS_RULES=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   const VERSION='md-20261027',n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0;
+  // Excel V2: physical units per purchased presentation. This helper does not
+  // change persisted decisions or legacy prices; callers must opt in only when
+  // the order, receipt and close all carry the matching version.
+  const MATERIAL_PACKS_V2=Object.freeze({cuero_sint:1,cuero_std:2,cuero_prem:2,acc_eco:1,acc_prem:1,hilo_std:270,hilo_ref:250,hilo_prem:200});
+  function materialPackConversion(sku,packs){
+    if(!Object.hasOwn(MATERIAL_PACKS_V2,sku))throw new RangeError('Presentación de material desconocida');
+    if(typeof packs!=='number'||!Number.isSafeInteger(packs)||packs<0)throw new RangeError('La cantidad de presentaciones debe ser un entero no negativo');
+    const units=packs*MATERIAL_PACKS_V2[sku];if(!Number.isSafeInteger(units))throw new RangeError('Cantidad física fuera de rango');
+    return {sku,packs,units,unitsPerPack:MATERIAL_PACKS_V2[sku],version:'excel-v2-packs-v1'};
+  }
   const salaries={corte_basico:1500,corte_exp:2000,corte_maestro:3800,ens_personal_basico:1500,ens_personal_ind:2800,ens_personal_esp:4500,aca_personal_basico:1500,aca_personal_tec:2800,aca_personal_art:4500,si_jefatura:3000,limpieza:600};
   const regimes={MYPE:{installation:.03,training:.02,moldTraining:.01,maintenance:.05,residual:.05,divisor:12.5,grati:1,vacation:.5,cts:750},NO_MYPE:{installation:.05,training:.03,moldTraining:.02,maintenance:.08,residual:.10,divisor:13,grati:2,vacation:1,cts:1500}};
   function regime(ctx={}){const ids=ctx.drafts?.REGIMEN_LABORAL?.optionIds??ctx.state?.REGIMEN_LABORAL?.optionIds??[];return ids.includes('no_mype')?'NO_MYPE':'MYPE';}
@@ -43,5 +53,5 @@
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
 });

@@ -1,0 +1,14 @@
+'use strict';
+const {chromium}=require('../.codex-work/lab-browser/node_modules/playwright-core'),{spawn}=require('child_process'),assert=require('node:assert/strict');
+(async()=>{const server=spawn('python',['-m','http.server','8794','--bind','127.0.0.1'],{stdio:'ignore'});let browser;try{
+ await new Promise(r=>setTimeout(r,1000));browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});const page=await browser.newPage();await page.route('**/*',r=>r.request().url().startsWith('http://127.0.0.1:8794/')?r.continue():r.abort());await page.goto('http://127.0.0.1:8794/docente.html',{waitUntil:'domcontentloaded'});
+ assert.equal(await page.locator('#challengeV1Panel').isHidden(),true);
+ await page.evaluate(()=>{state.partidaId='g';state.authoritative={economicEventsVersion:'demand-share-v1',cycles:6};state.reports=[{fuente:'supabase',empresaId:1,empresa:'Empresa A',estado:'activa'}];window.challengeCalls=[];window.SIDE.PartidaService.asignarDesafio=async(...a)=>{window.challengeCalls.push(a);return {success:true}};window.SIDE.PartidaService.consultarDesafios=async()=>({success:true,data:[{companyId:'1',round:2,eventId:'PE69',intensity:20,status:'programado'}]});renderTeacherChallengeControls();});
+ await page.evaluate(()=>{document.querySelector('#challengeV1Round').value='2';document.querySelector('#challengeV1Assign').click()});await page.waitForFunction(()=>document.querySelector('#challengeV1History').textContent.includes('PE69'));
+ const result=await page.evaluate(()=>({calls:window.challengeCalls,history:document.querySelector('#challengeV1History').textContent,hidden:document.querySelector('#challengeV1Panel').hidden}));assert.equal(result.hidden,false);assert.deepEqual(result.calls,[['g','1',2,'PE69',20]]);assert.match(result.history,/Empresa A.*ciclo 2.*programado/);
+ await page.evaluate(()=>{window.drawCalls=[];window.SIDE.PartidaService.sortearDesafios=async(...args)=>{window.drawCalls.push(args);return {success:true,data:{sourceCycle:2,events:[],reused:false,rosterChanged:false}};};document.querySelector('#challengeV1Draw').click();});
+ await page.waitForFunction(()=>window.drawCalls.length===1);assert.deepEqual(await page.evaluate(()=>window.drawCalls),[['g',2]]);
+ await page.selectOption('#challengeV1Event','PE75');assert.equal(await page.locator('#challengeV1Intensity').inputValue(),'6');assert.match(await page.locator('#challengeV1Preview').textContent(),/reduce/);
+ await page.selectOption('#challengeV1Event','PE30');assert.equal(await page.locator('#challengeV1Intensity').getAttribute('max'),'25');assert.match(await page.locator('#challengeV1Preview').textContent(),/ensamblado.*200/);
+ console.log('PASS docente V2: asignación y recuperación experimental');
+ }finally{if(browser)await browser.close();server.kill();}})().catch(e=>{console.error(e);process.exitCode=1});

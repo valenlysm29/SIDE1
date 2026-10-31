@@ -116,10 +116,11 @@
       try{batches=ctx.rules.nextStoreBatches(e,opt.id,quantity,ctx.round);}catch{batches=ctx.rules.storeBatches(e,opt.id,ctx.round);}
       if(!quantity&&!batches.length)continue;
       const term=n(opt.minCommitCycles||12),unit=n(opt.cost);
-      const remaining=sum(batches.map(b=>b.quantity*Math.max(0,b.round+term-1-ctx.round)));
-      const afterGame=sum(batches.map(b=>b.quantity*Math.max(0,b.round+term-1-Math.max(ctx.round,n(ctx.config?.cycles)))));
-      contracts.push({id:opt.id,label:opt.district,quantity,perCycle:quantity*unit,total:remaining*unit,beyondGame:afterGame*unit,
-        lastRound:Math.max(0,...batches.map(b=>b.round+term-1)),batches});
+      const configured=Number(ctx.config?.cycles),gameEnd=Number.isInteger(configured)&&configured>0?configured:null;
+      const end=b=>gameEnd===null?b.round+term-1:Math.min(gameEnd,b.round+term-1);
+      const remaining=sum(batches.map(b=>b.quantity*Math.max(0,end(b)-ctx.round)));
+      contracts.push({id:opt.id,label:opt.district,quantity,perCycle:quantity*unit,total:remaining*unit,beyondGame:0,
+        lastRound:Math.max(0,...batches.map(end)),batches});
     }
     return {contracts,total:sum(contracts.map(c=>c.total)),beyondGame:sum(contracts.map(c=>c.beyondGame))};
   }

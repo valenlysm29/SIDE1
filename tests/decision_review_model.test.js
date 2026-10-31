@@ -72,13 +72,19 @@ test('additional drafts apply only the difference',()=>{
  const f=model.finances([model.section(catalog.find(c=>c.cat==='D'),ctx)],ctx);
  assert.equal(f.pendingDelta,-1800);assert.equal(f.projectedCash,94600);
 });
-test('contract calculation excludes current cycle and shows obligations beyond game',()=>{
+test('contract calculation excludes current cycle and stops at game end',()=>{
  const ctx=context({drafts:{CANALES:{optionIds:['los_olivos'],quantities:{los_olivos:2}}}}),f=model.future(ctx);
- assert.equal(f.total,2*1800*11);assert.equal(f.beyondGame,2*1800*6);assert.equal(f.contracts[0].lastRound,12);
+ assert.equal(f.total,2*1800*5);assert.equal(f.beyondGame,0);assert.equal(f.contracts[0].lastRound,6);
 });
 test('contract batches preserve different opening cycles',()=>{
  const entry={optionIds:['los_olivos'],quantities:{los_olivos:3},storeContracts:{los_olivos:[{round:1,quantity:2},{round:3,quantity:1}]}},ctx=context({round:4,state:{CANALES:entry},drafts:{CANALES:{optionIds:['los_olivos'],quantities:{los_olivos:3}}}});
- assert.equal(model.future(ctx).total,(2*8+1*10)*1800);
+ assert.equal(model.future(ctx).total,(2*2+1*2)*1800);
+});
+test('store commitments never extend beyond three or six configured cycles',()=>{
+ for(const cycles of [3,6])for(let round=1;round<=cycles;round++){
+  const ctx=context({round,config:{interest:20,cycles},drafts:{CANALES:{optionIds:['los_olivos'],quantities:{los_olivos:1}}}}),f=model.future(ctx);
+  assert.equal(f.total,(cycles-round)*1800);assert.equal(f.beyondGame,0);assert.equal(f.contracts[0].lastRound,cycles);
+ }
 });
 test('pure model never mutates its context',()=>{
  const ctx=context({state:{MOLDE:{optionIds:['molde_1'],round:1}},drafts:{CUERO:{quantities:{cuero_sint:5}},PRODUCCION_META:{value:10}}}),before=JSON.stringify(ctx);

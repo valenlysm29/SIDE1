@@ -70,6 +70,20 @@ module.exports={runOnce,remoteRpc};
     }
     const economic=economicResult||ECON.closeMany([{id:'self',state,catalog,round,prices,events,financialPolicy}]).self;
     const plan=economic.plan;
+    const assemblyAvailable=n(plan.processes?.find(process=>process.id==='assembly')?.machines)>0;
+    const hasPhysicalStore=(state.CANALES?.optionIds||[]).some(id=>['los_olivos','miraflores','sjl'].includes(id));
+    const businessRules=typeof module==='object'&&module.exports?load("js/business_rules.js"):globalThis.SIDE_BUSINESS_RULES;
+    const expenses={PE23:500,PE68:1200,PE77:300};
+    const appliedEvents=events.filter(event=>{
+      if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')return assemblyAvailable;
+      if(event.id==='PE74'&&event.version==='demand-share-v1')return Number(state.INV_MARKETING?.round)===Number(round)&&businessRules.advertising({state})>0;
+      if(event.version==='operating-expense-v1'&&['PE23','PE77'].includes(event.id))return hasPhysicalStore;
+      return true;
+    });
+    for(const event of appliedEvents){
+      if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')ledger[`${round}:EVENT:${event.id}`]=-200;
+      if(event.version==='operating-expense-v1'&&Object.hasOwn(expenses,event.id))ledger[`${round}:EVENT:${event.id}`]=-expenses[event.id];
+    }
     const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
     const assigned=economic.allocation;
     const demandFactor=events.reduce((factor,event)=>factor*Math.max(0,1+Number(event.effect?.revenuePct||0)/100),1);
@@ -82,7 +96,6 @@ module.exports={runOnce,remoteRpc};
     ledger[`${round}:VENTAS_CREDITO`]=-economic.receivable;
     ledger[`${round}:COBRO_CREDITO`]=economic.collections;
     ledger[`${round}:ALMACENAJE`]=-economic.storage;
-    const businessRules=typeof module==='object'&&module.exports?load("js/business_rules.js"):globalThis.SIDE_BUSINESS_RULES;
     const maintenance=money(businessRules.maintenance(state,catalog,round));
     const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
@@ -93,16 +106,25 @@ module.exports={runOnce,remoteRpc};
       const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
       for(const order of orders){
         const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
-        const expected=n(state[item?.id]?.quantities?.[order.sku]),price=businessRules.materialUnitPrice(option,expected,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}});
+        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?businessRules.materialPackConversion(order.sku,chosen):null;
+        const expected=pack?pack.units:chosen,price=businessRules.materialUnitPrice(option,chosen,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}})/(pack?.unitsPerPack||1);
         if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
         seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
       }
       for(const item of items.filter(i=>i.material))for(const [sku,q] of Object.entries(state[item.id]?.quantities||{}))if(Number(state[item.id]?.round)===Number(round)&&n(q)>0&&!seen.has(sku))throw new Error('Falta una orden verificada para la compra.');
-      for(const event of events.filter(e=>e.type==='receipt'&&n(e.day)>=startDay&&n(e.day)<startDay+30)){
+      // In the version with commercial packs, round the cumulative value of an
+      // order and book only its increment. Rounding every partial receipt in
+      // isolation can create or lose cents (e.g. one S/ 2 spool in 3 parts).
+      const receivedByOrder={};
+      const receipts=events.filter(e=>e.type==='receipt'&&n(e.day)<startDay+30).sort((a,b)=>n(a.day)-n(b.day)||(String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0));
+      for(const event of receipts){
         const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
+        const before=n(receivedByOrder[event.orderId]);receivedByOrder[event.orderId]=before+n(event.quantity);
+        const value=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
+        if(n(event.day)<startDay)continue;
         temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
-        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+money(n(event.quantity)*n(order.unitCost)));
-        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value:money(n(event.quantity)*n(order.unitCost)),receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
+        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+value);
+        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value,receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
       }
     }
     if(temporalFacts?.paymentMode==='credit')ledger[`${round}:PROVEEDOR_CREDITO`]=money(Object.values(temporalFacts.ordersBySku).reduce((sum,o)=>sum+n(o.quantity)*n(o.unitCost),0));
@@ -124,7 +146,7 @@ module.exports={runOnce,remoteRpc};
       const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
       if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
     }
-    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(appliedEvents),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
     if(temporalFacts)ledger[`${round}:PROVEEDOR_PAGO`]=-n(financial.flujoCaja?.pagosProveedores)||0;
@@ -350,8 +372,11 @@ module.exports={runOnce,remoteRpc};
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
       const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
-      const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
-      return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
+      const modifier=id==='assembly'?(ctx.assemblyCapacityFactor??1):1;
+      if(!Number.isFinite(modifier)||modifier<0||modifier>1)throw new RangeError('Factor de capacidad inválido');
+      const dailyCapacity=pairing.capacity*modifier;
+      const cycleCapacity=Math.max(0,Math.round(dailyCapacity*days*efficiency));
+      return {id,label,dailyCapacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
     // Saved purchases are authoritative even when a synchronized record omits
     // optionIds. A live draft replaces the current cycle's saved selection.
@@ -368,9 +393,9 @@ module.exports={runOnce,remoteRpc};
     });
     const eligibleTarget=sum(productLines.filter(line=>line.available).map(line=>line.target));
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
-      const counts=quantityCounts(ctx,id),purchasesAvailable=sum(Object.entries(spec.yields).map(([optionId,yieldValue])=>n(counts[optionId])*yieldValue)),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
+      const counts=quantityCounts(ctx,id),factor=optionId=>ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=eligibleTarget?sum(productLines.filter(line=>line.available).map(line=>line.requirements[id]))/eligibleTarget:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
-      const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
+      const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(factor(option.id))})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
     // Explicit, provisional receipt-ledger mode. Historical snapshots without a
@@ -420,7 +445,7 @@ module.exports={runOnce,remoteRpc};
     };
   }
 
-  function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
+  function yieldFor(materialId,optionId,version){return n(version==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
   // Independent reference scenario: one basic machine per level-one worker.
   // Use the same capacity and rounding rules as calculate(), with no state writes.
   function planResources(target){
@@ -452,6 +477,16 @@ module.exports={runOnce,remoteRpc};
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_BUSINESS_RULES=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
   'use strict';
   const VERSION='md-20261027',n=v=>Number.isFinite(Number(v))?Math.max(0,Number(v)):0;
+  // Excel V2: physical units per purchased presentation. This helper does not
+  // change persisted decisions or legacy prices; callers must opt in only when
+  // the order, receipt and close all carry the matching version.
+  const MATERIAL_PACKS_V2=Object.freeze({cuero_sint:1,cuero_std:2,cuero_prem:2,acc_eco:1,acc_prem:1,hilo_std:270,hilo_ref:250,hilo_prem:200});
+  function materialPackConversion(sku,packs){
+    if(!Object.hasOwn(MATERIAL_PACKS_V2,sku))throw new RangeError('Presentación de material desconocida');
+    if(typeof packs!=='number'||!Number.isSafeInteger(packs)||packs<0)throw new RangeError('La cantidad de presentaciones debe ser un entero no negativo');
+    const units=packs*MATERIAL_PACKS_V2[sku];if(!Number.isSafeInteger(units))throw new RangeError('Cantidad física fuera de rango');
+    return {sku,packs,units,unitsPerPack:MATERIAL_PACKS_V2[sku],version:'excel-v2-packs-v1'};
+  }
   const salaries={corte_basico:1500,corte_exp:2000,corte_maestro:3800,ens_personal_basico:1500,ens_personal_ind:2800,ens_personal_esp:4500,aca_personal_basico:1500,aca_personal_tec:2800,aca_personal_art:4500,si_jefatura:3000,limpieza:600};
   const regimes={MYPE:{installation:.03,training:.02,moldTraining:.01,maintenance:.05,residual:.05,divisor:12.5,grati:1,vacation:.5,cts:750},NO_MYPE:{installation:.05,training:.03,moldTraining:.02,maintenance:.08,residual:.10,divisor:13,grati:2,vacation:1,cts:1500}};
   function regime(ctx={}){const ids=ctx.drafts?.REGIMEN_LABORAL?.optionIds??ctx.state?.REGIMEN_LABORAL?.optionIds??[];return ids.includes('no_mype')?'NO_MYPE':'MYPE';}
@@ -493,7 +528,7 @@ module.exports={runOnce,remoteRpc};
     }
     return maintenance(state,ctx.catalog,round);
   }
-  return Object.freeze({VERSION,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
+  return Object.freeze({VERSION,MATERIAL_PACKS_V2,materialPackConversion,regimes,regime,laborCost,materialUnitPrice,assetCost,advertising,assetPurchaseHistory,quantity,maintenance,maintenanceEstimate});
 });
 
 },
@@ -900,7 +935,8 @@ module.exports={runOnce,remoteRpc};
     const authorizedPrices=input.financialPolicy?.authoritativePrices
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy});
+    const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -960,7 +996,11 @@ module.exports={runOnce,remoteRpc};
     if(lowReputationCycles>=rules.lowReputationCycles){demandFactor*=rules.lowDemand;messages.push({id:'CONS-04',text:'Dos ciclos con reputación baja reducen la demanda.'});}
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
+    // V1 adjusts relative attraction, not sales or inventories. PE75 is a
+    // negative campaign shock; PE69 and PE71 increase attention.
+    const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
+    const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -979,7 +1019,7 @@ module.exports={runOnce,remoteRpc};
       }
       const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
       const repSum=participants.reduce((sum,p)=>sum+Math.max(0,Number(p.scores.reputation)||0),0);
-      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0);return {p,line,score,total};});
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=(segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0))*(p.attention??1);return {p,line,score,total};});
       if(!rows.length)continue;
       const sum=rows.reduce((s,row)=>s+row.total,0);
       for(const row of rows)row.share=sum?row.total/sum:1/rows.length;
@@ -2279,10 +2319,11 @@ module.exports={runOnce,remoteRpc};
       try{batches=ctx.rules.nextStoreBatches(e,opt.id,quantity,ctx.round);}catch{batches=ctx.rules.storeBatches(e,opt.id,ctx.round);}
       if(!quantity&&!batches.length)continue;
       const term=n(opt.minCommitCycles||12),unit=n(opt.cost);
-      const remaining=sum(batches.map(b=>b.quantity*Math.max(0,b.round+term-1-ctx.round)));
-      const afterGame=sum(batches.map(b=>b.quantity*Math.max(0,b.round+term-1-Math.max(ctx.round,n(ctx.config?.cycles)))));
-      contracts.push({id:opt.id,label:opt.district,quantity,perCycle:quantity*unit,total:remaining*unit,beyondGame:afterGame*unit,
-        lastRound:Math.max(0,...batches.map(b=>b.round+term-1)),batches});
+      const configured=Number(ctx.config?.cycles),gameEnd=Number.isInteger(configured)&&configured>0?configured:null;
+      const end=b=>gameEnd===null?b.round+term-1:Math.min(gameEnd,b.round+term-1);
+      const remaining=sum(batches.map(b=>b.quantity*Math.max(0,end(b)-ctx.round)));
+      contracts.push({id:opt.id,label:opt.district,quantity,perCycle:quantity*unit,total:remaining*unit,beyondGame:0,
+        lastRound:Math.max(0,...batches.map(end)),batches});
     }
     return {contracts,total:sum(contracts.map(c=>c.total)),beyondGame:sum(contracts.map(c=>c.beyondGame))};
   }
@@ -2482,7 +2523,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);
@@ -3026,6 +3067,10 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       const ctx=context.data;if(ctx.cierre)return {success:true,data:ctx.cierre,reused:true};
       if(!['number','string'].includes(typeof ctx.financialConfig?.cycles)||!Number.isInteger(Number(ctx.financialConfig.cycles))||Number(ctx.financialConfig.cycles)<1||Number(ctx.financialConfig.cycles)>6)return {success:false,code:'DURACION_INVALIDA',error:'La sala no tiene una duración válida en ciclos; no se puede liquidar el impuesto.'};
       if(!Number.isInteger(Number(ciclo))||Number(ciclo)<1||Number(ciclo)>Number(ctx.financialConfig.cycles))return {success:false,code:'CICLO_INVALIDO',error:'El ciclo solicitado está fuera de la duración configurada.'};
+      const eventVersion=ctx.financialConfig?.economicEventsVersion;
+      if(eventVersion&&eventVersion!=='demand-share-v1')return {success:false,code:'VERSION_EVENTOS_INVALIDA',error:'Versión de eventos desconocida.'};
+      const purchaseVersion=ctx.financialConfig?.materialPurchaseVersion;
+      if(purchaseVersion&&(purchaseVersion!=='excel-v2-packs-v1'||ctx.financialConfig?.materialRulesVersion!=='receipts-v1'))return {success:false,code:'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE',error:'La versión de compra requiere órdenes y recepciones verificadas.'};
       // No temporal game may silently fall back to instant purchases while
       // verified order persistence and financial settlement are unavailable.
       const temporal=!!ctx.financialConfig?.materialRulesVersion&&ctx.financialConfig.materialRulesVersion!=='legacy-instant',materialBooks={};
@@ -3145,7 +3190,14 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         if(temporal)preparedState.__materialOrders=materialBooks[String(company.id)];
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
-        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:[]});
+        let verifiedEvents=[];
+        if(eventVersion==='demand-share-v1'){
+          const response=await sb.rpc('side_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}), facts=response.data;
+          const eventLimits={PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
+          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>8||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
+          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
+        }
+        inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:verifiedEvents});
       }
       const resultadosPorEmpresa=global.SIDE_CYCLE_MODEL.closeMany(inputs);
       for(const company of ctx.empresas||[]){
@@ -3190,6 +3242,33 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       return {success:true,data:response.data.cierre,reused:!!response.data.reused};
     }catch(error){return {success:false,error:error.message};}
   }
+  // Teacher operations delegate authorization and timing to the database.
+  async function asignarDesafio(partidaId,empresaId,ciclo,eventId,intensidad){
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_assign_event_v1',{p_partida_id:partidaId,p_empresa_id:empresaId,p_ciclo:ciclo,p_event_id:eventId,p_intensity:intensidad});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(!data||data.eventId!==eventId||String(data.companyId)!==String(empresaId)||Number(data.round)!==Number(ciclo)||Number(data.intensity)!==Number(intensidad))return {success:false,code:'EVENTO_NO_CONFIRMADO',error:'El servidor no confirmó la asignación solicitada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
+  async function sortearDesafios(partidaId,ciclo){
+    const sb=client();if(!sb)return offline();
+    try{const {data,error}=await sb.rpc('side_draw_events_v1',{p_partida_id:partidaId,p_source_cycle:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.sourceCycle)!==Number(ciclo)||!Array.isArray(data?.events)||typeof data?.reused!=='boolean')return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó el sorteo.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
+  async function consultarDesafios(partidaId){
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_teacher_events_v1',{p_partida_id:partidaId});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(!Array.isArray(data))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó el historial de desafíos.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function podio(partidaId,accion='consultar',minutos=0,justificacion=''){
     const sb=client();if(!sb)return offline();
     let timer;
@@ -3204,7 +3283,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,consultarDesafios,podio };
 });
 
 }

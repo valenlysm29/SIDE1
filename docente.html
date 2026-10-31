@@ -106,6 +106,16 @@
       <article class="card events-config-summary">
         <div class="card-title"><div><h3>Eventos habilitados</h3><p>Selecciona los eventos que podrán ocurrir desde el Ciclo 1.</p></div><button id="openEventPicker" class="secondary" type="button" aria-haspopup="dialog">Seleccionar eventos</button></div>
         <div id="enabledEventsSummary" class="enabled-events-summary" aria-live="polite">Sin eventos habilitados.</div>
+        <div id="challengeV1Panel" hidden>
+          <h4>Asignación experimental por empresa</h4>
+          <p id="challengeV1Preview" class="hint">El atractivo relativo cambia el reparto de demanda; el inventario limita las ventas. Programa antes de que empiecen las decisiones del ciclo.</p>
+          <div class="value-row"><label>Empresa<select id="challengeV1Company"></select></label><label>Desafío<select id="challengeV1Event"><option value="PE69">Producto viral en TikTok</option><option value="PE71">Recomendación de influencer peruano</option><option value="PE74">Campaña de marketing altamente efectiva</option><option value="PE75">Campaña de marketing ineficiente</option><option value="PE30">Falla en máquina ensambladora</option><option value="PE23">Inseguridad en zona comercial</option><option value="PE68">Ataque de phishing empresarial</option><option value="PE77">Inspección municipal del local</option></select></label><label>Ciclo<input id="challengeV1Round" type="number" min="1" max="6" value="1"></label><label><span id="challengeV1IntensityLabel">Intensidad (%)</span><input id="challengeV1Intensity" type="number" min="1" max="25" value="20"></label></div>
+          <button id="challengeV1Assign" class="secondary" type="button">Programar desafío</button>
+          <button id="challengeV1Draw" class="secondary" type="button">Sortear eventos implementados para este ciclo</button>
+          <p class="hint">El sorteo usa las probabilidades y desfases del catálogo para los ocho eventos implementados y las empresas participantes actuales. Los demás eventos todavía no se sortean.</p>
+          <button id="challengeV1Refresh" class="secondary" type="button">Actualizar historial</button>
+          <div id="challengeV1History" role="status" aria-live="polite"></div>
+        </div>
       </article>
       <div id="creationFeedback" class="creation-feedback hidden" role="status" aria-live="polite"><p id="creationMessage"></p><button id="retryCreate" class="secondary hidden" type="button">Reintentar</button></div>
       <div class="config-start-footer"><div><strong id="configReadySummary">Revisa la configuración antes de iniciar.</strong><p>Iniciar partida abre la sala de espera. El Ciclo 1 comienza al terminar el tiempo de integración configurado.</p></div><button id="startGame" class="primary" type="button">Iniciar partida</button></div>
@@ -155,7 +165,7 @@
     </section>
     <section id="tab-laboratorio" class="tab-panel teacher-workspace" aria-labelledby="lab-heading">
       <article class="card lab"><div class="section-head"><div><h2 id="lab-heading">Laboratorio Estratégico</h2><p>Explora decisiones y resultados de ciclos cerrados.</p></div></div>
-      <div class="lab-controls"><label>Código de partida<select id="lab-game"></select></label><label>Empresa<select id="lab-company"></select></label><label>Ciclo (verificar cierre)<select id="lab-cycle"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label><button type="button" id="lab-present" class="secondary" aria-pressed="false">Mostrar al estudiante</button><button type="button" id="lab-refresh" class="secondary">Actualizar datos</button><button type="button" id="lab-demo" class="secondary" hidden>Activar demostración local</button></div>
+      <div class="lab-controls"><label>Código de partida<select id="lab-game"></select></label><label>Empresa<select id="lab-company"></select></label><label>Ciclo cerrado<select id="lab-cycle"></select></label><button type="button" id="lab-present" class="secondary" aria-pressed="false">Mostrar al estudiante</button><button type="button" id="lab-refresh" class="secondary">Actualizar datos</button><button type="button" id="lab-demo" class="secondary" hidden>Activar demostración local</button></div>
       <div class="lab-tabs" role="group" aria-label="Vistas del laboratorio"><button type="button" data-lab-tab="results" aria-pressed="true">Ver resultados</button><button type="button" data-lab-tab="scenario" aria-pressed="false">Probar otra decisión</button><button type="button" data-lab-tab="compare" aria-pressed="false">Comparar empresas</button></div>
       <p id="lab-status" role="status" aria-live="polite"></p><div id="lab-content"></div></article>
     </section>

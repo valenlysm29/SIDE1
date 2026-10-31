@@ -63,7 +63,7 @@ function reviewProblems(review,cats=decisionCategories().map(c=>c.cat)){
         for(const id of d.optionIds||[])if(!item.options.some(o=>o.id===id))issues.push({cat:cat.cat,item:item.id,text:`Opci\u00f3n no v\u00e1lida en ${item.name}.`});
         for(const [id,value] of Object.entries(d.quantities||{})){
           const q=Number(value),floor=item.asset?-getOwned(item,id):item.id==='CANALES'?1:0;
-          if(!(item.material?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
+          if(!(item.material&&ctx.config?.materialPurchaseVersion!=='excel-v2-packs-v1'?Number.isFinite(q):Number.isSafeInteger(q))||q<floor)issues.push({cat:cat.cat,item:item.id,text:`Cantidad no v\u00e1lida en ${item.name}.`});
         }
       }
       if(item.type==='number'&&draftItemComplete(item)&&(!Number.isFinite(Number(d.value))||Number(d.value)<Number(item.min||0)||Number(d.value)>(item.max??Infinity)))issues.push({cat:cat.cat,item:item.id,text:`Revisa el valor de ${item.name}.`});
@@ -246,7 +246,7 @@ function sectionSummaryHtml(section,{history=false,compact=false}={}){
 }
 function noticesHtml(problems,warnings){
   return `${problems.length?`<div class="cs-notice cs-notice-error"><h3>Antes de enviar, completa lo siguiente</h3>${problems.map(p=>`<p>${escapeHtml(p.text)} <button class="cs-link" type="button" ${sectionSubmitted(p.cat)&&!decisionsSubmitted()?`data-summary-reopen="${p.cat}"`:`data-summary-goto="${p.cat}"`}>${sectionSubmitted(p.cat)&&!decisionsSubmitted()?'Corregir':'Ir a'} ${escapeHtml(categoryByCat(p.cat)?.short||'la sección')}</button></p>`).join('')}</div>`:''}
-    ${warnings.length?`<details open class="cs-notice cs-notice-warning"><summary>${warnings.length} advertencia(s) de operaci\u00f3n \u00b7 no bloquean el env\u00edo</summary>${warnings.map(w=>`<p>${escapeHtml(w.text)}</p>`).join('')}</details>`:''}`;
+    ${warnings.length?`<details open class="cs-notice cs-notice-warning"><summary>${warnings.length} aviso(s) de operaci\u00f3n \u00b7 revisa los requisitos de cada secci\u00f3n</summary>${warnings.map(w=>`<p>${escapeHtml(w.text)}</p>`).join('')}</details>`:''}`;
 }
 function reopenSubmittedSection(cat){
   if(!studentAccess().canOperate||decisionsSubmitted()||!sectionSubmitted(cat))return false;

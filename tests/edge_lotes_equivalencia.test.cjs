@@ -18,3 +18,14 @@ test('Node y Edge rechazan por igual un cierre temporal sin persistencia verific
  const [a,b]=await Promise.all([attempt(source.runOnce),attempt(edge.runOnce)]);
  assert.deepEqual(a,b);assert.equal(a.result[0].code,'RECEPCIONES_NO_DISPONIBLES');assert.equal(a.writes,0);
 });
+
+test('Node y Edge rechazan presentaciones sin integración autoritativa',async()=>{
+ const edge=await import(pathToFileURL(path.resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);
+ async function attempt(runOnce){let writes=0;const snapshot={decision_state:{__cyclePlans:{1:{state:{}}}}};const rpc=async name=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'fixture',cycles:[1]}]};
+  if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:1000,snapshot}],financialConfig:{cycles:3,materialPurchaseVersion:'excel-v2-packs-v1'},token:'t'}};
+  if(name==='side_guardar_cierre_negocio'){writes++;return {data:{}};}throw Error(name);
+ };return {result:await runOnce(rpc),writes};}
+ const node=await attempt(source.runOnce),remote=await attempt(edge.runOnce);
+ assert.equal(node.result[0].code,'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE');assert.equal(node.writes,0);assert.deepEqual(remote,node);
+});

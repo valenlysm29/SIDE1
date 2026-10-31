@@ -147,8 +147,11 @@
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
       const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
-      const cycleCapacity=Math.max(0,Math.round(pairing.capacity*days*efficiency));
-      return {id,label,dailyCapacity:pairing.capacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
+      const modifier=id==='assembly'?(ctx.assemblyCapacityFactor??1):1;
+      if(!Number.isFinite(modifier)||modifier<0||modifier>1)throw new RangeError('Factor de capacidad inválido');
+      const dailyCapacity=pairing.capacity*modifier;
+      const cycleCapacity=Math.max(0,Math.round(dailyCapacity*days*efficiency));
+      return {id,label,dailyCapacity,cycleCapacity,pairs:pairing.pairs,assignments:pairing.assignments,staff:pairing.staff,machines:pairing.machines,payroll:payroll(ctx,staffId)};
     });
     // Saved purchases are authoritative even when a synchronized record omits
     // optionIds. A live draft replaces the current cycle's saved selection.
@@ -165,9 +168,9 @@
     });
     const eligibleTarget=sum(productLines.filter(line=>line.available).map(line=>line.target));
     const materials=Object.entries(MATERIALS).map(([id,spec])=>{
-      const counts=quantityCounts(ctx,id),purchasesAvailable=sum(Object.entries(spec.yields).map(([optionId,yieldValue])=>n(counts[optionId])*yieldValue)),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
+      const counts=quantityCounts(ctx,id),factor=optionId=>ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:spec.yields[optionId],purchasesAvailable=sum(Object.keys(spec.yields).map(optionId=>n(counts[optionId])*factor(optionId))),inventoryAvailable=sum(Object.keys(spec.yields).map(optionId=>Math.max(0,n(ctx.state?.__inventarioMP?.[optionId])))),available=purchasesAvailable+inventoryAvailable;
       const neededForTarget=sum(productLines.map(line=>line.requirements[id])),perUnit=eligibleTarget?sum(productLines.filter(line=>line.available).map(line=>line.requirements[id]))/eligibleTarget:n(requirements[id]),supportedUnits=perUnit>0?Math.floor(available/perUnit):0;
-      const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(spec.yields[option.id])})).filter(selection=>selection.quantity>0);
+      const definition=item(ctx,id),selections=(definition?.options||[]).map(option=>({id:option.id,label:option.label,quantity:Math.max(0,n(counts[option.id])),contribution:Math.max(0,n(counts[option.id]))*n(factor(option.id))})).filter(selection=>selection.quantity>0);
       return {id,label:spec.label,unit:spec.unit,available,purchasesAvailable,inventoryAvailable,perUnit,neededForTarget,supportedUnits,selections,cost:materialCost(ctx,id)};
     });
     // Explicit, provisional receipt-ledger mode. Historical snapshots without a
@@ -217,7 +220,7 @@
     };
   }
 
-  function yieldFor(materialId,optionId){return n(MATERIALS[materialId]?.yields?.[optionId]);}
+  function yieldFor(materialId,optionId,version){return n(version==='excel-v2-packs-v1'?BUS.MATERIAL_PACKS_V2[optionId]:MATERIALS[materialId]?.yields?.[optionId]);}
   // Independent reference scenario: one basic machine per level-one worker.
   // Use the same capacity and rounding rules as calculate(), with no state writes.
   function planResources(target){

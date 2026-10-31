@@ -1,0 +1,167 @@
+[
+  {
+    "cell": "K5",
+    "formula": "=MIN(I8,I14,I20)",
+    "value": 14.0
+  },
+  {
+    "cell": "L5",
+    "formula": "=K5*30",
+    "value": 420.0
+  },
+  {
+    "cell": "M5",
+    "formula": "=K7+(F7+F13+F19)/100+4%*F21",
+    "value": 0.91
+  },
+  {
+    "cell": "N5",
+    "formula": "=ROUND(L5*M5,0)",
+    "value": 382.0
+  },
+  {
+    "cell": "D46",
+    "formula": "150",
+    "value": 150.0
+  },
+  {
+    "cell": "D47",
+    "formula": "140",
+    "value": 140.0
+  },
+  {
+    "cell": "D48",
+    "formula": "95",
+    "value": 95.0
+  },
+  {
+    "cell": "E46",
+    "formula": "150",
+    "value": 150.0
+  },
+  {
+    "cell": "E47",
+    "formula": "140",
+    "value": 140.0
+  },
+  {
+    "cell": "E48",
+    "formula": "78",
+    "value": 78.0
+  },
+  {
+    "cell": "E49",
+    "formula": "=SUM(E46:E48)",
+    "value": 368.0
+  },
+  {
+    "cell": "H49",
+    "formula": "=SUM(H46:H48)",
+    "value": 167.5
+  },
+  {
+    "cell": "I49",
+    "formula": "=SUM(I46:I48)",
+    "value": 385.0
+  },
+  {
+    "cell": "J49",
+    "formula": "=SUM(J46:J48)",
+    "value": 3115.0
+  },
+  {
+    "cell": "L49",
+    "formula": "=SUM(L46:L48)",
+    "value": 155.6
+  },
+  {
+    "cell": "M49",
+    "formula": "=SUM(M46:M48)",
+    "value": 368.0
+  },
+  {
+    "cell": "N49",
+    "formula": "=SUM(N46:N48)",
+    "value": 2894.0
+  },
+  {
+    "cell": "F54",
+    "formula": "=MIN(E54,H49)",
+    "value": 60.0
+  },
+  {
+    "cell": "F55",
+    "formula": "=MIN(E55,H49-F54)",
+    "value": 107.5
+  },
+  {
+    "cell": "F56",
+    "formula": "=MIN(E56,H49-F54-F55)",
+    "value": 0.0
+  },
+  {
+    "cell": "F57",
+    "formula": "=MIN(E57,I49)",
+    "value": 200.0
+  },
+  {
+    "cell": "F58",
+    "formula": "=MIN(E58,I49-F57)",
+    "value": 185.0
+  },
+  {
+    "cell": "F59",
+    "formula": "=MIN(E59,J49)",
+    "value": 0.0
+  },
+  {
+    "cell": "F60",
+    "formula": "=MIN(E60,J49-F59)",
+    "value": 1500.0
+  },
+  {
+    "cell": "F61",
+    "formula": "=MIN(E61,J49-F59-F60)",
+    "value": 1400.0
+  },
+  {
+    "cell": "G54",
+    "formula": "=D54+E54-F54",
+    "value": 0.0
+  },
+  {
+    "cell": "G55",
+    "formula": "=D55+E55-F55",
+    "value": 2.5
+  },
+  {
+    "cell": "G56",
+    "formula": "=D56+E56-F56",
+    "value": 30.0
+  },
+  {
+    "cell": "G57",
+    "formula": "=D57+E57-F57",
+    "value": 0.0
+  },
+  {
+    "cell": "G58",
+    "formula": "=D58+E58-F58",
+    "value": 5.0
+  },
+  {
+    "cell": "G59",
+    "formula": "=D59+E59-F59",
+    "value": 0.0
+  },
+  {
+    "cell": "G60",
+    "formula": "=D60+E60-F60",
+    "value": 0.0
+  },
+  {
+    "cell": "G61",
+    "formula": "=D61+E61-F61",
+    "value": 0.0
+  }
+]

@@ -85,7 +85,8 @@
     const authorizedPrices=input.financialPolicy?.authoritativePrices
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy});
+    const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -145,7 +146,11 @@
     if(lowReputationCycles>=rules.lowReputationCycles){demandFactor*=rules.lowDemand;messages.push({id:'CONS-04',text:'Dos ciclos con reputación baja reducen la demanda.'});}
     const creditBase=input.financialPolicy?.creditPercentStart==null?config.credit.initial:Number(input.financialPolicy.creditPercentStart)/100;
     const creditRate=Math.max(0,Math.min(config.credit.max,Number(state.CREDITO_VENTAS?.value??(creditBase+(round-1)*config.credit.step+(chosen(state,'ANALISTA_COMPRAS')==='si_analista'?config.credit.analystBonus:0)))));
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
+    // V1 adjusts relative attraction, not sales or inventories. PE75 is a
+    // negative campaign shock; PE69 and PE71 increase attention.
+    const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
+    const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -164,7 +169,7 @@
       }
       const allPrices=participants.map(p=>p.lines.find(line=>line.id===id).price),min=Math.min(...allPrices),max=Math.max(...allPrices);
       const repSum=participants.reduce((sum,p)=>sum+Math.max(0,Number(p.scores.reputation)||0),0);
-      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0);return {p,line,score,total};});
+      const rows=participants.map(p=>{const line=p.lines.find(line=>line.id===id),score=Math.max(0,Math.min(100,id==='esencial'?(max===min?100:100*(max-line.price)/(max-min)):100-100*Math.abs(line.price-segment.ideal)/segment.ideal)),total=(segment.weights[0]*score+segment.weights[1]*p.scores.reputation*10+segment.weights[2]*(repSum?Math.round(p.scores.reputation/repSum*100):0))*(p.attention??1);return {p,line,score,total};});
       if(!rows.length)continue;
       const sum=rows.reduce((s,row)=>s+row.total,0);
       for(const row of rows)row.share=sum?row.total/sum:1/rows.length;

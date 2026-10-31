@@ -87,3 +87,14 @@ test('worker no convierte compras en stock cuando la sala requiere recepción te
  };
  const result=await runOnce(rpc);assert.equal(result[0].code,'RECEPCIONES_NO_DISPONIBLES');assert.equal(posted,false);
 });
+
+test('el cierre rechaza una versión de presentaciones aún no integrada en lugar de interpretarla como unidades físicas',async()=>{
+ let writes=0;const snapshot={decision_state:{__cyclePlans:{1:{state:{}}}}};
+ const rpc=async(name)=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[1]}]};
+  if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:1000,snapshot}],financialConfig:{cycles:6,materialPurchaseVersion:'excel-v2-packs-v1'},token:'t'}};
+  if(name==='side_guardar_cierre_negocio'){writes++;return {data:{}};}
+  throw Error(name);
+ };
+ const results=await runOnce(rpc);assert.equal(results[0].code,'VERSION_COMPRA_MATERIALES_NO_DISPONIBLE');assert.equal(writes,0);
+});

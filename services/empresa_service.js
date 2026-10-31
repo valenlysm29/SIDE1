@@ -228,6 +228,16 @@
     }
   }
 
+  async function consultarDesafios(partidaId,empresaId){
+    const sb=client();if(!sb)return offline();
+    if(!partidaId||!empresaId)return {success:false,code:'IDENTIDAD_INVALIDA',error:'No se pudo identificar la empresa.'};
+    try{
+      const {data,error}=await request(sb,'side_student_events_v1',{p_partida_id:partidaId,p_empresa_id:empresaId});
+      if(error)return technicalFailure(error,'RPC_ESTUDIANTE_ERROR');
+      if(!Array.isArray(data))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la respuesta del servidor.'};
+      return {success:true,data};
+    }catch(error){return technicalFailure(error,'RPC_ESTUDIANTE_EXCEPCION');}
+  }
   global.SIDE = global.SIDE || {};
-  global.SIDE.EmpresaService = { ingresar, obtenerEstado, guardarEstado, cleanText, cleanCode };
+  global.SIDE.EmpresaService = { ingresar, obtenerEstado, guardarEstado, consultarDesafios, cleanText, cleanCode };
 })(window);

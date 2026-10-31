@@ -32,6 +32,20 @@
     }
     const economic=economicResult||ECON.closeMany([{id:'self',state,catalog,round,prices,events,financialPolicy}]).self;
     const plan=economic.plan;
+    const assemblyAvailable=n(plan.processes?.find(process=>process.id==='assembly')?.machines)>0;
+    const hasPhysicalStore=(state.CANALES?.optionIds||[]).some(id=>['los_olivos','miraflores','sjl'].includes(id));
+    const businessRules=typeof module==='object'&&module.exports?require('./business_rules.js'):globalThis.SIDE_BUSINESS_RULES;
+    const expenses={PE23:500,PE68:1200,PE77:300};
+    const appliedEvents=events.filter(event=>{
+      if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')return assemblyAvailable;
+      if(event.id==='PE74'&&event.version==='demand-share-v1')return Number(state.INV_MARKETING?.round)===Number(round)&&businessRules.advertising({state})>0;
+      if(event.version==='operating-expense-v1'&&['PE23','PE77'].includes(event.id))return hasPhysicalStore;
+      return true;
+    });
+    for(const event of appliedEvents){
+      if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')ledger[`${round}:EVENT:${event.id}`]=-200;
+      if(event.version==='operating-expense-v1'&&Object.hasOwn(expenses,event.id))ledger[`${round}:EVENT:${event.id}`]=-expenses[event.id];
+    }
     const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
     const assigned=economic.allocation;
     const demandFactor=events.reduce((factor,event)=>factor*Math.max(0,1+Number(event.effect?.revenuePct||0)/100),1);
@@ -44,7 +58,6 @@
     ledger[`${round}:VENTAS_CREDITO`]=-economic.receivable;
     ledger[`${round}:COBRO_CREDITO`]=economic.collections;
     ledger[`${round}:ALMACENAJE`]=-economic.storage;
-    const businessRules=typeof module==='object'&&module.exports?require('./business_rules.js'):globalThis.SIDE_BUSINESS_RULES;
     const maintenance=money(businessRules.maintenance(state,catalog,round));
     const recordedMaintenance=Object.entries(sectionsByRound[round]||{}).filter(([cat,s])=>Object.hasOwn(ledger,`${round}:${cat}`)&&Math.abs(Number(s.recordedNet??s.net)-Number(ledger[`${round}:${cat}`]))<.02).flatMap(([,s])=>s.items||[]).filter(i=>i.id==='MANTENIMIENTO'&&(i.automaticMaintenance===true||i.type==='info')).reduce((s,i)=>s+n(i.outflow),0);
     ledger[`${round}:MANTENIMIENTO_AUTO`]=-money(Math.max(0,maintenance-recordedMaintenance))||0;
@@ -55,16 +68,25 @@
       const analyst=(state.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(round-1)*2):0;
       for(const order of orders){
         const item=items.find(i=>i.material&&(i.options||[]).some(o=>o.id===order.sku)),option=item?.options?.find(o=>o.id===order.sku);
-        const expected=n(state[item?.id]?.quantities?.[order.sku]),price=businessRules.materialUnitPrice(option,expected,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}});
+        const chosen=n(state[item?.id]?.quantities?.[order.sku]),pack=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?businessRules.materialPackConversion(order.sku,chosen):null;
+        const expected=pack?pack.units:chosen,price=businessRules.materialUnitPrice(option,chosen,analyst,{...ECON.config,materials:{...ECON.config.materials,...financialPolicy.materials}})/(pack?.unitsPerPack||1);
         if(!item||Number(state[item.id]?.round)!==Number(round)||seen.has(order.sku)||n(order.orderedDay)!==startDay||n(order.quantity)!==expected||Math.abs(n(order.unitCost)-price)>1e-7)throw new Error('Orden temporal incompatible con la decisión confirmada.');
         seen.add(order.sku);temporalFacts.ordersBySku[order.sku]={quantity:expected,unitCost:price};
       }
       for(const item of items.filter(i=>i.material))for(const [sku,q] of Object.entries(state[item.id]?.quantities||{}))if(Number(state[item.id]?.round)===Number(round)&&n(q)>0&&!seen.has(sku))throw new Error('Falta una orden verificada para la compra.');
-      for(const event of events.filter(e=>e.type==='receipt'&&n(e.day)>=startDay&&n(e.day)<startDay+30)){
+      // In the version with commercial packs, round the cumulative value of an
+      // order and book only its increment. Rounding every partial receipt in
+      // isolation can create or lose cents (e.g. one S/ 2 spool in 3 parts).
+      const receivedByOrder={};
+      const receipts=events.filter(e=>e.type==='receipt'&&n(e.day)<startDay+30).sort((a,b)=>n(a.day)-n(b.day)||(String(a.id)<String(b.id)?-1:String(a.id)>String(b.id)?1:0));
+      for(const event of receipts){
         const order=allOrders.find(o=>o.orderId===event.orderId);if(!order)throw new Error('Recepción sin orden verificada.');
+        const before=n(receivedByOrder[event.orderId]);receivedByOrder[event.orderId]=before+n(event.quantity);
+        const value=financialPolicy.materialPurchaseVersion==='excel-v2-packs-v1'?money(money(receivedByOrder[event.orderId]*n(order.unitCost))-money(before*n(order.unitCost))):money(n(event.quantity)*n(order.unitCost));
+        if(n(event.day)<startDay)continue;
         temporalFacts.receivedBySku[order.sku]=n(temporalFacts.receivedBySku[order.sku])+n(event.quantity);
-        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+money(n(event.quantity)*n(order.unitCost)));
-        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value:money(n(event.quantity)*n(order.unitCost)),receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
+        temporalFacts.receivedValueBySku[order.sku]=money(n(temporalFacts.receivedValueBySku[order.sku])+value);
+        temporalFacts.receipts.push({receiptId:event.id,orderId:order.orderId,sku:order.sku,quantity:n(event.quantity),value,receivedDay:n(event.day),dueCycle:Math.floor(n(event.day)/30)+1+temporalFacts.supplierCreditTermCycles});
       }
     }
     if(temporalFacts?.paymentMode==='credit')ledger[`${round}:PROVEEDOR_CREDITO`]=money(Object.values(temporalFacts.ordersBySku).reduce((sum,o)=>sum+n(o.quantity)*n(o.unitCost),0));
@@ -86,7 +108,7 @@
       const definition=catalog.flatMap(category=>category.items||[]).find(item=>item.id===key);
       if(definition?.asset)entry.purchases=businessRules.assetPurchaseHistory(entry,definition);
     }
-    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(events),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
+    const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(appliedEvents),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
     if(temporalFacts)ledger[`${round}:PROVEEDOR_PAGO`]=-n(financial.flujoCaja?.pagosProveedores)||0;
