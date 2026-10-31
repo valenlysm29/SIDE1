@@ -1,3 +1,15 @@
+# Estado actualizado
+
+Los seis escenarios completaron 27 cierres Edge en Supabase local, con 81 resultados y conciliación verificada por `tests/verificar_27_cierres.py`. Una partida Equilibrada adicional pasó dos llamadas Edge simultáneas y un cierre único. El detalle y las limitaciones están en `reports/VALIDACION_FINAL_INTEGRAL_SIDE.md`.
+
+| Requisito pendiente | Estado | Siguiente paso |
+|---|---|---|
+| Navegador para decisiones, compras, Kardex, cierre y avance | NO EJECUTADO | Adaptar el recorrido de `tests/p01_http_browser_admission.cjs` para usar las sesiones reales sin preparar decisiones mediante SQL. |
+| Capacidad con oráculo independiente y eventos con oferta suficiente | NO EJECUTADO | Contrastar cálculos y ejecutar escenarios con mayor stock y capacidad. |
+| Diez fallos históricos de producción e interfaz | FALLIDO | Los archivos focales arrojaron 16 aprobadas y 10 fallidas; investigar contratos antes de modificar fórmulas o expectativas. |
+| Siete pruebas dependientes del Excel | NO EJECUTADO | Recuperar el archivo de referencia de una fuente autorizada; no se encuentra en `output/`. |
+
+## Historial anterior
 # Pendientes reales SIDE
 
 | Requisito | Estado | Evidencia y siguiente paso |
