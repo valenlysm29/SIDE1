@@ -1,0 +1,17 @@
+'use strict';
+const {chromium}=require('playwright'),{execFileSync}=require('node:child_process'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..'),out=path.join(root,'tests/output/descuentos-informativos');fs.mkdirSync(out,{recursive:true});
+(async()=>{const html=execFileSync('python',['-c',"import sys;sys.path.insert(0,'tests');from browser_fixture import document;print(document('index.html'))"],{cwd:root,encoding:'utf8',maxBuffer:100*1024*1024,env:{...process.env,PYTHONUTF8:'1'}}).replace(/<script>\s*const fixtureData=[\s\S]*?<\/script>/,'');
+ const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});try{
+ const page=await browser.newPage({viewport:{width:1366,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.route('**/*',r=>r.abort());await page.route('http://side-test.local/**',r=>r.fulfill({contentType:'text/html',body:html}));await page.goto('http://side-test.local/');await page.waitForLoadState('networkidle');
+ await page.evaluate(()=>{localStorage.clear();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({codigo:'SIDE-QA23',capital:200000,cycles:6,roundHours:8}));currentStudent={name:'QA',company:'QA',game:{...DEMO_GAME,codigo:'SIDE-QA23'}};loadDecisionState();currentCategory='F';openDecisionMenu();renderDecisionCategory();});
+ const input=page.locator('[data-qty="HILO"][data-option="hilo_std"]'),detail=page.locator('[data-material-detail="HILO"][data-material-option="hilo_std"]');
+ await input.fill('12000');assert.match(await detail.innerText(),/24.000/);assert.match(await detail.innerText(),/22.080/);assert.match(await detail.innerText(),/Sin analista/);
+ await page.locator('.analyst-benefit summary').click();assert.match(await page.locator('.analyst-benefit').innerText(),/12 %/);
+ await page.locator('[data-choice="ANALISTA_COMPRAS"][data-option="si_analista"]').check();assert.match(await detail.innerText(),/Analista contratado \(12 %\)/);assert.match(await detail.innerText(),/19[,\\.]430[,\\.]4/);
+ await input.fill('99');assert.match(await detail.innerText(),/Sin descuento comercial/);const values=await page.evaluate(()=>({shown:SIDE_REVIEW_MODEL.materialBreakdown(findDecisionItem('HILO'),findDecisionItem('HILO').options[0],decisionModelContext()).total,official:computeItemCost(findDecisionItem('HILO'))}));assert.equal(values.shown,values.official);
+ await input.fill('12000');await page.reload({waitUntil:'networkidle'});await page.evaluate(()=>{currentStudent={name:'QA',company:'QA',game:{...DEMO_GAME,codigo:'SIDE-QA23'}};loadDecisionState();currentCategory='F';openDecisionMenu();restoreDraftsForRound();renderDecisionCategory()});assert.equal(await input.inputValue(),'12000');assert.match(await detail.innerText(),/Analista contratado/);await page.locator('[data-item="HILO"]').scrollIntoViewIfNeeded();await page.locator('[data-item="HILO"]').screenshot({path:path.join(out,'escritorio.png')});
+ await page.setViewportSize({width:390,height:844});await detail.scrollIntoViewIfNeeded();await detail.screenshot({path:path.join(out,'movil.png')});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ assert.deepEqual(errors,[]);console.log('PASS desktop/mobile, live quantity, analyst, commercial threshold and cost reconciliation');
+ }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
+

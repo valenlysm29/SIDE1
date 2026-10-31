@@ -27,6 +27,20 @@
   function previousStaff(item,id,ctx){const e=ctx.state?.[item.id];return n(n(e?.round)===ctx.round?e?.previousQuantities?.[id]:e?.quantities?.[id]);}
   function discount(ctx){return (ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista')?Math.max(2,12-(ctx.round-1)*2):0;}
   function unitCost(item,option,ctx){if(item.asset||item.id==='MOLDE')return BUS.assetCost(item,option,BUS.regime(ctx));if(item.material){const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;return BUS.materialUnitPrice(option,n(draft(item,ctx).quantities?.[option.id]),discount(ctx),{...config,materials:{...config?.materials,...ctx.config?.materials}});}return BUS.laborCost(option.id,BUS.regime(ctx),option.cost);}
+  // Derive the explanation from the same unit-price function used by decisions.
+  function materialBreakdown(item,option,ctx){
+    const config=typeof module==='object'&&module.exports?require('./engine/config.js'):globalThis.SIDE_ECONOMIC_CONFIG;
+    const rules={...config?.materials,...ctx.config?.materials};
+    const priceConfig={...config,materials:rules};
+    const quantity=Math.max(0,n(draft(item,ctx).quantities?.[option.id]));
+    const base=n(option.cost),gross=base*quantity;
+    const afterCommercial=quantity*BUS.materialUnitPrice(option,quantity,0,priceConfig);
+    const total=quantity*unitCost(item,option,ctx);
+    const threshold=Math.max(0,Number(rules.quantityDiscountThreshold??100));
+    const commercialRate=quantity>=threshold?Math.min(1,Math.max(0,Number(rules.quantityDiscountRate??.08))):0;
+    const analyst=(ctx.drafts?.ANALISTA_COMPRAS?.optionIds||ctx.state?.ANALISTA_COMPRAS?.optionIds||[]).includes('si_analista');
+    return {quantity,base,gross,commercial: gross-afterCommercial,commercialRate,threshold,analyst,analystRate:discount(ctx),analystSaving:afterCommercial-total,saving:gross-total,total};
+  }
   function approvedCreditLine(ctx){
     if(n(ctx.round)<=1)return Math.floor(n(ctx.capital)*0.70/500)*500;
     const assets=['MESA_CORTE','ENSAMBLE','ACABADOS','MOLDE'].reduce((total,id)=>{
@@ -147,5 +161,5 @@
     for(const process of plan.processes)if(process.shortfall>0)warnings.push({cat:process.id==='cut'?'B':'C',text:`${process.label}: capacidad de ${process.cycleCapacity.toLocaleString('es-PE')} unidades frente a una meta de ${plan.target.toLocaleString('es-PE')}. Revisa personal y equipos del proceso.`});
     return warnings;
   }
-  return Object.freeze({draft,owned,previousStaff,unitCost,breakdown,section,future,finances,warnings,roundMoney});
+  return Object.freeze({draft,owned,previousStaff,unitCost,materialBreakdown,breakdown,section,future,finances,warnings,roundMoney});
 });

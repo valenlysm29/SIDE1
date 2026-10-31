@@ -1128,6 +1128,18 @@ function manualDistributionHtml(){
   const rows=manualDistributionData();
   return `<section class="decision-row"><h3>Distribución a puntos de venta</h3><p>La distribución automática cubre la demanda prevista. Activa la asignación manual para decidir cuánto sale del almacén a cada punto.</p><label><input type="checkbox" data-transfer-mode ${enabled?'checked':''} ${locked?'disabled':''}> Usar distribución manual</label>${enabled?rows.map(r=>`<div class="quantity-option"><strong>${labels[r.id]} · almacén disponible ${r.central} · asignado ${r.assigned}</strong>${r.assigned>r.central?'<p role="alert">La asignación supera el stock disponible.</p>':''}${r.points.map(p=>`<label>${escapeHtml(manualPointLabel(p.id))} · stock actual ${Number(r.locations[p.id]||0)} <input type="number" min="0" step="1" data-transfer-product="${r.id}" data-transfer-point="${escapeHtml(p.id)}" value="${Number(d.transfers?.[r.id]?.[p.id]||0)}" ${locked?'disabled':''}></label>`).join('')||'<p>Selecciona primero una tienda o canal web.</p>'}</div>`).join(''):''}</section>`;
 }
+function materialDiscountHtml(item,option){
+  const b=window.SIDE_REVIEW_MODEL.materialBreakdown(item,option,decisionModelContext());
+  const unit=['excel-v2-packs-v1','side-packs-v1'].includes(teacherConfig().materialPurchaseVersion)?'presentaciones':window.SIDE_PRODUCTION_MODEL.materialUnit(item.id);
+  if(!b.quantity)return '';
+  const pct=value=>Number((value*100).toFixed(2)).toLocaleString('es-PE');
+  const commercial=b.commercialRate?`Descuento comercial (${pct(b.commercialRate)} %): − ${money(b.commercial)}`:`Sin descuento comercial: requiere ${b.threshold.toLocaleString('es-PE')} ${escapeHtml(unit)} de esta opción.`;
+  return `<div class="material-cost-detail"><strong>${escapeHtml(option.label)}</strong><p>Precio unitario: ${money(b.base)} · Cantidad: ${b.quantity.toLocaleString('es-PE')} ${escapeHtml(unit)}</p><p>Subtotal bruto: ${money(b.gross)}</p><p>${commercial}</p><p>${b.analyst?`Analista contratado (${b.analystRate} %): − ${money(b.analystSaving)}`:'Sin analista: no se aplica descuento adicional.'}</p><p>Ahorro total: ${money(b.saving)} · <strong>Costo final: ${money(b.total)}</strong></p><small>Estimación según tu decisión actual; el cargo depende de la confirmación de la compra.</small></div>`;
+}
+function analystBenefitHtml(item){
+  const a=window.SIDE_EXCEL_CONFIG.CONFIG.ANALISTA_BASE,option=item.options.find(o=>o.id==='si_analista');
+  return `<details class="analyst-benefit" ${analystSelected()?'open':''}><summary>Beneficio del analista de compras</summary><p>Contratarlo cuesta ${money(optionUnitCost(item,option))} por ciclo. Su descuento en materiales comienza en ${a.descuentoInicialPct} %, baja ${a.reduccionPorCicloPct} puntos por ciclo y llega a un mínimo de ${a.descuentoMinimoPct} %. En este ciclo es ${window.SIDE_EXCEL_COSTOS.descuentoAnalista(currentRound())} %.</p><p>Se aplica después del descuento comercial que corresponda. El ahorro en materiales depende de cuánto compres; el costo del analista se cobra por separado.</p></details>`;
+}
 function renderDecisionRow(item){
   const locked=isLocked(item)||cycleDecisionsLocked(),saved=itemComplete(item),cost=computeItemCost(item),d=initDraft(item),required=itemRequired(item);
   let body='';
@@ -1153,6 +1165,8 @@ function renderDecisionRow(item){
   } else if(item.type==='info'){
     let dynamic=item.id==='CREDITO_VENTAS'?`<strong>${creditPercent()}% de ventas a crédito</strong><small>${100-creditPercent()}% de ventas al contado</small>`:`<strong>Regla automática del juego</strong>`;if(item.id==='PERSONAL_VENTAS'){const n=RULES.storeCount(channelDraft());dynamic=`<strong data-basic-sales-staff>${n?`${n} vendedor(es) básico(s) · 1 por tienda · comisión total 1%`:'Sin tiendas físicas: no se asignan vendedores básicos.'}</strong>`;}body=`<div class="info-decision">${dynamic}<p>${escapeHtml(item.desc)}</p></div>`;
   }
+  if(item.id==='ANALISTA_COMPRAS')body+=analystBenefitHtml(item);
+  if(item.material)body+=`<div class="material-cost-list" aria-live="polite">${item.options.map(o=>`<div data-material-detail="${item.id}" data-material-option="${o.id}">${materialDiscountHtml(item,o)}</div>`).join('')}</div>`;
   const costLabel=item.type==='loan'?'Financiamiento opcional':item.noCashEffect?'No afecta caja':cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja';
   const sent=sectionSubmitted(currentCategory)||decisionsSubmitted();
   return `<article class="decision-row ${saved?'saved':''} ${locked?'locked':''} ${required?'required-row':'optional-row'}" data-item="${item.id}"><div class="decision-row-head"><div><span class="row-state">${sent?'ENVIADA · BLOQUEADA':locked?'BLOQUEADA':saved?'GUARDADA':required?'OBLIGATORIA':'OPCIONAL'}</span><h3>${escapeHtml(item.name)}</h3>${item.desc?`<p>${escapeHtml(item.desc)}</p>`:''}</div><div class="row-cost">${costLabel}</div></div>${body}</article>`;
@@ -1205,7 +1219,7 @@ function bindDecisionControls(){
     });
   });
   document.querySelectorAll('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(decisionEditingBlocked())return;changeQty(b.dataset.step,b.dataset.option,Number(b.dataset.delta));persistCurrentDraftOnly();}));
-  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item);d.quantities[i.dataset.option]=nonnegativeDecisionNumber(i.value);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty);refreshProductionDop()}));
+  document.querySelectorAll('[data-qty]').forEach(i=>i.addEventListener('input',()=>{if(decisionEditingBlocked())return;const item=findDecisionItem(i.dataset.qty),d=initDraft(item);d.quantities[i.dataset.option]=nonnegativeDecisionNumber(i.value);persistCurrentDraftOnly();updateSectionCost();updateRowCost(i.dataset.qty);updateMaterialDetails(item);refreshProductionDop()}));
   document.querySelectorAll('[data-production-mold]').forEach(select=>select.addEventListener('change',()=>{
     if(decisionEditingBlocked())return;
     const d=initDraft(findDecisionItem('PRODUCCION_META'));
@@ -1241,6 +1255,10 @@ function bindDecisionControls(){
 function changeQty(itemId,optId,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.quantities[optId]=nonnegativeDecisionNumber((Number(d.quantities[optId])||0)+delta);renderDecisionCategory()}
 function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=initDraft(item);d.staff[store]=Math.max(0,(Number(d.staff[store])||0)+delta);renderDecisionCategory()}
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
+function updateMaterialDetails(item){
+  if(!item.material)return;
+  document.querySelectorAll(`[data-material-detail="${item.id}"]`).forEach(el=>{const option=item.options.find(o=>o.id===el.dataset.materialOption);if(option)el.innerHTML=materialDiscountHtml(item,option)});
+}
 function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(!row)return;const cost=computeItemCost(item);row.textContent=cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja'}
 function updateSectionCost(){
   const locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
