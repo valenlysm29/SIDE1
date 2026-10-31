@@ -6,3 +6,9 @@ test('más hilo aumenta producción solo si los demás recursos alcanzan; es det
 test('no aumenta por materiales si ya limita la capacidad',()=>{const row=make({thread:2000,all:1}),a=simulate(row,'materials','HILO','hilo_std',600);assert.equal(a.available,true,JSON.stringify(a));assert.equal(a.difference,0)});
 test('más trabajadores puede superar un cuello de botella o quedar limitado por máquinas y materiales',()=>{const row=make({thread:2000,all:2,workers:1,machines:2}),a=simulate(row,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(a.available,true,JSON.stringify(a));assert.ok(a.difference>0);const machine=make({thread:2000,all:2,workers:1,machines:1}),b=simulate(machine,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(b.available,true,JSON.stringify(b));assert.equal(b.difference,0);const materials=make({thread:60,all:2,workers:1,machines:2}),c=simulate(materials,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(c.available,true,JSON.stringify(c));assert.equal(c.difference,0)});
 test('rechaza versión incierta, pedidos temporales, datos ausentes y cierre que no se reproduce',()=>{const row=make();for(const mutate of [r=>delete r.receipt.capacityRulesVersion,r=>r.state.__materialOrders={},r=>delete r.receipt.openingInventory,r=>r.receipt.produced++]){const x=JSON.parse(JSON.stringify(row));mutate(x);assert.equal(simulate(x,'materials','HILO','hilo_std',1).available,false)}});
+test('una política de recepciones no permite simular compras inmediatas sin libro verificado',()=>{
+ const row=make(),before=JSON.stringify(row),financial=require('../services/finance_config');
+ row.receipt.financialPolicy=financial.resolve({cycles:3,materialRulesVersion:'receipts-v1'},1);
+ assert.equal(simulate(row,'materials','HILO','hilo_std',10).available,false);
+ assert.equal(JSON.stringify(row.receipt.decisions),JSON.stringify(JSON.parse(before).receipt.decisions));
+});
