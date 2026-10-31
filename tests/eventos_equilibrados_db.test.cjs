@@ -31,16 +31,26 @@ test('rotación programada llega a noticias privadas, cierre e historial de las 
   for(const n of ['20261031030035_consulta_privada_desafios','20261031043153_programacion_desafios_autoritativa','20261031050037_eventos_grupales_mercado_v1','20261031055001_mercado_global_escenarios_v2','20261031055442_eventos_productivos_v2','20261031060031_eventos_atractivo_duracion_v2','20261031060810_proteger_programacion_desafios','20261031144757_programacion_equilibrada_v2'])await db.exec(fs.readFileSync(`supabase/migrations/${n}.sql`,'utf8'));
   const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1',enabledEvents:['PE69','PE71','PE75']})),ids=[];
   for(let i=0;i<3;i++)ids.push(Number((await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa '+i,p_nombre_comercial:'Marca '+i})).empresa_id));
-  const scheduled=await rpc(db,'side_schedule_balanced_v1',{p_partida_id:game.id,p_ciclo:1});
-  const student='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';await db.query('insert into side_private.student_claims values($1,$2)',[ids[0],student]);await db.query("select set_config('test.uid',$1,false)",[student]);await db.exec('set role authenticated');
-  const news=await rpc(db,'side_student_events_v1',{p_partida_id:game.id,p_empresa_id:ids[0]});assert.equal(news[0].eventId,scheduled.events.find(e=>e.companyId===String(ids[0])).eventId);await assert.rejects(()=>rpc(db,'side_student_events_v1',{p_partida_id:game.id,p_empresa_id:ids[1]}),/No autorizado/);await db.exec('reset role');
-  const fixture=require('./economic_v19_fixture.cjs');for(const id of ids){const state=fixture.state(1,{},0);await db.query('update side_student_state set snapshot=$2 where empresa_id=$1',[id,{decisions_submitted:true,decision_state:{__cyclePlans:{1:{state}}}}]);}
-  await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=$1",[game.id]);await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
-  const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args)}}catch(error){return {error:{message:error.message}}}};
-  const run=()=>require('../services/business_runtime.cjs').runOnce(call);assert.equal((await run())[0].success,true);
-  const close=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa;
-  for(const id of ids){const expected=scheduled.events.find(e=>e.companyId===String(id));assert.equal(close[id].receipt.events[0].id,expected.eventId);assert.equal(close[id].receipt.events[0].intensity,2);assert.equal(close[id].financial.balanceGeneral.activos,close[id].financial.balanceGeneral.pasivoPatrimonio);}
-  assert.equal((await run())[0].success,true);assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa,close);
-  await db.exec('reset role');await db.query("select set_config('test.uid',$1,false)",[professor]);await db.exec('set role authenticated');const history=await rpc(db,'side_teacher_events_v1',{p_partida_id:game.id});assert.equal(history.length,3);assert.ok(history.every(e=>e.status==='aplicado'));
+  const student='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';await db.query('insert into side_private.student_claims values($1,$2)',[ids[0],student]);
+  const fixture=require('./economic_v19_fixture.cjs');let previous={};
+  for(let round=1;round<=6;round++){
+   await db.exec('reset role');await db.query("select set_config('test.uid',$1,false)",[professor]);
+   await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',$2::int,'phase','integration','status','waiting')) where id=$1",[game.id,round]);
+   const scheduled=await rpc(db,'side_schedule_balanced_v1',{p_partida_id:game.id,p_ciclo:round});
+   await db.query("select set_config('test.uid',$1,false)",[student]);await db.exec('set role authenticated');
+   const news=await rpc(db,'side_student_events_v1',{p_partida_id:game.id,p_empresa_id:ids[0]});assert.equal(news.find(e=>e.round===round).eventId,scheduled.events.find(e=>e.companyId===String(ids[0])).eventId);
+   await assert.rejects(()=>rpc(db,'side_student_events_v1',{p_partida_id:game.id,p_empresa_id:ids[1]}),/No autorizado/);await db.exec('reset role');
+   for(const id of ids){const state=fixture.state(round,previous[id]?.state||{},0);await db.query('update side_student_state set snapshot=$2 where empresa_id=$1',[id,{decisions_submitted:true,decision_state:{__cyclePlans:{[round]:{state}}}}]);}
+   await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',$2::int,'phase','results','status','finished')) where id=$1",[game.id,round]);await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
+   const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[round]}]};try{return {data:await rpc(db,name,args)}}catch(error){return {error:{message:error.message}}}};
+   const run=()=>require('../services/business_runtime.cjs').runOnce(call);assert.equal((await run())[0].success,true);
+   const close=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa;
+   for(const id of ids){const expected=scheduled.events.find(e=>e.companyId===String(id)),result=close[id];assert.equal(result.receipt.events[0].id,expected.eventId);assert.equal(result.receipt.events[0].intensity,expected.intensity);assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);if(round>1)assert.equal(result.financial.balanceCaja.cajaInicial,previous[id].financial.balanceCaja.cajaFinal);for(const sale of result.receipt.sales)assert.ok(sale.sold<=sale.available);
+    const consumed={};for(const lot of result.receipt.materialLots)for(const family of Object.values(lot.materials))for(const [sku,q] of Object.entries(family))consumed[sku]=(consumed[sku]||0)+q;
+    for(const family of ['CUERO','ACCESORIOS','HILO'])for(const [sku,q] of Object.entries(result.receipt.decisions[family].quantities))assert.ok(Math.abs(Number(result.receipt.openingInventory[sku]||0)+q-Number(consumed[sku]||0)-Number(result.receipt.inventory[sku]||0))<1e-7);
+   }
+   assert.equal((await run())[0].success,true);assert.deepEqual((await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa,close);previous=close;
+   await db.exec('reset role');await db.query("select set_config('test.uid',$1,false)",[professor]);await db.exec('set role authenticated');const history=await rpc(db,'side_teacher_events_v1',{p_partida_id:game.id});assert.equal(history.length,round*3);assert.ok(history.every(e=>e.status==='aplicado'));
+  }
  }finally{await db.close();}
 });
