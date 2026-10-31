@@ -35,5 +35,10 @@ test('PostgreSQL: dos conexiones serializan asignaciones y rechazan intensidad d
   const group=delay=>`begin; select set_config('test.uid','11111111-1111-1111-1111-111111111111',false); set role authenticated; select public.side_assign_group_event_v1('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',4,'PE01',10); select pg_sleep(${delay}); commit;`;
   const [groupA,groupB]=await Promise.all([sql(group(1)),sql(group(0))]);assert.equal(groupA.code,0,groupA.err);assert.equal(groupB.code,0,groupB.err);assert.match(groupA.out+groupB.out,/"reused": true/);assert.match(groupA.out+groupB.out,/"reused": false/);
   result=await sql("select count(*) from public.side_event_assignments_v1 where event_id='PE01' and ciclo=4");assert.equal(result.out.trim(),'2');
+  const extra=['20261031055001_mercado_global_escenarios_v2','20261031055442_eventos_productivos_v2','20261031060031_eventos_atractivo_duracion_v2','20261031060810_proteger_programacion_desafios','20261031144757_programacion_equilibrada_v2'].map(n=>fs.readFileSync(`supabase/migrations/${n}.sql`,'utf8')).join('\n');
+  result=await sql("insert into public.empresas values(3); insert into public.participantes(partida_id,empresa_id) values('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',3); update public.partidas set configuracion=configuracion||'{\"enabledEvents\":[\"PE69\",\"PE71\",\"PE75\"]}'::jsonb;\n"+extra);assert.equal(result.code,0,result.err);
+  const balanced=delay=>`begin; select set_config('test.uid','11111111-1111-1111-1111-111111111111',false); set role authenticated; select public.side_schedule_balanced_v1('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',5); select pg_sleep(${delay}); commit;`;
+  const [balancedA,balancedB]=await Promise.all([sql(balanced(1)),sql(balanced(0))]);assert.equal(balancedA.code,0,balancedA.err);assert.equal(balancedB.code,0,balancedB.err);assert.match(balancedA.out+balancedB.out,/"reused": true/);assert.match(balancedA.out+balancedB.out,/"reused": false/);
+  result=await sql('select count(*) from public.side_event_assignments_v1 where ciclo=5');assert.equal(result.out.trim(),'3');
  }finally{try{run(['rm','-f',name]);}catch{}}
 });

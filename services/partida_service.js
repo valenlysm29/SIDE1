@@ -581,6 +581,16 @@
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function programarDesafiosEquilibrados(partidaId,ciclo){
+    if(!Number.isInteger(ciclo)||ciclo<1||ciclo>6)return {success:false,code:'CICLO_INVALIDO',error:'Ciclo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_schedule_balanced_v1',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.round)!==Number(ciclo)||typeof data?.reused!=='boolean'||!Array.isArray(data?.events)||data.events.length!==3||data.events.some(e=>!e||!/^\d+$/.test(String(e.companyId))||BigInt(e.companyId)<1n||!['PE69','PE71','PE75'].includes(e.eventId)||Number(e.round)!==Number(ciclo)||Number(e.intensity)!==(ciclo<=2?2:ciclo<=4?4:6))||new Set(data.events.map(e=>String(e.companyId))).size!==3||new Set(data.events.map(e=>e.eventId)).size!==3)return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó la programación equilibrada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function consultarDesafios(partidaId){
     const sb=client();if(!sb)return offline();
     try{
@@ -604,5 +614,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,asignarEventoGrupal,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,asignarEventoGrupal,sortearDesafios,programarDesafiosEquilibrados,consultarDesafios,podio };
 });
