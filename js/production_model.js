@@ -309,14 +309,24 @@
         const cost=ordered.reduce((v,o,i)=>v+value(o,n(quantities[o.id])+counts[i]*(packMode?1:packs[o.id])),0)-base;
         if(!purchase||cost<purchase.cost-1e-7||(Math.abs(cost-purchase.cost)<1e-7&&meters<purchase.meters))purchase={counts:Object.fromEntries(ordered.map((o,i)=>[o.id,counts[i]])),meters,cost,remaining:thread.available+meters-thread.neededForTarget};
       };
-      const maxA=Math.ceil(shortage/packs.hilo_std),maxB=Math.ceil(shortage/packs.hilo_ref);
-      if((maxA+1)*(maxB+1)<=30000){
-        exhaustive=false; // Quantity discounts can make buying extra spools cheaper.
-        for(let a=0;a<=maxA;a++)for(let b=0;b<=maxB;b++){
+      // Each SKU's price is linear on either side of its quantity-discount
+      // threshold. Beyond both coverage and that threshold, additional packs
+      // cannot reduce cost. Include the threshold even when it overbuys.
+      const threshold=Math.max(0,Number(priceConfig.materials?.quantityDiscountThreshold??100));
+      const increments=ordered.map(o=>packMode?1:packs[o.id]);
+      const thresholdPacks=ordered.map((o,i)=>Math.max(0,Math.ceil((threshold-n(quantities[o.id]))/increments[i])));
+      const bounds=ordered.map((o,i)=>Math.max(Math.ceil(shortage/packs[o.id]),thresholdPacks[i]));
+      if(shortage===0){evaluate([0,0,0]);exhaustive=true;}
+      else if(Number.isFinite(threshold)&&ordered.every(o=>Number.isFinite(Number(o.cost))&&Number(o.cost)>=0)&&(bounds[0]+1)*(bounds[1]+1)<=30000){
+        exhaustive=true;
+        for(let a=0;a<=bounds[0];a++)for(let b=0;b<=bounds[1];b++){
           const remaining=Math.max(0,shortage-a*packs.hilo_std-b*packs.hilo_ref);
-          evaluate([a,b,Math.ceil(remaining/packs.hilo_prem)]);
+          const minimum=Math.ceil(remaining/packs.hilo_prem);
+          evaluate([a,b,minimum]);
+          if(thresholdPacks[2]>minimum)evaluate([a,b,thresholdPacks[2]]);
         }
       }else for(let i=0;i<3;i++){const c=[0,0,0];c[i]=Math.ceil(shortage/packs[ordered[i].id]);evaluate(c);}
+
     }
     return {needed:thread.neededForTarget,available:thread.available,shortage,options,purchase,exhaustive,temporal:!!plan.temporal};
   }
