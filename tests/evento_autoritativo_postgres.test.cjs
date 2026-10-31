@@ -31,5 +31,9 @@ test('PostgreSQL: dos conexiones serializan asignaciones y rechazan intensidad d
   const [drawA,drawB]=await Promise.all([sql(draw(1)),sql(draw(0))]);assert.equal(drawA.code,0,drawA.err);assert.equal(drawB.code,0,drawB.err);
   assert.match(drawA.out+drawB.out,/"reused": true/);assert.match(drawA.out+drawB.out,/"reused": false/);
   result=await sql('select count(*) from public.side_event_draws_v1 where source_cycle=3');assert.equal(result.out.trim(),'1');
+  result=await sql("alter table public.participantes add column expulsada_at timestamptz; create table public.side_student_state(empresa_id bigint,snapshot jsonb); create schema side_private; create table side_private.student_claims(empresa_id bigint,owner_id uuid);\n"+fs.readFileSync('supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql','utf8'));assert.equal(result.code,0,result.err);
+  const group=delay=>`begin; select set_config('test.uid','11111111-1111-1111-1111-111111111111',false); set role authenticated; select public.side_assign_group_event_v1('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',4,'PE01',10); select pg_sleep(${delay}); commit;`;
+  const [groupA,groupB]=await Promise.all([sql(group(1)),sql(group(0))]);assert.equal(groupA.code,0,groupA.err);assert.equal(groupB.code,0,groupB.err);assert.match(groupA.out+groupB.out,/"reused": true/);assert.match(groupA.out+groupB.out,/"reused": false/);
+  result=await sql("select count(*) from public.side_event_assignments_v1 where event_id='PE01' and ciclo=4");assert.equal(result.out.trim(),'2');
  }finally{try{run(['rm','-f',name]);}catch{}}
 });

@@ -7,10 +7,14 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
  try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
   for(const file of ['docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql'])await db.exec(fs.readFileSync(file,'utf8'));
+  await db.exec('create schema side_private; create table side_private.student_claims(empresa_id bigint primary key,owner_id uuid)');
+  for(const file of ['supabase/migrations/20261031030035_consulta_privada_desafios.sql','supabase/migrations/20261031043153_programacion_desafios_autoritativa.sql','supabase/migrations/20261031050037_eventos_grupales_mercado_v1.sql'])await db.exec(fs.readFileSync(file,'utf8'));
   const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
   for(let i=1;i<=3;i++){const company=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa '+i,p_nombre_comercial:'Marca '+i});ids.push(Number(company.empresa_id));}
   const events=[{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1},{id:'PE30',intensity:25,sign:0}];
   for(let round=1;round<=6;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
+  const groups=[{id:'PE01',intensity:10},{id:'PE02',intensity:15},{id:'PE03',intensity:25},{id:'PE04',intensity:30}];
+  for(let round=1;round<=6;round++){const event=groups[(round-1)%groups.length];await rpc(db,'side_assign_group_event_v1',{p_partida_id:game.id,p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
   let previous={};
   for(let round=1;round<=6;round++){
    await db.exec('reset role');
@@ -26,13 +30,14 @@ test('tres empresas durante seis ciclos con desafíos rotados y cierres persisti
    const outcomes=await runOnce(call);assert.equal(outcomes[0].success,true,JSON.stringify(outcomes));
    const results=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:round})).cierre.resultadosPorEmpresa;
    for(const id of ids){
-    const result=results[id];assert.equal(result.receipt.events.length,id===ids[(round-1)%3]?1:0);if(id===ids[(round-1)%3])assert.equal(result.receipt.events[0].id,events[(round-1)%events.length].id);
+    const result=results[id];assert.equal(result.receipt.events.length,id===ids[(round-1)%3]?2:1);assert.ok(result.receipt.events.some(event=>event.id===groups[(round-1)%groups.length].id));if(id===ids[(round-1)%3])assert.ok(result.receipt.events.some(event=>event.id===events[(round-1)%events.length].id));
     assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
     if(round>1)assert.equal(result.financial.balanceCaja.cajaInicial,previous[id].financial.balanceCaja.cajaFinal);
     for(const sale of result.receipt.sales)assert.ok(sale.sold<=sale.available);
     const consumed={};for(const lot of result.receipt.materialLots)for(const family of Object.values(lot.materials))for(const [sku,q] of Object.entries(family))consumed[sku]=(consumed[sku]||0)+q;
     for(const family of ['CUERO','ACCESORIOS','HILO'])for(const [sku,q] of Object.entries(result.receipt.decisions[family].quantities))assert.ok(Math.abs(Number(result.receipt.openingInventory[sku]||0)+q-Number(consumed[sku]||0)-Number(result.receipt.inventory[sku]||0))<1e-7,`ciclo ${round}, empresa ${id}, ${sku}`);
    }
+   assert.equal(ids.reduce((sum,id)=>sum+results[id].receipt.marketAllocation.products.esencial.asignado,0),Math.round(3500*(1+groups[(round-1)%groups.length].intensity/100)));
    const affected=ids[(round-1)%3],other=ids[round%3];
    const shock=events[(round-1)%events.length];
    if(shock.sign)assert.ok(shock.sign*(results[affected].receipt.marketAllocation.products.esencial.asignado-results[other].receipt.marketAllocation.products.esencial.asignado)>0);

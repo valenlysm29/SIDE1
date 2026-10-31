@@ -150,15 +150,19 @@
     // negative campaign shock; PE69 and PE71 increase attention.
     const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
     const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
-    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
+    const marketEvents=(input.events||[]).filter(e=>e.version==='market-expansion-v1'&&['PE01','PE02','PE03','PE04'].includes(e.id)).map(e=>({id:e.id,intensity:e.intensity})).sort((a,b)=>a.id.localeCompare(b.id,'en'));
+    return {id:input.id,state,round,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,marketEvents,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
   function allocate(prepared,config=DEFAULT){
     const result=Object.fromEntries(prepared.map(p=>[p.id,{reputation:p.reputation||{valor:p.scores.reputation},products:{}}]));
+    const group=prepared[0]?.marketEvents||[];
+    if(prepared.some(p=>JSON.stringify(p.marketEvents||[])!==JSON.stringify(group)))throw new Error('Los eventos grupales no coinciden entre empresas.');
+    const marketFactor=group.reduce((factor,event)=>factor*(1+event.intensity/100),1);
     for(const id of config.products){
       const segment=config.segments[id],participants=prepared.filter(p=>p.lines.find(line=>line.id===id)?.available>0);
-      const market=Math.max(0,Math.round(segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market));
+      const market=Math.max(0,Math.round((segment.totalMarket!=null?segment.totalMarket*segment.penetration:segment.market)*marketFactor));
       const simulated=[];
       if(participants.length && config.simulatedCompetitors?.enabled){
         const count=Math.max(0,Math.floor(Number(config.simulatedCompetitors.target)||0)-participants.length);

@@ -10,5 +10,7 @@ const {chromium}=require('../.codex-work/lab-browser/node_modules/playwright-cor
  await page.waitForFunction(()=>window.drawCalls.length===1);assert.deepEqual(await page.evaluate(()=>window.drawCalls),[['g',2]]);
  await page.selectOption('#challengeV1Event','PE75');assert.equal(await page.locator('#challengeV1Intensity').inputValue(),'6');assert.match(await page.locator('#challengeV1Preview').textContent(),/reduce/);
  await page.selectOption('#challengeV1Event','PE30');assert.equal(await page.locator('#challengeV1Intensity').getAttribute('max'),'25');assert.match(await page.locator('#challengeV1Preview').textContent(),/ensamblado.*200/);
+ await page.evaluate(()=>{window.groupCalls=[];window.SIDE.PartidaService.asignarEventoGrupal=async(...args)=>{window.groupCalls.push(args);return {success:true};};});
+ await page.selectOption('#challengeV1Event','PE04');assert.equal(await page.locator('#challengeV1Intensity').getAttribute('max'),'30');await page.locator('#challengeV1Intensity').fill('30');await page.locator('#challengeV1Assign').click();await page.waitForFunction(()=>window.groupCalls.length===1);assert.deepEqual(await page.evaluate(()=>window.groupCalls),[['g',2,'PE04',30]]);
  console.log('PASS docente V2: asignación y recuperación experimental');
  }finally{if(browser)await browser.close();server.kill();}})().catch(e=>{console.error(e);process.exitCode=1});

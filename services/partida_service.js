@@ -506,9 +506,9 @@
         let verifiedEvents=[];
         if(eventVersion==='demand-share-v1'){
           const response=await sb.rpc('side_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}), facts=response.data;
-          const eventLimits={PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
-          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>8||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
-          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
+          const eventLimits={PE01:10,PE02:15,PE03:25,PE04:30,PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
+          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>12||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
+          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:['PE01','PE02','PE03','PE04'].includes(e.id)?'market-expansion-v1':e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
         }
         inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:verifiedEvents});
       }
@@ -565,9 +565,17 @@
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function asignarEventoGrupal(partidaId,ciclo,eventId,intensidad){
+    const sb=client();if(!sb)return offline();
+    try{const {data,error}=await sb.rpc('side_assign_group_event_v1',{p_partida_id:partidaId,p_ciclo:ciclo,p_event_id:eventId,p_intensity:intensidad});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(data?.eventId!==eventId||Number(data.round)!==Number(ciclo)||Number(data.intensity)!==Number(intensidad)||!Number.isInteger(data.companyCount)||data.companyCount<1)return {success:false,code:'EVENTO_NO_CONFIRMADO',error:'El servidor no confirmó el evento grupal.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function sortearDesafios(partidaId,ciclo){
     const sb=client();if(!sb)return offline();
-    try{const {data,error}=await sb.rpc('side_draw_events_v1',{p_partida_id:partidaId,p_source_cycle:ciclo});
+    try{const {data,error}=await sb.rpc('side_draw_all_events_v1',{p_partida_id:partidaId,p_source_cycle:ciclo});
       if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
       if(Number(data?.sourceCycle)!==Number(ciclo)||!Array.isArray(data?.events)||typeof data?.reused!=='boolean')return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó el sorteo.'};
       return {success:true,data};
@@ -596,5 +604,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,asignarEventoGrupal,sortearDesafios,consultarDesafios,podio };
 });
