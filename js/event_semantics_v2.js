@@ -15,8 +15,8 @@
  const byId={};
  for(const [primary,ids] of Object.entries(groups))for(const id of ids.split(' ')){
   const key='PE'+id;if(byId[key])throw new Error('Evento duplicado: '+key);
-  const implemented=['PE01','PE02','PE03','PE04','PE17','PE18','PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'].includes(key);
-  byId[key]=Object.freeze({primary,implemented,version:['PE01','PE02','PE03','PE04','PE17','PE18'].includes(key)?'market-expansion-v1':key==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(key)?'operating-expense-v1':implemented?'demand-share-v1':null});
+  const implemented=['PE01','PE02','PE03','PE04','PE17','PE18','PE23','PE26','PE30','PE38','PE39','PE44','PE68','PE69','PE71','PE74','PE75','PE77'].includes(key);
+  byId[key]=Object.freeze({primary,implemented,version:['PE01','PE02','PE03','PE04','PE17','PE18'].includes(key)?'market-expansion-v1':['PE26','PE39'].includes(key)?'plant-capacity-v1':['PE38','PE44'].includes(key)?'conditional-expense-v1':key==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(key)?'operating-expense-v1':implemented?'demand-share-v1':null});
  }
  if(Object.keys(byId).length!==92)throw new Error('Catálogo de semántica incompleto');
  return Object.freeze(byId);

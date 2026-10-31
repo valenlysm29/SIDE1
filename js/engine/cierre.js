@@ -86,7 +86,8 @@
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
+    const plantFactor=(input.events||[]).filter(e=>e.version==='plant-capacity-v1'&&['PE26','PE39'].includes(e.id)).reduce((v,e)=>v*(1-e.intensity/100),1);
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación

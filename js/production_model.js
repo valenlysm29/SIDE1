@@ -147,7 +147,7 @@
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
       const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
-      const modifier=id==='assembly'?(ctx.assemblyCapacityFactor??1):1;
+      const modifier=(id==='assembly'?(ctx.assemblyCapacityFactor??1):1)*(ctx.plantCapacityFactor??1);
       if(!Number.isFinite(modifier)||modifier<0||modifier>1)throw new RangeError('Factor de capacidad inválido');
       const dailyCapacity=pairing.capacity*modifier;
       const cycleCapacity=Math.max(0,Math.round(dailyCapacity*days*efficiency));

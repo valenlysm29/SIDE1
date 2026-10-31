@@ -34,16 +34,22 @@
     const plan=economic.plan;
     const assemblyAvailable=n(plan.processes?.find(process=>process.id==='assembly')?.machines)>0;
     const hasPhysicalStore=(state.CANALES?.optionIds||[]).some(id=>['los_olivos','miraflores','sjl'].includes(id));
+    const plantStaff=(plan.processes||[]).some(process=>Number(process.staff)>0||Object.values(process.staff||{}).some(q=>Number(q)>0));
+    const plantActive=(plan.processes||[]).some(process=>Number(process.machines)>0||Object.values(process.machines||{}).some(q=>Number(q)>0));
     const businessRules=typeof module==='object'&&module.exports?require('./business_rules.js'):globalThis.SIDE_BUSINESS_RULES;
     const expenses={PE23:500,PE68:1200,PE77:300};
     const appliedEvents=events.filter(event=>{
       if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')return assemblyAvailable;
+      if(['PE26','PE39','PE38'].includes(event.id))return plantStaff&&(event.id!=='PE26'||plantActive);
+      if(event.id==='PE44')return n(plan.producibleUnits)>0;
       if(event.id==='PE74'&&event.version==='demand-share-v1')return Number(state.INV_MARKETING?.round)===Number(round)&&businessRules.advertising({state})>0;
       if(event.version==='operating-expense-v1'&&['PE23','PE77'].includes(event.id))return hasPhysicalStore;
       return true;
     });
     for(const event of appliedEvents){
       if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')ledger[`${round}:EVENT:${event.id}`]=-200;
+      if(event.version==='conditional-expense-v1'&&event.id==='PE38')ledger[`${round}:EVENT:${event.id}`]=-1000;
+      if(event.version==='conditional-expense-v1'&&event.id==='PE44')ledger[`${round}:EVENT:${event.id}`]=-350;
       if(event.version==='operating-expense-v1'&&Object.hasOwn(expenses,event.id))ledger[`${round}:EVENT:${event.id}`]=-expenses[event.id];
     }
     const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));

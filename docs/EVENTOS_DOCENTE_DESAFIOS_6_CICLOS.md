@@ -1,8 +1,8 @@
 # Clasificación preliminar de los 92 eventos
 
-La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE17, PE18, PE23, PE30, PE68, PE69, PE71, PE74, PE75 y PE77. PE74 requiere inversión de marketing durante el ciclo.
+La variable primaria es una propuesta de auditoría, no una promesa de efecto implementado. Implementados experimentalmente: PE01, PE02, PE03, PE04, PE17, PE18, PE23, PE26, PE30, PE38, PE39, PE44, PE68, PE69, PE71, PE74, PE75 y PE77. PE74 requiere inversión de marketing durante el ciclo.
 
-La asignación manual y el sorteo persistido cubren ocho eventos individuales y seis eventos grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 78 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
+La asignación manual y el sorteo persistido cubren doce eventos individuales y seis eventos grupales mediante `20261031050037_eventos_grupales_mercado_v1.sql`. Las campañas modifican el mercado compartido antes de repartirlo, una vez por partida y ciclo, y el stock limita las ventas. Una prueba aislada concilia tres empresas durante seis ciclos con eventos individuales y grupales. Faltan competencia equilibrada, progresión por dificultad y los otros 74 efectos; el sorteo no constituye todavía el modo aleatorio completo. Pendientes también la aceptación integral con los tres modos y las observaciones funcionales permitidas sin evidencia de corrección. V2 permanece desactivado; la migración no se aplicó en remoto.
 
 | ID | Evento | Alcance | Variable primaria propuesta | Estado |
 |---|---|---|---|---|
@@ -31,7 +31,7 @@ La asignación manual y el sorteo persistido cubren ocho eventos individuales y 
 | PE23 | Inseguridad en zona comercial | individual | movimientos_financieros | experimental |
 | PE24 | Obras viales frente al local | individual | atractivo_competitivo | pendiente |
 | PE25 | Restricción temporal de tránsito pesado | group | costos_operacion | pendiente |
-| PE26 | Corte de luz en zona industrial | individual | capacidad_produccion | pendiente |
+| PE26 | Corte de luz en zona industrial | individual | capacidad_produccion | experimental |
 | PE27 | Inspección inopinada de SUNAFIL | individual | capacidad_produccion | pendiente |
 | PE28 | Renuncias de personal | individual | capacidad_produccion | pendiente |
 | PE29 | Rotación de personal operativo | individual | capacidad_produccion | pendiente |
@@ -43,13 +43,13 @@ La asignación manual y el sorteo persistido cubren ocho eventos individuales y 
 | PE35 | Reclamos por garantía | individual | inventario_calidad | pendiente |
 | PE36 | Control de calidad sobresaliente | individual | costos_operacion | pendiente |
 | PE37 | Diferencia en inventario físico | individual | inventario_calidad | pendiente |
-| PE38 | Accidente laboral menor | individual | movimientos_financieros | pendiente |
-| PE39 | Ausentismo del personal | individual | capacidad_produccion | pendiente |
+| PE38 | Accidente laboral menor | individual | movimientos_financieros | experimental |
+| PE39 | Ausentismo del personal | individual | capacidad_produccion | experimental |
 | PE40 | Capacitación de alto impacto | individual | capacidad_produccion | pendiente |
 | PE41 | Mejora inesperada de productividad | individual | capacidad_produccion | pendiente |
 | PE42 | Entrega anticipada del proveedor | individual | recepcion_materiales | pendiente |
 | PE43 | Retraso del proveedor principal | individual | recepcion_materiales | pendiente |
-| PE44 | Error de etiquetado de productos | individual | movimientos_financieros | pendiente |
+| PE44 | Error de etiquetado de productos | individual | movimientos_financieros | experimental |
 | PE45 | Nuevo supervisor eficiente | individual | capacidad_produccion | pendiente |
 | PE46 | Alza abrupta del dólar | group | adquisicion_materiales | pendiente |
 | PE47 | Caída del dólar | group | adquisicion_materiales | pendiente |
@@ -100,3 +100,5 @@ La asignación manual y el sorteo persistido cubren ocho eventos individuales y 
 | PE92 | Crisis reputacional | individual | atractivo_competitivo | pendiente |
 
 La migración adicional `20261031055001_mercado_global_escenarios_v2.sql` incorpora PE17 y PE18. La matriz recibida es guía, no autoriza inventar dependencias: faltan elegibilidad estacional, duración y mecanismos para varios eventos. No habilitar V2 hasta completar la aceptación.
+
+`20261031055442_eventos_productivos_v2.sql` incorpora PE26 y PE39 como capacidad de planta y PE38/PE44 como gastos condicionados a personal o producción. Pendiente la aceptación integral de los modos y observaciones Word no excluidas.

@@ -72,16 +72,22 @@ module.exports={runOnce,remoteRpc};
     const plan=economic.plan;
     const assemblyAvailable=n(plan.processes?.find(process=>process.id==='assembly')?.machines)>0;
     const hasPhysicalStore=(state.CANALES?.optionIds||[]).some(id=>['los_olivos','miraflores','sjl'].includes(id));
+    const plantStaff=(plan.processes||[]).some(process=>Number(process.staff)>0||Object.values(process.staff||{}).some(q=>Number(q)>0));
+    const plantActive=(plan.processes||[]).some(process=>Number(process.machines)>0||Object.values(process.machines||{}).some(q=>Number(q)>0));
     const businessRules=typeof module==='object'&&module.exports?load("js/business_rules.js"):globalThis.SIDE_BUSINESS_RULES;
     const expenses={PE23:500,PE68:1200,PE77:300};
     const appliedEvents=events.filter(event=>{
       if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')return assemblyAvailable;
+      if(['PE26','PE39','PE38'].includes(event.id))return plantStaff&&(event.id!=='PE26'||plantActive);
+      if(event.id==='PE44')return n(plan.producibleUnits)>0;
       if(event.id==='PE74'&&event.version==='demand-share-v1')return Number(state.INV_MARKETING?.round)===Number(round)&&businessRules.advertising({state})>0;
       if(event.version==='operating-expense-v1'&&['PE23','PE77'].includes(event.id))return hasPhysicalStore;
       return true;
     });
     for(const event of appliedEvents){
       if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')ledger[`${round}:EVENT:${event.id}`]=-200;
+      if(event.version==='conditional-expense-v1'&&event.id==='PE38')ledger[`${round}:EVENT:${event.id}`]=-1000;
+      if(event.version==='conditional-expense-v1'&&event.id==='PE44')ledger[`${round}:EVENT:${event.id}`]=-350;
       if(event.version==='operating-expense-v1'&&Object.hasOwn(expenses,event.id))ledger[`${round}:EVENT:${event.id}`]=-expenses[event.id];
     }
     const channels=state.CANALES||{},ids=channels.optionIds||[],hasChannel=ids.some(id=>['web','los_olivos','miraflores','sjl'].includes(id));
@@ -372,7 +378,7 @@ module.exports={runOnce,remoteRpc};
     ];
     const processes=specs.map(([id,label,staffId,machineId])=>{
       const pairing=pairedDailyCapacity(staff[id],STAFF_RATES[staffId],machines[id],MACHINE_MULTIPLIERS[machineId],draft(ctx,staffId).assignments);
-      const modifier=id==='assembly'?(ctx.assemblyCapacityFactor??1):1;
+      const modifier=(id==='assembly'?(ctx.assemblyCapacityFactor??1):1)*(ctx.plantCapacityFactor??1);
       if(!Number.isFinite(modifier)||modifier<0||modifier>1)throw new RangeError('Factor de capacidad inválido');
       const dailyCapacity=pairing.capacity*modifier;
       const cycleCapacity=Math.max(0,Math.round(dailyCapacity*days*efficiency));
@@ -936,7 +942,8 @@ module.exports={runOnce,remoteRpc};
       ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
       : {...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
-    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
+    const plantFactor=(input.events||[]).filter(e=>e.version==='plant-capacity-v1'&&['PE26','PE39'].includes(e.id)).reduce((v,e)=>v*(1-e.intensity/100),1);
+    const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,plantCapacityFactor:plantFactor,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;
     let plan=originalPlan;
     // CONS-03 se aplica a la meta, antes de los límites físicos. La asignación
@@ -3197,9 +3204,9 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         let verifiedEvents=[];
         if(eventVersion==='demand-share-v1'){
           const response=await sb.rpc('side_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}), facts=response.data;
-          const eventLimits={PE01:10,PE02:15,PE03:25,PE04:30,PE17:10,PE18:10,PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
-          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>14||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
-          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:['PE01','PE02','PE03','PE04','PE17','PE18'].includes(e.id)?'market-expansion-v1':e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
+          const eventLimits={PE01:10,PE02:15,PE03:25,PE04:30,PE17:10,PE18:10,PE23:1,PE26:10,PE30:25,PE38:1,PE39:6,PE44:1,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};
+          if(response.error||facts?.error||String(facts?.companyId)!==String(company.id)||Number(facts?.round)!==Number(ciclo)||!Array.isArray(facts?.events)||facts.events.length>18||new Set(facts.events.map(e=>e?.id)).size!==facts.events.length||facts.events.some(e=>!Object.hasOwn(eventLimits,e.id)||Number(e.round)!==Number(ciclo)||!Number.isInteger(e.intensity)||e.intensity<1||e.intensity>eventLimits[e.id]))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación de eventos de la empresa.'};
+          verifiedEvents=facts.events.map(e=>({id:e.id,round:e.round,intensity:e.intensity,version:['PE01','PE02','PE03','PE04','PE17','PE18'].includes(e.id)?'market-expansion-v1':['PE26','PE39'].includes(e.id)?'plant-capacity-v1':['PE38','PE44'].includes(e.id)?'conditional-expense-v1':e.id==='PE30'?'assembly-breakdown-v1':['PE23','PE68','PE77'].includes(e.id)?'operating-expense-v1':eventVersion}));
         }
         inputs.push({id:company.id,state:preparedState,ledger:previous?.ledger||{},catalog:global.SIDE_DECISION_CATALOG,round:ciclo,capital:Number(company.capital),sectionsByRound:previous?.financialSections||{},planSource:saved.source,fromRound:saved.fromRound,financialPolicy:{...(global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:ctx.financialConfig.materialPaymentMode,supplierCreditTermCycles:Number(ctx.financialConfig.supplierCreditTermCycles??1)}:{})},events:verifiedEvents});
       }

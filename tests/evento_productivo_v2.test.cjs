@@ -1,0 +1,10 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),cycle=require('../js/cycle_model.js'),fixture=require('./economic_v19_fixture.cjs');
+function state(){const s=fixture.state(1,{},0);for(const [id,opt,q] of [['MESA_CORTE','mesa',10],['ENSAMBLE','ens_ind',1],['ACABADOS','aca_ind',10],['PERS_CORTE','corte_maestro',10],['PERS_ENSAMBLE','ens_personal_esp',1],['PERS_ACABADO','aca_personal_art',10]]){s[id].quantities={[opt]:q};s[id].optionIds=[opt];if(s[id].purchases)s[id].purchases={1:{[opt]:q}};}s.CUERO.quantities={cuero_prem:300};s.ACCESORIOS.quantities={acc_prem:1000};s.HILO.quantities={hilo_prem:6000};s.PRODUCCION_META.moldTargets={molde_1:1000,molde_2:0,molde_3:0};return s;}
+for(const [id,intensity,version] of [['PE26',10,'plant-capacity-v1'],['PE39',6,'plant-capacity-v1'],['PE38',1,'conditional-expense-v1'],['PE44',1,'conditional-expense-v1']])test(`${id}: efecto económico y reintento`,()=>{
+ const input={state:state(),catalog:fixture.catalog,round:1,capital:1000000},base=cycle.close(input),event={id,round:1,intensity,version},actual=cycle.close({...input,events:[event]});
+ assert.equal(actual.receipt.events[0]?.id,id);if(version==='plant-capacity-v1')assert.ok(actual.receipt.produced<base.receipt.produced);else assert.equal(actual.financial.flujoCaja.eventos,id==='PE38'?-1000:-350);
+ assert.ok(actual.receipt.sold<=actual.receipt.produced);assert.equal(actual.financial.balanceGeneral.activos,actual.financial.balanceGeneral.pasivoPatrimonio);
+ assert.deepEqual(cycle.close({...input,state:actual.state,ledger:actual.ledger,sectionsByRound:actual.financialSections,events:[event]}).receipt,actual.receipt);
+});
+test('sin personal o sin producción los eventos condicionales no generan gasto',()=>{const s=state();for(const k of ['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO'])s[k].quantities={};for(const [id,version] of [['PE38','conditional-expense-v1'],['PE44','conditional-expense-v1'],['PE26','plant-capacity-v1'],['PE39','plant-capacity-v1']]){const r=cycle.close({state:s,catalog:fixture.catalog,round:1,capital:1000000,events:[{id,round:1,intensity:1,version}]});assert.deepEqual(r.receipt.events,[]);}});
