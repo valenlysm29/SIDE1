@@ -11,7 +11,9 @@ test('saved numeric production targets use the chosen mold and generate sales in
     const ctx=context(s),before=JSON.stringify(s),result=CYCLE.close(ctx);
     assert.equal(result.receipt.produced,90,mold);assert.equal(result.receipt.sold,90,mold);
     assert.equal(result.receipt.sales[index].sold,90);
-    assert.equal(result.receipt.revenue,90*[42.5,100,250][index]);
+    // Premium quality activates CONS-02: the effective price is 250 × 1.4.
+    assert.equal(result.receipt.revenue,90*[42.5,100,350][index]);
+    if(mold==='molde_3'){assert.equal(result.receipt.sales[index].chosenPrice,250);assert.equal(result.receipt.sales[index].price,350);assert.ok(result.receipt.consequences.some(x=>x.id==='CONS-02'));}
     assert.deepEqual(REVIEW.draft(item,ctx).moldTargets,PRO.resolveProductionTargets(ctx));
     assert.equal(JSON.stringify(s),before);
   }

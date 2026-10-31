@@ -236,6 +236,51 @@
     const capacity=Math.min(...processes.map(p=>p.cycleCapacity));
     return {target,days:WORKING_DAYS,efficiency:BASE_EFFICIENCY,capacity,processes,limitingProcesses:processes.filter(p=>p.cycleCapacity===capacity).map(p=>p.label)};
   }
+  // Bounded advisory search. Each candidate adds one worker and/or equipment
+  // type to one stage; calculate() remains the authority for pairing and bonuses.
+  function recommendResources(ctx={},plan=calculate(ctx)){
+    const specs=[['cut','PERS_CORTE','MESA_CORTE'],['assembly','PERS_ENSAMBLE','ENSAMBLE'],['finish','PERS_ACABADO','ACABADOS']];
+    let drafts={...(ctx.drafts||{})};
+    for(const [,staffId,machineId] of specs){drafts[staffId]={...draft(ctx,staffId),quantities:{...draft(ctx,staffId).quantities}};drafts[machineId]={...draft(ctx,machineId),quantities:{...draft(ctx,machineId).quantities}};}
+    let scenario=plan,totalCost=0;const additions=[];let complete=true;
+    for(const [stage,staffId,machineId] of specs){
+      const current=scenario.processes.find(p=>p.id===stage);
+      if(!current||current.cycleCapacity>=plan.target)continue;
+      const sd=item(ctx,staffId),md=item(ctx,machineId);if(!sd||!md){complete=false;continue;}
+      let best=null;
+      for(const worker of [null,...sd.options])for(const machine of [null,...md.options]){
+        if(!worker&&!machine)continue;
+        const unitCost=(worker?BUS.laborCost(worker.id,BUS.regime(ctx),worker.cost):0)+(machine?BUS.assetCost(md,machine,BUS.regime(ctx)):0);
+        if(!(unitCost>0))continue;
+        const trial=q=>{
+          const d={...drafts,[staffId]:{...drafts[staffId],quantities:{...drafts[staffId].quantities}},[machineId]:{...drafts[machineId],quantities:{...drafts[machineId].quantities}}};
+          if(worker)d[staffId].quantities[worker.id]=whole(d[staffId].quantities[worker.id])+q;
+          if(machine)d[machineId].quantities[machine.id]=whole(d[machineId].quantities[machine.id])+q;
+          const p=calculate({...ctx,drafts:d});return {drafts:d,plan:p,capacity:p.processes.find(x=>x.id===stage).cycleCapacity};
+        };
+        let high=1,t=trial(high);while(t.capacity<plan.target&&high<100000){high=Math.min(100000,high*2);t=trial(high);}
+        if(t.capacity<plan.target)continue;
+        let low=0;while(low+1<high){const mid=Math.floor((low+high)/2);if(trial(mid).capacity>=plan.target)high=mid;else low=mid;}
+        const cost=unitCost*high;if(!best||cost<best.cost){t=trial(high);best={...t,cost,quantity:high,worker,machine,stage};}
+      }
+      if(!best){complete=false;continue;}
+      drafts=best.drafts;scenario=best.plan;totalCost+=best.cost;
+      additions.push({stage,quantity:best.quantity,worker:best.worker?.label||null,machine:best.machine?.label||null,cost:best.cost});
+    }
+    return {additions,cost:totalCost,capacity:scenario.processCapacity,complete:complete&&scenario.processCapacity>=plan.target,
+      budget:Number.isFinite(ctx.availableCash)?ctx.availableCash:null,affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null};
+  }
+  function threadAlternatives(ctx={},plan=calculate(ctx)){
+    const thread=plan.materials.find(m=>m.id==='HILO'),definition=item(ctx,'HILO');
+    if(!thread||!definition)return null;
+    const shortage=Math.max(0,thread.neededForTarget-thread.available);
+    const packs=BUS.MATERIAL_PACKS_V2;
+    const options=definition.options.filter(o=>packs[o.id]).map(o=>{
+      const quantity=Math.ceil(shortage/packs[o.id]),meters=quantity*packs[o.id];
+      return {id:o.id,label:o.label,quantity,meters,remaining:thread.available+meters-thread.neededForTarget};
+    });
+    return {needed:thread.neededForTarget,available:thread.available,shortage,options,temporal:!!plan.temporal};
+  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){
     const target=Number(plan?.target),value=record?.producedUnits;
@@ -243,5 +288,5 @@
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,planResources,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,planResources,recommendResources,threadAlternatives,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });
