@@ -7,6 +7,8 @@ test('proyección y alternativas usan el cierre sin modificar decisiones ni cont
  const before=JSON.stringify(input),actual=C.project(input),result=P.analyze(input);
  assert.equal(result.available,true);assert.equal(result.base.profit,actual.financial.estadoResultados.utilidadNeta);
  assert.equal(result.base.cash,actual.financial.balanceGeneral.efectivo);assert.equal(result.base.sold,actual.receipt.sold);
+ const closed=C.close(input),decisionNet=F.catalog.filter(c=>!c.summaryOnly).reduce((sum,c)=>sum+(Number(closed.ledger[`1:${c.cat}`])||0),0);
+ assert.equal(result.base.availableBeforeSales,Math.round((closed.financial.flujoCaja.cajaInicial+decisionNet)*100)/100);
  assert.equal(JSON.stringify(input),before);assert.ok(result.alternatives.some(a=>a.label.startsWith('Personal')));
  assert.ok(result.alternatives.some(a=>a.label.startsWith('Maquinaria')));assert.ok(result.alternatives.some(a=>a.label.startsWith('Insumos')));
  assert.ok(result.alternatives.some(a=>a.label.startsWith('Canales')));
