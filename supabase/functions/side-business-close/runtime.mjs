@@ -3097,9 +3097,9 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       for(const company of ctx.empresas||[]){
         const snapshot=company.snapshot||{},state=snapshot.decision_state||{},saved=state.__cyclePlans?.[ciclo];
         if(!saved)continue;
-        // Event effects and migrated opening balances currently lack an independent
-        // server-verifiable source. Refuse rather than discard legitimate amounts.
-        if((state.__cycleBusiness?.[ciclo]?.events||[]).length || (Number(ciclo)===1&&state.__openingBalance))
+        // Legacy events have no independent source. Versioned events are loaded
+        // below from the server; client event effects are never used for closing.
+        if((eventVersion!=='demand-share-v1'&&(state.__cycleBusiness?.[ciclo]?.events||[]).length) || (Number(ciclo)===1&&state.__openingBalance))
           return {success:false,code:'DATOS_ECONOMICOS_NO_VERIFICADOS',error:'No se puede verificar el saldo inicial o los eventos de este ciclo.'};
         const previous=prior[company.id];
         if(Number(ciclo)>1&&!previous?.state)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'Falta el estado anterior de una empresa.'};

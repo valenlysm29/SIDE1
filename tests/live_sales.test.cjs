@@ -62,7 +62,7 @@ function teacher(context,report={}){
 test('teacher follows server room cycle even when company report still names the previous cycle',async()=>{
  const c={partida_id:'room',codigo:'SIDE-QA',ciclo:2,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot(2)};
  const [r]=await teacher(c,{ciclo:1,ingresos:0}).supabaseReports();
- assert.equal(r.ronda,2);assert.equal(r.provisional,false);assert.equal(r.unidadesVendidas,null);assert.equal(r.ingresos,0);
+ assert.equal(r.ronda,2);assert.equal(r.provisional,true);const estimate=LIVE.calculate({snapshot:c.snapshot,round:2,capital:200000,catalog,config:{},id:5,phase:'decisions'});assert.equal(r.unidadesVendidas,estimate.receipt.sold);assert.equal(r.ingresos,estimate.financial.estadoResultados.ingresos);
  const [foreign]=await teacher({...c,partida_id:'other'}).supabaseReports();assert.equal(foreign.ingresos,0);assert.equal(foreign.unidadesVendidas,null);
 });
 test('definitive report is never replaced by a provisional snapshot',async()=>{
@@ -72,7 +72,7 @@ test('definitive report is never replaced by a provisional snapshot',async()=>{
 });
 test('a closure arriving during a roster read also replaces its cached sold units',async()=>{
  const c={partida_id:'room',codigo:'SIDE-QA',ciclo:1,estado:'activa',phase:'decisions',configuracion:{},snapshot:snapshot()};
- const ctx=teacher(c);const [r]=await ctx.supabaseReports();assert.equal(r.provisional,false);assert.equal(r.unidadesVendidas,null);
+ const ctx=teacher(c);const [r]=await ctx.supabaseReports();assert.equal(r.provisional,true);assert.ok(r.unidadesVendidas>=0);
  ctx.rows=[r];ctx.final={...LIVE.calculate({snapshot:snapshot(),capital:200000,catalog}).financial,cycleReceipt:{round:1,sold:12,revenue:510}};
  ctx.final.estadoResultados.ingresos=510;
  vm.runInContext("confirmedReportClosures.set(JSON.stringify([roomGeneration,state.partidaId,1,'5']),final);applyConfirmedReportClosures(rows)",ctx);

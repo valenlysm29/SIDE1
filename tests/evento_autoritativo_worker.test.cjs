@@ -90,3 +90,17 @@ test('Node y Edge aplican la misma asignación autoritativa',async()=>{
  for(const [eventId,intensity] of [['PE23',1],['PE30',25],['PE68',1],['PE69',20],['PE71',15],['PE74',12],['PE75',6],['PE77',1]])assert.deepEqual(await run(edge.runOnce,eventId,intensity),await run(runOnce,eventId,intensity));
  assert.deepEqual(await run(edge.runOnce,[['PE68',1],['PE69',20]]),await run(runOnce,[['PE68',1],['PE69',20]]));
 });
+
+test('versioned events come only from verified server facts even when snapshot contains events',async()=>{
+ async function runWith(clientEvent,serverEvents,worker=runOnce){let written;const rpc=async(name,args)=>{
+  if(name==='side_cierres_pendientes')return {data:[{id:'g',cycles:[1]}]};
+  if(name==='side_contexto_cierre_negocio'){const s=snapshot();s.decision_state.__cycleBusiness={1:{events:[clientEvent]}};return {data:{empresas:[{id:'1',capital:1000000,snapshot:s}],financialConfig:{cycles:6,economicEventsVersion:'demand-share-v1'},token:'t'}};}
+  if(name==='side_event_context_v1')return {data:{companyId:'1',round:1,events:serverEvents}};
+  if(name==='side_guardar_cierre_negocio'){written=args.p_cierre;return {data:{cierre:written}};}throw Error(name);
+ };const result=await worker(rpc);return {result:result[0],written};}
+ const actual=await runWith({id:'PE69',effect:{revenuePct:999999}},[{id:'PE68',round:1,intensity:1}]);
+ assert.equal(actual.result.success,true);assert.deepEqual(actual.written.resultadosPorEmpresa['1'].receipt.events.map(e=>e.id),['PE68']);
+ const edge=await import(require('node:url').pathToFileURL(require('node:path').resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);
+ const equivalent=await runWith({id:'PE69',effect:{revenuePct:999999}},[{id:'PE68',round:1,intensity:1}],edge.runOnce);assert.deepEqual(equivalent.written,actual.written);
+ const missing=await runWith({id:'PE69'},[{id:'PE69',round:1,intensity:999}]);assert.equal(missing.result.code,'EVENTOS_NO_VERIFICADOS');assert.equal(missing.written,undefined);
+});
