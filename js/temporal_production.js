@@ -35,6 +35,7 @@
   for(const r of arrivals){if(!r.id||seen.has(r.id)||!Object.hasOwn(skuFamilies,r.sku)||!Number.isInteger(r.day)||r.day<startDay||!Number.isFinite(r.quantity)||r.quantity<0)throw new RangeError('Recepción inválida');seen.add(r.id);}
   const remaining={},produced={},consumed={leather:0,accessories:0,thread:0},windows=[],consumedByModelSku=Object.fromEntries(Object.keys(recipes).map(id=>[id,{}]));
   for(const id of Object.keys(recipes)){const q=targets[id]??0;if(!Number.isInteger(q)||q<0)throw new RangeError('Meta inválida');remaining[id]=q;produced[id]=0;}
+  const materialBlocks=Object.fromEntries(Object.keys(recipes).map(id=>[id,new Set()]));
   let priorCapacity=0;
   for(let d=0;d<days;d++){
    const day=startDay+d,received=arrivals.filter(r=>r.day===day);for(const r of received)stock[r.sku]+=r.quantity;
@@ -43,7 +44,9 @@
    for(const [id,recipe] of Object.entries(recipes)){
     if(!molds[id])continue;
     const limits=Object.entries(recipe).map(([family,qty])=>Math.floor((skus.filter(sku=>skuFamilies[sku]===family).reduce((sum,sku)=>sum+stock[sku],0)+1e-9)/qty));
-    const q=Math.max(0,Math.min(remaining[id],free,...limits));remaining[id]-=q;produced[id]+=q;free-=q;
+    const q=Math.max(0,Math.min(remaining[id],free,...limits));
+    if(q<Math.min(remaining[id],free))Object.keys(recipe).forEach((family,i)=>{if(limits[i]===q)materialBlocks[id].add(family);});
+    remaining[id]-=q;produced[id]+=q;free-=q;
     for(const [family,perUnit] of Object.entries(recipe)){
      let need=Number((q*perUnit).toFixed(9));consumed[family]=Number((consumed[family]+need).toFixed(9));
      for(const sku of skus.filter(sku=>skuFamilies[sku]===family)){
@@ -56,7 +59,8 @@
    windows.push({day,capacity,produced:capacity-free,receipts:received.map(r=>r.id),consumedBySku:dailyConsumption});
   }
   const familyStock=Object.fromEntries(['leather','accessories','thread'].map(family=>[family,skus.filter(sku=>skuFamilies[sku]===family).reduce((sum,sku)=>sum+stock[sku],0)]));
-  return {produced,consumed,stock:familyStock,stockBySku:stock,consumedBySku,consumedByModelSku,windows,pending:arrivals.filter(r=>r.day>=startDay+days)};
+  const limitingMaterials=[...new Set(Object.keys(recipes).filter(id=>remaining[id]>0&&molds[id]).flatMap(id=>[...materialBlocks[id]]))];
+  return {produced,consumed,stock:familyStock,stockBySku:stock,consumedBySku,consumedByModelSku,windows,pending:arrivals.filter(r=>r.day>=startDay+days),limitingMaterials};
  }
  return Object.freeze({calculate,calculateBySku,recipes});
 });
