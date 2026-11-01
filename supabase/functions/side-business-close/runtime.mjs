@@ -1040,16 +1040,15 @@ module.exports={runOnce,remoteRpc};
     for(const id of Object.keys(config.storeZones||{})){if(!ids.includes(id))continue;const count=Math.max(1,Math.floor(n(entry.quantities?.[id])||1));for(let i=1;i<=count;i++)out.push({id:`${id}:${i}`,zone:config.storeZones[id]});}
     return out;
   }
-  function distributeProduct({id,demand,price,available,openingLocations={},activePoints=[],affinity={},manualTransfers=null}){
+  function distributeProduct({id,demand,price,available,openingLocations={},activePoints=[],affinity={}}){
     const stocks=Object.fromEntries(Object.entries(openingLocations).map(([key,value])=>[key,Math.floor(n(value))]));
     const stored=Object.values(stocks).reduce((a,v)=>a+v,0);if(stored>Math.floor(n(available)))throw new RangeError('Inventario por punto supera inventario total');
     let central=Math.floor(n(available))-stored;
     const weights=Object.fromEntries(activePoints.map(p=>[p.id,n(affinity[p.zone])]));const demandByPoint=apportion(demand,weights);
     const needs=Object.fromEntries(activePoints.map(p=>[p.id,Math.max(0,(demandByPoint[p.id]||0)-(stocks[p.id]||0))]));
-    let transfers;if(manualTransfers){transfers={};for(const p of [...activePoints].sort((a,b)=>a.id.localeCompare(b.id,'en'))){const raw=Number(manualTransfers[p.id]??0);if(!Number.isInteger(raw)||raw<0||raw>central)throw new RangeError('Transferencia manual inválida o superior al stock central');const q=raw;transfers[p.id]=q;central-=q;}}
-    else {const totalNeed=Object.values(needs).reduce((a,v)=>a+v,0);transfers=totalNeed<=central?needs:apportion(central,needs);central-=Object.values(transfers).reduce((a,v)=>a+v,0);}
+    const totalNeed=Object.values(needs).reduce((a,v)=>a+v,0),transfers=totalNeed<=central?needs:apportion(central,needs);central-=Object.values(transfers).reduce((a,v)=>a+v,0);
     const rows=activePoints.map(p=>{const opening=stocks[p.id]||0,received=transfers[p.id]||0,stock=opening+received,assigned=demandByPoint[p.id]||0,sold=Math.min(assigned,stock);stocks[p.id]=stock-sold;return {id:p.id,zone:p.zone,product:id,opening,received,available:stock,demand:assigned,sold,lostSales:assigned-sold,revenue:money(sold*price),closing:stocks[p.id]};});
-    return {rows,central,locations:stocks,assignment:manualTransfers?'manual':'automatic',unservedWithoutChannel:activePoints.length?0:Math.floor(n(demand))};
+    return {rows,central,locations:stocks,assignment:'automatic',unservedWithoutChannel:activePoints.length?0:Math.floor(n(demand))};
   }
   // FIFO por ubicación: transferencias desde almacén y ventas desde el punto.
   function locateLots(lots,distribution,openingLocations,product,basePrice,config,round){
@@ -1081,7 +1080,7 @@ module.exports={runOnce,remoteRpc};
   }
   function closeMany(inputs=[],config=DEFAULT){const prepared=inputs.map(input=>prepare(input,config)),allocations=allocate(prepared,config);return Object.fromEntries(prepared.map(p=>{
     const pointList=points(p.state,config),locationInventory=clone(p.state.__storeInventory||{}),distributions={};
-    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id],manualTransfers:(Number(p.state.CANALES?.round)===Number(p.round)?p.state.CANALES?.transfers?.[line.id]:null)??p.state.PRODUCCION_META?.transfers?.[line.id]??null});distributions[line.id]=distribution;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);
+    const sales=p.lines.map(line=>{const a=allocations[p.id].products[line.id],demand=n(a?.demandaAjustada),distribution=distributeProduct({id:line.id,demand,price:line.effectivePrice,available:line.available,openingLocations:locationInventory[line.id]||{},activePoints:pointList,affinity:config.commercialAffinity[line.id]});distributions[line.id]=distribution;const sold=distribution.rows.reduce((sum,row)=>sum+row.sold,0);
       const located=locateLots(line.lots,distribution,locationInventory[line.id]||{},line.id,line.price,config,p.round);
       line.lots=located.lots;locationInventory[line.id]=distribution.locations;const lotSales=located.lotSales,lotRevenue=located.revenue;
       let reason='';if(!sold){const source=p.plan.productLines.find(l=>l.id===`molde_${config.products.indexOf(line.id)+1}`);reason=!pointList.length?'Sin canal de venta':line.available>0&&!demand?'Sin demanda asignada':!source?.target?'No planificó producción en este segmento':!source?.available?'Sin molde para este segmento':p.plan.processCapacity===0?'Sin personal o equipos en '+p.plan.limitingProcesses.join(', '):p.plan.materialCapacity===0?'Sin insumos suficientes: '+p.plan.limitingMaterials.join(', '):!line.produced?'No produjo en este segmento':!line.available?'Sin stock':!demand?'Sin demanda asignada':'Sin unidades enteras disponibles';}return {...line,alreadySold:0,chosenPrice:line.price,price:sold?money(lotRevenue/sold):line.price,effectivePrice:sold?money(lotRevenue/sold):line.price,lotSales,demand,assignedDemand:n(a?.asignado),sold,points:distribution.rows,assignment:distribution.assignment,lostSales:Math.max(0,demand-sold),potentialRevenue:money(demand*line.effectivePrice),revenue:lotRevenue,reason};});
