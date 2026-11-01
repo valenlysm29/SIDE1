@@ -70,3 +70,8 @@
 #profiles .profile-main{z-index:1;width:min(900px,100%)}
 #profiles :is(.student-hero-img,.teacher-mini-img){width:170px;height:120px}
 @media(max-width:650px){#profiles{padding:120px 35px 60px}#profiles::before{inset:18px 15px;border-radius:32px}#profiles .profile-faculty-logo{top:38px;left:38px}#profiles :is(.student-hero-img,.teacher-mini-img){width:150px;height:95px}}
+
+/* Mantener la marca completa y separada del contenido de la sala. */
+#studentLobby .lobby-card{padding-top:82px}
+#studentLobby .dash-logo{top:14px;left:50%;transform:translateX(-50%);width:150px;height:54px;max-width:65%;object-fit:contain;filter:none}
+@media(max-width:600px){#studentLobby .lobby-card{padding-top:68px}#studentLobby .dash-logo{top:12px;width:125px;height:45px}}
