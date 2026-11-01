@@ -167,7 +167,7 @@
     // negative campaign shock; PE69 and PE71 increase attention.
     const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
     const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
-    return {id:input.id,state,round,economicRulesVersion:input.financialPolicy?.economicRulesVersion,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,economicRulesVersion:input.financialPolicy?.economicRulesVersion,utilityDemand:input.financialPolicy?.utilityDemand,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -192,7 +192,18 @@
       for(const row of rows)row.share=sum?row.total/sum:1/rows.length;
       const rounded=apportion(market,Object.fromEntries(rows.map(row=>[String(row.p.id),row.share])));
       for(const row of rows)row.assigned=rounded[String(row.p.id)];
-      for(const row of rows)if(!row.p.simulated)result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      for(const row of rows)if(!row.p.simulated){
+        let absoluteFactor=1;
+        if(row.p.economicRulesVersion==='utility-v1'){
+          const settings={...config.utilityDemand?.[id],...row.p.utilityDemand?.[id]},reference=Number(settings.reference),elasticity=Number(settings.elasticity);
+          if(!(reference>0&&Number.isFinite(reference)&&elasticity>=0&&Number.isFinite(elasticity)))throw new RangeError('Parámetros de demanda inválidos para '+id);
+          const lots=row.line.lots||[],units=lots.reduce((sum,lot)=>sum+n(lot.available),0);
+          const effective=units?lots.reduce((sum,lot)=>sum+n(lot.available)*row.line.price*(id==='premium'&&lot.quality!=null?(lot.quality<4?config.consequences.lowQualityPrice:premiumBonus(lot,row.p.economicRulesVersion)?config.consequences.premiumPrice:1):1),0)/units:row.line.price;
+          absoluteFactor=Math.min(1,Math.pow(Math.max(1,effective/reference),-elasticity));
+        }
+        const adjustment=(row.p.demandFactor??1)*absoluteFactor;
+        result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.economicRulesVersion==='utility-v1'?Math.min(1,adjustment):adjustment)),...(row.p.economicRulesVersion==='utility-v1'?{factorPrecioAbsoluto:absoluteFactor}:{}),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      }
     }return result;
   }
   // Reparto entero determinista; cada punto conserva su identidad.

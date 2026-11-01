@@ -19,6 +19,9 @@
     // Cantidades de compra se expresan en m², unidades y metros.
     materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
     products:['esencial','urbano','premium'],
+    // Experimental absolute-price response; capped at the existing market.
+    // Reference prices and elasticities are model assumptions, not forecasts.
+    utilityDemand:{esencial:{reference:95,elasticity:1.1},urbano:{reference:150,elasticity:1.2},premium:{reference:250,elasticity:1.3}},
     segments:{esencial:{code:'SEG-01',min:0,defaultPrice:42.5,totalMarket:7000,penetration:.5,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:0,defaultPrice:100,totalMarket:5000,penetration:.7,ideal:100,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:0,defaultPrice:250,totalMarket:2000,penetration:.4,ideal:250,weights:[.1,.5,.4],quality:7}},
     consequences:{lowQualityPrice:.65,premiumPrice:1.4,reputationChange:2,lowEfficiency:4,lowProduction:.7,noLeaderEfficiency:5,noLeaderProduction:.95,lowReputation:3,lowReputationCycles:2,lowDemand:.8,lowHealth:3},
     // SUPUESTO: capacitación baja/alta 0%/12%; media +8% figura en Excel.

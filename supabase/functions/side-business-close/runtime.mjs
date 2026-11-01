@@ -782,6 +782,9 @@ module.exports={runOnce,remoteRpc};
     // Cantidades de compra se expresan en m², unidades y metros.
     materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
     products:['esencial','urbano','premium'],
+    // Experimental absolute-price response; capped at the existing market.
+    // Reference prices and elasticities are model assumptions, not forecasts.
+    utilityDemand:{esencial:{reference:95,elasticity:1.1},urbano:{reference:150,elasticity:1.2},premium:{reference:250,elasticity:1.3}},
     segments:{esencial:{code:'SEG-01',min:0,defaultPrice:42.5,totalMarket:7000,penetration:.5,weights:[.7,.2,.1],quality:0},urbano:{code:'SEG-02',min:0,defaultPrice:100,totalMarket:5000,penetration:.7,ideal:100,weights:[.4,.35,.25],quality:4},premium:{code:'SEG-03',min:0,defaultPrice:250,totalMarket:2000,penetration:.4,ideal:250,weights:[.1,.5,.4],quality:7}},
     consequences:{lowQualityPrice:.65,premiumPrice:1.4,reputationChange:2,lowEfficiency:4,lowProduction:.7,noLeaderEfficiency:5,noLeaderProduction:.95,lowReputation:3,lowReputationCycles:2,lowDemand:.8,lowHealth:3},
     // SUPUESTO: capacitación baja/alta 0%/12%; media +8% figura en Excel.
@@ -1145,7 +1148,7 @@ module.exports={runOnce,remoteRpc};
     // negative campaign shock; PE69 and PE71 increase attention.
     const signs={PE69:1,PE71:1,PE74:1,PE75:-1};
     const attention=(input.events||[]).filter(e=>e.version==='demand-share-v1'&&Object.hasOwn(signs,e.id)&&(e.id!=='PE74'||(Number(state.INV_MARKETING?.round)===Number(round)&&BUS.advertising({state})>0))).reduce((factor,e)=>factor*(1+signs[e.id]*e.intensity/100),1);
-    return {id:input.id,state,round,economicRulesVersion:input.financialPolicy?.economicRulesVersion,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
+    return {id:input.id,state,round,economicRulesVersion:input.financialPolicy?.economicRulesVersion,utilityDemand:input.financialPolicy?.utilityDemand,plan,materialLots:lots,reputation:rep,scores:{...p,reputation:rep.valorMercado},lines,hasChannel,demandFactor,attention,messages,lowReputationCycles,matrixReputation,creditRate,nextLoanRatePP:0};
   }
   // Excel ROUND: each company's share is rounded independently.
   function roundDemand(share,market){return Math.round(Math.max(0,share)*Math.max(0,market));}
@@ -1170,7 +1173,18 @@ module.exports={runOnce,remoteRpc};
       for(const row of rows)row.share=sum?row.total/sum:1/rows.length;
       const rounded=apportion(market,Object.fromEntries(rows.map(row=>[String(row.p.id),row.share])));
       for(const row of rows)row.assigned=rounded[String(row.p.id)];
-      for(const row of rows)if(!row.p.simulated)result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.demandFactor??1)),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      for(const row of rows)if(!row.p.simulated){
+        let absoluteFactor=1;
+        if(row.p.economicRulesVersion==='utility-v1'){
+          const settings={...config.utilityDemand?.[id],...row.p.utilityDemand?.[id]},reference=Number(settings.reference),elasticity=Number(settings.elasticity);
+          if(!(reference>0&&Number.isFinite(reference)&&elasticity>=0&&Number.isFinite(elasticity)))throw new RangeError('Parámetros de demanda inválidos para '+id);
+          const lots=row.line.lots||[],units=lots.reduce((sum,lot)=>sum+n(lot.available),0);
+          const effective=units?lots.reduce((sum,lot)=>sum+n(lot.available)*row.line.price*(id==='premium'&&lot.quality!=null?(lot.quality<4?config.consequences.lowQualityPrice:premiumBonus(lot,row.p.economicRulesVersion)?config.consequences.premiumPrice:1):1),0)/units:row.line.price;
+          absoluteFactor=Math.min(1,Math.pow(Math.max(1,effective/reference),-elasticity));
+        }
+        const adjustment=(row.p.demandFactor??1)*absoluteFactor;
+        result[row.p.id].products[id]={simulatedCompetitors:rows.filter(r=>r.p.simulated).map(r=>({id:r.p.id,precio:r.line.price,reputacion:r.p.scores.reputation,stock:r.line.available,demanda:r.assigned,participacion:r.share,puntaje:r.total})),asignado:row.assigned,demandaAjustada:Math.floor(row.assigned*(row.p.economicRulesVersion==='utility-v1'?Math.min(1,adjustment):adjustment)),...(row.p.economicRulesVersion==='utility-v1'?{factorPrecioAbsoluto:absoluteFactor}:{}),porcentaje:row.share,puntajePrecio:row.score,puntajeTotal:row.total,calidadMercado:repSum?Math.round(row.p.scores.reputation/repSum*100):0,reputacionEscalada:row.p.scores.reputation*10,mercadoReal:market};
+      }
     }return result;
   }
   // Reparto entero determinista; cada punto conserva su identidad.
@@ -2668,7 +2682,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);

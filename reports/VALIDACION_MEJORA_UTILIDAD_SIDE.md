@@ -4,6 +4,12 @@ Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba8
 
 **Estado: avance parcial.** Se implementaron una corrección de puntuación de maquinaria y una adaptación experimental de la bonificación prémium bajo la versión explícita `utility-v1`; no se activan automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
 
+## Avance: elasticidad de precio absoluto
+
+Nueva regla educativa experimental para `utility-v1`: después de repartir competitivamente el mercado, cada asignación se multiplica por `min(1, max(1, precio efectivo / precio de referencia)^(-elasticidad))`. El precio efectivo pondera los lotes disponibles y sus bonificaciones o descuentos. La asignación ajustada no supera la asignada, y las ventas siguen limitadas por canal e inventario. Referencias supuestas: S/ 95 / 150 / 250; elasticidades supuestas: 1,1 / 1,2 / 1,3. Son parámetros de exploración, no precios de venta nuevos ni estimaciones empíricas. Se pueden configurar con `financialPolicy.utilityDemand`; el cálculo rechaza referencias no positivas y elasticidades negativas. La versión anterior conserva sus reglas de demanda.
+
+Pruebas focales: `node --test tests/demanda_absoluta_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/calidad_utilidad_versionada.test.cjs tests/auditoria_mercado_20261023.test.cjs`: 13 aprobadas. Verifican el descenso de demanda al duplicar simultáneamente los precios, reparto relativo, límite de mercado, parámetros inválidos y equivalencia Node/Edge en el caso versionado. Los supuestos no han pasado la matriz de 3.000 ni se han activado en partidas nuevas.
+
 ## Avance: calidad prémium
 
 El contraste directo con el libro prioritario confirma que `Lotes_Produccion!I2` suma los aportes de calidad de cuero, accesorios, hilo y molde mediante `INDEX`/`MATCH`; el catálogo asigna 1 a cada insumo económico y 4 al molde prémium. El total 7 cumple la condición `Matriz_Consecuencias!C3` y produce el +40 % y +2 de reputación de esa matriz. Por tanto, el comportamiento anterior coincide con el Excel; no se clasifica como error de implementación.
