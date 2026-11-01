@@ -27,6 +27,9 @@ test('una decisión financiable no pierde caja dos veces por su costo contable',
 test('recepciones no verificadas no se presentan como proyección',()=>{
  const state=F.state();state.__materialOrders={};assert.equal(P.analyze({state,round:1}).available,false);
 });
+test('no se estima caja cuando falta el catálogo',()=>{
+ assert.equal(P.analyze({state:F.state(),round:1}).available,false);
+});
 test('la vista de estudiante muestra la proyección y advierte sus límites',()=>{
  const fs=require('node:fs'),vm=require('node:vm'),source=fs.readFileSync(require.resolve('../js/app.js'),'utf8');
  const snippet=source.slice(source.indexOf('function showProfitProjection(){'),source.indexOf('\nfunction renderDecisionCategory(){'));

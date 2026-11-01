@@ -19,6 +19,7 @@
  }
  function analyze(input){
   if(input.state?.__materialOrders)return {available:false,reason:'Las recepciones de insumos requieren una proyección autoritativa.'};
+  if(!Array.isArray(input.catalog)||!input.catalog.length)return {available:false,reason:'No se dispone del catálogo necesario para estimar los pagos.'};
   try{
    const base=project(input);if(!base)return {available:false,reason:'El ciclo ya está cerrado.'};
    const mutations=[];
