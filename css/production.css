@@ -770,3 +770,12 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .segment-sales{padding:10px 0;border-bottom:1px solid #cbd5e1}
 .segment-sales span{display:flex;justify-content:space-between;gap:12px}
 @media(max-width:600px){.production-prices{grid-template-columns:1fr}}
+
+/* DOP requirements use the same dark, bordered treatment as the summary. */
+.production-dop:not(.pd-target-first) .pd-requirements-table { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; padding: clamp(14px, 2vw, 20px); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); background: var(--ui-panel); text-align: center; }
+.production-dop:not(.pd-target-first) .pd-requirements-table h4:not(:first-child) { margin-top: 8px; }
+.production-dop:not(.pd-target-first) .pd-requirements-table .pd-table-scroll { min-width: 0; width: 100%; overflow-x: auto; scrollbar-width: thin; }
+.production-dop:not(.pd-target-first) .pd-requirements-table .pd-table-scroll:focus-visible { outline: 2px solid var(--ui-yellow); outline-offset: 2px; }
+.production-dop:not(.pd-target-first) .pd-requirements-table table { width: 100%; min-width: 520px; border-collapse: collapse; color: var(--ui-text); font-size: 12px; }
+.production-dop:not(.pd-target-first) .pd-requirements-table th, .production-dop:not(.pd-target-first) .pd-requirements-table td { padding: 10px 12px; border: 1px solid var(--ui-line); text-align: center; vertical-align: middle; line-height: 1.5; }
+.production-dop:not(.pd-target-first) .pd-requirements-table thead th { background: var(--ui-inset); }
