@@ -99,9 +99,10 @@
     }));
     // The trusted closure supplies this flag: prices are internal model
     // parameters, never a value chosen in the student snapshot.
+    const utilityPrices=Object.fromEntries(config.products.map(id=>[id,input.financialPolicy?.utilityPrices?.[id]??config.utilityPrices?.[id]??config.segments[id].defaultPrice]));
     const authorizedPrices=input.financialPolicy?.authoritativePrices
-      ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
-      : {...storedPrices,...input.prices};
+      ? input.financialPolicy?.economicRulesVersion==='utility-v1'?utilityPrices:Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
+      : input.financialPolicy?.economicRulesVersion==='utility-v1'?{...utilityPrices,...input.prices}:{...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
     const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;

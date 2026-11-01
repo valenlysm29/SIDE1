@@ -782,6 +782,8 @@ module.exports={runOnce,remoteRpc};
     // Cantidades de compra se expresan en m², unidades y metros.
     materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
     products:['esencial','urbano','premium'],
+    // Candidate prices for explicit utility-v1 games; not the legacy defaults.
+    utilityPrices:{esencial:120,urbano:150,premium:280},
     // Experimental absolute-price response; capped at the existing market.
     // Reference prices and elasticities are model assumptions, not forecasts.
     utilityDemand:{esencial:{reference:95,elasticity:1.1},urbano:{reference:150,elasticity:1.2},premium:{reference:250,elasticity:1.3}},
@@ -1080,9 +1082,10 @@ module.exports={runOnce,remoteRpc};
     }));
     // The trusted closure supplies this flag: prices are internal model
     // parameters, never a value chosen in the student snapshot.
+    const utilityPrices=Object.fromEntries(config.products.map(id=>[id,input.financialPolicy?.utilityPrices?.[id]??config.utilityPrices?.[id]??config.segments[id].defaultPrice]));
     const authorizedPrices=input.financialPolicy?.authoritativePrices
-      ? Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
-      : {...storedPrices,...input.prices};
+      ? input.financialPolicy?.economicRulesVersion==='utility-v1'?utilityPrices:Object.fromEntries(config.products.map(id=>[id,config.segments[id].defaultPrice]))
+      : input.financialPolicy?.economicRulesVersion==='utility-v1'?{...utilityPrices,...input.prices}:{...storedPrices,...input.prices};
     const breakdown=(input.events||[]).find(e=>e.id==='PE30'&&e.version==='assembly-breakdown-v1');
     const calc=(drafts={})=>PRO.calculate({state,drafts,catalog:input.catalog||[],round,config:input.financialPolicy,...(breakdown?{assemblyCapacityFactor:1-breakdown.intensity/100}:{})});
     const originalPlan=calc(), rules=config.consequences;
@@ -2682,7 +2685,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(config.utilityPrices?{utilityPrices:{...config.utilityPrices}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);

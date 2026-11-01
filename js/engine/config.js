@@ -19,6 +19,8 @@
     // Cantidades de compra se expresan en m², unidades y metros.
     materials:{quantityDiscountRate:.08,quantityDiscountThreshold:100},
     products:['esencial','urbano','premium'],
+    // Candidate prices for explicit utility-v1 games; not the legacy defaults.
+    utilityPrices:{esencial:120,urbano:150,premium:280},
     // Experimental absolute-price response; capped at the existing market.
     // Reference prices and elasticities are model assumptions, not forecasts.
     utilityDemand:{esencial:{reference:95,elasticity:1.1},urbano:{reference:150,elasticity:1.2},premium:{reference:250,elasticity:1.3}},

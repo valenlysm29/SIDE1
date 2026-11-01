@@ -2,6 +2,18 @@
 
 Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba85af8ba2c86b36a8`. Rama: `prueba_utilidad_mejora`.
 
+## Candidatos internos versionados
+
+La configuración experimental `utility-v1` utiliza por defecto S/ 120 / 150 / 280 para básico, mejorado y prémium. Son candidatos educativos, no precios empíricos ni activados para partidas nuevas. Las partidas sin esa versión conservan S/ 42,50 / 100 / 250. Los candidatos se resuelven internamente, se validan con el mismo verificador de precios, y pueden configurarse mediante `utilityPrices`; no se añadió ningún control al estudiante. El servidor y la Edge empaquetada usan la misma configuración explícita. La prueba `tests/precios_utilidad_versionada.test.cjs` verifica el aislamiento de versiones, los valores configurables y doce empresas por segmento con capital individual S/ 50.000.
+
+| Segmento | Precio efectivo S/ | Producido / vendido | Utilidad S/ | Caja S/ | Movimientos negativos S/ |
+|---|---:|---:|---:|---:|---:|
+| Básico | 120 | 250 / 225 | 9.215,46 | 36.933,63 | 40.066,37 |
+| Mejorado | 150 | 250 / 250 | 17.125,13 | 43.430,88 | 44.069,12 |
+| Prémium | 280 | 50 / 50 | 3.144,91 | 39.364,70 | 24.635,30 |
+
+Se trata de perfiles concretos en memoria, con doce empresas idénticas en cada mercado y sin recepciones parciales. Se comprobaron los movimientos negativos antes de ventas, no un calendario de tesorería completo. La prueba no justifica activar los parámetros hasta validar la regresión pendiente y su despliegue; tampoco demuestra una curva de mercado empírica. Las 20 pruebas focales de precios, calidad, demanda, maquinaria, recuperación, proyección y equivalencia Node/Edge pasaron.
+
 ## Proyección informativa en Estudiante
 
 Producción ofrece un cálculo bajo demanda individual mediante `SIDE_CYCLE_MODEL.project`, a partir de las decisiones actuales, sin guardar ni enviar el resultado. Presenta ingresos, costo de fabricación y unitario, costos y gastos, utilidad, caja, producción, demanda, ventas y precio efectivo. Ensaya hasta veinte metas de un único producto con los recursos y compras actuales; comunica la primera meta muestreada sin pérdida, o que no se encontró. No es un punto de equilibrio matemático exacto ni evalúa metas superiores a la elegida.
@@ -19,6 +31,8 @@ Una comprobación adicional de `tests/profit_projection.test.cjs` aprobó 3 prue
 Se ejecutaron los archivos `tests/*.test.js`, `tests/*.test.mjs` y `tests/*.test.cjs` con concurrencia 2: **947 pruebas, 927 aprobadas y 20 fallidas**; registro local `tests/output/regresion_utility_v1.log`. Incluye pruebas aprobadas de PostgreSQL real aislado y Node/Edge. Los fallos abarcan planificación DOP, comparación con Excel, reputación/mercado, transferencias manuales y pruebas de sincronización. No hay una línea base equivalente de esta ejecución para clasificarlos todos como previos o nuevos.
 
 Las tres fallas de navegador de `decisions_apartados_ui.test.cjs` y `student_sync_ui.test.js` muestran `Unexpected token '<'`; al instrumentar la prueba, Chrome identificó la URL `js/landing-progress.js`, para la cual el interceptor de la prueba devuelve HTML. El archivo no forma parte de la proyección añadida. No se atribuye por ello una causa al resto de fallos. La regresión no está limpia y bloquea la activación automática de `utility-v1`.
+
+Se corrigieron los interceptores de los dos fixtures para servir el JavaScript correcto. Al repetir solo esos archivos pasaron 17 pruebas, incluidos los tres casos antes fallidos. Los otros fallos de la regresión general permanecen sin clasificar mediante una ejecución de base equivalente; no se han cambiado fórmulas para hacerlos pasar. La suite general no se ha repetido después de esta corrección ni de los precios candidatos.
 
 **Estado: avance parcial.** Se implementaron una corrección de puntuación de maquinaria y una adaptación experimental de la bonificación prémium bajo la versión explícita `utility-v1`; no se activan automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
 
@@ -46,7 +60,7 @@ Ejemplos experimentales: básico 250 producidos y vendidos, precio S/ 120, venta
 
 `node --test tests/competencia_utilidad_representativa.test.cjs tests/recuperacion_utilidad_ciclos.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/continuidad_seis_ciclos_activos.test.cjs`: 10 pruebas aprobadas. Los primeros dos archivos usan cierres en memoria `utility-v1`; los otros prueban Node/Edge y persistencia PostgreSQL compatible mediante PGlite, incluyendo recepciones parciales y cuentas por pagar. La regresión también aprobó pruebas existentes de cierres compartidos y concurrentes en PostgreSQL real aislado; no prueban la nueva versión con los escenarios de competencia. No son una prueba integral en el servicio remoto.
 
-Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Los precios explícitos de esta prueba no están configurados como precios autoritativos de una partida real.
+Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Este precio coincide con el candidato `utility-v1`, todavía no activado para nuevas partidas.
 
 | Empresas | Demanda por empresa | Producido / vendido | Ventas S/ | Utilidad S/ | Caja final S/ | Movimientos negativos S/ |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -56,7 +70,7 @@ Doce empresas idénticas compiten por básico, con precio experimental explícit
 
 La prueba verifica también que al aumentar todos los precios baja la demanda conjunta. Es un único perfil con empresas idénticas, no demuestra factibilidad para todas las estrategias ni reproduce recepciones parciales en ese perfil.
 
-En un ejemplo local prémium de seis ciclos, la empresa pierde S/ 6.174,75 en el primero, acumula inventario terminado por S/ 33.991,07 y después vende ese inventario junto con la producción del segundo ciclo. Resultados posteriores: S/ 2.930,31; 5.736,38; 5.736,38; 5.736,38 y 3.766,27. La suma es positiva en el tercer ciclo; el impuesto del sexto es S/ 1.970,11 y la caja final S/ 170.165,99. Otro caso tiene resultados positivos en todos los ciclos y el tercero, sin canal, pierde en cada ciclo. En este último la caja cae por debajo de cero en el quinto: los cierres posteriores ilustran el comportamiento contable del motor, no una trayectoria financiable. La prueba de duración tres aplica impuesto en su último ciclo y recupera el acumulado. En estos ejemplos la deuda financiera es cero; la continuidad de cuentas por pagar con recepciones parciales se comprueba por separado en el test PGlite indicado.
+En un ejemplo local prémium de seis ciclos con los candidatos actuales, la empresa pierde S/ 6.174,75 en el primero, acumula inventario terminado por S/ 33.991,07 y después vende ese inventario junto con la producción del segundo ciclo. Resultados posteriores: S/ 10.414,71; 9.478,58; 9.478,58; 9.478,58 y 5.263,15. La suma es positiva en el segundo ciclo; el impuesto del sexto es S/ 4.215,43 y la caja final S/ 188.672,87. Otro caso tiene resultados positivos en todos los ciclos y el tercero, sin canal, pierde en cada ciclo. En este último la caja cae por debajo de cero en el quinto: los cierres posteriores ilustran el comportamiento contable del motor, no una trayectoria financiable. La prueba de duración tres aplica impuesto en su último ciclo y recupera el acumulado. En estos ejemplos la deuda financiera es cero; la continuidad de cuentas por pagar con recepciones parciales se comprueba por separado en el test PGlite indicado.
 
 ## Avance: calidad prémium
 
@@ -88,13 +102,13 @@ Cada caso usa `economic_v19_fixture.cjs`, capital inicial S/ 200.000, una empres
 | Prémium, 1 equipo y trabajador por etapa | 90 / 90 | 350,00 | 31.500,00 | 18.127,74 | 6.899,75 | 6.472,51 | 109.537,85 | 78.163,20 / 0 |
 | Prémium, 4 equipos y trabajadores por etapa | 90 / 90 | 350,00 | 31.500,00 | 33.523,07 | 6.989,75 | -9.012,82 | 71.550,65 | 78.163,20 / 0 |
 
-En estos casos el precio prémium de S/ 250 recibe CONS-02. Los valores no deben interpretarse como predicción de demanda ni como recomendaciones de precios. No hay tabla posterior a la corrección porque no se ha incorporado ninguna.
+En estos casos anteriores el precio prémium de S/ 250 recibe CONS-02. Los valores no deben interpretarse como predicción de demanda ni como recomendaciones de precios; la tabla de candidatos al principio presenta otros perfiles, no una comparación aislada del mismo escenario.
 
 ## Excel, fórmulas y parámetros
 
 Se localizó `.codex-work/fuente_logia/SIDE_prueba_cantidad_produccion (2).xlsx`; SHA-256 `a07710cd97447d0a5f1b79f2e7e200b01565abbf4a8ee3ff02055fa2768189b3`. El Python inicial carecía de `openpyxl`; se utilizó después el runtime incluido para comprobar directamente las celdas de calidad indicadas arriba. No se afirma un contraste independiente integral. El informe preexistente `reports/AUDITORIA_RENTABILIDAD_SIDE.md` recoge referencias y análisis anteriores, que deben volver a comprobarse contra el libro.
 
-La configuración actual `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. La selección de maquinaria y los requisitos de bonificación cambiaron solo para `utility-v1`; la demanda no ha cambiado. No se han evaluado suficientemente los escenarios de precios A y B ni el efecto de una elasticidad absoluta.
+La configuración anterior `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. La selección de maquinaria, los requisitos de bonificación, los precios candidatos y la elasticidad cambiaron solo para `utility-v1`. Las pruebas disponibles aún no acreditan la calibración para todo el universo de partidas.
 
 ## Verificación realizada
 
