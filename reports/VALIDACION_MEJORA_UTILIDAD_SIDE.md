@@ -8,7 +8,21 @@ Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba8
 
 Nueva regla educativa experimental para `utility-v1`: después de repartir competitivamente el mercado, cada asignación se multiplica por `min(1, max(1, precio efectivo / precio de referencia)^(-elasticidad))`. El precio efectivo pondera los lotes disponibles y sus bonificaciones o descuentos. La asignación ajustada no supera la asignada, y las ventas siguen limitadas por canal e inventario. Referencias supuestas: S/ 95 / 150 / 250; elasticidades supuestas: 1,1 / 1,2 / 1,3. Son parámetros de exploración, no precios de venta nuevos ni estimaciones empíricas. Se pueden configurar con `financialPolicy.utilityDemand`; el cálculo rechaza referencias no positivas y elasticidades negativas. La versión anterior conserva sus reglas de demanda.
 
-Pruebas focales: `node --test tests/demanda_absoluta_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/calidad_utilidad_versionada.test.cjs tests/auditoria_mercado_20261023.test.cjs`: 13 aprobadas. Verifican el descenso de demanda al duplicar simultáneamente los precios, reparto relativo, límite de mercado, parámetros inválidos y equivalencia Node/Edge en el caso versionado. Los supuestos no han pasado la matriz de 3.000 ni se han activado en partidas nuevas.
+Pruebas focales: `node --test tests/demanda_absoluta_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/calidad_utilidad_versionada.test.cjs tests/auditoria_mercado_20261023.test.cjs`: 13 aprobadas. Verifican el descenso de demanda al duplicar simultáneamente los precios, reparto relativo, límite de mercado, parámetros inválidos y equivalencia Node/Edge en el caso versionado. Los supuestos se exploraron en la matriz limitada siguiente y no se han activado en partidas nuevas.
+
+## Exploración de 3.000 combinaciones en memoria
+
+`node tests/matriz_utilidad_experimental.cjs 3000` ejecutó 3.000 combinaciones distintas, cada una con cierre anterior y experimental: 6.000 cierres individuales, sin excepciones. Cada segmento tiene 1.000 casos. Varían metas, materiales, niveles de personal, tipos y cantidades de equipos, jefatura, canal, capital inicial y precios de ensayo. Los parámetros se generan de forma determinista; el detalle se guarda localmente en `tests/output/matriz_utilidad_experimental.json`.
+
+| Segmento | Casos | Con utilidad anterior | Con utilidad experimental | Caja final negativa anterior / experimental |
+|---|---:|---:|---:|---:|
+| Básico | 1.000 | 137 (13,7 %) | 137 (13,7 %) | 242 / 242 |
+| Mejorado | 1.000 | 404 (40,4 %) | 404 (40,4 %) | 167 / 167 |
+| Prémium | 1.000 | 917 (91,7 %) | 825 (82,5 %) | 24 / 99 |
+
+Ejemplos experimentales: básico 250 producidos y vendidos, precio S/ 120, ventas S/ 30.000, costo de ventas S/ 15.897,72, gastos S/ 3.593,15, utilidad S/ 10.509,13 y caja S/ 34.537,05; mejorado 100 vendidos a S/ 150, utilidad S/ 3.719,91 y caja S/ 38.248,45; prémium 50 vendidos a S/ 250, utilidad S/ 1.629,91 y caja S/ 36.658,45. Los tres parten de S/ 50.000. Un básico de 50 a S/ 42,50 pierde S/ 7.497,34. Son resultados del cierre individual, no estrategias certificadas: una caja final positiva no acredita que cada compra inicial sea financiable.
+
+**Límites:** esta matriz usa una sola empresa, sin competidores explícitos, ni recepciones parciales, ni controles de admisión financiera, ni trayectorias de varios ciclos. Los precios de ensayo son entradas explícitas del motor local, no los precios autoritativos activos en nuevas partidas. No varía analista, marketing ni capacitación. La comparación refleja conjuntamente maquinaria, calidad y elasticidad; no atribuye las diferencias a una sola corrección. La cobertura obligatoria de 3.000 escenarios competitivos y financieramente factibles todavía no está completada y estos porcentajes no son predicciones de partidas reales.
 
 ## Avance: calidad prémium
 
