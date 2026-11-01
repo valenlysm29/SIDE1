@@ -54,3 +54,8 @@
 #landing .landing-progress span{color:#f8feff;text-shadow:0 1px 3px #081a34}
 #landing .landing-progress.is-complete span{color:#081a34;text-shadow:none}
 @media(prefers-reduced-motion:reduce){#landing .landing-progress-fill{transition:none}}
+
+/* Los perfiles usan las mismas marcas institucionales que la portada. */
+#profiles .profile-faculty-logo{position:absolute;z-index:3;top:24px;left:24px;width:clamp(120px,12vw,165px);height:auto;object-fit:contain;filter:invert(1) hue-rotate(180deg)}
+#profiles .profile-side-logo{width:min(250px,60vw);height:auto;aspect-ratio:auto;object-fit:contain;filter:none}
+@media(max-width:650px){#profiles .profile-faculty-logo{top:24px;left:24px;width:115px}}
