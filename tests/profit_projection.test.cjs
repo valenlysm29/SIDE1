@@ -18,6 +18,12 @@ test('ninguna alternativa sin caja suficiente se muestra como financiable',()=>{
  const result=P.analyze({state:F.state(1,{},2),catalog:F.catalog,round:1,capital:0,financialPolicy:{cycles:6}});
  assert.equal(result.available,true);assert.ok(result.base.availableBeforeSales<0);assert.deepEqual(result.alternatives,[]);
 });
+test('una decisión financiable no pierde caja dos veces por su costo contable',()=>{
+ const state=F.state(1,{},2);state.CANALES.optionIds=['sjl'];
+ const result=P.analyze({state,catalog:F.catalog,round:1,capital:280000,financialPolicy:{cycles:6,authoritativePrices:true}});
+ assert.equal(result.base.availableBeforeSales,5851.44);assert.equal(result.base.cash,30265.61);
+ assert.ok(result.alternatives.length>0);
+});
 test('recepciones no verificadas no se presentan como proyección',()=>{
  const state=F.state();state.__materialOrders={};assert.equal(P.analyze({state,round:1}).available,false);
 });
