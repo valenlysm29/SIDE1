@@ -3,10 +3,17 @@
  'use strict';
  const clone=x=>JSON.parse(JSON.stringify(x));
  function project(input){
-  const value=CYCLE.project({...input,state:clone(input.state),ledger:clone(input.ledger||{}),sectionsByRound:clone(input.sectionsByRound||{})});
-  if(!value)return null;
+  if(input.state?.__cycleSettlements?.[input.round])return null;
+  const value=CYCLE.close({...input,state:clone(input.state),ledger:clone(input.ledger||{}),sectionsByRound:clone(input.sectionsByRound||{})});
   const receipt=value.receipt,statement=value.financial.estadoResultados,balance=value.financial.balanceGeneral;
-  return {produced:receipt.produced,sold:receipt.sold,demand:receipt.sales.reduce((s,r)=>s+Number(r.demand||0),0),income:statement.ventasTotales,cost:statement.costos,productionCost:statement.costosProduccion,unitCost:receipt.produced?statement.costosProduccion/receipt.produced:null,profit:statement.utilidadNeta,cash:balance.efectivo,sales:receipt.sales.filter(r=>r.available||r.produced).map(r=>({id:r.id,price:r.price,sold:r.sold,demand:r.demand})),plan:receipt.production};
+  // Conservative cash test: pay every recorded current-cycle outflow before
+  // any sales, collections, new credit or other positive movement is received.
+  const opening=Number(value.financial.flujoCaja?.cajaInicial),outflow=Object.entries(value.ledger||{}).filter(([key])=>key.startsWith(`${input.round}:`)).reduce((sum,[,amount])=>sum+Math.max(0,-Number(amount||0)),0);
+  // Reserve the full projected cost as well: this may double-count payments,
+  // but avoids calling an option affordable when an expense is only accrued.
+  const reserve=Math.max(0,Number(statement.costos)||0);
+  const availableBeforeSales=Number.isFinite(opening)?Math.round((opening-outflow-reserve)*100)/100:null;
+  return {produced:receipt.produced,sold:receipt.sold,demand:receipt.sales.reduce((s,r)=>s+Number(r.demand||0),0),income:statement.ventasTotales,cost:statement.costos,productionCost:statement.costosProduccion,unitCost:receipt.produced?statement.costosProduccion/receipt.produced:null,profit:statement.utilidadNeta,cash:balance.efectivo,availableBeforeSales,sales:receipt.sales.filter(r=>r.available||r.produced).map(r=>({id:r.id,price:r.price,sold:r.sold,demand:r.demand})),plan:receipt.production};
  }
  function analyze(input){
   if(input.state?.__materialOrders)return {available:false,reason:'Las recepciones de insumos requieren una proyección autoritativa.'};
@@ -29,7 +36,7 @@
      else entry.quantities[m.option]-=m.decrease;
      const category=input.catalog.find(c=>c.items?.some(item=>item.id===m.id))?.cat;if(!category)continue;
      const ledger=clone(input.ledger||{}),sections=clone(input.sectionsByRound||{});delete ledger[`${input.round}:${category}`];if(sections[input.round])delete sections[input.round][category];
-     const result=project({...input,state,ledger,sectionsByRound:sections});if(result)alternatives.push({label:m.label,profit:result.profit,cash:result.cash,sold:result.sold,produced:result.produced,difference:Math.round((result.profit-base.profit)*100)/100});
+     const result=project({...input,state,ledger,sectionsByRound:sections});if(result&&result.availableBeforeSales!==null&&result.availableBeforeSales>=0)alternatives.push({label:m.label,profit:result.profit,cash:result.cash,availableBeforeSales:result.availableBeforeSales,sold:result.sold,produced:result.produced,difference:Math.round((result.profit-base.profit)*100)/100});
     }catch{}
    }
    // Sample the current single-product plan with unchanged purchases and
@@ -37,7 +44,7 @@
    let breakEven=null;const targets=input.state.PRODUCCION_META?.moldTargets||{},active=Object.entries(targets).filter(([,q])=>Number(q)>0);
    if(active.length===1){const [mold,raw]=active[0],max=Math.floor(Number(raw));
     for(let i=1;i<=20&&max>0;i++){const target=Math.max(1,Math.ceil(max*i/20)),state=clone(input.state);state.PRODUCCION_META.moldTargets={[mold]:target};state.PRODUCCION_META.value=target;
-     const sample=project({...input,state});if(sample&&sample.profit>=0){breakEven={target,produced:sample.produced,sold:sample.sold};break;}
+     const sample=project({...input,state});if(sample&&sample.profit>=0&&sample.availableBeforeSales!==null&&sample.availableBeforeSales>=0){breakEven={target,produced:sample.produced,sold:sample.sold};break;}
     }
    }
    return {available:true,base,alternatives,breakEven};
