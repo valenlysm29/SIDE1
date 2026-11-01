@@ -46,7 +46,7 @@ test('student synchronization and session recovery through the delivered UI',asy
     await p.addInitScript(seed=>{for(const [key,value] of Object.entries(seed))if(sessionStorage.getItem(key)===null)sessionStorage.setItem(key,value);},seed);
     const html=baseHTML.replace('const cfg = window.SIDE_CONFIG || {};',mock+'\nconst cfg = window.SIDE_CONFIG || {};');
     await p.route('**/*',route=>route.abort());
-    await p.route('http://side-sync.test/**',route=>route.fulfill({contentType:'text/html',body:html}));
+    await p.route('http://side-sync.test/**',route=>route.request().url().includes('/js/landing-progress.js')?route.fulfill({contentType:'application/javascript',body:fs.readFileSync(path.join(root,'js/landing-progress.js'),'utf8')}):route.fulfill({contentType:'text/html',body:html}));
     await p.goto('http://side-sync.test/');return p;
   }
   const session=JSON.stringify({game:{id:'test-game',codigo:'SIDE-418'},company:'Marca A',legalName:'Legal A',empresaId:1,snapshotRevision:0});

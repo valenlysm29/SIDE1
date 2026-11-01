@@ -14,7 +14,7 @@ for(const version of ['excel-16','side-lotes-2026-10-20'])test('Student edits ev
  page.on('pageerror',error=>errors.push(error.message));
  const html=base.replace('const cfg = window.SIDE_CONFIG || {};',mock.replace('capital:100000,round:1,cycles:6',`capital:100000,round:1,cycles:6,motor_version:'${version}'`)+`\nSIDE.PartidaService.excelDisponible=()=>new Promise(resolve=>window.resolveCapability=resolve);\nconst cfg = window.SIDE_CONFIG || {};`);
  await page.route('**/*',route=>route.abort());
- await page.route('http://side-tabs.test/**',route=>route.fulfill({contentType:'text/html',body:html}));
+ await page.route('http://side-tabs.test/**',route=>route.request().url().includes('/js/landing-progress.js')?route.fulfill({contentType:'application/javascript',body:fs.readFileSync(path.join(root,'js/landing-progress.js'),'utf8')}):route.fulfill({contentType:'text/html',body:html}));
  await page.goto('http://side-tabs.test/');
  await page.waitForLoadState('networkidle');
  await page.evaluate(async()=>{
