@@ -2,7 +2,15 @@
 
 Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba85af8ba2c86b36a8`. Rama: `prueba_utilidad_mejora`.
 
-**Estado: avance parcial.** Se implementó una corrección de puntuación de maquinaria bajo la versión explícita experimental `utility-v1`; no se activa automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
+**Estado: avance parcial.** Se implementaron una corrección de puntuación de maquinaria y una adaptación experimental de la bonificación prémium bajo la versión explícita `utility-v1`; no se activan automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
+
+## Avance: calidad prémium
+
+El contraste directo con el libro prioritario confirma que `Lotes_Produccion!I2` suma los aportes de calidad de cuero, accesorios, hilo y molde mediante `INDEX`/`MATCH`; el catálogo asigna 1 a cada insumo económico y 4 al molde prémium. El total 7 cumple la condición `Matriz_Consecuencias!C3` y produce el +40 % y +2 de reputación de esa matriz. Por tanto, el comportamiento anterior coincide con el Excel; no se clasifica como error de implementación.
+
+Clasificación 4: **nueva regla educativa experimental**, no calibrada como afirmación de mercado. En `utility-v1`, CONS-02 exige además que las tres familias del lote sean íntegramente de sus respectivos insumos prémium y tengan composición trazable. Se conserva la fórmula de puntuación y el descuento de CONS-01. Las partidas sin versión mantienen el Excel. Un lote anterior sin composición no recibe la nueva bonificación, sin inventar insumos. El precio y el cambio de reputación usan la misma condición por lote. Esto evita la prima automática para insumos económicos, pero su exigencia estricta debe evaluarse con la matriz económica antes de activarla; no es una conclusión empírica sobre calidad.
+
+`node --test tests/calidad_utilidad_versionada.test.cjs tests/puntaje_maquinaria_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/consecuencias_cierre_real.test.cjs tests/lotes_fifo_integrado.test.cjs tests/excel_calidad_comercial.test.cjs`: 25 pruebas aprobadas. Para el mismo lote prémium económico, la calidad sigue siendo 7 y el precio pasa de S/ 350 a S/ 250 en la versión experimental; con las tres familias prémium permanece en S/ 350. El caso histórico sin composición tampoco recibe el bono. No son resultados de una simulación masiva ni prueba de rentabilidad.
 
 ## Avance: puntuación de maquinaria versionada
 
@@ -30,9 +38,9 @@ En estos casos el precio prémium de S/ 250 recibe CONS-02. Los valores no deben
 
 ## Excel, fórmulas y parámetros
 
-Se localizó `.codex-work/fuente_logia/SIDE_prueba_cantidad_produccion (2).xlsx`; SHA-256 `a07710cd97447d0a5f1b79f2e7e200b01565abbf4a8ee3ff02055fa2768189b3`. Esta sesión confirmó el archivo y su huella; la lectura directa con el Python disponible falló por falta de `openpyxl`, por lo que no se afirma un contraste independiente integral. El informe preexistente `reports/AUDITORIA_RENTABILIDAD_SIDE.md` recoge referencias y análisis anteriores, que deben volver a comprobarse contra el libro.
+Se localizó `.codex-work/fuente_logia/SIDE_prueba_cantidad_produccion (2).xlsx`; SHA-256 `a07710cd97447d0a5f1b79f2e7e200b01565abbf4a8ee3ff02055fa2768189b3`. El Python inicial carecía de `openpyxl`; se utilizó después el runtime incluido para comprobar directamente las celdas de calidad indicadas arriba. No se afirma un contraste independiente integral. El informe preexistente `reports/AUDITORIA_RENTABILIDAD_SIDE.md` recoge referencias y análisis anteriores, que deben volver a comprobarse contra el libro.
 
-La configuración actual `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. Los parámetros económicos no han cambiado. La selección de maquinaria cambió solo para `utility-v1`; calidad y demanda requieren contraste antes de clasificarse. No se han evaluado suficientemente los escenarios de precios A y B ni el efecto de una elasticidad absoluta.
+La configuración actual `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. La selección de maquinaria y los requisitos de bonificación cambiaron solo para `utility-v1`; la demanda no ha cambiado. No se han evaluado suficientemente los escenarios de precios A y B ni el efecto de una elasticidad absoluta.
 
 ## Verificación realizada
 
