@@ -961,7 +961,7 @@ async function supabaseReports(reportsBase=state.reports){
         const result=window.SIDE_LIVE_RESULTS.calculate({snapshot:scopedContext.snapshot,round:cicloActual,capital:Number(emp.caja_inicial)||0,
           catalog:window.SIDE_DECISION_CATALOG,config:scopedContext.configuracion,id:p.empresa_id,
           phase:scopedContext.estado==='activa'?scopedContext.phase:'integration'});
-        if(result&&!result.provisional&&!report.cycleReceipt){
+        if(result?.provisional&&scopedContext.snapshot?.decisions_submitted===true&&!report.cycleReceipt){
           window.SIDE_LIVE_RESULTS.apply(report,result);
           report.updatedAt=scopedContext.updated_at||report.updatedAt;
         }
@@ -1133,7 +1133,7 @@ function renderCompanies(force=false){
     setText('company',r.empresa);
     setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
     setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
-    const remotePending=state.partidaId&&(!r.cycleReceipt||r.provisional);
+    const remotePending=state.partidaId&&!r.cycleReceipt&&!r.provisional;
     setText('cash',remotePending?'Pendiente':money(r.caja??r.capital));setText('profit',remotePending?'Pendiente':money(r.utilidad));
     setText('income',!remotePending&&(r.cycleReceipt||r.provisional)?money(r.ingresos):'Pendiente');setText('sold',remotePending?'Pendiente':String(r.unidadesVendidas??r.cycleReceipt?.sold??'Pendiente'));
     setText('resultScope',r.provisional?'Estimación individual · ciclo en juego':r.cycleReceipt?'Resultado definitivo del ciclo':'Esperando plan confirmado o cierre del ciclo');

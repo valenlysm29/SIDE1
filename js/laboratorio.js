@@ -77,10 +77,17 @@ async function refresh(reloadGames=false){
   if(reloadGames){const next=await svc.games();if(token!==seq)return;games=next;options($('lab-game'),games,g=>g.id,g=>gameLabel(g,true),g=>gameLabel(g));gameTitle();}
   const game=$('lab-game').value;if(!game){companies=[];closure=null;closedByCycle=null;options($('lab-company'),[],()=>'',()=> '');$('lab-status').textContent='No tienes partidas disponibles.';render();return;}
   if(reloadGames||!companies.length||closedGame!==game){const next=await svc.companies(game);if(token!==seq)return;companies=next;options($('lab-company'),companies,c=>c.empresa_id,name);}
-  if(reloadGames||!closedByCycle||closedGame!==game){const rows=await Promise.all([1,2,3,4,5,6].map(async cycle=>({cycle,source:await svc.closure(game,cycle)})));if(token!==seq)return;closedByCycle=rows;closedGame=game;const valid=rows.filter(r=>r.source);options($('lab-cycle'),valid,r=>r.cycle,r=>'Ciclo '+r.cycle+' · cerrado');}
+  if(reloadGames||!closedByCycle||closedGame!==game){
+   const config=games.find(g=>String(g.id)===String(game))?.configuracion,configured=Number(config?.cycles);
+   const count=Number.isInteger(configured)&&configured>0?Math.min(configured,6):6;
+   const previous=closedGame===game?closedByCycle||[]:[];
+   const rows=await Promise.all(Array.from({length:count},(_,i)=>i+1).map(async cycle=>{try{return {cycle,source:await svc.closure(game,cycle),error:false};}catch(e){return {cycle,source:previous.find(r=>r.cycle===cycle)?.source||null,error:true};}}));
+   if(token!==seq)return;closedByCycle=rows;closedGame=game;
+   options($('lab-cycle'),rows,r=>r.cycle,r=>'Ciclo '+r.cycle+(r.source?(r.error?' · cerrado (sincronización pendiente)':' · cerrado'):(r.error?' · error de consulta':' · sin cierre oficial')));
+  }
   if(!$('lab-cycle').value){closure=null;trend=null;signature='';$('lab-status').textContent='Esta partida todavía no tiene resultados para analizar.';render();return;}
-  const result=closedByCycle.find(r=>String(r.cycle)===$('lab-cycle').value)?.source||null;
-  const nextSignature=JSON.stringify([game,$('lab-cycle').value,result,companies,closedByCycle.filter(r=>r.cycle<=Number($('lab-cycle').value))]);closure=result;$('lab-status').textContent=result?(demo?'DEMOSTRACIÓN LOCAL · Datos ficticios; no son resultados oficiales.':'REAL · Cierre oficial del ciclo seleccionado.'):'NO DISPONIBLE · Este ciclo todavía no tiene cierre oficial.';
+  const selectedCycle=closedByCycle.find(r=>String(r.cycle)===$('lab-cycle').value),result=selectedCycle?.source||null;
+  const nextSignature=JSON.stringify([game,$('lab-cycle').value,result,companies,closedByCycle.filter(r=>r.cycle<=Number($('lab-cycle').value))]);closure=result;$('lab-status').textContent=result?(demo?'DEMOSTRACIÓN LOCAL · Datos ficticios; no son resultados oficiales.':'REAL · Cierre oficial del ciclo seleccionado.'):selectedCycle?.error?'ERROR · No se pudo consultar este ciclo. Reintenta la conexión.':'NO DISPONIBLE · Este ciclo todavía no tiene cierre oficial.';
   if(nextSignature!==signature){signature=nextSignature;trend=result?historyRows():null;++trendSeq;render();}else if(result&&trendState==='error'){trend=null;render();loadTrend();}
  }catch(e){if(token!==seq)return;if(gameBefore!==$('lab-game').value||cycleBefore!==$('lab-cycle').value){closure=null;render();}$('lab-status').textContent=/autoriz|sesión|denegad/i.test(e.message||'')?'ACCESO NO AUTORIZADO · Inicia sesión como docente o revisa el acceso a la partida.':'NO DISPONIBLE · No se pudieron cargar los resultados. Reintentar conexión.';}
 }
