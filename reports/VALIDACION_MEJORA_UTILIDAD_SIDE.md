@@ -32,6 +32,22 @@ Ejemplos experimentales: básico 250 producidos y vendidos, precio S/ 120, venta
 
 **Límites:** esta matriz usa una sola empresa, sin competidores explícitos, ni recepciones parciales, ni controles de admisión financiera, ni trayectorias de varios ciclos. Los precios de ensayo son entradas explícitas del motor local, no los precios autoritativos activos en nuevas partidas. No varía analista, marketing ni capacitación. La comparación refleja conjuntamente maquinaria, calidad y elasticidad; no atribuye las diferencias a una sola corrección. La cobertura obligatoria de 3.000 escenarios competitivos y financieramente factibles todavía no está completada y estos porcentajes no son predicciones de partidas reales.
 
+## Casos representativos competitivos y continuidad
+
+`node --test tests/competencia_utilidad_representativa.test.cjs tests/recuperacion_utilidad_ciclos.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/continuidad_seis_ciclos_activos.test.cjs`: 10 pruebas aprobadas. Los primeros dos archivos usan cierres en memoria `utility-v1`; los otros prueban Node/Edge y persistencia PostgreSQL compatible mediante PGlite, incluyendo recepciones parciales y cuentas por pagar. No son una prueba integral en el servicio remoto.
+
+Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Los precios explícitos de esta prueba no están configurados como precios autoritativos de una partida real.
+
+| Empresas | Demanda por empresa | Producido / vendido | Ventas S/ | Utilidad S/ | Caja final S/ | Movimientos negativos S/ |
+|---:|---:|---:|---:|---:|---:|---:|
+| 3 | 902 | 250 / 250 | 30.000 | 10.603,13 | 39.303,63 | 40.696,37 |
+| 6 | 451 | 250 / 250 | 30.000 | 10.603,13 | 39.303,63 | 40.696,37 |
+| 12 | 225 | 250 / 225 | 27.000 | 9.215,46 | 36.933,63 | 40.066,37 |
+
+La prueba verifica también que al aumentar todos los precios baja la demanda conjunta. Es un único perfil con empresas idénticas, no demuestra factibilidad para todas las estrategias ni reproduce recepciones parciales en ese perfil.
+
+En un ejemplo local prémium de seis ciclos, la empresa pierde S/ 6.174,75 en el primero, acumula inventario terminado por S/ 33.991,07 y después vende ese inventario junto con la producción del segundo ciclo. Resultados posteriores: S/ 2.930,31; 5.736,38; 5.736,38; 5.736,38 y 3.766,27. La suma es positiva en el tercer ciclo; el impuesto del sexto es S/ 1.970,11 y la caja final S/ 170.165,99. Otro caso tiene resultados positivos en todos los ciclos y el tercero, sin canal, pierde en cada ciclo. En este último la caja cae por debajo de cero en el quinto: los cierres posteriores ilustran el comportamiento contable del motor, no una trayectoria financiable. La prueba de duración tres aplica impuesto en su último ciclo y recupera el acumulado. En estos ejemplos la deuda financiera es cero; la continuidad de cuentas por pagar con recepciones parciales se comprueba por separado en el test PGlite indicado.
+
 ## Avance: calidad prémium
 
 El contraste directo con el libro prioritario confirma que `Lotes_Produccion!I2` suma los aportes de calidad de cuero, accesorios, hilo y molde mediante `INDEX`/`MATCH`; el catálogo asigna 1 a cada insumo económico y 4 al molde prémium. El total 7 cumple la condición `Matriz_Consecuencias!C3` y produce el +40 % y +2 de reputación de esa matriz. Por tanto, el comportamiento anterior coincide con el Excel; no se clasifica como error de implementación.
