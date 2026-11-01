@@ -8,22 +8,28 @@
   const mapping={MESA_CORTE:{mesa:'INF-01'},ENSAMBLE:{ens_basica:'INF-02',ens_semi:'INF-03',ens_ind:'INF-04'},ACABADOS:{aca_basica:'INF-05',aca_semi:'INF-06',aca_ind:'INF-07'},MOLDE:{molde_1:'INF-08',molde_2:'INF-09',molde_3:'INF-10'},PERS_CORTE:{corte_basico:'RH-01',corte_exp:'RH-02',corte_maestro:'RH-03'},PERS_ENSAMBLE:{ens_personal_basico:'RH-04',ens_personal_ind:'RH-05',ens_personal_esp:'RH-06'},PERS_ACABADO:{aca_personal_basico:'RH-07',aca_personal_tec:'RH-08',aca_personal_art:'RH-09'},JEFATURA:{si_jefatura:'RH-10A',no_jefatura:'RH-10B'},INV_RRHH:{cap_baja:'INV-01A',cap_media:'INV-01B',cap_alta:'INV-01C'},INV_MARKETING:{mkt_baja:'INV-02A',mkt_media:'INV-02B',mkt_alta:'INV-02C'},GARANTIA_PT:{pt_30:'COM-06B',pt_90:'COM-06C'},MANTENIMIENTO:{correctivo:'INF-11B'}};
   const materialCodes={CUERO:{cuero_sint:'INS-01',cuero_std:'INS-02',cuero_prem:'INS-03'},ACCESORIOS:{acc_eco:'INS-04',acc_prem:'INS-05'},HILO:{hilo_std:'INS-06',hilo_ref:'INS-07',hilo_prem:'INS-08'}};
   const chosen=(s,key)=>s[key]?.optionIds?.[0];
-  function codes(state){
+  function codes(state,options={}){
     const result=[];
     for(const [key,map] of Object.entries(mapping)){
       if(key==='MESA_CORTE')continue; // Not part of Motor_Puntajes selection blocks.
-      const entry=state[key]||{},selected=Object.keys(map).filter(id=>n(entry.quantities?.[id])>0||(entry.optionIds||[]).includes(id));
+      const entry=state[key]||{};
+      let selected;
+      if(options.economicRulesVersion==='utility-v1'&&['ENSAMBLE','ACABADOS'].includes(key)){
+        const history=BUS.assetPurchaseHistory(entry,{options:Object.keys(map).map(id=>({id}))});
+        const round=Number(options.round)||1;
+        selected=Object.keys(map).filter(id=>Math.floor(Object.entries(history).filter(([r])=>Number.isInteger(Number(r))&&Number(r)>=1&&Number(r)<=round).reduce((sum,[,row])=>sum+(Number.isFinite(Number(row?.[id]))?Number(row[id]):0),0))>0);
+      }else selected=Object.keys(map).filter(id=>n(entry.quantities?.[id])>0||(entry.optionIds||[]).includes(id));
       // SUPUESTO: dotación mixta aporta el mayor nivel presente una vez por grupo.
       if(selected.length)result.push(selected.map(id=>map[id]).sort((a,b)=>n(index[b]?.eficiencia)-n(index[a]?.eficiencia))[0]);
     }
     const channels=state.CANALES?.optionIds||[],web=channels.includes('web'),physical=channels.some(id=>['los_olivos','miraflores','sjl'].includes(id));
     if(web||physical)result.push(web&&physical?'COM-01C':web?'COM-01B':'COM-01A');
     result.push(n(state.PRESTAMO?.value||state.PRESTAMO?.amount)>0?'FIN-01A':'FIN-01B');
-    for(const code of state.__catalogSelection||[])if(index[code]&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
+    for(const code of state.__catalogSelection||[])if(index[code]&&!(options.economicRulesVersion==='utility-v1'&&['Maquina de ensamblado','Maquina de acabados'].includes(index[code].grupo))&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
     return [...new Set(result)];
   }
   const scoreGroups=new Set(['Maquina de ensamblado','Maquina de acabados','Molde','Personal de corte','Personal de ensamble','Personal de acabados','Jefatura','Canal de venta','Acceso a prestamo bancario','Numero de proveedores','Politica de pago a proveedores','Lead time','Inversion en RR.HH.','Inversion en marketing']);
-  function scores(state){const selected=codes(state),scored=selected.filter(id=>scoreGroups.has(index[id]?.grupo));return {selected,efficiency:scored.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0),reputation:scored.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0),health:scored.reduce((s,id)=>s+Number(index[id]?.financiero||0),0)};}
+  function scores(state,options={}){const selected=codes(state,options),scored=selected.filter(id=>scoreGroups.has(index[id]?.grupo));return {selected,efficiency:scored.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0),reputation:scored.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0),health:scored.reduce((s,id)=>s+Number(index[id]?.financiero||0),0)};}
   function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(raw===''||!Number.isFinite(value)||value<segment.min||value>(segment.max??Infinity))throw new RangeError(`Precio ${id}: introduce un importe válido igual o mayor que ${segment.min}.`);return [id,value];}));}
   function materialUse(state,plan,round){
     const use={},ratios={};
@@ -71,7 +77,7 @@
     return clamp((rep.factorMP+rep.factorProduccion)/2);
   }
   function prepare(input,config=DEFAULT){
-    const state=input.state||{},round=input.round||1,p=scores(state),messages=[];
+    const state=input.state||{},round=input.round||1,p=scores(state,{round,economicRulesVersion:input.financialPolicy?.economicRulesVersion}),messages=[];
     // Prices are resolved internally. Legacy hidden values must not prevent a
     // saved plan (or another company in the shared close) from generating sales.
     // Explicit caller overrides still pass through the strict price validator.

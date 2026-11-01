@@ -2,7 +2,13 @@
 
 Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba85af8ba2c86b36a8`. Rama: `prueba_utilidad_mejora`.
 
-**Estado: no se ha completado la corrección integral ni se han modificado reglas económicas.** Los resultados siguientes son caracterizaciones de la versión anterior; no demuestran que una propuesta sea segura ni satisfacen la validación masiva solicitada. No se han actualizado cierres de Supabase.
+**Estado: avance parcial.** Se implementó una corrección de puntuación de maquinaria bajo la versión explícita experimental `utility-v1`; no se activa automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
+
+## Avance: puntuación de maquinaria versionada
+
+Clasificación 1: corrección de implementación. Con `financialPolicy.economicRulesVersion = 'utility-v1'`, los equipos de ensamblado y acabados se obtienen de las compras registradas hasta el ciclo de cierre, sumando movimientos negativos de baja; solo se puntúa una opción por grupo. Compras futuras y selecciones de catálogo sin equipo disponible no otorgan puntos. Las partidas sin esta versión conservan el comportamiento anterior. La versión se propaga por `services/finance_config.js` y el código Edge se regeneró desde las mismas fuentes. Falta integrarla en la creación persistente de partidas nuevas y validar el resto de reglas antes de activarla.
+
+Pruebas: `node --test tests/puntaje_maquinaria_utilidad.test.cjs tests/diagnostico_utilidad_maquinaria.test.cjs tests/consecuencias_cierre_real.test.cjs tests/lotes_fifo_integrado.test.cjs` (20 aprobadas); `node --test tests/edge_lotes_equivalencia.test.cjs` (4 aprobadas). Una primera prueba Edge falló por un fixture sin ciclo de activo; tras corregir el fixture pasó. Las pruebas de continuidad de seis ciclos y de independencia 3D también pasaron en la ejecución que detectó ese fallo del fixture. Estas pruebas no sustituyen la matriz ni la regresión general.
 
 ## Hallazgos reproducidos
 
@@ -26,7 +32,7 @@ En estos casos el precio prémium de S/ 250 recibe CONS-02. Los valores no deben
 
 Se localizó `.codex-work/fuente_logia/SIDE_prueba_cantidad_produccion (2).xlsx`; SHA-256 `a07710cd97447d0a5f1b79f2e7e200b01565abbf4a8ee3ff02055fa2768189b3`. Esta sesión confirmó el archivo y su huella; la lectura directa con el Python disponible falló por falta de `openpyxl`, por lo que no se afirma un contraste independiente integral. El informe preexistente `reports/AUDITORIA_RENTABILIDAD_SIDE.md` recoge referencias y análisis anteriores, que deben volver a comprobarse contra el libro.
 
-La configuración actual `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. **Parámetros nuevos: ninguno. Fórmulas modificadas: ninguna.** La discrepancia de maquinaria es candidata a clasificación 1, corrección de implementación; calidad y demanda requieren contraste antes de clasificarse. No se han evaluado suficientemente los escenarios de precios A y B ni el efecto de una elasticidad absoluta.
+La configuración actual `md-20261027` conserva precios base S/ 42,50 / 100 / 250, el multiplicador prémium 1,4 y los umbrales de eficiencia 4 y 5. Los parámetros económicos no han cambiado. La selección de maquinaria cambió solo para `utility-v1`; calidad y demanda requieren contraste antes de clasificarse. No se han evaluado suficientemente los escenarios de precios A y B ni el efecto de una elasticidad absoluta.
 
 ## Verificación realizada
 

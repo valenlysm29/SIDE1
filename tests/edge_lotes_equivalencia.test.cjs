@@ -3,10 +3,11 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const {pathToFileURL}=require('node:url');const path=require('node:path');
 const source=require('../services/business_runtime.cjs'),F=require('./economic_v19_fixture.cjs');
 const copy=x=>structuredClone(x);
-async function close(runOnce){let written;const snapshot={decision_state:{__cyclePlans:{1:{state:F.state(1,{},2)}}},cash_ledger:{},financial_sections:{}};
- const rpc=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:'fixture',cycles:[1]}]};if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:200000,snapshot:copy(snapshot)}],financialConfig:{cycles:3},token:'test'}};if(name==='side_guardar_cierre_negocio'){written=copy(args.p_cierre);return {data:{cierre:written}};}throw Error(name);};
- const result=await runOnce(rpc);assert.equal(result[0].success,true);return written;}
+async function close(runOnce,version){let written;const state=F.state(1,{},2);if(version){state.ENSAMBLE={round:1,purchases:{1:{ens_ind:1}}};state.ACABADOS={round:1,purchases:{1:{aca_ind:1}}};}const snapshot={decision_state:{__cyclePlans:{1:{state}}},cash_ledger:{},financial_sections:{}};
+ const rpc=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:'fixture',cycles:[1]}]};if(name==='side_contexto_cierre_negocio')return {data:{empresas:[{id:'1',capital:200000,snapshot:copy(snapshot)}],financialConfig:{cycles:3,...(version?{economicRulesVersion:version}:{})},token:'test'}};if(name==='side_guardar_cierre_negocio'){written=copy(args.p_cierre);return {data:{cierre:written}};}throw Error(name);};
+ const result=await runOnce(rpc);assert.equal(result[0].success,true,JSON.stringify(result));return written;}
 test('edge empaquetada y servidor producen idéntico cierre financiero y lotes',async()=>{const edge=await import(pathToFileURL(path.resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);assert.deepEqual(await close(edge.runOnce),await close(source.runOnce));});
+test('Node y Edge aplican igual la puntuación de compras versionada',async()=>{const edge=await import(pathToFileURL(path.resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);const node=await close(source.runOnce,'utility-v1'),remote=await close(edge.runOnce,'utility-v1');assert.deepEqual(remote,node);assert.ok(JSON.stringify(node).includes('INF-04'));assert.ok(JSON.stringify(node).includes('INF-07'));});
 
 test('Node y Edge rechazan por igual un cierre temporal sin persistencia verificable',async()=>{
  const edge=await import(pathToFileURL(path.resolve(__dirname,'../supabase/functions/side-business-close/runtime.mjs')).href);

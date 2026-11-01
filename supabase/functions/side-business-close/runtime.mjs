@@ -461,6 +461,134 @@ module.exports={runOnce,remoteRpc};
     const capacity=Math.min(...processes.map(p=>p.cycleCapacity));
     return {target,days:WORKING_DAYS,efficiency:BASE_EFFICIENCY,capacity,processes,limitingProcesses:processes.filter(p=>p.cycleCapacity===capacity).map(p=>p.label)};
   }
+  // Bounded advisory search. Each candidate adds one worker and/or equipment
+  // type to one stage; calculate() remains the authority for pairing and bonuses.
+  function resourceCandidate(ctx={},plan=calculate(ctx),order=[0,1,2]){
+    let specs=[['cut','PERS_CORTE','MESA_CORTE'],['assembly','PERS_ENSAMBLE','ENSAMBLE'],['finish','PERS_ACABADO','ACABADOS']];
+    specs=order.map(i=>specs[i]);
+    let drafts={...(ctx.drafts||{})};
+    for(const [,staffId,machineId] of specs){drafts[staffId]={...draft(ctx,staffId),quantities:{...draft(ctx,staffId).quantities}};drafts[machineId]={...draft(ctx,machineId),quantities:{...draft(ctx,machineId).quantities}};}
+    let scenario=plan,totalCost=0;const additions=[];let complete=true;
+    for(const [stage,staffId,machineId] of specs){
+      const current=scenario.processes.find(p=>p.id===stage);
+      if(!current||current.cycleCapacity>=plan.target)continue;
+      const sd=item(ctx,staffId),md=item(ctx,machineId);if(!sd||!md){complete=false;continue;}
+      let best=null;
+      for(const worker of [null,...sd.options])for(const machine of [null,...md.options]){
+        if(!worker&&!machine)continue;
+        const unitCost=(worker?BUS.laborCost(worker.id,BUS.regime(ctx),worker.cost):0)+(machine?BUS.assetCost(md,machine,BUS.regime(ctx)):0);
+        if(!(unitCost>0))continue;
+        const trial=q=>{
+          const d={...drafts,[staffId]:{...drafts[staffId],quantities:{...drafts[staffId].quantities}},[machineId]:{...drafts[machineId],quantities:{...drafts[machineId].quantities}}};
+          if(worker)d[staffId].quantities[worker.id]=whole(d[staffId].quantities[worker.id])+q;
+          if(machine)d[machineId].quantities[machine.id]=whole(d[machineId].quantities[machine.id])+q;
+          const p=calculate({...ctx,drafts:d});return {drafts:d,plan:p,capacity:p.processes.find(x=>x.id===stage).cycleCapacity};
+        };
+        let high=1,t=trial(high);while(t.capacity<plan.target&&high<100000){high=Math.min(100000,high*2);t=trial(high);}
+        if(t.capacity<plan.target)continue;
+        let low=0;while(low+1<high){const mid=Math.floor((low+high)/2);if(trial(mid).capacity>=plan.target)high=mid;else low=mid;}
+        const cost=unitCost*high;if(!best||cost<best.cost){t=trial(high);best={...t,cost,quantity:high,worker,machine,stage};}
+      }
+      if(!best){complete=false;continue;}
+      drafts=best.drafts;scenario=best.plan;totalCost+=best.cost;
+      additions.push({stage,quantity:best.quantity,worker:best.worker?.label||null,machine:best.machine?.label||null,cost:best.cost});
+    }
+    return {drafts,additions,cost:totalCost,capacity:scenario.processCapacity,producibleUnits:scenario.producibleUnits,materialShortfalls:scenario.materials.filter(m=>m.shortfall>0).map(m=>({id:m.id,label:m.label,unit:m.unit,shortfall:m.shortfall})),unavailablePlannedMolds:scenario.unavailablePlannedMolds,complete:complete&&scenario.processCapacity>=plan.target,
+      budget:Number.isFinite(ctx.availableCash)?ctx.availableCash:null,affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null};
+  }
+  // Global cross-stage search over six stage orders. Candidate generation is
+  // bounded and is not a proof of global optimality.
+  function recommendResources(ctx={},plan=calculate(ctx)){
+    const orders=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+    let best=null;
+    for(const order of orders){
+      const candidate=resourceCandidate(ctx,plan,order);
+      if(!best||(candidate.complete&&!best.complete)||(candidate.complete===best.complete&&candidate.cost<best.cost))best=candidate;
+    }
+    return {...best,optimal:false};
+  }
+  function threadAlternatives(ctx={},plan=calculate(ctx)){
+    const thread=plan.materials.find(m=>m.id==='HILO'),definition=item(ctx,'HILO');
+    if(!thread||!definition)return null;
+    const shortage=Math.max(0,thread.neededForTarget-thread.available);
+    const packs=BUS.MATERIAL_PACKS_V2;
+    const options=definition.options.filter(o=>packs[o.id]).map(o=>{
+      const quantity=Math.ceil(shortage/packs[o.id]),meters=quantity*packs[o.id];
+      return {id:o.id,label:o.label,quantity,meters,remaining:thread.available+meters-thread.neededForTarget};
+    });
+    // Enumerate mixed whole spools when the bounded search is small enough.
+    // The catalog prices purchases in physical units in legacy mode and in
+    // packs only in the explicitly versioned pack mode, as materialCost does.
+    const ordered=['hilo_std','hilo_ref','hilo_prem'].map(id=>definition.options.find(o=>o.id===id));
+    let purchase=null,exhaustive=false;
+    if(ordered.every(Boolean)){
+      const quantities=quantityCounts(ctx,'HILO'),packMode=ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1';
+      const hasAnalyst=selected(ctx,'ANALISTA_COMPRAS').includes('si_analista'),discount=hasAnalyst?Math.max(2,12-(n(ctx.round)-1)*2):0;
+      const config=typeof module==='object'&&module.exports?load("js/engine/config.js"):globalThis.SIDE_ECONOMIC_CONFIG;
+      const priceConfig={...config,materials:{...config?.materials,...ctx.config?.materials}};
+      const value=(o,q)=>q*BUS.materialUnitPrice(o,q,discount,priceConfig);
+      const base=ordered.reduce((v,o)=>v+value(o,n(quantities[o.id])),0);
+      const evaluate=counts=>{
+        const meters=counts.reduce((v,q,i)=>v+q*packs[ordered[i].id],0);
+        if(meters<shortage)return;
+        const cost=ordered.reduce((v,o,i)=>v+value(o,n(quantities[o.id])+counts[i]*(packMode?1:packs[o.id])),0)-base;
+        if(!purchase||cost<purchase.cost-1e-7||(Math.abs(cost-purchase.cost)<1e-7&&meters<purchase.meters))purchase={counts:Object.fromEntries(ordered.map((o,i)=>[o.id,counts[i]])),meters,cost,remaining:thread.available+meters-thread.neededForTarget};
+      };
+      // Each SKU's price is linear on either side of its quantity-discount
+      // threshold. Beyond both coverage and that threshold, additional packs
+      // cannot reduce cost. Include the threshold even when it overbuys.
+      const threshold=Math.max(0,Number(priceConfig.materials?.quantityDiscountThreshold??100));
+      const increments=ordered.map(o=>packMode?1:packs[o.id]);
+      const thresholdPacks=ordered.map((o,i)=>Math.max(0,Math.ceil((threshold-n(quantities[o.id]))/increments[i])));
+      const bounds=ordered.map((o,i)=>Math.max(Math.ceil(shortage/packs[o.id]),thresholdPacks[i]));
+      if(shortage===0){evaluate([0,0,0]);exhaustive=true;}
+      else if(Number.isFinite(threshold)&&ordered.every(o=>Number.isFinite(Number(o.cost))&&Number(o.cost)>=0)&&(bounds[0]+1)*(bounds[1]+1)<=30000){
+        exhaustive=true;
+        for(let a=0;a<=bounds[0];a++)for(let b=0;b<=bounds[1];b++){
+          const remaining=Math.max(0,shortage-a*packs.hilo_std-b*packs.hilo_ref);
+          const minimum=Math.ceil(remaining/packs.hilo_prem);
+          evaluate([a,b,minimum]);
+          if(thresholdPacks[2]>minimum)evaluate([a,b,thresholdPacks[2]]);
+        }
+      }else for(let i=0;i<3;i++){const c=[0,0,0];c[i]=Math.ceil(shortage/packs[ordered[i].id]);evaluate(c);}
+
+    }
+    return {needed:thread.neededForTarget,available:thread.available,shortage,options,purchase,exhaustive,temporal:!!plan.temporal};
+  }
+  // Advisory scenario only. No orders or decisions are persisted.
+  function recommendIntegrated(ctx={},plan=calculate(ctx),resources=recommendResources(ctx,plan)){
+    let drafts={...resources.drafts};const rows=[];let materialCostTotal=0,known=true;
+    const packMode=ctx.config?.materialPurchaseVersion==='excel-v2-packs-v1';
+    for(const family of ['CUERO','ACCESORIOS','HILO']){
+      const material=plan.materials.find(m=>m.id===family),definition=item(ctx,family);
+      if(!material||!definition){known=false;continue;}
+      const shortage=Math.max(0,material.neededForTarget-material.available);
+      const original={...draft(ctx,family),quantities:{...draft(ctx,family).quantities}};
+      drafts[family]=original;
+      if(!shortage)continue;
+      const before=materialCost({...ctx,drafts},family);
+      let candidates=[];
+      if(family==='HILO'){
+        const thread=threadAlternatives(ctx,plan);
+        if(thread?.purchase){const quantities={...original.quantities};for(const [id,q] of Object.entries(thread.purchase.counts))quantities[id]=n(quantities[id])+q*(packMode?1:BUS.MATERIAL_PACKS_V2[id]);candidates.push({quantities,description:Object.entries(thread.purchase.counts).filter(([,q])=>q).map(([id,q])=>`${q} ${id}`).join(', ')});}
+      }else for(const option of definition.options||[]){
+        const units=packMode?n(BUS.MATERIAL_PACKS_V2[option.id]):1;if(!units)continue;
+        const q=packMode?Math.ceil(shortage/units):Math.ceil(shortage*100)/100;
+        candidates.push({quantities:{...original.quantities,[option.id]:n(original.quantities[option.id])+q},description:`${q} ${option.label}`});
+      }
+      let best=null;
+      for(const candidate of candidates){const d={...drafts,[family]:{...original,quantities:candidate.quantities}};const cost=materialCost({...ctx,drafts:d},family)-before;if(!best||cost<best.cost)best={...candidate,cost};}
+      if(!best){known=false;continue;}
+      drafts[family]={...original,quantities:best.quantities};materialCostTotal+=best.cost;
+      rows.push({id:family,label:material.label,shortfall:shortage,unit:material.unit,description:best.description,cost:best.cost});
+    }
+    const totalCost=resources.cost+materialCostTotal;
+    // Receipt-ledger mode requires actual receipt events; never fabricate them.
+    const scenario=known&&!plan.temporal?calculate({...ctx,drafts}):null;
+    return {rows,materialCost:materialCostTotal,totalCost,known,optimal:false,capacity:resources.capacity,
+      producibleUnits:scenario?.producibleUnits??null,unavailablePlannedMolds:plan.unavailablePlannedMolds,
+      affordable:Number.isFinite(ctx.availableCash)?totalCost<=ctx.availableCash:null,temporal:!!plan.temporal};
+  }
   function materialUnit(materialId){return MATERIALS[materialId]?.unit||'unidades';}
   function cycleProductivity(plan={},record=null,round=1){
     const target=Number(plan?.target),value=record?.producedUnits;
@@ -468,7 +596,7 @@ module.exports={runOnce,remoteRpc};
     return {produced,compliance:produced!==null&&Number.isFinite(target)&&target>0?produced/target*100:null,
       difference:produced!==null&&Number.isFinite(target)&&target>0?target-produced:null};
   }
-  return Object.freeze({calculate,planResources,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
+  return Object.freeze({calculate,planResources,recommendResources,recommendIntegrated,threadAlternatives,assetPurchaseHistory,resolveProductionTargets,yieldFor,materialUnit,cycleProductivity,constants:Object.freeze({WORKING_DAYS,BASE_EFFICIENCY,LEVEL_THREE_BONUS,LEADERSHIP_BONUS,MOLD_REQUIREMENTS,DOP_STEPS})});
 });
 
 },
@@ -858,22 +986,28 @@ module.exports={runOnce,remoteRpc};
   const mapping={MESA_CORTE:{mesa:'INF-01'},ENSAMBLE:{ens_basica:'INF-02',ens_semi:'INF-03',ens_ind:'INF-04'},ACABADOS:{aca_basica:'INF-05',aca_semi:'INF-06',aca_ind:'INF-07'},MOLDE:{molde_1:'INF-08',molde_2:'INF-09',molde_3:'INF-10'},PERS_CORTE:{corte_basico:'RH-01',corte_exp:'RH-02',corte_maestro:'RH-03'},PERS_ENSAMBLE:{ens_personal_basico:'RH-04',ens_personal_ind:'RH-05',ens_personal_esp:'RH-06'},PERS_ACABADO:{aca_personal_basico:'RH-07',aca_personal_tec:'RH-08',aca_personal_art:'RH-09'},JEFATURA:{si_jefatura:'RH-10A',no_jefatura:'RH-10B'},INV_RRHH:{cap_baja:'INV-01A',cap_media:'INV-01B',cap_alta:'INV-01C'},INV_MARKETING:{mkt_baja:'INV-02A',mkt_media:'INV-02B',mkt_alta:'INV-02C'},GARANTIA_PT:{pt_30:'COM-06B',pt_90:'COM-06C'},MANTENIMIENTO:{correctivo:'INF-11B'}};
   const materialCodes={CUERO:{cuero_sint:'INS-01',cuero_std:'INS-02',cuero_prem:'INS-03'},ACCESORIOS:{acc_eco:'INS-04',acc_prem:'INS-05'},HILO:{hilo_std:'INS-06',hilo_ref:'INS-07',hilo_prem:'INS-08'}};
   const chosen=(s,key)=>s[key]?.optionIds?.[0];
-  function codes(state){
+  function codes(state,options={}){
     const result=[];
     for(const [key,map] of Object.entries(mapping)){
       if(key==='MESA_CORTE')continue; // Not part of Motor_Puntajes selection blocks.
-      const entry=state[key]||{},selected=Object.keys(map).filter(id=>n(entry.quantities?.[id])>0||(entry.optionIds||[]).includes(id));
+      const entry=state[key]||{};
+      let selected;
+      if(options.economicRulesVersion==='utility-v1'&&['ENSAMBLE','ACABADOS'].includes(key)){
+        const history=BUS.assetPurchaseHistory(entry,{options:Object.keys(map).map(id=>({id}))});
+        const round=Number(options.round)||1;
+        selected=Object.keys(map).filter(id=>Math.floor(Object.entries(history).filter(([r])=>Number.isInteger(Number(r))&&Number(r)>=1&&Number(r)<=round).reduce((sum,[,row])=>sum+(Number.isFinite(Number(row?.[id]))?Number(row[id]):0),0))>0);
+      }else selected=Object.keys(map).filter(id=>n(entry.quantities?.[id])>0||(entry.optionIds||[]).includes(id));
       // SUPUESTO: dotación mixta aporta el mayor nivel presente una vez por grupo.
       if(selected.length)result.push(selected.map(id=>map[id]).sort((a,b)=>n(index[b]?.eficiencia)-n(index[a]?.eficiencia))[0]);
     }
     const channels=state.CANALES?.optionIds||[],web=channels.includes('web'),physical=channels.some(id=>['los_olivos','miraflores','sjl'].includes(id));
     if(web||physical)result.push(web&&physical?'COM-01C':web?'COM-01B':'COM-01A');
     result.push(n(state.PRESTAMO?.value||state.PRESTAMO?.amount)>0?'FIN-01A':'FIN-01B');
-    for(const code of state.__catalogSelection||[])if(index[code]&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
+    for(const code of state.__catalogSelection||[])if(index[code]&&!(options.economicRulesVersion==='utility-v1'&&['Maquina de ensamblado','Maquina de acabados'].includes(index[code].grupo))&&!result.some(other=>index[other]?.grupo===index[code].grupo))result.push(code);
     return [...new Set(result)];
   }
   const scoreGroups=new Set(['Maquina de ensamblado','Maquina de acabados','Molde','Personal de corte','Personal de ensamble','Personal de acabados','Jefatura','Canal de venta','Acceso a prestamo bancario','Numero de proveedores','Politica de pago a proveedores','Lead time','Inversion en RR.HH.','Inversion en marketing']);
-  function scores(state){const selected=codes(state),scored=selected.filter(id=>scoreGroups.has(index[id]?.grupo));return {selected,efficiency:scored.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0),reputation:scored.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0),health:scored.reduce((s,id)=>s+Number(index[id]?.financiero||0),0)};}
+  function scores(state,options={}){const selected=codes(state,options),scored=selected.filter(id=>scoreGroups.has(index[id]?.grupo));return {selected,efficiency:scored.reduce((s,id)=>s+Number(index[id]?.eficiencia||0),0),reputation:scored.reduce((s,id)=>s+Number(index[id]?.reputacion||0),0),health:scored.reduce((s,id)=>s+Number(index[id]?.financiero||0),0)};}
   function prices(state,provided={},config=DEFAULT){return Object.fromEntries(config.products.map(id=>{const segment=config.segments[id],raw=provided[id]??state.PRODUCCION_META?.prices?.[id]??segment.defaultPrice,value=Number(raw);if(raw===''||!Number.isFinite(value)||value<segment.min||value>(segment.max??Infinity))throw new RangeError(`Precio ${id}: introduce un importe válido igual o mayor que ${segment.min}.`);return [id,value];}));}
   function materialUse(state,plan,round){
     const use={},ratios={};
@@ -921,7 +1055,7 @@ module.exports={runOnce,remoteRpc};
     return clamp((rep.factorMP+rep.factorProduccion)/2);
   }
   function prepare(input,config=DEFAULT){
-    const state=input.state||{},round=input.round||1,p=scores(state),messages=[];
+    const state=input.state||{},round=input.round||1,p=scores(state,{round,economicRulesVersion:input.financialPolicy?.economicRulesVersion}),messages=[];
     // Prices are resolved internally. Legacy hidden values must not prevent a
     // saved plan (or another company in the shared close) from generating sales.
     // Explicit caller overrides still pass through the strict price validator.
@@ -2523,7 +2657,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);
@@ -2546,7 +2680,7 @@ module.exports={runOnce,remoteRpc};
  * según Costos De Producción y engine/costos.costoLaboral, no sueldo referencial. */
 const SIDE_DECISION_CATALOG_DATA = [
   {
-    cat:'A', title:'Resumen', short:'Resumen', icon:'assets/side_logo.png', summaryOnly:true,
+    cat:'A', title:'Resumen', short:'Resumen', icon:'assets/logo-side-original-pdf.png', summaryOnly:true,
     desc:'Consulta las decisiones del ciclo, el plan de producción por proceso y los costos estimados de tu empresa.',
     items:[]
   },
