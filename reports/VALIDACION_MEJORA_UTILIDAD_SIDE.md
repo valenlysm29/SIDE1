@@ -10,6 +10,14 @@ Se comparan contrafactuales calculados con el mismo cierre: reducción de una op
 
 Pruebas: `node --test tests/profit_projection.test.cjs tests/student_financial_summary.test.js tests/business_projection_regression.test.js` (11 aprobadas). Se verifica que las cifras base coincidan con la proyección oficial, que los cuatro tipos de comparación se calculen y que no se modifiquen las entradas. Falta prueba visual en navegador y una evaluación completa de factibilidad de cada alternativa.
 
+Una comprobación adicional de `tests/profit_projection.test.cjs` aprobó 3 pruebas, incluyendo la salida de la función de interfaz en un DOM simulado y sus avisos. `node --test tests/profit_projection_ui.test.cjs` pasó en Chrome sin interfaz: abre Producción, ejecuta el cálculo y verifica los resultados y que no se guarden decisiones. No sustituye una inspección visual ni la prueba de factibilidad financiera.
+
+## Regresión general
+
+Se ejecutaron los archivos `tests/*.test.js`, `tests/*.test.mjs` y `tests/*.test.cjs` con concurrencia 2: **947 pruebas, 927 aprobadas y 20 fallidas**; registro local `tests/output/regresion_utility_v1.log`. Incluye pruebas aprobadas de PostgreSQL real aislado y Node/Edge. Los fallos abarcan planificación DOP, comparación con Excel, reputación/mercado, transferencias manuales y pruebas de sincronización. No hay una línea base equivalente de esta ejecución para clasificarlos todos como previos o nuevos.
+
+Las tres fallas de navegador de `decisions_apartados_ui.test.cjs` y `student_sync_ui.test.js` muestran `Unexpected token '<'`; al instrumentar la prueba, Chrome identificó la URL `js/landing-progress.js`, para la cual el interceptor de la prueba devuelve HTML. El archivo no forma parte de la proyección añadida. No se atribuye por ello una causa al resto de fallos. La regresión no está limpia y bloquea la activación automática de `utility-v1`.
+
 **Estado: avance parcial.** Se implementaron una corrección de puntuación de maquinaria y una adaptación experimental de la bonificación prémium bajo la versión explícita `utility-v1`; no se activan automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
 
 ## Avance: elasticidad de precio absoluto
@@ -34,7 +42,7 @@ Ejemplos experimentales: básico 250 producidos y vendidos, precio S/ 120, venta
 
 ## Casos representativos competitivos y continuidad
 
-`node --test tests/competencia_utilidad_representativa.test.cjs tests/recuperacion_utilidad_ciclos.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/continuidad_seis_ciclos_activos.test.cjs`: 10 pruebas aprobadas. Los primeros dos archivos usan cierres en memoria `utility-v1`; los otros prueban Node/Edge y persistencia PostgreSQL compatible mediante PGlite, incluyendo recepciones parciales y cuentas por pagar. No son una prueba integral en el servicio remoto.
+`node --test tests/competencia_utilidad_representativa.test.cjs tests/recuperacion_utilidad_ciclos.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/continuidad_seis_ciclos_activos.test.cjs`: 10 pruebas aprobadas. Los primeros dos archivos usan cierres en memoria `utility-v1`; los otros prueban Node/Edge y persistencia PostgreSQL compatible mediante PGlite, incluyendo recepciones parciales y cuentas por pagar. La regresión también aprobó pruebas existentes de cierres compartidos y concurrentes en PostgreSQL real aislado; no prueban la nueva versión con los escenarios de competencia. No son una prueba integral en el servicio remoto.
 
 Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Los precios explícitos de esta prueba no están configurados como precios autoritativos de una partida real.
 
