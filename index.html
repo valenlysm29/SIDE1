@@ -22,7 +22,8 @@
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
   <link rel="stylesheet" href="css/world_minimap.css?v=20261009-mobile-map">
   <link rel="stylesheet" href="css/role-selection.css?v=20261009-brand-scale">
-  <link rel="stylesheet" href="css/institutional.css?v=20261101">
+  <link rel="stylesheet" href="css/institutional.css?v=20261101-landing2">
+  <script defer src="js/landing-progress.js?v=20261101"></script>
 </head>
 <body>
 <main id="app">
@@ -30,10 +31,13 @@
     <img class="upch-corner" src="assets/upch_logo.png" alt="Universidad Peruana Cayetano Heredia">
     <div class="landing-overlay"></div>
     <div class="landing-content">
-      <img class="landing-side-logo" src="assets/side_logo.png" alt="SIDE">
+      <div class="landing-wordmark" role="img" aria-label="SIDE"><span>SI</span><span class="landing-wordmark-d">D</span><span>E</span></div>
       <p class="landing-subtitle">Simulador de Decisiones Financieras</p>
-      <div class="loading-wrap" aria-label="Carga inicial">
-        <button id="startBtn" class="start-link">Empezar</button>
+      <div class="loading-wrap">
+        <div id="landingProgress" class="landing-progress" role="progressbar" aria-label="Carga de la página" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Cargando página">
+          <div class="landing-progress-fill"></div><span id="landingProgressText">Cargando</span>
+        </div>
+        <button id="startBtn" class="start-link">EMPEZAR</button>
       </div>
     </div>
   </section>
