@@ -2,7 +2,7 @@
  * según Costos De Producción y engine/costos.costoLaboral, no sueldo referencial. */
 const SIDE_DECISION_CATALOG_DATA = [
   {
-    cat:'A', title:'Resumen', short:'Resumen', icon:'assets/side_logo.png', summaryOnly:true,
+    cat:'A', title:'Resumen', short:'Resumen', icon:'assets/logo-side-original-pdf.png', summaryOnly:true,
     desc:'Consulta las decisiones del ciclo, el plan de producción por proceso y los costos estimados de tu empresa.',
     items:[]
   },

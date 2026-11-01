@@ -1355,8 +1355,8 @@ let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
 function pdfLogo(){
   if(!pdfLogoPromise)pdfLogoPromise=new Promise(resolve=>{
     const image=new Image();
-    image.onload=()=>{try{const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;canvas.getContext('2d').drawImage(image,0,0);resolve(canvas.toDataURL('image/png'));}catch{resolve(null)}};
-    image.onerror=()=>resolve(null);image.src='assets/side_logo.png';
+    image.onload=()=>{try{const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;const ctx=canvas.getContext('2d');ctx.fillStyle='#081a34';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0);resolve(canvas.toDataURL('image/png'));}catch{resolve(null)}};
+    image.onerror=()=>resolve(null);image.src='assets/logo-side-original-pdf.png';
   });
   return pdfLogoPromise;
 }

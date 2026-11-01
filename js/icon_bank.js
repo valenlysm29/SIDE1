@@ -1,6 +1,6 @@
 window.SIDE_ICON_BANK = {
   categories: {
-    A: 'assets/side_logo.png',
+    A: 'assets/logo-side-original-pdf.png',
     B: 'assets/icons/categories/infraestructura.svg',
     C: 'assets/icons/categories/recursos_humanos.svg',
     D: 'assets/icons/categories/canales_ventas.svg',
