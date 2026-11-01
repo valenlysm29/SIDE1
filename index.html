@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/character-selection.css?v=20260927-selector">
   <link rel="stylesheet" href="css/world_minimap.css?v=20261009-mobile-map">
   <link rel="stylesheet" href="css/role-selection.css?v=20261009-brand-scale">
+  <link rel="stylesheet" href="css/institutional.css?v=20261101">
 </head>
 <body>
 <main id="app">
@@ -30,13 +31,9 @@
     <div class="landing-overlay"></div>
     <div class="landing-content">
       <img class="landing-side-logo" src="assets/side_logo.png" alt="SIDE">
-      <p class="landing-subtitle">SIMULADOR DE DECISIONES FINANCIERAS</p>
+      <p class="landing-subtitle">Simulador de Decisiones Financieras</p>
       <div class="loading-wrap" aria-label="Carga inicial">
-        <div class="loading-track">
-          <div id="loadingBar" class="loading-bar"></div>
-          <span id="loadingPercent">0%</span>
-        </div>
-        <button id="startBtn" class="start-link" disabled>Empezar</button>
+        <button id="startBtn" class="start-link">Empezar</button>
       </div>
     </div>
   </section>
@@ -50,23 +47,25 @@
       <h1 class="profile-title">Elige cómo entrar</h1>
       <p id="roomCancellationNotice" class="form-message hidden" role="status" aria-live="polite"></p>
 
+      <div class="profile-cards">
       <button class="profile-card student-hero" data-profile="student" aria-label="Iniciar sesión como estudiante">
-        <img class="student-hero-img" src="assets/estudiante.png" alt="">
+        <img class="student-hero-img" src="assets/icons/profile-person.webp" alt="">
         <span class="student-hero-copy">
           <span class="hero-eyebrow">Estudiante</span>
           <span class="profile-description">Dirige tu empresa y decide en cada ciclo.</span>
-          <span class="hero-cta">Entrar a una partida <i class="hero-arrow" aria-hidden="true"><img src="assets/icons/ui/arrow-right-thick.svg" alt=""></i></span>
+          <span class="hero-cta">Entrar a una partida</span>
         </span>
       </button>
-    </div>
-
     <button class="profile-card teacher-mini" data-profile="teacher" aria-label="Iniciar sesión como profesor">
-      <img class="teacher-mini-img" src="assets/profesor.png" alt="">
+      <img class="teacher-mini-img" src="assets/icons/profile-person.webp" alt="">
       <span class="teacher-mini-copy">
         <span class="mini-eyebrow">Profesor</span>
+        <span class="profile-description">Administra una partida</span>
         <span class="mini-cta">Iniciar sesión</span>
       </span>
     </button>
+      </div>
+    </div>
   </section>
 
   <div id="modalRoot" class="modal-root hidden">
@@ -145,6 +144,7 @@
           <label for="companyBrandName">Nombre comercial</label>
           <input id="companyBrandName" placeholder="Ej. BOSS BAGS" maxlength="40" autocomplete="off" required>
         </div>
+        <p id="studentRejoinHelp" class="field-hint">Si ya participaste, usa el mismo código y los mismos nombres de empresa para recuperar tu progreso.</p>
         <button class="primary-gold join-submit" type="submit">Entrar a la partida</button>
       </form>
       <div id="studentMessage" class="form-message" role="status"></div>
