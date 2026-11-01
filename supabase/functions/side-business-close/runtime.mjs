@@ -68,6 +68,28 @@ module.exports={runOnce,remoteRpc};
       const section=REVIEW.section(category,{state,drafts:{},catalog,round,capital,ledger,rules:RULES,config:financialPolicy});
       ledger[key]=section.net;sectionsByRound[round]={...sectionsByRound[round],[category.cat]:{...section,recordedNet:section.net}};
     }
+    // A posted material breakdown must describe the same SKU quantities as the
+    // confirmed cycle decisions. Do not infer wastage or rewrite old receipts.
+    for(const category of catalog.filter(c=>!c.summaryOnly)){
+      const materialItems=category.items.filter(item=>item.material);
+      if(!materialItems.length)continue;
+      const key=`${round}:${category.cat}`,section=sectionsByRound[round]?.[category.cat];
+      if(!Object.hasOwn(ledger,key))continue;
+      const hasPurchases=materialItems.some(item=>Number(state[item.id]?.round)===Number(round)&&Object.values(state[item.id]?.quantities||{}).some(q=>n(q)>0));
+      if(!section){if(hasPurchases)throw new Error('Compra de materiales sin desglose verificable.');continue;}
+      if(!Array.isArray(section.items)||!Number.isFinite(Number(ledger[key]))||!Number.isFinite(Number(section.recordedNet??section.net))||Math.abs(Number(section.recordedNet??section.net)-Number(ledger[key]))>=0.02)throw new Error('Desglose de materiales incompatible con el libro.');
+      for(const item of materialItems){
+        const entries=section.items.filter(x=>x.id===item.id), quantities=Number(state[item.id]?.round)===Number(round)?state[item.id]?.quantities||{}:{};
+        if(entries.length!==1||!Array.isArray(entries[0].rows))throw new Error('Compra de materiales sin desglose verificable.');
+        const rows=entries[0].rows;
+        if(rows.some(row=>!item.options.some(option=>option.label===row.label)||!Number.isFinite(Number(row.quantity))||Number(row.quantity)<0))throw new Error('Opción o cantidad de material no verificable.');
+        for(const option of item.options){
+          const selected=rows.filter(row=>row.label===option.label),actual=selected.reduce((sum,row)=>sum+n(row.quantity),0),expected=n(quantities[option.id]);
+          if(selected.length>1||Math.abs(actual-expected)>1e-7)throw new Error('Compra de materiales incompatible con decisiones confirmadas.');
+          if(selected.length){const cost=Number(selected[0].outflow),unit=REVIEW.unitCost(item,option,{state,drafts:{},catalog,round:Number(round),capital,ledger,rules:RULES,config:financialPolicy});if(!Number.isFinite(cost)||Math.abs(cost-expected*unit)>=0.02)throw new Error('Costo de materiales incompatible con decisiones confirmadas.');}
+        }
+      }
+    }
     const economic=economicResult||ECON.closeMany([{id:'self',state,catalog,round,prices,events,financialPolicy}]).self;
     const plan=economic.plan;
     const assemblyAvailable=n(plan.processes?.find(process=>process.id==='assembly')?.machines)>0;
@@ -3272,6 +3294,16 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function programarDesafiosEquilibrados(partidaId,ciclo){
+    if(!Number.isInteger(ciclo)||ciclo<1||ciclo>6)return {success:false,code:'CICLO_INVALIDO',error:'Ciclo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_schedule_balanced_v1',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.round)!==Number(ciclo)||typeof data?.reused!=='boolean'||!Array.isArray(data?.events)||data.events.length<2||data.events.some(e=>!e||!/^\d+$/.test(String(e.companyId))||BigInt(e.companyId)<1n||!['PE69','PE71','PE75'].includes(e.eventId)||Number(e.round)!==Number(ciclo)||Number(e.intensity)!==(ciclo<=2?2:ciclo<=4?4:6))||new Set(data.events.map(e=>String(e.companyId))).size!==data.events.length||new Set(data.events.map(e=>e.eventId)).size!==Math.min(3,data.events.length))return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó la programación equilibrada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
   async function consultarDesafios(partidaId){
     const sb=client();if(!sb)return offline();
     try{
@@ -3295,7 +3327,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,programarDesafiosEquilibrados,consultarDesafios,podio };
 });
 
 }
