@@ -1,0 +1,28 @@
+# Resultado de los seis escenarios SIDE
+
+Fecha: 1 de noviembre de 2026. Rama: `codex/finanzas-tres-modos`; base de trabajo `fdf0abf`. **Estado: validación integral y publicación pendientes.**
+
+| Modo | Ciclos | Tres empresas y cierres Edge por API | Recorrido íntegro por interfaces y tres vistas |
+|---|---:|---|---|
+| Manual | 3 | 3 cierres; `tests/output/continuacion_cierre_manual_final.log` | Pendiente |
+| Manual | 6 | 6 cierres; `tests/output/final_6_manual_api_6.log` | Pendiente |
+| Aleatorio | 3 | 3 cierres; `tests/output/final_6_random_api_3_reintento.log` | Pendiente |
+| Aleatorio | 6 | 6 cierres; `tests/output/final_6_random_api_6_reintento.log` | Pendiente |
+| Equilibrado | 3 | 3 cierres; `tests/output/final_6_balanced_api_3.log` | Pendiente |
+| Equilibrado | 6 | 6 cierres; `tests/output/final_6_balanced_api_6.log` | Pendiente |
+
+Los 27 cierres de la tabla son ensayos parciales con autenticación, HTTP, PostgreSQL y Edge locales: las decisiones se enviaron por API y no prueban las tres vistas. Sus pruebas verifican un cierre persistido por ciclo, resultados de tres empresas, balance e idempotencia de recepciones. No son 6/6 aprobaciones integrales.
+
+En otro ensayo, tres estudiantes ingresaron y confirmaron decisiones mediante sus interfaces; se registraron recepciones y Edge guardó el primer cierre con tres balances cuadrados. Evidencia: `tests/output/final_6_ui_manual_3_reintento.log` y consulta local de solo lectura. El guion consideró fallida la respuesta global porque Edge también informó errores de otras partidas locales pendientes; el resultado de la partida propia era exitoso. Ese ensayo no ha completado los tres ciclos ni las tres vistas. La versión posterior del guion avanzó al ciclo 2 y quedó detenida al intentar seleccionar nuevamente un molde ya bloqueado; se ajustó para respetar el bloqueo. Los datos de ensayo anteriores no se modificaron.
+
+Aleatorio falló inicialmente porque el guion llamó `side_draw_all_events_v1`, una función inexistente; al usar la función oficial `side_draw_events_v1`, ambos tamaños completaron sus cierres parciales. No se alteró lógica de producto. La suite anterior registra 952 aprobadas y 16 fallos históricos, sin fallos nuevos por nombre (`reports/VALIDACION_FINAL_FINANZAS_Y_TRES_MODOS.md`). No se ha demostrado aquí que todos esos fallos se reproduzcan en main o carezcan de impacto financiero.
+
+**Finanzas y vistas:** los balances de los cierres de la tabla cuadran en los controles ejecutados; esto no acredita toda la cadena financiera ni conciliación visible Estudiante–Docente–Laboratorio. La prueba de cierre contradictorio mediante Edge/PostgreSQL y rollback sigue pendiente. **Integración:** ninguna en `main`; no hay commit publicado. No se ha desplegado Supabase de producción ni alterado registros históricos. La integración está condicionada a completar los seis recorridos y controles críticos exigidos.
+
+### Avance adicional por interfaz
+
+`tests/output/final_6_ui_multiciclo_manual_3_v3.log` registra una partida Manual con tres estudiantes autenticados, decisiones confirmadas mediante sus controles, recepciones registradas mediante RPC y tres cierres Edge con tres balances cuadrados por ciclo. Avanzó mediante `controlar_partida` sin cambiar el ciclo por SQL. El guion no verificó las vistas Estudiante, Docente y Laboratorio ni las recepciones por controles visibles; **el escenario integral sigue pendiente**. Los scripts de prueba locales se conservan en `tests/output/final_6_ui_multiciclo.cjs` y `tests/output/final_6_ui_modos.cjs`.
+
+En la partida Manual terminada, se volvió a entrar por la interfaz del docente: Laboratorio mostró los tres ciclos cerrados y, para la empresa 1 del ciclo 1, ventas S/ 3.500 y utilidad S/ -5.370,38, coincidentes con una lectura del cierre oficial. La pestaña Resultados mostró cero empresas y «Sin resultados recibidos» en esa sesión. Se desconoce si se necesita seleccionar la partida terminada por otra ruta o si hay un defecto; no se ha validado Estudiante–Docente–Laboratorio. Registro: `tests/output/final_6_vistas_docente.log`.
+
+Los cinco ensayos simultáneos posteriores encontraron problemas durante la admisión y Auth registró HTTP 429. En el proyecto aislado se aumentó únicamente el límite local de cuentas anónimas de 30 a 500 y se reinició esa instancia conservando volúmenes. No se cambió configuración remota. Los escenarios se reintentaron secuencialmente; los resultados finales deben constar en los registros individuales antes de calificarlos.
