@@ -1084,6 +1084,23 @@ function refreshProductionDop(){
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
 }
 
+function showProfitProjection(){
+  const mount=document.querySelector('[data-profit-projection]');if(!mount)return;
+  if(temporalStudentRoom()){mount.textContent='La proyección no está disponible hasta que las recepciones puedan verificarse con el cierre.';return;}
+  try{
+    const context=decisionModelContext(),state=deepClone(context.state),ledger={...financialLedger()},sections=deepClone(recordedFinancialSections()),round=currentRound();
+    for(const category of DECISION_CATALOG.filter(c=>!c.summaryOnly)){
+      const prepared=prepareSectionSave(category,context);Object.assign(state,prepared.entries);
+      delete ledger[`${round}:${category.cat}`];if(sections[round])delete sections[round][category.cat];
+    }
+    const result=window.SIDE_PROFIT_PROJECTION.analyze({state,ledger,sectionsByRound:sections,catalog:DECISION_CATALOG,round,capital:initialCapital(),financialPolicy:{...(window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig()),authoritativePrices:true},events:cycleBusinessData(round).events});
+    if(!result.available){mount.textContent=result.reason;return;}
+    const b=result.base,breakeven=result.breakEven?`Primera meta con resultado no negativo en las 20 pruebas: ${result.breakEven.target} unidades (ventas estimadas: ${result.breakEven.sold}).`:'No se encontró punto de equilibrio dentro de las metas probadas con estos recursos.';
+    const alternative=result.alternatives.length?result.alternatives.map(a=>`<li>${escapeHtml(a.label)}: utilidad ${money(a.profit)} (${a.difference>=0?'+':''}${money(a.difference)}), caja ${money(a.cash)}, ventas ${a.sold} u.</li>`).join(''):'<li>No hay alternativas calculables con las decisiones actuales.</li>';
+    mount.innerHTML=`<p><strong>${b.profit<0?'Riesgo de pérdida: ':''}utilidad estimada ${money(b.profit)}</strong> · ingresos ${money(b.income)} · costos y gastos ${money(b.cost)} · caja final ${money(b.cash)}</p><p>Producción ${b.produced} u. · ventas ${b.sold} u. · demanda asignada ${b.demand} u. · costo de fabricación ${money(b.productionCost)} · costo por unidad ${b.unitCost==null?'no disponible':money(b.unitCost)}</p><p>${b.sales.map(s=>`${escapeHtml(s.id)}: precio efectivo ${money(s.price)}`).join(' · ')}</p><p>${escapeHtml(breakeven)}</p><strong>Comparaciones calculadas con el motor</strong><ul>${alternative}</ul><small>Estimación individual: no incluye el reparto definitivo con competidores. Las alternativas cambian una decisión por vez y no verifican disponibilidad de caja en el momento de comprar. La primera meta probada no es un punto de equilibrio exacto. No se guardó ninguna decisión.</small>`;
+  }catch(error){mount.textContent='No se pudo calcular la proyección con las decisiones disponibles.';console.warn('SIDE: proyección de rentabilidad no disponible',error);}
+}
+
 function renderDecisionCategory(){
   disposeProductionDop();
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
@@ -1106,10 +1123,10 @@ function renderDecisionCategory(){
   }
 
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
-  const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
+  const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<section class="decision-row"><h3>Proyección de rentabilidad</h3><p>Calcula el resultado y compara cambios sin guardar decisiones.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section><div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?automaticDistributionHtml()+cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
-  bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
+  bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
 }
 function automaticDistributionHtml(){
