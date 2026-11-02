@@ -114,6 +114,12 @@ function validateCreation(config){
   const plan=RULES.cycleSchedule(config);
   if(plan.error&&!errors.length)invalid(config.cycleCloseMode==='automatic'?'scheduledStart':'roundMinutes',plan.error);
   if(config.enabledEvents.some(id=>!EVENT_CATALOG.some(e=>e.id===id)||!Number.isInteger(Number(config.eventRules[id]?.firstRound||1))||Number(config.eventRules[id]?.firstRound||1)>config.cycles||Number(config.eventRules[id]?.firstRound||1)<1))invalid('cycles','Revisa los eventos: su primer ciclo debe estar dentro de los ciclos configurados.');
+  const unavailable=EVENT_CATALOG.filter(e=>config.enabledEvents.includes(e.id)&&!canSelectEvent(e));
+  if(unavailable.length){
+    creationFeedback('Desmarca los eventos temporalmente no disponibles antes de crear o guardar: '+unavailable.map(e=>e.title).join(', ')+'. Abre Seleccionar eventos para ajustar la selección.');
+    if($('creationFeedback'))$('creationFeedback').dataset.source='validation';
+    return false;
+  }
   if(errors.length){creationFeedback(gameStatus()?.active?'Revisa los campos indicados antes de guardar la configuración.':'Revisa los campos indicados antes de crear la sala.');if($('creationFeedback'))$('creationFeedback').dataset.source='validation';errors[0].focus();return false;}
   return true;
 }
@@ -135,6 +141,15 @@ function formatStudentTime(total){const s=Math.max(0,Math.floor(Number(total)||0
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function escapeAttr(v){return escapeHtml(v)}
 function gameStatus(){try{return JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{return null}}
+function canSelectEvent(event){
+  const c=state.authoritative;
+  if(!event.effect?.costPct||c?.economicEventsVersion)return true;
+  if(state.partidaId&&c){
+    if(c.sequentialCloseVersion!=='1')return true;
+    if((c.enabledEvents||[]).includes(event.id))return true;
+  }
+  return false;
+}
 function renderEnabledEvents(){
   const selected=EVENT_CATALOG.filter(e=>state.enabledEvents.has(e.id));
   if($('enabledEventsSummary'))setTeacherResultMarkup($('enabledEventsSummary'),selected.length?
@@ -468,13 +483,13 @@ function triggerGroupEvents(round){
 function eventsImpactingRound(round){const schedule=eventSchedule(),out=[];Object.entries(schedule).forEach(([trigger,data])=>(data?.group||[]).forEach(id=>{const e=EVENT_CATALOG.find(x=>x.id===id);if(!e||!state.enabledEvents.has(id))return;const start=Number(trigger)+Number(e.cycleOffset||0),end=start+Math.max(1,Number(e.cycles||1));if(round>=start&&round<end)out.push({...e,triggerRound:Number(trigger),impactRound:start})}));return out}
 function renderCycleNews(){const els=eventsImpactingRound(state.round);setTeacherResultMarkup($('cycleNews'),els.length?els.map(e=>`<div class="news-entry"><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>GRUPAL · ${escapeHtml(cycleOffsetLabel(e))} · ocurre ${e.probability}% · impacto en ciclo ${e.impactRound}</small></div>`).join(''):'<p class="hint">Sin noticia grupal activa en este ciclo. Los eventos individuales se evalúan por empresa según su probabilidad.</p>')}
 function updateEventModeUI(){state.eventSelectionMode=eventSelectionMode();const panel=document.querySelector('.event-mode-panel');panel?.classList.toggle('random-mode',state.eventSelectionMode==='random');panel?.classList.toggle('manual-mode',state.eventSelectionMode==='manual');renderEventBank()}
-function randomizeEventSelection(){const visible=filteredEvents(),candidates=state.enabledEvents.size?visible.filter(e=>state.enabledEvents.has(e.id)):(state.eventsExplicitlyCleared?[]:visible);if(!candidates.length){toast('No hay eventos habilitados con los filtros actuales.');return}const count=Math.max(1,Math.min(candidates.length,Math.min(40,Number($('eventRandomCount')?.value||15))));const shuffled=candidates.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}state.enabledEvents=new Set(shuffled.slice(0,count).map(e=>e.id));state.eventsExplicitlyCleared=false;state.eventSelectionMode='random';const radio=document.querySelector('input[name="eventSelectionMode"][value="random"]');if(radio)radio.checked=true;saveConfig(true);updateEventModeUI();toast(`${count} eventos fueron seleccionados aleatoriamente.`)}
+function randomizeEventSelection(){const visible=filteredEvents().filter(canSelectEvent),candidates=state.enabledEvents.size?visible.filter(e=>state.enabledEvents.has(e.id)):(state.eventsExplicitlyCleared?[]:visible);if(!candidates.length){toast('No hay eventos habilitados con los filtros actuales.');return}const count=Math.max(1,Math.min(candidates.length,Math.min(40,Number($('eventRandomCount')?.value||15))));const shuffled=candidates.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}state.enabledEvents=new Set(shuffled.slice(0,count).map(e=>e.id));state.eventsExplicitlyCleared=false;state.eventSelectionMode='random';const radio=document.querySelector('input[name="eventSelectionMode"][value="random"]');if(radio)radio.checked=true;saveConfig(true);updateEventModeUI();toast(`${count} eventos fueron seleccionados aleatoriamente.`)}
 const eventBoundInputs=new WeakSet(),eventBankMarkup=new WeakMap();
 function renderEventBank(){
   renderEnabledEvents();
   const body=$('eventBankBody');if(!body)return;
   const events=filteredEvents(),random=eventSelectionMode()==='random';
-  const html=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
+  const html=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  ${!canSelectEvent(e)&&!state.enabledEvents.has(e.id)?'disabled':''} aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small>${!canSelectEvent(e)?'<small>Temporalmente no disponible para nuevas partidas.</small>':''}<span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
   if(eventBankMarkup.get(body)===html){updateSelectAllBtn();return;}
   eventBankMarkup.set(body,html);
   const template=document.createElement('template');template.innerHTML=`<table><tbody>${html}</tbody></table>`;
@@ -491,6 +506,7 @@ function renderEventBank(){
         if(current.type==='checkbox'){if(current.checked!==next.checked)current.checked=next.checked;}
         else if(current!==document.activeElement&&current.value!==next.value)current.value=next.value;
         if(current.max!==next.max)current.max=next.max;
+        if(current.disabled!==next.disabled)current.disabled=next.disabled;
       });
     }
     if(row!==cursor)body.insertBefore(row,cursor);
@@ -515,14 +531,14 @@ function renderEventBank(){
 }
 function updateSelectAllBtn(){
   const btn=$('eventSelectAll');if(!btn)return;
-  const all=EVENT_CATALOG,enabled=all.filter(e=>state.enabledEvents.has(e.id));
+  const all=EVENT_CATALOG.filter(canSelectEvent),enabled=all.filter(e=>state.enabledEvents.has(e.id));
   const allSelected=all.length>0&&enabled.length===all.length;
   btn.textContent=allSelected?'Deseleccionar todos':'Seleccionar todos';
   btn.dataset.allSelected=allSelected?'1':'';
 }
 function toggleSelectAllEvents(){
   const btn=$('eventSelectAll');if(!btn)return;
-  const all=EVENT_CATALOG;
+  const all=EVENT_CATALOG.filter(canSelectEvent);
   if(!all.length){toast('No hay eventos visibles con los filtros actuales.');return;}
   const allSelected=btn.dataset.allSelected==='1';
   if(allSelected){

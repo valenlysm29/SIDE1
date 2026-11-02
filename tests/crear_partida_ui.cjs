@@ -48,7 +48,9 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
  async function screenshot(p,options){await p.waitForTimeout(300);return p.screenshot({...options,animations:'disabled'});}
  async function success(p){await p.waitForFunction(()=>state.partidaId&&runtime()?.phase==='integration');await p.waitForFunction(()=>$('creationFeedback').dataset.tone==='success');assert.match(await p.locator('#creationMessage').innerText(),/Sala creada.*Código/);}
  try{
-  await reset();let p=await page();await configure(p);assert.match(await p.locator('#configReadySummary').innerText(),/3 ciclos operativos de 0 h 5 min/);delayCreation=true;
+  let p;
+  if(!process.env.SIDE_CREATION_COST_ONLY){
+  await reset();p=await page();await configure(p);assert.match(await p.locator('#configReadySummary').innerText(),/3 ciclos operativos de 0 h 5 min/);delayCreation=true;
   await p.evaluate(()=>{$('startGame').click();$('startGame').click()});await p.waitForFunction(()=>$('startGame').textContent==='Creando sala…');assert.equal(await p.locator('#startGame').isDisabled(),true);await success(p);delayCreation=false;
   assert.equal(await count(),1);let game=(await db.query('select * from partidas')).rows[0];assert.equal(game.configuracion.integrationDurationMinutes,2);assert.equal(game.configuracion.cycles,3);assert.equal(game.configuracion.roundHours,0);assert.equal(game.configuracion.roundMinutes,5);assert.deepEqual(game.configuracion.enabledEvents,['PE01','PE02','PE03','PE04']);
   assert.equal(await p.locator('#teacherLobby').isVisible(),true);assert.equal(await p.locator('#lobbyCode').innerText(),game.codigo);const clock=await p.evaluate(()=>({text:$('lobbyCountdown').textContent,seconds:state.seconds,clock:teacherClock,now:teacherNow(),config:state.authoritative,runtime:runtime()}));assert.match(clock.text,/00:0[12]:/,JSON.stringify(clock));assert.match(await p.locator('#lobbyNext').innerText(),/tú controlas el cierre/);
@@ -94,7 +96,22 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
    await Promise.all([p,other].map(x=>x.evaluate(()=>refreshTeacherGame())));const after=(await db.query('select configuracion from partidas where id=$1',[room])).rows[0].configuracion;assert.equal(after.gameStartedAt,first.gameStartedAt);assert.equal(after.runtime.startedAt,first.runtime.startedAt);assert.equal(after.runtime.round,1);await screenshot(p,{path:path.join(output,automatic?'after_automatico_ciclo1.png':'after_manual_ciclo1.png'),fullPage:true});console.log('PASS '+(automatic?'Automático':'Manual')+': deadline inicia Ciclo 1 una vez con dos pestañas');
   }
   await reset();p=await page();await configure(p);await p.locator('#integrationDurationMinutes').fill('0');await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);assert.equal(await p.locator('#integrationDurationMinutesError').isVisible(),true);assert.equal(await count(),0);await p.locator('#integrationDurationMinutes').fill('2');await p.locator('#roundMinutes').fill('0');await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);assert.equal(await p.locator('#roundMinutesError').isVisible(),true);assert.equal(await count(),0);console.log('PASS validación visible junto a campos antes de crear');
-  assert.deepEqual(pageErrors,[],'sin errores JavaScript de página');assert.ok(consoleErrors.some(x=>x.includes('creación de sala')||x.includes('crear/recuperar sala')),'errores simulados tienen detalle técnico en consola');
+  }
+  await reset();
+  await db.exec(fs.readFileSync(path.join(root,'supabase/migrations/20261102025853_bloquear_eventos_costos_no_verificados.sql'),'utf8'));
+  p=await page();await configure(p);
+  await p.evaluate(()=>{state.enabledEvents=new Set();toggleSelectAllEvents();});
+  assert.equal(await p.evaluate(()=>[...state.enabledEvents].some(id=>EVENT_CATALOG.find(e=>e.id===id).effect?.costPct)),false);
+  assert.equal(await p.locator('.event-enable[data-event="PE15"]').isDisabled(),true);
+  await p.evaluate(()=>{state.enabledEvents=new Set(['PE15']);renderEventBank();});
+  await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);
+  assert.equal(await count(),0);assert.match(await p.locator('#creationMessage').innerText(),/Paro de transportistas/);
+  await p.locator('.event-enable[data-event="PE15"]').evaluate(input=>input.click());
+  await p.evaluate(()=>{state.enabledEvents=new Set();toggleSelectAllEvents();});
+  await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await success(p);
+  assert.equal(await count(),1);
+  console.log('PASS restricciones reales de costos: selección masiva válida, selección antigua corregible y creación exitosa');
+  assert.deepEqual(pageErrors,[],'sin errores JavaScript de página');if(!process.env.SIDE_CREATION_COST_ONLY)assert.ok(consoleErrors.some(x=>x.includes('creación de sala')||x.includes('crear/recuperar sala')),'errores simulados tienen detalle técnico en consola');
   console.log('PASS E2E crear sala: todos los casos');
  }finally{fs.writeFileSync(path.join(output,'after_evidencia.json'),JSON.stringify({backend:'PGlite local; app y PartidaService reales; auth fixture docente; red externa bloqueada',calls,pageErrors,consoleErrors},null,2));for(const c of contexts)await c.close();await browser.close();await new Promise(r=>server.close(r));await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1});
