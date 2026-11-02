@@ -1,0 +1,65 @@
+{
+  "before": {
+    "game": "6d9be971-6821-4c75-89f4-b2a7f3ef6d85",
+    "mutationBatches": {
+      "roundTimer": 14,
+      "cycleNews": 3,
+      "enabledEventsSummary": 3,
+      "eventBankBody": 3,
+      "roundState": 3
+    },
+    "stable": {
+      "cycleNews": false,
+      "enabledEventsSummary": false,
+      "eventBankBody": false,
+      "roundTimer": false,
+      "roundState": false,
+      "lobbyCompanies": true
+    },
+    "pageErrors": [],
+    "finalPhase": null,
+    "finalRound": null,
+    "focusPreserved": null,
+    "confirmedClosures": 0
+  },
+  "after": {
+    "game": "304f593d-0a68-41d5-88bc-69870af327a5",
+    "mutationBatches": {
+      "lobbyCompanies": 1,
+      "roundTimer": 10
+    },
+    "stable": {
+      "cycleNews": true,
+      "enabledEventsSummary": true,
+      "eventBankBody": true,
+      "roundTimer": false,
+      "roundState": true,
+      "lobbyCompanies": true
+    },
+    "pageErrors": [],
+    "finalPhase": "finished",
+    "finalRound": 3,
+    "focusPreserved": true,
+    "confirmedClosures": 0
+  },
+  "acceptance": {
+    "game": "370323c5-5a93-4a52-83e3-827d4fc47c5a",
+    "mutationBatches": {
+      "roundTimer": 11,
+      "lobbyCompanies": 1
+    },
+    "stable": {
+      "cycleNews": true,
+      "enabledEventsSummary": true,
+      "eventBankBody": true,
+      "roundTimer": false,
+      "roundState": true,
+      "lobbyCompanies": true
+    },
+    "pageErrors": [],
+    "finalPhase": "finished",
+    "finalRound": 3,
+    "focusPreserved": true,
+    "confirmedClosures": 3
+  }
+}

@@ -1,0 +1,90 @@
+[
+  {
+    "cycles": 3,
+    "mode": "manual",
+    "game": "a0575f0e-0702-4fb3-af49-235187ca8372",
+    "checks": [
+      {
+        "cycle": 1,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 186148.23,
+        "immutableClosures": 3
+      },
+      {
+        "cycle": 2,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 181411.46,
+        "immutableClosures": 6
+      },
+      {
+        "cycle": 3,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 176120.69,
+        "immutableClosures": 9
+      }
+    ],
+    "pageErrors": []
+  },
+  {
+    "cycles": 6,
+    "mode": "automatic",
+    "game": "c2e46b2c-0fea-4b5e-85f6-f82f5a631b1a",
+    "checks": [
+      {
+        "cycle": 1,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 186148.23,
+        "immutableClosures": 3
+      },
+      {
+        "cycle": 2,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 181411.46,
+        "immutableClosures": 6
+      },
+      {
+        "cycle": 3,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 176120.69,
+        "immutableClosures": 9
+      },
+      {
+        "cycle": 4,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 170829.92,
+        "immutableClosures": 12
+      },
+      {
+        "cycle": 5,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 165539.15,
+        "immutableClosures": 15
+      },
+      {
+        "cycle": 6,
+        "confirmedCompanies": 3,
+        "produced": 14,
+        "sold": 14,
+        "cash": 160248.38,
+        "immutableClosures": 18
+      }
+    ],
+    "pageErrors": []
+  }
+]

@@ -44,7 +44,8 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
    for(const cat of tabs){await tab(cat);assert.equal(await p.locator('#decisionTabs .active').getAttribute('data-cat'),cat);}
    const scroll=await p.locator('#decisionTabs').evaluate(e=>({width:e.clientWidth,total:e.scrollWidth}));
    if(width<=1024)assert.ok(scroll.total>scroll.width,`horizontal scroll ${width}`);
-   await tab('DOP');assert.equal(await p.locator('.production-dop').count(),1);
+   assert.equal(await p.locator('#decisionTabs [data-cat="DOP"] .tab-label').innerText(),'Planificación');
+   await tab('DOP');assert.equal(await p.locator('#categoryTitle').innerText(),'Planificación');assert.equal(await p.locator('.production-dop').count(),1);
    const target=p.locator('[data-mold-target]');await target.fill('25');await target.press('Tab');
    assert.match(await p.locator('[data-production-total]').innerText(),/25/);
    await tab('C');assert.equal(await p.locator('.production-dop').count(),0);assert.equal(await p.locator('[data-mold-target]').count(),0);

@@ -1,0 +1,380 @@
+{
+  "game": "6d9be971-6821-4c75-89f4-b2a7f3ef6d85",
+  "errors": [],
+  "mutations": [
+    {
+      "id": "roundTimer",
+      "at": 64100.89999999106,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 65104.59999999404,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 66105,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "cycleNews",
+      "at": 66124.69999998808,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "enabledEventsSummary",
+      "at": 66124.69999998808,
+      "count": 1,
+      "removed": 2
+    },
+    {
+      "id": "eventBankBody",
+      "at": 66124.69999998808,
+      "count": 1,
+      "removed": 92
+    },
+    {
+      "id": "roundTimer",
+      "at": 66124.69999998808,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundState",
+      "at": 66124.69999998808,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 67095.39999999106,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 68102,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 69096.39999999106,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "cycleNews",
+      "at": 69130.5,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "enabledEventsSummary",
+      "at": 69130.5,
+      "count": 1,
+      "removed": 2
+    },
+    {
+      "id": "eventBankBody",
+      "at": 69130.59999999404,
+      "count": 1,
+      "removed": 92
+    },
+    {
+      "id": "roundTimer",
+      "at": 69130.59999999404,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundState",
+      "at": 69130.69999998808,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 70100,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 71106.09999999404,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 72111,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "cycleNews",
+      "at": 72168.79999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "enabledEventsSummary",
+      "at": 72168.79999999702,
+      "count": 1,
+      "removed": 2
+    },
+    {
+      "id": "eventBankBody",
+      "at": 72168.79999999702,
+      "count": 1,
+      "removed": 92
+    },
+    {
+      "id": "roundTimer",
+      "at": 72168.79999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundState",
+      "at": 72168.79999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 73099.29999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 74109.39999999106,
+      "count": 1,
+      "removed": 1
+    }
+  ],
+  "stable": {
+    "cycleNews": false,
+    "enabledEventsSummary": false,
+    "eventBankBody": false,
+    "roundTimer": false,
+    "roundState": false,
+    "lobbyCompanies": true
+  },
+  "requests": [
+    {
+      "at": 1793593170.8879843,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_sala_docente"
+    },
+    {
+      "at": 1793593172.897987,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_sala_docente"
+    },
+    {
+      "at": 1793593172.9457614,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_admission_features"
+    },
+    {
+      "at": 1793593172.9765882,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_game_features"
+    },
+    {
+      "at": 1793593172.9954932,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593173.0158072,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/crear_sala_docente"
+    },
+    {
+      "at": 1793593173.6318517,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593173.6805317,
+      "url": "http://127.0.0.1:55321/rest/v1/decisiones_catalogo"
+    },
+    {
+      "at": 1793593173.6814003,
+      "url": "http://127.0.0.1:55321/rest/v1/decisiones_opciones"
+    },
+    {
+      "at": 1793593174.0853238,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593176.083578,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593178.08175,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593179.083989,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593181.08153,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593182.0796099,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593185.081234,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593185.0817773,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593188.084693,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593188.0852256,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593191.0839174,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593192.0869842,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593194.0826383,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593196.0858126,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593197.084799,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593200.0830326,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593200.08423,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593203.0863998,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593203.0914967,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593206.0833187,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593207.0828044,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593209.0826542,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593210.0837705,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593212.0822752,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593214.0812218,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593215.0804632,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593217.0813038,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593218.0802476,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593221.0809162,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593221.08176,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593224.0810995,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593225.0808861,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593227.0819635,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593229.0804708,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593230.0857482,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593232.0797193,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593233.0859506,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593235.0919821,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593236.0888023,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593239.081802,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593239.082636,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593242.0949852,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593242.0969172,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    }
+  ]
+}

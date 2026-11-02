@@ -1,0 +1,88 @@
+CIERRE_CREDITO_QA {"producido":100,"recibidoHilo":1300,"pendienteHilo":1300,"cxp":14352,"vencimiento":2,"cajaInicial":200000,"cajaFinal":204924.06,"ventas":35000,"costoVentas":13582.94,"utilidad":16023.52}
+✔ crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierran igual (4932.4945ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":206704.45,"costoVentas":13582.94,"utilidad":17803.91,"impuesto":0},{"ciclo":2,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":206704.45,"cajaFinal":215621.9,"costoVentas":13164.34,"utilidad":16490.01,"impuesto":0},{"ciclo":3,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"valorMP":879.87,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":9975,"cajaInicial":215621.9,"cajaFinal":236149.35,"costoVentas":13569.67,"utilidad":16084.68,"impuesto":0},{"ciclo":4,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"valorMP":1322.71,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":11637.5,"cajaInicial":236149.35,"cajaFinal":250248.8,"costoVentas":13588.1,"utilidad":16066.25,"impuesto":0},{"ciclo":5,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"valorMP":1763.95,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":13300,"cajaInicial":250248.8,"cajaFinal":264348.25,"costoVentas":13589.7,"utilidad":16064.65,"impuesto":0},{"ciclo":6,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":25,"hilo_ref":0,"hilo_std":325,"cuero_std":0,"hilo_prem":0,"cuero_prem":17.5,"cuero_sint":0},"valorMP":2204.99,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":14962.5,"cajaInicial":264348.25,"cajaFinal":265455.88,"costoVentas":13589.9,"utilidad":3072.63,"impuesto":12991.82}]
+✔ 6 ciclos credit anterior: arrastran stock y liquidan obligaciones sin duplicación (5130.4689ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":28000,"cxc":5600,"cajaInicial":200000,"cajaFinal":201174.45,"costoVentas":13582.94,"utilidad":10873.91,"impuesto":0},{"ciclo":2,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":28000,"cxc":7000,"cajaInicial":201174.45,"cajaFinal":204806.9,"costoVentas":13582.94,"utilidad":10873.91,"impuesto":0},{"ciclo":3,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":8400,"cajaInicial":204806.9,"cajaFinal":220399.35,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":4,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":9800,"cajaInicial":220399.35,"cajaFinal":229563.8,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":5,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":11200,"cajaInicial":229563.8,"cajaFinal":238728.25,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":6,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":12600,"cajaInicial":238728.25,"cajaFinal":241547.55,"costoVentas":14030.94,"utilidad":4080.76,"impuesto":6345.15}]
+✔ 6 ciclos credit utility-v1: arrastran stock y liquidan obligaciones sin duplicación (5162.2775ms)
+(node:19724) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_vehicles.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ five city cars reuse geometry and batch body panels without losing wheel transforms (23.3912ms)
+✔ tres empresas durante seis ciclos con desafíos rotados y cierres persistidos (6951.694ms)
+┌─────────┬───────┬──────────┬───────────┬─────────┬──────────┬─────────────┬───────────┬───────────┬───────────┬─────────┬────────────┬────────────┐
+│ (index) │ ciclo │ planeado │ producido │ vendido │ ingresos │ cajaInicial │ cajaFinal │ costos    │ utilidad  │ calidad │ eficiencia │ reputacion │
+├─────────┼───────┼──────────┼───────────┼─────────┼──────────┼─────────────┼───────────┼───────────┼───────────┼─────────┼────────────┼────────────┤
+│ 0       │ 1     │ 100      │ 80        │ 80      │ 3200     │ 100000      │ 85158.03  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+│ 1       │ 2     │ 100      │ 80        │ 80      │ 3200     │ 85158.03    │ 78179.06  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+│ 2       │ 3     │ 100      │ 80        │ 80      │ 3200     │ 78179.06    │ 71200.09  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+└─────────┴───────┴──────────┴───────────┴─────────┴──────────┴─────────────┴───────────┴───────────┴───────────┴─────────┴────────────┴────────────┘
+✔ Diagnóstico ingresos: un plan factible vende; faltar recursos produce cero sin inventar stock (20.4519ms)
+✔ Modo actual: tres ciclos local/remoto, caja, utilidad, inventario, puntajes e idempotencia (57.9625ms)
+✔ Preparar el plan no descuenta caja; local y limpieza son gasto de cada cierre (12.2709ms)
+✔ reads sealed values and preserves zero and losses (31.7737ms)
+✔ missing values remain missing and inconsistency is flagged (0.3437ms)
+✔ a production gap is not described as lost sales (0.6138ms)
+✔ calculates ratios only from valid same-cycle inputs (1.6501ms)
+✔ exposes a financial breakdown only if all components reconcile (0.4981ms)
+✔ previous cycle variation needs both comparable values (0.3275ms)
+✔ margen con ventas negativas usa un denominador no nulo (0.3256ms)
+✔ un cierre muestra la instantánea sellada aunque el libro del cliente cambie (4.1746ms)
+✔ los estados presentan pasivos de proveedores, anticipos e impuesto pagado (35.5321ms)
+✔ one roster channel, three-second financial reconciliation while connected, backoff and cleanup (3.459ms)
+✔ failed snapshot survives reload and retries its decisions/report with the original CAS revision (4.9456ms)
+✔ operation retry after an acknowledged snapshot never repeats the snapshot or the completed report (2.3844ms)
+✔ offline edits coalesce by cycle and category without losing other categories (0.9778ms)
+✔ a newer edit made during a failed request survives and merges the unfinished operations (0.8635ms)
+✔ successful writes advance later jobs of the same company across cycles (0.8985ms)
+✔ CAS conflicts stop retries, preserve a local copy and never overwrite the other session (0.9483ms)
+✔ logout or identity change during a request prevents operations and revision changes in the next session (0.6677ms)
+✔ explicit identity rejection clears the outbox; technical failures with the same code keep it (0.9312ms)
+✔ lost snapshot acknowledgment is verified before retrying decisions and never writes the snapshot twice (1.3562ms)
+✔ an unavailable conflict check retains the job and does not adopt an unknown server revision (1.0333ms)
+✔ network failure backs off polling and resumes a durable snapshot exactly once (2.9222ms)
+✔ decision writes preserve technical errors and require an explicit acknowledgment (20.5884ms)
+✔ report preview never writes a financial result from the client (4.0212ms)
+✔ the status gives a useful reason without discarding the local save (0.9941ms)
+✔ manual retry bypasses backoff and resumes only unfinished operations (1.9887ms)
+✔ does not borrow financial data from another company with the same name (5.8931ms)
+✔ does not fill current cycle statements with previous cycle data (3.7252ms)
+✔ keeps same-company same-cycle fallback when its report is pending (2.3697ms)
+✔ presence connects immediately and needs sustained elapsed time before going idle (4.7448ms)
+✔ grade queue retries, persists, and only acknowledges the latest edit (7.6341ms)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at Object.enqueue (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:74:7)
+    at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:85:9)
+    at Test.runInAsyncScope (node:async_hooks:227:14)
+    at Test.run (node:internal/test_runner/test:1402:25)
+    at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    at Test.postRun (node:internal/test_runner/test:1542:19)
+    at Test.run (node:internal/test_runner/test:1467:12)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+SIDE: no se pudo sincronizar el puntaje docente Error: offline
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:87:41)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:98:13)
+✔ grade queue shows failure only after repeated retries and keeps job locally (2.5302ms)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:91:15)
+✔ grade queue still saves and retries when local storage is full (3.284ms)
+✔ grade migration persists only for the owner and a company in that game (3597.2244ms)
+✔ legacy world charges are removed before closure while frozen history and decisions stay intact (3.5509ms)
+✔ world sales cannot raise assigned demand, revenue, production, stock or cash (36.7395ms)
+✔ cycle business context never reads world inventory or prices (3.3359ms)
+✔ world has no financial write bridge and the bridge exposes no mutable decisions (6.1906ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 45
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15547.0389

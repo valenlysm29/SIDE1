@@ -1,0 +1,670 @@
+{
+  "game": "304f593d-0a68-41d5-88bc-69870af327a5",
+  "errors": [],
+  "mutations": [
+    {
+      "id": "lobbyCompanies",
+      "at": 62682.40000000596,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 63643.5,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 64645,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 65644.10000000894,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 66645.29999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 67644.40000000596,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 68652.29999999702,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 70650.90000000596,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 71647.10000000894,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 71724.40000000596,
+      "count": 1,
+      "removed": 1
+    },
+    {
+      "id": "roundTimer",
+      "at": 73638.5,
+      "count": 1,
+      "removed": 1
+    }
+  ],
+  "stable": {
+    "cycleNews": true,
+    "enabledEventsSummary": true,
+    "eventBankBody": true,
+    "roundTimer": false,
+    "roundState": true,
+    "lobbyCompanies": true
+  },
+  "focusPreserved": true,
+  "cycles": [],
+  "finalPhase": "finished",
+  "finalRound": 3,
+  "requests": [
+    {
+      "at": 1793593389.924191,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_sala_docente"
+    },
+    {
+      "at": 1793593391.732119,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_sala_docente"
+    },
+    {
+      "at": 1793593391.7708297,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_admission_features"
+    },
+    {
+      "at": 1793593391.7862203,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_game_features"
+    },
+    {
+      "at": 1793593391.8004708,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593391.812986,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/crear_sala_docente"
+    },
+    {
+      "at": 1793593392.1187818,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593392.1366494,
+      "url": "http://127.0.0.1:55321/rest/v1/decisiones_catalogo"
+    },
+    {
+      "at": 1793593392.137107,
+      "url": "http://127.0.0.1:55321/rest/v1/decisiones_opciones"
+    },
+    {
+      "at": 1793593392.155053,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593392.8394544,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593392.8579016,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593394.8408403,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593395.8378916,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593395.8522768,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593397.8384237,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593398.838858,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593398.8615844,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593400.8376763,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593402.837846,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593402.8535347,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593403.8379815,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593405.838185,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593405.8519697,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593406.8383589,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593408.8380914,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593408.8511353,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593409.838114,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593411.8424196,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593411.8717566,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593412.8435986,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593414.8437397,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593414.8637307,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593415.8415117,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593418.8417778,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593418.8429008,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593418.861518,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593421.8436532,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593421.8441012,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593421.867727,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593424.8409443,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593425.8388615,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593425.8545954,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593427.8385575,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593428.8385706,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593428.8566074,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593430.8406785,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593431.83908,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593431.8573906,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593433.839358,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593434.839179,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593434.9016864,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593436.8387685,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593438.8372529,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593438.8540704,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593439.8378093,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593441.8393574,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593441.852648,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593442.8397071,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593444.8393645,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593444.8610947,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593445.8398821,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593448.840384,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593448.8407423,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593448.8581078,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593451.843129,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593451.8433561,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593451.8658354,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593454.8442538,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593454.8451538,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593454.8646388,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593457.8513339,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593457.8516288,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593457.8713737,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593460.8469908,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593461.84159,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593461.8544621,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593463.8508196,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593464.8418696,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593464.8565447,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593466.8497245,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593468.837804,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593468.8492951,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593469.840999,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593470.3369052,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_guardar_configuracion_v19"
+    },
+    {
+      "at": 1793593471.8493316,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593471.8642418,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593472.8401258,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593474.5746481,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593474.5936987,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593474.7504106,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593474.7693746,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593475.8446712,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593475.8450994,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593475.8562248,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593475.8663425,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593478.8500662,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593478.8505127,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593478.8648598,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593478.867008,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593481.8388927,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593481.8620374,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593482.8395472,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593482.8522944,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593484.838706,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593484.8540328,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593485.8736215,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593485.9393206,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593485.9583304,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593486.0749488,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593486.0911415,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593486.1030817,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593486.838774,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593486.8548331,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593487.8462164,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593487.8735662,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593487.8990626,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593489.84691,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593489.885911,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593490.8403358,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593490.8552969,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593490.8671076,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593493.8406613,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593493.8414583,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593493.8609164,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593493.8632216,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593493.883517,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593496.8432739,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593496.8435082,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593496.8577504,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593496.8579588,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593496.8699594,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.2189555,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593497.2354872,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.2507138,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.2621667,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.3849058,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593497.4111702,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.478643,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593497.4929974,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593499.8589048,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/controlar_partida"
+    },
+    {
+      "at": 1793593499.85911,
+      "url": "http://127.0.0.1:55321/rest/v1/participantes"
+    },
+    {
+      "at": 1793593499.8787656,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/obtener_reporte_empresa"
+    },
+    {
+      "at": 1793593499.8801918,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593499.8971229,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    },
+    {
+      "at": 1793593499.9151192,
+      "url": "http://127.0.0.1:55321/rest/v1/rpc/side_consultar_cierre_negocio"
+    }
+  ]
+}

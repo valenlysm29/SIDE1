@@ -1,0 +1,370 @@
+✔ untouched zero production stays pending and a changed target becomes a draft (58.499ms)
+✔ current store selection normalizes duplicates without mutating legacy data (1.5935ms)
+✔ store checkboxes accumulate districts, keep web, and update prices independently (48.5776ms)
+✔ single-store draft saves and reloads with one charge and one basic seller (33.8581ms)
+✔ multiple stores survive draft restoration and repeated saves with correct charges and sellers (32.2302ms)
+✔ existing contracts prevent closure but allow adding districts in later cycles (61.5596ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (10.4871ms)
+✖ DOP renders once in Production and nowhere in the other categories or summary (32.7645ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (39.5435ms)
+✖ manual transfers show central and store stock, persist in sales decision and reject excess (11.8102ms)
+✔ DOP shortages never block saving or sending production and material sections (2282.746ms)
+✖ la meta sin recursos calcula materiales y recursos suficientes sin modificar el estado (25.0342ms)
+✖ prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada (3.5187ms)
+✖ DOP compares recommended, available and missing resources without changing the target (1.7916ms)
+✔ closing keeps a 2000-unit decision and produces only the 500 supported by stock (28.5664ms)
+✔ each of three cycles charges exactly the announced fixed rows in the real cash ledger (49.4542ms)
+✔ saving the same infrastructure and production costs never charges announced mandatory rows again (18.8547ms)
+✔ integration and pause cannot charge, and a resumed cycle only charges once (13.7018ms)
+✔ unsaved optional purchases, payroll and loan cannot enter the automatic cost notice or real ledger (12.1411ms)
+✔ next-cycle notice preserves saved staff and store commitments without repeating marketing or loan (30.6553ms)
+✔ acknowledged receipt survives the real student snapshot hydration contract without duplicate debit (10.8361ms)
+✔ zero existing fixed charges cannot create a notice or any cash movement (8.6257ms)
+✔ another company cannot inherit the acknowledgement or charge receipt of the previous company (15.3545ms)
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (8.5001ms)
+✖ corrected actual consumption gives exact reputation and quality factors (4.3405ms)
+✔ advertising is capped, debited once and contributes only its reputation factor (1.6729ms)
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (11.6162ms)
+✔ MYPE and No MYPE labor, acquisition and maintenance follow the two source columns (0.4459ms)
+✔ base maintenance recurs in the engine while the optional decision keeps its original fee (10.3005ms)
+✔ the engine retains all owned mold types without adding a multi-purchase control (1.1666ms)
+✔ largest remainders preserve the market and are independent of input order (21.1705ms)
+✔ price guards support identical prices, arbitrary chosen prices and zero total scores (0.6266ms)
+✔ opening finished stock sells without new labor, material or production plan (2.0143ms)
+✔ unused premium purchases do not raise reputation; all thread levels form its denominator (0.6353ms)
+✔ sub-cent physical material balances survive repeated closures (2.5554ms)
+✔ unsold production costs remain in inventory and sold costs are recognized once (5.3633ms)
+✔ 10 básicos sin recursos (27.7119ms)
+✔ 100 prémium y receta (2.0091ms)
+✔ metas combinadas y cambio de cantidad (1.2743ms)
+✔ la representación no altera estado ni resultados reales (2.6847ms)
+✖ 3000 básicos conservan la meta y muestran capacidad y producción real (1.6506ms)
+✔ current revenue adapter reproduces fresh v19 Excel market allocations (16.7117ms)
+✖ catalog reputation is unique, bounded and independent from advertising spend proxy (10.6402ms)
+✔ shared closure competes across companies, caps sales at stock and ignores POS activity (27.3355ms)
+✔ unsold goods carry forward and opening stock can sell without current production (10.287ms)
+✔ browser pages load the same revenue dependencies as Node (32.2493ms)
+✔ remote service ignores world prices and preserves confirmed decision expenses (23.2455ms)
+✔ connected students cannot allocate the whole shared market to themselves (1.9064ms)
+✔ a live projection computes physical sales and price times units without settling or mutating input (27.6638ms)
+✔ the projection requires a channel and preserves stock (6.552ms)
+✖ the final shared market replaces the individual reference and cannot sell stock twice (3.2005ms)
+ℹ tests 51
+ℹ suites 0
+ℹ pass 40
+ℹ fail 11
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2802.3707
+
+✖ failing tests:
+
+test at tests\decisions_corrections.test.js:113:1
+✖ DOP renders once in Production and nowhere in the other categories or summary (32.7645ms)
+  AssertionError [ERR_ASSERTION]: C
+
+  0 !== 1
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:118:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\decisions_corrections.test.js:138:1
+✖ manual transfers show central and store stock, persist in sales decision and reject excess (11.8102ms)
+  evalmachine.<anonymous>:1
+  manualDistributionData()[0]
+  ^
+
+  ReferenceError: manualDistributionData is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:149:12)
+      at Object.runInContext (node:vm:301:6)
+      at run (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:19:22)
+      at Object.json (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:24:190)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:140:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests\dop_resource_planning.test.cjs:7:1
+✖ la meta sin recursos calcula materiales y recursos suficientes sin modificar el estado (25.0342ms)
+  AssertionError [ERR_ASSERTION]: 20 juegos de piezas
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:11:124)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\dop_resource_planning.test.cjs:14:1
+✖ prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada (3.5187ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /100 unidades totales/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="100" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 0 u. · Molde mejorado: 0 u. · Molde premium: 100 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>100 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">70 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 70 m² de cuero. Referencia básica: 1 mesas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">100 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">100 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 1,300 m. Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde premium</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>100 u.</td><td>70 m²</td><td>100 unidades</td><td>1,300 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>70 m²</td><td>0 m²</td><td>70 m²</td></tr><tr><th scope="row">Accesorios</th><td>100 unidades</td><td>0 unidades</td><td>100 unidades</td></tr><tr><th scope="row">Hilo</th><td>1,300 metros</td><td>0 metros</td><td>1,300 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:19:79)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="100" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 0 u. · Molde mejorado: 0 u. · Molde premium: 100 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>100 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">70 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 70 m² de cuero. Referencia básica: 1 mesas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">100 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">100 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 1,300 m. Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde premium</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>100 u.</td><td>70 m²</td><td>100 unidades</td><td>1,300 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>70 m²</td><td>0 m²</td><td>70 m²</td></tr><tr><th scope="row">Accesorios</th><td>100 unidades</td><td>0 unidades</td><td>100 unidades</td></tr><tr><th scope="row">Hilo</th><td>1,300 metros</td><td>0 metros</td><td>1,300 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /100 unidades totales/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\dop_resource_planning.test.cjs:24:1
+✖ DOP compares recommended, available and missing resources without changing the target (1.7916ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /<th>Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="2000" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 2,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>2,000 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">600 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 600 m² de cuero. Referencia básica: 13 mesas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">2,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">2,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 12,000 m. Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>2,000 u.</td><td>600 m²</td><td>2,000 unidades</td><td>12,000 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>600 m²</td><td>0 m²</td><td>600 m²</td></tr><tr><th scope="row">Accesorios</th><td>2,000 unidades</td><td>0 unidades</td><td>2,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>12,000 metros</td><td>0 metros</td><td>12,000 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:27:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="2000" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 2,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>2,000 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">600 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 600 m² de cuero. Referencia básica: 13 mesas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">2,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">2,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 12,000 m. Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>2,000 u.</td><td>600 m²</td><td>2,000 unidades</td><td>12,000 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>600 m²</td><td>0 m²</td><td>600 m²</td></tr><tr><th scope="row">Accesorios</th><td>2,000 unidades</td><td>0 unidades</td><td>2,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>12,000 metros</td><td>0 metros</td><td>12,000 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /<th>Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:14:1
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (8.5001ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+  +   8,
+  -   14,
+      31.4,
+      24
+    ]
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:15:72)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 8, 31.4, 24 ],
+    expected: [ 14, 31.4, 24 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:18:1
+✖ corrected actual consumption gives exact reputation and quality factors (4.3405ms)
+  AssertionError [ERR_ASSERTION]: 0 != 2.119565217391304
+      at near (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:6:65)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:19:43)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:26:1
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (11.6162ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  221 !== 368
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:27:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 221,
+    expected: 368,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\production_dop_target_ui.test.js:14:1
+✖ 3000 básicos conservan la meta y muestran capacidad y producción real (1.6506ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Capacidad instalada: 0 unidades/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="3000" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 3,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>3,000 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">900 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 900 m² de cuero. Referencia básica: 19 mesas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">3,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">3,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 18,000 m. Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>3,000 u.</td><td>900 m²</td><td>3,000 unidades</td><td>18,000 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>900 m²</td><td>0 m²</td><td>900 m²</td></tr><tr><th scope="row">Accesorios</th><td>3,000 unidades</td><td>0 unidades</td><td>3,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>18,000 metros</td><td>0 metros</td><td>18,000 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\production_dop_target_ui.test.js:14:354)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="3000" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 3,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>3,000 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">900 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 900 m² de cuero. Referencia básica: 19 mesas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">3,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">3,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 18,000 m. Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>3,000 u.</td><td>900 m²</td><td>3,000 unidades</td><td>18,000 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>900 m²</td><td>0 m²</td><td>900 m²</td></tr><tr><th scope="row">Accesorios</th><td>3,000 unidades</td><td>0 unidades</td><td>3,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>18,000 metros</td><td>0 metros</td><td>18,000 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /Capacidad instalada: 0 unidades/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\revenue_excel_current.test.cjs:11:1
+✖ catalog reputation is unique, bounded and independent from advertising spend proxy (10.6402ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(Math.abs(profile.scores.reputation-(1/3+1+1+0)*10/4)<1e-10)
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\revenue_excel_current.test.cjs:12:135)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\sales_projection.test.cjs:31:1
+✖ the final shared market replaces the individual reference and cannot sell stock twice (3.2005ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  162 !== 3500
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\sales_projection.test.cjs:33:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 162,
+    expected: 3500,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

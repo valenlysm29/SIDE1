@@ -112,15 +112,16 @@
     return html;
   }
   function createController({mount,status,refresh,service,catalog=[]}){
-    let snapshot=null,selectedId=null,generation=0;
+    let snapshot=null,selectedId=null,generation=0,gameId=null;
     function render(){mount.innerHTML=snapshotHtml(snapshot,selectedId,catalog);}
     mount.addEventListener('change',event=>{if(event.target.id==='historyCompanySelect'){selectedId=event.target.value;render();mount.querySelector('#historyCompanySelect')?.focus();}});
-    async function load(){
+    async function load(id){
+      if(typeof id==='string')gameId=id;
       const request=++generation;
       snapshot=null;selectedId=null;mount.innerHTML='';mount.setAttribute('aria-busy','true');
       status.textContent='Cargando la última partida finalizada…';if(refresh)refresh.disabled=true;
       try{
-        const result=service?.obtenerUltima?await service.obtenerUltima():{success:false,unavailable:true};
+        const result=gameId&&service?.obtener?await service.obtener(gameId):service?.obtenerUltima?await service.obtenerUltima():{success:false,unavailable:true};
         if(request!==generation)return;
         if(!result.success){
           status.textContent=result.unavailable?'El apartado Historial aún no está habilitado. Aplica el SQL de historial en Supabase y pulsa Actualizar.':result.offline?'Conecta Supabase para consultar la partida anterior.':'No se pudo consultar el historial. Revisa tu conexión o sesión y pulsa Actualizar.';

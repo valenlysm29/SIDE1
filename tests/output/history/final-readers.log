@@ -1,0 +1,20 @@
+✔ seal status overrides the financial calculation status, and isolates company and cycle (2.7646ms)
+✔ official history rendering omits future or processing amounts and never mutates the seal (34.6748ms)
+✔ history service distinguishes no previous game and preserves every company, cycle and zero grade (5.8805ms)
+✔ history service re-reads the last game rather than accumulating older games (1.886ms)
+✔ missing RPC or table returns actionable configuration feedback without console spam (5.8413ms)
+✔ history service reports unavailable connection, rejected permission and RPC exceptions (6.9584ms)
+✔ history presentation uses catalog categories, labels and every recorded cycle (23.2032ms)
+✔ history presentation handles empty games, company selection and escaped student values (2.1324ms)
+✔ history controller discards obsolete responses and clears previous data on unavailable schema (0.888ms)
+✔ does not borrow financial data from another company with the same name (4.858ms)
+✔ does not fill current cycle statements with previous cycle data (2.8647ms)
+✔ keeps same-company same-cycle fallback when its report is pending (1.984ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 292.2941

@@ -1,0 +1,18 @@
+{
+  "functions": [
+    {
+      "id": "0d40ac68-22b8-4f90-aee1-1b9d0f6e0ec2",
+      "slug": "side-business-close",
+      "name": "side-business-close",
+      "status": "ACTIVE",
+      "version": 8,
+      "created_at": 1793161076710,
+      "updated_at": 1793596863070,
+      "verify_jwt": false,
+      "import_map": false,
+      "entrypoint_path": "file:///tmp/user_fn_plfuwfdpsagzrlveqkvl_0d40ac68-22b8-4f90-aee1-1b9d0f6e0ec2_8/source/supabase/functions/side-business-close/index.ts",
+      "ezbr_sha256": "56908073dcc15c97144a2b3f78710bc5314ed9708b8c25079e85883d75d33a31"
+    }
+  ],
+  "message": ""
+}

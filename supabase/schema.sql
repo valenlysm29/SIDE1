@@ -332,3 +332,18 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- admisión y cierre v19, aplicar supabase/migrations/20261027_resultados_en_vivo.sql.
 -- Amplía obtener_reporte_empresa con el plan confirmado y el ciclo de la sala,
 -- conservando la lectura exclusiva del profesor propietario.
+
+-- Continuidad histórica oficial (02/11/2026):
+-- 20261102044053_historical_continuity.sql agrega side_historial_oficial(uuid,bigint)
+-- y restaura los snapshots de lectura desde side_business_closures. Autoriza
+-- docentes propietarios y estudiantes con student_claims de su propia empresa.
+-- 20261102044938_atomic_purchase_presentations.sql unifica la confirmación
+-- atómica con las presentaciones de 20261031041921_presentaciones_excel_v2.sql.
+-- El avance de nuevas partidas usa las migraciones 20261102022758,
+-- 20261102024042, 20261102034926 y 20261102040000; el ejecutor Edge enruta
+-- partidas anteriores al motor legacy y las nuevas al motor secuencial.
+-- Ninguna de estas lecturas ni conversiones reescribe cierres sellados.
+
+-- 20261102051739_closure_processing_status.sql registra intentos y errores del
+-- ejecutor, con RLS y escritura exclusiva del servicio. La lectura histórica
+-- expone el estado sin transformar errores en comprobantes oficiales.

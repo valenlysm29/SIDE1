@@ -1,0 +1,12 @@
+create role anon; create role authenticated; create role service_role;
+create schema auth; create function auth.role() returns text language sql as $$select current_setting('test.role',true)$$;
+create schema net; create schema vault;
+create table vault.decrypted_secrets(name text,decrypted_secret text);
+create table net._http_response(id bigint,status_code int,timed_out boolean,error_msg text);
+create function net.http_post(url text,headers jsonb,body jsonb,timeout_milliseconds int) returns bigint language sql as $$select 1::bigint$$;
+create table public.partidas(id uuid primary key);
+create table public.side_business_closures(partida_id uuid,ciclo int,primary key(partida_id,ciclo));
+create function public.side_registrar_estado_cierre(uuid,integer,boolean,boolean,text,text) returns void language sql as $$select$$;
+create function public.side_historial_oficial(p_partida_id uuid,p_empresa_id bigint default null) returns text language plpgsql as $$ declare n int:=1; b record; begin select partida_id into b from public.side_business_closures limit 1; return case when b.partida_id is not null then 'missing' else 'pending' end; end $$;
+create function public.side_guardar_cierre_negocio(uuid,integer,text,jsonb) returns jsonb language sql as $$select jsonb_build_object('saved',true)$$;
+create function public.side_guardar_cierre_temporal_v1(uuid,integer,text,jsonb,jsonb) returns jsonb language sql as $$select jsonb_build_object('saved',true)$$;

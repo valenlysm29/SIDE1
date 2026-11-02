@@ -6,10 +6,10 @@ const rules=require('../js/side_rules');
 const root=path.resolve(__dirname,'..');
 function runtime(){
   const elements=new Map(),inputs=[],storage=new Map(),errors=[];
-  function element(){return {innerHTML:'',textContent:'',dataset:{},style:{setProperty(){}},offsetHeight:82,getBoundingClientRect(){return {top:0,left:0,right:800,bottom:82,width:800,height:82}},
+  function element(){return {children:[],insertBefore(child,before){const old=this.children.indexOf(child);if(old>=0)this.children.splice(old,1);const index=this.children.indexOf(before);this.children.splice(index<0?this.children.length:index,0,child);},appendChild(child){this.children.push(child);},innerHTML:'',textContent:'',dataset:{},style:{setProperty(){}},offsetHeight:82,getBoundingClientRect(){return {top:0,left:0,right:800,bottom:82,width:800,height:82}},
     classList:{add(){},remove(){},toggle(){},contains(){return false}},handlers:{},
-    addEventListener(type,fn){this.handlers[type]=fn},setAttribute(){},querySelector(){return element()},querySelectorAll(){return []},focus(){}};}
-  const document={getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id)},
+    addEventListener(type,fn){this.handlers[type]=fn},setAttribute(){},querySelector(){return element()},querySelectorAll(){return []},remove(){},focus(){}};}
+  const document={createElement(){return element()},getElementById(id){if(!elements.has(id))elements.set(id,element());return elements.get(id)},
     querySelector(){return null},querySelectorAll(selector){return selector==='[data-choice]'?inputs:[]},addEventListener(){}};
   const context=vm.createContext({document,URLSearchParams,location:{search:''},console:{log(){},warn(){},error(...args){errors.push(args)}},
     setInterval(){},clearInterval(){},setTimeout(){},clearTimeout(){},requestAnimationFrame(){},
