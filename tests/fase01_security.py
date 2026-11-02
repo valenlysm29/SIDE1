@@ -37,7 +37,12 @@ for session in (None,a,teacher,other):
         ('side_guardar_cierre_excel',{'p_partida_id':gid,'p_ciclo':1,'p_token':'fake','p_cierre':{}}),
         ('side_registrar_estado_cierre',{'p_partida_id':gid,'p_ciclo':1,'p_success':True,'p_pending':False}),
         ('side_record_material_receipt_v1',{'p_order_id':'fake','p_receipt_id':'fake','p_quantity':1,'p_day':0}),
-        ('side_validar_token_cierre',{'p_token':'fase01-local-only'})]:
+        ('side_validar_token_cierre',{'p_token':'fase01-local-only'}),
+        ('side_iniciar_intento_cierre',{'p_run':gid,'p_partida':gid,'p_ciclo':1}),
+        ('side_finalizar_intento_cierre',{'p_run':gid,'p_partida':gid,'p_ciclo':1,'p_success':True,'p_pending':False,'p_code':None,'p_error':None}),
+        ('side_contexto_cierre_con_intento',{'p_run':gid,'p_partida_id':gid,'p_ciclo':1,'p_ciclo_intento':1}),
+        ('side_guardar_cierre_con_intento',{'p_run':gid,'p_partida_id':gid,'p_ciclo':1,'p_token':'fake','p_cierre':{}}),
+        ('side_estado_intento_cierre',{'p_partida':gid,'p_ciclo':1})]:
         code_,_=rpc(name,args,session);passed('server-only '+name+' '+str(len(checks)),code_ in (401,403,404))
 for session in (None,a,teacher,other):
     code_,_=req('/rest/v1/side_business_closures?select=partida_id',session=session,method='GET')

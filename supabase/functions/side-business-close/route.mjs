@@ -33,7 +33,7 @@ export async function runVersioned(rpc,legacy,newEngine,options={}) {
       }
     }
   }
-  for(const result of results){
+  for(const result of options.tracked?[]:results){
     if(!result.game||!Number.isInteger(Number(result.cycle)))continue;
     try{
       const recorded=await rpc('side_registrar_estado_cierre',{p_partida_id:result.game,p_ciclo:result.cycle,p_success:result.success,p_pending:!!result.pending,p_code:result.code||null,p_error:result.error||null});
@@ -41,4 +41,41 @@ export async function runVersioned(rpc,legacy,newEngine,options={}) {
     }catch{console.error('Closure status journal unavailable: NETWORK_ERROR');}
   }
   return results;
+}
+
+// Preserve the deployed execution ownership/fencing contract. The same isolated
+// routing applies, while only the owning attempt may read/write its seal.
+export async function runTracked(rpc,legacy,newEngine,{runId,deadline=Infinity}={}) {
+  if(!runId)throw new Error('Falta el identificador de ejecución');
+  const tracked=engine=>async scoped=>{
+    const [game]=(await scoped('side_cierres_pendientes',{})).data,results=[];
+    for(const cycle of game.cycles){
+      const failed=(code,error)=>({game:game.id,cycle,success:false,pending:false,code,error});
+      if(Date.now()>=deadline){results.push({...failed('PLAZO_TRABAJADOR_AGOTADO','Pendiente de reintento programado.'),success:true,pending:true});break;}
+      const args={p_run:runId,p_partida:game.id,p_ciclo:cycle};
+      let claim;
+      try{claim=await rpc('side_iniciar_intento_cierre',args);}catch{claim={error:true};}
+      if(claim.error){results.push(failed('EJECUCION_CIERRE_NO_VERIFICABLE','No se pudo verificar el intento de esta partida.'));break;}
+      if(claim.data!==true){results.push({...failed('INTENTO_EN_CURSO','Otro intento conserva la propiedad del cierre.'),success:true,pending:true});break;}
+      const filtered=async(name,params)=>{
+        if(name==='side_cierres_pendientes')return {data:[{...game,cycles:[cycle]}],error:null};
+        if(name==='side_contexto_cierre_negocio')return rpc('side_contexto_cierre_con_intento',{...params,p_run:runId,p_ciclo_intento:cycle});
+        if(name==='side_guardar_cierre_negocio'||name==='side_guardar_cierre_temporal_v1')return rpc('side_guardar_cierre_con_intento',{...params,p_run:runId});
+        return rpc(name,params);
+      };
+      let result;
+      try{
+        const current=await engine(filtered,{deadline});
+        result=current?.find(r=>r.game===game.id&&Number(r.cycle)===Number(cycle));
+        if(!result)throw new Error('Missing result');
+      }catch{result=failed('PROCESAMIENTO_CIERRE_NO_DISPONIBLE','No se pudo procesar esta partida; se reintentará sin avanzar su ciclo.');}
+      let done;
+      try{done=await rpc('side_finalizar_intento_cierre',{...args,p_success:!!result.success,p_pending:!!result.pending,p_code:result.code||null,p_error:result.error||null});}catch{done={error:true};}
+      if(done.error)result=failed('REGISTRO_INTENTO_NO_DISPONIBLE','No se pudo confirmar el registro del intento; se requiere reintento.');
+      results.push(result);
+      if(!result.success||result.pending)break;
+    }
+    return results;
+  };
+  return runVersioned(rpc,tracked(legacy),tracked(newEngine),{deadline,tracked:true});
 }

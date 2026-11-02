@@ -4,7 +4,7 @@ Uses the reviewed bootstrap manifests, with real Supabase Auth and extensions.
 No production data is loaded into the API/Edge acceptance database.
 """
 from pathlib import Path
-import ast, hashlib, json, os, shutil, subprocess, sys
+import ast, hashlib, json, os, shutil, subprocess, sys, re
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTAINER = 'supabase_db_fase01local'
@@ -42,6 +42,15 @@ source=(ROOT/'supabase/migrations/20261028_programar_cierre_edge.sql').read_text
 source=source.replace('https://plfuwfdpsagzrlveqkvl.supabase.co/functions/v1/side-business-close','http://kong:8000/functions/v1/side-business-close')
 sql(source.encode())
 sql(b"select vault.update_secret(id,'fase01-local-only',name,description) from vault.secrets where name='side_business_cron_token'; select cron.unschedule(jobid) from cron.job where jobname='side-business-close'; notify pgrst,'reload schema';")
+tracking_file='supabase/migrations/20261102174348_ejecucion_cierres_verificable.sql'
+tracking=(ROOT/tracking_file).read_text(encoding='utf8').replace('https://plfuwfdpsagzrlveqkvl.supabase.co/functions/v1/side-business-close','http://kong:8000/functions/v1/side-business-close')
+exists=subprocess.check_output(['docker','exec',CONTAINER,'psql','-U','postgres','-Atc',"select to_regclass('public.side_closure_execution_requests') is not null"],encoding='utf8').strip()
+if exists=='t':
+    wrapper=re.search(r'create or replace function public.side_invocar_cierre_programado\(\).*?end \$\$;',tracking,re.S)
+    assert wrapper,'Missing tracked scheduler wrapper'
+    sql(wrapper.group(0).encode())
+else:sql(tracking.encode())
+applied.append({'path':tracking_file,'sha256':hashlib.sha256((ROOT/tracking_file).read_bytes()).hexdigest()})
 functions=WORK/'supabase/functions/side-business-close'
 functions.mkdir(parents=True,exist_ok=True)
 for file in (ROOT/'supabase/functions/side-business-close').iterdir():
