@@ -27,7 +27,7 @@ declare
       if r->>'phase'='decisions' and coalesce((r->>'running')::boolean,false)
         and clock_timestamp()>=(r->>'startedAt')::timestamptz+make_interval(secs=>(r->>'duration')::integer) then
         r:=r||jsonb_build_object('phase','results','status','finished','running',false,'remaining',0);
-      elsif r->>'phase'='results' and exists(select 1 from public.side_business_closures b where b.partida_id=p_id and b.ciclo=(r->>'round')::integer) then
+      elsif r->>'phase'='results' and public.side_cierre_completo(p_id,(r->>'round')::integer) then
         if (r->>'round')::integer >= (c->>'cycles')::integer then
           r:=r||jsonb_build_object('phase','finished','status','simulation-finished','running',false,'remaining',0);
         else
