@@ -4,7 +4,14 @@
  const clone=x=>JSON.parse(JSON.stringify(x));
  function project(input){
   if(input.state?.__cycleSettlements?.[input.round])return null;
-  const value=CYCLE.close({...input,state:clone(input.state),ledger:clone(input.ledger||{}),sectionsByRound:clone(input.sectionsByRound||{})});
+  const own={...input,state:clone(input.state),ledger:clone(input.ledger||{}),sectionsByRound:clone(input.sectionsByRound||{})};
+  let value;
+  if(input.marketContext){
+    const market=input.marketContext,company=String(market.companyId||''),competitors=market.competitors;
+    if(market.verified!==true||!company||!Array.isArray(competitors)||competitors.some(c=>!c.id||String(c.id)===company||Number(c.round)!==Number(input.round)||!c.state)||new Set(competitors.map(c=>String(c.id))).size!==competitors.length)throw new Error('Contexto competitivo no verificable.');
+    const inputs=[{...own,id:company},...competitors.map(c=>clone(c))];
+    value=CYCLE.closeMany(inputs)[company];
+  }else value=CYCLE.close(own);
   const receipt=value.receipt,statement=value.financial.estadoResultados,balance=value.financial.balanceGeneral;
   // Section movements represent decisions and include purchases, salaries,
   // expenses and any selected financing once. The ledger has no dates within
@@ -18,12 +25,14 @@
   return {produced:receipt.produced,sold:receipt.sold,demand:receipt.sales.reduce((s,r)=>s+Number(r.demand||0),0),income:statement.ventasTotales,cost:statement.costos,productionCost:statement.costosProduccion,unitCost:receipt.produced?statement.costosProduccion/receipt.produced:null,profit:statement.utilidadNeta,cash:balance.efectivo,availableBeforeSales,sales:receipt.sales.filter(r=>r.available||r.produced).map(r=>({id:r.id,price:r.price,sold:r.sold,demand:r.demand})),plan:receipt.production};
  }
  function analyze(input){
-  if(input.state?.__materialOrders)return {available:false,reason:'Las recepciones de insumos requieren una proyección autoritativa.'};
+  const temporal=!!input.state?.__materialOrders;
+  if(temporal&&(!input.financialPolicy?.verifiedMaterialContext||!['cash','credit'].includes(input.financialPolicy?.materialPaymentMode)))return {available:false,reason:'Las recepciones de insumos requieren una proyección autoritativa.'};
   if(!Array.isArray(input.catalog)||!input.catalog.length)return {available:false,reason:'No se dispone del catálogo necesario para estimar los pagos.'};
   try{
    const base=project(input);if(!base)return {available:false,reason:'El ciclo ya está cerrado.'};
    const mutations=[];
    for(const [kind,ids] of [['Personal',['PERS_CORTE','PERS_ENSAMBLE','PERS_ACABADO']],['Maquinaria',['MESA_CORTE','ENSAMBLE','ACABADOS']],['Insumos',['CUERO','ACCESORIOS','HILO']]]){
+    if(temporal&&kind==='Insumos')continue; // Confirmed orders cannot be edited as a local counterfactual.
     for(const id of ids){const e=input.state[id],quantities=kind==='Maquinaria'?e?.purchases?.[input.round]:e?.quantities;const option=Object.keys(quantities||{}).find(k=>Number(quantities[k])>0);if(!option)continue;
      const amount=Number(quantities[option]),decrease=kind==='Insumos'?amount*.1:1;if(amount-decrease<0)continue;
      mutations.push({label:`${kind}: reducir ${id} (${option})`,id,option,decrease,kind});break;
@@ -50,7 +59,7 @@
      const sample=project({...input,state});if(sample&&sample.profit>=0&&sample.cash>=0&&sample.availableBeforeSales!==null&&sample.availableBeforeSales>=0){breakEven={target,produced:sample.produced,sold:sample.sold};break;}
     }
    }
-   return {available:true,base,alternatives,breakEven};
+   return {available:true,base,alternatives,breakEven,marketScope:input.marketContext?'competitive':'individual'};
   }catch{return {available:false,reason:'No hay datos suficientes para calcular una proyección fiable.'};}
  }
  return {analyze};

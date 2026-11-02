@@ -1086,14 +1086,15 @@ function refreshProductionDop(){
 
 function showProfitProjection(){
   const mount=document.querySelector('[data-profit-projection]');if(!mount)return;
-  if(temporalStudentRoom()){mount.textContent='La proyección no está disponible hasta que las recepciones puedan verificarse con el cierre.';return;}
+  if(temporalStudentRoom()&&!validStudentMaterialBook()){mount.textContent='La proyección no está disponible hasta que las recepciones puedan verificarse con el cierre.';return;}
   try{
     const context=decisionModelContext(),state=deepClone(context.state),ledger={...financialLedger()},sections=deepClone(recordedFinancialSections()),round=currentRound();
     for(const category of DECISION_CATALOG.filter(c=>!c.summaryOnly)){
       const prepared=prepareSectionSave(category,context);Object.assign(state,prepared.entries);
       delete ledger[`${round}:${category.cat}`];if(sections[round])delete sections[round][category.cat];
     }
-    const result=window.SIDE_PROFIT_PROJECTION.analyze({state,ledger,sectionsByRound:sections,catalog:DECISION_CATALOG,round,capital:initialCapital(),financialPolicy:{...(window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),round)||teacherConfig()),authoritativePrices:true},events:cycleBusinessData(round).events});
+    const config=teacherConfig(),temporal=temporalStudentRoom();
+    const result=window.SIDE_PROFIT_PROJECTION.analyze({state,ledger,sectionsByRound:sections,catalog:DECISION_CATALOG,round,capital:initialCapital(),financialPolicy:{...(window.SIDE_FINANCE_CONFIG?.resolve(config,round)||config),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:config.materialPaymentMode,supplierCreditTermCycles:Number(config.supplierCreditTermCycles??1)}:{})},events:cycleBusinessData(round).events});
     if(!result.available){mount.textContent=result.reason;return;}
     const b=result.base,breakeven=result.breakEven?`Primera meta con resultado no negativo en las 20 pruebas: ${result.breakEven.target} unidades (ventas estimadas: ${result.breakEven.sold}).`:'No se encontró punto de equilibrio dentro de las metas probadas con estos recursos.';
     const alternative=result.alternatives.length?result.alternatives.map(a=>`<li>${escapeHtml(a.label)}: utilidad ${money(a.profit)} (${a.difference>=0?'+':''}${money(a.difference)}), caja ${money(a.cash)}, ventas ${a.sold} u.</li>`).join(''):'<li>No hay alternativas que superen la comprobación estimada de caja.</li>';

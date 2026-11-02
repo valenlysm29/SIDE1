@@ -19,6 +19,10 @@ test('crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierra
    const order=await rpc(db,'side_confirm_material_order_v1',{p_partida_id:game.id,p_empresa_id:id,p_ciclo:1,p_sku:sku});assert.equal(Number(order.quantity),quantity);
    await rpc(db,'side_record_material_receipt_v1',{p_order_id:order.orderId,p_receipt_id:'credit-'+sku,p_quantity:received,p_day:day});
   }
+  const partialFacts=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:29});
+  const partialInput={state:{...state,__materialOrders:partialFacts},catalog:fixture.catalog,round:1,capital:200000,financialPolicy:{cycles:1,verifiedMaterialContext:true,materialPaymentMode:'credit'}};
+  const expected=require('../js/cycle_model').close(partialInput),preview=require('../js/profit_projection').analyze(partialInput);
+  assert.equal(preview.available,true);assert.equal(preview.base.produced,100);assert.equal(preview.base.produced,expected.receipt.produced);assert.equal(preview.base.cash,expected.financial.balanceGeneral.efectivo);
   const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args),error:null};}catch(error){return {data:null,error:{message:error.message}};}};
   await db.exec('reset role');const snapshotBefore=(await db.query('select snapshot,revision from side_student_state where empresa_id=$1',[id])).rows[0];
   await db.exec("create function public.fail_credit_close() returns trigger language plpgsql as $$begin raise exception 'fallo crédito inducido'; end$$; create trigger fail_credit_close before insert or update on public.reportes_ciclo for each row execute function public.fail_credit_close()");

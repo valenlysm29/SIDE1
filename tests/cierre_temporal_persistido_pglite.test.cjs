@@ -24,6 +24,10 @@ test('cierre contado con hilo pendiente: anticipo, stock cero, rollback y reinte
   const facts=await rpc(db,'side_material_context_v1',{p_partida_id:game.id,p_empresa_id:id,p_cutoff_day:29});
   const preview=PRO.calculate({state:{...state,__materialOrders:facts},catalog:fixture.catalog,round:1});assert.equal(preview.producibleUnits,0);assert.equal(preview.materials.find(m=>m.id==='HILO').pending,2600);
   const CYCLE=require('../js/cycle_model');assert.throws(()=>CYCLE.close({state:{...state,__materialOrders:facts},catalog:fixture.catalog,round:1,capital:0,financialPolicy:{cycles:1,verifiedMaterialContext:true,materialPaymentMode:'cash'}}),/Caja insuficiente/);
+  const projectionInput={state:{...state,__materialOrders:facts},catalog:fixture.catalog,round:1,capital:200000,financialPolicy:{cycles:1,verifiedMaterialContext:true,materialPaymentMode:'cash'}};
+  const baseline=CYCLE.close(projectionInput),projection=require('../js/profit_projection').analyze(projectionInput);
+  assert.equal(projection.available,true);assert.equal(projection.base.produced,baseline.receipt.produced);assert.equal(projection.base.cash,baseline.financial.balanceGeneral.efectivo);
+  assert.ok(projection.alternatives.every(a=>!a.label.startsWith('Insumos')));assert.equal(projection.base.produced,0);
   const run=()=>worker.runOnce(async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args),error:null};}catch(error){return {data:null,error:{message:error.message}};}});
   const failed=await run();assert.equal(failed[0].success,false);assert.match(failed[0].error,/fallo temporal inducido/);
   await db.exec('reset role');assert.deepEqual((await db.query('select snapshot,revision from side_student_state where empresa_id=$1',[id])).rows[0],before);assert.equal((await db.query('select caja_actual from empresas where id=$1',[id])).rows[0].caja_actual,cash);assert.equal(Number((await db.query('select count(*) as n from side_business_closures where partida_id=$1',[game.id])).rows[0].n),0);

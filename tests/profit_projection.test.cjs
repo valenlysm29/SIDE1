@@ -30,6 +30,14 @@ test('recepciones no verificadas no se presentan como proyección',()=>{
 test('no se estima caja cuando falta el catálogo',()=>{
  assert.equal(P.analyze({state:F.state(),round:1}).available,false);
 });
+test('el contexto competitivo explícito usa el cierre compartido y rechaza datos incompletos',()=>{
+ const input={state:F.state(),catalog:F.catalog,round:1,capital:500000,financialPolicy:{cycles:6}};
+ const competitor={id:'b',state:F.state(),catalog:F.catalog,round:1,capital:500000,financialPolicy:{cycles:6}};
+ const result=P.analyze({...input,marketContext:{verified:true,companyId:'a',competitors:[competitor]}});
+ assert.equal(result.available,true);assert.equal(result.marketScope,'competitive');assert.equal(result.base.demand,1750);
+ assert.equal(P.analyze({...input,marketContext:{verified:false,companyId:'a',competitors:[competitor]}}).available,false);
+ assert.equal(P.analyze({...input,marketContext:{verified:true,companyId:'a',competitors:[{...competitor,round:2}]}}).available,false);
+});
 test('la vista de estudiante muestra la proyección y advierte sus límites',()=>{
  const fs=require('node:fs'),vm=require('node:vm'),source=fs.readFileSync(require.resolve('../js/app.js'),'utf8');
  const snippet=source.slice(source.indexOf('function showProfitProjection(){'),source.indexOf('\nfunction renderDecisionCategory(){'));
