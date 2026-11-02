@@ -2,16 +2,37 @@
 export async function runVersioned(rpc,legacy,newEngine,options={}) {
   const pending=await rpc('side_cierres_pendientes',{});
   if(pending.error||!Array.isArray(pending.data))throw new Error('Cierres pendientes no disponibles');
-  const groups={'0':[],'1':[]};
+  const groups={'0':[],'1':[]},results=[];
+  const unavailable=(game,code,error)=>({game:game.id,cycle:game.cycles?.[0],success:false,pending:false,code,error});
   for(const game of pending.data){
-    const version=await rpc('side_version_worker_cierre',{p_partida_id:game.id});
-    if(version.error||!Object.hasOwn(groups,version.data))throw new Error('Versión de cierre no verificable');
-    groups[version.data].push(game);
+    try{
+      const version=await rpc('side_version_worker_cierre',{p_partida_id:game.id});
+      if(version.error||!Object.hasOwn(groups,version.data))throw new Error('Unknown version');
+      groups[version.data].push(game);
+    }catch{
+      // A damaged historical game cannot prevent independently authorized games
+      // from closing. Its error remains explicit, never a successful settlement.
+      results.push(unavailable(game,'VERSION_CIERRE_NO_VERIFICABLE','Versión de cierre no verificable; requiere revisión de esta partida.'));
+    }
   }
   const filtered=games=>async(name,args)=>name==='side_cierres_pendientes'?{data:games,error:null}:rpc(name,args);
-  const oldResults=await legacy(filtered(groups['0']),options);
-  const newResults=await newEngine(filtered(groups['1']),options);
-  const results=[...oldResults,...newResults];
+  // New sequential games receive the budget first. Old games retain exactly
+  // their original engine; neither configuration nor economic inputs are changed.
+  for(const [version,engine] of [['1',newEngine],['0',legacy]]){
+    for(const game of groups[version]){
+      if(Date.now()>=Number(options.deadline??Infinity)){
+        results.push({...unavailable(game,'PLAZO_TRABAJADOR_AGOTADO','Pendiente de reintento programado.'),success:true,pending:true});
+        continue;
+      }
+      try{
+        const closed=await engine(filtered([game]),options);
+        if(!Array.isArray(closed)||!closed.length||closed.some(r=>r.game!==game.id))throw new Error('Invalid worker response');
+        results.push(...closed);
+      }catch{
+        results.push(unavailable(game,'PROCESAMIENTO_CIERRE_NO_DISPONIBLE','No se pudo procesar esta partida; se reintentará sin avanzar su ciclo.'));
+      }
+    }
+  }
   for(const result of results){
     if(!result.game||!Number.isInteger(Number(result.cycle)))continue;
     try{

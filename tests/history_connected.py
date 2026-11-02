@@ -2,6 +2,7 @@
 Only newly created QA games have their test clock accelerated; no mocked RPCs.
 """
 import os,sys,json,subprocess,threading,urllib.request,concurrent.futures,hashlib,time
+import urllib.error
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 ROOT=Path(__file__).resolve().parents[1];PROJECT=ROOT.parents[1] if ROOT.parent.name=='.codex-work' else ROOT
@@ -18,6 +19,8 @@ KEY=status['ANON_KEY']
 OUT=ROOT/('tests/output/fase01/connected' if os.environ.get('SIDE_FASE01_WORK') else 'tests/output/history');OUT.mkdir(parents=True,exist_ok=True)
 if os.environ.get('HISTORY_LEGACY'):
  OUT=ROOT/'tests/output/fase01/connected-legacy';OUT.mkdir(parents=True,exist_ok=True)
+if os.environ.get('HISTORY_BLOCKED_GAME'):
+ OUT=ROOT/'tests/output/fase01/finalizacion/connected-isolation';OUT.mkdir(parents=True,exist_ok=True)
 def req(path,payload,token=None):
  r=urllib.request.Request(BASE+path,data=json.dumps(payload).encode(),headers={'apikey':KEY,'Authorization':'Bearer '+(token or KEY),'Content-Type':'application/json'})
  with urllib.request.urlopen(r) as f:return json.load(f)
@@ -27,8 +30,18 @@ def sql(query):
 def worker(game,cycle):
  if os.environ.get('SIDE_FASE01_WORK'):
   request=urllib.request.Request(BASE+'/functions/v1/side-business-close',data=b'{}',headers={'x-side-cron-token':'fase01-local-only','Content-Type':'application/json'})
-  with urllib.request.urlopen(request,timeout=60) as response:result=json.load(response)
-  assert result['success'] and all(r['success'] and not r.get('pending') for r in result['results']),result
+  try:
+   with urllib.request.urlopen(request,timeout=60) as response:result=json.load(response)
+  except urllib.error.HTTPError as error:
+   if not os.environ.get('HISTORY_BLOCKED_GAME') or error.code!=503:raise
+   result=json.load(error)
+  if os.environ.get('HISTORY_BLOCKED_GAME'):
+   blocked=[r for r in result['results'] if r['game']==os.environ['HISTORY_BLOCKED_GAME']]
+   assert blocked and all(not r['success'] and r['code']=='DECISION_INVALIDA' for r in blocked),result
+   own=[r for r in result['results'] if r['game']==game]
+   assert all(r['success'] and not r.get('pending') for r in own),result
+   assert not result['success'],'Historical failures must remain explicit'
+  else:assert result['success'] and all(r['success'] and not r.get('pending') for r in result['results']),result
   return result
  result=req('/functions/v1/history-qa',{'game':game,'cycle':cycle},status['SERVICE_ROLE_KEY'])
  assert result and all(r['success'] and not r.get('pending') for r in result),result
@@ -149,7 +162,7 @@ with sync_playwright() as p:
    t.wait_for_function('runtime()?.phase==="finished"',timeout=20000);t.reload(wait_until='networkidle');t.locator('[data-tab="historial"]').click();t.wait_for_timeout(1500);t.screenshot(path=str(OUT/f'history-{count}.png'))
    assert not errors,errors
    assert not local_failures,local_failures
-   scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))
+   scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;scenario['blockedHistoricalGame']=os.environ.get('HISTORY_BLOCKED_GAME');evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))
    print('PASS',count,'cycles, 3 companies, manual/automatic, authenticated reloads, sealed history and lab',flush=True)
    for sc,*_ in students:sc.close()
    ctx.close()
