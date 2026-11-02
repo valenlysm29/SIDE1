@@ -1,25 +1,57 @@
 """Authenticated Chromium + local Auth/Data API/PostgreSQL + generated Edge worker.
 Only newly created QA games have their test clock accelerated; no mocked RPCs.
 """
-import os,sys,json,subprocess,threading,urllib.request,concurrent.futures,hashlib,time
+import os,sys,json,subprocess,threading,urllib.request,concurrent.futures,hashlib,time,uuid
+import urllib.error
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
 ROOT=Path(__file__).resolve().parents[1];PROJECT=ROOT.parents[1] if ROOT.parent.name=='.codex-work' else ROOT
 sys.path.insert(0,str(PROJECT/'.codex-work/flicker-python'))
 from playwright.sync_api import sync_playwright
-status=json.loads(subprocess.check_output([str(PROJECT/'node_modules/.bin/supabase.cmd'),'status','--workdir',str(PROJECT/'.codex-work/p01-http-stack'),'-o','json'],stderr=subprocess.DEVNULL))
-proxy=subprocess.check_output(['docker','port','side-history-local-proxy','8000/tcp'],encoding='utf8').strip();assert proxy.startswith('127.0.0.1:');BASE='http://'+proxy;KEY=status['ANON_KEY']
-OUT=ROOT/'tests/output/history';OUT.mkdir(parents=True,exist_ok=True)
+work=Path(os.environ.get('SIDE_FASE01_WORK',PROJECT/'.codex-work/p01-http-stack')).resolve()
+assert work.is_relative_to(PROJECT)
+status=json.loads(subprocess.check_output([str(PROJECT/'node_modules/.bin/supabase.cmd'),'status','--workdir',str(work),'-o','json'],stderr=subprocess.DEVNULL))
+if os.environ.get('SIDE_FASE01_WORK'):
+ BASE=status['API_URL'];assert BASE=='http://127.0.0.1:33421'
+else:
+ proxy=subprocess.check_output(['docker','port','side-history-local-proxy','8000/tcp'],encoding='utf8').strip();assert proxy.startswith('127.0.0.1:');BASE='http://'+proxy
+KEY=status['ANON_KEY']
+OUT=ROOT/('tests/output/fase01/connected' if os.environ.get('SIDE_FASE01_WORK') else 'tests/output/history');OUT.mkdir(parents=True,exist_ok=True)
+if os.environ.get('HISTORY_LEGACY'):
+ OUT=ROOT/'tests/output/fase01/connected-legacy';OUT.mkdir(parents=True,exist_ok=True)
+if os.environ.get('HISTORY_BLOCKED_GAME'):
+ OUT=ROOT/'tests/output/fase01/finalizacion/connected-isolation';OUT.mkdir(parents=True,exist_ok=True)
 def req(path,payload,token=None):
  r=urllib.request.Request(BASE+path,data=json.dumps(payload).encode(),headers={'apikey':KEY,'Authorization':'Bearer '+(token or KEY),'Content-Type':'application/json'})
  with urllib.request.urlopen(r) as f:return json.load(f)
 def rpc(name,args,token):return req('/rest/v1/rpc/'+name,args,token)
 def sql(query):
- return subprocess.check_output(['docker','exec','supabase_db_sidep01http','psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-Atc',query],encoding='utf8').strip()
+ return subprocess.check_output(['docker','exec',('supabase_db_fase01local' if os.environ.get('SIDE_FASE01_WORK') else 'supabase_db_sidep01http'),'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-Atc',query],encoding='utf8').strip()
 def worker(game,cycle):
+ if os.environ.get('SIDE_FASE01_WORK'):
+  run=uuid.uuid4()
+  sql(f"insert into side_closure_execution_requests(run_id,request_id) values('{run}',{-int(run.int%(2**60))})")
+  request=urllib.request.Request(BASE+'/functions/v1/side-business-close',data=json.dumps({'run_id':str(run)}).encode(),headers={'x-side-cron-token':'fase01-local-only','Content-Type':'application/json'})
+  try:
+   with urllib.request.urlopen(request,timeout=60) as response:result=json.load(response)
+  except urllib.error.HTTPError as error:
+   if not os.environ.get('HISTORY_BLOCKED_GAME') or error.code!=503:raise
+   result=json.load(error)
+  if os.environ.get('HISTORY_BLOCKED_GAME'):
+   blocked=[r for r in result['results'] if r['game']==os.environ['HISTORY_BLOCKED_GAME']]
+   assert blocked and all(not r['success'] and r['code']=='DECISION_INVALIDA' or r.get('pending') and r.get('code')=='INTENTO_EN_CURSO' for r in blocked),result
+   own=[r for r in result['results'] if r['game']==game]
+   assert all(r['success'] and (not r.get('pending') or r.get('code')=='INTENTO_EN_CURSO') for r in own),result
+   assert not result['success'],'Historical failures must remain explicit'
+  else:assert result['success'] and all(r['success'] and not r.get('pending') for r in result['results']),result
+  return result
  result=req('/functions/v1/history-qa',{'game':game,'cycle':cycle},status['SERVICE_ROLE_KEY'])
  assert result and all(r['success'] and not r.get('pending') for r in result),result
  return result
+
+if os.environ.get('SIDE_FASE01_WORK'):
+ # Quarantine only abandoned fixtures in this dedicated local database.
+ sql("update public.partidas set configuracion=configuracion||'{\"phase\":\"cancelled\",\"runtime\":{\"phase\":\"cancelled\"}}'::jsonb where nombre like 'QA Historia %'")
 
 class Handler(SimpleHTTPRequestHandler):
  def __init__(self,*a,**kw):super().__init__(*a,directory=str(ROOT),**kw)
@@ -40,19 +72,27 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='C:/Program Files/Google/Chrome/Application/chrome.exe',headless=True)
  try:
   for count,mode in [(3,'manual'),(6,'automatic')]:
+   if os.environ.get('HISTORY_LEGACY') and mode!='manual':continue
    if os.environ.get('HISTORY_SCENARIO') and int(os.environ['HISTORY_SCENARIO'])!=count:continue
    teacher=req('/auth/v1/signup',{});uid=teacher['user']['id'];sql(f"insert into profesores(id,nombre,apellido) values ('{uid}','Historia','QA') on conflict do nothing")
-   ctx=browser.new_context(viewport={'width':1366,'height':900},record_video_dir=str(OUT/f'video-{count}'))
+   options={'viewport':{'width':1366,'height':900}}
+   if not os.environ.get('SIDE_FASE01_WORK'):options['record_video_dir']=str(OUT/f'video-{count}')
+   ctx=browser.new_context(**options)
    ctx.add_init_script('localStorage.setItem("sb-127-auth-token",'+json.dumps(json.dumps(teacher))+');')
-   t=ctx.new_page();errors=[];t.on('pageerror',lambda e:errors.append(str(e)))
+   t=ctx.new_page();errors=[];local_failures=[];t.on('pageerror',lambda e:errors.append(str(e)))
+   def check_resource(response):
+    if response.url.startswith(origin+'/') and response.status>=400:local_failures.append({'url':response.url,'status':response.status})
+   ctx.on('response',check_resource)
    t.goto(origin+'/docente.html',wait_until='networkidle')
    t.locator('#gameName').fill(f'QA Historia {count}');t.locator('#cycles').fill(str(count));t.locator('#roundMinutes').fill('1');t.locator('#integrationDurationMinutes').fill('5');t.locator('#capital').fill('200000')
    t.locator(f'input[name=cycleMode][value={mode}]').check()
    t.evaluate("state.authoritative={materialRulesVersion:'receipts-v1',materialPurchaseVersion:'excel-v2-packs-v1',materialLeadTimeDays:0,materialPaymentMode:'credit',supplierCreditTermCycles:2,planSyncGraceSeconds:0}")
    t.locator('#startGame').click();t.wait_for_function('state.partidaId!==null',timeout=30000);game=t.evaluate('state.partidaId');code=t.locator('#gameCode').input_value()
+   if os.environ.get('HISTORY_LEGACY'):
+    sql(f"update partidas set configuracion=configuracion-'sequentialCloseVersion' where id='{game}' and nombre='QA Historia {count}'")
    students=[]
    for n in range(3):
-    sc=browser.new_context(viewport={'width':1366,'height':900});s=sc.new_page();s.on('pageerror',lambda e:errors.append(str(e)))
+    sc=browser.new_context(viewport={'width':1366,'height':900});sc.on('response',check_resource);s=sc.new_page();s.on('pageerror',lambda e:errors.append(str(e)))
     s.goto(origin+'/index.html',wait_until='networkidle')
     try:s.locator('#startBtn').click(timeout=15000)
     except Exception:
@@ -69,11 +109,11 @@ with sync_playwright() as p:
    # Test clock only: this SQL targets the new QA game, preserving real RPC transitions.
    sql(f"update partidas set configuracion=jsonb_set(configuracion,'{{gameStartAt}}',to_jsonb(clock_timestamp()-interval '1 second')) where id='{game}'")
    t.evaluate('refreshTeacherGame()');t.wait_for_function('runtime()?.phase==="decisions"',timeout=15000)
-   before_hashes={};previous={};scenario={'cycles':count,'mode':mode,'game':game,'checks':[]}
+   before_hashes={};previous={};scenario={'cycles':count,'mode':mode,'game':game,'workerVersion':'0' if os.environ.get('HISTORY_LEGACY') else '1','checks':[]}
    for cycle in range(1,count+1):
     for n,(sc,s,ident,company) in enumerate(students):
      s.evaluate('refreshStudentGame({forceHydrate:true})')
-     result=s.evaluate('''async ({ident,plan,cycle})=>{const current=await SIDE.EmpresaService.obtenerEstado(ident);if(!current.success)return current;const snapshot=current.data.snapshot||{};snapshot.round=cycle;snapshot.decisions_submitted=true;const ds=snapshot.decision_state||{};Object.assign(ds,plan);ds.__cyclePlans={...ds.__cyclePlans,[cycle]:{state:plan}};snapshot.decision_state=ds;return SIDE.EmpresaService.guardarEstado(ident,snapshot,current.data.snapshot_revision);}''',{'ident':ident,'plan':plan(cycle,n),'cycle':cycle})
+     result=s.evaluate('''async ({ident,plan,cycle})=>{let result;for(let attempt=0;attempt<5;attempt++){const current=await SIDE.EmpresaService.obtenerEstado(ident);if(!current.success)return current;const snapshot=current.data.snapshot||{};snapshot.round=cycle;snapshot.decisions_submitted=true;const ds=snapshot.decision_state||{};Object.assign(ds,plan);ds.__cyclePlans={...ds.__cyclePlans,[cycle]:{state:plan}};snapshot.decision_state=ds;result=await SIDE.EmpresaService.guardarEstado(ident,snapshot,current.data.snapshot_revision);if(result.success||result.code!=='ESTADO_DESACTUALIZADO')return result;await new Promise(r=>setTimeout(r,100));}return result;}''',{'ident':ident,'plan':plan(cycle,n),'cycle':cycle})
      assert result['success'],result
     if mode=='manual':
      t.locator('[data-tab="rondas"]').click();t.locator('#cutRound').click();t.wait_for_function('runtime()?.phase==="results"')
@@ -123,7 +163,8 @@ with sync_playwright() as p:
     if cycle<count:t.wait_for_function(f'state.round==={cycle+1}',timeout=15000)
    t.wait_for_function('runtime()?.phase==="finished"',timeout=20000);t.reload(wait_until='networkidle');t.locator('[data-tab="historial"]').click();t.wait_for_timeout(1500);t.screenshot(path=str(OUT/f'history-{count}.png'))
    assert not errors,errors
-   scenario['pageErrors']=errors;evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))
+   assert not local_failures,local_failures
+   scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;scenario['blockedHistoricalGame']=os.environ.get('HISTORY_BLOCKED_GAME');evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))
    print('PASS',count,'cycles, 3 companies, manual/automatic, authenticated reloads, sealed history and lab',flush=True)
    for sc,*_ in students:sc.close()
    ctx.close()
