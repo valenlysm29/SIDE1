@@ -38,9 +38,8 @@ test('HUD muestra la caja guardada y no cobra borradores',()=>{
 });
 test('Navegación conserva cinco decisiones y el resumen según ciclo',()=>{
  let round=1;const catalog=['A','B','C','D','E','F'].map(cat=>({cat,items:[],summaryOnly:cat==='A'}));
- const ctx={DECISION_CATALOG:catalog,currentRound:()=>round,decisionCategories:()=>catalog.filter(c=>!c.summaryOnly)};vm.createContext(ctx);appFunction('navigationCategories',ctx);
- assert.deepEqual(Array.from(ctx.navigationCategories(),c=>c.cat),['B','C','D','E','F','A']);round=2;
- assert.deepEqual(Array.from(ctx.navigationCategories(),c=>c.cat),['A','B','C','D','E','F']);assert.equal(ctx.navigationCategories().filter(c=>!c.summaryOnly).length,5);
+ const ctx={DECISION_CATALOG:catalog,planningCategory:{cat:'DOP',summaryOnly:true},currentRound:()=>round,decisionCategories:()=>catalog.filter(c=>!c.summaryOnly)};vm.createContext(ctx);appFunction('navigationCategories',ctx);
+ for(const cycles of [3,6])for(round=1;round<=cycles;round++)assert.deepEqual(Array.from(ctx.navigationCategories(),c=>c.cat),['DOP','B','C','F','D','E','A']);assert.equal(ctx.navigationCategories().filter(c=>!c.summaryOnly).length,5);
 });
 test('Enviar todo desde cualquier pestaña abre revisión validada antes de cobrar',()=>{
  let reviews=0;const ctx={openCompanyReview(){reviews++;}};vm.createContext(ctx);

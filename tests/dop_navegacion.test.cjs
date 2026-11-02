@@ -35,10 +35,15 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   await p.goto(origin,{waitUntil:'networkidle'});
   await p.addStyleTag({content:'*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}'});
   await p.evaluate(()=>{const startedAt=new Date(Date.now()-42000).toISOString();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,roundHours:0,roundMinutes:10,cycles:6}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify({round:1,running:true,startedAt,duration:600,remaining:600}));openDecisionMenu();});
-  for(const [width,height] of [[1366,900],[390,844]]){
+  for(const [width,height] of [[1920,1080],[1366,900],[1024,768],[768,900],[390,844],[320,568]]){
    await p.setViewportSize({width,height});
    const tabs=await p.locator('#decisionTabs .decision-tab').evaluateAll(es=>es.map(e=>e.dataset.cat));
-   assert.equal(tabs[tabs.indexOf('C')-1],'DOP');
+   assert.deepEqual(tabs,['DOP','B','C','F','D','E','A']);
+   const layout=await p.locator('#decisionTabs .decision-tab').evaluateAll(es=>es.map(e=>({top:e.offsetTop,height:e.offsetHeight})));
+   assert.equal(new Set(layout.map(e=>e.top)).size,1,`single row ${width}`);
+   for(const cat of tabs){await tab(cat);assert.equal(await p.locator('#decisionTabs .active').getAttribute('data-cat'),cat);}
+   const scroll=await p.locator('#decisionTabs').evaluate(e=>({width:e.clientWidth,total:e.scrollWidth}));
+   if(width<=1024)assert.ok(scroll.total>scroll.width,`horizontal scroll ${width}`);
    await tab('DOP');assert.equal(await p.locator('.production-dop').count(),1);
    const target=p.locator('[data-mold-target]');await target.fill('25');await target.press('Tab');
    assert.match(await p.locator('[data-production-total]').innerText(),/25/);
@@ -46,9 +51,15 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
    await tab('DOP');assert.equal(await p.locator('[data-mold-target]').inputValue(),'25');
    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   }
-  await p.evaluate(()=>{decisionDrafts={};restoreDraftsForRound();});
+  for(const cycles of [3,6])for(let round=1;round<=cycles;round++){
+   const order=await p.evaluate(({cycles,round})=>{localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({capital:100000,cycles}));localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));return navigationCategories().map(c=>c.cat);},{cycles,round});
+   assert.deepEqual(order,['DOP','B','C','F','D','E','A']);
+  }
+  await p.evaluate(()=>{localStorage.setItem('SIDE_ACTIVE_ROUND','1');decisionDrafts={};restoreDraftsForRound();});
   await tab('C');await tab('DOP');assert.equal(await p.locator('[data-mold-target]').inputValue(),'25');
-  await p.evaluate(()=>setSectionSubmitted('C'));await tab('C');await tab('DOP');assert.equal(await p.locator('[data-mold-target]').isDisabled(),true);
+  await p.evaluate(()=>{window.originalCategoryHasSaved=categoryHasSaved;categoryHasSaved=cat=>cat==='C';renderTabs();});
+  assert.equal(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),'BORRADOR');
+  await p.evaluate(()=>{categoryHasSaved=window.originalCategoryHasSaved;setSectionSubmitted('C');});await tab('C');assert.match(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),/ENVIADA/);await tab('DOP');assert.equal(await p.locator('[data-mold-target]').isDisabled(),true);
   assert.deepEqual(errors,[]);console.log('PASS DOP navigation, draft, lock and responsive layout');return;
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
