@@ -1,0 +1,1652 @@
+✔ standard formulas, positive income, losses and zero sales use 29.5% only on profits (5.2082ms)
+✔ unused MP and unsold finished goods stay capitalized; assets do not become expenses (3.8661ms)
+✔ no sales create no COGS, no commission, and preserve all finished goods (0.6134ms)
+✔ idle labor and depreciation are expenses, not production or inventory (0.5596ms)
+✔ TEA uses effective monthly compounding and loan principal stays outside revenue (0.6196ms)
+✔ restoring and reading historical receipts is deterministic and does not mutate state (1.8081ms)
+✔ closed financial snapshots resist later ledger and policy changes (0.7743ms)
+✔ unconfirmed material section never creates an inventory asset (0.3425ms)
+✔ warranty uses source rates and explicit v19 180-day assumption (2.1597ms)
+✔ migrated MP aggregate is consumed using explicit opening quantities (0.6446ms)
+✔ paga parcialmente un vencimiento solo hasta la caja y conserva el saldo (0.6598ms)
+✔ AssetManager comparte cargas concurrentes y permite reintentar un fallo (8.147ms)
+✔ CharacterManager persiste selección, deduplica template y evita NPC del jugador (3.1519ms)
+✔ CharacterManager rechaza identidades inventadas y recupera una selección válida (0.5782ms)
+✔ Matriz C7 uses produced quantity, independently of a larger planned quantity (1.9951ms)
+✔ Matriz C7 is strictly greater: produced quantity above capacity activates even with a smaller plan (0.4434ms)
+✔ partial demand evaluations and nonnumeric capacity never assume an installed capacity of zero (0.6745ms)
+✔ the capped production pipeline preserves an oversized desired quantity without inventing overtime (6.2797ms)
+✔ 22 perfiles laborales cotejan los siete componentes con celdas originales, ambos regímenes (4.7369ms)
+✔ 20 perfiles de activos cotejan cada componente con celdas originales, ambos regímenes (1.5746ms)
+✔ nómina de matriz completa cuenta cada máquina y nivel con tarifa del régimen elegido (2.9697ms)
+✔ cada presentación MP concilia conversión y precio original con compra cargada (9.0506ms)
+✔ stock decimal exacto no crea faltantes ni rechaza consumo, y exceso real sigue rechazado (3.1916ms)
+✔ compras y consumo decimal conservan valoración sin merma añadida en los ocho materiales (2.7081ms)
+✔ caja inicial cero se respeta y deuda sin principal cero no inventa intereses (7.0275ms)
+✔ deuda previa a tasa cero preserva el cero; nueva deuda positiva pondera solo su interés (3.4665ms)
+✔ activos omitidos o reducidos no se recompran; ampliación cobra solo delta en ambos regímenes (39.7595ms)
+✔ caja concilia compras y consumo posterior sin recompra ni intereses (1.8046ms)
+✔ default quality uses original reputation proxy, independent of material score (2.5254ms)
+✔ medium and premium keep the absolute economic denominator, without a 100 cap (0.4266ms)
+✔ explicit zero economic population uses the documented finite guard (0.3857ms)
+✔ cycle shares the economic population across segments instead of reusing each population (10.8021ms)
+✔ audit expectations come from original Excel recalculation, without added sheets (1.3755ms)
+✔ original Excel perturbation: original_baseline (1.1852ms)
+✔ original Excel perturbation: market_distinct_reputations (0.1796ms)
+✔ original Excel perturbation: market_economic_price_tie (0.1454ms)
+✔ original Excel perturbation: market_negative_ideal_price_score (0.1675ms)
+✔ original Excel perturbation: staff_none (0.1214ms)
+✔ original Excel perturbation: staff_n3_industrial (0.1691ms)
+✔ original Excel perturbation: staff_high_efficiency_unclamped (0.1493ms)
+✔ original Excel perturbation: salary_perturbed (0.1249ms)
+✔ original Excel perturbation: assets_perturbed (0.2025ms)
+✔ original Excel perturbation: bom_fractional (0.1228ms)
+✔ original Excel perturbation: market_model1_distinct_populations (0.1233ms)
+✔ original Excel perturbation: quality_lot_proxy_independence (0.2044ms)
+✔ separate Excel arithmetic experiment: operand_injection_inventory_1 (1.775ms)
+✔ separate Excel arithmetic experiment: operand_injection_inventory_2 (0.0955ms)
+✔ separate Excel arithmetic experiment: operand_injection_inventory_3 (0.09ms)
+✔ separate Excel arithmetic experiment: operand_injection_inventory_4 (0.074ms)
+✔ worker ignores forged current ledger, valid section and financial snapshot (57.5283ms)
+✔ worker restores previous immutable closure, rejecting forged current opening cash (10.4513ms)
+✔ unverifiable events fail closed (0.4945ms)
+✔ legitimate loan is reconstructed from confirmed decision, not client ledger (6.7855ms)
+✔ worker usa precio interno pese a precio inyectado con producción y ventas (6.5098ms)
+✔ missing prior immutable closure fails closed (0.3553ms)
+✔ forged past acquisitions cannot create assets in a later cycle (3.4223ms)
+✔ worker rejects invalid decisions before calculating or persisting (3.2319ms)
+✔ later credit line rejects fabricated loan and permits verified available line (8.1522ms)
+✔ worker rejects cycle totals above six before persisting a closure (0.5099ms)
+✔ worker rejects an out-of-range cycle even when a context is returned (0.2574ms)
+✔ worker no convierte compras en stock cuando la sala requiere recepción temporal (0.2534ms)
+✔ el cierre rechaza una versión de presentaciones aún no integrada en lugar de interpretarla como unidades físicas (0.3258ms)
+┌─────────┬───────┬──────────┬──────┬─────────┬───────────┬───────────┐
+│ (index) │ round │ produced │ sold │ revenue │ cash      │ profit    │
+├─────────┼───────┼──────────┼──────┼─────────┼───────────┼───────────┤
+│ 0       │ 1     │ 100      │ 100  │ 4250    │ 149938.67 │ -20795.63 │
+│ 1       │ 2     │ 100      │ 100  │ 4250    │ 129167.84 │ -20795.63 │
+│ 2       │ 3     │ 100      │ 100  │ 4250    │ 108397.01 │ -20795.63 │
+└─────────┴───────┴──────────┴──────┴─────────┴───────────┴───────────┘
+✔ three complete restored cycles buy, produce, sell, persist and reconcile cash (47.5035ms)
+✔ missing materials or workers never invent production or revenue (11.885ms)
+✔ legacy POS counts do not change the demand-based settlement (8.4784ms)
+✔ 700 metres of thread cost S/1288.00 with retained volume discount (0.4137ms)
+✔ migration preserves cash and closed receipts without charging a finished cycle again (1.0809ms)
+✔ accounting opening seed preserves debt, assets, equity and visible past revenue (0.6261ms)
+✔ new receipts identify capacity rules and historical receipts remain unchanged (1.8326ms)
+✔ edge rejects missing and invalid scheduler token without running closures (32.4494ms)
+✔ edge reports failed and pending closures as unavailable (4.0161ms)
+✔ edge authorizes scheduler through service-only RPC and then closes cycles (2.541ms)
+✔ edge fails closed on auth outage and disallows non-POST calls (1.7095ms)
+✔ zero confirmed plans is a provisional no-op and never calls persistence RPC (9.7702ms)
+✔ malformed confirmed plans still return an error (1.4326ms)
+✔ cut, advance and pause controls can continue without submitted plans and never claim a persisted closure (5.5251ms)
+✔ visual courier crosses warehouse and production on a clear route without changing stock (978.8126ms)
+✔ all three businesses belong to one world group with same-coordinate door crossings (14.5688ms)
+✔ player can physically walk in and out of each real doorway (15.3332ms)
+✔ every worker route and customer browse/checkout route avoids solid furniture (12.9782ms)
+✔ walls, racks, sewing machines and cash counter stop moving player (12.2884ms)
+✔ current financial snapshot changes visible display and reserve tiers independently (24.767ms)
+✔ pending supplier delivery is a marker and never available reserve inventory (13.1276ms)
+✔ stock levels clamp valid ratios and malformed values safely (0.2618ms)
+✔ every room has actors from world entry and keeps moving while the player stays outside (48.3612ms)
+✔ shared instancing batches stock per room/tier; furniture has metre-scale ceilings (6.0378ms)
+✔ streamed store props preserve routes while quality tiers limit mirrors and shadows (8.0586ms)
+✔ prop installation is idempotent, falls back per category and never disposes cached resources (6.0899ms)
+✔ warehouse streamed props keep physical contracts and tier complete supported stock safely (7.9963ms)
+✔ warehouse installation is idempotent with partial fallback and cached resources survive disposal (6.9158ms)
+✔ repeat business model updates retain one scene and disposal is idempotent (8.097ms)
+✔ physical restocking projects the authoritative transfer without creating stock or money (4.6877ms)
+✔ repeated restocking at shelf capacity does not repeat financial or inventory writes (3.0862ms)
+✔ customer reservation immediately reduces visual shelves while preserving production and cash (1.7ms)
+✔ historical inventory with unknown output does not animate an already allocated production plan (1.4531ms)
+✔ production presentation stops when the existing total inventory capacity is reached (1.2755ms)
+✔ interior projection derives shelf levels, order and capacity from existing business state (3.7105ms)
+✔ repeated visual reads and detached product summaries never mutate inventory or orders (4.4195ms)
+✔ received supplier stock changes warehouse view without fabricating produced output (1.6223ms)
+✔ machine animation respects pause, shift end and completed production plan (1.3233ms)
+✔ visual capacity saturates while stock and unknown historical output remain accurate (1.1558ms)
+✔ Cierres conservan ingresos y estados de cada ciclo sin anidar el historial (12.4181ms)
+✔ Caja paga compra MP una vez, no vuelve a cobrar consumo ni depreciación (4.0413ms)
+✔ Riesgo bancario afecta préstamo nuevo, preserva tasa de deuda anterior y pondera ampliación (3.3922ms)
+✔ Transición de caja declarada se usa una vez; ledger anterior no entra al cierre (1.772ms)
+✔ la adaptación conserva el Excel antiguo y exige materiales prémium trazables para CONS-02 (23.4319ms)
+✔ lote histórico sin composición no recibe nueva bonificación (2.6473ms)
+✔ un fallo de cancelación conserva la identidad heredada para reintentar sin falso éxito (11.1193ms)
+✔ un poll detenido en cierre de negocio no reaplica su sala activa después de cancelar (3.9617ms)
+✔ solo el propietario ve cancelar una sala abierta (3.2283ms)
+✔ la clave cancelledAt nula o falsa no cancela ni congela el inicio (2.0354ms)
+✔ una marca real y cualquiera de las fases canceladas siguen bloqueando acceso (0.2591ms)
+✔ central states use smooth mixer crossfades without restarting the active state (4.4561ms)
+✔ walk and run playback rates follow real speed within safe bounds (0.8677ms)
+✔ update owns locomotion, talk, interaction and airborne decisions and advances one mixer (0.6242ms)
+✔ an explicit player locomotion state keeps WALK and RUN synchronized with movement physics (0.4113ms)
+✔ npc_motion adapter is a non-blocking procedural fallback and creates no loop (0.8673ms)
+✔ a missing animation keeps the prior valid action when there is no fallback (0.2516ms)
+✔ dispose releases mixer bindings once and exposes asset provenance metadata (0.3162ms)
+✔ all NPC geometries including unusual GLB units are at most the player height (15.878ms)
+✔ floor pivot survives repeated animation writes to the GLB root for 60 seconds (47.1229ms)
+✔ pelvis clip keeps its vertical gait bounce without travel or vertical drift (0.8102ms)
+✔ normalizing again is idempotent and grounding retains player jumps (0.8752ms)
+✔ the shipped public NPC GLBs normalize using their actual skinned mesh bounds (1064.507ms)
+✔ Lotes de igual material conservan sus precios distintos al venderse (13.8583ms)
+✔ La penalización bancaria se conserva hasta el préstamo siguiente (4.0443ms)
+✔ SIM-2 dispara las siete reglas alcanzables; no cobra sobrecapacidad de una meta ni atribuye efectos al lote calidad4 (5.0482ms)
+✔ factores productivos reducen consumo y restauran MP antes de calcular costos (1.295ms)
+✔ redondeo conserva 200×0.70×0.95=133 y depreciación retirada no altera costo (4.0052ms)
+✔ SIM-3 arrastra existencias, replica decisiones y mantiene eliminación inicial (11.1732ms)
+✔ inventario anterior se vende aunque la nueva producción sea cero (1.7981ms)
+✔ costo recurrente se cuenta una vez y garantía base no cobra; préstamo no es ingreso (8.8147ms)
+✔ Cierre remoto mock y local usan exactamente motor y caja comunes; retry no duplica (44.301ms)
+✔ CAS rechazado y migración faltante devuelven error sin cierre local ni avance (28.9907ms)
+✔ Cierre tardío usa plan confirmado del ciclo histórico y parámetros profesor (39.9052ms)
+✔ Tres ciclos remoto mock igualan cierre local y recuperan historial monetario del servidor (106.5496ms)
+✔ Feature check ausente desactiva solo editor remoto, RPC legacy sigue disponible (11.0176ms)
+✔ reloj automático espera cada cierre antes de iniciar el siguiente ciclo (3350.3165ms)
+✔ manual: no avanza sin cierre persistido y permite reintento tras confirmación (3431.6528ms)
+✔ fallo al guardar reporte revierte cierre y estado económico de la empresa (2747.1927ms)
+✔ cierre contado con hilo pendiente: anticipo, stock cero, rollback y reintento (2924.1133ms)
+✔ v19 deterministic closure uses actual stock, segment eligibility and chosen price (18.1026ms)
+✔ v19 equal prices give price score 100 and preserve unserved demand (14.4692ms)
+✔ la calidad premium modifica el precio efectivo conservando el precio base (3.2727ms)
+✔ v19 price validation and nonnegative price score (1.6925ms)
+✔ v19 three cycles four companies have sales, receivables collect next cycle, retries reuse (68.4642ms)
+✔ v19 physical resource failures report no production (2.0399ms)
+✔ physical capacity follows the document without catalog score penalties (1.1821ms)
+✔ v19 reconstructed cost sections survive authoritative financial recalculation (4.5117ms)
+✔ v19 asset depreciation reads real UI purchases history without synthetic quantities (3.0693ms)
+(node:40456) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_world.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ the city grid expands without moving existing business entrances (76.6886ms)
+✔ outer destinations have collision-free approaches on the connected streets (124.9099ms)
+(node:28444) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_world.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ HUD 390px conserva destinos solo en minimapa y mapa expandido (4.3977ms)
+✔ HUD 1366px conserva destinos solo en minimapa y mapa expandido (1.5238ms)
+✔ altura de suelo usa geometría caminable mundial de plaza, pedestal y avenidas (72.2039ms)
+✔ manual expulsion remains outside final podium; historical grades can still be consulted (4.122ms)
+✔ expulsion service confirms RPC and reports missing migration without claiming success (4.7222ms)
+✔ expelled student stops durable retries during snapshot (1.2576ms)
+✔ expelled student stops durable retries during operation (0.3629ms)
+✔ expelled student stops durable retries during conflict-read (0.2723ms)
+✔ expelled admission remains a user rejection rather than a technical retry (3.8841ms)
+✔ copiar usa el código del servidor aunque el campo muestre texto concatenado (2.9536ms)
+✔ rechazo del portapapeles moderno usa copia compatible y retira campo temporal (2.331ms)
+✔ al finalizar la sala confirmada se deshabilita compartir su código (0.9291ms)
+✔ si fallan ambos métodos selecciona el código real para copia manual (1.1265ms)
+✔ una sala cancelada deja de compartir su código (0.8033ms)
+✔ copiar con teclado conserva foco y confirma Copiado (1.6026ms)
+COMPETENCIA_UTILIDAD {"empresas":3,"producido":250,"vendido":250,"demanda":902,"ventas":30000,"utilidad":10603.13,"caja":39303.63,"compromisos":-40696.369999999995}
+COMPETENCIA_UTILIDAD {"empresas":6,"producido":250,"vendido":250,"demanda":451,"ventas":30000,"utilidad":10603.13,"caja":39303.63,"compromisos":-40696.369999999995}
+COMPETENCIA_UTILIDAD {"empresas":12,"producido":250,"vendido":225,"demanda":225,"ventas":27000,"utilidad":9215.46,"caja":36933.63,"compromisos":-40066.369999999995}
+✔ presupuesto finito y competencia: mercado, stock y balances concilian (75.3402ms)
+✔ elevar todos los precios reduce demanda efectiva con los mismos competidores (46.0643ms)
+✔ configuration conflict retains form version despite newer polling state (3.8377ms)
+✔ explicit version uses CAS; two-argument legacy call remains compatible (3.695ms)
+✔ two queued own saves rebase only the revision acknowledged by the first save (2.468ms)
+✔ CONS-02 modifica precio e ingresos reales una sola vez (25.4537ms)
+✔ CONS-03 y CONS-08 limitan unidades y consumen solo lo fabricado (8.0409ms)
+✔ CONS-04 usa reputación del catálogo y persiste dos ciclos (3.1037ms)
+✔ CONS-01 usa calidad prémium registrada y el precio reducido (2.9028ms)
+✔ dos cierres conservan el contador de reputación y no reescriben el primero (14.1745ms)
+CIERRE_CREDITO_QA {"producido":100,"recibidoHilo":1300,"pendienteHilo":1300,"cxp":14352,"vencimiento":2,"cajaInicial":200000,"cajaFinal":204924.06,"ventas":35000,"costoVentas":13582.94,"utilidad":16023.52}
+✔ crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierran igual (3094.5699ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":206704.45,"costoVentas":13582.94,"utilidad":17803.91,"impuesto":0},{"ciclo":2,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":206704.45,"cajaFinal":215621.9,"costoVentas":13164.34,"utilidad":16490.01,"impuesto":0},{"ciclo":3,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"valorMP":879.87,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":9975,"cajaInicial":215621.9,"cajaFinal":236149.35,"costoVentas":13569.67,"utilidad":16084.68,"impuesto":0},{"ciclo":4,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"valorMP":1322.71,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":11637.5,"cajaInicial":236149.35,"cajaFinal":250248.8,"costoVentas":13588.1,"utilidad":16066.25,"impuesto":0},{"ciclo":5,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"valorMP":1763.95,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":13300,"cajaInicial":250248.8,"cajaFinal":264348.25,"costoVentas":13589.7,"utilidad":16064.65,"impuesto":0},{"ciclo":6,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":25,"hilo_ref":0,"hilo_std":325,"cuero_std":0,"hilo_prem":0,"cuero_prem":17.5,"cuero_sint":0},"valorMP":2204.99,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":14962.5,"cajaInicial":264348.25,"cajaFinal":265455.88,"costoVentas":13589.9,"utilidad":3072.63,"impuesto":12991.82}]
+✔ 6 ciclos credit anterior: arrastran stock y liquidan obligaciones sin duplicación (6020.9012ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":28000,"cxc":5600,"cajaInicial":200000,"cajaFinal":201174.45,"costoVentas":13582.94,"utilidad":10873.91,"impuesto":0},{"ciclo":2,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":28000,"cxc":7000,"cajaInicial":201174.45,"cajaFinal":204806.9,"costoVentas":13582.94,"utilidad":10873.91,"impuesto":0},{"ciclo":3,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":8400,"cajaInicial":204806.9,"cajaFinal":220399.35,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":4,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":9800,"cajaInicial":220399.35,"cajaFinal":229563.8,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":5,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":11200,"cajaInicial":229563.8,"cajaFinal":238728.25,"costoVentas":14030.94,"utilidad":10425.91,"impuesto":0},{"ciclo":6,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":12600,"cajaInicial":238728.25,"cajaFinal":241547.55,"costoVentas":14030.94,"utilidad":4080.76,"impuesto":6345.15}]
+✔ 6 ciclos credit utility-v1: arrastran stock y liquidan obligaciones sin duplicación (5516.6612ms)
+(node:35752) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_vehicles.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ five city cars reuse geometry and batch body panels without losing wheel transforms (17.0924ms)
+✔ MO conserva fórmulas, CTS manual y divisores de Costos!U5:AD39 (2.3713ms)
+✔ maquinaria y moldes reproducen las veinte sumas anuales MYPE/No MYPE (0.5428ms)
+✔ almacén consume en jerarquía según necesidad y usa inventario inicial (1.0166ms)
+✔ tabla de valorización AB88:AC96 usa el fixture propio107, separado de F55=107.5 (1.7301ms)
+✔ reputación operativa conserva C65:G65 y el denominador literal de H61 (0.3521ms)
+✔ los descuentos son multiplicativos, preservan valoración e inventario entre ciclos (1.1971ms)
+✔ costos de ciclo cuentan operarios de toda matriz, mantenimiento y depreciación no caja (1.6376ms)
+✔ métodos de depreciación definidos y pendientes usan parámetros inyectables (0.2238ms)
+✔ Depreciación e inventarios retirados no generan efectos por selección antigua; mantenimiento base no se convierte en política Excel (0.8671ms)
+✔ Analista usa la negociación base 12/10/2 por ciclo y cobra su contratación una sola vez (1.2513ms)
+✔ active payroll prices equal independently recalculated Excel MYPE monthly costs at every level (7.4825ms)
+✔ active materials charge Excel physical unit cost with volume discount exactly once (1.6642ms)
+✔ opening receivables are counted once in assets after a migrated balance (3.9419ms)
+✔ creación usa RPC atómico, conserva requestId y envía la configuración exacta (6.239ms)
+✔ crear una sala no altera la versión explícita de una configuración heredada (1.5106ms)
+✔ conflicto entrega sala anterior sin anunciar éxito (2.8123ms)
+✔ crear nunca cancela ni reemplaza una partida anterior implícitamente (1.4079ms)
+✔ migración ausente PGRST202 identifica script y permite reintento (1.6002ms)
+✔ migración ausente PGRST204 identifica script y permite reintento (1.7781ms)
+✔ migración ausente 42883 identifica script y permite reintento (1.4486ms)
+✔ migración ausente 42703 identifica script y permite reintento (1.2916ms)
+✔ recuperación servidor es explícita, admite vacío y exige reloj válido (1.6432ms)
+✔ respuesta de creación vacía no se anuncia como sala creada (1.8653ms)
+✔ reintento de solicitud ya cancelada o terminada exige nueva solicitud (2.5298ms)
+✔ respuesta sin estado usable o runtime coherente no anuncia éxito (3.4003ms)
+✔ recuperación heredada conserva identificación para sincronizar el servidor (2.9905ms)
+✔ recuperación moderna sin runtime no se acepta como partida heredada (1.3311ms)
+✔ sala moderna sin fecha de inicio conserva identificación para reparar el reloj (1.4906ms)
+✔ versión 2 guardada como texto conserva sala usable, sin clasificarla antigua (2.5171ms)
+✔ recuperación RPC conserva id y comprueba reloj, estado y código (1.5828ms)
+✔ recuperación ausente pide el SQL específico, sin éxito ficticio (1.2281ms)
+✔ recuperación de terminal permite configurar nueva sin reabrir la partida (1.2382ms)
+CIERRE_CREDITO_QA {"producido":100,"recibidoHilo":1300,"pendienteHilo":1300,"cxp":14352,"vencimiento":2,"cajaInicial":200000,"cajaFinal":204924.06,"ventas":35000,"costoVentas":13582.94,"utilidad":16023.52}
+✔ crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierran igual (3997.8063ms)
+CICLOS_CREDIT_2 [{"ciclo":1,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":206704.45,"costoVentas":13582.94,"utilidad":17803.91},{"ciclo":2,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":206704.45,"cajaFinal":212192.51,"costoVentas":13164.34,"utilidad":13060.62}]
+✔ 2 ciclos credit: arrastran stock y liquidan obligaciones sin duplicación (3268.8272ms)
+CICLOS_CASH_2 [{"ciclo":1,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":2392,"cxpInicial":0,"cxpNueva":0,"pago":0,"cxpFinal":0,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":189960.45,"costoVentas":13582.94,"utilidad":17803.91},{"ciclo":2,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":0,"cxpNueva":0,"pago":0,"cxpFinal":0,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":189960.45,"cajaFinal":209800.51,"costoVentas":13164.34,"utilidad":13060.62}]
+✔ 2 ciclos cash: arrastran stock y liquidan obligaciones sin duplicación (3279.2263ms)
+CICLOS_CREDIT_6 [{"ciclo":1,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":206704.45,"costoVentas":13582.94,"utilidad":17803.91},{"ciclo":2,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":206704.45,"cajaFinal":215621.9,"costoVentas":13164.34,"utilidad":16490.01},{"ciclo":3,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{},"consumido":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":2392,"cxpNueva":0,"pago":2392,"cxpFinal":0,"inventarioPT":0,"ventas":0,"cxc":0,"cajaInicial":215621.9,"cajaFinal":213206.85,"costoVentas":0,"utilidad":-8474.09},{"ciclo":4,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{},"consumido":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":0,"cxpNueva":0,"pago":0,"cxpFinal":0,"inventarioPT":0,"ventas":0,"cxc":0,"cajaInicial":213206.85,"cajaFinal":204871.3,"costoVentas":0,"utilidad":-8474.09},{"ciclo":5,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{},"consumido":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":0,"cxpNueva":0,"pago":0,"cxpFinal":0,"inventarioPT":0,"ventas":0,"cxc":0,"cajaInicial":204871.3,"cajaFinal":196535.75,"costoVentas":0,"utilidad":-8474.09},{"ciclo":6,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{},"consumido":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":0,"cxpNueva":0,"pago":0,"cxpFinal":0,"inventarioPT":0,"ventas":0,"cxc":0,"cajaInicial":196535.75,"cajaFinal":188160.44,"costoVentas":0,"utilidad":-8513.85}]
+✔ 6 ciclos credit: arrastran stock y liquidan obligaciones sin duplicación (5373.2425ms)
+✔ credits data contains the required Poly Pizza attribution and traceable CC0 furniture (3.1612ms)
+✔ splash omits credits entry while attribution remains available in the project (3.4994ms)
+✔ closing ignores entertainment POS counters for every product (27.3724ms)
+✔ the last automatic cycle settles when its runtime reaches simulation-finished (2.7145ms)
+✔ teacher closure displays persisted revenue and stops on a rejected closure (3.9432ms)
+✔ cycle productivity uses recorded output and does not substitute planned units (1.4102ms)
+✔ changing the target updates percentage and signed difference without capping at 100 (0.1914ms)
+✔ zero or absent target, absent output and output from another cycle are safe (0.2753ms)
+✔ legacy multiple stores normalize to one, keeping its district and first contract (2.6784ms)
+✔ world exposes no production record back to the economic model (10.5532ms)
+✔ local display production and supplier stock never provide economic productivity (3.2981ms)
+✔ legacy database flags remain attached to their saved cycle when the room advances (6.1078ms)
+✔ already contaminated current plans recover their original cycle without modifying resources or historical closures (3.3417ms)
+✔ valid current plans and completed historical receipts cannot be discarded as stale (2.0417ms)
+✔ current-cycle and partial confirmations survive hydration with explicit or nested round markers (1.7176ms)
+✔ legacy partial decisions infer the latest actual decision cycle rather than an older plan (2.4272ms)
+✔ durable queue skips a stale preview after a confirmed closure without dropping real decisions (1.3744ms)
+✔ real PostgreSQL whitelist, student snapshots and three shared closures preserve nonzero sales (2764.308ms)
+✔ migration restores already overwritten reports from exact stored closures and preserves later company cash (2657.388ms)
+✔ Sales and Finance retain the decisions, labels, options and prices before the engine update (2.6565ms)
+✔ engine fixes do not require a new regime or worker-assignment decision (0.2443ms)
+✔ production calculator contains no editable segment prices (18.5306ms)
+(node:28920) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_world.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ decision interiors allocate furniture once and preserve directed physical entry and exit (100.1719ms)
+✔ B E F interaction stations and queues are reachable while furniture blocks the player (73.8952ms)
+✔ financial and order boards read immutable simulation state without creating stock (71.9725ms)
+✔ repeated interior visits reuse distinct actors with clear unique positions (59.2869ms)
+✔ empty scenario includes mandatory local and cleaning only (6.2029ms)
+✔ all three districts retain their quantities and cost (3.018ms)
+✔ asset acquisitions and disposals have separate gross flows (0.8412ms)
+✔ same-round submitted mold still costs money; later cycles do not charge again (0.5437ms)
+✔ staff severance survives repeated saves in the same round (0.3866ms)
+✔ analyst discount affects material prices, not wages (0.5118ms)
+✔ material purchases use physical units and the retained quantity discount (0.5083ms)
+✔ review uses the nine full MYPE monthly wages recalculated in Excel v19 (0.5296ms)
+✔ asset purchases use their displayed price and persist across later cycles (0.4428ms)
+✔ loan is financing, never sales or a reduction of gross expenses; zero TEA is preserved (0.5318ms)
+✔ saved ledger is reconciled instead of charged twice (0.6124ms)
+✔ additional drafts apply only the difference (0.2953ms)
+✔ contract calculation excludes current cycle and stops at game end (0.1958ms)
+✔ contract batches preserve different opening cycles (0.2854ms)
+✔ store commitments never extend beyond three or six configured cycles (0.2931ms)
+✔ pure model never mutates its context (28.0068ms)
+✔ all catalog items, including zero-cost guarantees and automatic rules, appear (0.6785ms)
+✔ production review lists the desired quantity for every planned mold (0.404ms)
+✔ strict staff draw reuses a safe outfit when remaining bag only contains nearby actors (3.0765ms)
+✔ approved city manifest retains at least 16 CC0 actors and strict roles exclude eligible avatars (7.8654ms)
+✔ Guardar un ítem conserva el otro cambio como borrador, incluso al cambiar de pestaña (52.1131ms)
+✔ HUD muestra la caja guardada y no cobra borradores (0.9942ms)
+✔ Navegación conserva cinco decisiones y el resumen según ciclo (1.8679ms)
+✔ Enviar todo desde cualquier pestaña abre revisión validada antes de cobrar (0.8954ms)
+✔ Cabecera compartida conserva caja superior sin saldo duplicado (1.2072ms)
+EDIT B [data-qty="MESA_CORTE"][data-option="mesa"]
+EDIT C [data-qty="PERS_CORTE"][data-option="corte_basico"]
+EDIT F [data-qty="CUERO"][data-option="cuero_sint"]
+EDIT E [data-loan-number]
+✔ Student edits every tab with pending or rejected capability check: excel-16 (4168.6243ms)
+EDIT B [data-qty="MESA_CORTE"][data-option="mesa"]
+EDIT C [data-qty="PERS_CORTE"][data-option="corte_basico"]
+EDIT F [data-qty="CUERO"][data-option="cuero_sint"]
+EDIT E [data-loan-number]
+✔ Student edits every tab with pending or rejected capability check: side-lotes-2026-10-20 (4009.5007ms)
+✔ untouched zero production stays pending and a changed target becomes a draft (55.0024ms)
+✔ current store selection normalizes duplicates without mutating legacy data (1.3442ms)
+✔ store checkboxes accumulate districts, keep web, and update prices independently (80.5932ms)
+✔ single-store draft saves and reloads with one charge and one basic seller (38.6507ms)
+✔ multiple stores survive draft restoration and repeated saves with correct charges and sellers (44.8311ms)
+✔ existing contracts prevent closure but allow adding districts in later cycles (79.0494ms)
+✔ loading existing multi-store decisions preserves all quantities and contracts (10.6595ms)
+✖ DOP renders once in Production and nowhere in the other categories or summary (31.0319ms)
+✔ visual DOP handles empty, zero and valid targets and updates from active drafts (26.9524ms)
+✖ manual transfers show central and store stock, persist in sales decision and reject excess (8.9572ms)
+✔ DOP shortages never block saving or sending production and material sections (3100.7472ms)
+✔ Remote capability failure preserves editable autosaved draft and blocks confirmation (45.5507ms)
+✔ A mounted editor rejects input when the runtime becomes paused and resumes safely (12.8491ms)
+✔ Plan projection reserves costs once, preserves owned assets, and matches a zero-sales close (11.4376ms)
+✔ Confirmation rejects unfunded plans but preserves desired quantities above capacity (43.4625ms)
+✔ Material purchases preserve fractional conversions required by the Excel oracle (13.425ms)
+✔ si todos elevan el precio, cae la demanda; la versión anterior se conserva (37.2467ms)
+✔ la competencia conserva el reparto relativo y la demanda está acotada (1.7912ms)
+✔ parámetros explícitos inválidos no se aceptan (1.482ms)
+✔ la capacidad reconoce compras que el puntaje actual omite (5.611ms)
+✔ referencia de rentabilidad con 90 unidades y recursos distintos (20.3184ms)
+✔ room diagnosis distinguishes a late zero report from a genuinely zero closure and a pending cycle (3288.1789ms)
+✔ la selección aleatoria parte de los eventos visibles incluso si no hay ninguno habilitado (2.6908ms)
+✔ la selección respeta exclusiones explícitas y la desactivación total (2.6339ms)
+✔ Profesor en navegador nuevo reconstruye balance financiero desde reporte persistido sin cache local (14.4973ms)
+✔ Falla transitoria mantiene ciclo pendiente y próximo poll reintenta antes de avanzar (6.5558ms)
+✔ Profesor recién recargado recupera todos los ciclos pasados desde el primero (3.6099ms)
+✔ Fase results cierra mismo ciclo; finished inactivo permite reintentar último (4.4697ms)
+✔ Cancelación no calcula nuevos cierres después de cancelar la partida (2.6829ms)
+✔ último ciclo cerrado ofrece finalizar y deshabilita controles que ya no aplican (3.9077ms)
+✔ desired quantity above Excel capacity is confirmed intact and executed with existing limits (71.2217ms)
+✔ material shortage warns and preserves the target while the engine never consumes missing stock (23.4462ms)
+✔ cash, disconnection, pause and required fields still prevent confirmation (32.317ms)
+✔ Excel editor matches actual workbook quantity case: cero_todos (32.6222ms)
+✔ Excel editor matches actual workbook quantity case: uno_basico (10.9243ms)
+✔ Excel editor matches actual workbook quantity case: uno_mejorado (12.3821ms)
+✔ Excel editor matches actual workbook quantity case: uno_premium (8.9005ms)
+✔ Excel editor matches actual workbook quantity case: diez_basico (8.8972ms)
+✔ Excel editor matches actual workbook quantity case: diez_mejorado (8.6649ms)
+✔ Excel editor matches actual workbook quantity case: diez_premium (13.9099ms)
+✔ Excel editor matches actual workbook quantity case: capacidad_ejemplo_396 (11.1397ms)
+✔ Excel editor matches actual workbook quantity case: sobre_capacidad_ejemplo_397 (12.1716ms)
+✔ Excel editor matches actual workbook quantity case: mezcla_uno_cada_molde (11.4414ms)
+✔ Excel editor matches actual workbook quantity case: mezcla_original_520 (7.9521ms)
+✔ Excel editor matches actual workbook quantity case: mezcla_total_396 (11.3442ms)
+✔ Excel editor matches actual workbook quantity case: premium_397 (9.9131ms)
+✔ Excel editor matches actual workbook quantity case: supera_ejemplo_ampliamente_1000 (11.8706ms)
+✔ changing only target recalculates preview without charging missing stock or mutating decisions (17.4036ms)
+✔ Excel editor requirements depend on desired quantities even when inventory and capacity change (11.9868ms)
+✔ Excel editor compares each chosen quality without treating another quality as a substitute (7.5379ms)
+✔ Excel editor zero target is finite and reports zero needs and costs (7.7163ms)
+✔ Excel editor purchase equivalence exposes the literal division and adds no package rounding (25.9781ms)
+✔ actual Excel requirements: cero_todos (38.4034ms)
+✔ actual Excel requirements: uno_basico (3.0353ms)
+✔ actual Excel requirements: uno_mejorado (1.7299ms)
+✔ actual Excel requirements: uno_premium (1.2115ms)
+✔ actual Excel requirements: diez_basico (1.774ms)
+✔ actual Excel requirements: diez_mejorado (1.3429ms)
+✔ actual Excel requirements: diez_premium (0.7506ms)
+✔ actual Excel requirements: capacidad_ejemplo_396 (1.2307ms)
+✔ actual Excel requirements: sobre_capacidad_ejemplo_397 (0.5779ms)
+✔ actual Excel requirements: mezcla_uno_cada_molde (1.1639ms)
+✔ actual Excel requirements: mezcla_original_520 (2.1916ms)
+✔ actual Excel requirements: mezcla_total_396 (0.9177ms)
+✔ actual Excel requirements: premium_397 (0.9903ms)
+✔ actual Excel requirements: supera_ejemplo_ampliamente_1000 (0.4811ms)
+✔ explicit persisted stock is physical and combines only with current purchases (0.9788ms)
+✔ fresh Excel historical parity: base (40.9175ms)
+✔ fresh Excel historical parity: sim2 (4.3464ms)
+✔ fresh Excel historical parity: sim2_premium (1.3902ms)
+✔ fresh Excel historical parity: sim1_pipeline (17.0319ms)
+✔ fresh Excel historical parity: sim2_pipeline (10.5288ms)
+✔ fresh Excel historical parity: sim3_pipeline (13.5061ms)
+✔ fresh Excel historical parity: banca_pipeline (7.284ms)
+✔ fresh Excel historical parity: bancamezcla_pipeline (4.6041ms)
+✔ oracle provenance and 3104 historical cells (0.1656ms)
+PASS DOP navigation, draft, lock and responsive layout
+✔ tests\dop_navegacion.test.cjs (17429.018ms)
+✖ la meta sin recursos calcula materiales y recursos suficientes sin modificar el estado (26.0075ms)
+✖ prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada (2.7496ms)
+✖ DOP compares recommended, available and missing resources without changing the target (0.8363ms)
+✔ closing keeps a 2000-unit decision and produces only the 500 supported by stock (25.5702ms)
+✔ edge empaquetada y servidor producen idéntico cierre financiero y lotes (122.0607ms)
+✔ Node y Edge aplican igual la puntuación y los precios versionados (13.142ms)
+✔ Node y Edge rechazan por igual un cierre temporal sin persistencia verificable (0.8442ms)
+✔ Node y Edge rechazan presentaciones sin integración autoritativa (0.6676ms)
+✔ docente registra evento elegible con reloj de servidor, una vez y sin alterar otras empresas (4233.9689ms)
+✔ la clasificación cubre cada ID del catálogo y distingue los eventos implementados (8.0627ms)
+✔ asignaciones PE69: propietario, inmutabilidad, ciclo y contexto de servidor (3498.1472ms)
+✔ PostgreSQL: dos conexiones serializan asignaciones y rechazan intensidad divergente (9271.5742ms)
+✔ PE23: noticia y cierre persistido en PGlite con tres empresas (3096.5596ms)
+✔ PE30: noticia y cierre persistido en PGlite con tres empresas (2348.6706ms)
+✔ PE68: noticia y cierre persistido en PGlite con tres empresas (2022.8232ms)
+✔ PE69: noticia y cierre persistido en PGlite con tres empresas (2148.2605ms)
+✔ PE71: noticia y cierre persistido en PGlite con tres empresas (2191.8474ms)
+✔ PE74: noticia y cierre persistido en PGlite con tres empresas (2216.2305ms)
+✔ PE75: noticia y cierre persistido en PGlite con tres empresas (2501.0664ms)
+✔ PE77: noticia y cierre persistido en PGlite con tres empresas (2673.1666ms)
+✔ evento verificado redistribuye un mercado fijo entre tres empresas y respeta stock (157.3097ms)
+✔ dos sorteos independientes afectan mercado y gasto sin duplicar unidades (22.3636ms)
+✔ PE71 cambia el atractivo y conserva la demanda y el stock (27.56ms)
+✔ PE74 cambia el atractivo y conserva la demanda y el stock (24.86ms)
+✔ PE75 cambia el atractivo y conserva la demanda y el stock (21.0623ms)
+✔ PE74 no altera el mercado ni figura aplicado si no existe campaña financiada (24.6921ms)
+✔ una programación de servidor inválida no llega al cierre (1.0422ms)
+✔ el cierre rechaza duplicados incluso si el contexto proviene del servidor (0.8642ms)
+✔ Node y Edge aplican la misma asignación autoritativa (272.9996ms)
+✔ versioned events come only from verified server facts even when snapshot contains events (8.9493ms)
+✔ PE30 reduce capacidad de ensamblado, consumo físico y cobra reparación una vez (39.3587ms)
+✔ sin ensambladora PE30 no cobra reparación ni se registra como aplicado (3.907ms)
+✔ actividad recreativa no modifica el cierre con PE30 autorizado (10.0617ms)
+✔ PE30 y recepciones tardías limitan producción sin consumir órdenes en tránsito (19.4219ms)
+✔ PE23 registra gasto una vez sin alterar producción ni crear ventas (43.2637ms)
+✔ PE68 registra gasto una vez sin alterar producción ni crear ventas (5.8966ms)
+✔ PE77 registra gasto una vez sin alterar producción ni crear ventas (7.1897ms)
+✔ tres empresas durante 3 ciclos con desafíos rotados y cierres persistidos (3430.9086ms)
+✔ tres empresas durante 6 ciclos con desafíos rotados y cierres persistidos (3813.9004ms)
+✔ los 92 eventos conservan sus efectos, ámbito y duración originales (7.6122ms)
+✔ mezcla ocurrencias verificables y conserva repeticiones de ciclos distintos (15.0452ms)
+✔ rechaza identificadores, ámbitos, ciclos y duplicados inconsistentes (0.8407ms)
+✔ agrupa multiplicadores y movimientos usando únicamente el catálogo original (1.9148ms)
+✔ impide nuevas selecciones costPct y conserva selecciones históricas (2699.1357ms)
+✔ el servicio docente rechaza asignaciones confirmadas para otra empresa o ciclo (1.1163ms)
+✔ el servicio acepta solo sorteos confirmados para el ciclo solicitado (0.3478ms)
+✔ consulta privada usa sesión del alumno y falla cerrada ante respuestas inválidas (3.7408ms)
+✔ el libro autoritativo es solo para servidor y no inventa sorteos (3056.2619ms)
+✔ PostgreSQL aísla la lectura de eventos al servicio y preserva sorteos (5588.2566ms)
+✔ eventos históricos se obtienen del servidor y no del cliente (81.3402ms)
+✔ eventos históricos sin contexto verificable no se guardan (1.8175ms)
+✔ efectos históricos de costos no se omiten silenciosamente (1.0443ms)
+✔ impacto histórico de caja se registra una vez con importe del catálogo (7.8987ms)
+✖ Excel real y producción SIDE: base (23.9434ms)
+✖ Excel real y producción SIDE: meta_cero (5.6352ms)
+✖ Excel real y producción SIDE: material_insuficiente (10.4758ms)
+✖ Excel real y producción SIDE: premium (5.9959ms)
+✖ Excel real y producción SIDE: capacidad_limitada (5.1606ms)
+✖ Excel real y SIDE: inventario arrastrado durante tres ciclos (5.8869ms)
+✔ Costos E118: calidad comercial es proporción de reputación, no calidad de lote (2.4627ms)
+✔ HUD and report count current-cycle section confirmations and ignore obsolete Excel envelopes (6.1456ms)
+✔ draft readiness never claims submission and the review remains accessible after confirmation (4.2888ms)
+✔ caso V2: capacidad, producción y saldo físico por familia (6.0984ms)
+✔ cierre V2: consumo por SKU concilia inventario, lotes y valoración (23.6852ms)
+✔ la prioridad de fabricación mantiene metas y no consume hilo inexistente (1.5926ms)
+✔ tax is deferred and accumulated losses offset final-cycle profit (6.1672ms)
+✔ accumulated loss has zero tax and pending final period is not liquidated (0.8498ms)
+✔ financial schedule keeps total cycles for the runtime and worker (0.5917ms)
+✔ financial changes preserve prior cycles, replace pending target, and retain actual random assignment (1.1428ms)
+✔ capital adjustment is financing, reconciles cash, and applies only once across closures (10.5472ms)
+✔ El estado conserva las filas sin detalles adicionales (37.1829ms)
+✔ Estado de resultados conserva las doce filas obligatorias y valores realizados (13.0753ms)
+✔ DOM de alumno y profesor consume el mismo estado sin generar movimientos (5.8359ms)
+✔ Advertencias de garantías son visibles y escapadas en alumno, historial y profesor (11.8941ms)
+✔ balance identifica las cuentas persistidas que explican los totales (4.6036ms)
+✔ unsold goods remain valued; subsequent sales recognize cost once (7.8433ms)
+✔ cancellation overrides operating and automatic schedule states, including legacy games (2.9179ms)
+✔ Supabase client retries a delayed SDK and all services share one instance (1.7276ms)
+✔ game creation distinguishes missing migration from transient network failures without inserting (6.0684ms)
+✔ game creation requires the alphanumeric migration before inserting a remote lobby (2.8635ms)
+✔ game creation returns the RPC server clock instead of a plain inserted row (2.633ms)
+✔ operational tasks supersede the tour without changing financial state (0.9795ms)
+✔ stockout distinguishes delivery from procurement and never invents transactions (0.2889ms)
+✔ tour only counts supported unique destinations and continues to operation (0.3395ms)
+✔ shift closure always supersedes live tasks and removes navigation (0.4054ms)
+✔ unloaded inventory is not mistaken for a stockout (0.255ms)
+(node:28340) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_world.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ outdoor GLBs are instanced by category and quality tiers cap detail without changing physics (78.1993ms)
+✔ partial outdoor loading preserves category fallbacks and installation is idempotent (39.7354ms)
+✔ outdoor placement is deterministic across worlds and birds use transform animation only (95.6611ms)
+✔ expanded district has clear service approaches, crossings and separated garden parcels (36.7385ms)
+✔ impuesto solo en cierre 1 y caja descuenta una vez (8.859ms)
+✔ impuesto solo en cierre 3 y caja descuenta una vez (1.6123ms)
+✔ impuesto solo en cierre 5 y caja descuenta una vez (0.8391ms)
+✔ SUNAT: general y tramos MYPE, incluyendo el límite (0.3376ms)
+✔ configuración de sala conserva duración y parámetros fiscales (1.2065ms)
+✔ utilidad acumulada no positiva no genera impuesto (0.5686ms)
+✔ cierre calcula caja y base MYPE en ambos tramos (3.3568ms)
+✔ each of three cycles charges exactly the announced fixed rows in the real cash ledger (71.4184ms)
+✔ saving the same infrastructure and production costs never charges announced mandatory rows again (18.447ms)
+✔ integration and pause cannot charge, and a resumed cycle only charges once (19.5092ms)
+✔ unsaved optional purchases, payroll and loan cannot enter the automatic cost notice or real ledger (17.4249ms)
+✔ next-cycle notice preserves saved staff and store commitments without repeating marketing or loan (55.7436ms)
+✖ acknowledged receipt survives the real student snapshot hydration contract without duplicate debit (20.1312ms)
+✔ zero existing fixed charges cannot create a notice or any cash movement (16.1315ms)
+✔ another company cannot inherit the acknowledgement or charge receipt of the previous company (19.1568ms)
+┌─────────┬───────┬──────────┬───────────┬─────────┬──────────┬─────────────┬───────────┬───────────┬───────────┬─────────┬────────────┬────────────┐
+│ (index) │ ciclo │ planeado │ producido │ vendido │ ingresos │ cajaInicial │ cajaFinal │ costos    │ utilidad  │ calidad │ eficiencia │ reputacion │
+├─────────┼───────┼──────────┼───────────┼─────────┼──────────┼─────────────┼───────────┼───────────┼───────────┼─────────┼────────────┼────────────┤
+│ 0       │ 1     │ 100      │ 80        │ 80      │ 3200     │ 100000      │ 85158.03  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+│ 1       │ 2     │ 100      │ 80        │ 80      │ 3200     │ 85158.03    │ 78179.06  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+│ 2       │ 3     │ 100      │ 80        │ 80      │ 3200     │ 78179.06    │ 71200.09  │ 10109.695 │ -6909.695 │ 4       │ 5          │ 3          │
+└─────────┴───────┴──────────┴───────────┴─────────┴──────────┴─────────────┴───────────┴───────────┴───────────┴─────────┴────────────┴────────────┘
+✔ Diagnóstico ingresos: un plan factible vende; faltar recursos produce cero sin inventar stock (19.6642ms)
+✔ Modo actual: tres ciclos local/remoto, caja, utilidad, inventario, puntajes e idempotencia (61.3405ms)
+✔ Preparar el plan no descuenta caja; local y limpieza son gasto de cada cierre (13.3869ms)
+✔ interior ground queries use the floor geometry world matrix, including translated parents (38.873ms)
+✔ rotated scaled floors match a rendered floor raycast instead of a constant local height (23.3756ms)
+✔ normalized NPC feet stay within one centimetre of all six transformed interior floors for sixty seconds (650.0762ms)
+(node:24304) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/vendor/yuka.module.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ low interior navigation stays on AABB without building geometry (5.4935ms)
+✔ room navmesh initializes lazily and routes around furniture (50.8152ms)
+✔ reads sealed values and preserves zero and losses (26.7835ms)
+✔ missing values remain missing and inconsistency is flagged (0.3037ms)
+✔ a production gap is not described as lost sales (0.3688ms)
+✔ calculates ratios only from valid same-cycle inputs (1.116ms)
+✔ exposes a financial breakdown only if all components reconcile (0.2852ms)
+✔ previous cycle variation needs both comparable values (0.2067ms)
+✔ margen con ventas negativas usa un denominador no nulo (0.3486ms)
+✔ más hilo aumenta producción solo si los demás recursos alcanzan; es determinista y no altera el cierre (23.1639ms)
+✔ no aumenta por materiales si ya limita la capacidad (5.202ms)
+✔ más trabajadores puede superar un cuello de botella o quedar limitado por máquinas y materiales (11.9602ms)
+✔ rechaza versión incierta, pedidos temporales, datos ausentes y cierre que no se reproduce (8.6922ms)
+✔ consulta código y UUID reales desde la misma fila después de autenticar (2.7073ms)
+✔ sin sesión docente no consulta partidas (1.793ms)
+✔ legacy physical holdings generate production and sales in their acquisition cycle and later cycles (24.4147ms)
+✔ legacy option selections are recovered only without a purchase ledger and actual holdings remain authoritative (14.1781ms)
+✔ holdings from future cycles never supply current equipment or sales (8.2069ms)
+✔ purchase history overrides duplicate holdings and sums purchases and liquidations exactly once (0.8567ms)
+✔ current draft purchases add to prior legacy holdings while replacing same-cycle saved purchases (1.1093ms)
+✔ invalid acquisition cycles cannot create equipment, purchases, maintenance or investment costs (3.2516ms)
+✔ legacy equipment review and maintenance preserve the same acquisition costs and holdings as canonical history (10.1188ms)
+✔ saved numeric production targets use the chosen mold and generate sales in every segment (25.7513ms)
+✔ numeric plans honor an explicit mold, recover previous purchases, and ignore invalid mold ids (0.3398ms)
+✔ current drafts and explicit per-mold zero plans take precedence over legacy values (0.6883ms)
+✔ numeric and text cycle identifiers preserve identical material consumption, sales and remaining stock (6.0285ms)
+✔ a current-cycle mold purchase remains available when synchronized optionIds are missing (2.4565ms)
+✔ RPC history restores only the latest cycle for production, materials, staff, channels and loan (3.1536ms)
+✔ asset history preserves purchases and disposals while molds retain their first acquisition cycle (0.4604ms)
+✔ fallbacks keep the true cycle of older decisions and exclude future-cycle rows (13.2699ms)
+✔ recovered two-cycle plans sell the current target rather than summing historical targets (7.8115ms)
+✔ real admission RPC supplies complete history without merging prior-cycle material and target rows (3437.2089ms)
+✔ SQL limita nuevas partidas a 1–6 y conserva configuraciones históricas (3532.6823ms)
+✔ student and teacher load the current UI with explicit shared calculation dependencies (32.5815ms)
+✔ materials use physical units and bounded affordable thread purchases (21.8366ms)
+✔ teacher preview matches the student economic projection without posting sales (39.388ms)
+✔ unconfirmed plans, other cycles and integration do not create live sales (0.7592ms)
+✔ compatible report transport requires the exact game, company, cycle and an open phase (6.561ms)
+✔ no materials means no sale and financial schedule is identical to student ledger (16.2397ms)
+✔ shared final closure replaces individual preview, survives reload and remains idempotent (24.5302ms)
+✔ teacher follows server room cycle even when company report still names the previous cycle (12.8352ms)
+✔ definitive report is never replaced by a provisional snapshot (5.4625ms)
+✔ a closure arriving during a roster read also replaces its cached sold units (10.4186ms)
+✔ FIFO concilia tres ciclos, calidades y costos distintos (42.5244ms)
+✔ umbrales reales CONS-03 y CONS-08 distinguen puntaje y eficiencia física (4.4043ms)
+✔ CONS-04 con umbral real tras dos ciclos de reputación baja (8.128ms)
+✔ dos calidades prémium conservan sus precios por unidad y FIFO (1.737ms)
+✔ varias tiendas concilian lotes FIFO, ingresos, inventario y cuentas por cobrar (14.4923ms)
+✔ cada tienda vende solo sus lotes y conserva los saldos por ubicación (1.8555ms)
+✔ transferencias manuales no pueden superar el stock central (2.2124ms)
+✔ múltiples lotes antiguos sin ubicación verificable se bloquean (0.7947ms)
+✔ tres ciclos con dos tiendas mantienen FIFO por ubicación y concilian el balance (18.4309ms)
+✔ saldo agregado anterior conserva ubicación registrada y no inventa su composición (1.244ms)
+✔ trazabilidad inequívoca reconcilia producción, consumo e inventario (35.3181ms)
+✔ mezcla asignada según consumo real, con calidad ponderada e inventario conciliado (6.3686ms)
+✔ pedido, recepción parcial, repetición y cancelación conservan unidades (3.1219ms)
+✔ evita sobre recepciones, empresas ajenas e identificadores alterados (1.2733ms)
+✔ órdenes derivadas de decisiones confirmadas y recepciones idempotentes en PGlite local (3171.5292ms)
+CIERRE_TEMPORAL_QA {"produccion":125,"vendidas":125,"hiloRecibido":2600,"hiloConsumido":1625,"hiloFinal":975,"valorHiloRecibido":4784,"valorHiloFinal":1794,"anticipos":0,"cajaInicial":100000,"cajaFinal":94435.61,"ventas":43750,"costoVentas":15675.94,"utilidad":21936.07}
+✔ libro leído de PGlite alimenta preview con recepción día 7 y capacidad no retroactiva (2845.4574ms)
+✔ presentaciones Excel V2 convierten a unidades físicas sin alterar la cantidad comprada (1.763ms)
+✔ presentaciones rechazan fracciones, valores inválidos y desbordamiento (0.9063ms)
+✔ presentaciones Excel V2: decisión, orden, recepción, producción, costo y reintento (3268.1912ms)
+✔ lectura de preview autoriza dueño o docente y entrega la misma revisión del libro (3281.8505ms)
+✔ lectura de material comprueba identidad, ciclo, revisión y error de red (23.0305ms)
+✔ reintento acotado de bloqueo usa el mismo identificador y no reintenta otros errores (7.4723ms)
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (9.9973ms)
+✖ corrected actual consumption gives exact reputation and quality factors (4.0593ms)
+✔ advertising is capped, debited once and contributes only its reputation factor (2.38ms)
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (17.0311ms)
+✔ MYPE and No MYPE labor, acquisition and maintenance follow the two source columns (0.8125ms)
+✔ base maintenance recurs in the engine while the optional decision keeps its original fee (14.4665ms)
+✔ the engine retains all owned mold types without adding a multi-purchase control (2.1119ms)
+✔ largest remainders preserve the market and are independent of input order (24.5372ms)
+✔ price guards support identical prices, arbitrary chosen prices and zero total scores (0.9417ms)
+✔ opening finished stock sells without new labor, material or production plan (4.0021ms)
+✔ unused premium purchases do not raise reputation; all thread levels form its denominator (1.1758ms)
+✔ sub-cent physical material balances survive repeated closures (3.5703ms)
+✔ unsold production costs remain in inventory and sold costs are recognized once (7.0079ms)
+✔ Excel redondea mitades lejos de cero y trunca negativos (3.6595ms)
+✔ Mercado literal por defecto SEG-01 (11.3141ms)
+✔ Mercado literal por defecto SEG-02 (0.4135ms)
+✔ Mercado literal por defecto SEG-03 (0.8522ms)
+✔ Modelo 1 conserva sobrante literal (0.7476ms)
+✔ Mercado vacío y empate de precios son finitos (0.4054ms)
+✔ hub requests a free identity even when every role model is occupied (2.7209ms)
+✔ outdoor requests a free identity even when every role model is occupied (0.9006ms)
+✔ interior staff excludes distant pedestrians and the mobile guide before they approach (2.6218ms)
+✔ a strict exhausted roster supplies no duplicate and can recover after an identity is released (5.5848ms)
+✔ chico1: intact source, self-contained GLB, valid articulated weights (146.5745ms)
+✔ chico2: intact source, self-contained GLB, valid articulated weights (115.4874ms)
+✔ chico3: intact source, self-contained GLB, valid articulated weights (142.7652ms)
+✔ mona: intact source, self-contained GLB, valid articulated weights (182.4768ms)
+✔ 16 licensed city NPCs have same-file skinned idle, walk and in-place run (113.1897ms)
+✔ city roster draws without replacement until its role pool is exhausted (3.0339ms)
+✔ scene pools are independent and player avatars are rejected (2.6791ms)
+✔ unlicensed entries and unsupported roles cannot enter the roster (2.0957ms)
+✔ office, bank, cashier, supplier and guard roles select only assigned outfits (0.9529ms)
+✔ a model already present in another scene gets a distinct appearance (0.7591ms)
+✔ outdoor bag reuses an available outfit before duplicating a nearby interior worker (0.5539ms)
+✔ clip catalogue distinguishes the second idle and optional work actions (3.791ms)
+✔ actual post-collision distance controls walk clip timing with a 0.2-second fade (2.2969ms)
+✔ root translation yields reference speed; in-place clip remains unknown (0.7068ms)
+✔ a player already overlapping a person separates gradually and can escape (8.0412ms)
+✔ player slides around a person without penetrating and releases contact on reverse (2.3207ms)
+✔ sliding between three people preserves every contact instead of reintroducing overlap (0.5657ms)
+✔ separation against an obstacle corner never pushes a player through a wall or bounds (2.872ms)
+✔ NPC respects a player radius and walks past without a teleport (13.7635ms)
+✔ vehicle chassis checks pedestrian circles and stops before contact in either heading (4.4821ms)
+✔ an interior walker near the player keeps moving while workers retain their station (65.4717ms)
+✔ interior staff respect customers supplied by the shared world population (35.0654ms)
+✔ the city manifest can be absent or contain no released models (2.5791ms)
+✔ released NPC manifest contains only unique IDs and existing files (14.1766ms)
+✔ released NPCs contain idle, walk and run clips (84.2168ms)
+✔ released NPC GLBs differ from playable avatars and each other (41.6119ms)
+✔ NPC path goes around furniture with body clearance (4.0462ms)
+✔ NPC cannot take an unreachable route through a wall (5.0055ms)
+✔ NPC completes a furniture detour without collision or teleportation (9.2161ms)
+✔ NPC stops before another person and resumes when the path clears (3.1328ms)
+✔ NPC turns before moving backwards and brakes at destination (1.3475ms)
+✔ NPC can detour from a stop beside a person blocking the entrance (5.0421ms)
+✔ city navmesh grid excludes solid colliders and applies the hub offset (3.702ms)
+✔ grid rejects excessive density before allocating geometry (1.1071ms)
+(node:32020) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/vendor/yuka.module.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ three-pathfinding route is accepted only when complete and clear (13.521ms)
+✔ Yuka steering remains behind AABB and neighbor collision guard (15.7788ms)
+✔ navmesh spawn samples real triangles and exposes their interpolated height (1.395ms)
+✔ Yuka separation steers around a stationary neighbor without overriding collision guards (8.3113ms)
+✔ patrols move for sixty seconds, bound pauses and never cross a solid collider (67.6643ms)
+✔ spawn uses a valid navmesh node and never spawns inside a solid (2.0001ms)
+✔ null and partial navmesh paths recover through the authoritative safe planner (12.2505ms)
+✔ an obstructing player causes a new destination without teleports or overlap (8.3292ms)
+✔ motion distance follows real movement, including zero distance during stops (1.3584ms)
+✔ low tier loads four nearby-role models and protects active clones from eviction (32.9567ms)
+✔ high tier retains all approved models; invalid licenses never enter a load plan (1.9055ms)
+✔ snapshot confirmado crea órdenes atomizadas; borrador, reintento y conflicto (4274.9473ms)
+CIERRE_TEMPORAL_QA {"produccion":125,"vendidas":125,"hiloRecibido":2600,"hiloConsumido":1625,"hiloFinal":975,"valorHiloRecibido":4784,"valorHiloFinal":1794,"anticipos":0,"cajaInicial":100000,"cajaFinal":95953.86,"ventas":43750,"costoVentas":15652.19,"utilidad":21963.07}
+✔ confirmación, entrega docente y cierre comparten libro en PGlite (11112.1117ms)
+✔ DOM alumno: libro verificado disponible y bloqueo sin datos (2572.8734ms)
+✔ DOM docente: consulta de empresa y render de proyección, luego fallo de lectura (2507.3284ms)
+✔ report reconciliation keeps verified previews while waiting, coalesces requests and rejects old rooms (3.3428ms)
+✔ teacher and laboratory retain unchanged DOM in desktop and mobile Chromium (3594.1656ms)
+✔ camera-relative walking and normalized diagonal keep matching speed (13.7167ms)
+✔ idle walk run and reverse transitions accelerate and settle without drift (1.5603ms)
+✔ locomotion is stable at 30/120 Hz and cannot cross a thin wall (2.2732ms)
+✔ camera clamps exact wall intersection, including smoothed endpoint behind wall (4.8895ms)
+✔ vehicle transition approaches door over time and completes once (0.8497ms)
+✔ DOP muestra faltante por material elegido aunque exista otro cuero en bodega (55.4982ms)
+✔ Editor ya montado rechaza confirmar durante pausa y permite reanudar sin guardar antes (32.3163ms)
+PRECIO_UTILIDAD {"segment":0,"price":120,"sold":225,"profit":9215.46,"cash":36933.63,"commitments":-40066.369999999995}
+PRECIO_UTILIDAD {"segment":1,"price":150,"sold":250,"profit":17125.13,"cash":43430.88,"commitments":-44069.119999999995}
+PRECIO_UTILIDAD {"segment":2,"price":280,"sold":50,"profit":3144.91,"cash":39364.7,"commitments":-24635.300000000003}
+✔ precios internos versionados ignoran valores guardados y conservan precios anteriores (11.2749ms)
+✔ candidatos generan resultados positivos con doce competidores y presupuesto finito (85.626ms)
+✔ Excel CANTIDAD: capacidad, eficiencia literal, reparto y límites MP (7.487ms)
+✔ Excel COSTOS permite inyectar 30 días y sus productividades (0.5626ms)
+✔ INV-01B amplía capacidad antes de redondear; bandera N3 explícita y sin tope (0.5261ms)
+✔ Inventario y compras se arrastran, convierten y consumen una sola vez (0.6277ms)
+✔ Asignación no crea stock; los códigos del lote limitan el material consumido (0.8936ms)
+✔ Cero personal, cero plan y MP ausente producen cero sin divisiones inválidas (1.2533ms)
+✔ Motor UMD expone la misma API pura en navegador (6.2139ms)
+✔ one rectangular calculator renders only the selected mold while retaining every target (21.2005ms)
+✔ calculator respects the submitted lock and distinguishes comparison from acquisition (3.0441ms)
+✔ production target input normalizes negatives and fractions immediately in the visible field (1.2402ms)
+✔ desktop wires touch the intended borders and cross no cards (2.93ms)
+✔ mobile wires touch the intended borders and cross no cards (0.5548ms)
+✔ connector coordinates follow changed card widths and heights instead of fixed viewport positions (0.5318ms)
+✔ rendering an empty plan preserves inputs and shows zero output, percent and mold detail (27.2434ms)
+✔ material requirement labels are escaped and coverage is supplied by the model (1.736ms)
+✔ mount redraws after resize and disconnects observers when the category changes (4.1359ms)
+✔ persisted adapter plans render real comparison stock without mutating snapshots (0.9768ms)
+✔ diagram mounts and redraws without ResizeObserver, and tolerates partial markup (2.5526ms)
+✔ 10 básicos sin recursos (29.3543ms)
+✔ 100 prémium y receta (2.1789ms)
+✔ metas combinadas y cambio de cantidad (2.1922ms)
+✔ la representación no altera estado ni resultados reales (2.7853ms)
+✖ 3000 básicos conservan la meta y muestran capacidad y producción real (1.6775ms)
+✔ purchase fields use physical material units without multiplying by packs (16.1632ms)
+✔ a raw-material shortage limits all three production processes (3.5022ms)
+✔ physical inventory adds to current purchases without charging inventory again (3.89ms)
+✔ stock ignores invalid values and never infers old purchases (1.2072ms)
+✔ workers and machines are paired and the slowest process is the bottleneck (1.3459ms)
+✔ level-three staff and production leadership reproduce the efficiency bonuses (1.2439ms)
+✔ equipment acquired in a previous cycle remains available (3.9118ms)
+✔ calculator keeps one target and material requirement for every mold (1.5982ms)
+✔ industrial DOP separates operations, inspection and combined activity (1.9001ms)
+✔ DOP data includes purchased material qualities and cycle yield by mold (1.6865ms)
+✔ no available mold means no production despite complete staff and stock (0.898ms)
+✔ each table and machine serves at most one worker, including saved assignments (1.5488ms)
+✔ mixed equipment and workers never exceed resources and idle workers retain payroll (1.1661ms)
+✔ store facade, emissive lights and ATM preserve the physical doorway contract (28.3844ms)
+✔ production props respect tier density, instancing and real-light limits (16.6171ms)
+✔ production installation is idempotent with category fallback and cached resources survive disposal (7.9252ms)
+✔ production placement matrices are deterministic between independent worlds (18.4071ms)
+✔ recommendation 0 (10.9867ms)
+✔ recommendation 100 (1.6836ms)
+✔ recommendation 500 (1.4586ms)
+✔ recommendation 1000 (1.3654ms)
+✔ recommendation 3000 (343.0098ms)
+✔ recommendation 5000 (395.9381ms)
+✔ recommendation 10000 (503.4673ms)
+✔ thread alternatives use integer spools and available physical stock (9.413ms)
+✔ alternative capacity does not imply production when materials are missing (426.8681ms)
+✔ mixed spool estimate uses catalog cost without changing saved decisions (3.0628ms)
+✔ integrated scenario accounts for all materials and respects the cash comparison (357.7787ms)
+✔ bounded thread optimization matches brute force including quantity discounts (8.94ms)
+✔ proyección y alternativas usan el cierre sin modificar decisiones ni contabilidad (135.888ms)
+✔ ninguna alternativa sin caja suficiente se muestra como financiable (59.6348ms)
+✔ una decisión financiable no pierde caja dos veces por su costo contable (53.9304ms)
+✔ recepciones no verificadas no se presentan como proyección (0.4037ms)
+✔ no se estima caja cuando falta el catálogo (0.3705ms)
+✔ el contexto competitivo explícito usa el cierre compartido y rechaza datos incompletos (128.3137ms)
+✔ la vista de estudiante muestra la proyección y advierte sus límites (62.6539ms)
+✔ la vista temporal solo pasa al motor el libro vigente y la modalidad configurada (3.4392ms)
+✖ la proyección se abre desde Producción sin guardar decisiones (37037.5815ms)
+✔ compras vigentes puntúan una vez y bajas y compras futuras no cuentan (10.5437ms)
+✔ CONS-03 y CONS-08 emplean el puntaje corregido sin cambiar la versión anterior (8.851ms)
+✔ la configuración conserva la versión explícita (2.6377ms)
+✔ Lotes y Motor: fixture 6.2,17,8,-3 sin normalizar (3.1189ms)
+✔ Catálogo: todas las filas, costos y aportes coinciden con extracción Excel (3.111ms)
+✔ Menú congelado: diez selectores y seis campos base; marketing se elige una sola vez (0.8041ms)
+✔ Decisiones congeladas: solo garantía y mantenimiento ya existentes suman; catálogo interno intacto (1.0667ms)
+✔ No duplica grupos ni acepta más de tres lotes (1.8303ms)
+✔ Mensajes de consecuencias son literales del libro (0.4385ms)
+✔ Premium insuficiente, coherente y rango sin efecto; reputación una vez por regla (1.3256ms)
+✔ Todas las consecuencias: multiplicación, historial, costos y tasa (0.657ms)
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+✖ Motor de cierre: puntajes SUM del Excel con selección real, sin recortes (2920.369ms)
+✖ mezcla: promedio ponderado de calidades Excel y materiales del motor real (4635.2989ms)
+✔ preview real no usa pedido pendiente, y solo fabrica tras recepción explícita (26.2149ms)
+✔ cierre rechaza ledger temporal hasta implementar valoración y persistencia (5.9427ms)
+✔ recepción tardía no reutiliza la capacidad de los siete días anteriores (11.81ms)
+✔ preview temporal sin libro falla en vez de sumar compras inmediatamente (1.138ms)
+✔ preview conserva por SKU entradas tardías y consumo de materiales (5.0013ms)
+✔ etapa económica usa SKU realmente consumidos por el plan temporal (10.5598ms)
+RECUPERACION_UTILIDAD {"recovery":[{"round":1,"net":-6174.75,"cash":124860.85,"inventoryMP":0,"inventoryPT":33991.07,"assets":34973.33,"debt":0,"tax":0,"sold":0},{"round":2,"net":10414.71,"cash":151943.3,"inventoryMP":0,"inventoryPT":0,"assets":34656.66,"debt":0,"tax":0,"sold":180},{"round":3,"net":9478.58,"cash":168794.55,"inventoryMP":0,"inventoryPT":0,"assets":34339.99,"debt":0,"tax":0,"sold":90},{"round":4,"net":9478.58,"cash":176825.8,"inventoryMP":0,"inventoryPT":0,"assets":34023.32,"debt":0,"tax":0,"sold":90},{"round":5,"net":9478.58,"cash":184857.05,"inventoryMP":0,"inventoryPT":0,"assets":33706.65,"debt":0,"tax":0,"sold":90},{"round":6,"net":5263.15,"cash":188672.87,"inventoryMP":0,"inventoryPT":0,"assets":33389.98,"debt":0,"tax":4215.43,"sold":90}],"failure":[{"round":1,"net":-6174.75,"cash":124860.85,"inventoryMP":0,"inventoryPT":33991.07,"assets":34973.33,"debt":0,"tax":0,"sold":0},{"round":2,"net":-6174.75,"cash":85011.7,"inventoryMP":0,"inventoryPT":67982.14,"assets":34656.66,"debt":0,"tax":0,"sold":0},{"round":3,"net":-6174.75,"cash":45162.55,"inventoryMP":0,"inventoryPT":101973.21,"assets":34339.99,"debt":0,"tax":0,"sold":0},{"round":4,"net":-6174.75,"cash":5313.4,"inventoryMP":0,"inventoryPT":135964.28,"assets":34023.32,"debt":0,"tax":0,"sold":0},{"round":5,"net":-6174.75,"cash":-34535.75,"inventoryMP":0,"inventoryPT":169955.35,"assets":33706.65,"debt":0,"tax":0,"sold":0},{"round":6,"net":-6174.75,"cash":-74384.9,"inventoryMP":0,"inventoryPT":203946.42,"assets":33389.98,"debt":0,"tax":0,"sold":0}],"profit":[{"round":1,"net":9746.71,"cash":190219.25,"inventoryMP":0,"inventoryPT":0,"assets":12471.46,"debt":0,"tax":0,"sold":90},{"round":2,"net":9746.71,"cash":198340.5,"inventoryMP":0,"inventoryPT":0,"assets":12332.92,"debt":0,"tax":0,"sold":90},{"round":3,"net":9746.71,"cash":206461.75,"inventoryMP":0,"inventoryPT":0,"assets":12194.38,"debt":0,"tax":0,"sold":90},{"round":4,"net":9746.71,"cash":214583,"inventoryMP":0,"inventoryPT":0,"assets":12055.84,"debt":0,"tax":0,"sold":90},{"round":5,"net":9746.71,"cash":222704.25,"inventoryMP":0,"inventoryPT":0,"assets":11917.3,"debt":0,"tax":0,"sold":90},{"round":6,"net":3898.68,"cash":224977.47,"inventoryMP":0,"inventoryPT":0,"assets":11778.76,"debt":0,"tax":5848.03,"sold":90}]}
+✔ seis ciclos conservan balances con pérdida inicial y recuperación, y con pérdida persistente (299.9123ms)
+✔ tres ciclos aplican impuesto final y permiten recuperar pérdida inicial (35.641ms)
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+✖ suma comercial real de Excel y conversión de escala para demanda (1773.8988ms)
+✔ student and teacher pages load the final responsive layer (5.9701ms)
+✔ responsive layer covers target widths, orientation and accessibility preferences (0.5569ms)
+✔ responsive layer addresses every primary product surface (0.3742ms)
+✔ responsive CSS has balanced blocks and no remote asset references (0.7574ms)
+✔ Todo el catálogo autorizado dispone de controles visibles, editables y guardado de borradores en las cinco pestañas de decisión actuales (34301.3872ms)
+✔ un cierre muestra la instantánea sellada aunque el libro del cliente cambie (2.2168ms)
+✔ los estados presentan pasivos de proveedores, anticipos e impuesto pagado (31.7841ms)
+✔ Cycle 2 summary uses the current analyst discount consistently with review and production (95.889ms)
+✔ current revenue adapter reproduces fresh v19 Excel market allocations (26.6935ms)
+✖ catalog reputation is unique, bounded and independent from advertising spend proxy (22.3477ms)
+✔ shared closure competes across companies, caps sales at stock and ignores POS activity (68.3379ms)
+✔ unsold goods carry forward and opening stock can sell without current production (22.5837ms)
+✔ browser pages load the same revenue dependencies as Node (55.1946ms)
+✔ remote service ignores world prices and preserves confirmed decision expenses (40.1633ms)
+✔ connected students cannot allocate the whole shared market to themselves (4.6561ms)
+✔ one roster channel, three-second financial reconciliation while connected, backoff and cleanup (5.722ms)
+✔ cancelar llama RPC y exige confirmación de la misma partida cancelada (14.8655ms)
+✔ cancelar informa migración pendiente y rechazo de propietario sin falso éxito (4.9646ms)
+✔ normalización acepta código nuevo pegado con/sin guion y whitespace; conserva demo y legados (5.0492ms)
+✔ doble Supabase: ingreso/reingreso exige identidad registrada; cancelación bloquea incluso identidad coincidente (12.7973ms)
+✔ timeout limita una RPC pendiente y permite repetir el ingreso (10.2466ms)
+✔ estado cancelada basta para rechazar una respuesta de admisión exitosa antigua (4.0817ms)
+✔ códigos cortos y antiguos se envían canónicos; largos inválidos no llaman Supabase (7.2694ms)
+✔ without channel stock is retained and no commission is charged (39.7341ms)
+✔ web sales earn exactly one percent commission and close is idempotent (34.3474ms)
+✔ unsold inventory carries forward and earlier receipt remains frozen (48.0711ms)
+✔ material inventory preserves unrelated lots and consumes only available purchased stock (40.9695ms)
+✔ shared closing keeps company stock and cash isolated (57.2866ms)
+✔ POS receipts never alter assigned demand or stock (11.8533ms)
+✔ restoring a submitted plan preserves live material inventories and accounting seed (0.7688ms)
+✔ commercial event changes demand before fulfillment, never money beyond stocked units (12.5487ms)
+✔ a live projection computes physical sales and price times units without settling or mutating input (67.5452ms)
+✔ the projection requires a channel and preserves stock (10.3245ms)
+✖ the final shared market replaces the individual reference and cannot sell stock twice (6.7195ms)
+✔ old empty, partial and unavailable machine assignments cannot strand hired staff (82.1646ms)
+✔ hidden malformed legacy prices fall back internally without blocking other companies (45.0589ms)
+✔ a preliminary zero snapshot is replaced by settled sales while closed history stays frozen (11.8931ms)
+✔ three cycles across four companies and every segment reconcile sales, stock, reports and retries (129.8905ms)
+✔ witness: untrusted current ledger changes closing cash (28.6772ms)
+✔ witness: a forged known section bypasses reconstruction of confirmed decisions (14.0628ms)
+✔ PostgreSQL real: Node y Edge cierran utility-v1 y PE30 una sola vez (25189.3256ms)
+✔ reparto económico según ejemplo y stock real (3.36ms)
+✔ precios iguales y precio superior al doble del ideal (11.8555ms)
+✔ descuento por cantidad se aplica al superar umbral configurable (1.5023ms)
+✔ unidades de producción en el formulario no se convierten dos veces (0.3761ms)
+✔ redondeo individual Excel (0.2977ms)
+✔ reputación del ciclo por defecto; suavizado opcional (8.5403ms)
+✔ cierre autorizado ignora precios inyectados y usa configuración interna (2.1314ms)
+✔ participantes sintéticos configurables se registran en el reparto (10.2832ms)
+✔ sin canal se advierte que no habrá ventas (2.5301ms)
+✔ explica falta de molde y muestra ventas y stock del comprobante (25.9698ms)
+✔ no inventa un resultado para un ciclo abierto (0.4132ms)
+✔ la sala elige régimen tributario y separa impuesto de costos operativos (6.9309ms)
+✔ umbral de sala llega a revisión de compras y resolución financiera (0.9642ms)
+✔ resultado explica demanda frente a stock aunque haya ventas (24.2197ms)
+✔ Six 8-hour cycles: zero minutes stay zero, 48 hours total (1.4961ms)
+✔ Month and year rollover (1.2506ms)
+✔ Invalid values rejected (0.3572ms)
+✔ Clock boundaries and catch-up (0.3469ms)
+✔ Manual waiting expiry preserves zero cycle minutes and closes at the configured boundary (0.5632ms)
+✔ Legacy selected districts mean one store each, web is not a store (0.2203ms)
+✔ Quantities and malformed values (0.2182ms)
+✔ Same-cycle drafts editable, prior contracts enforced (1.6559ms)
+✔ Openings expire independently after 12 cycles (0.4043ms)
+✔ Repeated saves do not duplicate openings (0.352ms)
+✔ cycle schedules reject invalid totals and never include cycle seven (0.3966ms)
+✔ venta limitada por stock genera ingreso por unidades efectivas (5.3384ms)
+✔ sin demanda no se vende inventario ni se reconoce ingreso (0.9064ms)
+✔ sin stock no existe venta aunque exista mercado (1.4915ms)
+✔ reparto por afinidad y ventas sin reposición durante venta (47.8583ms)
+✔ conserva stock y reparte necesidades con puntos distintos (0.5976ms)
+✔ sin canales conserva stock central e inactivo (0.2397ms)
+✔ preserva reparto confirmado anterior y las decisiones nuevas siguen automáticas (1.1645ms)
+✔ the reformed world has three separated business sectors (1.1895ms)
+✔ the city contains a crosswalk between the store and customer spawn (0.1884ms)
+✔ the complete customer state machine is declared (0.2056ms)
+✔ every quality level sets finite simulation limits (0.8904ms)
+✔ the local human avatar is a valid GLB with idle and walk clips (5.3917ms)
+✔ simulator visualizes decisions while entertainment sales stay local (1.6929ms)
+✔ sorteo autoritativo persiste decisiones, probabilidades, desfases y permite cero eventos (2826.8598ms)
+✔ sorteo forzado en base aislada llega a noticia privada, cierre e historial (2137.6313ms)
+✔ baked studio is a valid HDR CubeUV atlas without runtime convolution (18.7879ms)
+✔ invalid or truncated environment data is rejected before texture allocation (0.5582ms)
+✔ all local HTML assets exist (33.8508ms)
+✔ market-segment decision is absent from the active catalog (0.7399ms)
+✔ production model loads before the application and review modules (0.6125ms)
+✔ productive catalog requires a mold and a sales channel, with calculator first (1.7389ms)
+✔ student navigation keeps the requested order in every cycle (1.1348ms)
+✔ DOP presentation loads before the app and keeps the documented cycle (0.9851ms)
+✔ infrastructure, production and logistics drafts remain saveable over budget (0.9111ms)
+✔ student service normalizes the three admission fields and preserves server codes (5.8877ms)
+✔ admission creates an anonymous session and never forwards an old company key (2.0183ms)
+✔ student service does not call the server with any missing identity field (0.8476ms)
+✔ student service preserves technical Supabase errors for any game and company (1.648ms)
+✔ student service logs permission and network failures without relabeling them as identity rejection (2.0313ms)
+✔ real student form shows the server message for technical failures and business messages only for safe rejections (6402.7585ms)
+✔ student state service always uses normalized identity and compare-and-swap revision (3.1675ms)
+✔ student decision/report writes use identity wrappers, never empresaId RPCs (3.4138ms)
+✔ state reads and writes preserve technical error codes instead of rejecting the saved identity (4.2537ms)
+✔ frontend maps safe errors, hydrates by identity and recovers stale revisions (3.0431ms)
+✔ missing capability and missing server time require explicit migration, network remains technical (6.3924ms)
+✔ el formulario rechaza el código concatenado de la captura antes de llamar al servidor (6.5186ms)
+✔ código inexistente se explica junto al campo y no se atribuye a los nombres de empresa (1.5447ms)
+✔ un código retirado se explica junto al campo y exige el código de una sala nueva (1.4331ms)
+✔ la identidad exacta y la restricción de reingreso tras inicio se conservan (5.401ms)
+✔ el servicio rechaza códigos inválidos antes de consultar capacidades o ingresar una empresa (3.2569ms)
+✔ validación [16]: integration rechaza whitespace-only y altas sobre 60/40 (3226.5382ms)
+✔ seguridad [16]: puntuación y texto SQL se permiten literalmente sin ejecutar código (3730.6117ms)
+✔ student and teacher use independent Supabase Auth storage (2.1945ms)
+✔ respuestas tardías no cruzan empresas ni sesiones (3.2924ms)
+✔ sin V2 no consulta y el error no se muestra como ausencia de desafíos (0.4633ms)
+✔ rechaza noticias desconocidas o incompletas (0.4154ms)
+✔ rechazo distingue PARTIDA_CANCELADA sin registrar una empresa nueva (13.647ms)
+✔ rechazo distingue PARTIDA_FINALIZADA sin registrar una empresa nueva (3.4288ms)
+✔ rechazo distingue CODIGO_RETIRADO sin registrar una empresa nueva (4.5328ms)
+✔ rechazo distingue PARTIDA_NO_ENCONTRADA sin registrar una empresa nueva (2.6213ms)
+✔ una respuesta de sala cancelada no se convierte en ingreso exitoso (2.2129ms)
+✔ cancelledAt null no rechaza una sala válida (4.4952ms)
+✔ sin diagnóstico nuevo no se inventa cancelación ni ingreso (2.3604ms)
+✔ partida iniciada se distingue de cancelada usando estado público del código (3.1908ms)
+✔ marcadores nulos o falsos no equivalen a cancelar, ni en textos antiguos (18.6903ms)
+✔ avisa una vez antes del cierre solo si hay decisiones pendientes (5.4935ms)
+✔ teacher cash adjustments preserve closed cycles and enter equity, never profit or debt (8.7242ms)
+✔ summary retains every cycle, including quiet cycles, and reports cumulative values (29.7307ms)
+✔ office view uses financial model statements, including debt and assets (4.0581ms)
+✔ student financial report uses the same ledger model as the teacher summary (4.8839ms)
+✔ pause blocks persistence, preserves review and remaining: {"lifecycleVersion":2} (1.8003ms)
+✔ pause blocks persistence, preserves review and remaining: {"integrationMinutes":0} (0.3575ms)
+✔ pause blocks persistence, preserves review and remaining: {"integrationMinutes":60} (0.2664ms)
+✔ cancellation has priority over paused review (0.359ms)
+✔ authoritative decisions stop accepting edits at their deadline before the next server refresh (4.1616ms)
+✔ student podium error fails closed without losing game state (5.4911ms)
+✔ student podium throw fails closed without losing game state (3.4586ms)
+✔ student podium denied fails closed without losing game state (3.2869ms)
+✔ student podium accepts only the publication explicitly returned by the server (2.676ms)
+✔ una cancelación antigua no se atribuye a otra sala aunque tenga el mismo empresaId (5.5946ms)
+✔ la sala nueva en espera sustituye la cancelación local y conserva cancelaciones reales del servidor (2.4021ms)
+✔ una respuesta tardía de otra sala no sobrescribe estado ni reloj de la sala actual (1.6765ms)
+✔ un enlace a otra sala abre ingreso sin recuperar la sesión cancelada anterior (3.0909ms)
+✔ abrir ingreso manual invalida una recuperación pendiente y conserva sesión y decisiones anteriores (3.9755ms)
+✔ otra pestaña no cambia configuración, ciclo ni reloj de la sala confirmada del alumno (2.9258ms)
+✔ failed snapshot survives reload and retries its decisions/report with the original CAS revision (9.2687ms)
+✔ operation retry after an acknowledged snapshot never repeats the snapshot or the completed report (2.2103ms)
+✔ offline edits coalesce by cycle and category without losing other categories (1.043ms)
+✔ a newer edit made during a failed request survives and merges the unfinished operations (0.8506ms)
+✔ successful writes advance later jobs of the same company across cycles (0.9758ms)
+✔ CAS conflicts stop retries, preserve a local copy and never overwrite the other session (0.9424ms)
+✔ logout or identity change during a request prevents operations and revision changes in the next session (0.7833ms)
+✔ explicit identity rejection clears the outbox; technical failures with the same code keep it (0.8813ms)
+✔ lost snapshot acknowledgment is verified before retrying decisions and never writes the snapshot twice (1.3254ms)
+✔ an unavailable conflict check retains the job and does not adopt an unknown server revision (0.7993ms)
+✔ network failure backs off polling and resumes a durable snapshot exactly once (2.865ms)
+✔ decision writes preserve technical errors and require an explicit acknowledgment (16.9952ms)
+✔ report preview never writes a financial result from the client (3.1505ms)
+✔ the status gives a useful reason without discarding the local save (0.8594ms)
+✔ manual retry bypasses backoff and resumes only unfinished operations (2.0637ms)
+✔ implicit defaults preserve engine prices, quantities, cash and explicit historic prices (2.8062ms)
+✔ an implicit default stays equivalent during lost-ack recovery (1.9649ms)
+✔ the actual old SQL trigger reproduces 22023 and accepts the repaired durable job (2560.6052ms)
+▶ student synchronization and session recovery through the delivered UI
+  ✔ polling preserves tab nodes, active edits and scroll across newer revisions (1652.4702ms)
+  ✔ three company contexts remain isolated through rapid tab changes and reconnects (6041.1726ms)
+  ✔ loan slider updates amounts without replacing the dragged control (1804.633ms)
+  ✔ unchanged financial ticks preserve expanded details and nodes (1451.1446ms)
+  ✔ simultaneous forced refreshes share the next read instead of racing (1470.6739ms)
+  ✔ saving a draft sends snapshot, report and normalized decisions with the acknowledged revision (1358.3153ms)
+  ✔ online retries failed writes before reading and does not erase the local draft (1446.2725ms)
+  ✔ the top status explains a server rejection and manual retry really sends during backoff (1431.5323ms)
+  ✔ internal Medio default syncs with the old server contract without a new price control (1485.5882ms)
+  ✔ retry reconstructs a locally confirmed plan when the durable queue is empty without charging again (2126.7101ms)
+  ✔ going offline with no unsent jobs does not invent a pending save (1680.5787ms)
+  ✔ reload recovers an orphaned local confirmation before hydrating the older server draft (2178.1293ms)
+  ✔ pending decisions/report survive a reload and recover the latest offline draft (2100.9169ms)
+  ✔ a stale offline write preserves another session and hydrates the newer server state (1803.504ms)
+  ✔ a lost save response still recovers normalized decisions without repeating the committed snapshot (1509.241ms)
+  ✔ network failure retains the session and admission identity without a retry button (937.9657ms)
+  ✔ an explicit identity rejection clears the session instead of retrying indefinitely (909.2636ms)
+  ✔ online automatically restores a session retained after a network failure (1178.7544ms)
+  ✔ configured teacher demo credentials use Supabase Auth and stay on login if rejected (868.5377ms)
+✔ student synchronization and session recovery through the delivered UI (35046.7431ms)
+✔ hung Supabase request aborts, releases the caller and allows a subsequent request (54.9779ms)
+✔ Supabase deadline covers a stalled body after headers arrived (2.3156ms)
+✔ bounded transport preserves caller cancellation and HTTP error bodies (3.6517ms)
+✔ el borrador conserva juntas todas las decisiones del segmento (5.0419ms)
+✔ el borrador de otro segmento se conserva (2.1789ms)
+✔ un error de almacenamiento conserva las decisiones editables (2.9216ms)
+✔ sin segmento no se afirma un guardado correcto (1.2802ms)
+✔ twenty tablet exits blur the editor and return once without modifying decisions or the cycle (4.4601ms)
+✔ Escape respects review and login dialogs and ignores a hidden tablet (2.197ms)
+✔ return label distinguishes the world from the lobby and lobby exit keeps its destination (1.1485ms)
+✔ grade service acknowledges only a confirmed matching grade, including zero (13.8057ms)
+✔ grade service explains missing Supabase migration and validates before RPC (2.0508ms)
+✔ history service distinguishes no previous game and preserves every company, cycle and zero grade (6.7577ms)
+✔ history service re-reads the last game rather than accumulating older games (2.5184ms)
+✔ missing RPC or table returns actionable configuration feedback without console spam (9.0022ms)
+✔ history service reports unavailable connection, rejected permission and RPC exceptions (9.4329ms)
+✔ history presentation uses catalog categories, labels and every recorded cycle (28.8168ms)
+✔ history presentation handles empty games, company selection and escaped student values (1.5951ms)
+✔ history controller discards obsolete responses and clears previous data on unavailable schema (1.2509ms)
+✔ integration is cycle 1 and counts toward the configured total (1.2376ms)
+✔ admission only during the first hour; returning companies may rejoin (0.573ms)
+✔ automatic schedule cannot start before activation and closes after its last cycle (0.2612ms)
+✔ podium expires exactly 24 hours after publication and belongs to its game (0.2026ms)
+✔ SIDE suggestion uses financial statements and remains separate from grades (1.3239ms)
+✔ completed games grade all participants regardless of activity or presence (1.6249ms)
+✔ podium rejects out-of-range grades and breaks ties by company name (11.9705ms)
+✔ published podium candidates depend only on teacher grades (0.3342ms)
+✔ a fresh heartbeat connects immediately and reconnects immediately after sustained inactivity (3.6553ms)
+✔ an out-of-order polling response cannot overwrite a newer realtime heartbeat (0.4071ms)
+✔ duplicate callbacks do not count as sustained inactivity (0.274ms)
+✔ two companies survive heartbeat jitter, delayed responses, missing fields and a brief disconnection (0.388ms)
+✔ clock ticks expire the retained heartbeat even when no new network response arrives (0.337ms)
+✔ cycle identifies the reported period relative to the configured total (0.9353ms)
+✔ PDF preserves cents, accounting signs, zero grades and absent data (19.6555ms)
+✔ report mapping keeps the model balances and presents outflows as deductions (5.6869ms)
+✔ academic status uses mandatory counts and never invents completion (0.38ms)
+✔ empty and eliminated rosters cannot download a misleading blank report (1.4377ms)
+✔ does not borrow financial data from another company with the same name (3.3541ms)
+✔ does not fill current cycle statements with previous cycle data (2.7505ms)
+✔ keeps same-company same-cycle fallback when its report is pending (1.359ms)
+✔ presence connects immediately and needs sustained elapsed time before going idle (3.984ms)
+✔ grade queue retries, persists, and only acknowledges the latest edit (4.1032ms)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at Object.enqueue (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:74:7)
+    at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:85:9)
+    at Test.runInAsyncScope (node:async_hooks:227:14)
+    at Test.run (node:internal/test_runner/test:1402:25)
+    at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+    at Test.postRun (node:internal/test_runner/test:1542:19)
+    at Test.run (node:internal/test_runner/test:1467:12)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+SIDE: no se pudo sincronizar el puntaje docente Error: offline
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:87:41)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:98:13)
+✔ grade queue shows failure only after repeated retries and keeps job locally (1.3741ms)
+SIDE: no se pudo conservar la cola de notas Error: QuotaExceededError
+    at Object.setItem (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\teacher_sync.test.js:80:60)
+    at persist (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:57:21)
+    at flush (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\services\teacher_sync.js:91:15)
+✔ grade queue still saves and retries when local storage is full (2.4425ms)
+✔ grade migration persists only for the owner and a company in that game (3084.9581ms)
+✔ material recibido el día siete solo habilita capacidad posterior (11.6471ms)
+✔ recepción posterior, molde ausente y días con inventario limitado (1.3139ms)
+✔ Autonomous migration retains paid assets, cash, debt and materials without duplicating purchase or financing (21.9919ms)
+✔ A paid current-cycle decision remains canonical and migration is idempotent across reloads (0.476ms)
+✔ Cierre local por lotes es idempotente y no añade movimientos al ledger 3D (27.5318ms)
+✔ Empresa sin plan confirmado se elimina en ciclo 1; historial replica un ciclo posterior (12.5731ms)
+✔ Validación acepta IFERROR de componentes o decisiones ausentes y exige plan con precio (8.6623ms)
+✔ Cierre local tardío conserva plan confirmado previo aunque editor ya avanzó de ciclo (14.4271ms)
+✔ Editor conserva distritos y opciones base; no ofrece ni reactiva decisiones retiradas (59.067ms)
+✔ Marketing base alto pasa S/12000 al Excel sin doble cobro y analista conserva su negociación por ciclo (11.161ms)
+✔ Garantías 30/90 tienen mapeo exacto de puntaje y conservan costo base cero; mantenimiento opcional cobra S/200 una vez (13.6034ms)
+✔ Activación en ciclo 2 no elimina retroactivamente una empresa durante cierre del ciclo 1 (14.5626ms)
+✔ Consumo físico real y valorización literal explícita mantienen separados 107 vs107.5 (4.6013ms)
+✔ acceleration and steering are stable across frame rates (4.1285ms)
+✔ brake stops without reversing; reverse is limited (1.6623ms)
+✔ swept substeps stop the bumper at a thin wall (1.8144ms)
+✔ rotated chassis and world bounds are respected (0.2648ms)
+✔ vehicle pairs include bumpers and rotation for both chassis (1.6617ms)
+✔ confirmed remote plan enters the durable snapshot queue even if report rendering fails (6.6867ms)
+✔ the final individual section opens the company summary without entering 3D (2.9836ms)
+✔ send all opens the summary and duplicate confirmation cannot charge again (2.0843ms)
+✔ failed persistence and a cycle paused before entry never open the world (2.251ms)
+✔ snapshot recursively freezes a detached allowlisted projection and reads only pushed data without invoking an economic provider (3.9802ms)
+✔ bridge works without economic publication and with unavailable storage (1.6803ms)
+✔ SIM-1: three cycle closures identical absent, loaded with 120 real POS sales, and provider error (41.3337ms)
+✔ SIM-2: three cycle closures identical absent, loaded with 120 real POS sales, and provider error (19.056ms)
+✔ SIM-3: three cycle closures identical absent, loaded with 120 real POS sales, and provider error (27.1871ms)
+✔ 3D source and bridge cannot import or call economic services or legacy mutable globals (3.1233ms)
+✔ current CYCLE_MODEL closure remains byte-identical after actual POS handler transactions (57.4268ms)
+✔ resetting or reloading a fun shift preserves spent local resources and economic state (1.7554ms)
+✔ economic cost notice has no economic reads or writes while simulator3d is visible (25.3758ms)
+✔ economic cost notice has no economic reads or writes while simulationLoading is visible (1.345ms)
+✔ all five decision categories have a destination on the agreed city map (2.4036ms)
+✔ missions follow the current cycle and stock urgency without modifying decisions (1.4834ms)
+✔ visible stock, delivery, machinery and clients use only authoritative inputs (1.1003ms)
+✔ festival events are unique and changing visuals never generate cash or inventory (0.8892ms)
+✔ unknown production and financial values stay unknown (0.3808ms)
+✔ legacy world charges are removed before closure while frozen history and decisions stay intact (2.321ms)
+✔ world sales cannot raise assigned demand, revenue, production, stock or cash (30.7611ms)
+✔ cycle business context never reads world inventory or prices (3.1762ms)
+✔ world has no financial write bridge and the bridge exposes no mutable decisions (3.3996ms)
+✔ world sales, supplier expenses and upgrades never mutate economic cash (4.8046ms)
+✔ teacher pause and closed cycles do not block independent entertainment (2.3574ms)
+✔ local supplier timer is independent of economic server time and delivers once (2.7936ms)
+(node:39620) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/Asus/OneDrive/Documentos/side_side_va/SIDE1/.codex-work/parpadeos/services/hub_world.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ minimapa mantiene escala y orientación para la ciudad completa (1.6763ms)
+✔ todas las zonas poseen nombre, posición, ícono integrado y destino distinto (0.7288ms)
+✔ el escenario contiene controles accesibles para mapa, avisos y objetivo (1.122ms)
+✔ rótulos móviles priorizan objetivo y zona actual sin cubrir controles (1.1446ms)
+✔ el objetivo fuera de cámara conserva rótulo y abrevia si el espacio es estrecho (0.4509ms)
+✔ walking across a facade threshold enters once without a button or cooldown (1.5156ms)
+✔ side walls and passing in front of a shop do not enter (0.2575ms)
+✔ swept entrance chooses only the doorway crossed even during a long frame (1.2553ms)
+✔ interior returns through the physical exit and arrival cannot bounce outside (0.2157ms)
+✔ concurrent lobby and entry preload share critical requests without loading indoor models (12.6287ms)
+✔ failed engine preparation can retry rather than caching a permanent false result (3.4307ms)
+✔ rejected preloading releases its cache and allows the retry button to succeed (5.8434ms)
+✔ shared deferred requests do not block critical readiness or repeat staff upgrades (5.8001ms)
+✔ same-round economic closure does not suspend the independent world (9.6426ms)
+✔ a hidden world schedules a wakeup without rendering or operating (5.0264ms)
+✔ idle animation does not replenish stock during pause or after shift end (5.358ms)
+✔ suspension clears held keys, queued jump and velocity (2.538ms)
+✔ visible pause draws once and then leaves physics, NPCs and GPU idle (3.3241ms)
+✔ vehicle audio reuses one voice and disconnects it when muted (2.754ms)
+✔ flecha de objetivo respeta área segura y borde en móvil vertical (2.0813ms)
+✔ flecha evita minimapa y controles táctiles en orientación vertical (2.84ms)
+✔ flecha halla tramo libre de borde en orientación horizontal (0.307ms)
+✔ objetivo detrás de cámara tiene dirección estable y viewport inviable no dibuja flecha (0.2108ms)
+✔ aviso de zona busca espacio entre estadísticas y minimapa (0.3942ms)
+ℹ tests 981
+ℹ suites 0
+ℹ pass 959
+ℹ fail 22
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 215943.5667
+
+✖ failing tests:
+
+test at tests\decisions_corrections.test.js:113:1
+✖ DOP renders once in Production and nowhere in the other categories or summary (31.0319ms)
+  AssertionError [ERR_ASSERTION]: C
+
+  0 !== 1
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:118:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\decisions_corrections.test.js:138:1
+✖ manual transfers show central and store stock, persist in sales decision and reject excess (8.9572ms)
+  evalmachine.<anonymous>:1
+  manualDistributionData()[0]
+  ^
+
+  ReferenceError: manualDistributionData is not defined
+      at evalmachine.<anonymous>:1:1
+      at Script.runInContext (node:vm:149:12)
+      at Object.runInContext (node:vm:301:6)
+      at run (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:19:22)
+      at Object.json (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:24:190)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\decisions_corrections.test.js:140:17)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests\dop_resource_planning.test.cjs:7:1
+✖ la meta sin recursos calcula materiales y recursos suficientes sin modificar el estado (26.0075ms)
+  AssertionError [ERR_ASSERTION]: 20 juegos de piezas
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:11:124)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\dop_resource_planning.test.cjs:14:1
+✖ prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada (2.7496ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /100 unidades totales/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="100" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 0 u. · Molde mejorado: 0 u. · Molde premium: 100 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>100 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">70 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 70 m² de cuero. Referencia básica: 1 mesas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">100 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">100 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 1,300 m. Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde premium</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>100 u.</td><td>70 m²</td><td>100 unidades</td><td>1,300 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>70 m²</td><td>0 m²</td><td>70 m²</td></tr><tr><th scope="row">Accesorios</th><td>100 unidades</td><td>0 unidades</td><td>100 unidades</td></tr><tr><th scope="row">Hilo</th><td>1,300 metros</td><td>0 metros</td><td>1,300 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:19:79)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="100" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 0 u. · Molde mejorado: 0 u. · Molde premium: 100 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>100 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">70 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 70 m² de cuero. Referencia básica: 1 mesas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">100 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">100 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 1,300 m. Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 1 máquinas básicas y 1 operarios de nivel 1 · Capacidad: 162 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde premium</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>100 u.</td><td>70 m²</td><td>100 unidades</td><td>1,300 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>70 m²</td><td>0 m²</td><td>70 m²</td></tr><tr><th scope="row">Accesorios</th><td>100 unidades</td><td>0 unidades</td><td>100 unidades</td></tr><tr><th scope="row">Hilo</th><td>1,300 metros</td><td>0 metros</td><td>1,300 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>1</td><td>0</td><td>1</td></tr><tr><th scope="row">Equipos</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde premium</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /100 unidades totales/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\dop_resource_planning.test.cjs:24:1
+✖ DOP compares recommended, available and missing resources without changing the target (0.8363ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /<th>Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="2000" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 2,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>2,000 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">600 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 600 m² de cuero. Referencia básica: 13 mesas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">2,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">2,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 12,000 m. Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>2,000 u.</td><td>600 m²</td><td>2,000 unidades</td><td>12,000 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>600 m²</td><td>0 m²</td><td>600 m²</td></tr><tr><th scope="row">Accesorios</th><td>2,000 unidades</td><td>0 unidades</td><td>2,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>12,000 metros</td><td>0 metros</td><td>12,000 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\dop_resource_planning.test.cjs:27:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="2000" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 2,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>2,000 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">600 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 600 m² de cuero. Referencia básica: 13 mesas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">2,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">2,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 12,000 m. Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 13 máquinas básicas y 13 operarios de nivel 1 · Capacidad: 2,106 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>2,000 u.</td><td>600 m²</td><td>2,000 unidades</td><td>12,000 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>600 m²</td><td>0 m²</td><td>600 m²</td></tr><tr><th scope="row">Accesorios</th><td>2,000 unidades</td><td>0 unidades</td><td>2,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>12,000 metros</td><td>0 metros</td><td>12,000 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>13</td><td>0</td><td>13</td></tr><tr><th scope="row">Equipos</th><td>13</td><td>0</td><td>13</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /<th>Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: base (23.9434ms)
+  AssertionError [ERR_ASSERTION]: base N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:28:42)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: meta_cero (5.6352ms)
+  AssertionError [ERR_ASSERTION]: meta_cero N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:28:42)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: material_insuficiente (10.4758ms)
+  AssertionError [ERR_ASSERTION]: material_insuficiente N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:28:42)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: premium (5.9959ms)
+  AssertionError [ERR_ASSERTION]: premium N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:28:42)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: capacidad_limitada (5.1606ms)
+  AssertionError [ERR_ASSERTION]: capacidad_limitada N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:28:42)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\equivalencia_fuente_side.cjs:30:1
+✖ Excel real y SIDE: inventario arrastrado durante tres ciclos (5.8869ms)
+  AssertionError [ERR_ASSERTION]: ciclo 1 N5: Excel 386, SIDE 221
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:48:43)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\independent_cycle_costs_20261022.test.cjs:49:1
+✖ acknowledged receipt survives the real student snapshot hydration contract without duplicate debit (20.1312ms)
+  js/app.js:327
+    if($('decisionCards')?.contains(document.activeElement)){materialViewRefreshPending=true;return;}
+                           ^
+
+  TypeError: $(...)?.contains is not a function
+      at requestMaterialViewRefresh (js/app.js:327:26)
+      at hydrateRemoteProgress (js/app.js:464:93)
+      at evalmachine.<anonymous>:1:182
+      at Script.runInContext (node:vm:149:12)
+      at Object.runInContext (node:vm:301:6)
+      at Object.run (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\independent_cycle_costs_20261022.test.cjs:13:21)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\independent_cycle_costs_20261022.test.cjs:51:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+
+test at tests\md_logic.test.cjs:14:1
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (9.9973ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+  +   8,
+  -   14,
+      31.4,
+      24
+    ]
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:15:72)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 8, 31.4, 24 ],
+    expected: [ 14, 31.4, 24 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:18:1
+✖ corrected actual consumption gives exact reputation and quality factors (4.0593ms)
+  AssertionError [ERR_ASSERTION]: 0 != 2.119565217391304
+      at near (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:6:65)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:19:43)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:26:1
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (17.0311ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  221 !== 368
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\md_logic.test.cjs:27:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 221,
+    expected: 368,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\production_dop_target_ui.test.js:14:1
+✖ 3000 básicos conservan la meta y muestran capacidad y producción real (1.6775ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Capacidad instalada: 0 unidades/. Input:
+
+  '<section class="production-dop pd-panel" data-production-target="3000" aria-labelledby="productionDopTitle">\n' +
+    '      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n' +
+    '      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 3,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>3,000 u.</strong></div></div>\n' +
+    '      <div class="pd-graph" data-pd-graph>\n' +
+    '        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n' +
+    '        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">900 m²</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 900 m² de cuero. Referencia básica: 19 mesas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">3,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n' +
+    '        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">3,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n' +
+    '        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n' +
+    '        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 18,000 m. Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n' +
+    '        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n' +
+    '          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n' +
+    '        </section>\n' +
+    '      </div>\n' +
+    '      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n' +
+    '        <h4>Materiales necesarios por molde</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>3,000 u.</td><td>900 m²</td><td>3,000 unidades</td><td>18,000 metros</td></tr></tbody></table></div>\n' +
+    '        <h4>Insumos para la cantidad deseada</h4>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>900 m²</td><td>0 m²</td><td>900 m²</td></tr><tr><th scope="row">Accesorios</th><td>3,000 unidades</td><td>0 unidades</td><td>3,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>18,000 metros</td><td>0 metros</td><td>18,000 metros</td></tr></tbody></table></div>\n' +
+    '      </section>\n' +
+    '      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n' +
+    '        <h4>Personal y equipos para la meta</h4>\n' +
+    '        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n' +
+    '        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr></tbody></table></div>\n' +
+    '        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n' +
+    '      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n' +
+    '    </section>'
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\production_dop_target_ui.test.js:14:354)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<section class="production-dop pd-panel" data-production-target="3000" aria-labelledby="productionDopTitle">\n      <header class="pd-heading"><div><span class="pd-eyebrow">DOP · DIAGRAMA DE OPERACIONES DEL PROCESO</span><h3 id="productionDopTitle">Elaboración mensual de bolsos</h3><p>Área productiva única · Ciclo undefined. Numeración independiente por tipo de actividad.</p><p>Planificación orientativa: tú decides si sigues las recomendaciones. Los faltantes no impiden guardar ni enviar tu meta. La producción real respetará los recursos disponibles y las condiciones del ciclo.</p></div><div class="pd-legend" aria-label="Leyenda de actividades"><span><i class="pd-symbol pd-operation" aria-hidden="true"></i>Operación</span><span><i class="pd-symbol pd-inspection" aria-hidden="true"></i>Inspección</span><span><i class="pd-symbol pd-combined" aria-hidden="true"></i>Combinada</span></div></header>\n      <div class="pd-plan"><div><h4>DOP consolidado de producción</h4><p>Molde básico: 3,000 u. · Molde mejorado: 0 u. · Molde premium: 0 u.</p></div><div><span class="pd-eyebrow">PRODUCCIÓN TOTAL DESEADA</span><strong>3,000 u.</strong></div></div>\n      <div class="pd-graph" data-pd-graph>\n        <svg class="pd-connectors" data-pd-connectors aria-hidden="true" focusable="false"></svg>\n        <article class="pd-node pd-source pd-leather" data-pd-node="leather"><span class="pd-eyebrow">MATERIA PRIMA PRINCIPAL</span><h4>Cuero</h4><strong class="pd-value">900 m²</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-cut" data-pd-node="cut"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 1"><span>1</span></i><h4>Corte de piezas</h4></div><strong class="pd-value">0 juegos de piezas</strong><span class="pd-state">Proyección</span><p>Entrada: 900 m² de cuero. Referencia básica: 19 mesas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <article class="pd-node pd-source pd-accessories" data-pd-node="accessories"><span class="pd-eyebrow">MATERIA PRIMA SECUNDARIA</span><h4>Accesorios</h4><strong class="pd-value">3,000 unidades</strong><span class="pd-state">Material necesario</span></article>\n        <article class="pd-node pd-classification" data-pd-node="classification"><div class="pd-node-title"><i class="pd-symbol pd-inspection" aria-label="Inspección 1"><span>1</span></i><h4>Clasificación</h4></div><strong class="pd-value">3,000 accesorios</strong><span class="pd-state">Proyección</span><p>Selección y conteo</p></article>\n        <article class="pd-node pd-preparation" data-pd-node="preparation"><div class="pd-node-title"><i class="pd-symbol pd-operation" aria-label="Operación 2"><span>2</span></i><h4>Preparación</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Materiales preparados para ensamblado</p></article>\n        <article class="pd-node pd-assembly" data-pd-node="assembly"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 1"><span>1</span></i><h4>Ensamblado y colocación de accesorios</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Piezas, accesorios e hilo: 18,000 m. Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <article class="pd-node pd-finish" data-pd-node="finish"><div class="pd-node-title"><i class="pd-symbol pd-combined" aria-label="Combinada 2"><span>2</span></i><h4>Acabado final</h4></div><strong class="pd-value">0 bolsos</strong><span class="pd-state">Proyección</span><p>Referencia básica: 19 máquinas básicas y 19 operarios de nivel 1 · Capacidad: 3,078 u./ciclo</p></article>\n        <section class="pd-result pd-node" data-pd-node="result" aria-label="Resultado de producción del ciclo">\n          <div class="pd-output"><span class="pd-eyebrow">PRODUCCIÓN FACTIBLE ESTIMADA</span><strong>0 unidades totales</strong><div class="pd-mix"><span><b>Molde básico</b> 0 u.</span></div><p>Producción factible estimada con los recursos y materiales disponibles; el cierre oficial puede aplicar otras condiciones.</p></div>\n        </section>\n      </div>\n      <section class="pd-requirements-table" aria-label="Materiales e insumos">\n        <h4>Materiales necesarios por molde</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Materiales necesarios por molde"><table><thead><tr><th>Molde</th><th>Cantidad</th><th>Cuero</th><th>Accesorios</th><th>Hilo</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>3,000 u.</td><td>900 m²</td><td>3,000 unidades</td><td>18,000 metros</td></tr></tbody></table></div>\n        <h4>Insumos para la cantidad deseada</h4>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Insumos para la cantidad deseada"><table><thead><tr><th>Insumo</th><th>Cantidad necesaria</th><th>Disponible</th><th>Faltante</th></tr></thead><tbody><tr><th scope="row">Cuero</th><td>900 m²</td><td>0 m²</td><td>900 m²</td></tr><tr><th scope="row">Accesorios</th><td>3,000 unidades</td><td>0 unidades</td><td>3,000 unidades</td></tr><tr><th scope="row">Hilo</th><td>18,000 metros</td><td>0 metros</td><td>18,000 metros</td></tr></tbody></table></div>\n      </section>\n      <section class="pd-requirements-table" aria-label="Personal, equipos y moldes">\n        <h4>Personal y equipos para la meta</h4>\n        <p>Referencia: operarios de nivel 1 y máquinas básicas o mesas. La diferencia compara cantidades; otras combinaciones pueden alcanzar la meta.</p>\n        <div class="pd-table-scroll" tabindex="0" role="region" aria-label="Personal y equipos para la meta"><table><thead><tr><th>Etapa</th><th>Recurso</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="rowgroup" rowspan="2">Corte</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Ensamblado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="rowgroup" rowspan="2">Acabado</th><th scope="row">Personal</th><td>19</td><td>0</td><td>19</td></tr><tr><th scope="row">Equipos</th><td>19</td><td>0</td><td>19</td></tr></tbody></table></div>\n        <h4>Moldes para la meta</h4><div class="pd-table-scroll" tabindex="0" role="region" aria-label="Moldes para la meta"><table><thead><tr><th>Molde</th><th>Referencia</th><th>Disponible</th><th>Diferencia</th></tr></thead><tbody><tr><th scope="row">Molde básico</th><td>1</td><td>0</td><td>1</td></tr></tbody></table></div>\n      </section><footer class="pd-footer"><table><caption>Tabla de resumen</caption><thead><tr><th>Actividad</th><th>Cantidad</th></tr></thead><tbody><tr><td>Operaciones</td><td>2</td></tr><tr><td>Inspecciones</td><td>1</td></tr><tr><td>Combinadas</td><td>2</td></tr><tr><th>Total</th><th>5</th></tr></tbody></table><div class="pd-metrics"><div><span>UNIDADES PROYECTADAS POR OPERACIÓN</span><strong>0 unidades</strong></div></div></footer>\n    </section>',
+    expected: /Capacidad instalada: 0 unidades/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\profit_projection_ui.test.cjs:4:1
+✖ la proyección se abre desde Producción sin guardar decisiones (37037.5815ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for locator('[data-profit-calculate]')[22m
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\profit_projection_ui.test.cjs:13:161) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for locator('[data-profit-calculate]')" ]
+  }
+
+test at tests\puntajes_excel_real.test.cjs:4:1
+✖ Motor de cierre: puntajes SUM del Excel con selección real, sin recortes (2920.369ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\plan.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_fuente_actual\fuente_inmutable.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\calculado.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\puntajes_excel_real.test.cjs:7:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes> ],
+    pid: 16932,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes>
+  }
+
+test at tests\puntajes_excel_real.test.cjs:15:1
+✖ mezcla: promedio ponderado de calidades Excel y materiales del motor real (4635.2989ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_fuente_actual\fuente_inmutable.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla-resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\puntajes_excel_real.test.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes> ],
+    pid: 8452,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes>
+  }
+
+test at tests\reputacion_excel_real.test.cjs:4:1
+✖ suma comercial real de Excel y conversión de escala para demanda (1773.8988ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\plan.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\resultado.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\reputacion_excel_real.test.cjs:6:120)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 29560,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\revenue_excel_current.test.cjs:11:1
+✖ catalog reputation is unique, bounded and independent from advertising spend proxy (22.3477ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(Math.abs(profile.scores.reputation-(1/3+1+1+0)*10/4)<1e-10)
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\revenue_excel_current.test.cjs:12:135)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\sales_projection.test.cjs:31:1
+✖ the final shared market replaces the individual reference and cannot sell stock twice (6.7195ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  162 !== 3500
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\sales_projection.test.cjs:33:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 162,
+    expected: 3500,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

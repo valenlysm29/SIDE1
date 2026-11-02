@@ -1,0 +1,346 @@
+✖ Excel real y producción SIDE: base (858.2123ms)
+✖ Excel real y producción SIDE: meta_cero (832.1675ms)
+✖ Excel real y producción SIDE: material_insuficiente (877.7287ms)
+✖ Excel real y producción SIDE: premium (771.4919ms)
+✖ Excel real y producción SIDE: capacidad_limitada (737.6027ms)
+✖ Excel real y SIDE: inventario arrastrado durante tres ciclos (810.6803ms)
+✖ la proyección se abre desde Producción sin guardar decisiones (33229.867ms)
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+✖ Motor de cierre: puntajes SUM del Excel con selección real, sin recortes (809.4008ms)
+✖ mezcla: promedio ponderado de calidades Excel y materiales del motor real (761.9399ms)
+Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+Carácter: 1
++ Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+   ption
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+✖ suma comercial real de Excel y conversión de escala para demanda (841.4675ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 0
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41575.764
+
+✖ failing tests:
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: base (858.2123ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\base.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\base.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\base-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 11324,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: meta_cero (832.1675ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\meta_cero.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\meta_cero.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\meta_cero-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 6804,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: material_insuficiente (877.7287ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\material_insuficiente.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\material_insuficiente.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\material_insuficiente-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 10772,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: premium (771.4919ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\premium.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\premium.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\premium-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 15508,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\equivalencia_fuente_side.cjs:14:25
+✖ Excel real y producción SIDE: capacidad_limitada (737.6027ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\capacidad_limitada.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\capacidad_limitada.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\capacidad_limitada-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 9956,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\equivalencia_fuente_side.cjs:30:1
+✖ Excel real y SIDE: inventario arrastrado durante tres ciclos (810.6803ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\arrastre_1.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\arrastre_1.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_equivalencia_actual\arrastre_1-valores.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\equivalencia_fuente_side.cjs:39:6)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 37024,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }
+
+test at tests\profit_projection_ui.test.cjs:4:1
+✖ la proyección se abre desde Producción sin guardar decisiones (33229.867ms)
+  locator.click: Timeout 30000ms exceeded.
+  Call log:
+  [2m  - waiting for locator('[data-profit-calculate]')[22m
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\profit_projection_ui.test.cjs:13:161) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for locator('[data-profit-calculate]')" ]
+  }
+
+test at tests\puntajes_excel_real.test.cjs:4:1
+✖ Motor de cierre: puntajes SUM del Excel con selección real, sin recortes (809.4008ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\plan.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_fuente_actual\fuente_inmutable.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\calculado.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\puntajes_excel_real.test.cjs:7:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes> ],
+    pid: 41292,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes>
+  }
+
+test at tests\puntajes_excel_real.test.cjs:15:1
+✖ mezcla: promedio ponderado de calidades Excel y materiales del motor real (761.9399ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\excel_fuente_actual\fuente_inmutable.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\puntajes_reales\mezcla-resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\tests\output\excel_fuente_actual\fuente_inmutable.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._inmutable.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\puntajes_excel_real.test.cjs:18:5)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes> ],
+    pid: 40160,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 636 more bytes>
+  }
+
+test at tests\reputacion_excel_real.test.cjs:4:1
+✖ suma comercial real de Excel y conversión de escala para demanda (841.4675ms)
+  Error: Command failed: powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1 -Plan C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\plan.json -Modelo C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\output\SIDE_prueba_cantidad_produccion_corregido.xlsx -LibroSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\resultado.xlsx -JsonSalida C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\output\reputacion_excel\resultado.json
+  Copy-Item : No se encuentra la ruta de acceso 'C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpade
+  os\output\SIDE_prueba_cantidad_produccion_corregido.xlsx' porque no existe.
+  En C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\oracle\recalcular_com.ps1: 6
+  Carácter: 1
+  + Copy-Item -LiteralPath $Modelo -Destination $LibroSalida -Force
+  + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      + CategoryInfo          : ObjectNotFound: (C:\Users\Asus\O..._corregido.xlsx:String) [Copy-Item], ItemNotFoundExce
+     ption
+      + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.CopyItemCommand
+
+
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:943:11)
+      at Object.execFileSync (node:child_process:979:15)
+      at test.timeout (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\reputacion_excel_real.test.cjs:6:120)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    status: 1,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes> ],
+    pid: 38580,
+    stdout: <Buffer >,
+    stderr: <Buffer 43 6f 70 79 2d 49 74 65 6d 20 3a 20 4e 6f 20 73 65 20 65 6e 63 75 65 6e 74 72 61 20 6c 61 20 72 75 74 61 20 64 65 20 61 63 63 65 73 6f 20 27 43 3a 5c ... 635 more bytes>
+  }

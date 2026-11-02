@@ -2,17 +2,17 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
 const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 const {runOnce}=require('../services/business_runtime.cjs');const fixture=require('./economic_v19_fixture.cjs');
-test('tres empresas durante seis ciclos con desafíos rotados y cierres persistidos',async()=>{
+for(const cycles of [3,6])test(`tres empresas durante ${cycles} ciclos con desafíos rotados y cierres persistidos`,async()=>{
  const db=await database();
  try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
   for(const file of ['docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql'])await db.exec(fs.readFileSync(file,'utf8'));
-  const game=await createGame(db,config({cycles:6,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
+  const game=await createGame(db,config({cycles,capital:1000000,economicEventsVersion:'demand-share-v1'})),ids=[];
   for(let i=1;i<=3;i++){const company=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Empresa '+i,p_nombre_comercial:'Marca '+i});ids.push(Number(company.empresa_id));}
   const events=[{id:'PE69',intensity:20,sign:1},{id:'PE71',intensity:15,sign:1},{id:'PE75',intensity:6,sign:-1},{id:'PE30',intensity:25,sign:0}];
-  for(let round=1;round<=6;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
+  for(let round=1;round<=cycles;round++){const event=events[(round-1)%events.length];await rpc(db,'side_assign_event_v1',{p_partida_id:game.id,p_empresa_id:ids[(round-1)%3],p_ciclo:round,p_event_id:event.id,p_intensity:event.intensity});}
   let previous={};
-  for(let round=1;round<=6;round++){
+  for(let round=1;round<=cycles;round++){
    await db.exec('reset role');
    for(const id of ids){
     const state=fixture.state(round,previous[id]?.state||{},0);
