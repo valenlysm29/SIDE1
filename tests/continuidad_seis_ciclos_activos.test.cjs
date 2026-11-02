@@ -48,12 +48,12 @@ test('crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierra
  }finally{await db.close();}
 });
 
-for(const [mode,total] of [['credit',6]])test(`${total} ciclos ${mode}: arrastran stock y liquidan obligaciones sin duplicación`,async()=>{
+for(const [mode,total,version] of [['credit',6,null],['credit',6,'utility-v1']])test(`${total} ciclos ${mode} ${version||'anterior'}: arrastran stock y liquidan obligaciones sin duplicación`,async()=>{
  const db=await database();
  try{
   await db.exec("create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$; alter table participantes add column if not exists expulsada_at timestamptz");
   for(const f of ['../docs/sql/20261023_despliegue_cierre_v19.sql','../supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','../supabase/migrations/20261027_corregir_ventas_generales.sql','../supabase/migrations/20261028_cierre_servidor.sql','../supabase/migrations/20261030162649_side_pedidos_autoritativos.sql','../supabase/migrations/20261030165204_side_cierre_revision_pedidos.sql'])await db.exec(sql(f));
-  const game=await createGame(db,config({cycles:total,capital:200000,materialRulesVersion:'receipts-v1',materialLeadTimeDays:7,materialPaymentMode:mode,supplierCreditTermCycles:1}));
+  const game=await createGame(db,config({cycles:total,capital:200000,materialRulesVersion:'receipts-v1',materialLeadTimeDays:7,materialPaymentMode:mode,supplierCreditTermCycles:1,...(version?{economicRulesVersion:version}:{})}));
   const joined=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Crédito dos ciclos',p_nombre_comercial:'Crédito dos ciclos'}),id=Number(joined.empresa_id);
   const state=fixture.state(1,{},2);state.__inventarioMP={};state.CUERO={round:1,quantities:{cuero_prem:140}};state.ACCESORIOS={round:1,quantities:{acc_prem:200}};state.HILO={round:1,quantities:{hilo_std:2600}};state.PRODUCCION_META.moldTargets={molde_1:0,molde_2:0,molde_3:200};state.JEFATURA={round:1,optionIds:['no_jefatura']};
   let idB=null,stateB=null,priorB=null;if(total===6){const joinedB=await rpc(db,'ingresar_empresa',{p_codigo:game.codigo,p_nombre_legal:'Segunda empresa',p_nombre_comercial:'Segunda empresa'});idB=Number(joinedB.empresa_id);}
@@ -74,6 +74,7 @@ for(const [mode,total] of [['credit',6]])test(`${total} ciclos ${mode}: arrastra
   const run=round=>worker.runOnce(async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[round]}]};try{return {data:await rpc(db,name,args),error:null};}catch(error){return {data:null,error:{message:error.message}};}});
   const firstResult=await run(1);assert.equal(firstResult[0].success,true,JSON.stringify(firstResult));
   const first=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa[String(id)];
+  if(version){assert.equal(first.receipt.financialPolicy.economicRulesVersion,version);assert.equal(first.receipt.sales.find(x=>x.id==='premium').chosenPrice,280);}
   assert.equal(first.receipt.produced,100);assert.equal(first.financial.balanceGeneral.cuentasPorPagarProveedores,mode==='credit'?14352:0);assert.equal(first.financial.balanceGeneral.anticiposMateriales,mode==='cash'?2392:0);
   if(idB){priorB=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre.resultadosPorEmpresa[String(idB)];assert.equal(priorB.receipt.sold,0);assert.ok(priorB.financial.balanceGeneral.inventarioPT>0);}
   await db.exec('reset role');
@@ -99,7 +100,8 @@ for(const [mode,total] of [['credit',6]])test(`${total} ciclos ${mode}: arrastra
   const second=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:2})).cierre.resultadosPorEmpresa[String(id)];
   if(idB){const b2=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:2})).cierre.resultadosPorEmpresa[String(idB)];assert.equal(b2.receipt.production.producibleUnits,0);assert.ok(b2.receipt.sold>0);assert.ok(b2.financial.estadoResultados.costoVentas>0);assert.equal(b2.financial.balanceCaja.cajaInicial,priorB.financial.balanceCaja.cajaFinal);priorB=b2;}
   assert.equal(second.receipt.openingInventory.cuero_prem,70);assert.equal(second.receipt.openingInventory.acc_prem,100);
-  assert.ok(second.receipt.consequences.some(row=>row.id==='CONS-08'));assert.equal(second.receipt.produced,95);assert.equal(second.receipt.production.temporal.consumedBySku.hilo_std,95*13);
+  if(!version){assert.ok(second.receipt.consequences.some(row=>row.id==='CONS-08'));assert.equal(second.receipt.produced,95);}
+  assert.equal(second.receipt.production.temporal.consumedBySku.hilo_std,second.receipt.produced*13);
   assert.equal(second.ledger['2:PROVEEDOR_PAGO'],mode==='credit'?-14352:0);
   assert.equal(second.financial.flujoCaja.pagosProveedores,mode==='credit'?14352:0);assert.equal(second.financial.balanceGeneral.cuentasPorPagarProveedores,mode==='credit'?2392:0);assert.equal(second.financial.balanceGeneral.anticiposMateriales,0);
   assert.equal(second.financial.pagosProveedores.reduce((sum,row)=>sum+row.amount,0),mode==='credit'?14352:0);if(mode==='credit')assert.equal(second.financial.cuentasPorPagarDetalle.filter(row=>row.outstanding>0)[0].dueCycle,3);

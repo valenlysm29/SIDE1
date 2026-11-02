@@ -10,7 +10,7 @@ const q=v=>"'"+String(v).replaceAll("'","''")+"'";
 const arg=v=>v===null?'null':typeof v==='object'?q(JSON.stringify(v))+'::jsonb':typeof v==='number'?String(v):q(v);
 const call=(func,args,role='service_role')=>`set test.role=${q(role)}; set role ${role}; select public.${func}(${Object.entries(args).map(([key,v])=>`${key} => ${arg(v)}`).join(',')})::text;`;
 async function exec(text){const r=await sql(text);if(r.code)throw Error(r.err);return r.out.trim();}
-test('PostgreSQL real: dos workers cierran PE30 una sola vez',{timeout:90000},async()=>{
+test('PostgreSQL real: Node y Edge cierran utility-v1 y PE30 una sola vez',{timeout:90000},async()=>{
  try{
   docker(['run','-d','--rm','--network','none','--name',name,'-e','POSTGRES_HOST_AUTH_METHOD=trust','postgres:17-alpine']);
   let ready=false;for(let i=0;i<80;i++){try{docker(['exec',name,'pg_isready','-U','postgres']);ready=true;break;}catch{await pause(250);}}assert.ok(ready);
@@ -24,31 +24,44 @@ test('PostgreSQL real: dos workers cierran PE30 una sola vez',{timeout:90000},as
    create table decisiones_opciones(id serial primary key,decision_id integer,opcion_id text,etiqueta text,descripcion text,costo numeric,capacidad_diaria numeric,tasa_liquidacion numeric,canal text,distrito text,demanda_factor numeric,compromiso_ciclos integer,activo boolean default true);
    create table empresas_decisiones(id serial primary key,empresa_id bigint,ciclo integer,decision_id integer,opcion_id integer,cantidad integer,costo_total numeric,enviada boolean,updated_at timestamptz default now());`;
   await exec(base);
-  for(const f of ['supabase/migrations/supabase_migration.sql','supabase/migrations/supabase_game_lifecycle.sql','supabase/migrations/supabase_student_admission.sql','supabase/migrations/20260930_preservar_opciones_decisiones.sql','supabase/migrations/20261009_sala_espera_identidad_exacta.sql','docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql']){
+  for(const f of ['supabase/migrations/supabase_migration.sql','supabase/migrations/supabase_game_lifecycle.sql','supabase/migrations/supabase_student_admission.sql','supabase/migrations/20260930_preservar_opciones_decisiones.sql','supabase/migrations/20261009_sala_espera_identidad_exacta.sql','docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql','supabase/migrations/20261030162649_side_pedidos_autoritativos.sql','supabase/migrations/20261030165204_side_cierre_revision_pedidos.sql','supabase/migrations/20261031025358_desafios_autoritativos_v1.sql']){
    let source=fs.readFileSync(f,'utf8');if(f.endsWith('supabase_migration.sql'))source=source.replace(/create extension if not exists "pgcrypto";/,'');
    if(f.endsWith('20261026_cierre_sin_expulsion_automatica.sql'))await exec('alter table participantes add column if not exists expulsada_at timestamptz;');
    try{await exec(source);}catch(e){throw Error(f+': '+e.message);}
   }
   const teacher='11111111-1111-1111-1111-111111111111';await exec(`insert into auth.users values(${q(teacher)},'{}','test@example.invalid');`);
-  const config={lifecycleVersion:2,cycleCloseMode:'manual',integrationDurationMinutes:5,integrationMinutes:0,cycles:6,roundHours:0,roundMinutes:10,enabledEvents:[],capital:1000000,economicEventsVersion:'demand-share-v1'};
+  const config={lifecycleVersion:2,cycleCloseMode:'manual',integrationDurationMinutes:5,integrationMinutes:0,cycles:6,roundHours:0,roundMinutes:10,enabledEvents:[],capital:1000000,economicEventsVersion:'demand-share-v1',economicRulesVersion:'utility-v1',materialRulesVersion:'receipts-v1',materialLeadTimeDays:7,materialPaymentMode:'cash'};
   const game=JSON.parse(await exec(`set test.uid=${q(teacher)}; insert into partidas(profesor_id,nombre,configuracion) values(${q(teacher)},'Prueba',${arg(config)}) returning row_to_json(partidas)::text;`));
   const ids=[];
   for(let i=1;i<=3;i++){
    const company=JSON.parse(await exec(`set test.uid=${q(teacher)}; select public.ingresar_empresa(${q(game.codigo)},${q('Empresa '+i)},${q('Marca '+i)})::text;`));ids.push(Number(company.empresa_id));
-   const state=fixture.state(1,{},0),snapshot={decisions_submitted:true,decision_state:{__cyclePlans:{1:{state}}}};
+   const state=fixture.state(1,{},i-1),recipe=[[.3,6],[.4,7],[.7,13]][i-1];
+   state.__inventarioMP={};state.CUERO={round:1,quantities:{cuero_prem:Math.round(recipe[0]*9000)/100}};state.ACCESORIOS={round:1,quantities:{acc_prem:90}};state.HILO={round:1,quantities:{hilo_std:recipe[1]*90}};
+   const snapshot={decisions_submitted:true,decision_state:{__cyclePlans:{1:{state}}}};
    await exec(`update side_student_state set snapshot=${arg(snapshot)} where empresa_id=${ids.at(-1)};`);
   }
   await exec(`set test.uid=${q(teacher)}; set role authenticated; select public.side_assign_event_v1(${q(game.id)},${ids[0]},1,'PE30',25)::text;`);
   await exec(`update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=${q(game.id)};`);
+  for(const [i,id] of ids.entries())for(const [sku,quantity] of [['cuero_prem',[27,36,63][i]],['acc_prem',90],['hilo_std',[540,630,1170][i]]]){
+   const order=JSON.parse(await exec(call('side_confirm_material_order_v1',{p_partida_id:game.id,p_empresa_id:id,p_ciclo:1,p_sku:sku})));
+   await exec(call('side_record_material_receipt_v1',{p_order_id:order.orderId,p_receipt_id:`utility-${id}-${sku}`,p_quantity:sku==='hilo_std'?quantity/2:quantity,p_day:sku==='hilo_std'?7:0}));
+  }
   let calls=0,release;const barrier=new Promise(r=>release=r);
   const rpc=async(func,args)=>{
    if(func==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};
-   if(func==='side_guardar_cierre_negocio'){if(++calls===2)release();await barrier;}
+   if(func==='side_guardar_cierre_temporal_v1'){if(++calls===2)release();await barrier;}
    try{return {data:JSON.parse(await exec(call(func,args)))};}catch(error){return {error:{message:error.message}};}
   };
-  const results=await Promise.all([runOnce(rpc),runOnce(rpc)]);for(const result of results)assert.equal(result[0].success,true,JSON.stringify(results));assert.equal(calls,2);
+  const edge=await import(require('node:url').pathToFileURL(require('node:path').resolve('supabase/functions/side-business-close/runtime.mjs')).href);
+  const results=await Promise.all([runOnce(rpc),edge.runOnce(rpc)]);for(const result of results)assert.equal(result[0].success,true,JSON.stringify(results));assert.equal(calls,2,JSON.stringify(results));
   const stored=JSON.parse(await exec(`select cierre::text from public.side_business_closures where partida_id=${q(game.id)} and ciclo=1;`));
   assert.equal(stored.resultadosPorEmpresa[ids[0]].receipt.events[0].id,'PE30');assert.equal(stored.resultadosPorEmpresa[ids[0]].financial.flujoCaja.eventos,-200);
+  for(const [i,product,price] of [[0,'esencial',120],[1,'urbano',150],[2,'premium',280]]){
+   const result=stored.resultadosPorEmpresa[ids[i]],line=result.receipt.sales.find(s=>s.id===product);
+   assert.equal(result.receipt.financialPolicy.economicRulesVersion,'utility-v1');assert.equal(line.chosenPrice,price);
+   assert.equal(result.receipt.produced,45);assert.equal(result.receipt.materialReceiptFacts.receivedBySku.hilo_std,[270,315,585][i]);
+   assert.equal(result.financial.balanceGeneral.activos,result.financial.balanceGeneral.pasivoPatrimonio);
+  }
   assert.equal(await exec(`select count(*) from public.side_business_closures where partida_id=${q(game.id)} and ciclo=1;`),'1');
   const reused=await runOnce(async(func,args)=>func==='side_cierres_pendientes'?{data:[{id:game.id,cycles:[1]}]}:{data:JSON.parse(await exec(call(func,args)))});assert.equal(reused[0].success,true);
   assert.deepEqual(JSON.parse(await exec(`select cierre::text from public.side_business_closures where partida_id=${q(game.id)} and ciclo=1;`)),stored);
