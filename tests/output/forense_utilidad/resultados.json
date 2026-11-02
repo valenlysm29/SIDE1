@@ -1,0 +1,96 @@
+[
+  {
+    "real": true,
+    "cycle": 1,
+    "net": -8255.46,
+    "admin": 9243.57,
+    "replayedWithoutSnapshots": true
+  },
+  {
+    "real": true,
+    "cycle": 2,
+    "net": -8768.91,
+    "admin": 9243.57,
+    "replayedWithoutSnapshots": true
+  },
+  {
+    "name": "sin producción",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 0,
+    "sold": 0,
+    "net": -30,
+    "cogs": 0,
+    "goods": 0
+  },
+  {
+    "name": "sin ventas",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 10,
+    "sold": 0,
+    "net": -10,
+    "cogs": 0,
+    "goods": 120
+  },
+  {
+    "name": "ventas parciales",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 10,
+    "sold": 4,
+    "net": 42.86,
+    "cogs": 48,
+    "goods": 72
+  },
+  {
+    "name": "ventas completas",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 10,
+    "sold": 10,
+    "net": 117.73,
+    "cogs": 120,
+    "goods": 0
+  },
+  {
+    "name": "fijos elevados",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 10,
+    "sold": 10,
+    "net": -823,
+    "cogs": 120,
+    "goods": 0
+  },
+  {
+    "name": "recursos alternativos",
+    "simulated": true,
+    "cycles": 1,
+    "produced": 10,
+    "sold": 10,
+    "net": 236.18,
+    "cogs": 120,
+    "goods": 0
+  },
+  {
+    "name": "continuidad tres ciclos",
+    "simulated": true,
+    "cycles": 3,
+    "produced": 10,
+    "sold": 10,
+    "net": 19.21,
+    "cogs": 120,
+    "goods": 0
+  },
+  {
+    "name": "continuidad seis ciclos",
+    "simulated": true,
+    "cycles": 6,
+    "produced": 10,
+    "sold": 10,
+    "net": -128.59,
+    "cogs": 120,
+    "goods": 0
+  }
+]
