@@ -513,7 +513,8 @@
           if(response.error||facts?.error||facts?.version!=='legacy-event-context-v1'||String(facts.companyId)!==String(company.id)||Number(facts.cycle)!==Number(ciclo)||!Array.isArray(facts.enabledEvents)||!Array.isArray(ctx.financialConfig.enabledEvents)||JSON.stringify([...facts.enabledEvents].sort())!==JSON.stringify([...ctx.financialConfig.enabledEvents].sort())||!global.SIDE_AUTHORIZED_EVENTS)return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación histórica.'};
           try{
             verifiedEvents=global.SIDE_AUTHORIZED_EVENTS.resolve({...facts,round:Number(ciclo)});
-            if(verifiedEvents.some(e=>Object.keys(e.effect||{}).some(k=>k!=='revenuePct')))return {success:false,code:'EFECTO_HISTORICO_NO_DISPONIBLE',error:'El efecto histórico de costos o caja requiere reconciliación antes del cierre.'};
+            if(verifiedEvents.some(e=>Object.keys(e.effect||{}).some(k=>!['revenuePct','cashDelta'].includes(k))))return {success:false,code:'EFECTO_HISTORICO_NO_DISPONIBLE',error:'El efecto histórico de costos requiere reconciliación antes del cierre.'};
+            verifiedEvents=verifiedEvents.map(e=>({...e,version:'legacy-event-context-v1'}));
           }catch{return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'La programación histórica no es válida.'};}
         }
         if(eventVersion==='demand-share-v1'){

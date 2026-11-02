@@ -43,6 +43,7 @@
       return true;
     });
     for(const event of appliedEvents){
+      if(event.version==='legacy-event-context-v1'&&Number(event.startRound)===Number(round)&&Number.isFinite(Number(event.effect?.cashDelta)))ledger[`${round}:EVENT:${event.id}:${event.triggerRound}`]=money(Number(event.effect.cashDelta));
       if(event.id==='PE30'&&event.version==='assembly-breakdown-v1')ledger[`${round}:EVENT:${event.id}`]=-200;
       if(event.version==='operating-expense-v1'&&Object.hasOwn(expenses,event.id))ledger[`${round}:EVENT:${event.id}`]=-expenses[event.id];
     }

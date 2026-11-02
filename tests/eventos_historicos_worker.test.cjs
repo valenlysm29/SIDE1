@@ -25,3 +25,10 @@ test('efectos históricos de costos no se omiten silenciosamente',async()=>{
  const outcome=await run({version:'legacy-event-context-v1',companyId:'1',cycle:1,enabledEvents:['PE15'],groupByCycle:{1:['PE15']},individualByCycle:{1:[]}},['PE15']);
  assert.equal(outcome.result.code,'EFECTO_HISTORICO_NO_DISPONIBLE');assert.equal(outcome.written,undefined);
 });
+test('impacto histórico de caja se registra una vez con importe del catálogo',async()=>{
+ const outcome=await run({version:'legacy-event-context-v1',companyId:'1',cycle:1,enabledEvents:['PE23'],groupByCycle:{1:[]},individualByCycle:{1:['PE23']}},['PE23']);
+ assert.equal(outcome.result.success,true,JSON.stringify(outcome.result));
+ const result=outcome.written.resultadosPorEmpresa['1'];
+ assert.equal(result.ledger['1:EVENT:PE23:1'],-500);
+ assert.equal(result.financial.flujoCaja.eventos,-500);
+});
