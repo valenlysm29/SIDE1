@@ -106,9 +106,7 @@ window.supabase={createClient:()=>({auth:{getUser:async()=>({data:{user:{id:'${p
   await p.evaluate(()=>{state.enabledEvents=new Set(['PE15']);renderEventBank();});
   await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);
   assert.equal(await count(),0);assert.match(await p.locator('#creationMessage').innerText(),/Paro de transportistas/);
-  await p.locator('.event-enable[data-event="PE15"]').evaluate(input=>input.click());
-  await p.evaluate(()=>{state.enabledEvents=new Set();toggleSelectAllEvents();});
-  await p.locator('#startGame').click();await p.waitForFunction(()=>!state.starting);await success(p);
+  await p.locator('#createWithAvailableEvents').click();await p.waitForFunction(()=>!state.starting);await success(p);
   assert.equal(await count(),1);
   console.log('PASS restricciones reales de costos: selección masiva válida, selección antigua corregible y creación exitosa');
   assert.deepEqual(pageErrors,[],'sin errores JavaScript de página');if(!process.env.SIDE_CREATION_COST_ONLY)assert.ok(consoleErrors.some(x=>x.includes('creación de sala')||x.includes('crear/recuperar sala')),'errores simulados tienen detalle técnico en consola');

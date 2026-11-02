@@ -38,6 +38,7 @@ function newCreationRequest(){
 }
 function creationFeedback(message,tone='error',conflict=null,notify=true){
   previousRoom=conflict;
+  $('createWithAvailableEvents')?.classList.add('hidden');
   const box=$('creationFeedback');if(!box)return;
   delete box.dataset.source;
   box.classList.remove('hidden');box.dataset.tone=tone;$('creationMessage').textContent=message;
@@ -117,7 +118,20 @@ function validateCreation(config){
   const unavailable=EVENT_CATALOG.filter(e=>config.enabledEvents.includes(e.id)&&!canSelectEvent(e));
   if(unavailable.length){
     creationFeedback('Desmarca los eventos temporalmente no disponibles antes de crear o guardar: '+unavailable.map(e=>e.title).join(', ')+'. Abre Seleccionar eventos para ajustar la selección.');
-    if($('creationFeedback'))$('creationFeedback').dataset.source='validation';
+    if($('creationFeedback')){
+      $('creationFeedback').dataset.source='validation';
+      let action=$('createWithAvailableEvents');
+      if(!action){
+        action=document.createElement('button');action.id='createWithAvailableEvents';action.type='button';action.className=$('retryCreate').className;
+        action.textContent='Crear con los eventos disponibles';
+        action.addEventListener('click',()=>{
+          state.enabledEvents=new Set([...state.enabledEvents].filter(id=>{const event=EVENT_CATALOG.find(e=>e.id===id);return event&&canSelectEvent(event);}));
+          renderEventBank();startGame();
+        });
+        $('creationFeedback').appendChild(action);
+      }
+      action.classList.remove('hidden');
+    }
     return false;
   }
   if(errors.length){creationFeedback(gameStatus()?.active?'Revisa los campos indicados antes de guardar la configuración.':'Revisa los campos indicados antes de crear la sala.');if($('creationFeedback'))$('creationFeedback').dataset.source='validation';errors[0].focus();return false;}
