@@ -30,7 +30,7 @@ async function runOnce(rpc,{deadline=Infinity}={}){
 function remoteRpc(url,key){
   return async(name,args)=>{
     const response=await fetch(url.replace(/\/$/,'')+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(args),signal:AbortSignal.timeout(30000)});
-    const data=await response.json();return response.ok?{data,error:null}:{data:null,error:{message:data.message||'RPC HTTP '+response.status,code:data.code}};
+    const body=await response.text();const data=body?JSON.parse(body):null;return response.ok?{data,error:null}:{data:null,error:{message:data?.message||'RPC HTTP '+response.status,code:data?.code}};
   };
 }
 module.exports={runOnce,remoteRpc};
