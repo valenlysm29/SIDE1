@@ -820,7 +820,7 @@ function navigationCategories(){
   const byCategory=new Map(DECISION_CATALOG.map(category=>[category.cat,category]));
   return [planningCategory,...['B','C','F','D','E','A'].map(cat=>byCategory.get(cat)).filter(Boolean)];
 }
-const planningCategory={cat:'DOP',title:'DOP y Planificación',short:'DOP y Planificación',desc:'Revisa tu meta, capacidad y recursos para planificar la producción.',icon:'assets/icons/categories/recursos_humanos.svg',items:[],summaryOnly:true};
+const planningCategory={cat:'DOP',title:'Planificación',short:'Planificación',desc:'Revisa tu meta, capacidad y recursos para planificar la producción.',icon:'assets/icons/categories/recursos_humanos.svg',items:[],summaryOnly:true};
 function categoryByCat(cat){return cat==='DOP'?planningCategory:DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
 function savedEntry(item){return decisionState[item.id]||null}
