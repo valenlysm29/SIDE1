@@ -5,7 +5,7 @@ returns trigger language plpgsql set search_path=pg_catalog as $$
 declare old_enabled jsonb:='[]'::jsonb; forbidden text[]:=array['PE15','PE16','PE20','PE21','PE25','PE27','PE29','PE32','PE34','PE36','PE40','PE41','PE43','PE45','PE46','PE47','PE48','PE49','PE50','PE51','PE52','PE53','PE54','PE55','PE56','PE57','PE58','PE59','PE60','PE62','PE63','PE72','PE73','PE78','PE87'];
 begin
  if tg_op='UPDATE' then old_enabled:=coalesce(old.configuracion->'enabledEvents','[]'::jsonb); end if;
- if new.configuracion->>'lifecycleVersion'='2' and coalesce(new.configuracion->>'economicEventsVersion','')='' and exists(
+ if new.configuracion->>'lifecycleVersion'='2' and (tg_op='INSERT' or new.configuracion->>'sequentialCloseVersion'='1') and coalesce(new.configuracion->>'economicEventsVersion','')='' and exists(
    select 1 from jsonb_array_elements_text(coalesce(new.configuracion->'enabledEvents','[]'::jsonb)) e(id)
    where e.id=any(forbidden) and not old_enabled ? e.id
  ) then raise exception 'Este evento de costos aún no está disponible para nuevas programaciones.' using errcode='23514'; end if;
