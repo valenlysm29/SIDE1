@@ -1,0 +1,29 @@
+[
+  {
+    "game": "c2e46b2c-0fea-4b5e-85f6-f82f5a631b1a",
+    "cycle": 6,
+    "result": [
+      {
+        "game": "c2e46b2c-0fea-4b5e-85f6-f82f5a631b1a",
+        "cycle": 6,
+        "success": true,
+        "pending": false
+      }
+    ],
+    "persistedStatus": "confirmed|"
+  },
+  {
+    "game": "11adba44-c4d1-48b3-920a-c541f04bd53c",
+    "cycle": 1,
+    "result": [
+      {
+        "game": "11adba44-c4d1-48b3-920a-c541f04bd53c",
+        "cycle": 1,
+        "success": false,
+        "pending": false,
+        "error": "Orden temporal incompatible con la decisi\u00f3n confirmada."
+      }
+    ],
+    "persistedStatus": "error|"
+  }
+]

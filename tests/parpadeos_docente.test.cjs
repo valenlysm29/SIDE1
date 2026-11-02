@@ -32,7 +32,7 @@ test('teacher and laboratory retain unchanged DOM in desktop and mobile Chromium
       return {stable,updated:$('detailReports').textContent.includes('2,000')||$('detailReports').textContent.includes('2.000')};
     });assert.deepEqual(result,{stable:true,updated:true});
     await page.evaluate(()=>{
-      const svc=SIDE_LAB_SERVICE;svc.games=async()=>[{id:'g',nombre:'Prueba',configuracion:{cycles:3}}];svc.companies=async()=>[1,2,3].map(id=>({empresa_id:id,empresa:'Empresa '+id}));
+      const svc=SIDE_LAB_SERVICE;svc.history=undefined;svc.games=async()=>[{id:'g',nombre:'Prueba',configuracion:{cycles:3}}];svc.companies=async()=>[1,2,3].map(id=>({empresa_id:id,empresa:'Empresa '+id}));
       svc.closure=async()=>({resultadosPorEmpresa:Object.fromEntries([1,2,3].map(id=>[id,{receipt:{produced:10,sold:10,revenue:1000},financial:{estadoResultados:{ingresos:1000,costos:900,utilidadNeta:100},balanceCaja:{cajaFinal:100100}}}]))});SIDE_LAB.open();
     });
     await page.waitForSelector('.lab-chart',{state:'attached'});

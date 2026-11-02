@@ -1,0 +1,8 @@
+BEGIN
+DO
+ anonymous_writer | student_writer
+------------------+----------------
+ f                | f
+(1 row)
+
+ROLLBACK

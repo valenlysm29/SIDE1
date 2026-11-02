@@ -412,7 +412,9 @@ function legacyRemoteDecisionState(data){
   }
   return state;
 }
+let studentOfficialHistory=null;
 function hydrateRemoteProgress(data){
+  if(data?.officialHistory)studentOfficialHistory=data.officialHistory;
   const snapshot=remoteSnapshot(data);
   if(!data?.partida||!data?.empresa||!snapshot||typeof snapshot!=='object'||Array.isArray(snapshot))return false;
   if(data.expulsada_at||data.empresa.expulsada_at||data.empresa.estado==='eliminada'){showStudentExpulsion();return false;}
@@ -506,6 +508,7 @@ async function refreshStudentGame(options={}){
         void studentChallengeNews?.refresh();
         if(config?.materialRulesVersion==='receipts-v1')await refreshStudentMaterialBook();
         if(epoch!==studentSnapshotEpoch||!studentConnected||studentIdentityKey()!==identityKey)return false;
+        if(data.officialHistory)studentOfficialHistory=data.officialHistory;
         renderStudentPodium(data.podio);
         if(!forceHydrate&&studentSyncPending())studentProgressHydrated=true;
         else if(forceHydrate||!studentProgressHydrated||serverRevision!==previousRevision){if(!hydrateRemoteProgress(data))return false;}
@@ -1584,6 +1587,13 @@ function cycleSalesProjection(round=currentRound()){
 function financialReport({projection=false}={}){
   const actual=window.SIDE_FINANCIAL_MODEL.calculate({capital:initialCapital(),ledger:financialLedger(),sectionsByRound:recordedFinancialSections(),catalog:DECISION_CATALOG,round:currentRound(),openingBalance:decisionState.__openingBalance,state:decisionState,financialPolicy:window.SIDE_FINANCE_CONFIG?.resolve(teacherConfig(),currentRound())||teacherConfig()});
   const estimate=projection?cycleSalesProjection():null;
+  if(typeof studentOfficialHistory!=='undefined'&&studentOfficialHistory?.partida_id===currentStudent.game?.id&&window.SIDE_OFFICIAL_HISTORY){
+    const official=window.SIDE_OFFICIAL_HISTORY.rows(studentOfficialHistory,currentStudent.empresaId);
+    const closed=official.filter(row=>row.closureStatus==='confirmed'),current=official.find(row=>row.round===currentRound());
+    const history=closed;
+    if(current?.closureStatus==='confirmed')return {...current,history,pendiente:false};
+    return {...(estimate?.financial||actual),history,pendiente:true,provisional:true,closureStatus:current?.closureStatus||'processing',closureError:current?.closureError};
+  }
   const history=actual.history.map(row=>({...row,cycleReceipt:decisionState.__cycleSettlements?.[row.round]||row.cycleReceipt||null,closureStatus:decisionState.__cycleSettlements?.[row.round]?'closed':'pending'}));
   return estimate?{...estimate.financial,history,provisional:true,projectionReceipt:estimate.receipt}:{...actual,history,pendiente:!decisionState.__cycleSettlements?.[currentRound()]};
 }
@@ -1935,7 +1945,7 @@ function renderStudentStatus(){
     if(historyMount.dataset.signature!==signature){historyMount.innerHTML=window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml(f,finished);historyMount.dataset.signature=signature;}
   }
   const events=activeStudentEvents();
-  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.provisional?`Ciclo ${currentRound()}: proyección individual con las decisiones confirmadas. Las ventas definitivas dependen del reparto entre empresas al cierre; tu caja guardada aún no recibe estos cobros.`:f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. El costo de ventas corresponde a unidades vendidas; inventarios y activos conservan su valor pendiente de consumo o depreciación. Préstamos como deuda.`;
+  if($('studentEventImpactText'))$('studentEventImpactText').textContent=f.closureStatus==='error'?`Error en el cierre oficial: ${f.closureError?.message||'No se pudo procesar o recuperar el ciclo. Reintenta la conexión.'}`:f.provisional?`Ciclo ${currentRound()}: proyección individual con las decisiones confirmadas. Las ventas definitivas dependen del reparto entre empresas al cierre; tu caja guardada aún no recibe estos cobros.`:f.pendiente?`Ciclo ${currentRound()} pendiente de cierre. Las ventas e ingresos se calculan al cerrar el ciclo; consulta los ciclos cerrados debajo.`:`Ciclo ${currentRound()}: movimientos guardados. El costo de ventas corresponde a unidades vendidas; inventarios y activos conservan su valor pendiente de consumo o depreciación. Préstamos como deuda.`;
   renderStudentChallengeNews(events);
 }
 function renderStudentChallengeNews(legacyEvents=null){

@@ -912,7 +912,11 @@ async function supabaseReports(reportsBase=state.reports){
     }
   }));
   if(!stillCurrent())return null;
+  let official=null,historyError=null;
+  try{const response=await S.SupabaseClient.get().rpc('side_historial_oficial',{p_partida_id:partidaId,p_empresa_id:null});if(response.error)throw response.error;official=response.data;}catch(error){historyError=error.message;}
+  if(!stillCurrent())return null;
   const failures=[];
+  if(historyError)failures.push('Historial oficial: '+historyError);
   for(const p of (parts.data||[])){
     if(!p.empresa_id)continue;
     const rr=reportRows.get(p.empresa_id)||{success:false,error:'Reporte no disponible'};
@@ -964,6 +968,15 @@ async function supabaseReports(reportsBase=state.reports){
       updatedAt:rep?.updated_at||rep?.created_at||local?.updatedAt||null,fuente:'supabase'
     });
     const report=out[out.length-1];
+    if(official&&window.SIDE_OFFICIAL_HISTORY){
+      report.cycleHistory=window.SIDE_OFFICIAL_HISTORY.rows(official,p.empresa_id);
+      Object.assign(report,window.SIDE_OFFICIAL_HISTORY.report(report,cicloActual));
+    }else if(historyError){
+      report.historyError=historyError;
+      const cached=localBase.find(r=>String(r.empresaId)===String(p.empresa_id)&&r.partida===code);
+      if(cached?.cycleHistory)report.cycleHistory=cached.cycleHistory.filter(row=>row.partidaId===partidaId);
+    }
+
     if(scopedContext?.configuracion?.materialRulesVersion==='receipts-v1'){
       report.materialPreview='<p role="status">Datos de recepción no verificados / proyección no disponible.</p>';
       try{
@@ -1165,10 +1178,10 @@ function renderCompanies(force=false){
     setText('company',r.empresa);
     setText('student',`${r.nombre||'Jugador'} · ciclo ${r.rondasActivas||r.ronda||0}`);
     setText('progress',`${Number(r.progreso||0)}% decisiones obligatorias`);
-    const remotePending=state.partidaId&&!r.cycleReceipt&&!r.provisional;
+    const remotePending=state.partidaId&&!r.cycleReceipt;
     setText('cash',remotePending?'Pendiente':money(r.caja??r.capital));setText('profit',remotePending?'Pendiente':money(r.utilidad));
     setText('income',!remotePending&&(r.cycleReceipt||r.provisional)?money(r.ingresos):'Pendiente');setText('sold',remotePending?'Pendiente':String(r.unidadesVendidas??r.cycleReceipt?.sold??'Pendiente'));
-    setText('resultScope',r.provisional?'Estimación individual · ciclo en juego':r.cycleReceipt?'Resultado definitivo del ciclo':'Esperando plan confirmado o cierre del ciclo');
+    setText('resultScope',r.cycleReceipt?(r.provisional?'Estimación individual · ciclo en juego':'Resultado definitivo del ciclo'):r.historyError?'Error al recuperar el cierre':window.SIDE_OFFICIAL_HISTORY?.label(r.closureStatus)||'Esperando plan confirmado o cierre del ciclo');
     const rec=r.cycleReceipt, reasons=window.SIDE_STUDENT_FINANCIAL_VIEW?.zeroReasons(rec)||[];
     const purchases=Number(rec?.production?.costs?.materials||0)>0||Number(rec?.production?.costs?.labor||0)>0||(rec?.production?.materials||[]).some(m=>Number(m.purchasesAvailable)>0)||(rec?.production?.processes||[]).some(p=>Number(p.machines)>0)||Number(rec?.production?.availableMoldIds?.length)>0;
     const warning=rec&&((purchases&&!Number(rec.produced))||(Number(rec.produced)>0&&!Number(rec.revenue)));
@@ -1250,21 +1263,32 @@ function setTeacherResultMarkup(node,html){
   return true;
 }
 function renderResults(){
-  const active=state.reports.filter(r=>r.estado!=='eliminada'&&(!state.partidaId||!r.localOnly)),totalProfit=active.reduce((s,r)=>s+(state.partidaId&&(!r.cycleReceipt||r.provisional)?0:Number(r.utilidad||0)),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
+  const cycleSelect=$('resultCycleSelect');
+  if(cycleSelect){
+    const cycles=Math.max(1,Number(state.authoritative?.cycles||$('cycles')?.value||state.round));
+    const value=state.resultCycle==null?state.round:Math.min(cycles,state.resultCycle);
+    setTeacherResultMarkup(cycleSelect,Array.from({length:cycles},(_,i)=>`<option value="${i+1}">Ciclo ${i+1}</option>`).join(''));
+    cycleSelect.value=String(value);cycleSelect.onchange=()=>{state.resultCycle=Number(cycleSelect.value);renderResults();};
+  }
+  const displayed=window.SIDE_OFFICIAL_HISTORY&&cycleSelect&&state.partidaId?state.reports.map(r=>r.cycleHistory?window.SIDE_OFFICIAL_HISTORY.report(r,Number(cycleSelect.value)):r):state.reports;
+  const active=displayed.filter(r=>r.estado!=='eliminada'&&(!state.partidaId||!r.localOnly)),totalProfit=active.reduce((s,r)=>s+(state.partidaId&&(!r.cycleReceipt||r.provisional)?0:Number(r.utilidad||0)),0),graded=active.filter(r=>gradeValue(r)!=null),best=graded.sort((a,b)=>gradeValue(b)-gradeValue(a))[0];
   setTeacherResultMarkup($('resultStats'),[['Empresas en partida',active.length],['Calificadas',graded.length],['Utilidad de cierres oficiales',active.some(r=>r.cycleReceipt&&!r.provisional)?money(totalProfit):'Pendiente'],['Mayor nota',best?gradeLabel(best):'Sin calificar']].map(x=>`<div class="stat"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join(''));
   const compare=[...active].sort((a,b)=>resultSort==='empresa'?String(a.empresa).localeCompare(String(b.empresa),'es'):Number(b[resultSort]||0)-Number(a[resultSort]||0));
   let table=$('resultComparison');if(!table&&typeof document!=='undefined'&&$('resultStats')?.after){table=document.createElement('section');table.id='resultComparison';$('resultStats').after(table);}
   if(table){
-  table.className='financial-section';setTeacherResultMarkup(table,`<h3>Comparación por empresa</h3><label>Ordenar por <select id="resultComparisonSort"><option value="empresa">Empresa</option><option value="ingresos">Ingresos</option><option value="costos">Costos</option><option value="utilidad">Utilidad</option></select></label><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ciclo</th><th>Vendidas</th><th>Ingresos</th><th>Costos operativos</th><th>Utilidad antes de impuestos</th><th>Impuesto a la renta</th><th>Utilidad neta</th><th>Caja</th></tr></thead><tbody>${compare.map(r=>r.cycleReceipt&&!r.provisional?`<tr><td>${escapeHtml(r.empresa)}</td><td>${Number(r.ronda)||0}</td><td>${Number(r.cycleReceipt.sold||0)}</td><td>${money(r.ingresos)}</td><td>${money(r.estadoResultados?.desgloseCostos?.total??r.costos)}</td><td>${money(r.estadoResultados?.utilidadAntesImpuestos)}</td><td>${money(r.estadoResultados?.impuestoRenta)}</td><td>${money(r.estadoResultados?.utilidadNeta??r.utilidad)}</td><td>${money(r.caja)}</td></tr>`:`<tr><td>${escapeHtml(r.empresa)}</td><td colspan="8">Ciclo pendiente de cierre</td></tr>`).join('')}</tbody></table></div>`);
+  table.className='financial-section';setTeacherResultMarkup(table,`<h3>Comparación por empresa</h3><label>Ordenar por <select id="resultComparisonSort"><option value="empresa">Empresa</option><option value="ingresos">Ingresos</option><option value="costos">Costos</option><option value="utilidad">Utilidad</option></select></label><div class="table-wrap"><table><thead><tr><th>Empresa</th><th>Ciclo</th><th>Vendidas</th><th>Ingresos</th><th>Costos operativos</th><th>Utilidad antes de impuestos</th><th>Impuesto a la renta</th><th>Utilidad neta</th><th>Caja</th></tr></thead><tbody>${compare.map(r=>r.cycleReceipt&&!r.provisional?`<tr><td>${escapeHtml(r.empresa)}</td><td>${Number(r.ronda)||0}</td><td>${Number(r.cycleReceipt.sold||0)}</td><td>${money(r.ingresos)}</td><td>${money(r.estadoResultados?.desgloseCostos?.total??r.costos)}</td><td>${money(r.estadoResultados?.utilidadAntesImpuestos)}</td><td>${money(r.estadoResultados?.impuestoRenta)}</td><td>${money(r.estadoResultados?.utilidadNeta??r.utilidad)}</td><td>${money(r.caja)}</td></tr>`:`<tr><td>${escapeHtml(r.empresa)}</td><td colspan="8">${escapeHtml(r.historyError?'Error al recuperar el cierre':window.SIDE_OFFICIAL_HISTORY?.label(r.closureStatus)||'Ciclo pendiente de cierre')}</td></tr>`).join('')}</tbody></table></div>`);
   table.querySelector('#resultComparisonSort').value=resultSort;table.querySelector('#resultComparisonSort').onchange=e=>{resultSort=e.target.value;renderResults();};}
 
   const sel=$('resultCompanySelect');
-  const selectable=state.partidaId?state.reports.filter(r=>!r.localOnly):state.reports;
+  const selectable=state.partidaId?displayed.filter(r=>!r.localOnly):displayed;
   const selected=selectable.find(r=>r.id===state.resultCompanyId)||selectable[0];
   if(!selected){sel.innerHTML='';$('detailReports').innerHTML='<p class="hint">Sin resultados recibidos.</p>';return;}
   state.resultCompanyId=selected.id;
   setTeacherResultMarkup(sel,selectable.map(r=>`<option value="${escapeAttr(r.id)}"${r.id===selected.id?' selected':''}>${escapeHtml(r.empresa)}</option>`).join(''));
   const r=selected,pending=state.partidaId&&(!r.cycleReceipt||r.provisional),er=pending?{}:r.estadoResultados||{},bc=pending?{}:r.balanceCaja||{},fc=pending?{}:r.flujoCaja||{},bg=pending?{}:r.balanceGeneral||bc.balanceGeneral||{};
+  if(pending){
+    setTeacherResultMarkup($('detailReports'),`<h3>${escapeHtml(r.empresa)} · Ciclo ${Number(r.ronda)}</h3><p role="status">${escapeHtml(r.historyError?'Error al recuperar el cierre: '+r.historyError:(window.SIDE_OFFICIAL_HISTORY?.label(r.closureStatus)||'Cierre en procesamiento')+(r.closureError?.message?' · '+r.closureError.message:''))}</p>${r.cycleHistory?.length?window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml({history:r.cycleHistory.filter(h=>h.cycleReceipt)},false):''}`);return;
+  }
   const section=(title,entries,income=false)=>`<section class="financial-section"><h4>${title}</h4><div class="financial-rows">${entries.map(([label,value],i)=>`<div class="${income?window.SIDE_STUDENT_FINANCIAL_VIEW.incomeRowClass(i):''}"><span class="financial-row-label">${label}</span><strong>${money(value)}</strong></div>`).join('')}</div></section>`;
   const detailChanged=setTeacherResultMarkup($('detailReports'),`<div class="individual-report"><h3>${escapeHtml(r.empresa)}</h3><p class="hint">${escapeHtml(r.nombre||'Jugador')} · Ciclo ${Number(r.ronda)||1} · Nota docente: ${gradeLabel(r)}</p><div class="section-status-row">${sectionBadges(r)}</div>${r.materialPreview||''}${r.cycleHistory?.length?window.SIDE_STUDENT_FINANCIAL_VIEW.summaryHtml({history:r.cycleHistory},false):teacherSalesDetail(r)}${section(r.provisional?'Estado de resultados estimado':'Estado de resultados',window.SIDE_STUDENT_FINANCIAL_VIEW.incomeEntries(er),true)}${window.SIDE_STUDENT_FINANCIAL_VIEW.policyWarningsHtml(er)}${section('Balance de caja',[['Caja inicial',bc.cajaInicial??r.capital],['Entradas',bc.entradas],['Salidas',bc.salidas],['Caja final',bc.cajaFinal??r.caja]])}${section('Flujo de caja',[['Operación',fc.operacion],['Inversión',fc.inversion],['Financiamiento',fc.financiamiento],['Flujo neto',fc.flujoNeto]])}${section('Balance general',[['Efectivo',bg.efectivo],['Cuentas por cobrar',bg.cuentasPorCobrar],['Anticipos a proveedores',bg.anticiposMateriales],['Inventarios',bg.inventarios],['Activos fijos netos',bg.activosFijos],['Total activos',bg.activos],['Deuda',bg.deuda],['Cuentas por pagar a proveedores',bg.cuentasPorPagarProveedores],['Impuestos por pagar',bg.impuestosPorPagar],['Intereses por pagar',bg.interesesPorPagar],['Provisión por garantías',bg.provisionGarantias],['Patrimonio',bg.patrimonio],['Pasivo + patrimonio',bg.pasivoPatrimonio]])}<p class="hint">Actualizado: ${r.updatedAt?new Date(r.updatedAt).toLocaleString('es-PE'):'—'}</p>${eventReportTable(r)}${r.materialDeliveryForms||''}</div>`);
   if(!detailChanged)return;
@@ -1395,7 +1419,19 @@ $('podiumReschedule').addEventListener('click',()=>{$('podiumPublishMode').value
 setInterval(()=>{if($('tab-podio').classList.contains('active'))renderPodium();},1000);
 setInterval(()=>{if($('tab-podio').classList.contains('active')&&!podiumBusy)loadPublished();},5000);
 const historyController=window.SIDE_TEACHER_HISTORY?.createController({mount:$('historyContent'),status:$('historyStatus'),refresh:$('refreshHistory'),service:window.SIDE?.TeacherHistoryService,catalog:window.SIDE_DECISION_CATALOG||[]});
-function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio',historial:'Historial · última partida',laboratorio:'Laboratorio Estratégico'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='historial')historyController?.load();if(tab==='laboratorio')window.SIDE_LAB?.open()}
+let historyListGeneration=0;
+async function loadTeacherHistory(){
+ const generation=++historyListGeneration,service=window.SIDE?.TeacherHistoryService,select=$('historyGameSelect');
+ if(!select||!service?.listar){historyController?.load();return;}
+ const result=await service.listar();if(generation!==historyListGeneration)return;
+ if(!result.success){$('historyStatus').textContent=result.error;return;}
+ const previous=select.value;
+ setTeacherResultMarkup(select,result.data.map(g=>`<option value="${escapeAttr(g.id)}">${escapeHtml(g.codigo+' · '+g.nombre)}</option>`).join(''));
+ if(result.data.some(g=>g.id===previous))select.value=previous;
+ select.onchange=()=>historyController?.load(select.value);
+ historyController?.load(select.value||undefined);
+}
+function switchTab(tab){if(tab==='rondas'&&!gameStatus()?.active&&!gameStatus()?.finishedAt)return;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-'+tab));const titles={configuracion:'Configuración de la simulación',rondas:'Ciclos y eventos',empresas:'Empresas participantes',resultados:'Resultados',podio:'Ganador y podio',historial:'Historial de partidas',laboratorio:'Laboratorio Estratégico'};$('pageTitle').textContent=titles[tab];if(['empresas','resultados','podio'].includes(tab))loadReports();if(tab==='podio')loadPublished();if(tab==='historial')loadTeacherHistory();if(tab==='laboratorio')window.SIDE_LAB?.open()}
 let pdfPreviewUrl=null,pdfBusy=false,pdfLogoPromise=null;
 function pdfLogo(){
   if(!pdfLogoPromise)pdfLogoPromise=new Promise(resolve=>{

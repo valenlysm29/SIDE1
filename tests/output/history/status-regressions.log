@@ -1,0 +1,24 @@
+✔ edge rejects missing and invalid scheduler token without running closures (61.3547ms)
+✔ edge reports failed and pending closures as unavailable (9.5267ms)
+✔ edge authorizes scheduler through service-only RPC and then closes cycles (3.9157ms)
+✔ edge fails closed on auth outage and disallows non-POST calls (4.5784ms)
+✔ cada partida usa su motor y un reintento no mezcla versiones (7.2193ms)
+✔ rechaza versiones desconocidas sin ejecutar motores (2.5305ms)
+✔ registra errores de procesamiento sin convertirlos en cierres ni cambiar el resultado económico (0.8523ms)
+✔ seal status overrides the financial calculation status, and isolates company and cycle (2.8303ms)
+✔ official history rendering omits future or processing amounts and never mutates the seal (29.591ms)
+✔ teacher cash adjustments preserve closed cycles and enter equity, never profit or debt (8.2496ms)
+✔ summary retains every cycle, including quiet cycles, and reports cumulative values (26.818ms)
+✔ office view uses financial model statements, including debt and assets (3.4538ms)
+✔ student financial report uses the same ledger model as the teacher summary (5.568ms)
+✔ does not borrow financial data from another company with the same name (3.5479ms)
+✔ does not fill current cycle statements with previous cycle data (2.6026ms)
+✔ keeps same-company same-cycle fallback when its report is pending (1.423ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 352.5817

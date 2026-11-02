@@ -1,0 +1,25 @@
+{
+  "restored": true,
+  "database": "history_restore_qa4",
+  "sealedBefore": " count |               md5                \n-------+----------------------------------\n   155 | e9444aa8211fe7a585b7c13076a8e9f8\n(1 row)\n\n",
+  "sealedAfter": " count |               md5                \n-------+----------------------------------\n   155 | e9444aa8211fe7a585b7c13076a8e9f8\n(1 row)\n\n",
+  "migrations": [
+    "20261031041921_presentaciones_excel_v2.sql",
+    "20261102022758_impedir_avance_sin_cierre.sql",
+    "20261102024042_cierre_automatico_secuencial.sql",
+    "20261102034926_versionar_worker_cierres.sql",
+    "20261102040000_gracia_cierre_secuencial.sql",
+    "20261102044053_historical_continuity.sql",
+    "20261102044938_atomic_purchase_presentations.sql"
+  ],
+  "files": {
+    "data.sql": {
+      "bytes": 20068156,
+      "sha256": "88597e41a29fb681b0e636e365c85670dc8a98626cab1b51c9d06207f8712df1"
+    },
+    "schema.sql": {
+      "bytes": 277838,
+      "sha256": "3570e6d1910db2f6b3ba32f82351d69bb95eee0684339697942e4c3a8fa749ef"
+    }
+  }
+}

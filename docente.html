@@ -152,7 +152,7 @@
       <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/resultados.svg" alt=""></span><div><h2 id="resultsHeading">Resultados por empresa</h2><p>Consulta el cierre del ciclo y sus estados financieros.</p></div></div><div class="top-actions"><button id="viewPdf" class="secondary" type="button">Ver PDF</button><button id="downloadPdf" class="primary" type="button">Descargar PDF</button></div></div>
       <p class="hint">El PDF incluye todas las empresas activas y el ciclo reportado de cada una.</p>
       <div class="stats-grid" id="resultStats"></div>
-      <article class="card result-company-card"><div class="card-title"><h3>Detalle por empresa</h3><label>Empresa<select id="resultCompanySelect" aria-label="Empresa para ver resultados"></select></label></div><div id="detailReports"></div></article>
+      <label>Ciclo de resultados<select id="resultCycleSelect" aria-label="Ciclo de resultados"></select></label><article class="card result-company-card"><div class="card-title"><h3>Detalle por empresa</h3><label>Empresa<select id="resultCompanySelect" aria-label="Empresa para ver resultados"></select></label></div><div id="detailReports"></div></article>
     </section>
 
     <section id="tab-podio" class="tab-panel">
@@ -170,9 +170,9 @@
       <p id="lab-status" role="status" aria-live="polite"></p><div id="lab-content"></div></article>
     </section>
     <section id="tab-historial" class="tab-panel teacher-workspace" aria-labelledby="historyHeading">
-      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Historial</h2><p>Historial de la última partida finalizada.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
-      <div class="info-banner teacher-guide">Selecciona una empresa y despliega sus ciclos para revisar las decisiones y los resultados registrados. Esta consulta es de solo lectura y se reemplaza al finalizar una nueva partida.</div>
-      <p id="historyStatus" class="history-status" role="status" aria-live="polite"></p>
+      <div class="section-head"><div class="teacher-section-title"><span class="teacher-section-icon" aria-hidden="true"><img src="assets/icons/teacher/decisiones.svg" alt=""></span><div><h2 id="historyHeading">Historial</h2><p>Cierres oficiales de tus partidas anteriores.</p></div></div><button id="refreshHistory" class="secondary" type="button">Actualizar historial</button></div>
+      <div class="info-banner teacher-guide">Selecciona una empresa y despliega sus ciclos para revisar las decisiones y los resultados registrados. Esta consulta es de solo lectura; cada partida conserva sus propios cierres oficiales.</div>
+      <label>Partida anterior<select id="historyGameSelect" aria-label="Partida del historial"></select></label><p id="historyStatus" class="history-status" role="status" aria-live="polite"></p>
       <div id="historyContent" aria-busy="false"></div>
     </section>
   </main>
@@ -232,9 +232,9 @@
 <script src="services/partida_service.js?v=20261028-server-close"></script>
 <script src="services/empresa_service.js?v=20261022-reversion"></script>
 <script src="services/decisiones_service.js?v=20261027-live-sales"></script>
-<script src="services/teacher_history_service.js?v=20260930-2"></script>
+<script src="services/teacher_history_service.js?v=20261102-official-history"></script>
 <script src="js/decision_catalog.js?v=20261101-logo"></script>
-<script src="js/teacher_history.js?v=20260930-2"></script>
+<script src="js/teacher_history.js?v=20261102-official-history"></script>
 <script src="js/side_rules.js?v=20261012-sesion-codigos"></script>
 <script src="js/events_catalog.js?v=20260910-2"></script>
 <script src="js/teacher_podium.js?v=20261022-reversion"></script>
@@ -256,12 +256,13 @@
 <script src="js/revenue_model.js?v=20261024-v19"></script>
 <script src="js/cycle_model.js?v=20261028-materiales"></script>
 <script src="services/live_results.js?v=20261027-live-sales"></script>
-<script src="js/student_financial_view.js?v=20261028-balance"></script>
-<script src="services/laboratorio_service.js?v=20261030-4"></script>
+<script src="services/official_history.js?v=20261102-history"></script>
+<script src="js/student_financial_view.js?v=20261102-official-history"></script>
+<script src="services/laboratorio_service.js?v=20261102-official-history"></script>
 <script src="services/laboratorio_demo.js?v=1"></script>
 <script src="js/laboratorio_model.js?v=20261030-4"></script>
 <script src="js/laboratorio_scenarios.js?v=1"></script>
-<script src="js/laboratorio.js?v=20261030-7"></script>
-<script src="js/docente.js?v=20261101-stable-rounds"></script>
+<script src="js/laboratorio.js?v=20261102-official-history"></script>
+<script src="js/docente.js?v=20261102-history"></script>
 </body>
 </html>
