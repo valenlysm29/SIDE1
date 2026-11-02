@@ -4,7 +4,7 @@ Fecha: 2 de noviembre de 2026, Lima. Base: `main` / `406a0ae`.
 
 ## Estado de entrega
 
-**Implementación funcional y pruebas integrales locales aprobadas. Backend desplegado. Publicación del frontend en `main` detenida por cuatro partidas antiguas de producción que no pueden cerrarse con sus entradas actuales.** El trabajo se publica en `codex/history-continuity`, siguiendo la condición de aceptación solicitada. No se declara resuelta la continuidad de esas cuatro partidas ni se inventan cierres para ellas.
+**Implementación funcional y pruebas integrales locales aprobadas. Backend desplegado. Publicación en `main` autorizada posteriormente por el usuario el 2 de noviembre de 2026.** La implementación se preparó en `codex/history-continuity` y se publica en `main` por esa instrucción expresa. Cuatro partidas antiguas de producción siguen sin poder cerrarse con sus entradas actuales; esta publicación no declara resuelta su continuidad ni inventa cierres para ellas.
 
 ## Causas comprobadas y correcciones
 
@@ -48,7 +48,7 @@ Regresiones: **96 aprobadas, 0 fallidas**, más comprobaciones específicas del 
 - Migraciones nuevas: `20261102044053_historical_continuity.sql`, `20261102044938_atomic_purchase_presentations.sql`, `20261102051739_closure_processing_status.sql`. Historial de migraciones registrado.
 - `side_legacy_event_context_v1` ya estaba en producción; se instaló en el entorno local donde faltaba. No se sustituyeron sorteos históricos ni se recalcularon sus efectos.
 - Lectura histórica comprobada en producción con el propietario autenticado; acceso anónimo denegado y escritura privada de órdenes denegada a estudiantes. El asesor de seguridad no reportó incidencias de nivel error en la comprobación realizada.
-- Edge Function **v8** desplegada con enrutamiento por versión y registro de estados; conserva la autorización por token de Vault. El frontend queda en la rama de trabajo mientras persiste el bloqueo siguiente.
+- Edge Function **v8** desplegada con enrutamiento por versión y registro de estados; conserva la autorización por token de Vault. El frontend se publica en `main` por instrucción expresa posterior del usuario; permanece el bloqueo de datos descrito a continuación.
 
 ## Bloqueo indispensable pendiente
 
@@ -61,7 +61,7 @@ La comprobación posterior del programador de producción devuelve HTTP 503 por 
 | `67111697-d6be-408b-8ff1-4950c00fcfa9` | 2 | `DATOS_ECONOMICOS_NO_VERIFICADOS`: saldo inicial o eventos sin verificación |
 | `691d9d55-8592-403a-87cf-3cca173cc13f` | 1 | `DATOS_ECONOMICOS_NO_VERIFICADOS`: saldo inicial o eventos sin verificación |
 
-También hay comprobantes antiguos vacíos: la lectura los distingue de un resultado financiero real. No existe una reconstrucción autorizada que pueda generar los importes faltantes sin conciliar las entradas. Corregir silenciosamente préstamos o aceptar efectos financieros sin respaldo incumpliría la petición de conservar cálculos y registros oficiales. Hace falta conciliar esas entradas con una fuente verificable antes de declarar completada la recuperación de todas las partidas existentes y publicar el frontend en `main`.
+También hay comprobantes antiguos vacíos: la lectura los distingue de un resultado financiero real. No existe una reconstrucción autorizada que pueda generar los importes faltantes sin conciliar las entradas. Corregir silenciosamente préstamos o aceptar efectos financieros sin respaldo incumpliría la petición de conservar cálculos y registros oficiales. Hace falta conciliar esas entradas con una fuente verificable antes de declarar completada la recuperación de todas las partidas existentes La publicación del frontend en `main`, autorizada posteriormente, no resuelve por sí sola esa conciliación.
 
 ## Archivos y evidencias
 
