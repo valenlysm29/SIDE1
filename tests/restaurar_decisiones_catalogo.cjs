@@ -10,12 +10,14 @@ const out=path.join(__dirname,'output/restaurar-decisiones');fs.mkdirSync(out,{r
  try{
   const {page,context}=await newPage(browser,'http://127.0.0.1:'+server.address().port,'catalog-coverage');
   const tabs=await page.locator('#decisionTabs [data-cat]').evaluateAll(els=>els.map(el=>[el.dataset.cat,el.innerText]));
-  assert.deepEqual(tabs.map(t=>t[0]),['B','C','F','D','E','A']);
+  assert.deepEqual(tabs.map(t=>t[0]),['DOP','B','C','F','D','E','A']);
   assert.equal(await page.evaluate(()=>Boolean(decisionState.__excel)),false,'current UI does not activate legacy state');
   const catalog=await page.evaluate(()=>SIDE_DECISION_CATALOG.map(c=>({cat:c.cat,items:c.items})));
   async function open(cat){await page.locator('#decisionTabs [data-cat="'+cat+'"]').click();}
   async function saved(id,expected){
+   if(id==='PRODUCCION_META')await open('C');
    await page.locator('#saveDecisionSection').click();
+   if(id==='PRODUCCION_META')await open('DOP');
    const actual=await page.evaluate(id=>({live:decisionState[id],stored:JSON.parse(localStorage.getItem(decisionKey()))[id]}),id);
    assert.deepEqual(actual.live,actual.stored,id+' persisted in decision storage');
    for(const [key,value]of Object.entries(expected))assert.deepEqual(actual.stored[key],value,id+' saved '+key);
@@ -32,6 +34,7 @@ const out=path.join(__dirname,'output/restaurar-decisiones');fs.mkdirSync(out,{r
    if(cat==='A')continue;await open(cat);
    for(const item of items){
     if(item.displayAsAsterisk){assert.match(await page.locator('#decisionCards').innerText(),new RegExp(item.desc.slice(0,35)));covered.push(item.id);continue;}
+    if(item.id==='PRODUCCION_META')await open('DOP');else if(cat==='C')await open('C');
     const card=page.locator('[data-item="'+item.id+'"]');assert.equal(await card.count(),1,item.id+' rendered');
     await card.scrollIntoViewIfNeeded();assert.ok(await card.isVisible(),item.id+' visible');
     if(item.mandatoryFixed){const selected=card.locator('input:checked');assert.equal(await selected.count(),1);assert.ok(await selected.isDisabled(),item.id+' required fixed cost');}

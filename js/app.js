@@ -817,10 +817,8 @@ $('restartDecisionMenu')?.addEventListener('click',()=>{$('decisionSummary').cla
 function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
 function decisionCategories(){return DECISION_CATALOG.filter(category=>!category.summaryOnly)}
 function navigationCategories(){
-  const summary=DECISION_CATALOG.find(category=>category.summaryOnly),decisions=decisionCategories();
-  const tabs=currentRound()<=1?[...decisions,...(summary?[summary]:[])]:[...(summary?[summary]:[]),...decisions];
-  tabs.splice(tabs.findIndex(c=>c.cat==='C'),0,planningCategory);
-  return tabs;
+  const byCategory=new Map(DECISION_CATALOG.map(category=>[category.cat,category]));
+  return [planningCategory,...['B','C','F','D','E','A'].map(cat=>byCategory.get(cat)).filter(Boolean)];
 }
 const planningCategory={cat:'DOP',title:'DOP y Planificación',short:'DOP y Planificación',desc:'Revisa tu meta, capacidad y recursos para planificar la producción.',icon:'assets/icons/categories/recursos_humanos.svg',items:[],summaryOnly:true};
 function categoryByCat(cat){return cat==='DOP'?planningCategory:DECISION_CATALOG.find(c=>c.cat===cat)}
