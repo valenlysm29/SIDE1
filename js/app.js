@@ -818,17 +818,20 @@ function allDecisionItems(){return DECISION_CATALOG.flatMap(c=>c.items)}
 function decisionCategories(){return DECISION_CATALOG.filter(category=>!category.summaryOnly)}
 function navigationCategories(){
   const summary=DECISION_CATALOG.find(category=>category.summaryOnly),decisions=decisionCategories();
-  return currentRound()<=1?[...decisions,...(summary?[summary]:[])]:[...(summary?[summary]:[]),...decisions];
+  const tabs=currentRound()<=1?[...decisions,...(summary?[summary]:[])]:[...(summary?[summary]:[]),...decisions];
+  tabs.splice(tabs.findIndex(c=>c.cat==='C'),0,planningCategory);
+  return tabs;
 }
-function categoryByCat(cat){return DECISION_CATALOG.find(c=>c.cat===cat)}
+const planningCategory={cat:'DOP',title:'DOP y Planificación',short:'DOP y Planificación',desc:'Revisa tu meta, capacidad y recursos para planificar la producción.',icon:'assets/icons/categories/recursos_humanos.svg',items:[],summaryOnly:true};
+function categoryByCat(cat){return cat==='DOP'?planningCategory:DECISION_CATALOG.find(c=>c.cat===cat)}
 function findDecisionItem(id){return allDecisionItems().find(i=>i.id===id)}
 function savedEntry(item){return decisionState[item.id]||null}
 function sectionSubmissionKey(cat=currentCategory){return `SIDE_DECISION_SECTION_SUBMITTED_${storageKey()}_${currentRound()}_${cat}`}
 function sectionSubmitted(cat=currentCategory){return localStorage.getItem(sectionSubmissionKey(cat))==='1'}
 function setSectionSubmitted(cat,v=true){const k=sectionSubmissionKey(cat);if(v)localStorage.setItem(k,'1');else localStorage.removeItem(k)}
-function isLocked(item){const e=savedEntry(item);return sectionSubmitted(currentCategory) || decisionsSubmitted() || !!(item.lockAfterPurchase&&e&&Number(e.round)<currentRound())}
+function isLocked(item){const e=savedEntry(item);return sectionSubmitted(currentCategory==='DOP'?'C':currentCategory) || decisionsSubmitted() || !!(item.lockAfterPurchase&&e&&Number(e.round)<currentRound())}
 function cycleDecisionsLocked(){return decisionsSubmitted()}
-function decisionEditingBlocked(){if(decisionsSubmitted()){toast('Todas las decisiones de este ciclo ya fueron enviadas. Podrás modificarlas cuando comience el próximo ciclo.');return true}if(sectionSubmitted(currentCategory)){toast('Esta sección ya fue enviada y está bloqueada hasta el próximo ciclo.');return true}return false}
+function decisionEditingBlocked(){if(decisionsSubmitted()){toast('Todas las decisiones de este ciclo ya fueron enviadas. Podrás modificarlas cuando comience el próximo ciclo.');return true}if(sectionSubmitted(currentCategory==='DOP'?'C':currentCategory)){toast('Esta sección ya fue enviada y está bloqueada hasta el próximo ciclo.');return true}return false}
 function itemRequired(item){
   if(item?.id==='MOLDE'||item?.requiredWhenProduction)return false;
   return item?.required===true;
@@ -1084,7 +1087,7 @@ function refreshProductionCalculator(plan){
 }
 // Calculator and diagram read the same working draft after each control updates it.
 function refreshProductionDop(){
-  if(currentCategory!=='C')return;
+  if(currentCategory!=='DOP')return;
   const plan=productionPlan();refreshProductionCalculator(plan);
   const mount=document.querySelector('.production-dop-mount');
   if(!mount)return;
@@ -1116,7 +1119,13 @@ function renderDecisionCategory(){
   disposeProductionDop();
   const cat=categoryByCat(currentCategory)||DECISION_CATALOG[0];currentCategory=cat.cat;
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
-  if(temporalStudentRoom()&&!validStudentMaterialBook()){$('decisionCards').innerHTML=`<p role="status">${escapeHtml(studentMaterialStatus)}</p>`;return;}
+  if(temporalStudentRoom()&&!validStudentMaterialBook()){document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);$('decisionCards').innerHTML=`<p role="status">${escapeHtml(studentMaterialStatus)}</p>`;return;}
+  if(cat.cat==='DOP'){
+    $('decisionCards').innerHTML=renderDecisionRow(findDecisionItem('PRODUCCION_META'))+`<p class="decision-row">La meta se comparte con Producción. Para guardar o enviar la decisión, abre Producción.</p><section class="decision-row"><h3>Proyección de rentabilidad</h3><p>Calcula el resultado y compara cambios sin guardar decisiones.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section><div class="production-dop-mount">${productionDopHtml()}</div>`;
+    document.querySelector('.section-save-bar')?.classList.add('hidden');
+    bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection);updateHud();syncStudentTimer();updateDecisionLayout();
+    disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));return;
+  }
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
   const cardItems=items.filter(i=>!i.displayAsAsterisk),footnoteItems=items.filter(i=>i.displayAsAsterisk);
   let lead=cat.summaryOnly?'':`<div class="event-clue"><span>NOTICIA / CONTEXTO</span><strong>${escapeHtml(eventHint())}</strong><small>Los eventos aplicados aparecen en el resumen financiero.</small></div>`;
@@ -1134,7 +1143,7 @@ function renderDecisionCategory(){
   }
 
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
-  const cards=cat.cat==='C'?renderDecisionRow(cardItems.find(item=>item.id==='PRODUCCION_META'))+`<section class="decision-row"><h3>Proyección de rentabilidad</h3><p>Calcula el resultado y compara cambios sin guardar decisiones.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section><div class="production-dop-mount">${productionDopHtml()}</div>`+cardItems.filter(item=>item.id!=='PRODUCCION_META').map(renderDecisionRow).join(''):cardItems.map(renderDecisionRow).join('');
+  const cards=cardItems.filter(item=>cat.cat!=='C'||item.id!=='PRODUCCION_META').map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?automaticDistributionHtml()+cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
   bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
@@ -1816,10 +1825,11 @@ function buildSupabaseDecision(item,st,round){
 
 
 function persistCurrentDraftOnly(){
-  const cat=categoryByCat(currentCategory);if(!cat)return false;
+  const draftCategory=currentCategory==='DOP'?'C':currentCategory;
+  const cat=categoryByCat(draftCategory);if(!cat)return false;
   const draftStoreKey=`SIDE_DECISION_DRAFTS_${storageKey()}_${currentRound()}`;
   let store={};try{store=JSON.parse(localStorage.getItem(draftStoreKey)||'{}')||{}}catch{}
-  store[currentCategory]={};cat.items.forEach(item=>{if(decisionDrafts[item.id])store[currentCategory][item.id]=deepClone(decisionDrafts[item.id])});
+  store[draftCategory]={};cat.items.forEach(item=>{if(decisionDrafts[item.id])store[draftCategory][item.id]=deepClone(decisionDrafts[item.id])});
   localStorage.setItem(draftStoreKey,JSON.stringify(store));
   return true;
 }
