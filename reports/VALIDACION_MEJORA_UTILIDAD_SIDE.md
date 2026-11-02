@@ -2,6 +2,16 @@
 
 Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba85af8ba2c86b36a8`. Rama: `prueba_utilidad_mejora`.
 
+## Activación experimental y verificación complementaria
+
+En esta rama, la creación de nuevas salas de ciclo de vida 2 envía por defecto `economicRulesVersion: utility-v1`; una versión explícita se conserva. La recuperación, el guardado y los cierres previos no reciben una versión nueva. La prueba de creación con PostgreSQL compatible verifica que la versión se persista y que un reintento recupere la misma sala sin sustituirla. El código actualizado debe desplegarse de forma coordinada en frontend y en el worker/Edge antes de probar salas contra un servidor remoto; este trabajo no despliega ni modifica el servicio remoto.
+
+En PostgreSQL real aislado, Node y Edge ejecutaron concurrentemente el cierre oficial de tres empresas —una por segmento— con `utility-v1`, precios base S/ 120 / 150 / 280 y recepciones parciales verificadas; los recibos y balances se conservaron en un solo cierre. Un ensayo adicional en PGlite ejecutó seis ciclos con `utility-v1`, crédito, recepción parcial, arrastre de existencias, obligaciones e impuesto final. Las pruebas críticas agrupadas aprobaron 39 casos y la prueba de creación de sala con base de datos también pasó.
+
+Los 17 fallos de la regresión previa se reprodujeron con el código de `f726225`: diez en una ejecución selectiva de la base y siete mediante el mismo libro y pruebas de Excel en una copia de la base. Son preexistentes a esta rama; esto no demuestra que sus expectativas o comportamientos sean correctos. Los registros locales son `tests/output/base_utilidad_f726_regresion.log` y `tests/output/base_utilidad_excel.log`. No se modificaron fórmulas para ocultarlos.
+
+La regresión general final ejecutó 958 pruebas: 941 aprobadas y 17 fallidas, las mismas 17 reproducidas en la base. No hubo cancelaciones ni pruebas omitidas. Registro local: `tests/output/regresion_utility_v1_activacion.log`. Las comprobaciones de creación de sala contra la base de datos y 33 pruebas adicionales de Estudiante, Docente, Laboratorio y configuración pasaron por separado.
+
 ## Continuación: recepciones y regresión
 
 La proyección admite el libro de recepciones de la empresa cuando la aplicación lo obtuvo y validó para la partida, empresa, ciclo y fase, junto con una modalidad de pago configurada. El cálculo usa el cierre en una copia y no propone modificar insumos de pedidos confirmados. En el ensayo PGlite de crédito, con 1.300 de 2.600 metros recibidos, proyectó 100 unidades y la misma caja que el cierre; la prueba Node/Edge del cierre pasó. Un libro no verificado sigue sin proyectarse.
@@ -14,7 +24,7 @@ La regresión general iniciada antes de estos últimos cambios terminó con **95
 
 ## Candidatos internos versionados
 
-La configuración experimental `utility-v1` utiliza por defecto S/ 120 / 150 / 280 para básico, mejorado y prémium. Son candidatos educativos, no precios empíricos ni activados para partidas nuevas. Las partidas sin esa versión conservan S/ 42,50 / 100 / 250. Los candidatos se resuelven internamente, se validan con el mismo verificador de precios, y pueden configurarse mediante `utilityPrices`; no se añadió ningún control al estudiante. El servidor y la Edge empaquetada usan la misma configuración explícita. La prueba `tests/precios_utilidad_versionada.test.cjs` verifica el aislamiento de versiones, los valores configurables y doce empresas por segmento con capital individual S/ 50.000.
+La configuración experimental `utility-v1` utiliza por defecto S/ 120 / 150 / 280 para básico, mejorado y prémium. Son candidatos educativos, no precios empíricos. Las partidas sin esa versión conservan S/ 42,50 / 100 / 250. Los candidatos se resuelven internamente, se validan con el mismo verificador de precios, y pueden configurarse mediante `utilityPrices`; no se añadió ningún control al estudiante. El servidor y la Edge empaquetada usan la misma configuración explícita. La prueba `tests/precios_utilidad_versionada.test.cjs` verifica el aislamiento de versiones, los valores configurables y doce empresas por segmento con capital individual S/ 50.000.
 
 | Segmento | Precio efectivo S/ | Producido / vendido | Utilidad S/ | Caja S/ | Movimientos negativos S/ |
 |---|---:|---:|---:|---:|---:|
@@ -42,19 +52,19 @@ Una comprobación adicional de `tests/profit_projection.test.cjs` aprobó 3 prue
 
 Se ejecutaron los archivos `tests/*.test.js`, `tests/*.test.mjs` y `tests/*.test.cjs` con concurrencia 2: **947 pruebas, 927 aprobadas y 20 fallidas**; registro local `tests/output/regresion_utility_v1.log`. Incluye pruebas aprobadas de PostgreSQL real aislado y Node/Edge. Los fallos abarcan planificación DOP, comparación con Excel, reputación/mercado, transferencias manuales y pruebas de sincronización. No hay una línea base equivalente de esta ejecución para clasificarlos todos como previos o nuevos.
 
-Las tres fallas de navegador de `decisions_apartados_ui.test.cjs` y `student_sync_ui.test.js` muestran `Unexpected token '<'`; al instrumentar la prueba, Chrome identificó la URL `js/landing-progress.js`, para la cual el interceptor de la prueba devuelve HTML. El archivo no forma parte de la proyección añadida. No se atribuye por ello una causa al resto de fallos. La regresión no está limpia y bloquea la activación automática de `utility-v1`.
+Las tres fallas de navegador de `decisions_apartados_ui.test.cjs` y `student_sync_ui.test.js` mostraban `Unexpected token '<'`; Chrome identificó la URL `js/landing-progress.js`, para la cual el interceptor de la prueba devolvía HTML. El archivo no forma parte de la proyección añadida. Esos fixtures se corrigieron posteriormente.
 
-Se corrigieron los interceptores de los dos fixtures para servir el JavaScript correcto. Al repetir solo esos archivos pasaron 17 pruebas, incluidos los tres casos antes fallidos. Los otros fallos de la regresión general permanecen sin clasificar mediante una ejecución de base equivalente; no se han cambiado fórmulas para hacerlos pasar. La suite general no se ha repetido después de esta corrección ni de los precios candidatos.
+Se corrigieron los interceptores de los dos fixtures para servir el JavaScript correcto. Al repetir solo esos archivos pasaron 17 pruebas, incluidos los tres casos antes fallidos. Los otros fallos fueron reproducidos posteriormente contra la base indicada arriba; no se han cambiado fórmulas para hacerlos pasar.
 
 Después de los precios candidatos también se ejecutaron 32 pruebas focales adicionales de configuración histórica, cierre, competencia, producción, vista de estudiante y resumen financiero; todas pasaron.
 
-**Estado: avance parcial.** Se implementaron una corrección de puntuación de maquinaria y una adaptación experimental de la bonificación prémium bajo la versión explícita `utility-v1`; no se activan automáticamente en partidas nuevas. El resto de la corrección integral sigue pendiente. Los resultados económicos siguientes caracterizan la versión anterior y no satisfacen la validación masiva. No se han actualizado cierres de Supabase.
+**Estado: versión experimental.** La puntuación de maquinaria y la adaptación de la bonificación prémium se aplican bajo `utility-v1`, predeterminada para nuevas salas en esta rama. La validación conserva las limitaciones descritas. No se han actualizado cierres de Supabase.
 
 ## Avance: elasticidad de precio absoluto
 
 Nueva regla educativa experimental para `utility-v1`: después de repartir competitivamente el mercado, cada asignación se multiplica por `min(1, max(1, precio efectivo / precio de referencia)^(-elasticidad))`. El precio efectivo pondera los lotes disponibles y sus bonificaciones o descuentos. La asignación ajustada no supera la asignada, y las ventas siguen limitadas por canal e inventario. Referencias supuestas: S/ 95 / 150 / 250; elasticidades supuestas: 1,1 / 1,2 / 1,3. Son parámetros de exploración, no precios de venta nuevos ni estimaciones empíricas. Se pueden configurar con `financialPolicy.utilityDemand`; el cálculo rechaza referencias no positivas y elasticidades negativas. La versión anterior conserva sus reglas de demanda.
 
-Pruebas focales: `node --test tests/demanda_absoluta_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/calidad_utilidad_versionada.test.cjs tests/auditoria_mercado_20261023.test.cjs`: 13 aprobadas. Verifican el descenso de demanda al duplicar simultáneamente los precios, reparto relativo, límite de mercado, parámetros inválidos y equivalencia Node/Edge en el caso versionado. Los supuestos se exploraron en la matriz limitada siguiente y no se han activado en partidas nuevas.
+Pruebas focales: `node --test tests/demanda_absoluta_utilidad.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/calidad_utilidad_versionada.test.cjs tests/auditoria_mercado_20261023.test.cjs`: 13 aprobadas. Verifican el descenso de demanda al duplicar simultáneamente los precios, reparto relativo, límite de mercado, parámetros inválidos y equivalencia Node/Edge en el caso versionado. Los supuestos se exploraron en la matriz limitada siguiente.
 
 ## Exploración de 3.000 combinaciones en memoria
 
@@ -74,7 +84,7 @@ Ejemplos experimentales: básico 250 producidos y vendidos, precio S/ 120, venta
 
 `node --test tests/competencia_utilidad_representativa.test.cjs tests/recuperacion_utilidad_ciclos.test.cjs tests/edge_lotes_equivalencia.test.cjs tests/continuidad_seis_ciclos_activos.test.cjs`: 10 pruebas aprobadas. Los primeros dos archivos usan cierres en memoria `utility-v1`; los otros prueban Node/Edge y persistencia PostgreSQL compatible mediante PGlite, incluyendo recepciones parciales y cuentas por pagar. La regresión también aprobó pruebas existentes de cierres compartidos y concurrentes en PostgreSQL real aislado; no prueban la nueva versión con los escenarios de competencia. No son una prueba integral en el servicio remoto.
 
-Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Este precio coincide con el candidato `utility-v1`, todavía no activado para nuevas partidas.
+Doce empresas idénticas compiten por básico, con precio experimental explícito S/ 120, capital individual S/ 50.000, 250 unidades planeadas, insumos económicos, dos equipos y dos trabajadores básicos por etapa, sin jefatura y con web. Como comprobación conservadora se cargaron al capital todos los movimientos negativos antes de las ventas. Los balances cuadraron. Este precio coincide con el candidato `utility-v1`.
 
 | Empresas | Demanda por empresa | Producido / vendido | Ventas S/ | Utilidad S/ | Caja final S/ | Movimientos negativos S/ |
 |---:|---:|---:|---:|---:|---:|---:|
