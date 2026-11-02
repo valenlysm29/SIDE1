@@ -26,3 +26,17 @@ test('cut, advance and pause controls can continue without submitted plans and n
   if(action!=='pausar')assert.match(status.textContent,/servidor.*procesando el cierre/);
  }
 });
+
+test('teacher reuses confirmed closures, retries pending closures and scopes the cache to the room generation',async()=>{
+ const source=fs.readFileSync(require.resolve('../js/docente.js'),'utf8');
+ let calls=0,pending=true;
+ const status={textContent:''},context={roomGeneration:0,reportsRevision:0,state:{partidaId:'game',reports:[]},confirmedReportClosures:new Map(),
+  window:{SIDE:{PartidaService:{consultarCierreNegocio:async()=>{calls++;return pending?{success:true,pending:true}:{success:true,data:{resultadosPorEmpresa:{}}};}}}},
+  $:()=>status,toast(){},persistReports(){},renderResults(){},applyConfirmedReportClosures(){}};
+ vm.createContext(context);
+ vm.runInContext(source.slice(source.indexOf('async function closeBusinessRemoteRound('),source.indexOf('\nfunction renderWinnerSelect(')),context);
+ await context.closeBusinessRemoteRound(1);await context.closeBusinessRemoteRound(1);assert.equal(calls,2);
+ pending=false;await context.closeBusinessRemoteRound(1);await context.closeBusinessRemoteRound(1);assert.equal(calls,3);
+ context.roomGeneration++;await context.closeBusinessRemoteRound(1);assert.equal(calls,4);
+ context.state.partidaId='other-game';await context.closeBusinessRemoteRound(1);assert.equal(calls,5);
+});

@@ -65,14 +65,19 @@ function clearRoomLink(){
   state.partidaId=null;state.authoritative=null;state.configRevision=null;state.formConfigRevision=null;delete state.eventsExplicitlyCleared;teacherClock=null;state.reports=[];publishedState='';
   ['SIDE_PARTIDA_ID','SIDE_GAME_STATUS','SIDE_ROUND_RUNTIME','SIDE_EVENT_SCHEDULE'].forEach(k=>localStorage.removeItem(k));
 }
+function setTeacherText(id,text){const node=$(id);if(node&&node.textContent!==text)node.textContent=text;}
+function paintTeacherLobbyCountdown(){
+  if(!state.partidaId||!gameStatus()?.active)return;
+  setTeacherText('lobbyCountdown',runtime()?.phase==='integration'?`El Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:`Ciclo ${state.round} · ${formatStudentTime(state.seconds)}`);
+}
 function renderTeacherLobby(){
   const r=runtime(),active=!!state.partidaId&&!!gameStatus()?.active;
   $('teacherLobby')?.classList.toggle('hidden',!active);
   if(!active)return;
-  $('lobbyHeading').textContent=r?.phase==='integration'?'Sala de espera':'Sala en curso';
-  $('lobbyCode').textContent=$('gameCode').value;
-  $('lobbyCountdown').textContent=r?.phase==='integration'?`El Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`:`Ciclo ${state.round} · ${formatStudentTime(state.seconds)}`;
-  $('lobbyNext').textContent=state.authoritative?.cycleCloseMode==='manual'?'El Ciclo 1 inicia automáticamente; tú controlas el cierre de cada ciclo.':'El Ciclo 1 inicia automáticamente; los ciclos avanzan según la programación.';
+  setTeacherText('lobbyHeading',r?.phase==='integration'?'Sala de espera':'Sala en curso');
+  setTeacherText('lobbyCode',$('gameCode').value);
+  paintTeacherLobbyCountdown();
+  setTeacherText('lobbyNext',state.authoritative?.cycleCloseMode==='manual'?'El Ciclo 1 inicia automáticamente; tú controlas el cierre de cada ciclo.':'El Ciclo 1 inicia automáticamente; los ciclos avanzan según la programación.');
   const companies=state.reports.filter(x=>x.fuente==='supabase'&&x.estado!=='eliminada'),container=$('lobbyCompanies');
   if(!companies.length){
     const empty='Esperando empresas. Comparte el código para que ingresen.';
@@ -132,8 +137,8 @@ function escapeAttr(v){return escapeHtml(v)}
 function gameStatus(){try{return JSON.parse(localStorage.getItem('SIDE_GAME_STATUS')||'null')}catch{return null}}
 function renderEnabledEvents(){
   const selected=EVENT_CATALOG.filter(e=>state.enabledEvents.has(e.id));
-  if($('enabledEventsSummary'))$('enabledEventsSummary').innerHTML=selected.length?
-    `<strong>${selected.length} habilitados</strong>`+selected.slice(0,3).map(e=>`<span class="enabled-event-chip">${escapeHtml(e.title)}</span>`).join('')+(selected.length>3?`<span>y ${selected.length-3} más · consulta la selección</span>`:''):'Sin eventos habilitados. Pulsa Seleccionar eventos para agregarlos.';
+  if($('enabledEventsSummary'))setTeacherResultMarkup($('enabledEventsSummary'),selected.length?
+    `<strong>${selected.length} habilitados</strong>`+selected.slice(0,3).map(e=>`<span class="enabled-event-chip">${escapeHtml(e.title)}</span>`).join('')+(selected.length>3?`<span>y ${selected.length-3} más · consulta la selección</span>`:''):'Sin eventos habilitados. Pulsa Seleccionar eventos para agregarlos.');
 }
 function refreshSetupSummary(){
   const status=gameStatus(),active=Boolean(status?.active),r=runtime();
@@ -392,7 +397,7 @@ function writeRuntime(extra={}){
   localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(data));publishGameState();if(data.round!==base.round)syncRoundToSupabase();refreshSetupSummary();return data;
 }
 function updateRoundDisplay(){$('roundDisplay').textContent=`${state.round} / ${Number($('cycles').value||6)}`;$('currentRound').value=state.round;localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));$('roundSummary').textContent=`TEA inicial: ${Number($('interest').value||0).toFixed(1)}% · ${cycleMode()==='automatic'?'Avance automático':'Control manual'}`;renderAcademicCalendar()}
-function updateTimer(){const seconds=Math.max(0,state.seconds),h=String(Math.floor(seconds/3600)).padStart(2,'0'),m=String(Math.floor(seconds%3600/60)).padStart(2,'0'),sec=String(seconds%60).padStart(2,'0');$('roundTimer').textContent=`${h}:${m}:${sec}`}
+function updateTimer(){const seconds=Math.max(0,state.seconds),h=String(Math.floor(seconds/3600)).padStart(2,'0'),m=String(Math.floor(seconds%3600/60)).padStart(2,'0'),sec=String(seconds%60).padStart(2,'0');setTeacherText('roundTimer',`${h}:${m}:${sec}`)}
 function stopTimer(status='paused'){if(state.timer){clearInterval(state.timer);state.timer=null}$('startTimer').textContent='Iniciar';const r=runtime();writeRuntime({running:false,remaining:state.seconds,status})}
 function beginTimer(auto=false,referenceStart=null){
   if(!gameStatus()?.active){toast('Primero pulsa Iniciar partida.');return;}
@@ -461,27 +466,49 @@ function triggerGroupEvents(round){
   renderCycleNews();return schedule[round];
 }
 function eventsImpactingRound(round){const schedule=eventSchedule(),out=[];Object.entries(schedule).forEach(([trigger,data])=>(data?.group||[]).forEach(id=>{const e=EVENT_CATALOG.find(x=>x.id===id);if(!e||!state.enabledEvents.has(id))return;const start=Number(trigger)+Number(e.cycleOffset||0),end=start+Math.max(1,Number(e.cycles||1));if(round>=start&&round<end)out.push({...e,triggerRound:Number(trigger),impactRound:start})}));return out}
-function renderCycleNews(){const els=eventsImpactingRound(state.round);$('cycleNews').innerHTML=els.length?els.map(e=>`<div class="news-entry"><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>GRUPAL · ${escapeHtml(cycleOffsetLabel(e))} · ocurre ${e.probability}% · impacto en ciclo ${e.impactRound}</small></div>`).join(''):'<p class="hint">Sin noticia grupal activa en este ciclo. Los eventos individuales se evalúan por empresa según su probabilidad.</p>'}
+function renderCycleNews(){const els=eventsImpactingRound(state.round);setTeacherResultMarkup($('cycleNews'),els.length?els.map(e=>`<div class="news-entry"><strong>${escapeHtml(e.title)}</strong><span>${escapeHtml(e.implication)}</span><small>GRUPAL · ${escapeHtml(cycleOffsetLabel(e))} · ocurre ${e.probability}% · impacto en ciclo ${e.impactRound}</small></div>`).join(''):'<p class="hint">Sin noticia grupal activa en este ciclo. Los eventos individuales se evalúan por empresa según su probabilidad.</p>')}
 function updateEventModeUI(){state.eventSelectionMode=eventSelectionMode();const panel=document.querySelector('.event-mode-panel');panel?.classList.toggle('random-mode',state.eventSelectionMode==='random');panel?.classList.toggle('manual-mode',state.eventSelectionMode==='manual');renderEventBank()}
 function randomizeEventSelection(){const visible=filteredEvents(),candidates=state.enabledEvents.size?visible.filter(e=>state.enabledEvents.has(e.id)):(state.eventsExplicitlyCleared?[]:visible);if(!candidates.length){toast('No hay eventos habilitados con los filtros actuales.');return}const count=Math.max(1,Math.min(candidates.length,Math.min(40,Number($('eventRandomCount')?.value||15))));const shuffled=candidates.slice();for(let i=shuffled.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]}state.enabledEvents=new Set(shuffled.slice(0,count).map(e=>e.id));state.eventsExplicitlyCleared=false;state.eventSelectionMode='random';const radio=document.querySelector('input[name="eventSelectionMode"][value="random"]');if(radio)radio.checked=true;saveConfig(true);updateEventModeUI();toast(`${count} eventos fueron seleccionados aleatoriamente.`)}
+const eventBoundInputs=new WeakSet(),eventBankMarkup=new WeakMap();
 function renderEventBank(){
   renderEnabledEvents();
   const body=$('eventBankBody');if(!body)return;
-  if(body.contains(document.activeElement)&&document.activeElement.matches('.event-first-round'))return;
   const events=filteredEvents(),random=eventSelectionMode()==='random';
-  body.innerHTML=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
-  body.querySelectorAll('.event-first-round,.event-repeat').forEach(input=>input.addEventListener('change',()=>{
+  const html=events.map(e=>`<tr class="${random&&state.enabledEvents.has(e.id)?'random-picked':''}"><td><input class="event-enable" type="checkbox" data-event="${e.id}" ${state.enabledEvents.has(e.id)?'checked':''}  aria-label="Habilitar ${escapeAttr(e.title)}"></td><td><strong>${escapeHtml(e.title)}</strong><small>${escapeHtml(e.description)}</small><span class="event-category">${escapeHtml(e.category||'General')}</span></td><td><span class="scope-badge ${e.scope}">${e.scope==='group'?'GRUPAL':'INDIVIDUAL'}</span></td><td><span class="cycle-offset">${escapeHtml(cycleOffsetLabel(e))}</span></td><td>${escapeHtml(e.implication)}</td><td><b>${e.probability}%</b></td><td><input class="event-first-round" type="number" min="1" max="${Number($('cycles').value)||100}" step="1" value="${Number(state.eventRules[e.id]?.firstRound||1)}" data-event="${e.id}" aria-label="Desde ciclo: ${escapeAttr(e.title)}"></td><td><input class="event-repeat" type="checkbox" data-event="${e.id}" ${state.eventRules[e.id]?.repeat!==false?'checked':''} aria-label="Repetir ${escapeAttr(e.title)}"></td></tr>`).join('')||'<tr><td colspan="8"><p class="hint">No hay eventos que coincidan con los filtros.</p></td></tr>';
+  if(eventBankMarkup.get(body)===html){updateSelectAllBtn();return;}
+  eventBankMarkup.set(body,html);
+  const template=document.createElement('template');template.innerHTML=`<table><tbody>${html}</tbody></table>`;
+  const previous=new Map([...body.querySelectorAll('tr')].map(row=>[row.querySelector('[data-event]')?.dataset.event||'empty',row]));
+  let cursor=body.firstElementChild;
+  for(const incoming of template.content.querySelectorAll('tr')){
+    const key=incoming.querySelector('[data-event]')?.dataset.event||'empty';
+    const row=previous.get(key)||incoming;previous.delete(key);
+    if(row!==incoming){
+      if(row.className!==incoming.className)row.className=incoming.className;
+      const oldInputs=row.querySelectorAll('input');
+      incoming.querySelectorAll('input').forEach((next,index)=>{
+        const current=oldInputs[index];
+        if(current.type==='checkbox'){if(current.checked!==next.checked)current.checked=next.checked;}
+        else if(current!==document.activeElement&&current.value!==next.value)current.value=next.value;
+        if(current.max!==next.max)current.max=next.max;
+      });
+    }
+    if(row!==cursor)body.insertBefore(row,cursor);
+    cursor=row.nextElementSibling;
+  }
+  for(const row of previous.values())row.remove();
+  body.querySelectorAll('.event-first-round,.event-repeat').forEach(input=>{if(eventBoundInputs.has(input))return;eventBoundInputs.add(input);input.addEventListener('change',()=>{
     const id=input.dataset.event,rule={firstRound:1,repeat:true,...state.eventRules[id]};
     if(input.classList.contains('event-repeat'))rule.repeat=input.checked;
     else {if(!input.checkValidity()){input.reportValidity();return;}rule.firstRound=Number(input.value);}
     state.eventRules[id]=rule;saveConfig(true);
-  }));
-  body.querySelectorAll('.event-enable').forEach(i=>i.addEventListener('change',()=>{
+  });});
+  body.querySelectorAll('.event-enable').forEach(i=>{if(eventBoundInputs.has(i))return;eventBoundInputs.add(i);i.addEventListener('change',()=>{
     i.checked?state.enabledEvents.add(i.dataset.event):state.enabledEvents.delete(i.dataset.event);
     state.eventsExplicitlyCleared=state.enabledEvents.size===0;
     $('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados`;
     updateSelectAllBtn();renderEnabledEvents();saveConfig(true);
-  }));
+  });});
   $('eventSelectionCount').textContent=`${state.enabledEvents.size} seleccionados de ${EVENT_CATALOG.length}`;
   if($('eventVisibleCount'))$('eventVisibleCount').textContent=`Mostrando ${events.length} de ${EVENT_CATALOG.length}`;
   updateSelectAllBtn();
@@ -587,13 +614,18 @@ function applyTeacherState(partida){
   localStorage.setItem('SIDE_ACTIVE_ROUND',String(state.round));
   localStorage.setItem('SIDE_EVENT_SCHEDULE',JSON.stringify(c.eventSchedule||{}));
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:c.cancelledAt||partida.cancelled_at||null,active:!['finalizada','cancelada'].includes(partida.estado)&&!c.cancelledAt,startedAt:c.gameStartedAt,finishedAt:['finalizada','cancelada'].includes(partida.estado)?new Date(teacherNow()).toISOString():null,code:partida.codigo||$('gameCode').value}));
-  paintTeacherClock();updateRoundDisplay();refreshSetupSummary();renderCycleNews();renderEventBank();
+  paintTeacherClock();
+  const {runtime:clockRuntime,...viewConfig}=c;
+  const viewKey=JSON.stringify([state.partidaId,roomGeneration,partida.estado,viewConfig,state.round,r.phase,r.running]);
+  if(state.teacherViewKey!==viewKey){
+    state.teacherViewKey=viewKey;updateRoundDisplay();refreshSetupSummary();renderCycleNews();renderEventBank();
+  }
 }
 function paintTeacherClock(){
   const r=runtime(),c=state.authoritative;if(!c||!r)return;
   state.seconds=r.phase==='integration'&&c.gameStartAt?Math.max(0,Math.ceil((Date.parse(c.gameStartAt)-teacherNow())/1000)):r.running?Math.max(0,Math.ceil((Date.parse(r.startedAt)+r.duration*1000-teacherNow())/1000)):Number(r.remaining||0);
-  updateTimer();$('startTimer').textContent=r.running?'Pausar':'Reanudar';
-  renderTeacherLobby();
+  updateTimer();setTeacherText('startTimer',r.running?'Pausar':'Reanudar');
+  paintTeacherLobbyCountdown();
   if(r.phase==='integration'){
     const label=`Sala de espera · el Ciclo 1 comienza en ${formatStudentTime(state.seconds)}.`;
     for(const id of ['gameStatusBanner','roundState'])if($(id)&&$(id).textContent!==label)$(id).textContent=label;
@@ -1260,17 +1292,22 @@ function closeBusinessLocalRound(){
 async function closeBusinessRemoteRound(ciclo){
   if(!state.partidaId)return true;
   const partidaId=state.partidaId,generation=roomGeneration;
+  const closureKey=JSON.stringify([generation,partidaId,Number(ciclo)]);
+  const loadedTeacherClosures=state.loadedTeacherClosures||(state.loadedTeacherClosures=new Set());
+  if(loadedTeacherClosures.has(closureKey)){applyConfirmedReportClosures(state.reports);return true;}
   const response=await window.SIDE.PartidaService.consultarCierreNegocio(partidaId,ciclo);
   if(partidaId!==state.partidaId||generation!==roomGeneration)return false;
   if(!response.success){
     toast(response.migrationMissing?'Aplica la migración 20261023_cierre_negocio.sql para habilitar el cierre de ciclos.':response.error||'No se pudo guardar el cierre del ciclo.');
-    const status=$('roundState');if(status)status.textContent=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;
+    const status=$('roundState'),label=`Cierre del ciclo ${ciclo} pendiente de sincronización.`;if(status&&status.textContent!==label)status.textContent=label;
     return false;
   }
   if(response.pending){
-    const status=$('roundState');if(status)status.textContent=`Ciclo ${ciclo}: el servidor está procesando el cierre económico. Puedes continuar; los resultados se actualizarán automáticamente.`;
+    // Older pending cycles must not alternate the current cycle's status on every poll.
+    const status=Number(ciclo)===Number(state.round)?$('roundState'):null,label=`Ciclo ${ciclo}: el servidor está procesando el cierre económico. Puedes continuar; los resultados se actualizarán automáticamente.`;if(status&&status.textContent!==label)status.textContent=label;
     return true;
   }
+  if(response.data){loadedTeacherClosures.add(closureKey);state.teacherViewKey=null;}
   reportsRevision++;
   for(const [empresaId,result] of Object.entries(response.data?.resultadosPorEmpresa||{})){
     const f=result.financial;
