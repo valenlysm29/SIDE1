@@ -37,12 +37,12 @@ SIDE.SupabaseClient.get=()=>({auth:{onAuthStateChange(){},signInWithPassword:asy
 `;
 test('student synchronization and session recovery through the delivered UI',async t=>{
   const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
-  const errors=[];
+  const errors=[],diagnostics={consoleErrors:[],failedRequests:[]};
   // Una acción fallida no debe dejar una página animada viva durante los demás casos.
   t.afterEach(async()=>{for(const context of browser.contexts())await context.close();});
   async function page(seed={}){
     const context=await browser.newContext({viewport:{width:1366,height:900}}),p=await context.newPage();
-    p.on('pageerror',error=>errors.push(error.message));
+    p.on('pageerror',error=>errors.push(error.message));p.on('console',message=>{if(message.type()==='error')diagnostics.consoleErrors.push(message.text());});p.on('requestfailed',request=>diagnostics.failedRequests.push({url:request.url(),error:request.failure()?.errorText}));
     await p.addInitScript(seed=>{for(const [key,value] of Object.entries(seed))if(sessionStorage.getItem(key)===null)sessionStorage.setItem(key,value);},seed);
     const html=baseHTML.replace('const cfg = window.SIDE_CONFIG || {};',mock+'\nconst cfg = window.SIDE_CONFIG || {};');
     await p.route('**/*',route=>route.abort());
@@ -61,6 +61,72 @@ test('student synchronization and session recovery through the delivered UI',asy
     await p.evaluate(()=>studentSnapshotQueue);
   }
   try{
+    await t.test('polling preserves tab nodes, active edits and scroll across newer revisions',async()=>{
+      const p=await page();await draft(p);
+      const result=await p.evaluate(async()=>{
+        currentCategory='B';renderTabs();renderDecisionCategory();
+        const tabs=Array.from($('decisionTabs').children);renderTabs();renderTabs();
+        const stableTabs=tabs.every((node,index)=>node===$('decisionTabs').children[index]);
+        const input=$('decisionCards').querySelector('input[type=number]');
+        if(!input)throw Error('Expected infrastructure quantity input');
+        input.focus();input.value='3';input.dispatchEvent(new Event('input',{bubbles:true}));
+        const scroller=$('decisionFormScroll');scroller.scrollTop=120;const scroll=scroller.scrollTop;
+        server.snapshot=buildStudentSnapshot();server.snapshot.selected_character='character-2';server.revision++;
+        const first=await refreshStudentGame();
+        const second=await refreshStudentGame({forceHydrate:true});
+        const preserved={stableTabs,first,second,focus:document.activeElement===input,attached:input.isConnected,value:input.value,scroll:scroller.scrollTop===scroll};
+        input.blur();await new Promise(resolve=>setTimeout(resolve,30));
+        return {...preserved,restored:$('decisionCards').querySelector('input[type=number]').value};
+      });
+      assert.deepEqual(result,{stableTabs:true,first:true,second:true,focus:true,attached:true,value:'3',scroll:true,restored:'3'});
+      await p.context().close();
+    });
+    await t.test('three company contexts remain isolated through rapid tab changes and reconnects',async()=>{
+      const pages=await Promise.all([page(),page(),page()]);
+      await Promise.all(pages.map(p=>draft(p)));
+      for(const [index,p] of pages.entries()){
+        const result=await p.evaluate(async index=>{
+          const tabs=Array.from($('decisionTabs').children),cash=cashBalance();
+          for(let n=0;n<3;n++)for(const button of tabs)button.click();
+          server.snapshot=buildStudentSnapshot();server.revision=index+2;
+          await refreshStudentGame();
+          return {tabs:tabs.every(button=>button.isConnected),count:$('decisionTabs').children.length,cash:cashBalance()===cash,revision:currentStudent.snapshotRevision};
+        },index);
+        assert.deepEqual(result,{tabs:true,count:7,cash:true,revision:index+2});
+      }
+      await Promise.all(pages.map(p=>p.context().setOffline(true)));
+      await Promise.all(pages.map(p=>p.context().setOffline(false)));
+      await Promise.all(pages.map(p=>p.context().close()));
+    });
+    await t.test('loan slider updates amounts without replacing the dragged control',async()=>{
+      const p=await page();await draft(p);
+      const result=await p.evaluate(()=>{
+        currentCategory='E';renderTabs();renderDecisionCategory();
+        const slider=document.querySelector('[data-loan]');slider.focus();
+        for(const value of [500,1000,1500]){slider.value=value;slider.dispatchEvent(new Event('input',{bubbles:true}));}
+        return {attached:slider.isConnected,focus:document.activeElement===slider,number:document.querySelector('[data-loan-number]').value,available:document.querySelector('[data-loan-available]').textContent===money(creditAvailable()-1500)};
+      });assert.deepEqual(result,{attached:true,focus:true,number:'1500',available:true});await p.context().close();
+    });
+    await t.test('unchanged financial ticks preserve expanded details and nodes',async()=>{
+      const p=await page();await draft(p);
+      const stable=await p.evaluate(()=>{
+        renderStudentStatus();const detail=$('studentFinancialDetail').querySelector('details');
+        if(!detail)throw Error('Expected financial detail');detail.open=true;
+        const income=$('studentIncomeStatement').firstElementChild;
+        for(let i=0;i<6;i++)renderStudentStatus();
+        return detail.isConnected&&detail.open&&income===$('studentIncomeStatement').firstElementChild;
+      });assert.equal(stable,true);await p.context().close();
+    });
+    await t.test('simultaneous forced refreshes share the next read instead of racing',async()=>{
+      const p=await page();await draft(p);
+      const counts=await p.evaluate(async()=>{
+        let release;const original=SIDE.EmpresaService.obtenerEstado;let reads=0,active=0,max=0;
+        SIDE.EmpresaService.obtenerEstado=async(...args)=>{reads++;active++;max=Math.max(max,active);if(reads===1)await new Promise(resolve=>release=resolve);const result=await original(...args);active--;return result;};
+        const first=refreshStudentGame({forceHydrate:true});await Promise.resolve();
+        const second=refreshStudentGame({forceHydrate:true}),third=refreshStudentGame({forceHydrate:true});
+        release();await Promise.all([first,second,third]);return {reads,max};
+      });assert.deepEqual(counts,{reads:2,max:1});await p.context().close();
+    });
     await t.test('saving a draft sends snapshot, report and normalized decisions with the acknowledged revision',async()=>{
       const p=await page();await draft(p);
       const calls=await p.evaluate(()=>window.calls.filter(c=>c.type!=='read'));
@@ -252,5 +318,5 @@ test('student synchronization and session recovery through the delivered UI',asy
       await p.context().close();
     });
     assert.deepEqual(errors,[]);
-  }finally{await browser.close();}
+  }finally{fs.writeFileSync(path.join(__dirname,'output/parpadeos-student-diagnostics.json'),JSON.stringify({pageErrors:errors,...diagnostics},null,2));await browser.close();}
 });
