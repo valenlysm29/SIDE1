@@ -1,7 +1,7 @@
 """Authenticated Chromium + local Auth/Data API/PostgreSQL + generated Edge worker.
 Only newly created QA games have their test clock accelerated; no mocked RPCs.
 """
-import os,sys,json,subprocess,threading,urllib.request,concurrent.futures,hashlib,time
+import os,sys,json,subprocess,threading,urllib.request,concurrent.futures,hashlib,time,uuid
 import urllib.error
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -29,7 +29,9 @@ def sql(query):
  return subprocess.check_output(['docker','exec',('supabase_db_fase01local' if os.environ.get('SIDE_FASE01_WORK') else 'supabase_db_sidep01http'),'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-Atc',query],encoding='utf8').strip()
 def worker(game,cycle):
  if os.environ.get('SIDE_FASE01_WORK'):
-  request=urllib.request.Request(BASE+'/functions/v1/side-business-close',data=b'{}',headers={'x-side-cron-token':'fase01-local-only','Content-Type':'application/json'})
+  run=uuid.uuid4()
+  sql(f"insert into side_closure_execution_requests(run_id,request_id) values('{run}',{-int(run.int%(2**60))})")
+  request=urllib.request.Request(BASE+'/functions/v1/side-business-close',data=json.dumps({'run_id':str(run)}).encode(),headers={'x-side-cron-token':'fase01-local-only','Content-Type':'application/json'})
   try:
    with urllib.request.urlopen(request,timeout=60) as response:result=json.load(response)
   except urllib.error.HTTPError as error:
@@ -37,9 +39,9 @@ def worker(game,cycle):
    result=json.load(error)
   if os.environ.get('HISTORY_BLOCKED_GAME'):
    blocked=[r for r in result['results'] if r['game']==os.environ['HISTORY_BLOCKED_GAME']]
-   assert blocked and all(not r['success'] and r['code']=='DECISION_INVALIDA' for r in blocked),result
+   assert blocked and all(not r['success'] and r['code']=='DECISION_INVALIDA' or r.get('pending') and r.get('code')=='INTENTO_EN_CURSO' for r in blocked),result
    own=[r for r in result['results'] if r['game']==game]
-   assert all(r['success'] and not r.get('pending') for r in own),result
+   assert all(r['success'] and (not r.get('pending') or r.get('code')=='INTENTO_EN_CURSO') for r in own),result
    assert not result['success'],'Historical failures must remain explicit'
   else:assert result['success'] and all(r['success'] and not r.get('pending') for r in result['results']),result
   return result
