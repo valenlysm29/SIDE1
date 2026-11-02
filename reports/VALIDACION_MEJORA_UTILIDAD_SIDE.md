@@ -2,6 +2,14 @@
 
 Fecha: 1 de noviembre de 2026. Base: `origin/main` en `f7262256e9a0fcf268ce28ba85af8ba2c86b36a8`. Rama: `prueba_utilidad_mejora`.
 
+## Preparación de despliegue: bloqueada
+
+El frontend público se sirve desde GitHub Pages, rama `main`; la compilación consultada corresponde a `5373f7c7bb0891804f2712bf0f7a57d2badeba89`. El cierre remoto es la función `side-business-close` versión 5, con Cron activo cada minuto y autenticación mediante token del programador. La versión 5 no contiene `utility-v1`. Se guardó una copia local de la función y sus metadatos en `.codex-work/respaldo_edge_utility_v5.json` para reversión; no contiene el valor del token. La integración local de `main` con la rama de mejora pasó 51 pruebas críticas; 18 casos heredados sintéticos produjeron el mismo resultado con la función remota anterior y la candidata.
+
+**Bloqueo confirmado:** una sala nueva `utility-v1` con eventos del mecanismo anterior puede guardar eventos en `__cycleBusiness`, pero el worker rechaza el cierre con `DATOS_ECONOMICOS_NO_VERIFICADOS` cuando no se ha configurado `economicEventsVersion: demand-share-v1`. La reproducción local `tests/output/repro_eventos_utility.cjs` devolvió ese código y cero escrituras. Activar la versión de eventos sin adaptación no es una solución equivalente: el catálogo contiene 92 eventos y solo ocho tienen efectos autoritativos implementados. Se requiere completar y validar una fuente autoritativa compatible sin perder opciones ni aceptar eventos arbitrarios de clientes.
+
+La consulta remota de solo lectura encontró cinco salas activas, dos con resultado pendiente. Los últimos intentos del programador incluyen rechazos por eventos no verificables o crédito no validado. La comparación local de los dos contextos activos pendientes mantuvo el mismo rechazo con ambos motores, sin escribir cierres. No se desplegaron funciones, no se crearon salas remotas y no se integró ni publicó `main`: las condiciones de comprobación crítica no se cumplen. La versión de los servicios remotos y los datos históricos permanecen sin cambios.
+
 ## Activación experimental y verificación complementaria
 
 En esta rama, la creación de nuevas salas de ciclo de vida 2 envía por defecto `economicRulesVersion: utility-v1`; una versión explícita se conserva. La recuperación, el guardado y los cierres previos no reciben una versión nueva. La prueba de creación con PostgreSQL compatible verifica que la versión se persista y que un reintento recupere la misma sala sin sustituirla. El código actualizado debe desplegarse de forma coordinada en frontend y en el worker/Edge antes de probar salas contra un servidor remoto; este trabajo no despliega ni modifica el servicio remoto.
