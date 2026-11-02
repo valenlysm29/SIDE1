@@ -1,12 +1,17 @@
 'use strict';
-const fs=require('node:fs'),assert=require('node:assert/strict');
+const fs=require('node:fs'),assert=require('node:assert/strict'),vm=require('node:vm');
 const F=require('../js/financial_model'),{catalog}=require('./economic_v19_fixture.cjs');
+// Replay with the archived historical engine, never with corrected current rules.
+const legacy={};vm.runInNewContext(fs.readFileSync('tests/output/forense_utilidad/edge_desplegado.mjs','utf8').replace('export const {runOnce,remoteRpc}=load("services/business_runtime.cjs");','globalThis.financial=load("js/financial_model.js");'),legacy);
 const rows=JSON.parse(fs.readFileSync('tests/output/forense_utilidad/cierres_reales.json'));
 const output=[];
 for(const row of rows){
  const r=row.cierre.resultadosPorEmpresa['188'],state=structuredClone(r.state);
  delete state.__financialSnapshots;
- const f=F.calculate({capital:100000,round:row.ciclo,ledger:r.ledger,sectionsByRound:r.financialSections,catalog,state,financialPolicy:r.receipt.financialPolicy});
+ const input={capital:100000,round:row.ciclo,ledger:r.ledger,sectionsByRound:r.financialSections,catalog,state,financialPolicy:r.receipt.financialPolicy};
+ const f=JSON.parse(JSON.stringify(legacy.financial.calculate(input)));
+ const frozen=F.calculate({...input,state:r.state});
+ for(const section of ['estadoResultados','balanceGeneral','flujoCaja'])assert.deepEqual(frozen[section],r.financial[section],`historical snapshot C${row.ciclo} ${section}`);
  for(const section of ['estadoResultados','balanceGeneral','flujoCaja'])assert.deepEqual(f[section],r.financial[section],`reconstrucción real C${row.ciclo} ${section}`);
  for(const [round,sections] of Object.entries(r.financialSections))for(const [cat,s] of Object.entries(sections))assert.ok(Math.abs(s.items.reduce((a,i)=>a+Number(i.net||0),0)-r.ledger[`${round}:${cat}`])<1e-8);
  output.push({real:true,cycle:row.ciclo,net:f.estadoResultados.utilidadNeta,admin:f.estadoResultados.gastosAdministrativos,replayedWithoutSnapshots:true});

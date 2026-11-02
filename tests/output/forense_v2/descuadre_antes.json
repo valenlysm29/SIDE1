@@ -1,0 +1,5523 @@
+{
+  "scenario": "ventas parciales",
+  "total": 6,
+  "round": 6,
+  "financial": {
+    "estadoResultados": {
+      "otros": 0,
+      "costos": 11814.28,
+      "ingresos": 1200,
+      "utilidad": -10614.28,
+      "costoVentas": 708.71,
+      "ventasNetas": 1200,
+      "depreciacion": 59.38,
+      "devoluciones": 0,
+      "gastosVentas": 3362,
+      "utilidadNeta": -10614.28,
+      "cicloImpuesto": 6,
+      "impuestoRenta": 0,
+      "utilidadBruta": 491.29,
+      "ventasTotales": 1200,
+      "criterioCostos": "ventas",
+      "desgloseCostos": {
+        "fijos": 2712.32,
+        "otros": 6862,
+        "total": 11814.28,
+        "manoObra": 5072.4,
+        "intereses": 0,
+        "almacenaje": 0,
+        "maquinaria": 90.63,
+        "materiales": 2060.64,
+        "publicidad": 1500,
+        "costoVentas": 708.71,
+        "depreciacion": 59.38,
+        "mantenimiento": 31.25,
+        "capacidadOciosa": 0,
+        "costoProduccionCiclo": 7192.42
+      },
+      "gastoGarantias": 50,
+      "impactoEventos": 0,
+      "policyWarnings": [],
+      "gastosOperacion": 11105.57,
+      "costosProduccion": 7192.42,
+      "impuestoDiferido": false,
+      "gastosFinancieros": 0,
+      "regimenTributario": "MYPE",
+      "utilidadNetaFinal": -68185.68,
+      "utilidadOperativa": -10614.28,
+      "ingresosFinancieros": 0,
+      "gastosAdministrativos": 7743.57,
+      "resultadoVentaActivos": 0,
+      "baseImponibleAcumulada": 0,
+      "utilidadAntesImpuestos": -10614.28,
+      "utilidadAntesImpuestosAcumulada": -68185.68
+    },
+    "balanceGeneral": {
+      "deuda": 0,
+      "activos": 132114.29,
+      "capital": 200000,
+      "efectivo": 85070.42,
+      "patrimonio": 131814.32,
+      "inventarios": 38937.15,
+      "activosFijos": 7506.72,
+      "inventarioMP": 542.27,
+      "inventarioPT": 38394.88,
+      "cuentasPorCobrar": 600,
+      "pasivoPatrimonio": 132114.32,
+      "impuestosPorPagar": 0,
+      "interesesPorPagar": 0,
+      "provisionGarantias": 300,
+      "resultadosAcumulados": -68185.68
+    },
+    "flujoCaja": {
+      "otros": 0,
+      "eventos": 0,
+      "cajaFinal": 85070.42,
+      "flujoNeto": -17165.53,
+      "inversion": 0,
+      "operacion": -17165.53,
+      "reembolsos": 0,
+      "cajaInicial": 102235.95,
+      "cobrosVentas": 1140,
+      "ventaActivos": 0,
+      "compraActivos": 0,
+      "impuestoRenta": 0,
+      "financiamiento": 0,
+      "pagosOperacion": -18305.53
+    },
+    "inventoryValues": {
+      "goods": {
+        "urbano": 0,
+        "premium": 0,
+        "esencial": 38394.88494409937
+      },
+      "materials": {
+        "acc_eco": 89.80954142989296,
+        "acc_prem": 0,
+        "hilo_ref": 0,
+        "hilo_std": 269.4286242896789,
+        "cuero_std": 0,
+        "hilo_prem": 0,
+        "cuero_prem": 0,
+        "cuero_sint": 183.03574732390643
+      }
+    },
+    "lotMovements": [
+      {
+        "id": "1-esencial",
+        "mold": "molde_1",
+        "sold": 10,
+        "cycle": 1,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 100,
+        "unitCost": 70.8714,
+        "available": 40,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "materials": {
+          "HILO": {
+            "hilo_std": 600
+          },
+          "CUERO": {
+            "cuero_sint": 30
+          },
+          "ACCESORIOS": {
+            "acc_eco": 100
+          }
+        },
+        "costOfSales": 708.7139999999999,
+        "inventoryValue": 2834.8559999999998
+      },
+      {
+        "id": "2-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 2,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.01673684210526,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7031.59
+      },
+      {
+        "id": "3-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 3,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.43997493734337,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7071.797619047619
+      },
+      {
+        "id": "4-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 4,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.86321303258144,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7112.005238095237
+      },
+      {
+        "id": "5-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 5,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 75.28647597254003,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7152.215217391303
+      },
+      {
+        "id": "6-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 6,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 75.7096933638444,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7192.420869565218
+      }
+    ]
+  },
+  "receipt": {
+    "sold": 10,
+    "goods": {
+      "urbano": 0,
+      "premium": 0,
+      "esencial": 515
+    },
+    "round": 6,
+    "sales": [
+      {
+        "id": "esencial",
+        "lots": [
+          {
+            "id": "1-esencial",
+            "mold": "molde_1",
+            "cycle": 1,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 100,
+            "unitCost": 70.8714,
+            "available": 50,
+            "locations": {
+              "los_olivos:1": 0
+            },
+            "materials": {
+              "HILO": {
+                "hilo_std": 600
+              },
+              "CUERO": {
+                "cuero_sint": 30
+              },
+              "ACCESORIOS": {
+                "acc_eco": 100
+              }
+            },
+            "inventoryValue": 3543.5699999999997,
+            "closingLocations": {
+              "los_olivos:1": 0
+            }
+          },
+          {
+            "id": "2-esencial",
+            "mold": "molde_1",
+            "cycle": 2,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 95,
+            "unitCost": 74.01673684210526,
+            "available": 95,
+            "locations": {},
+            "materials": {
+              "HILO": {
+                "hilo_std": 570
+              },
+              "CUERO": {
+                "cuero_sint": 28.5
+              },
+              "ACCESORIOS": {
+                "acc_eco": 95
+              }
+            },
+            "inventoryValue": 7031.59,
+            "closingLocations": {}
+          },
+          {
+            "id": "3-esencial",
+            "mold": "molde_1",
+            "cycle": 3,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 95,
+            "unitCost": 74.43997493734337,
+            "available": 95,
+            "locations": {},
+            "materials": {
+              "HILO": {
+                "hilo_std": 570
+              },
+              "CUERO": {
+                "cuero_sint": 28.5
+              },
+              "ACCESORIOS": {
+                "acc_eco": 95
+              }
+            },
+            "inventoryValue": 7071.797619047619,
+            "closingLocations": {}
+          },
+          {
+            "id": "4-esencial",
+            "mold": "molde_1",
+            "cycle": 4,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 95,
+            "unitCost": 74.86321303258144,
+            "available": 95,
+            "locations": {},
+            "materials": {
+              "HILO": {
+                "hilo_std": 570
+              },
+              "CUERO": {
+                "cuero_sint": 28.5
+              },
+              "ACCESORIOS": {
+                "acc_eco": 95
+              }
+            },
+            "inventoryValue": 7112.005238095237,
+            "closingLocations": {}
+          },
+          {
+            "id": "5-esencial",
+            "mold": "molde_1",
+            "cycle": 5,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 95,
+            "unitCost": 75.28647597254003,
+            "available": 95,
+            "locations": {},
+            "materials": {
+              "HILO": {
+                "hilo_std": 570
+              },
+              "CUERO": {
+                "cuero_sint": 28.5
+              },
+              "ACCESORIOS": {
+                "acc_eco": 95
+              }
+            },
+            "inventoryValue": 7152.215217391303,
+            "closingLocations": {}
+          },
+          {
+            "id": "6-esencial",
+            "mold": "molde_1",
+            "cycle": 6,
+            "quality": 4,
+            "segment": "esencial",
+            "produced": 95,
+            "available": 95,
+            "locations": {},
+            "materials": {
+              "HILO": {
+                "hilo_std": 570
+              },
+              "CUERO": {
+                "cuero_sint": 28.5
+              },
+              "ACCESORIOS": {
+                "acc_eco": 95
+              }
+            },
+            "closingLocations": {}
+          }
+        ],
+        "sold": 10,
+        "price": 120,
+        "demand": 2165,
+        "points": [
+          {
+            "id": "los_olivos:1",
+            "sold": 10,
+            "zone": "media",
+            "demand": 2165,
+            "closing": 0,
+            "opening": 0,
+            "product": "esencial",
+            "revenue": 1200,
+            "lotSales": [
+              {
+                "id": "1-esencial",
+                "price": 120,
+                "units": 10,
+                "revenue": 1200
+              }
+            ],
+            "received": 10,
+            "available": 10,
+            "lostSales": 2155,
+            "lotTransfers": [
+              {
+                "id": "1-esencial",
+                "units": 10
+              }
+            ]
+          }
+        ],
+        "reason": "",
+        "quality": 4,
+        "revenue": 1200,
+        "lotSales": [
+          {
+            "id": "1-esencial",
+            "price": 120,
+            "units": 10,
+            "revenue": 1200
+          },
+          {
+            "id": "2-esencial",
+            "price": 120,
+            "units": 0,
+            "revenue": 0
+          },
+          {
+            "id": "3-esencial",
+            "price": 120,
+            "units": 0,
+            "revenue": 0
+          },
+          {
+            "id": "4-esencial",
+            "price": 120,
+            "units": 0,
+            "revenue": 0
+          },
+          {
+            "id": "5-esencial",
+            "price": 120,
+            "units": 0,
+            "revenue": 0
+          },
+          {
+            "id": "6-esencial",
+            "price": 120,
+            "units": 0,
+            "revenue": 0
+          }
+        ],
+        "produced": 95,
+        "available": 525,
+        "lostSales": 2155,
+        "assignment": "manual",
+        "alreadySold": 0,
+        "chosenPrice": 120,
+        "assignedDemand": 3500,
+        "effectivePrice": 120,
+        "potentialRevenue": 259800
+      },
+      {
+        "id": "urbano",
+        "lots": [],
+        "sold": 0,
+        "price": 150,
+        "demand": 0,
+        "points": [
+          {
+            "id": "los_olivos:1",
+            "sold": 0,
+            "zone": "media",
+            "demand": 0,
+            "closing": 0,
+            "opening": 0,
+            "product": "urbano",
+            "revenue": 0,
+            "lotSales": [],
+            "received": 0,
+            "available": 0,
+            "lostSales": 0,
+            "lotTransfers": []
+          }
+        ],
+        "reason": "No planificó producción en este segmento",
+        "quality": 0,
+        "revenue": 0,
+        "lotSales": [],
+        "produced": 0,
+        "available": 0,
+        "lostSales": 0,
+        "assignment": "automatic",
+        "alreadySold": 0,
+        "chosenPrice": 150,
+        "assignedDemand": 0,
+        "effectivePrice": 150,
+        "potentialRevenue": 0
+      },
+      {
+        "id": "premium",
+        "lots": [],
+        "sold": 0,
+        "price": 280,
+        "demand": 0,
+        "points": [
+          {
+            "id": "los_olivos:1",
+            "sold": 0,
+            "zone": "media",
+            "demand": 0,
+            "closing": 0,
+            "opening": 0,
+            "product": "premium",
+            "revenue": 0,
+            "lotSales": [],
+            "received": 0,
+            "available": 0,
+            "lostSales": 0,
+            "lotTransfers": []
+          }
+        ],
+        "reason": "No planificó producción en este segmento",
+        "quality": 0,
+        "revenue": 0,
+        "lotSales": [],
+        "produced": 0,
+        "available": 0,
+        "lostSales": 0,
+        "assignment": "automatic",
+        "alreadySold": 0,
+        "chosenPrice": 280,
+        "assignedDemand": 0,
+        "effectivePrice": 280,
+        "potentialRevenue": 0
+      }
+    ],
+    "events": [],
+    "market": 3500,
+    "scores": {
+      "health": 2,
+      "selected": [
+        "INF-02",
+        "INF-05",
+        "RH-01",
+        "RH-04",
+        "RH-07",
+        "RH-10B",
+        "INV-02A",
+        "COM-06B",
+        "COM-01A",
+        "FIN-01B"
+      ],
+      "efficiency": 4,
+      "reputation": 0.375
+    },
+    "regimen": "MYPE",
+    "revenue": 1200,
+    "produced": 95,
+    "decisions": {
+      "HILO": {
+        "cost": 971.52,
+        "label": "Compra de hilo",
+        "round": 6,
+        "quantities": {
+          "hilo_ref": 0,
+          "hilo_std": 600,
+          "hilo_prem": 0
+        }
+      },
+      "CUERO": {
+        "cost": 660,
+        "label": "Compra de cuero",
+        "round": 6,
+        "quantities": {
+          "cuero_std": 0,
+          "cuero_prem": 0,
+          "cuero_sint": 30
+        }
+      },
+      "MOLDE": {
+        "cost": 303,
+        "label": "Molde básico",
+        "round": 6,
+        "optionIds": [],
+        "purchases": {
+          "1": {
+            "molde_1": 1
+          },
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {},
+          "6": {}
+        },
+        "optionRounds": {
+          "molde_1": 1
+        }
+      },
+      "CANALES": {
+        "cost": 1800,
+        "label": "Tienda · Los Olivos x 1",
+        "round": 6,
+        "optionIds": [
+          "los_olivos"
+        ],
+        "transfers": {
+          "esencial": {
+            "los_olivos:1": 10
+          }
+        },
+        "quantities": {
+          "los_olivos": 1
+        },
+        "optionRounds": {
+          "los_olivos": 1
+        },
+        "storeContracts": {
+          "los_olivos": [
+            {
+              "round": 1,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "ACABADOS": {
+        "cost": 1260,
+        "label": "Máquinas de acabados",
+        "round": 6,
+        "purchases": {
+          "1": {
+            "aca_ind": 0,
+            "aca_semi": 0,
+            "aca_basica": 1
+          },
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {},
+          "6": {}
+        }
+      },
+      "ENSAMBLE": {
+        "cost": 3675,
+        "label": "Máquinas de ensamblado",
+        "round": 6,
+        "purchases": {
+          "1": {
+            "ens_ind": 0,
+            "ens_semi": 0,
+            "ens_basica": 1
+          },
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {},
+          "6": {}
+        }
+      },
+      "INV_RRHH": {
+        "cost": 0,
+        "label": "No capacitar este ciclo",
+        "round": 6,
+        "optionIds": [
+          "cap_no"
+        ],
+        "optionRounds": {
+          "cap_no": 1
+        }
+      },
+      "JEFATURA": {
+        "cost": 0,
+        "label": "No contratar",
+        "round": 6,
+        "optionIds": [
+          "no_jefatura"
+        ],
+        "optionRounds": {
+          "no_jefatura": 1
+        }
+      },
+      "LIMPIEZA": {
+        "cost": 712.32,
+        "label": "Limpieza y servicios generales",
+        "round": 6,
+        "optionIds": [
+          "limpieza"
+        ],
+        "optionRounds": {
+          "limpieza": 1
+        }
+      },
+      "PRESTAMO": {
+        "cost": 0,
+        "label": "Línea de crédito utilizada: S/ 0",
+        "round": 6,
+        "amount": 0
+      },
+      "ACCESORIOS": {
+        "cost": 323.84,
+        "label": "Compra de accesorios",
+        "round": 6,
+        "quantities": {
+          "acc_eco": 100,
+          "acc_prem": 0
+        }
+      },
+      "LOCAL_PROD": {
+        "cost": 2000,
+        "label": "Local de producción estándar",
+        "round": 6,
+        "optionIds": [
+          "local_std"
+        ],
+        "optionRounds": {
+          "local_std": 1
+        }
+      },
+      "MESA_CORTE": {
+        "cost": 2625,
+        "label": "Mesas de corte",
+        "round": 6,
+        "purchases": {
+          "1": {
+            "mesa": 1
+          },
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {},
+          "6": {}
+        }
+      },
+      "PERS_CORTE": {
+        "cost": 1690.8,
+        "label": "Personal de corte",
+        "round": 6,
+        "quantities": {
+          "corte_exp": 0,
+          "corte_basico": 1,
+          "corte_maestro": 0
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PT": {
+        "cost": 0,
+        "label": "Cobertura comercial 30 días",
+        "round": 6,
+        "optionIds": [
+          "pt_30"
+        ],
+        "optionRounds": {
+          "pt_30": 1
+        }
+      },
+      "PERS_ACABADO": {
+        "cost": 1690.8,
+        "label": "Personal de acabados",
+        "round": 6,
+        "quantities": {
+          "aca_personal_art": 0,
+          "aca_personal_tec": 0,
+          "aca_personal_basico": 1
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PROV": {
+        "cost": 0,
+        "label": "Sin garantía",
+        "round": 6,
+        "optionIds": [
+          "gar_0"
+        ],
+        "optionRounds": {
+          "gar_0": 1
+        }
+      },
+      "INV_MARKETING": {
+        "cost": 1500,
+        "label": "Baja",
+        "round": 6,
+        "optionIds": [
+          "mkt_baja"
+        ],
+        "optionRounds": {
+          "mkt_baja": 1
+        }
+      },
+      "MANTENIMIENTO": {
+        "cost": 1500,
+        "label": "Mantenimiento preventivo",
+        "round": 6,
+        "optionIds": [],
+        "optionRounds": {
+          "correctivo": 1
+        }
+      },
+      "PERS_ENSAMBLE": {
+        "cost": 1690.8,
+        "label": "Personal de ensamble",
+        "round": 6,
+        "quantities": {
+          "ens_personal_esp": 0,
+          "ens_personal_ind": 0,
+          "ens_personal_basico": 1
+        },
+        "previousQuantities": {}
+      },
+      "PRODUCCION_META": {
+        "cost": 0,
+        "label": "Producción deseada: 100 unidades",
+        "round": 6,
+        "value": 100,
+        "moldTargets": {
+          "molde_1": 100,
+          "molde_2": 0,
+          "molde_3": 0
+        }
+      },
+      "ANALISTA_COMPRAS": {
+        "cost": 5000,
+        "label": "Contratar",
+        "round": 6,
+        "optionIds": [
+          "si_analista"
+        ],
+        "optionRounds": {
+          "si_analista": 1
+        }
+      }
+    },
+    "inventory": {
+      "acc_eco": 25,
+      "acc_prem": 0,
+      "hilo_ref": 0,
+      "hilo_std": 150,
+      "cuero_std": 0,
+      "hilo_prem": 0,
+      "cuero_prem": 0,
+      "cuero_sint": 7.5
+    },
+    "production": {
+      "dop": [
+        {
+          "id": "cut",
+          "type": "operation",
+          "label": "Corte de piezas",
+          "units": 95,
+          "number": 1,
+          "sequence": 1
+        },
+        {
+          "id": "accessories_classification",
+          "type": "inspection",
+          "label": "Clasificación de accesorios",
+          "units": 95,
+          "number": 1,
+          "sequence": 2
+        },
+        {
+          "id": "accessories_preparation",
+          "type": "operation",
+          "label": "Preparación de accesorios",
+          "units": 95,
+          "number": 2,
+          "sequence": 3
+        },
+        {
+          "id": "assembly_accessories",
+          "type": "combined",
+          "label": "Ensamblado y colocación de accesorios",
+          "units": 95,
+          "number": 1,
+          "sequence": 4
+        },
+        {
+          "id": "finish",
+          "type": "combined",
+          "label": "Acabado final",
+          "units": 95,
+          "number": 2,
+          "sequence": 5
+        }
+      ],
+      "days": 30,
+      "costs": {
+        "labor": 5072.4,
+        "materials": 2177.5600000000004
+      },
+      "moldId": "molde_1",
+      "target": 100,
+      "targets": {
+        "molde_1": 100,
+        "molde_2": 0,
+        "molde_3": 0
+      },
+      "materials": [
+        {
+          "id": "CUERO",
+          "cost": 735,
+          "unit": "m²",
+          "label": "Cuero",
+          "perUnit": 0.3,
+          "available": 36,
+          "remaining": 7.5,
+          "shortfall": 0,
+          "selections": [
+            {
+              "id": "cuero_sint",
+              "label": "Cuero sintético",
+              "quantity": 30,
+              "contribution": 30
+            }
+          ],
+          "consumption": 28.5,
+          "supportedUnits": 120,
+          "neededForTarget": 30,
+          "inventoryAvailable": 6,
+          "purchasesAvailable": 30
+        },
+        {
+          "id": "ACCESORIOS",
+          "cost": 360.64000000000004,
+          "unit": "unidades",
+          "label": "Accesorios",
+          "perUnit": 1,
+          "available": 120,
+          "remaining": 25,
+          "shortfall": 0,
+          "selections": [
+            {
+              "id": "acc_eco",
+              "label": "Aleación económica",
+              "quantity": 100,
+              "contribution": 100
+            }
+          ],
+          "consumption": 95,
+          "supportedUnits": 120,
+          "neededForTarget": 100,
+          "inventoryAvailable": 20,
+          "purchasesAvailable": 100
+        },
+        {
+          "id": "HILO",
+          "cost": 1081.92,
+          "unit": "metros",
+          "label": "Hilo",
+          "perUnit": 6,
+          "available": 720,
+          "remaining": 150,
+          "shortfall": 0,
+          "selections": [
+            {
+              "id": "hilo_std",
+              "label": "Poliéster estándar",
+              "quantity": 600,
+              "contribution": 600
+            }
+          ],
+          "consumption": 570,
+          "supportedUnits": 120,
+          "neededForTarget": 600,
+          "inventoryAvailable": 120,
+          "purchasesAvailable": 600
+        }
+      ],
+      "moldLabel": "Molde básico",
+      "processes": [
+        {
+          "id": "cut",
+          "label": "Corte",
+          "pairs": 1,
+          "staff": 1,
+          "payroll": 1690.8,
+          "machines": 1,
+          "shortfall": 0,
+          "assignments": {
+            "corte_exp": {
+              "mesa": 0
+            },
+            "corte_basico": {
+              "mesa": 1
+            },
+            "corte_maestro": {
+              "mesa": 0
+            }
+          },
+          "plannedUnits": 95,
+          "cycleCapacity": 162,
+          "dailyCapacity": 6
+        },
+        {
+          "id": "assembly",
+          "label": "Ensamblado",
+          "pairs": 1,
+          "staff": 1,
+          "payroll": 1690.8,
+          "machines": 1,
+          "shortfall": 0,
+          "assignments": {
+            "ens_personal_esp": {
+              "ens_ind": 0,
+              "ens_semi": 0,
+              "ens_basica": 0
+            },
+            "ens_personal_ind": {
+              "ens_ind": 0,
+              "ens_semi": 0,
+              "ens_basica": 0
+            },
+            "ens_personal_basico": {
+              "ens_ind": 0,
+              "ens_semi": 0,
+              "ens_basica": 1
+            }
+          },
+          "plannedUnits": 95,
+          "cycleCapacity": 162,
+          "dailyCapacity": 6
+        },
+        {
+          "id": "finish",
+          "label": "Acabado",
+          "pairs": 1,
+          "staff": 1,
+          "payroll": 1690.8,
+          "machines": 1,
+          "shortfall": 0,
+          "assignments": {
+            "aca_personal_art": {
+              "aca_ind": 0,
+              "aca_semi": 0,
+              "aca_basica": 0
+            },
+            "aca_personal_tec": {
+              "aca_ind": 0,
+              "aca_semi": 0,
+              "aca_basica": 0
+            },
+            "aca_personal_basico": {
+              "aca_ind": 0,
+              "aca_semi": 0,
+              "aca_basica": 1
+            }
+          },
+          "plannedUnits": 95,
+          "cycleCapacity": 162,
+          "dailyCapacity": 6
+        }
+      ],
+      "efficiency": 0.9,
+      "levelThree": 0,
+      "ownedMoldIds": [
+        "molde_1"
+      ],
+      "productLines": [
+        {
+          "id": "molde_1",
+          "label": "Molde básico",
+          "owned": true,
+          "target": 100,
+          "available": true,
+          "suggested": 162,
+          "plannedUnits": 95,
+          "requirements": {
+            "HILO": 600,
+            "CUERO": 30,
+            "ACCESORIOS": 100
+          },
+          "productionPercent": 95,
+          "selectedThisCycle": false
+        },
+        {
+          "id": "molde_2",
+          "label": "Molde mejorado",
+          "owned": false,
+          "target": 0,
+          "available": false,
+          "suggested": 0,
+          "plannedUnits": 0,
+          "requirements": {
+            "HILO": 0,
+            "CUERO": 0,
+            "ACCESORIOS": 0
+          },
+          "productionPercent": 0,
+          "selectedThisCycle": false
+        },
+        {
+          "id": "molde_3",
+          "label": "Molde premium",
+          "owned": false,
+          "target": 0,
+          "available": false,
+          "suggested": 0,
+          "plannedUnits": 0,
+          "requirements": {
+            "HILO": 0,
+            "CUERO": 0,
+            "ACCESORIOS": 0
+          },
+          "productionPercent": 0,
+          "selectedThisCycle": false
+        }
+      ],
+      "hasLeadership": false,
+      "productionGap": 5,
+      "processCapacity": 162,
+      "producibleUnits": 95,
+      "selectedMoldIds": [],
+      "availableMoldIds": [
+        "molde_1"
+      ],
+      "materialCapacity": 95,
+      "limitingMaterials": [],
+      "limitingProcesses": [
+        "Corte",
+        "Ensamblado",
+        "Acabado"
+      ],
+      "unavailablePlannedMolds": []
+    },
+    "reputation": {
+      "valor": 1.5,
+      "consumo": {
+        "acc_eco": 95,
+        "acc_prem": 0,
+        "hilo_ref": 0,
+        "hilo_std": 570,
+        "cuero_std": 0,
+        "hilo_prem": 0,
+        "cuero_prem": 0,
+        "cuero_sint": 28.5
+      },
+      "total40": 1.5,
+      "factorMO": 0,
+      "factorMP": 0,
+      "advertising": 1500,
+      "proporciones": {
+        "HILO": 0,
+        "CUERO": 0,
+        "ACCESORIOS": 0
+      },
+      "valorMercado": 0.375,
+      "factorProduccion": 0,
+      "factorPublicidad": 1.5
+    },
+    "cashRevenue": 1140,
+    "storageCost": 0,
+    "consequences": [
+      {
+        "id": "CONS-08",
+        "text": "Sin jefatura y con baja eficiencia, la producción se reduce un 5 % adicional."
+      },
+      {
+        "id": "CAPACIDAD",
+        "text": "La producción respeta la capacidad disponible y los materiales, en orden N1, N2 y N3."
+      },
+      {
+        "id": "CONS-04",
+        "text": "Dos ciclos con reputación baja reducen la demanda."
+      }
+    ],
+    "demandFactor": 0.8,
+    "lotMovements": [
+      {
+        "id": "1-esencial",
+        "mold": "molde_1",
+        "sold": 10,
+        "cycle": 1,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 100,
+        "unitCost": 70.8714,
+        "available": 40,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "materials": {
+          "HILO": {
+            "hilo_std": 600
+          },
+          "CUERO": {
+            "cuero_sint": 30
+          },
+          "ACCESORIOS": {
+            "acc_eco": 100
+          }
+        },
+        "costOfSales": 708.7139999999999,
+        "inventoryValue": 2834.8559999999998
+      },
+      {
+        "id": "2-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 2,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.01673684210526,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7031.59
+      },
+      {
+        "id": "3-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 3,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.43997493734337,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7071.797619047619
+      },
+      {
+        "id": "4-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 4,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.86321303258144,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7112.005238095237
+      },
+      {
+        "id": "5-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 5,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 75.28647597254003,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7152.215217391303
+      },
+      {
+        "id": "6-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 6,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 75.7096933638444,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7192.420869565218
+      }
+    ],
+    "materialLots": [
+      {
+        "mold": "molde_1",
+        "units": 95,
+        "unknown": [],
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "excelQuality": 4
+      }
+    ],
+    "modelVersion": "md-20261027",
+    "distributions": {
+      "urbano": {
+        "rows": [
+          {
+            "id": "los_olivos:1",
+            "sold": 0,
+            "zone": "media",
+            "demand": 0,
+            "closing": 0,
+            "opening": 0,
+            "product": "urbano",
+            "revenue": 0,
+            "lotSales": [],
+            "received": 0,
+            "available": 0,
+            "lostSales": 0,
+            "lotTransfers": []
+          }
+        ],
+        "central": 0,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "assignment": "automatic",
+        "unservedWithoutChannel": 0
+      },
+      "premium": {
+        "rows": [
+          {
+            "id": "los_olivos:1",
+            "sold": 0,
+            "zone": "media",
+            "demand": 0,
+            "closing": 0,
+            "opening": 0,
+            "product": "premium",
+            "revenue": 0,
+            "lotSales": [],
+            "received": 0,
+            "available": 0,
+            "lostSales": 0,
+            "lotTransfers": []
+          }
+        ],
+        "central": 0,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "assignment": "automatic",
+        "unservedWithoutChannel": 0
+      },
+      "esencial": {
+        "rows": [
+          {
+            "id": "los_olivos:1",
+            "sold": 10,
+            "zone": "media",
+            "demand": 2165,
+            "closing": 0,
+            "opening": 0,
+            "product": "esencial",
+            "revenue": 1200,
+            "lotSales": [
+              {
+                "id": "1-esencial",
+                "price": 120,
+                "units": 10,
+                "revenue": 1200
+              }
+            ],
+            "received": 10,
+            "available": 10,
+            "lostSales": 2155,
+            "lotTransfers": [
+              {
+                "id": "1-esencial",
+                "units": 10
+              }
+            ]
+          }
+        ],
+        "central": 515,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "assignment": "manual",
+        "unservedWithoutChannel": 0
+      }
+    },
+    "storeInventory": {
+      "urbano": {
+        "los_olivos:1": 0
+      },
+      "premium": {
+        "los_olivos:1": 0
+      },
+      "esencial": {
+        "los_olivos:1": 0
+      }
+    },
+    "financialPolicy": {
+      "cycles": 6,
+      "capital": 200000,
+      "interest": 20,
+      "capitalMax": 120000,
+      "capitalMin": 80000,
+      "capitalMode": "fixed",
+      "incomeTaxTiming": "final-cycle",
+      "authoritativePrices": true,
+      "economicRulesVersion": "utility-v1"
+    },
+    "maintenanceCost": 31.25,
+    "catalogSelection": [],
+    "marketAllocation": {
+      "products": {
+        "esencial": {
+          "asignado": 3500,
+          "porcentaje": 1,
+          "mercadoReal": 3500,
+          "puntajeTotal": 80.75,
+          "puntajePrecio": 100,
+          "calidadMercado": 100,
+          "demandaAjustada": 2165,
+          "reputacionEscalada": 3.75,
+          "factorPrecioAbsoluto": 0.773386514735649,
+          "simulatedCompetitors": []
+        }
+      },
+      "reputation": {
+        "valor": 1.5,
+        "consumo": {
+          "acc_eco": 95,
+          "acc_prem": 0,
+          "hilo_ref": 0,
+          "hilo_std": 570,
+          "cuero_std": 0,
+          "hilo_prem": 0,
+          "cuero_prem": 0,
+          "cuero_sint": 28.5
+        },
+        "total40": 1.5,
+        "factorMO": 0,
+        "factorMP": 0,
+        "advertising": 1500,
+        "proporciones": {
+          "HILO": 0,
+          "CUERO": 0,
+          "ACCESORIOS": 0
+        },
+        "valorMercado": 0.375,
+        "factorProduccion": 0,
+        "factorPublicidad": 1.5
+      }
+    },
+    "openingInventory": {
+      "acc_eco": 20,
+      "acc_prem": 0,
+      "hilo_ref": 0,
+      "hilo_std": 120,
+      "cuero_std": 0,
+      "hilo_prem": 0,
+      "cuero_prem": 0,
+      "cuero_sint": 6
+    },
+    "creditCollections": 540,
+    "accountsReceivable": 600,
+    "capacityRulesVersion": "one-worker-per-resource-20261029"
+  },
+  "ledger": {
+    "1:B": -11363,
+    "1:C": -5784.719999999999,
+    "1:D": -1800,
+    "1:E": -1500,
+    "1:F": -6955.360000000001,
+    "2:B": -2000,
+    "2:C": -5784.719999999999,
+    "2:D": -1800,
+    "2:E": -1500,
+    "2:F": -6999.8,
+    "3:B": -3500,
+    "3:C": -5784.719999999999,
+    "3:D": -1800,
+    "3:E": -1500,
+    "3:F": -7044.240000000001,
+    "4:B": -2000,
+    "4:C": -5784.719999999999,
+    "4:D": -1800,
+    "4:E": -1500,
+    "4:F": -7088.68,
+    "5:B": -3500,
+    "5:C": -5784.719999999999,
+    "5:D": -1800,
+    "5:E": -1500,
+    "5:F": -7133.12,
+    "6:B": -2000,
+    "6:C": -5784.719999999999,
+    "6:D": -1800,
+    "6:E": -1500,
+    "6:F": -7177.56,
+    "1:ALMACENAJE": 0,
+    "1:SIM_VENTAS": 1200,
+    "2:ALMACENAJE": 0,
+    "2:SIM_VENTAS": 1200,
+    "3:ALMACENAJE": 0,
+    "3:SIM_VENTAS": 1200,
+    "4:ALMACENAJE": 0,
+    "4:SIM_VENTAS": 1200,
+    "5:ALMACENAJE": 0,
+    "5:SIM_VENTAS": 1200,
+    "6:ALMACENAJE": 0,
+    "6:SIM_VENTAS": 1200,
+    "1:COBRO_CREDITO": 0,
+    "2:COBRO_CREDITO": 300,
+    "3:COBRO_CREDITO": 360,
+    "4:COBRO_CREDITO": 420,
+    "5:COBRO_CREDITO": 480,
+    "6:COBRO_CREDITO": 540,
+    "1:VENTAS_CREDITO": -300,
+    "2:VENTAS_CREDITO": -360,
+    "3:VENTAS_CREDITO": -420,
+    "4:VENTAS_CREDITO": -480,
+    "5:VENTAS_CREDITO": -540,
+    "6:VENTAS_CREDITO": -600,
+    "1:COMISION_VENTAS": -12,
+    "2:COMISION_VENTAS": -12,
+    "3:COMISION_VENTAS": -12,
+    "4:COMISION_VENTAS": -12,
+    "5:COMISION_VENTAS": -12,
+    "6:COMISION_VENTAS": -12,
+    "1:MANTENIMIENTO_AUTO": -31.25,
+    "2:MANTENIMIENTO_AUTO": -31.25,
+    "3:MANTENIMIENTO_AUTO": -31.25,
+    "4:MANTENIMIENTO_AUTO": -31.25,
+    "5:MANTENIMIENTO_AUTO": -31.25,
+    "6:MANTENIMIENTO_AUTO": -31.25
+  },
+  "financialSections": {
+    "1": {
+      "B": {
+        "cat": "B",
+        "net": -11363,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": -2625,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 0. Compra nueva con instalación y capacitación: 1. Total disponible: 1.",
+                "income": 0,
+                "outflow": 2625,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 2625,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": -3675,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 0. Compra nueva con instalación y capacitación: 1. Total disponible: 1.",
+                "income": 0,
+                "outflow": 3675,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 3675,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": -1260,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 0. Compra nueva con instalación y capacitación: 1. Total disponible: 1.",
+                "income": 0,
+                "outflow": 1260,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1260,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": -303,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Compra nueva con capacitación. Disponible para los siguientes ciclos.",
+                "income": 0,
+                "outflow": 303,
+                "quantity": 1,
+                "unitCost": 303
+              }
+            ],
+            "type": "choice",
+            "outflow": 303,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": -1500,
+            "name": "Mantenimiento de maquinaria",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mantenimiento preventivo",
+                "detail": "",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 1,
+        "title": "Infraestructura",
+        "outflow": 11363,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -11363
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 1,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "25% a crédito / 75% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 1,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 1,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -6955.360000000001,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -660,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 12%.",
+                "income": 0,
+                "outflow": 660,
+                "quantity": 30,
+                "unitCost": 22
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 660,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -323.84,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 12%.",
+                "income": 0,
+                "outflow": 323.84,
+                "quantity": 100,
+                "unitCost": 3.2384
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 323.84,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -971.52,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 12%.",
+                "income": 0,
+                "outflow": 971.52,
+                "quantity": 600,
+                "unitCost": 1.6192
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 971.52,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 1,
+        "title": "Logística",
+        "outflow": 6955.360000000001,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -6955.360000000001
+      }
+    },
+    "2": {
+      "B": {
+        "cat": "B",
+        "net": -2000,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": 0,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": 0,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": 0,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": 0,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Moldes disponibles",
+                "detail": "Molde básico",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": 0,
+            "name": "Mantenimiento de maquinaria",
+            "note": "Sin selección para este ciclo.",
+            "rows": [],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 2,
+        "title": "Infraestructura",
+        "outflow": 2000,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -2000
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 2,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "30% a crédito / 70% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 2,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 2,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -6999.8,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -675,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 10%.",
+                "income": 0,
+                "outflow": 675,
+                "quantity": 30,
+                "unitCost": 22.5
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 675,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -331.20000000000005,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 10%.",
+                "income": 0,
+                "outflow": 331.20000000000005,
+                "quantity": 100,
+                "unitCost": 3.3120000000000003
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 331.20000000000005,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -993.6000000000001,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 10%.",
+                "income": 0,
+                "outflow": 993.6000000000001,
+                "quantity": 600,
+                "unitCost": 1.6560000000000001
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 993.6000000000001,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 2,
+        "title": "Logística",
+        "outflow": 6999.8,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -6999.8
+      }
+    },
+    "3": {
+      "B": {
+        "cat": "B",
+        "net": -3500,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": 0,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": 0,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": 0,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": 0,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Moldes disponibles",
+                "detail": "Molde básico",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": -1500,
+            "name": "Mantenimiento de maquinaria",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mantenimiento preventivo",
+                "detail": "",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 3,
+        "title": "Infraestructura",
+        "outflow": 3500,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -3500
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 3,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "35% a crédito / 65% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 3,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 3,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -7044.240000000001,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -690,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 8%.",
+                "income": 0,
+                "outflow": 690,
+                "quantity": 30,
+                "unitCost": 23
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 690,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -338.56,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 8%.",
+                "income": 0,
+                "outflow": 338.56,
+                "quantity": 100,
+                "unitCost": 3.3856
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 338.56,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -1015.6800000000001,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 8%.",
+                "income": 0,
+                "outflow": 1015.6800000000001,
+                "quantity": 600,
+                "unitCost": 1.6928
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1015.6800000000001,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 3,
+        "title": "Logística",
+        "outflow": 7044.240000000001,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -7044.240000000001
+      }
+    },
+    "4": {
+      "B": {
+        "cat": "B",
+        "net": -2000,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": 0,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": 0,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": 0,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": 0,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Moldes disponibles",
+                "detail": "Molde básico",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": 0,
+            "name": "Mantenimiento de maquinaria",
+            "note": "Sin selección para este ciclo.",
+            "rows": [],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 4,
+        "title": "Infraestructura",
+        "outflow": 2000,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -2000
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 4,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "40% a crédito / 60% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 4,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 4,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -7088.68,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -705,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 6%.",
+                "income": 0,
+                "outflow": 705,
+                "quantity": 30,
+                "unitCost": 23.5
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 705,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -345.92,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 6%.",
+                "income": 0,
+                "outflow": 345.92,
+                "quantity": 100,
+                "unitCost": 3.4592
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 345.92,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -1037.76,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 6%.",
+                "income": 0,
+                "outflow": 1037.76,
+                "quantity": 600,
+                "unitCost": 1.7296
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1037.76,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 4,
+        "title": "Logística",
+        "outflow": 7088.68,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -7088.68
+      }
+    },
+    "5": {
+      "B": {
+        "cat": "B",
+        "net": -3500,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": 0,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": 0,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": 0,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": 0,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Moldes disponibles",
+                "detail": "Molde básico",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": -1500,
+            "name": "Mantenimiento de maquinaria",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mantenimiento preventivo",
+                "detail": "",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 5,
+        "title": "Infraestructura",
+        "outflow": 3500,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -3500
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 5,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "45% a crédito / 55% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 5,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 5,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -7133.12,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -720,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 4%.",
+                "income": 0,
+                "outflow": 720,
+                "quantity": 30,
+                "unitCost": 24
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 720,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -353.28,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 4%.",
+                "income": 0,
+                "outflow": 353.28,
+                "quantity": 100,
+                "unitCost": 3.5328
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 353.28,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -1059.84,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 4%.",
+                "income": 0,
+                "outflow": 1059.84,
+                "quantity": 600,
+                "unitCost": 1.7664
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1059.84,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 5,
+        "title": "Logística",
+        "outflow": 7133.12,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -7133.12
+      }
+    },
+    "6": {
+      "B": {
+        "cat": "B",
+        "net": -2000,
+        "items": [
+          {
+            "id": "MESA_CORTE",
+            "net": 0,
+            "name": "Mesas de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Mesa de corte",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 2625
+              }
+            ],
+            "type": "quantity",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ENSAMBLE",
+            "net": 0,
+            "name": "Máquinas de ensamblado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 3675
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACABADOS",
+            "net": 0,
+            "name": "Máquinas de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Básica / manual",
+                "detail": "Antes: 1. Sin compra nueva: 0. Total disponible: 1.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": 1260
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MOLDE",
+            "net": 0,
+            "name": "Molde de producto",
+            "note": "",
+            "rows": [
+              {
+                "label": "Moldes disponibles",
+                "detail": "Molde básico",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LOCAL_PROD",
+            "net": -2000,
+            "name": "Local de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "Local de producción estándar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 2000,
+                "quantity": null,
+                "unitCost": 2000
+              }
+            ],
+            "type": "choice",
+            "outflow": 2000,
+            "financing": 0,
+            "recurring": 2000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "MANTENIMIENTO",
+            "net": 0,
+            "name": "Mantenimiento de maquinaria",
+            "note": "Sin selección para este ciclo.",
+            "rows": [],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 6,
+        "title": "Infraestructura",
+        "outflow": 2000,
+        "financing": 0,
+        "recurring": 2000,
+        "assetIncome": 0,
+        "recordedNet": -2000
+      },
+      "C": {
+        "cat": "C",
+        "net": -5784.719999999999,
+        "items": [
+          {
+            "id": "PRODUCCION_META",
+            "net": 0,
+            "name": "¿Cuánto deseas producir?",
+            "note": "",
+            "rows": [
+              {
+                "label": "Molde básico",
+                "detail": "Producción deseada para esta línea de molde.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 100,
+                "unitCost": null
+              }
+            ],
+            "type": "production-plan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_CORTE",
+            "net": -1690.8,
+            "name": "Personal de corte",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ENSAMBLE",
+            "net": -1690.8,
+            "name": "Personal de ensamble",
+            "note": "",
+            "rows": [
+              {
+                "label": "Costurero básico",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERS_ACABADO",
+            "net": -1690.8,
+            "name": "Personal de acabados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Operario de acabado",
+                "detail": "Cantidad contratada para este ciclo.",
+                "income": 0,
+                "outflow": 1690.8,
+                "quantity": 1,
+                "unitCost": 1690.8
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1690.8,
+            "financing": 0,
+            "recurring": 1690.8,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "JEFATURA",
+            "net": 0,
+            "name": "Jefatura de producción",
+            "note": "",
+            "rows": [
+              {
+                "label": "No contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "LIMPIEZA",
+            "net": -712.32,
+            "name": "Limpieza y servicios generales",
+            "note": "",
+            "rows": [
+              {
+                "label": "Limpieza y servicios generales",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 712.32,
+                "quantity": null,
+                "unitCost": 712.32
+              }
+            ],
+            "type": "choice",
+            "outflow": 712.32,
+            "financing": 0,
+            "recurring": 712.32,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PT",
+            "net": 0,
+            "name": "Garantía de productos terminados",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cobertura comercial 30 días",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 6,
+        "title": "Producción",
+        "outflow": 5784.719999999999,
+        "financing": 0,
+        "recurring": 5784.719999999999,
+        "assetIncome": 0,
+        "recordedNet": -5784.719999999999
+      },
+      "D": {
+        "cat": "D",
+        "net": -1800,
+        "items": [
+          {
+            "id": "CANALES",
+            "net": -1800,
+            "name": "Canales de venta",
+            "note": "",
+            "rows": [
+              {
+                "label": "Tienda · Los Olivos",
+                "detail": "Los Olivos. 1 tienda(s), 1 vendedor(es) básico(s). Alquiler por ciclo.",
+                "income": 0,
+                "outflow": 1800,
+                "quantity": 1,
+                "unitCost": 1800
+              }
+            ],
+            "type": "multi-choice",
+            "outflow": 1800,
+            "financing": 0,
+            "recurring": 1800,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PERSONAL_VENTAS",
+            "net": 0,
+            "name": "Personal básico de ventas",
+            "note": "",
+            "rows": [
+              {
+                "label": "Vendedores básicos",
+                "detail": "1 por tienda física. Comisión total: 1% de las ventas; sin sueldo fijo adicional.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": 1,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CREDITO_VENTAS",
+            "net": 0,
+            "name": "Ventas a crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "50% a crédito / 50% al contado",
+                "detail": "Regla automática; no es una decisión editable.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "DEVOLUCIONES",
+            "net": 0,
+            "name": "Producto fallado",
+            "note": "",
+            "rows": [
+              {
+                "label": "Si un producto vendido presenta una falla que corresponde devolver, la empresa reintegra el dinero al cliente.",
+                "detail": "",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "info",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 6,
+        "title": "Ventas",
+        "outflow": 1800,
+        "financing": 0,
+        "recurring": 1800,
+        "assetIncome": 0,
+        "recordedNet": -1800
+      },
+      "E": {
+        "cat": "E",
+        "net": -1500,
+        "items": [
+          {
+            "id": "INV_RRHH",
+            "net": 0,
+            "name": "Capacitación del equipo",
+            "note": "",
+            "rows": [
+              {
+                "label": "No capacitar este ciclo",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "INV_MARKETING",
+            "net": -1500,
+            "name": "Inversión en marketing",
+            "note": "",
+            "rows": [
+              {
+                "label": "Baja",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 1500,
+                "quantity": null,
+                "unitCost": 1500
+              }
+            ],
+            "type": "choice",
+            "outflow": 1500,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "PRESTAMO",
+            "net": 0,
+            "name": "Línea de crédito",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin préstamo",
+                "detail": "TEA: 20%. El catálogo no define plazo, cuotas ni un calendario de amortización.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": null
+              }
+            ],
+            "type": "loan",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 6,
+        "title": "Finanzas",
+        "outflow": 1500,
+        "financing": 0,
+        "recurring": 0,
+        "assetIncome": 0,
+        "recordedNet": -1500
+      },
+      "F": {
+        "cat": "F",
+        "net": -7177.56,
+        "items": [
+          {
+            "id": "ANALISTA_COMPRAS",
+            "net": -5000,
+            "name": "Analista de compras",
+            "note": "",
+            "rows": [
+              {
+                "label": "Contratar",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 5000,
+                "quantity": null,
+                "unitCost": 5000
+              }
+            ],
+            "type": "choice",
+            "outflow": 5000,
+            "financing": 0,
+            "recurring": 5000,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "CUERO",
+            "net": -735,
+            "name": "Compra de cuero",
+            "note": "",
+            "rows": [
+              {
+                "label": "Cuero sintético",
+                "detail": "Insumos de este ciclo; descuento de compras: 2%.",
+                "income": 0,
+                "outflow": 735,
+                "quantity": 30,
+                "unitCost": 24.5
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 735,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "ACCESORIOS",
+            "net": -360.64000000000004,
+            "name": "Compra de accesorios",
+            "note": "",
+            "rows": [
+              {
+                "label": "Aleación económica",
+                "detail": "Insumos de este ciclo; descuento de compras: 2%.",
+                "income": 0,
+                "outflow": 360.64000000000004,
+                "quantity": 100,
+                "unitCost": 3.6064000000000003
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 360.64000000000004,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "HILO",
+            "net": -1081.92,
+            "name": "Compra de hilo",
+            "note": "",
+            "rows": [
+              {
+                "label": "Poliéster estándar",
+                "detail": "Insumos de este ciclo; descuento de compras: 2%.",
+                "income": 0,
+                "outflow": 1081.92,
+                "quantity": 600,
+                "unitCost": 1.8032000000000001
+              }
+            ],
+            "type": "quantity-choice",
+            "outflow": 1081.92,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          },
+          {
+            "id": "GARANTIA_PROV",
+            "net": 0,
+            "name": "Garantía de proveedores",
+            "note": "",
+            "rows": [
+              {
+                "label": "Sin garantía",
+                "detail": "Decisión del ciclo.",
+                "income": 0,
+                "outflow": 0,
+                "quantity": null,
+                "unitCost": 0
+              }
+            ],
+            "type": "choice",
+            "outflow": 0,
+            "financing": 0,
+            "recurring": 0,
+            "assetIncome": 0,
+            "bookValueDisposed": 0
+          }
+        ],
+        "round": 6,
+        "title": "Logística",
+        "outflow": 7177.56,
+        "financing": 0,
+        "recurring": 5000,
+        "assetIncome": 0,
+        "recordedNet": -7177.56
+      }
+    }
+  },
+  "previousFinancial": {
+    "estadoResultados": {
+      "otros": 0,
+      "costos": 13314.28,
+      "ingresos": 1200,
+      "utilidad": -12114.28,
+      "costoVentas": 708.71,
+      "ventasNetas": 1200,
+      "depreciacion": 59.38,
+      "devoluciones": 0,
+      "gastosVentas": 3362,
+      "utilidadNeta": -12114.28,
+      "cicloImpuesto": 6,
+      "impuestoRenta": 0,
+      "utilidadBruta": 491.29,
+      "ventasTotales": 1200,
+      "criterioCostos": "ventas",
+      "desgloseCostos": {
+        "fijos": 2712.32,
+        "otros": 6862,
+        "total": 13314.28,
+        "manoObra": 5072.4,
+        "intereses": 0,
+        "almacenaje": 0,
+        "maquinaria": 1590.63,
+        "materiales": 2020.44,
+        "publicidad": 1500,
+        "costoVentas": 708.71,
+        "depreciacion": 59.38,
+        "mantenimiento": 1531.25,
+        "capacidadOciosa": 0,
+        "costoProduccionCiclo": 7152.22
+      },
+      "gastoGarantias": 50,
+      "impactoEventos": 0,
+      "policyWarnings": [],
+      "gastosOperacion": 12605.57,
+      "costosProduccion": 7152.22,
+      "impuestoDiferido": true,
+      "gastosFinancieros": 0,
+      "regimenTributario": "MYPE",
+      "utilidadNetaFinal": null,
+      "utilidadOperativa": -12114.28,
+      "ingresosFinancieros": 0,
+      "gastosAdministrativos": 9243.57,
+      "resultadoVentaActivos": 0,
+      "baseImponibleAcumulada": 0,
+      "utilidadAntesImpuestos": -12114.28,
+      "utilidadAntesImpuestosAcumulada": -57571.4
+    },
+    "balanceGeneral": {
+      "deuda": 0,
+      "activos": 142678.58,
+      "capital": 200000,
+      "efectivo": 102235.95,
+      "patrimonio": 142428.6,
+      "inventarios": 32336.53,
+      "activosFijos": 7566.1,
+      "inventarioMP": 425.35,
+      "inventarioPT": 31911.18,
+      "cuentasPorCobrar": 540,
+      "pasivoPatrimonio": 142678.6,
+      "impuestosPorPagar": 0,
+      "interesesPorPagar": 0,
+      "provisionGarantias": 250,
+      "resultadosAcumulados": -57571.4
+    },
+    "flujoCaja": {
+      "otros": 0,
+      "eventos": 0,
+      "cajaFinal": 102235.95,
+      "flujoNeto": -18621.09,
+      "inversion": 0,
+      "operacion": -18621.09,
+      "reembolsos": 0,
+      "cajaInicial": 120857.04,
+      "cobrosVentas": 1140,
+      "ventaActivos": 0,
+      "compraActivos": 0,
+      "impuestoRenta": 0,
+      "financiamiento": 0,
+      "pagosOperacion": -19761.09
+    },
+    "inventoryValues": {
+      "goods": {
+        "urbano": 0,
+        "premium": 0,
+        "esencial": 31911.178074534157
+      },
+      "materials": {
+        "acc_eco": 70.44579886348619,
+        "acc_prem": 0,
+        "hilo_ref": 0,
+        "hilo_std": 211.33739659045855,
+        "cuero_std": 0,
+        "hilo_prem": 0,
+        "cuero_prem": 0,
+        "cuero_sint": 143.5715871547509
+      }
+    },
+    "lotMovements": [
+      {
+        "id": "1-esencial",
+        "mold": "molde_1",
+        "sold": 10,
+        "cycle": 1,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 100,
+        "unitCost": 70.8714,
+        "available": 50,
+        "locations": {
+          "los_olivos:1": 0
+        },
+        "materials": {
+          "HILO": {
+            "hilo_std": 600
+          },
+          "CUERO": {
+            "cuero_sint": 30
+          },
+          "ACCESORIOS": {
+            "acc_eco": 100
+          }
+        },
+        "costOfSales": 708.7139999999999,
+        "inventoryValue": 3543.5699999999997
+      },
+      {
+        "id": "2-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 2,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.01673684210526,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7031.59
+      },
+      {
+        "id": "3-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 3,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.43997493734337,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7071.797619047619
+      },
+      {
+        "id": "4-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 4,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 74.86321303258144,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7112.005238095237
+      },
+      {
+        "id": "5-esencial",
+        "mold": "molde_1",
+        "sold": 0,
+        "cycle": 5,
+        "quality": 4,
+        "segment": "esencial",
+        "produced": 95,
+        "unitCost": 75.28647597254003,
+        "available": 95,
+        "locations": {},
+        "materials": {
+          "HILO": {
+            "hilo_std": 570
+          },
+          "CUERO": {
+            "cuero_sint": 28.5
+          },
+          "ACCESORIOS": {
+            "acc_eco": 95
+          }
+        },
+        "costOfSales": 0,
+        "inventoryValue": 7152.215217391303
+      }
+    ]
+  }
+}

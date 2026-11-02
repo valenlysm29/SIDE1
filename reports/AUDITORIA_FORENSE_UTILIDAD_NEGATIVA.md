@@ -1,6 +1,6 @@
 # Auditoría forense de gastos y utilidad negativa
 
-Fecha: 2026-11-02. Estado: cierre real conciliado; recomendaciones pendientes de validación funcional. No se ha corregido ni desplegado el motor.
+Fecha: 2026-11-02. Las secciones originales documentan el corte del commit `9c8d176`, antes de corregir el motor. El seguimiento al final de este informe documenta la corrección posterior y sus validaciones; no hubo despliegue ni cambios en históricos.
 
 ## Evidencia e identificación
 
@@ -134,3 +134,107 @@ Los ocho casos nuevos son pruebas del modelo financiero con entradas controladas
 No hubo escrituras a Supabase, cambios de caja, edición de cierres, migraciones, despliegues ni publicación en main. Se preservaron cambios previos del usuario; el commit de auditoría incluye únicamente informe, pruebas y evidencia. El contenedor del proyecto contiene únicamente SIDE1 al revisar; todos los artefactos creados permanecen dentro del repositorio.
 
 Conclusión: la pérdida reportada está conciliada exactamente con los movimientos persistidos y tiene una causa económica demostrada. Persisten anomalías de política y cobertura pendientes; no se declara solucionado el problema general.
+
+## Seguimiento: mantenimiento y molde no depreciable (2026-11-02)
+
+Este seguimiento sustituye los pendientes relativos a mantenimiento y depreciación del corte inicial. No sustituye ni reescribe las cifras históricas anteriores.
+
+### Mantenimiento: conceptos independientes, sin eliminación de cargos
+
+La definición ya existía antes de esta corrección: `docs/actualizacion_logica_documento_20261027.md`, sección «Costos, caja e inventarios», dice: «La opción original de mantenimiento preventivo por S/1500 se conserva como intervención opcional independiente». La prueba anterior `tests/md_logic.test.cjs`, «base maintenance recurs in the engine while the optional decision keeps its original fee», expresa la misma regla y pasa tanto con el código previo como con el corregido.
+
+Por tanto, los S/1500 de la intervención y los S/31.25 de cuota mensual son conceptos independientes según la política vigente del proyecto. No existe evidencia para anular uno de ellos como duplicación. Esto determina la semántica de SIDE; no afirma que esas tarifas sean económicamente óptimas.
+
+No se modificó la lógica de mantenimiento. La prueba nueva `tests/forense_correcciones.test.cjs` exige:
+
+- Con intervención seleccionada: mantenimiento total 1531.25; automático en ledger -31.25.
+- Sin intervención: total 31.25; diferencia de caja exactamente 1500, sin cambiar el resto del cálculo.
+- Si una sección antigua ya contiene el mantenimiento automático identificado por `type=info`/`automaticMaintenance`: ledger automático adicional cero; gasto y caja iguales al caso de cuota única.
+- En la matriz de continuidad se alterna la intervención entre ciclos impares y pares y se comprueba el cargo de cada ciclo. Nunca se descuenta dos veces el automático ya registrado.
+
+### Corrección: respetar noDepreciation
+
+`js/financial_model.js` omite del bucle de depreciación cualquier definición de activo con `noDepreciation === true`. No pone a cero importes acumulados anteriores ni genera un asiento de reversión. Se regeneró el paquete candidato `supabase/functions/side-business-close/runtime.mjs` desde las fuentes; el paquete histórico archivado y `legacy-runtime.mjs` permanecen intactos.
+
+Efectos comprobados por las pruebas específicas:
+
+- El molde configurado no genera depreciación nueva con método lineal, acelerado ni por unidades.
+- La compra sigue como inversión y activo fijo. Un molde de S/300 conserva S/300 de valor en el escenario aislado, sin gasto de fabricación ni reducción de activo por depreciación.
+- Sin producción, sin ventas, con ventas parciales y con ventas completas no se imputa depreciación del molde a gasto o inventario. Si se permite depreciarlo, el caso de control conserva S/4.75, costo de ventas S/4.75 y activo S/295.25.
+- Las máquinas mantienen su depreciación. Para los recursos de la partida real, el total mensual nuevo es S/59.38 en vez de S/64.13.
+- En un contrafactual de C2 que conserva C1 congelado, el costo de ventas es S/7031.59, la pérdida S/8764.16 y el activo fijo S/7739.49. El acumulado de depreciación anterior del molde, S/4.75, se conserva; no se devuelve ni se cobra de nuevo. El balance cuadra y el flujo de caja de ese contrafactual es idéntico al histórico.
+- La corrección no genera un movimiento de caja por depreciación. En escenarios rentables puede cambiar el impuesto final y, por esa razón legítima, el pago tributario; la matriz verifica ambos estados y su conciliación.
+
+`tests/forense_edge_desplegado.test.cjs` ahora caracteriza expresamente la diferencia entre Edge v11 archivada y el candidato corregido. Ya no exige igualdad con el defecto antiguo: reproduce depreciación 64.13/costo 7091.89 en v11 y 59.38/7087.14 en la candidata para el escenario C1, con igual flujo. La igualdad exigida para publicar el candidato es Node actual frente a Edge actual y al cierre persistido.
+
+### Hallazgo adicional de la validación: deriva de céntimos en ventas parciales
+
+La matriz `utility-v1` de seis ciclos encontró un tercer defecto que impedía dar por terminada la validación: el costo de ventas se redondeaba en el estado de resultados, pero se retiraba del inventario su valor fraccionario sin redondear. Además, el consumo de MP se calculaba sobre valores internos fraccionarios mientras el saldo presentado de MP ya estaba expresado en céntimos. Las diferencias podían acumularse aunque cada ciclo individual pareciera cuadrar con una tolerancia de dos céntimos.
+
+Corrección en `financial_model.js`: el consumo contable de MP conserva la identidad saldo inicial + compras recibidas − saldo final. El costo de producción se distribuye entre productos en céntimos enteros por proporciones y restos mayores deterministas. Cada lote reconoce el costo vendido en céntimos y conserva exactamente la diferencia como valor del stock. Los recibos agregados sin lotes siguen la misma conservación. La suma de costos asignados coincide con el costo a repartir; no se introduce una contrapartida artificial en caja, patrimonio o resultados para cuadrar el balance.
+
+Evidencia anterior de QA: `tests/output/forense_v2/descuadre_antes.json`. Reproducción de seis ciclos con diez ventas por ciclo:
+
+| Concepto final C6 | Antes del redondeo corregido | Después, reproducción local |
+|---|---:|---:|
+| Activos | 132114.29 | 132114.30 |
+| Pasivo + patrimonio | 132114.32 | 132114.30 |
+| PT | 38394.88 | 38394.89 |
+| Caja | 85070.42 | 85070.42 |
+
+`tests/forense_redondeo.test.cjs` exige balance sin diferencia de céntimos en cada uno de los seis ciclos, conservación de PT inicial + producción − costo de ventas, costo de ventas igual a la suma de los lotes vendidos y PT igual a la suma de sus lotes restantes. También prueba reparto entre varios productos con y sin lotes, usando costos indivisibles entre unidades (por ejemplo S/30.04). La matriz PostgreSQL dejó de tolerar diferencias de S/0.02: sus ecuaciones monetarias solo admiten error numérico inferior a 0.0000001, sin permitir diferencias de un céntimo.
+
+Los snapshots históricos siguen prevaleciendo sobre las fórmulas corregidas; no se recalculan ni se revierten diferencias antiguas. Esta corrección aplica al cálculo nuevo.
+
+### Verificación de los históricos preservados
+
+`tests/forense_utilidad.cjs` reproduce los movimientos históricos sin snapshots con el motor archivado que originaba sus reglas. Separadamente exige que el motor actual, al leer los snapshots congelados, devuelva exactamente los estados originales. Esto evita presentar un recálculo con política corregida como si fuera un cierre histórico.
+
+Dos consultas remotas de solo lectura, antes y después del cambio, confirmaron los mismos `md5(cierre::text)`:
+
+| Ciclo | Hash remoto conservado |
+|---|---|
+| 1 | 0702184c38c36b78e16deb0b21b978f1 |
+| 2 | 265260f6bfd6fcd86fa3685e3fc8176e |
+
+Evidencia: `tests/output/forense_utilidad/historicos_v2.json`. No se escribió en Supabase ni se alteraron partidas activas. Las escrituras de validación se realizan únicamente en PostgreSQL de prueba aislado.
+
+### Alcance de integración y fallos previos
+
+La prueba `tests/forense_postgres.test.cjs` arranca PostgreSQL 17 real en un contenedor sin red y un servicio de prueba Supabase Edge Runtime v1.77.8 (Deno) en localhost, sin credenciales de producción. No es un mock de almacenamiento ni PGlite. Usa las funciones SQL existentes de contexto y guardado de cierres; cada escritura se confirma y se relee desde conexiones PostgreSQL independientes.
+
+Node y el módulo Edge reciben el mismo contexto real. Deno ejecuta el paquete candidato con las respuestas de lectura de esas RPC reproducidas. Se exige igualdad exacta de los tres estados financieros. Al comparar el cierre completo solo se normaliza `factorPrecioAbsoluto` a 14 cifras significativas: `Math.pow` produjo 0.773386514735649 en Node y 0.7733865147356489 en Deno, sin diferencia en unidades, precio, demanda entera ni dinero. Ningún campo monetario recibe esa tolerancia. El módulo Edge candidato también envía el mismo cierre calculado a la RPC real de PostgreSQL. Se contrastan cierre, reporte, ledger, secciones y snapshot. Esto valida cálculo en Deno y persistencia SQL real; no afirma que se haya invocado o actualizado el endpoint remoto de producción.
+
+La matriz usa partidas QA independientes y cubre sin producción, producción sin ventas, ventas parciales, ventas completas, fijos elevados, recursos alternativos y una configuración rentable. Las ventas parciales se obtienen mediante la transferencia existente de diez unidades a la tienda por ciclo; el resto queda en PT. La configuración rentable usa premium, materiales correspondientes y la opción válida de no contratar analista; se conservan sus demás costos, comisión, garantía e impuesto. No se cambian precios ni tarifas para pasar las pruebas.
+
+Se comprueban las identidades de resultados, caja, flujo operativo/inversión/financiamiento, activo/pasivo/patrimonio, arrastre de caja y resultados, reconstrucción desde movimientos, reintentos idempotentes y hashes de todos los cierres previos de cada partida QA. El selector de versión también se verifica para evitar usar la candidata en partidas históricas de otra versión.
+
+La batería ampliada inicial dio 45/48: fallaron tres pruebas de `tests/md_logic.test.cjs` (ejemplo de matriz/capacidad, reputación por consumo y cierre completo de ese ejemplo). `node tests/forense_baseline_md.cjs` repite exactamente esos tres fallos con `js/financial_model.js` del commit `9c8d176`: esperado 368 unidades frente a 221 en el ejemplo de cierre. No son regresiones de esta corrección. No se alteraron las expectativas ni se eliminaron esas pruebas; siguen pendientes fuera del alcance de estos dos problemas. Logs: `regresion_v2.log` y `baseline_md_v2.log` en `tests/output/forense_utilidad/`.
+
+### Resultado final de las validaciones
+
+- Batería crítica: **42 pruebas aprobadas, 0 fallos**. Incluye molde, mantenimiento, conservación de céntimos, históricos, garantías, crédito, Node/Edge, continuidad y concurrencia sobre PostgreSQL.
+- Inventarios y ventas: **25 pruebas aprobadas, 0 fallos**, ejecutando `tests/lotes_fifo_integrado.test.cjs`, `tests/legacy_asset_inventory.test.cjs` y `tests/sales_accounting_integration.test.cjs`.
+- `node --test tests/forense_postgres.test.cjs`: **1 prueba integrada aprobada**, con **14 escenarios temporales y 63 cierres confirmados y releídos en PostgreSQL real**. Son siete configuraciones, cada una repetida durante tres y seis ciclos. Todos los estados financieros comparados coinciden entre Node, Deno Edge y persistencia, sin diferencia de céntimos en balance.
+- `node tests/forense_utilidad.cjs`: los dos cierres reales siguen reproduciéndose con el motor archivado, y el motor corregido sigue leyendo sus snapshots sin cambios; también pasan sus ocho controles contables.
+- Repetición de `tests/md_logic.test.cjs` después de todas las correcciones: 10 aprobadas y los mismos 3 fallos previos. Evidencia adicional `md_actual_v2.log`. Por tanto, no se afirma que la totalidad del repositorio tenga pruebas verdes.
+
+En conjunto son **68 pruebas críticas/de inventarios/integración aprobadas**, además de la reproducción histórica y sus controles. Logs finales: `criticas_v2.log`, `inventarios_v2.log`, `postgres_v2.log` y `replay_v2.log`, dentro de `tests/output/forense_utilidad/`. La evidencia de los 63 cierres y las huellas del código probado están en `tests/output/forense_v2/postgres.json`. Para repetir la matriz completa no deben establecerse los filtros opcionales `SIDE_FORENSE_SCENARIO` ni `SIDE_FORENSE_CYCLES`.
+
+Resultados del último ciclo de cada escenario QA, en soles (no son nuevos cierres de la partida real):
+
+| Configuración | Utilidad C3, partida de 3 ciclos | Utilidad C6, partida de 6 ciclos |
+|---|---:|---:|
+| Sin producción | -17675.35 | -16175.35 |
+| Producción sin ventas | -10743.57 | -9243.57 |
+| Ventas parciales | -12114.29 | -10614.28 |
+| Ventas completas | -8804.37 | -7424.99 |
+| Fijos elevados | -11661.19 | -10294.51 |
+| Recursos alternativos | -11261.05 | -9894.37 |
+| Configuración rentable | 3111.92 | 2874.53 |
+
+Los resultados positivos y negativos se conservan conforme a las decisiones y reglas, incluido el impuesto acumulado final. Vender toda la producción no implica que los gastos fijos estén cubiertos.
+
+**Estado de estos hallazgos:** mantenimiento investigado y confirmado como dos conceptos independientes; depreciación del molde corregida; deriva de céntimos descubierta y corregida. Las validaciones críticas de estos cambios están completadas. Permanecen los tres fallos previos de producción documentados, las limitaciones de procedencia del binario histórico y cualquier cobertura del motor no ejecutada aquí. No se declara corregido todo SIDE.
+
+Se conserva la misma rama `codex/auditoria-forense-utilidad-negativa`. No se hizo merge a main ni se desplegaron migraciones o Edge Functions. Las funciones SQL existentes solo se cargaron en contenedores QA temporales, ya eliminados. El endpoint de producción continúa con su versión desplegada anterior; este informe valida el candidato de la rama, no un cambio ya operativo en producción.
