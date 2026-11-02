@@ -417,7 +417,7 @@
         if(!saved)continue;
         // Legacy events have no independent source. Versioned events are loaded
         // below from the server; client event effects are never used for closing.
-        if((eventVersion!=='demand-share-v1'&&(state.__cycleBusiness?.[ciclo]?.events||[]).length) || (Number(ciclo)===1&&state.__openingBalance))
+        if((eventVersion!=='demand-share-v1'&&ctx.financialConfig?.economicRulesVersion!=='utility-v1'&&(state.__cycleBusiness?.[ciclo]?.events||[]).length) || (Number(ciclo)===1&&state.__openingBalance))
           return {success:false,code:'DATOS_ECONOMICOS_NO_VERIFICADOS',error:'No se puede verificar el saldo inicial o los eventos de este ciclo.'};
         const previous=prior[company.id];
         if(Number(ciclo)>1&&!previous?.state)return {success:false,code:'SALDO_ANTERIOR_NO_VERIFICADO',error:'Falta el estado anterior de una empresa.'};
@@ -508,6 +508,14 @@
         // This is a decision selection, not a financial balance.
         if(Array.isArray(saved.state?.__catalogSelection))preparedState.__catalogSelection=saved.state.__catalogSelection;
         let verifiedEvents=[];
+        if(!eventVersion&&ctx.financialConfig?.economicRulesVersion==='utility-v1'&&((ctx.financialConfig.enabledEvents||[]).length||(state.__cycleBusiness?.[ciclo]?.events||[]).length)){
+          const response=await sb.rpc('side_legacy_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}),facts=response.data;
+          if(response.error||facts?.error||facts?.version!=='legacy-event-context-v1'||String(facts.companyId)!==String(company.id)||Number(facts.cycle)!==Number(ciclo)||!Array.isArray(facts.enabledEvents)||!Array.isArray(ctx.financialConfig.enabledEvents)||JSON.stringify([...facts.enabledEvents].sort())!==JSON.stringify([...ctx.financialConfig.enabledEvents].sort())||!global.SIDE_AUTHORIZED_EVENTS)return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'No se pudo verificar la programación histórica.'};
+          try{
+            verifiedEvents=global.SIDE_AUTHORIZED_EVENTS.resolve({...facts,round:Number(ciclo)});
+            if(verifiedEvents.some(e=>Object.keys(e.effect||{}).some(k=>k!=='revenuePct')))return {success:false,code:'EFECTO_HISTORICO_NO_DISPONIBLE',error:'El efecto histórico de costos o caja requiere reconciliación antes del cierre.'};
+          }catch{return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'La programación histórica no es válida.'};}
+        }
         if(eventVersion==='demand-share-v1'){
           const response=await sb.rpc('side_event_context_v1',{p_partida_id:partidaId,p_empresa_id:company.id,p_ciclo:Number(ciclo)}), facts=response.data;
           const eventLimits={PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1};

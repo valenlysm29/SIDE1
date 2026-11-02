@@ -3,6 +3,7 @@ function service(rpc){
   const window={SIDE:{SupabaseClient:{get:()=>({rpc})}},
     SIDE_CYCLE_MODEL:require('../js/cycle_model.js'),
     SIDE_FINANCIAL_MODEL:require('../js/financial_model.js'),
+    SIDE_AUTHORIZED_EVENTS:require('../js/engine/eventos_autorizados.js'),
     SIDE_FINANCE_CONFIG:require('./finance_config.js'),
     SIDE_DECISION_CATALOG:require('../js/decision_catalog.js')};
   require('./partida_service.js')(window);
