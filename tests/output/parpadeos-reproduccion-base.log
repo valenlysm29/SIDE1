@@ -1,0 +1,145 @@
+✖ report reconciliation keeps verified previews while waiting, coalesces requests and rejects old rooms (5.884ms)
+✖ teacher and laboratory retain unchanged DOM in desktop and mobile Chromium (19919.2641ms)
+▶ student synchronization and session recovery through the delivered UI
+  ✖ polling preserves tab nodes, active edits and scroll across newer revisions (2918.8318ms)
+  ✖ unchanged financial ticks preserve expanded details and nodes (1987.884ms)
+  ✖ simultaneous forced refreshes share the next read instead of racing (2200.0586ms)
+  ✔ saving a draft sends snapshot, report and normalized decisions with the acknowledged revision (2233.8005ms)
+  ✔ online retries failed writes before reading and does not erase the local draft (2043.3099ms)
+  ✔ the top status explains a server rejection and manual retry really sends during backoff (2171.8942ms)
+  ✔ internal Medio default syncs with the old server contract without a new price control (1857.9576ms)
+  ✔ retry reconstructs a locally confirmed plan when the durable queue is empty without charging again (2418.9673ms)
+  ✔ going offline with no unsent jobs does not invent a pending save (1958.8136ms)
+  ✔ reload recovers an orphaned local confirmation before hydrating the older server draft (2305.7243ms)
+  ✔ pending decisions/report survive a reload and recover the latest offline draft (2268.0244ms)
+  ✔ a stale offline write preserves another session and hydrates the newer server state (1808.5035ms)
+  ✔ a lost save response still recovers normalized decisions without repeating the committed snapshot (1834.2897ms)
+  ✔ network failure retains the session and admission identity without a retry button (964.5554ms)
+  ✔ an explicit identity rejection clears the session instead of retrying indefinitely (870.2367ms)
+  ✔ online automatically restores a session retained after a network failure (1213.3001ms)
+  ✔ configured teacher demo credentials use Supabase Auth and stay on login if rejected (966.5101ms)
+✖ student synchronization and session recovery through the delivered UI (34098.975ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 14
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35478.8843
+
+✖ failing tests:
+
+test at tests\parpadeos_docente.test.cjs:5:1
+✖ report reconciliation keeps verified previews while waiting, coalesces requests and rejects old rooms (5.884ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  1 !== 0
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\parpadeos_docente.test.cjs:12:32)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\parpadeos_docente.test.cjs:16:1
+✖ teacher and laboratory retain unchanged DOM in desktop and mobile Chromium (19919.2641ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   stable: false,
+  -   stable: true,
+      updated: true
+    }
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\parpadeos_docente.test.cjs:33:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { stable: false, updated: true },
+    expected: { stable: true, updated: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\student_sync_ui.test.js:64:13
+✖ polling preserves tab nodes, active edits and scroll across newer revisions (2918.8318ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   attached: false,
+  -   attached: true,
+      first: true,
+  +   focus: false,
+  -   focus: true,
+      scroll: true,
+      second: true,
+  +   stableTabs: false,
+  -   stableTabs: true,
+      value: '3'
+    }
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:79:14)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:64:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { stableTabs: false, first: true, second: true, focus: false, attached: false, value: '3', scroll: true },
+    expected: { stableTabs: true, first: true, second: true, focus: true, attached: true, value: '3', scroll: true },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\student_sync_ui.test.js:82:13
+✖ unchanged financial ticks preserve expanded details and nodes (1987.884ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  false !== true
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:90:17)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:82:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\student_sync_ui.test.js:92:13
+✖ simultaneous forced refreshes share the next read instead of racing (2200.0586ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   max: 2,
+  +   reads: 3
+  -   max: 1,
+  -   reads: 2
+    }
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:100:17)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\.codex-work\parpadeos\tests\student_sync_ui.test.js:92:5)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { reads: 3, max: 2 },
+    expected: { reads: 2, max: 1 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

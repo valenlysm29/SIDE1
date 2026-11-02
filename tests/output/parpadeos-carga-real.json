@@ -1,0 +1,62 @@
+[
+  {
+    "file": "index.html",
+    "width": 1366,
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_FAILED"
+    ],
+    "localFailures": [],
+    "blockedExternal": [
+      "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+    ],
+    "overflow": false
+  },
+  {
+    "file": "docente.html",
+    "width": 1366,
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "SIDE: crear/recuperar sala: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at http://127.0.0.1…es/supabase_client.js?v=20261013-connection:39:37, hint: , code: }",
+      "SIDE: recuperación de sala {success: false, code: undefined, error: TypeError: Failed to fetch, data: undefined, migrationMissing: false}"
+    ],
+    "localFailures": [],
+    "blockedExternal": [
+      "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+      "https://plfuwfdpsagzrlveqkvl.supabase.co/rest/v1/rpc/obtener_sala_docente"
+    ],
+    "overflow": false
+  },
+  {
+    "file": "index.html",
+    "width": 390,
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_FAILED"
+    ],
+    "localFailures": [],
+    "blockedExternal": [
+      "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
+    ],
+    "overflow": false
+  },
+  {
+    "file": "docente.html",
+    "width": 390,
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_FAILED",
+      "Failed to load resource: net::ERR_FAILED",
+      "SIDE: crear/recuperar sala: {message: TypeError: Failed to fetch, details: TypeError: Failed to fetch\n    at http://127.0.0.1…es/supabase_client.js?v=20261013-connection:39:37, hint: , code: }",
+      "SIDE: recuperación de sala {success: false, code: undefined, error: TypeError: Failed to fetch, data: undefined, migrationMissing: false}"
+    ],
+    "localFailures": [],
+    "blockedExternal": [
+      "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js",
+      "https://plfuwfdpsagzrlveqkvl.supabase.co/rest/v1/rpc/obtener_sala_docente"
+    ],
+    "overflow": false
+  }
+]
