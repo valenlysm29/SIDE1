@@ -20,10 +20,10 @@ declare
   anchor text := $$    if p_accion='avanzar' then
       if cycle>=(c->>'cycles')::integer then$$;
   guarded text := $$    if p_accion='avanzar' then
-      if r->>'phase' <> 'results' then
+      if c->>'sequentialCloseVersion'='1' and r->>'phase' <> 'results' then
         return jsonb_build_object('error','Finaliza el ciclo antes de avanzar y espera su cierre oficial.','code','CIERRE_REQUERIDO');
       end if;
-      if not public.side_cierre_completo(p_partida_id,cycle) then
+      if c->>'sequentialCloseVersion'='1' and not public.side_cierre_completo(p_partida_id,cycle) then
         return jsonb_build_object('error','El cierre oficial todavía no está confirmado. Reintenta cuando termine el procesamiento.','code','CIERRE_PENDIENTE');
       end if;
       if cycle>=(c->>'cycles')::integer then$$;
