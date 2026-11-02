@@ -49,3 +49,14 @@ test('la vista de estudiante muestra la proyección y advierte sus límites',()=
  vm.runInNewContext(snippet+'\nshowProfitProjection();',ctx);
  assert.match(mount.innerHTML,/utilidad estimada/);assert.match(mount.innerHTML,/caja final/);assert.match(mount.innerHTML,/parejas activas/);assert.match(mount.innerHTML,/no incluye el reparto definitivo/);
 });
+test('la vista temporal solo pasa al motor el libro vigente y la modalidad configurada',()=>{
+ const fs=require('node:fs'),vm=require('node:vm'),source=fs.readFileSync(require.resolve('../js/app.js'),'utf8');
+ const snippet=source.slice(source.indexOf('function showProfitProjection(){'),source.indexOf('\nfunction renderDecisionCategory(){'));
+ const book={events:{}},state={...F.state(),__materialOrders:book},mount={textContent:''};let captured;
+ const ctx={document:{querySelector:()=>mount},window:{SIDE_PROFIT_PROJECTION:{analyze:x=>(captured=x,{available:false,reason:'prueba'})}},
+  temporalStudentRoom:()=>true,validStudentMaterialBook:()=>book,decisionModelContext:()=>({state}),deepClone:x=>JSON.parse(JSON.stringify(x)),financialLedger:()=>({}),recordedFinancialSections:()=>({}),currentRound:()=>1,DECISION_CATALOG:F.catalog,
+  prepareSectionSave:()=>({entries:{}}),initialCapital:()=>200000,teacherConfig:()=>({cycles:6,materialPaymentMode:'credit',supplierCreditTermCycles:2}),cycleBusinessData:()=>({events:[]}),console};
+ vm.runInNewContext(snippet+'\nshowProfitProjection();',ctx);
+ assert.deepEqual(captured.state.__materialOrders,book);assert.equal(captured.financialPolicy.verifiedMaterialContext,true);
+ assert.equal(captured.financialPolicy.materialPaymentMode,'credit');assert.equal(captured.financialPolicy.supplierCreditTermCycles,2);
+});
