@@ -16,7 +16,8 @@ Deno.serve(async (request: Request) => {
     if (auth.data !== true) return new Response('Unauthorized', { status: 401 });
     const results = await runOnce(rpc, { deadline: Date.now() + 45000 });
     console.log(JSON.stringify({ job: 'side-business-close', results }));
-    return Response.json({ success: results.every((r: { success: boolean }) => r.success), results });
+    const success = results.every((r: { success: boolean; pending?: boolean }) => r.success && !r.pending);
+    return Response.json({ success, results }, { status: success ? 200 : 503 });
   } catch (error) {
     console.error('side-business-close:', error instanceof Error ? error.message : 'Unknown error');
     return new Response('Closure processing failed; scheduled retry will follow', { status: 503 });
