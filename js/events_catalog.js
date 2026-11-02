@@ -1,4 +1,4 @@
-window.SIDE_EVENT_CATALOG = [
+(function(root,factory){const catalog=factory();if(typeof module==='object'&&module.exports)module.exports=catalog;else root.SIDE_EVENT_CATALOG=catalog;})(typeof window!=='undefined'?window:globalThis,function(){return [
   {"id":"PE01","title":"Día del Padre","description":"La campaña por el Día del Padre incrementa temporalmente la compra de regalos.","scope":"group","probability":2,"cycleOffset":1,"cycles":1,"implication":"Las ventas aumentan 10% durante el ciclo afectado.","effect":{"revenuePct":10},"category":"Comerciales y festividades"},
   {"id":"PE02","title":"Día de la Madre","description":"La campaña del Día de la Madre eleva el flujo de compradores.","scope":"group","probability":3,"cycleOffset":1,"cycles":1,"implication":"Las ventas aumentan 15%.","effect":{"revenuePct":15},"category":"Comerciales y festividades"},
   {"id":"PE03","title":"Campaña de Fiestas Patrias","description":"El consumo por celebraciones de julio impulsa las compras.","scope":"group","probability":5,"cycleOffset":1,"cycles":1,"implication":"Las ventas aumentan 25%.","effect":{"revenuePct":25},"category":"Comerciales y festividades"},
@@ -91,4 +91,4 @@ window.SIDE_EVENT_CATALOG = [
   {"id":"PE90","title":"Devoluciones superiores a lo normal","description":"Aumentan los cambios y devoluciones de productos terminados.","scope":"individual","probability":3,"cycleOffset":0,"cycles":1,"implication":"Se genera un costo de S/ 750.","effect":{"cashDelta":-750},"category":"Regulatorios, clientes y competencia"},
   {"id":"PE91","title":"Reconocimiento a la marca local","description":"La empresa recibe una mención positiva en un medio peruano.","scope":"individual","probability":2,"cycleOffset":1,"cycles":2,"implication":"Las ventas aumentan 7% durante dos ciclos.","effect":{"revenuePct":7},"category":"Regulatorios, clientes y competencia"},
   {"id":"PE92","title":"Crisis reputacional","description":"Un incidente afecta la percepción pública de la empresa.","scope":"individual","probability":1,"cycleOffset":0,"cycles":2,"implication":"Las ventas disminuyen 12% durante dos ciclos.","effect":{"revenuePct":-12},"category":"Regulatorios, clientes y competencia"},
-];
+];});
