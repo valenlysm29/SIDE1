@@ -77,6 +77,7 @@ async function refresh(reloadGames=false){
   if(reloadGames){const next=await svc.games();if(token!==seq)return;games=next;options($('lab-game'),games,g=>g.id,g=>gameLabel(g,true),g=>gameLabel(g));gameTitle();}
   const game=$('lab-game').value;if(!game){companies=[];closure=null;closedByCycle=null;options($('lab-company'),[],()=>'',()=> '');$('lab-status').textContent='No tienes partidas disponibles.';render();return;}
   if(reloadGames||!companies.length||closedGame!==game){const next=await svc.companies(game);if(token!==seq)return;companies=next;options($('lab-company'),companies,c=>c.empresa_id,name);}
+  if(!companies.length){closure=null;closedByCycle=null;closedGame='';options($('lab-cycle'),[],()=>'',()=> '');$('lab-status').textContent='Esta partida no tiene empresas disponibles para consultar.';render();return;}
   if(reloadGames||!closedByCycle||closedGame!==game){
    const config=games.find(g=>String(g.id)===String(game))?.configuracion,configured=Number(config?.cycles);
    const count=Number.isInteger(configured)&&configured>0?Math.min(configured,6):6;

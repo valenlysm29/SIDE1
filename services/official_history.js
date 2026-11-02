@@ -1,7 +1,7 @@
 /* Read-only adapters for sealed PostgreSQL closures. No economic calculation. */
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_OFFICIAL_HISTORY=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
  'use strict';
- const labels={confirmed:'Cierre confirmado',in_progress:'Ciclo en curso · provisional',pending:'Pendiente · No hay cierre oficial',processing:'Estado de cierre sin confirmar',missing:'Comprobante de empresa inexistente',not_started:'Ciclo todavía no iniciado',error:'Error al recuperar o procesar el cierre'};
+ const labels={confirmed:'Cierre confirmado',in_progress:'Ciclo en curso · provisional',pending:'Pendiente · No hay cierre oficial',processing:'Cierre en ejecución',interrupted:'Ejecución interrumpida · reintento pendiente',unknown:'Estado de ejecución sin confirmar',missing:'Comprobante de empresa inexistente',not_started:'Ciclo todavía no iniciado',error:'Error al recuperar o procesar el cierre'};
  function rows(history,company){return (history?.cycles||[]).filter(r=>String(r.empresa_id)===String(company)).map(r=>({round:Number(r.ciclo),closedAt:r.closed_at,partidaId:r.partida_id,empresaId:r.empresa_id,closureError:r.processing_error,...(r.status==='confirmed'?{...r.result.financial,cycleReceipt:r.result.receipt,decisions:r.result.receipt?.decisions||r.result.state?.__cyclePlans?.[r.ciclo]?.state||{},officialResult:r.result}:{}),closureStatus:r.status}));}
  function report(base,cycle){
   const row=base.cycleHistory?.find(r=>Number(r.round)===Number(cycle));
