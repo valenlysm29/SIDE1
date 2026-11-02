@@ -1,4 +1,6 @@
 import { runOnce, remoteRpc } from './runtime.mjs';
+import { runOnce as legacyRunOnce } from './legacy-runtime.mjs';
+import { runVersioned } from './route.mjs';
 
 // Supabase provides these credentials inside the function; never sent to clients.
 const url = Deno.env.get('SUPABASE_URL');
@@ -14,7 +16,7 @@ Deno.serve(async (request: Request) => {
     const auth = await rpc('side_validar_token_cierre', { p_token: token });
     if (auth.error) return new Response('Authorization unavailable', { status: 503 });
     if (auth.data !== true) return new Response('Unauthorized', { status: 401 });
-    const results = await runOnce(rpc, { deadline: Date.now() + 45000 });
+    const results = await runVersioned(rpc, legacyRunOnce, runOnce, { deadline: Date.now() + 45000 });
     console.log(JSON.stringify({ job: 'side-business-close', results }));
     const success = results.every((r: { success: boolean; pending?: boolean }) => r.success && !r.pending);
     return Response.json({ success, results }, { status: success ? 200 : 503 });
