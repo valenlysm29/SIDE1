@@ -14,6 +14,7 @@ declare
       end if;
       if cycle>=(c->>'cycles')::integer then$$;
 begin
+  anchor:=replace(anchor,chr(13),''); guarded:=replace(guarded,chr(13),'');
   if position(guarded in definition)>0 then return; end if;
   if position(anchor in definition)=0 then raise exception 'Contrato de controlar_partida incompatible'; end if;
   execute replace(definition,anchor,guarded);
