@@ -1,16 +1,96 @@
 # Inventario general de tareas completadas y pendientes de SIDE
 
-Corte inicial: **1 de noviembre de 2026, Lima**. **Actualización de ejecución: 2 de noviembre de 2026, Lima**. Esta revisión implementa y verifica fases 0/1 en un clon y Supabase aislados. No modifica datos reales ni despliega las correcciones candidatas. Las secciones de antecedentes conservan el corte original y se subordinan a la actualización siguiente.
+Corte inicial: **1 de noviembre de 2026, Lima**. **Actualización de ejecución: 2 de noviembre de 2026, Lima**. Esta revisión incorpora la finalización operativa de Fase 1 y el despliegue SQL/Edge verificado. No modifica decisiones ni reconstruye cierres de partidas reales. Las secciones de antecedentes conservan el corte original y se subordinan a la actualización siguiente.
 
 ## Resumen del estado real
 
 **SIDE todavía no reúne evidencia suficiente para entrega final.** Hay motor económico, cierres persistentes, interfaces, Laboratorio, modos experimentales, oráculos y pruebas relevantes. La brecha principal está en la compatibilidad y aceptación conjunta de frontend, SQL y Edge, la recuperación histórica y las funciones económicas incompletas.
 
-Inventario actualizado: **90 tareas: 26 ✅, 48 🟡, 13 🔴 y 3 ⚪**. De las 64 tareas abiertas, **15 son P0, 40 P1, 6 P2 y 3 P3**. Estos números cuentan tareas de esta matriz, no porcentajes de avance ni número de defectos independientes. Varias se resuelven en un mismo ensayo o paquete coordinado.
+Inventario actualizado: **90 tareas: 29 ✅, 45 🟡, 13 🔴 y 3 ⚪**. De las 61 tareas abiertas, **12 son P0, 40 P1, 6 P2 y 3 P3**. Estos números cuentan tareas de esta matriz, no porcentajes de avance ni número de defectos independientes. Varias se resuelven en un mismo ensayo o paquete coordinado.
 
 Los estados ✅ certifican exclusivamente el alcance descrito: una prueba de modelo, un escenario histórico o una comprobación administrativa no certifican toda un área ni toda producción. Las tareas 🟡 tienen implementación y evidencia parcial; las 🔴 tienen falta o fallo documentado; las ⚪ carecen de evidencia suficiente para afirmar implementación/operación completas.
 
-## Ejecución de fases 0 y 1 — 2/11/2026
+## F02 — Finalización operativa de Fase 1 y despliegue real
+
+**Resultado: infraestructura de Fase 1 desplegada y verificada. La recuperación histórica queda separada y pendiente; no constituye un bloqueo de las partidas nuevas.** No se declara completada la economía ni la aceptación global de SIDE. El estado de cada una de las 90 tareas continúa reflejando sus límites: SIDE-013/059/064/067/068 y el pipeline general conservan deuda explícita.
+
+### Separación implementada
+
+Los commits **3c0455d**, **fe9b4e6** y **de49d92** priorizan partidas nuevas, aíslan errores de versión/red/procesamiento por partida y preservan el motor legado. Un fallo histórico no impide atender las demás; sí devuelve error/pending explícito. Se mantiene el cierre ordenado por ciclo dentro de cada partida. Una versión desconocida nunca se ejecuta con otro motor. No se cambiaron fórmulas, decisiones, versiones de partidas existentes ni cierres sellados.
+
+Durante la implementación apareció Edge v10 y la migración de seguimiento **20261102174348**, desplegados externamente. Se conservaron el registro de ejecución, la propiedad de intentos y las RPC con fencing. Su SQL ya instalado se incorporó al repositorio con la versión exacta, sin reaplicarlo en producción. El aislamiento se adaptó a runTracked y se probó con ese contrato vigente. El legacy-runtime permanece idéntico.
+
+### Clasificación final de los 26 huecos (sin recuperar datos)
+
+- **2 candidatos técnicos con evidencia suficiente para propuesta de recuperación:** SIDE-019 ciclo 1 y SIDE-AYRH ciclo 1. El primero dispone de confirmación original y decisiones del ciclo recuperables por la RPC; el segundo conserva plan original. Ambos alcanzan persistencia bajo su motor original, con guardado interceptado y sin snapshots de eventos que requieran fuente adicional. No se guardaron resultados; una recuperación posterior requiere revisión académica y autorización concreta.
+- **11 con evidencia incompleta**, **3 que requieren conciliación** y **10 dependientes de cierres anteriores**. Los eventos del snapshot del cliente no se consideran hechos verificados. SIDE-JRHM no se da por recuperable aunque el motor llegue a guardar: sus eventos carecen de fuente independiente demostrada.
+- Diagnóstico sobre copia restaurada sin API, RPC dentro de BEGIN/ROLLBACK y persistencia interceptada; hashes de partidas, estados y cierres iguales antes/después. No se inventaron planes cero para acreditar recuperación: los planes generados por política no-plan se excluyeron expresamente del criterio de evidencia.
+
+| Partida | Ciclo | Clasificación | Resultado de validación |
+| --- | --- | --- | --- |
+| SIDE-002 | 1 | EVIDENCIA_INCOMPLETA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-019 | 1 | CANDIDATO_VERIFICABLE_SIN_ESCRITURA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-225M | 1 | EVIDENCIA_INCOMPLETA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-63AA | 2 | CONCILIACION_REQUERIDA | DECISION_INVALIDA |
+| SIDE-63AA | 3 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-8KP4 | 2 | EVIDENCIA_INCOMPLETA | DECISION_INVALIDA |
+| SIDE-8KP4 | 3 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-AYRH | 1 | CANDIDATO_VERIFICABLE_SIN_ESCRITURA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-DDBN | 1 | EVIDENCIA_INCOMPLETA | DECISION_INVALIDA |
+| SIDE-DT42 | 2 | CONCILIACION_REQUERIDA | DATOS_ECONOMICOS_NO_VERIFICADOS |
+| SIDE-DT42 | 3 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-FWPZ | 2 | EVIDENCIA_INCOMPLETA | DATOS_ECONOMICOS_NO_VERIFICADOS |
+| SIDE-FWPZ | 3 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-JDGT | 1 | EVIDENCIA_INCOMPLETA | DATOS_ECONOMICOS_NO_VERIFICADOS |
+| SIDE-JDGT | 2 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-JRHM | 1 | CONCILIACION_REQUERIDA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-JRHM | 2 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-JRHM | 3 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-N3S3 | 1 | EVIDENCIA_INCOMPLETA | DECISION_INVALIDA |
+| SIDE-U8NA | 1 | EVIDENCIA_INCOMPLETA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-U8NA | 2 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-X6VC | 1 | EVIDENCIA_INCOMPLETA | DECISION_INVALIDA |
+| SIDE-YHM8 | 1 | EVIDENCIA_INCOMPLETA | DECISION_INVALIDA |
+| SIDE-YHM8 | 2 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+| SIDE-ZJ3K | 1 | EVIDENCIA_INCOMPLETA | DIAGNOSTICO_SIN_ESCRITURA |
+| SIDE-ZJ3K | 2 | DEPENDENCIA_HISTORICA | CIERRE_ANTERIOR_REQUERIDO |
+
+Evidencia: tests/output/fase01/finalizacion/historical-classification.json y classify_historical_gaps.cjs. Los códigos indican el primer rechazo observado; la clasificación no garantiza que no existan otros tras resolverlo.
+
+### Pruebas focales y rollback
+
+- **13 pruebas Node aprobadas, 0 fallidas finales:** aislamiento, versión, seguimiento/fencing, autorización HTTP y respuesta RPC. Archivo tracked.log. Se añaden **4** pruebas de guardia manual/automática/costos aprobadas (guards.log), sin sumar repeticiones previas.
+- **54 comprobaciones negativas Auth/Data API/Edge aprobadas**, incluyendo nuevos endpoints de seguimiento y acceso directo a escritores financieros (tracked-security.log).
+- Escenarios conectados **3×3 y 3×6: 27 resultados** con dos solicitudes Edge concurrentes por ciclo mientras una partida antigua conserva un préstamo inválido. Se verificaron historia sellada, transiciones, Estudiante/Docente/Laboratorio y ausencia de errores de página/recursos locales en el recorrido (connected-isolation/integration.json). El conjunto completo de interfaces sigue siendo objeto de fase 3.
+- Tras preservar la incorporación externa de seguimiento: **6 resultados oficiales adicionales** —3 empresas manual y 3 automático— con propiedad de intento, guardado protegido, reintento inmutable y fase final. La partida inválida conserva cero cierres (tracked-smoke.json).
+- Respaldo actualizado public/side_private/Auth/Vault restaurado en **fase01_restore3**. La primera descarga se truncó por conexión; se repitió y solo se usó la copia completa. Token de Vault recuperado por copia DPAPI ya verificada. Dumps y token permanecen ignorados por Git.
+- **SQL: forward → rollback exacto de metadatos → reaplicación**, con datos de negocio iguales, conservando el seguimiento ya existente (metadata-rollback.json y rollback-tracked.log). No se revocó seguridad para hacer pasar pruebas.
+- **Edge: reversión real a v10 → candidato**, autenticación y rechazo económico explícito conservados, hashes económicos sin cambios (edge-rollback-tracked.log/edge-rollback.json). Los HTTP 502 breves del recargador local se trataron como disponibilidad transitoria en el guion; ninguna prueba financiera se omitió.
+
+### Estado real de publicación
+
+- **Main de aplicación: de49d92c0df3f82a0b0260027bdb54802d76ba41**, publicado por fast-forward, sin fuerza. Pages aprobado: [ejecución 41497403197](https://github.com/valenlysm29/SIDE1/actions/runs/41497403197). El commit posterior de este informe solo cambia documentación.
+- **Edge side-business-close v11 ACTIVE**. Los cuatro archivos descargados tras desplegar coinciden con main normalizando saltos de línea. Se conserva verify_jwt=false del mecanismo previo con token dedicado validado por RPC; pruebas remotas sin token: POST 401, GET 405.
+- **SQL instalado:** `fase01_security_paths` versión remota **20261102181532**, y `bloquear_eventos_costos_no_verificados` versión **20261102181550**. Se corresponden con fuentes locales 20261102054323 y 20261102025853. Trigger presente, search_path=pg_catalog y escritores/intent RPC solo servidor verificados.
+- La aplicación anterior que agotó tiempo no se había instalado. Una sesión propia del pg_dump fallido quedó idle in transaction; se identificó por usuario, PID y COPY y se cerró para liberar el bloqueo. No se cancelaron transacciones de partidas ni se alteraron sus filas.
+- **158 cierres actuales al verificar; los 155 originales del respaldo conservan exactamente el hash e9444aa8211fe7a585b7c13076a8e9f8**. Los tres adicionales aparecieron fuera de los ensayos de esta tarea. No se ejecutó recuperación histórica ni se invocó manualmente el worker de producción.
+- **Cron activo cada minuto**. Sus respuestas observadas siguen HTTP 503 cuando hay rechazos históricos DECISION_INVALIDA/DATOS_ECONOMICOS_NO_VERIFICADOS; es una señal verdadera, no un falso éxito. Los intentos se finalizan con outcome=error. Las partidas nuevas se procesan primero y se aíslan de dichos errores, probado en local real. No se creó una partida remota para probarlo.
+
+### Tareas cerradas y pendientes
+
+| ID | Estado anterior | Estado actual | Evidencia / corrección |
+| --- | --- | --- | --- |
+| SIDE-012 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F02: HTTP 204, errores por partida y seguimiento/fencing probados y desplegados en Edge v11; commits d56806d,3c0455d,fe9b4e6,de49d92 |
+| SIDE-013 | 🔴 Pendiente | 🔴 Pendiente | F02: 26 huecos clasificados sin escritura; 2 candidatos, 11 sin evidencia, 3 para conciliar, 10 dependientes |
+| SIDE-059 | 🔴 Pendiente | 🔴 Pendiente | F02: efectos de costos no conciliados bloqueados en selección nueva y cierre; no se modificó semántica |
+| SIDE-061 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F02: trigger instalado y verificado; migración remota 20261102181550, fuente 20261102025853 |
+| SIDE-064 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F02: clasificación con motor original en transacciones revertidas; hashes de copia sin cambios |
+| SIDE-067 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F02: 54 pruebas negativas reales; search_path fijo y escritores financieros server-only verificados en producción; migración 20261102181532 |
+| SIDE-069 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F02: SQL instalado y Edge v11 idéntica a los cuatro archivos de main de49d92; Pages success |
+
+**Pendientes independientes:** recuperación/conciliación histórica, efectos de costos de fase 2, revisión completa de RPC y Auth, normalización total de migraciones antiguas, regresión general y pipeline de calidad, aceptación económica y de interfaz de fase 3. Ninguno se oculta como completado. La publicación focal no es certificación integral de SIDE.
+
+## Antecedente de ejecución anterior a la finalización — 2/11/2026
 
 **Fase 0: completada en la base de trabajo nueva. Fase 1: pendiente por bloqueo histórico/económico real; no se publica el candidato en main ni se despliega.** No se pide autorización adicional: faltan planes originales/fuentes de eventos y conciliación de un crédito inválido; autorizar una operación no reemplaza esa evidencia.
 
@@ -193,8 +273,8 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 | SIDE-009 | Cierres | Avance automático secuencial sin saltos | ✅ Completada y verificada | F01: 6 ciclos automáticos consecutivos, 3 empresas, Edge real y RPC reales; commit d56806d. | Aceptación económica/UI completa sigue en fase 3. | P0 |
 | SIDE-010 | Cierres | Respetar gracia de sincronización y reloj real de cada ciclo | ✅ Completada y verificada | F01: tests PostgreSQL de reloj/gracia/6 ciclos aprobados; escenario automático conectado aprobado; commit d56806d. | Mantener pruebas al cambiar transiciones; no adelantar relojes de partidas reales. | P0 |
 | SIDE-011 | Cierres | Enrutar motor nuevo y legado sin transformar partidas | ✅ Completada y verificada | F01: Edge v8 coincide con cuatro archivos del main base; motores 1 y 0 probados mediante Edge real; commit d56806d. | No se cambió el motor legado. El ajuste HTTP candidato no se desplegó. | P0 |
-| SIDE-012 | Cierres | Distinguir error económico de HTTP exitoso | 🟡 Implementada, pendiente de validación | F01: corregido HTTP 204 en remoteRpc y Edge generada; 8 pruebas focales + motor legado real sin falso NETWORK_ERROR; commit d56806d. | Publicar corrección tras resolver bloqueo crítico de publicación; producción conserva v8. | P0 |
-| SIDE-013 | Cierres | Recuperar ciclos históricos ausentes | 🔴 Pendiente | F01: diagnóstico individual en copia restaurada: 26 huecos estructurales; tabla de evidencia abajo; commit d56806d. | Faltan planes/fuentes verificables en varios casos; no reconstruir ni sobrescribir cierres. | P0 |
+| SIDE-012 | Cierres | Distinguir error económico de HTTP exitoso | ✅ Completada y verificada | F02: HTTP 204, errores por partida y seguimiento/fencing probados y desplegados en Edge v11; commits d56806d,3c0455d,fe9b4e6,de49d92 | Mantener monitoreo; errores históricos continúan explícitos. | P0 |
+| SIDE-013 | Cierres | Recuperar ciclos históricos ausentes | 🔴 Pendiente | F02: 26 huecos clasificados sin escritura; 2 candidatos, 11 sin evidencia, 3 para conciliar, 10 dependientes | Recuperación histórica independiente. No ejecutar automáticamente candidatos ni inventar planes/eventos. | P0 |
 | SIDE-014 | Estudiante | Admisión, código, identidad y reingreso | 🟡 Implementada, pendiente de validación | E07/E12: Auth local y pruebas de código; controles presentes | Recorrido actual con sesión real, transferencia autorizada y expulsión | P1 |
 | SIDE-015 | Estudiante | Guardar borradores y confirmar decisiones por ciclo | 🟡 Implementada, pendiente de validación | E05/E12: persistencia, cola y recuperación focales | E2E en red interrumpida; confirmar coincidencia con snapshot servidor | P1 |
 | SIDE-016 | Estudiante | Aislamiento entre empresas, salas y ciclos | 🟡 Implementada, pendiente de validación | E05/E07: guardias de identidad y pruebas locales | Pruebas negativas HTTP con dos docentes y estudiantes en revisión final | P0 |
@@ -240,17 +320,17 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 | SIDE-056 | Eventos | Inventario estático de 92 IDs únicos | ✅ Completada y verificada | E11: catálogo e inventario; 48 grupales y 44 individuales | Conservar inventario; no confundir con efectos completos | P2 |
 | SIDE-057 | Eventos | Fuente autoritativa, programación y recuperación de sorteos | ✅ Completada y verificada | F01: lectura de contexto/sorteos solo servicio; PostgreSQL real y rechazo de hechos no verificables probados; commit d56806d. | Alcance: fuente/guardias; semántica completa de 92 eventos sigue en SIDE-060. | P0 |
 | SIDE-058 | Eventos | Aplicación de demanda histórica y movimientos de caja | 🟡 Implementada, pendiente de validación | E03: integración local; runtime remoto contiene contexto de eventos | Prueba remota controlada, idempotencia y continuidad con nuevas reglas | P1 |
-| SIDE-059 | Eventos | Efectos de costos históricos no verificables | 🔴 Pendiente | F01: costos sin base verificable siguen rechazados; no se inventó regla ni se retiró validación; commit d56806d. | Conciliar base económica de costos; el bloqueo seguro no equivale a implementar esos efectos. | P0 |
+| SIDE-059 | Eventos | Efectos de costos históricos no verificables | 🔴 Pendiente | F02: efectos de costos no conciliados bloqueados en selección nueva y cierre; no se modificó semántica | Regla económica pendiente de fase 2; no bloquea partidas nuevas con configuración admitida. | P0 |
 | SIDE-060 | Eventos | Semántica económica completa de los 92 eventos | 🔴 Pendiente | E11: solo 8 IDs marcados implemented en event_semantics_v2 | Completar 84 restantes y reconciliar incluso los 8 con texto/condiciones; PE30 es compuesto | P1 |
-| SIDE-061 | Eventos | Restricciones de selección antes de iniciar partida | 🟡 Implementada, pendiente de validación | F01: trigger de restricción probado localmente; 20261102025853 no figura instalado en producción; commit d56806d. | Instalar trigger compatible solo al superar la puerta crítica; conserva eventos existentes. | P0 |
+| SIDE-061 | Eventos | Restricciones de selección antes de iniciar partida | ✅ Completada y verificada | F02: trigger instalado y verificado; migración remota 20261102181550, fuente 20261102025853 | No altera selecciones existentes; costos no soportados siguen bloqueados. | P0 |
 | SIDE-062 | Eventos | Noticia privada y trazabilidad docente de aplicación | 🟡 Implementada, pendiente de validación | E11: UI y RPC experimentales, fixtures aprobados | Auth real y comprobante: programado/aplicado/no aplicado, sin filtración entre empresas | P1 |
 | SIDE-063 | Eventos | Equidad, duración, combinaciones y concurrencia | 🟡 Implementada, pendiente de validación | E11: rotación PE69 y ensayos de modos parciales | Eventos positivos/negativos/grupales distintos, seis ciclos y dos conexiones | P1 |
-| SIDE-064 | Eventos | Reconstrucción histórica sin resorteo ni datos inventados | 🟡 Implementada, pendiente de validación | F01: 26 huecos inspeccionados sin resorteo; cuatro rechazos registrados por datos/crédito; commit d56806d. | Obtener decisiones/fuentes históricas y resolver cada caso antes de recuperarlo. | P0 |
+| SIDE-064 | Eventos | Reconstrucción histórica sin resorteo ni datos inventados | 🟡 Implementada, pendiente de validación | F02: clasificación con motor original en transacciones revertidas; hashes de copia sin cambios | Revisión y eventual recuperación separadas; fuentes de eventos y saldos aún necesarias. | P0 |
 | SIDE-065 | Supabase | RLS habilitado en tablas públicas inspeccionadas | ✅ Completada y verificada | E02: 20 tablas públicas con rowsecurity=true en consulta actual | No repetir comprobación de bandera; autorización efectiva en tareas 16/35/67 | P0 |
 | SIDE-066 | Supabase | RPC de guardado de cierre restringidas a servidor | ✅ Completada y verificada | E02: side_guardar_cierre_excel y negocio sin EXECUTE anon/authenticated | Cierra hallazgo antiguo de acceso directo; no acredita todas las rutas RPC | P0 |
-| SIDE-067 | Supabase | Auditar permisos SECURITY DEFINER y search_path | 🟡 Implementada, pendiente de validación | F01: 34 negativos Auth/HTTP/Edge; migración final cierra escritor legacy reabierto por bootstrap y fija dos search_path; commit d56806d. | Migración candidata no desplegada; revisión contextual restante de RPC públicas y política Auth. | P0 |
+| SIDE-067 | Supabase | Auditar permisos SECURITY DEFINER y search_path | 🟡 Implementada, pendiente de validación | F02: 54 pruebas negativas reales; search_path fijo y escritores financieros server-only verificados en producción; migración 20261102181532 | Resta revisión contextual completa de otras RPC/política Auth; no bloquea este despliegue focal. | P0 |
 | SIDE-068 | Supabase | Reconstrucción completa de esquema/migraciones desde cero | 🟡 Implementada, pendiente de validación | F01: bootstrap reproducible de manifiestos y restauración real desde vacío con Auth, side_private y FK; commit d56806d. | Cadena histórica CLI completa todavía no normalizada; no confundir manifiesto de instalación probado con todas las migraciones antiguas. | P0 |
-| SIDE-069 | Supabase | Alinear migraciones nuevas con funciones instaladas | 🟡 Implementada, pendiente de validación | F01: SQL/Edge v8/main base alineados salvo trigger de costos; endurecimiento y HTTP 204 preparados y probados; commit d56806d. | Aplicar 20261102025853 y 20261102054323 y desplegar candidato cuando se libere la puerta crítica. | P0 |
+| SIDE-069 | Supabase | Alinear migraciones nuevas con funciones instaladas | ✅ Completada y verificada | F02: SQL instalado y Edge v11 idéntica a los cuatro archivos de main de49d92; Pages success | Seguimiento instalado externamente conservado y versionado en el repositorio. | P0 |
 | SIDE-070 | Supabase | Cron y presencia de secreto de programación | ✅ Completada y verificada | F01: un job activo por minuto y Vault presente en producción; lectura sin invocación de partidas reales; commit d56806d. | Presencia comprobada; recuperación y operación aisladas en SIDE-071/072. | P0 |
 | SIDE-071 | Supabase | Operación autenticada cron→Edge→cierre y alertas | ✅ Completada y verificada | F01: cron real local -> pg_net -> Edge real HTTP 200/success; token inválido 401; programación restaurada inactiva; commit d56806d. | La operación remota conserva errores históricos económicos explícitos; no se confunden con éxito de cron. | P0 |
 | SIDE-072 | Supabase | Respaldo integral y restauración ensayada | ✅ Completada y verificada | F01: respaldo real de public/side_private/Auth/Vault; recuperación DPAPI, 155 cierres con hash idéntico y cron inactivo; commit d56806d. | DPAPI requiere esta cuenta/equipo; en otro host rotar token dedicado y probarlo antes de activar cron. Copias sensibles locales, no en Git. | P0 |
@@ -287,14 +367,17 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-009: Avance automático secuencial sin saltos.
 - SIDE-010: Respetar gracia de sincronización y reloj real de cada ciclo.
 - SIDE-011: Enrutar motor nuevo y legado sin transformar partidas.
+- SIDE-012: Distinguir error económico de HTTP exitoso.
 - SIDE-030: Modelo de indicadores solo desde cierres sellados.
 - SIDE-032: Comparaciones, gráficos y ausencia de ciclos futuros.
 - SIDE-042: Búsqueda acotada de compras de hilo.
 - SIDE-047: Estados y caja conciliados seis ciclos en escenario local.
 - SIDE-056: Inventario estático de 92 IDs únicos.
 - SIDE-057: Fuente autoritativa, programación y recuperación de sorteos.
+- SIDE-061: Restricciones de selección antes de iniciar partida.
 - SIDE-065: RLS habilitado en tablas públicas inspeccionadas.
 - SIDE-066: RPC de guardado de cierre restringidas a servidor.
+- SIDE-069: Alinear migraciones nuevas con funciones instaladas.
 - SIDE-070: Cron y presencia de secreto de programación.
 - SIDE-071: Operación autenticada cron→Edge→cierre y alertas.
 - SIDE-072: Respaldo integral y restauración ensayada.
@@ -306,7 +389,6 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 
 ### 🟡 Implementada, pendiente de validación
 
-- SIDE-012: Distinguir error económico de HTTP exitoso.
 - SIDE-014: Admisión, código, identidad y reingreso.
 - SIDE-015: Guardar borradores y confirmar decisiones por ciclo.
 - SIDE-016: Aislamiento entre empresas, salas y ciclos.
@@ -340,13 +422,11 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-053: Proyección informativa sin guardar decisiones.
 - SIDE-054: Calibración educativa utility-v1 y rentabilidad por segmento.
 - SIDE-058: Aplicación de demanda histórica y movimientos de caja.
-- SIDE-061: Restricciones de selección antes de iniciar partida.
 - SIDE-062: Noticia privada y trazabilidad docente de aplicación.
 - SIDE-063: Equidad, duración, combinaciones y concurrencia.
 - SIDE-064: Reconstrucción histórica sin resorteo ni datos inventados.
 - SIDE-067: Auditar permisos SECURITY DEFINER y search_path.
 - SIDE-068: Reconstrucción completa de esquema/migraciones desde cero.
-- SIDE-069: Alinear migraciones nuevas con funciones instaladas.
 - SIDE-073: Protección de contraseñas y sesiones.
 - SIDE-076: Navegación estudiantil y separación DOP/Producción.
 - SIDE-077: Adaptación escritorio, tablet y móvil.
@@ -377,7 +457,7 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-074: Rendimiento de consultas, índices y límites operativos.
 - SIDE-078: Accesibilidad: teclado, lector y contraste.
 
-## Bloqueos de publicación pendientes tras la ejecución
+## Bloqueos registrados antes de la separación histórica (superados para este despliegue)
 
 1. **Historial no recuperable con la evidencia disponible:** 26 huecos estructurales en la copia de producción; varios no tienen planes y cuatro partidas registran rechazos de datos económicos/crédito. No se inventan cierres.
 2. **Costos de eventos sin regla verificable:** se mantiene rechazo; el trigger preventivo de nuevas selecciones aún no está instalado en producción. No se sustituye por costos arbitrarios.
