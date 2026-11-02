@@ -11,6 +11,11 @@ const datos={nombre:'Prueba',configuracion:{lifecycleVersion:2,enabledEvents:['P
 test('creación usa RPC atómico, conserva requestId y envía la configuración exacta',async()=>{
  const s=service(async()=>({data:sala}));const r=await s.api.crear(datos);assert.equal(r.success,true);assert.equal(r.data.id,'room');
  const call=s.calls.find(c=>c.name==='crear_sala_docente');assert.equal(call.args.p_request_id,datos.requestId);assert.equal(call.args.p_config.integrationDurationMinutes,2);assert.equal(call.args.p_config.cycles,3);assert.equal(call.args.p_config.roundMinutes,5);assert.equal(call.args.p_reemplazar_id,null);
+ assert.equal(call.args.p_config.economicRulesVersion,'utility-v1');
+});
+test('crear una sala no altera la versión explícita de una configuración heredada',async()=>{
+ const s=service(async()=>({data:sala}));await s.api.crear({...datos,configuracion:{...datos.configuracion,economicRulesVersion:'md-20261027'}});
+ assert.equal(s.calls.find(c=>c.name==='crear_sala_docente').args.p_config.economicRulesVersion,'md-20261027');
 });
 test('conflicto entrega sala anterior sin anunciar éxito',async()=>{const s=service(async()=>({data:{error:'Sala anterior',code:'SALA_ACTIVA',partida:sala}}));const r=await s.api.crear(datos);assert.equal(r.success,false);assert.equal(r.code,'SALA_ACTIVA');assert.equal(r.data.id,'room');assert.equal(s.errors.length,1);});
 test('crear nunca cancela ni reemplaza una partida anterior implícitamente',async()=>{const s=service(async()=>({data:sala}));await s.api.crear({...datos,reemplazarId:'old'});assert.equal(s.calls.at(-1).args.p_reemplazar_id,null);assert.equal(s.calls.some(c=>c.name==='controlar_partida'&&c.args.p_accion==='cancelar'),false);});

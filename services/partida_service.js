@@ -168,7 +168,11 @@
         nombre: d.nombre,
         curso: d.curso || null,
         segmento: d.segmento || 'Estandar',
-        configuracion: d.configuracion || {},
+        // Only creation receives the experimental default. Recovery and
+        // updates retain the version persisted with their existing room.
+        configuracion: d.configuracion?.lifecycleVersion===2
+          ? {economicRulesVersion:'utility-v1',...d.configuracion}
+          : d.configuracion || {},
         eventos_habilitados: d.eventos_habilitados || []
       };
       if(d.configuracion?.lifecycleVersion===2){
