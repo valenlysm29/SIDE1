@@ -1,0 +1,26 @@
+{
+  "version": 16,
+  "status": "ACTIVE",
+  "files": [
+    {
+      "file": "index.ts",
+      "sha256": "e5ddbff7a7fb469451e1d6c5f9031b60485b7edaaee9fde9b1c69e6cfbd1f6ae",
+      "matchesMain": true
+    },
+    {
+      "file": "legacy-runtime.mjs",
+      "sha256": "66e182f1ae7a696696d55df18f6933a8d357ec10d158f9bbd58ac037439bb134",
+      "matchesMain": true
+    },
+    {
+      "file": "route.mjs",
+      "sha256": "ff609857ab2718f9d903866ce086f91cb428f908ad504a000126198f371efb72",
+      "matchesMain": true
+    },
+    {
+      "file": "runtime.mjs",
+      "sha256": "063ebddc58719cc512a4dec0afe0e0ef801e55e2a97918dedfb968dbb24372b8",
+      "matchesMain": true
+    }
+  ]
+}

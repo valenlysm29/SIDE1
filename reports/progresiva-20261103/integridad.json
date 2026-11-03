@@ -1,0 +1,20 @@
+{
+  "baselineClock": "2026-11-03T15:57:56.348224+00:00",
+  "oldClosures": 167,
+  "oldReports": 216,
+  "oldClosuresHash": "1088a80ea03e7dab9955f784341c0c96",
+  "oldReportsHash": "7dd937ecc38fe38ec87f92c895686f60",
+  "baselineUnchanged": true,
+  "closureHashExpression": "md5(string_agg(partida_id::text||':'||ciclo::text||':'||cierre::text,'|' order by partida_id,ciclo))",
+  "reportHashExpression": "md5(string_agg(to_jsonb(r)::text,'|' order by id))",
+  "historicalFilter": "created_at <= '2026-11-03T15:57:56.348224+00:00'",
+  "newQaClosures": 10,
+  "newQaReports": 109,
+  "newQaDuplicates": 0,
+  "readIndexMismatches": 0,
+  "officialReportMismatches": 0,
+  "finalDatabaseCheck": "2026-11-03T21:05:39.727239+00:00",
+  "regressionsPassed": 216,
+  "remoteMigrationVersions": ["20261103161357", "20261103162054", "20261103162552", "20261103163740"],
+  "note": "Supabase apply_migration asigna su fecha de ejecución; los archivos versionados documentan las mismas migraciones con la hora de preparación. El corte de baseline excluye partidas nuevas de otras sesiones concurrentes."
+}

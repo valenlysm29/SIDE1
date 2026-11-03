@@ -1,0 +1,1996 @@
+[
+  {
+    "partida": "SIDE-GR2X",
+    "ciclos": 3,
+    "checks": [
+      {
+        "vista": "docente",
+        "empresa": 211,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 212,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 213,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 214,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 215,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 216,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 217,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 218,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 219,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 220,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 221,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 222,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 211,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 212,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 213,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 214,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 215,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 216,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 217,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 218,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 219,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 220,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 221,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 222,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 211,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 212,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 213,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 214,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 215,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 216,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 217,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 218,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 219,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 220,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 221,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 222,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 211,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 212,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 213,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 214,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 215,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 216,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 217,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 218,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 219,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 220,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 221,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 222,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 211,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 212,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 213,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 214,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 215,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 216,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 217,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 218,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 219,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 220,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 221,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 222,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 211,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 212,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 213,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 214,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 215,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 216,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 217,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 218,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 219,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 220,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 221,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 222,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 211,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 211,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 211,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 212,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 212,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 212,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 213,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 213,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 213,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 214,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 214,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 214,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 215,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 215,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 215,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 216,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 216,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 216,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 217,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 217,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 217,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 218,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 218,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 218,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 219,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 219,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 219,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 220,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 220,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 220,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 221,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 221,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 221,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 222,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 222,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 222,
+        "ciclo": 3,
+        "exacto": true
+      }
+    ],
+    "errors": [],
+    "reloaded": true,
+    "reentryRetries": [],
+    "passed": true
+  },
+  {
+    "partida": "SIDE-6DJZ",
+    "ciclos": 6,
+    "checks": [
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 223,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 224,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 225,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 226,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 227,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 228,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 229,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 230,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 231,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 232,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 233,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "docente",
+        "empresa": 234,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 223,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 224,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 225,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 226,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 227,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 228,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 229,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 230,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 231,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 232,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 233,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 234,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 223,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 224,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 225,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 226,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 227,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 228,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 229,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 230,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 231,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 232,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 233,
+        "ciclo": 6,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 2,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 3,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 4,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 5,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 234,
+        "ciclo": 6,
+        "exacto": true
+      }
+    ],
+    "errors": [],
+    "reloaded": true,
+    "reentryRetries": [],
+    "passed": true
+  },
+  {
+    "partida": "SIDE-8ZRJ",
+    "ciclos": 1,
+    "ciclosConfigurados": 3,
+    "empresas": 1,
+    "checks": [
+      {
+        "vista": "docente",
+        "empresa": 236,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "laboratorio",
+        "empresa": 236,
+        "ciclo": 1,
+        "exacto": true
+      },
+      {
+        "vista": "estudiante",
+        "empresa": 236,
+        "ciclo": 1,
+        "exacto": true
+      }
+    ],
+    "errors": [],
+    "reloaded": true,
+    "reentryRetries": [],
+    "passed": true
+  }
+]

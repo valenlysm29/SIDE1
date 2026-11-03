@@ -8,12 +8,22 @@ sys.path.insert(0,str(PROJECT/'.codex-work/python'))
 from playwright.sync_api import sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
 BASE='https://valenlysm29.github.io/SIDE1/'
-cycles=int(sys.argv[1]);m=load(cycles)
-h=json.loads((OUT/(str(cycles)+'-historia-'+str(cycles)+'.json')).read_text())
+repeat=sys.argv[1]=='repeat2250'
+if repeat:
+ cycles=1;raw=json.loads((OUT/'repeticion2250.json').read_text())
+ m={'game':raw['game'],'companies':[{**raw['company'],'key':'repeticion2250'}]}
+ h=json.loads((OUT/'repeticion2250-oficial.json').read_text())
+else:
+ cycles=int(sys.argv[1]);m=load(cycles)
+ h=json.loads((OUT/(str(cycles)+'-historia-'+str(cycles)+'.json')).read_text())
+companyCount=len(m['companies'])
+def qa_session(company=None):
+ if repeat:return json.loads((OUT/'repeticion2250-session.local.json').read_text()) if company else session(3)
+ return session(cycles,company)
 rows=[r for r in h['cycles'] if r['status']=='confirmed']
-assert len(rows)==cycles*12
+assert len(rows)==cycles*companyCount
 by={(str(r['empresa_id']),r['ciclo']):r['result'] for r in rows}
-evidence={'partida':m['game']['codigo'],'ciclos':cycles,'checks':[],'errors':[],'reloaded':False,'reentryRetries':[]}
+evidence={'partida':m['game']['codigo'],'ciclos':cycles,'ciclosConfigurados':m['game']['configuracion']['cycles'],'empresas':companyCount,'checks':[],'errors':[],'reloaded':False,'reentryRetries':[]}
 def amount(t):return builtins.round(float(re.sub(r'[^0-9.\-]','',t)),2)
 def init(s,student=False):
  key='side-student-auth' if student else 'sb-plfuwfdpsagzrlveqkvl-auth-token'
@@ -29,23 +39,23 @@ def navigate(page,url=None):
  except PlaywrightTimeout:pass
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='C:/Program Files/Google/Chrome/Application/chrome.exe',headless=True,args=['--disable-background-timer-throttling','--disable-renderer-backgrounding'])
- tc=browser.new_context(viewport={'width':1440,'height':1050});tc.add_init_script(init(session(cycles)))
+ tc=browser.new_context(viewport={'width':1440,'height':1050});tc.add_init_script(init(qa_session()))
  t=tc.new_page();t.on('pageerror',lambda e:evidence['errors'].append(str(e)))
  try:
   navigate(t,BASE+'docente.html?qa=progresiva')
   t.wait_for_function('(game)=>state.partidaId===game',arg=m['game']['id'],timeout=60000)
-  t.wait_for_function('state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length>0)',timeout=120000)
+  t.wait_for_function('state.reports.length==='+str(companyCount)+'&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length>0)',timeout=120000)
   # Reload exercises the actual persisted history instead of browser state.
-  navigate(t);t.wait_for_function('(n)=>state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length===n)',arg=cycles,timeout=120000)
+  navigate(t);t.wait_for_function('(e)=>state.reports.length===e.count&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length===e.cycles)',arg={'count':companyCount,'cycles':cycles},timeout=120000)
   evidence['reloaded']=True
-  actual=t.evaluate('state.reports.map(r=>({id:r.empresaId,cycles:r.cycleHistory.map(c=>({round:c.round,estadoResultados:c.estadoResultados,balanceCaja:c.balanceCaja,flujoCaja:c.flujoCaja,balanceGeneral:c.balanceGeneral,status:c.closureStatus}))}))')
+  actual=t.evaluate('state.reports.map(r=>({id:r.empresaId,cycles:r.cycleHistory.filter(c=>c.closureStatus==="confirmed").map(c=>({round:c.round,estadoResultados:c.estadoResultados,balanceCaja:c.balanceCaja,flujoCaja:c.flujoCaja,balanceGeneral:c.balanceGeneral,status:c.closureStatus}))}))')
   for company in actual:
    for row in company['cycles']:
     assert row['status']=='confirmed';statements(row,by[(str(company['id']),row['round'])]['financial'])
   t.locator('[data-tab="resultados"]').click()
   for round in range(1,cycles+1):
    t.locator('#resultCycleSelect').select_option(str(round))
-   dom=t.locator('#resultComparison tbody tr').evaluate_all('(rows)=>rows.map(r=>Array.from(r.cells).map(c=>c.textContent))');assert len(dom)==12
+   dom=t.locator('#resultComparison tbody tr').evaluate_all('(rows)=>rows.map(r=>Array.from(r.cells).map(c=>c.textContent))');assert len(dom)==companyCount
    for company in m['companies']:
     cells=next(r for r in dom if r[0]==company['name']);r=by[(str(company['id']),round)]
     assert amount(cells[3])==r['receipt']['revenue'];assert amount(cells[7])==r['financial']['estadoResultados']['utilidadNeta'];assert amount(cells[8])==r['financial']['balanceCaja']['cajaFinal']
@@ -54,7 +64,7 @@ with sync_playwright() as p:
   print('UI TEACHER',cycles,len(evidence['checks']),flush=True)
   t.locator('[data-tab="laboratorio"]').click();t.wait_for_selector('#lab-game')
   t.locator('#lab-game').select_option(m['game']['id']);t.locator('#lab-refresh').click()
-  t.wait_for_function('document.querySelectorAll("#lab-company option").length===12',timeout=60000)
+  t.wait_for_function('document.querySelectorAll("#lab-company option").length==='+str(companyCount),timeout=60000)
   lab=t.evaluate('async game=>{const h=await SIDE_LAB_SERVICE.history(game);return h.cycles.filter(c=>c.status==="confirmed").map(c=>({id:c.empresa_id,round:c.ciclo,financial:{estadoResultados:c.result.financial.estadoResultados,balanceCaja:c.result.financial.balanceCaja,flujoCaja:c.result.financial.flujoCaja,balanceGeneral:c.result.financial.balanceGeneral}}))}',m['game']['id'])
   assert len(lab)==len(rows)
   for row in lab:statements(row['financial'],by[(str(row['id']),row['round'])]['financial'])
@@ -69,8 +79,11 @@ with sync_playwright() as p:
     evidence['checks'].append({'vista':'laboratorio','empresa':company['id'],'ciclo':round,'exacto':True})
   t.screenshot(path=str(OUT/('laboratorio-'+str(cycles)+'-final.png')),full_page=True)
   print('UI LAB',cycles,len(lab),flush=True)
+  # Teacher/lab assertions are complete. Release their polling before opening
+  # the twelve isolated student sessions on the same QA workstation.
+  tc.close()
   for company in m['companies']:
-   sc=browser.new_context(viewport={'width':1440,'height':1080});sc.add_init_script(init(session(cycles,company['key']),True))
+   sc=browser.new_context(viewport={'width':1440,'height':1080});sc.add_init_script(init(qa_session(company['key']),True))
    s=sc.new_page();s.on('pageerror',lambda e:evidence['errors'].append(str(e)))
    try:
     navigate(s,BASE+'index.html?qa=progresiva')
@@ -110,7 +123,7 @@ with sync_playwright() as p:
     print('UI STUDENT FAILURE',company['key'],repr(error),s.locator('body').inner_text()[-1800:],flush=True)
     raise
    finally:sc.close()
-  assert len(evidence['checks'])==cycles*12*3;assert not evidence['errors'],evidence['errors']
+  assert len(evidence['checks'])==cycles*companyCount*3;assert not evidence['errors'],evidence['errors']
   evidence['passed']=True
  except Exception as error:
   print('UI FAILURE',repr(error),flush=True)

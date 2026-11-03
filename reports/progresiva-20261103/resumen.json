@@ -1,0 +1,61 @@
+{
+  "local": {
+    "casos": 90,
+    "positivos": 58,
+    "negativos": 32,
+    "conciliados": 90
+  },
+  "oficial": {
+    "casos": 109,
+    "positivos": 65,
+    "negativos": 44,
+    "conciliados": 109
+  },
+  "interfaces": [
+    {
+      "partida": "SIDE-GR2X",
+      "ciclos": 3,
+      "comprobaciones": 108,
+      "recarga": true,
+      "aprobado": true
+    },
+    {
+      "partida": "SIDE-6DJZ",
+      "ciclos": 6,
+      "comprobaciones": 216,
+      "recarga": true,
+      "aprobado": true
+    },
+    {
+      "partida": "SIDE-8ZRJ",
+      "ciclos": 1,
+      "comprobaciones": 3,
+      "recarga": true,
+      "aprobado": true
+    }
+  ],
+  "incidencias": [
+    {
+      "partida": "SIDE-6DJZ",
+      "ciclo": 5,
+      "empresa": 234,
+      "detalle": "Plan QA de 2250 unidades no confirmado antes de vencer el ciclo; cierre oficial con meta 0, sin sobrescribirlo."
+    }
+  ],
+  "cajaNegativa": [
+    {
+      "partida": "SIDE-6DJZ",
+      "ciclo": 6,
+      "empresa": 231,
+      "estrategia": "ineficiente",
+      "caja": -95313.6
+    },
+    {
+      "partida": "SIDE-6DJZ",
+      "ciclo": 6,
+      "empresa": 234,
+      "estrategia": "ineficiente",
+      "caja": -884822.94
+    }
+  ]
+}

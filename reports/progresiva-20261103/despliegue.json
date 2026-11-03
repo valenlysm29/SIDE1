@@ -1,0 +1,37 @@
+{
+  "appCommit": "0b12a2c",
+  "url": "https://valenlysm29.github.io/SIDE1/",
+  "verifiedAt": "2026-11-03T20:48:30.490288+00:00",
+  "files": [
+    {
+      "file": "index.html",
+      "matchesMain": true,
+      "sha256": "4dedc0459a0d8f463c197999d9ef3f00a6259d523b8c2c0fa525875c648edbf1"
+    },
+    {
+      "file": "docente.html",
+      "matchesMain": true,
+      "sha256": "a4a28991262abd024018120d9e10da84d98d2b98b23e6c1e4b74539a277bec4f"
+    },
+    {
+      "file": "services/supabase_client.js",
+      "matchesMain": true,
+      "sha256": "2958b167377af6509ffb91fb448485bd2f88ac0db5a55c36dc68d14b04c8ea32"
+    },
+    {
+      "file": "services/official_history_service.js",
+      "matchesMain": true,
+      "sha256": "2bba61908b4f02cf7a1180fade47bd552f390e6b488747112ce34fae0fac7fa2"
+    },
+    {
+      "file": "services/laboratorio_service.js",
+      "matchesMain": true,
+      "sha256": "7909fec199ba8492d724e5b00dcf65d03827c9889d2f84b8905f6b690ddce423"
+    },
+    {
+      "file": "js/docente.js",
+      "matchesMain": true,
+      "sha256": "f52b1ad30fe5333a9f3b3a5213570e61f32aa7d917c886bb5e51a3a301faa6d8"
+    }
+  ]
+}
