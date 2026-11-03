@@ -16,6 +16,29 @@ function runtime(){
  return {run,json,elements,storage,cycle};
 }
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+test('automatic fixed and inherited rows never become student drafts across six cycles',()=>{
+ const r=runtime();
+ for(let cycle=1;cycle<=6;cycle++){
+  r.cycle(cycle);r.run('ensureCycleFixedCosts()');
+  for(const [,status] of r.json('decisionCategories().map(c=>[c.cat,decisionSectionStatus(c.cat)])'))assert.equal(status,'pending');
+  assert.ok(r.json('liveCompanyReview().sections').every(s=>s.status==='pending'));
+ }
+});
+test('explicit save with unchanged defaults is durable student activity and not an automatic charge',()=>{
+ const r=runtime();r.run("ensureCycleFixedCosts();currentCategory='C';saveCurrentSection();loadDecisionState();restoreDraftsForRound()");
+ assert.equal(r.run("decisionSectionStatus('C')"),'saved');assert.equal(r.run("decisionSectionStatus('DOP')"),'saved');
+ assert.ok(r.json('buildStudentSnapshot().decision_state.__decisionProgress[1].C').savedAt);
+ r.cycle(2);r.run('ensureCycleFixedCosts()');assert.equal(r.run("decisionSectionStatus('C')"),'pending');
+});
+test('legacy real drafts survive, while ambiguous recurring rows never claim student authorship',()=>{
+ const r=runtime();r.run("decisionState.PRODUCCION_META={round:1,moldTargets:{molde_1:24},value:24}");
+ assert.equal(r.run("decisionSectionStatus('C')"),'saved');
+ r.run("decisionState={LOCAL_PROD:{round:1,optionIds:['local_std']}}");
+ assert.equal(r.run("decisionSectionStatus('B')"),'legacy');
+});
+test('sales personnel changes are compared independently from defaults',()=>{
+ const r=runtime();assert.notEqual(r.run("JSON.stringify(comparableSummaryDraft({type:'sales-staff'},{staff:{web:1}}))"),r.run("JSON.stringify(comparableSummaryDraft({type:'sales-staff'},{staff:{web:2}}))"));
+});
 test('cash follows the last settled financial snapshot and only later ledger movements',()=>{
  const r=runtime();r.cycle(2);
  r.run("cashLedger={'1:SIM_VENTAS':1000,'2:C':-250};decisionState.__cycleSettlements={1:{round:1}};decisionState.__financialSnapshots={1:{balanceCaja:{cajaFinal:100700}}}");

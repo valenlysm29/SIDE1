@@ -34,6 +34,8 @@ function migrateCurrentReceipts(){
   if(changed)writeDecisionBatch({[receiptKey()]:JSON.stringify(receipts)});
 }
 function comparableSummaryDraft(item,d){
+  d=d||{};
+  if(item.type==='sales-staff')return Object.entries(d.staff||{}).map(([id,value])=>[id,Number(value)||0]).filter(([,value])=>value!==0).sort();
   if(item.type==='production-plan')return {moldTargets:Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Number(value)||0]).filter(([,value])=>value!==0).sort(),prices:{...defaultSegmentPrices(),...d.prices}};
   if(item.type==='number')return {value:Number(d.value)||0};
   if(item.type==='loan')return {amount:Number(d.amount)||0};
@@ -44,11 +46,10 @@ function comparableSummaryDraft(item,d){
 function liveCompanyReview(){
   const context=confirmedContext(),receipts=readReviewReceipts();
   const sections=decisionCategories().map(cat=>{
-    const submitted=sectionSubmitted(cat.cat)||decisionsSubmitted(),saved=cat.items.some(i=>Number(decisionState[i.id]?.round)===currentRound());
+    const submitted=sectionSubmitted(cat.cat)||decisionsSubmitted();
     const frozen=submitted?receipts[cat.cat]:null;
     const section=frozen?.items?deepClone(frozen):reviewModel.section(cat,context);
-    const dirty=!submitted&&cat.items.some(item=>JSON.stringify(comparableSummaryDraft(item,context.drafts[item.id]))!==JSON.stringify(comparableSummaryDraft(item,reviewModel.draft(item,{...context,drafts:{}}))));
-    return {...section,submitted,status:submitted?'sent':dirty?'draft':saved?'saved':'pending',sentAt:frozen?.sentAt||null,source:frozen?.source||'local'};
+    return {...section,submitted,status:decisionSectionStatus(cat.cat),sentAt:frozen?.sentAt||null,source:frozen?.source||'local'};
   });
   return {round:currentRound(),context,sections,financial:reviewModel.finances(sections,context),warnings:reviewModel.warnings(context)};
 }
@@ -150,7 +151,7 @@ function showCompanyAfterConfirmation(){
   currentCategory='A';companySummaryRound='current';companySummaryFilter='sent';
   renderTabs();renderDecisionCategory();
 }
-function summaryStatus(section){return section.submitted?'ENVIADA':section.status==='draft'?'BORRADOR SIN GUARDAR':section.status==='saved'?'GUARDADA, NO ENVIADA':'PENDIENTE';}
+function summaryStatus(section){return decisionStatusLabel(section.status||(section.submitted?'sent':'pending')).toUpperCase();}
 function summaryDate(section){
   if(!section.submitted)return 'No confirmada en este ciclo';
   if(!section.sentAt)return 'Registro anterior; fecha original no disponible';
@@ -279,8 +280,8 @@ function renderCompanySummary(){
     ${!history?'<p class="cs-financial-scope">Vista financiera del ciclo completo: decisiones enviadas y borradores. El filtro inferior corresponde al detalle.</p>':''}
     ${!history?noticesHtml([],review.warnings):''}
     ${history?'<p class="cs-local-note">Historial de env\u00edos guardados: las cantidades y costos permanecen como se confirmaron. No se recalcula la caja actual de un ciclo anterior.</p>':financialCardsHtml(review.financial)+`<div class="cs-cumulative-resource"><span>CANTIDAD ACUMULADA</span><strong>${cumulativeResourceQuantity(review).toLocaleString('es-PE')}</strong><small>Suma de las cantidades registradas de ciclos anteriores y del ciclo actual.</small></div>`+productionSummaryHtml(review)+`<details class="financial-details"><summary>${statement.provisional?'Proyección financiera':'Reportes financieros guardados'} · ciclo ${currentRound()}</summary><p>Utilidad${statement.provisional?' estimada':''}: ${reviewMoney(statement.estadoResultados.utilidad)} · Caja${statement.provisional?' estimada':''}: ${reviewMoney(statement.balanceCaja.cajaFinal)}</p>${financialDetailsHtml(statement)}</details>`+futureHtml(review.financial)}
-    <p class="cs-local-note">Las etiquetas ENVIADA indican confirmación en este equipo. El aviso de envío indica cuándo el servidor la recibe. Los borradores no se presentan como enviados.</p>
-    ${!history?`<div class="cs-status-strip">${review.sections.map(s=>`<span class="cs-mini-${s.submitted?'sent':'pending'}">${escapeHtml(s.title)}: ${s.submitted?'enviada':'pendiente de env\u00edo'}</span>`).join('')}</div>`:''}
+    <p class="cs-local-note">Confirmado indica confirmación en este equipo. El aviso de sincronización informa si el servidor aún no la recibe. En edición se conserva en este navegador; Guardar inicia la sincronización del borrador. Los valores iniciales y heredados no cuentan como decisiones nuevas.</p>
+    ${!history?`<div class="cs-status-strip">${review.sections.map(s=>`<span class="cs-mini-${s.submitted?'sent':'pending'}">${escapeHtml(s.title)}: ${decisionStatusLabel(s.status)}</span>`).join('')}</div>`:''}
     <div class="cs-sections">${sections.length?sections.map(s=>sectionSummaryHtml(s,{history})).join(''):'<div class="cs-empty"><h3>A\u00fan no hay decisiones enviadas</h3><p>Guardar borrador no confirma una decisi\u00f3n. Usa ENVIAR DECISI\u00d3N en cada apartado o revisa el env\u00edo completo.</p></div>'}</div>
     ${!history?`<footer class="cs-main-actions"><span>${decisionsSubmitted()?'Ciclo completo confirmado. Este resumen sigue disponible para consulta.':'Revisa lo elegido y los apartados pendientes antes de confirmar.'}</span><button id="companyReviewAll" type="button" class="cs-primary">${decisionsSubmitted()?'VER REVISI\u00d3N DEL CICLO':'REVISAR Y ENVIAR TODO'}</button></footer>`:''}
   </section>`;

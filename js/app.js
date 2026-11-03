@@ -583,7 +583,7 @@ function ensureCycleFixedCosts(){
     if(!charges.length)continue;
     // The partial category contains only the already-defined fixed/recurring
     // choices. A later save replaces this same ledger key with the full section.
-    ledger[key]=plan.net;Object.assign(state,plan.entries);
+    ledger[key]=plan.net;Object.assign(state,Object.fromEntries(Object.entries(plan.entries).map(([id,entry])=>[id,{...entry,decisionOrigin:'automatic'}])));
     sections[round]={...(sections[round]||{}),[category.cat]:{...plan.model,recordedNet:plan.net}};
     items.push(...charges.map(item=>({id:item.id,label:item.name,amount:Number(item.outflow)})));prepared.push(...fixed.map(item=>item.id));
   }
@@ -1054,16 +1054,34 @@ function renderTabs(){
       button.innerHTML=`<img src="${escapeHtml(c.icon)}" alt=""><span class="tab-label">${escapeHtml(c.short||c.title)}</span>`;
       button.addEventListener('click',()=>{if(currentCategory===c.cat)return;currentCategory=c.cat;renderTabs();renderDecisionCategory();scrollDecisionContentToTop();button.focus({preventScroll:true});});
     }
-    const sent=!c.summaryOnly&&sectionSubmitted(c.cat),saved=!c.summaryOnly&&categoryHasSaved(c.cat);
+    const progress=c.cat==='A'?null:decisionSectionStatus(c.cat),sent=progress==='sent';
     const className=`decision-tab ${c.cat===currentCategory?'active':''} ${sent?'section-sent':''}`;
     if(button.className!==className)button.className=className;
-    let status=button.querySelector('.tab-status');const text=sent?'✓ ENVIADA':saved?'BORRADOR':'';
+    let status=button.querySelector('.tab-status');const text=progress?decisionStatusLabel(progress):'';
     if(text){if(!status){status=document.createElement('b');status.className='tab-status';button.appendChild(status);}if(status.textContent!==text)status.textContent=text;}else status?.remove();
     if(nav.children[index]!==button)nav.insertBefore(button,nav.children[index]||null);
   });
   updateDecisionLayout();
 }
-function categoryHasSaved(cat){const c=categoryByCat(cat);const req=c.items.filter(itemRequired);return req.length?req.every(itemComplete):c.items.filter(i=>i.type!=='info').some(itemComplete)}
+// Progress is student activity, not completeness or the existence of economic rows.
+function decisionSectionStatus(cat=currentCategory){
+  if(cat==='DOP')cat='C';
+  const category=categoryByCat(cat);if(!category||cat==='A')return 'pending';
+  if(decisionState.__cycleSettlements?.[currentRound()])return 'finished';
+  if(sectionSubmitted(cat)||decisionsSubmitted())return 'sent';
+  const working=decisionDrafts;let baseline;
+  try{decisionDrafts={};baseline=Object.fromEntries(category.items.filter(i=>i.type!=='info').map(i=>[i.id,deepClone(initDraft(i))]));}finally{decisionDrafts=working;}
+  if(category.items.some(i=>i.type!=='info'&&working[i.id]&&JSON.stringify(comparableSummaryDraft(i,working[i.id]))!==JSON.stringify(comparableSummaryDraft(i,baseline[i.id]))))return 'draft';
+  if(decisionState.__decisionProgress?.[currentRound()]?.[cat]?.savedAt)return 'saved';
+  const automatic=new Set((decisionState.__cycleCosts?.[currentRound()]?.items||[]).map(i=>i.id));
+  const legacy=category.items.filter(i=>Number(decisionState[i.id]?.round)===currentRound()&&decisionState[i.id]?.decisionOrigin!=='automatic');
+  // Old automatic rows have no provenance. Do not rewrite or erase them.
+  if(legacy.some(i=>!i.mandatoryFixed&&!automatic.has(i.id)))return 'saved';
+  if(legacy.length)return 'legacy';
+  return 'pending';
+}
+function decisionStatusLabel(status){return {pending:'Sin decisiones',draft:'En edición',saved:'Borrador guardado',sent:'Confirmado',finished:'Finalizado',legacy:'Origen no verificado'}[status]||'Sin decisiones';}
+function categoryHasSaved(cat){return decisionSectionStatus(cat)==='saved';}
 function draftItemComplete(item){
   if(item.type==='info')return true;
   if(item.lockAfterPurchase&&itemComplete(item))return true;
@@ -1316,7 +1334,8 @@ function updateSectionCost(){
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
   updateCashHud();
-  $('sectionSaveHint').textContent=locked?'Decisiones enviadas: edición bloqueada hasta el próximo ciclo.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':'Borrador local: guarda tus avances y envía el ciclo solo cuando estés seguro.';
+  const status=decisionSectionStatus();
+  $('sectionSaveHint').textContent=locked?'Confirmado en este equipo. Consulta el aviso de sincronización para verificar la recepción del servidor.':projected<0?'El gasto supera tu caja actual. Puedes guardar el borrador, pero no enviarlo hasta ajustar el presupuesto.':status==='draft'?'En edición: cambios conservados en este navegador. Guarda para sincronizarlos con Supabase.':status==='saved'?`Borrador guardado en este equipo. ${currentStudent.empresaId?'Consulta el aviso de sincronización para verificar su recepción en Supabase.':'Modo local.'}`:status==='legacy'?'Hay valores anteriores cuyo origen no está registrado. Se conservan sin atribuirlos a una nueva edición.':'Sin decisiones nuevas. Los valores iniciales y heredados son una base de trabajo; los costos automáticos se conservan.';
   // El presupuesto puede impedir confirmar una decisión, pero nunca debe impedir
   // conservar el avance del jugador como borrador.
   $('saveDecisionSection').disabled=locked;
@@ -1425,6 +1444,7 @@ function saveCurrentSection(){
   const key=sectionLedgerKey(currentCategory),old=Number(cashLedger[key]||0);
   const affordable=cashBalance()-old+plan.net>=-0.005;
   const state={...decisionState,...plan.entries};
+  state.__decisionProgress={...(state.__decisionProgress||{}),[currentRound()]:{...(state.__decisionProgress?.[currentRound()]||{}),[currentCategory]:{savedAt:new Date().toISOString()}}};
   // Un borrador que excede la caja conserva sus elecciones sin aplicar todavía
   // el movimiento financiero. El envío seguirá bloqueado hasta ajustar el gasto.
   const ledger=affordable?{...cashLedger,[key]:plan.net}:{...cashLedger};
@@ -1886,6 +1906,7 @@ function persistCurrentDraftOnly(){
   let store={};try{store=JSON.parse(localStorage.getItem(draftStoreKey)||'{}')||{}}catch{}
   store[draftCategory]={};cat.items.forEach(item=>{if(decisionDrafts[item.id])store[draftCategory][item.id]=deepClone(decisionDrafts[item.id])});
   localStorage.setItem(draftStoreKey,JSON.stringify(store));
+  renderTabs();
   return true;
 }
 function restoreDraftsForRound(){
