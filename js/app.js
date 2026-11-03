@@ -1191,9 +1191,9 @@ function renderDecisionCategory(){
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   if(temporalStudentRoom()&&!validStudentMaterialBook()){document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);const html=`<p role="status">${escapeHtml(studentMaterialStatus)}</p>`;if($('decisionCards').innerHTML!==html)$('decisionCards').innerHTML=html;return;}
   if(cat.cat==='DOP'){
-    $('decisionCards').innerHTML=renderDecisionRow(findDecisionItem('PRODUCCION_META'))+`<p class="decision-row">La meta se comparte con Producción. Para guardar o enviar la decisión, abre Producción.</p>`+profitProjectionPanel()+`<div class="production-dop-mount">${productionDopHtml()}</div>`;
+    $('decisionCards').innerHTML=renderDecisionRow(findDecisionItem('PRODUCCION_META'))+`<p class="decision-row">La meta se comparte con Producción. Para guardar o enviar la decisión, abre Producción.</p>`+`<div class="production-dop-mount">${productionDopHtml()}</div>`;
     document.querySelector('.section-save-bar')?.classList.add('hidden');
-    bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection);updateHud();syncStudentTimer();updateDecisionLayout();
+    bindDecisionControls();updateHud();syncStudentTimer();updateDecisionLayout();
     disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));return;
   }
   const items=cat.items.filter(item=>!(item.lockAfterPurchase&&isLocked(item)));
@@ -1212,12 +1212,11 @@ function renderDecisionCategory(){
     if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;
   }
 
-  if(['A','C','E'].includes(cat.cat))lead+=profitProjectionPanel();
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cardItems.filter(item=>cat.cat!=='C'||item.id!=='PRODUCCION_META').map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?automaticDistributionHtml()+cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
   document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);
-  bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
+  bindDecisionControls(); updateHud(); updateSectionCost(); syncStudentTimer(); updateDecisionLayout();
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));
 }
 function automaticDistributionHtml(){

@@ -18,6 +18,10 @@ test('la proyección permanece oculta en decisiones y revisión sin alterar el p
  }
  await page.locator('[data-cat="DOP"]').click();
  assert.equal(await page.locator('[data-mold-target="molde_1"]').count(),1);
+ // El estilo también bloquea el panel insertado por una versión antigua en caché.
+ await page.evaluate(()=>$('decisionCards').insertAdjacentHTML('beforeend','<section id="legacyProjection" class="decision-row"><h3>Proyección de rentabilidad</h3><button data-profit-calculate>Calcular proyección</button><div data-profit-projection></div></section>'));
+ assert.equal(await page.locator('#legacyProjection').isVisible(),false);
+ await page.evaluate(()=>$('legacyProjection').remove());
  assert.equal(await page.evaluate(()=>JSON.stringify(decisionState)),before);
  for(const width of [1365,390]){await page.setViewportSize({width,height:900});await page.screenshot({path:path.join(root,`tests/output/rentabilidad_final/proyeccion-${width}.png`),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
  await page.evaluate(()=>openCompanyReview());await page.waitForSelector('#companyReviewDialog[open]');

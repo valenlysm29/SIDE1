@@ -314,7 +314,7 @@ function paintReviewDialog(message=''){
   const dialog=ensureReviewDialog(),review=liveCompanyReview(),problems=decisionsSubmitted()?[]:reviewProblems(review),complete=decisionsSubmitted();
   activeReview={fingerprint:reviewFingerprint(),round:currentRound()};
   dialog.innerHTML=`<div class="cs-dialog-frame"><header class="cs-dialog-heading"><div><span class="cs-kicker">EMPRESA \u00b7 CICLO ${currentRound()}</span><h2 id="companyReviewTitle">${complete?'Decisiones del ciclo confirmado':'Revisi\u00f3n final antes de enviar'}</h2><p id="companyReviewDescription">${complete?'Consulta las decisiones confirmadas en este equipo.':'Revisar no guarda, no cobra y no bloquea. Solo el bot\u00f3n de confirmaci\u00f3n env\u00eda el ciclo.'}</p></div><button type="button" id="closeCompanyReview" class="cs-close" aria-label="Cerrar revisi\u00f3n">\u00d7</button></header>
-    <div class="cs-dialog-body" tabindex="0">${message?`<p class="cs-notice cs-notice-warning" role="status">${escapeHtml(message)}</p>`:''}${financialCardsHtml(review.financial)}${!complete?profitProjectionPanel():''}${productionSummaryHtml(review)}${futureHtml(review.financial)}${noticesHtml(problems,review.warnings)}
+    <div class="cs-dialog-body" tabindex="0">${message?`<p class="cs-notice cs-notice-warning" role="status">${escapeHtml(message)}</p>`:''}${financialCardsHtml(review.financial)}${productionSummaryHtml(review)}${futureHtml(review.financial)}${noticesHtml(problems,review.warnings)}
     <div class="cs-sections">${review.sections.map(s=>sectionSummaryHtml(s,{compact:true,history:complete})).join('')}</div><p class="cs-local-note">Las decisiones quedan guardadas en este equipo. Un aviso separado confirma cuándo el servidor recibe el plan del ciclo.</p></div>
     <footer class="cs-dialog-footer"><p>${complete?'Las decisiones no se vuelven a cobrar.':problems.length?`${problems.length} punto(s) por resolver antes de confirmar.`:'Se bloquear\u00e1n los apartados pendientes hasta el pr\u00f3ximo ciclo. Las advertencias no impiden continuar.'}</p><div><button type="button" id="cancelCompanyReview" class="cs-secondary">${complete?'CERRAR':'VOLVER A EDITAR'}</button>${!complete?`<button type="button" id="confirmCompanyReview" class="cs-primary" ${problems.length?'disabled':''}>CONFIRMAR Y ENVIAR TODO</button>`:''}</div></footer></div>`;
   dialog.querySelector('#closeCompanyReview').addEventListener('click',closeCompanyReview);dialog.querySelector('#cancelCompanyReview').addEventListener('click',closeCompanyReview);
@@ -324,7 +324,6 @@ function paintReviewDialog(message=''){
     commitReviewedSections(decisionCategories().map(c=>c.cat),true);
   });
   bindSummaryLinks(dialog);
-  if(!complete){const mount=dialog.querySelector('[data-profit-projection]');dialog.querySelector('[data-profit-calculate]')?.addEventListener('click',()=>showProfitProjection(mount));showProfitProjection(mount);}
 }
 function openCompanyReview(){
   // Working drafts are already persisted by the existing input handlers. This

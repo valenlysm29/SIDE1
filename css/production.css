@@ -832,3 +832,10 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 .profit-price-table th:first-child { text-align: start; }
 .profit-diagnostic details { margin-block: 14px; }
 .profit-diagnostic summary { cursor: pointer; }
+
+/* La proyección de rentabilidad no forma parte de las decisiones del estudiante.
+   Incluye el marcado antiguo para evitar que reaparezca con scripts en caché. */
+#decisionMenu .profit-diagnostic,
+#decisionMenu section:has([data-profit-calculate]),
+#companyReviewDialog .profit-diagnostic,
+#companyReviewDialog section:has([data-profit-calculate]) { display: none !important; }
