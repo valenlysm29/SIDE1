@@ -5,7 +5,7 @@ const scope={window:{}};vm.runInNewContext(fs.readFileSync(require.resolve('../j
 const catalog=JSON.parse(JSON.stringify(scope.window.SIDE_DECISION_CATALOG));
 function input(target=100){
   const state={};
-  const counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1},ACABADOS:{aca_basica:1},
+  const counts={MESA_CORTE:{mesa:100},ENSAMBLE:{ens_basica:100},ACABADOS:{aca_basica:100},
     PERS_CORTE:{corte_basico:100},PERS_ENSAMBLE:{ens_personal_basico:100},PERS_ACABADO:{aca_personal_basico:100},
     CUERO:{cuero_sint:target*.3},ACCESORIOS:{acc_eco:target},HILO:{hilo_std:target*6}};
   for(const [id,quantities]of Object.entries(counts))state[id]={round:1,quantities,...(catalog.flatMap(c=>c.items).find(i=>i.id===id).asset?{purchases:{1:quantities}}:{})};

@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const F=require('../js/financial_model'),C=require('../js/cycle_model'),{catalog}=require('./economic_v19_fixture.cjs');
-const original=require('./output/forense_utilidad/cierres_reales.json');
+const original=require('./fixtures/financial_forensic.json');
 const near=(a,b)=>assert.ok(Math.abs(a-b)<.011,`${a} != ${b}`);
 
 function mold({noDepreciation=true,produced=10,sold=10,method=[]}={}){

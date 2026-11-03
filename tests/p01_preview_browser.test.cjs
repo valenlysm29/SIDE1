@@ -22,7 +22,7 @@ test('DOM docente: consulta de empresa y render de proyección, luego fallo de l
   const page=await browser.newPage();await page.setContent(html('docente.html'),{waitUntil:'load'});
   const text=await page.evaluate(async({plan,book})=>{
    state.partidaId='game';state.authoritative={materialRulesVersion:'receipts-v1'};$('gameCode').value='SIDE-123';
-   window.SIDE.SupabaseClient={isReady:()=>true};
+   window.SIDE.SupabaseClient={isReady:()=>true,get:()=>({rpc:async()=>({data:{cycles:[]},error:null})})};
    window.SIDE.PartidaService={listarParticipantes:async()=>({success:true,data:[{empresa_id:7,empresa:'A',empresas:{nombre_comercial:'A',ciclo_actual:1,caja_inicial:200000}}]})};
    window.SIDE.DecisionesService={obtenerCatalogo:async()=>({success:true,data:{decisions:[],options:[]}}),obtenerReporte:async()=>({success:true,data:{empresa:{nombre_comercial:'A',ciclo_actual:1},decisiones:[],reportes:[],contexto_juego:{partida_id:'game',codigo:'SIDE-123',ciclo:1,estado:'activa',phase:'decisions',configuracion:{materialRulesVersion:'receipts-v1'},snapshot:{decisions_submitted:true,decision_state:{...plan,__cyclePlans:{1:{state:plan}}}}}}}),obtenerContextoMaterial:async()=>({success:true,data:book})};
    state.reports=await supabaseReports([]);renderResults();const first=$('detailReports').innerText;

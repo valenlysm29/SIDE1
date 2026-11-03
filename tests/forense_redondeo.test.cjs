@@ -1,7 +1,7 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const C=require('../js/cycle_model'),F=require('../js/financial_model'),{catalog}=require('./economic_v19_fixture.cjs');
-const initial=require('./output/forense_utilidad/cierres_reales.json')[0].cierre.resultadosPorEmpresa['188'].receipt.decisions;
+const initial=require('./fixtures/financial_forensic.json')[0].cierre.resultadosPorEmpresa['188'].receipt.decisions;
 const money=v=>Math.round(v*100)/100;
 test('seis ciclos con ventas parciales conservan los céntimos de MP, PT y costo de ventas',()=>{
  let previous;

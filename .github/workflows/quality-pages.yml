@@ -1,0 +1,65 @@
+name: SIDE quality and publication
+on:
+  pull_request:
+    paths-ignore: ["reports/**", "docs/**", "README.md"]
+  push:
+    branches: [main, codex/finalizacion-integral]
+    paths-ignore: ["reports/**", "docs/**", "README.md"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: side-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  business-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node tools/check_release.cjs
+  postgres-edge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test tests/forense_postgres.test.cjs
+  package:
+    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
+    needs: [business-contract, postgres-edge]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/configure-pages@v5
+      - run: node tools/package_site.cjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: output/site
+  deploy:
+    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
+    needs: package
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish tested static files
+        id: deployment
+        uses: actions/deploy-pages@v4
