@@ -6,3 +6,23 @@ test('más hilo aumenta producción solo si los demás recursos alcanzan; es det
 test('no aumenta por materiales si ya limita la capacidad',()=>{const row=make({thread:2000,all:1}),a=simulate(row,'materials','HILO','hilo_std',600);assert.equal(a.available,true,JSON.stringify(a));assert.equal(a.difference,0)});
 test('más trabajadores puede superar un cuello de botella o quedar limitado por máquinas y materiales',()=>{const row=make({thread:2000,all:2,workers:1,machines:2}),a=simulate(row,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(a.available,true,JSON.stringify(a));assert.ok(a.difference>0);const machine=make({thread:2000,all:2,workers:1,machines:1}),b=simulate(machine,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(b.available,true,JSON.stringify(b));assert.equal(b.difference,0);const materials=make({thread:60,all:2,workers:1,machines:2}),c=simulate(materials,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(c.available,true,JSON.stringify(c));assert.equal(c.difference,0)});
 test('rechaza versión incierta, pedidos temporales, datos ausentes y cierre que no se reproduce',()=>{const row=make();for(const mutate of [r=>delete r.receipt.capacityRulesVersion,r=>r.state.__materialOrders={},r=>delete r.receipt.openingInventory,r=>r.receipt.produced++]){const x=JSON.parse(JSON.stringify(row));mutate(x);assert.equal(simulate(x,'materials','HILO','hilo_std',1).available,false)}});
+test('admite maquinaria registrada mediante historial de compras y exige reproducir el cierre',()=>{const row=make({thread:2000,all:2});for(const id of ['MESA_CORTE','ENSAMBLE','ACABADOS'])delete row.receipt.decisions[id].quantities;const result=simulate(row,'workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.equal(result.available,true,JSON.stringify(result));row.receipt.production.producibleUnits++;assert.equal(simulate(row,'workers','PERS_ENSAMBLE','ens_personal_basico',1).available,false)});
+test('reproduce cierres de tres y seis ciclos y recalcula alternativas sin modificar resultados oficiales',()=>{
+ for(const count of [3,6]){
+  const first=make({thread:2000,all:2,workers:1,machines:2}),decisions=first.receipt.decisions,policy={capital:100000,cycles:count},history=[];let previous=null;
+  for(let round=1;round<=count;round++){
+   const current=JSON.parse(JSON.stringify(decisions));for(const entry of Object.values(current))if(entry&&typeof entry==='object'&&entry.round)entry.round=round;
+   const state={...current,...Object.fromEntries(Object.entries(previous?.state||{}).filter(([key])=>key.startsWith('__'))),__catalogSelection:[]};
+   const closed=cycle.closeMany([{id:'a',state,ledger:previous?.ledger||{},catalog,round,capital:100000,sectionsByRound:previous?.financialSections||{},financialPolicy:policy,events:[]}]).a;
+   const closure={resultadosPorEmpresa:{a:closed}},prior=previous?{resultadosPorEmpresa:{a:previous}}:null,before=JSON.stringify(closure);
+   const run=(kind,group,option,amount)=>lab.economic({closure,previous:prior,catalog,companyId:'a',kind,group,option,amount,expectedCycle:round});
+   const same=run('workers','PERS_ENSAMBLE','ens_personal_basico',0);assert.equal(same.available,true,JSON.stringify(same));assert.deepEqual(same.actual,same.alternative);
+   assert.equal(run('workers','PERS_ENSAMBLE','ens_personal_basico','').available,false);assert.equal(run('workers','PERS_ENSAMBLE','ens_personal_basico',-1).available,false);
+   if(round>1)assert.match(lab.economic({closure,catalog,companyId:'a',kind:'target',option:'molde_1',amount:400,expectedCycle:round}).reason,/ciclo anterior/);
+   for(const args of [['workers','PERS_ENSAMBLE','ens_personal_basico',1],['materials','HILO','hilo_std',600],['machines','MESA_CORTE','mesa',1],['target','','molde_1',400]])assert.equal(run(...args).available,true,JSON.stringify(args));
+   const staff=run('workers','PERS_ENSAMBLE','ens_personal_basico',1);assert.ok(staff.alternative.costs>staff.actual.costs);
+   assert.equal(JSON.stringify(closure),before);history.push(closed);previous=closed;
+  }
+  assert.equal(history.length,count);
+ }
+});

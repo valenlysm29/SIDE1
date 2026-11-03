@@ -597,7 +597,15 @@ function ensureCycleFixedCosts(){
   try{queueStudentSnapshot(buildStudentSnapshot(round));}catch(error){console.warn('SIDE: costos del ciclo guardados; sincronización pendiente',error);}
   return receipt;
 }
-function cashBalance(){return initialCapital()+ledgerTotal()}
+function cashBalance(){
+  // A settled financial snapshot includes cash movements (such as income tax)
+  // calculated by the official engine that are not separate ledger entries.
+  const snapshots=decisionState.__financialSnapshots||{},settlements=decisionState.__cycleSettlements||{},round=currentRound();
+  const last=Object.keys(snapshots).map(Number).filter(r=>Number.isInteger(r)&&r<=round&&settlements[r]&&snapshots[r]?.balanceCaja?.cajaFinal!=null&&Number.isFinite(Number(snapshots[r].balanceCaja.cajaFinal))).sort((a,b)=>b-a)[0];
+  if(last==null)return initialCapital()+ledgerTotal();
+  const later=Object.entries(financialLedger()).reduce((sum,[key,value])=>{const r=Number(key.split(':')[0]);return sum+(Number.isInteger(r)&&r>last?(Number(value)||0):0);},0);
+  return Number(snapshots[last].balanceCaja.cajaFinal)+later;
+}
 function submissionKey(){return `SIDE_DECISIONS_SUBMITTED_${storageKey()}_${currentRound()}`}
 function decisionsSubmitted(){return localStorage.getItem(submissionKey())==='1'}
 function simulationSubmissionComplete(){return decisionsSubmitted()||decisionCategories().every(category=>sectionSubmitted(category.cat))}

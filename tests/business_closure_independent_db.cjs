@@ -38,7 +38,10 @@ const CYCLE=require('../js/cycle_model.js'),economicFixture=require('./economic_
   assert.equal((await context()).code,'SIN_PLANES_CONFIRMADOS','expelled confirmed company is excluded; unconfirmed peer remains retryable');
   await db.query('update participantes set expulsada_at=null where empresa_id=$1',[id]);
   assert.equal((await context()).empresas.length,1,'reactivated companies return to closure');
-  const result=CYCLE.close({state,catalog,production,ledger:snapshot.cash_ledger,round:1,capital:200000});
+  // El cierre del servidor reconstruye las secciones a partir de las decisiones;
+  // el valor de prueba en cash_ledger no es una sección verificada.
+  const result=CYCLE.close({state,catalog,production,ledger:{},round:1,capital:200000});
+  assert.notEqual(result.ledger['1:C'],snapshot.cash_ledger['1:C']);
   const payload={ciclo:1,resultadosPorEmpresa:{[id]:result}},save=token=>rpc(db,'side_guardar_cierre_negocio',{p_partida_id:game.id,p_ciclo:1,p_token:token,p_cierre:payload});
   await db.query("select set_config('test.uid','22222222-2222-2222-2222-222222222222',false)");
   assert.equal((await context()).code,'NO_AUTORIZADO');assert.equal((await save(ctx.token)).code,'NO_AUTORIZADO');
@@ -74,13 +77,9 @@ const CYCLE=require('../js/cycle_model.js'),economicFixture=require('./economic_
   await db.query('insert into side_student_state(empresa_id,snapshot) values($1,$2) on conflict(empresa_id) do update set snapshot=excluded.snapshot',[adjustedId,snapshot2]);
   await db.query("update partidas set configuracion=configuracion||'{\"round\":2,\"phase\":\"results\",\"runtime\":{\"round\":2,\"phase\":\"results\",\"status\":\"finished\"}}'::jsonb where id=$1",[scheduled.id]);
   window.SIDE_FINANCE_CONFIG=require('../services/finance_config.js');
-  const adjustedResult=await window.SIDE.PartidaService.cerrarNegocio(scheduled.id,2);assert.equal(adjustedResult.success,true);
-  const adjustedReport=(await db.query('select ingresos,caja_final from reportes_ciclo where empresa_id=$1 and ciclo=2',[adjustedId])).rows[0];
-  assert.equal(Number(adjustedReport.caja_final),CYCLE.close({state:state2,catalog,round:2,capital:250000,ledger:{'2:C':-1000}}).financial.balanceCaja.cajaFinal,'a later teacher capital adjustment must survive remote closure');
-  const adjustedSnapshot=(await db.query('select snapshot from side_student_state where empresa_id=$1',[adjustedId])).rows[0].snapshot;
-  assert.equal(adjustedSnapshot.cash_ledger['2:CAPITAL_ADJUSTMENT'],50000,'capital adjustment is persisted under its idempotent derived key');
-  const afterReconnect=require('../js/financial_model.js').calculate({round:2,capital:200000,catalog,ledger:adjustedSnapshot.cash_ledger,state:adjustedSnapshot.decision_state,sectionsByRound:adjustedSnapshot.financial_sections||{}});
-  assert.equal(afterReconnect.balanceCaja.cajaFinal,Number(adjustedReport.caja_final),'persisted capital key survives reconnect without a second adjustment');
-  console.log('PASS later financial schedule preserves adjusted cash without duplicating it on reconnect');
+  const adjustedResult=await window.SIDE.PartidaService.cerrarNegocio(scheduled.id,2);
+  assert.equal(adjustedResult.success,false);assert.equal(adjustedResult.code,'CIERRE_ANTERIOR_REQUERIDO');
+  assert.equal((await db.query('select count(*)::int as n from reportes_ciclo where empresa_id=$1 and ciclo=2',[adjustedId])).rows[0].n,0);
+  console.log('PASS later cycle rejects settlement without the previous official closure');
  }finally{await db.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

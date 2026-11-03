@@ -16,6 +16,13 @@ function runtime(){
  return {run,json,elements,storage,cycle};
 }
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
+test('cash follows the last settled financial snapshot and only later ledger movements',()=>{
+ const r=runtime();r.cycle(2);
+ r.run("cashLedger={'1:SIM_VENTAS':1000,'2:C':-250};decisionState.__cycleSettlements={1:{round:1}};decisionState.__financialSnapshots={1:{balanceCaja:{cajaFinal:100700}}}");
+ near(r.run('cashBalance()'),100450);
+ r.run("decisionState.__cycleSettlements[2]={round:2};decisionState.__financialSnapshots[2]={balanceCaja:{cajaFinal:100400}}");
+ near(r.run('cashBalance()'),100400);
+});
 test('each of three cycles charges exactly the announced fixed rows in the real cash ledger',()=>{
  const r=runtime();let last=100000;
  for(let cycle=1;cycle<=3;cycle++){

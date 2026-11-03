@@ -4,7 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs');
 const CYCLE=require('../js/cycle_model'),FIN=require('../js/financial_model'),{catalog}=require('./economic_v19_fixture.cjs');
-const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'output/sales-six-cycles');
+const root=path.resolve(__dirname,'..'),out=process.env.SIDE_SIX_CYCLES_DIR?path.resolve(root,process.env.SIDE_SIX_CYCLES_DIR):path.join(__dirname,'output/sales-six-cycles');
 const near=(a,b)=>assert.ok(Math.abs(Number(a)-Number(b))<.02,`${a} != ${b}`);
 (async()=>{
  const ui=JSON.parse(fs.readFileSync(path.join(out,'ui-results.json'),'utf8'));

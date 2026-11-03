@@ -37,7 +37,7 @@ with sync_playwright() as p:
         student.evaluate("""() => {
          localStorage.clear();const now=new Date().toISOString();
          const runtime={round:1,phase:'decisions',status:'running',running:true,startedAt:now,duration:3600,remaining:3600};
-         const config={codigo:'SIDE-QA6',nombre:'Prueba seis ciclos',capitalMode:'fixed',capital:200000,cycles:6,lifecycleVersion:2,cycleCloseMode:'manual',integrationMinutes:0,roundHours:1,roundMinutes:0,interest:20,creditPercentStart:20,enabledEvents:[],gameStartedAt:now,gameStartAt:now,runtime};
+         const config={codigo:'SIDE-QA6',nombre:'Prueba seis ciclos',capitalMode:'fixed',capital:200000,cycles:6,lifecycleVersion:2,sequentialCloseVersion:'1',cycleCloseMode:'manual',integrationMinutes:0,roundHours:1,roundMinutes:0,interest:20,creditPercentStart:20,enabledEvents:[],gameStartedAt:now,gameStartAt:now,runtime};
          localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(config));localStorage.setItem('SIDE_ACTIVE_ROUND','1');
          localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({active:true,startedAt:now,code:'SIDE-QA6'}));localStorage.setItem('SIDE_ROUND_RUNTIME',JSON.stringify(runtime));
          SIDE3D={suspend(){},cycleProductionRecord:()=>null};
@@ -81,10 +81,12 @@ with sync_playwright() as p:
                 # Already owned molds are deliberately disabled for repurchase.
                 assert student.locator('[data-choice="MOLDE"][data-option="molde_3"]').is_disabled()
             send('B')
-            tab('C')
+            # La meta se edita en Planificación; Producción conserva su envío.
+            tab('DOP')
             for mold in RECIPES:
-                student.locator('#productionMoldSelector').select_option(mold)
+                student.locator('[data-production-mold]').select_option(mold)
                 student.locator(f'[data-mold-target="{mold}"]').fill(str(targets.get(mold,0)))
+            tab('C')
             for item,option in [('PERS_CORTE','corte_basico'),('PERS_ENSAMBLE','ens_personal_basico'),('PERS_ACABADO','aca_personal_basico')]:
                 quantity(item,option,1)
             choice('JEFATURA','no_jefatura');choice('GARANTIA_PT','pt_30')
@@ -101,7 +103,12 @@ with sync_playwright() as p:
             print(f'SUBMITTED cycle {cycle}: all five decision sections selected and sent',flush=True)
             assert student.locator('[data-sale-price], [data-worker-assignment]').count()==0
             before=student.evaluate("""() => ({snapshot:buildStudentSnapshot(),projection:cycleSalesProjection().receipt,plan:productionPlan(),cash:cashBalance()})""")
-            assert before['projection']['sold']==sum(targets.values()),before['projection']
+            assert before['projection']['produced']<=sum(targets.values()),before['projection']
+            if cycle==1:
+                # 100 × 70 % por eficiencia baja y luego 95 % sin jefatura:
+                # el motor redondea hacia abajo a 66 unidades.
+                assert before['projection']['produced']==66
+                assert {'CONS-03','CONS-08'} <= {c['id'] for c in before['projection']['consequences']}
             # Close through the real teacher control; student follows the lifecycle.
             teacher.locator('#cutRound').click()
             teacher.wait_for_function('state.authoritative.runtime.phase==="results"&&!teacherBusy')
@@ -111,7 +118,8 @@ with sync_playwright() as p:
              return {snapshot:buildStudentSnapshot(),receipt:decisionState.__cycleSettlements[round],financial:financialReport(),cash:cashBalance(),reports:JSON.parse(localStorage.getItem('SIDE_STUDENT_REPORTS')||'[]')};
             }""")
             receipt=after['receipt'];financial=after['financial']
-            assert receipt['produced']==sum(targets.values()) and receipt['sold']==receipt['produced']
+            assert receipt['produced']==before['projection']['produced']
+            assert receipt['sold']<=sum(line['available'] for line in receipt['sales'])
             assert receipt['revenue']>0 and receipt['revenue']==sum(line['sold']*line['price'] for line in receipt['sales'])
             assert financial['estadoResultados']['ingresos']==receipt['revenue']
             assert len(after['snapshot']['decision_state']['__cycleSettlements'])==cycle
@@ -126,7 +134,7 @@ with sync_playwright() as p:
             teacher_receipt=teacher_result.get('cycleReceipt') or teacher_result['gameState']['__cycleSettlements'][str(cycle)]
             assert teacher_receipt['sold']==receipt['sold']
             # A retry of the teacher close cannot charge, produce or sell again.
-            teacher.locator('#cutRound').click();teacher.wait_for_function('!teacherBusy')
+            assert teacher.locator('#cutRound').is_disabled(), 'Un ciclo cerrado no debe poder cortarse de nuevo.'
             retry=student.evaluate('JSON.stringify({state:decisionState,ledger:cashLedger})')
             student.evaluate('settleCycle();renderStudentStatus()')
             assert student.evaluate('JSON.stringify({state:decisionState,ledger:cashLedger})')==retry
