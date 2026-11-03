@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { closeCycle, EVENTS, rank } from '../js/engine.js';
+const base={cash:30000,costs:{basic:50,standard:80,premium:120},marketingCosts:{none:0,low:100,medium:300,high:600},seed:'cycle-1',companyId:'company-1'};
+const decision={quality:'basic',quantity:200,price:100,marketing:'none'};
+test('ventas y caja coinciden con las reglas',()=>{const r=closeCycle({...base,decision});assert.equal(r.purchase,10000);assert.equal(r.revenue,r.sold*100);assert.equal(r.cashEnd,30000-r.purchase+r.revenue);assert.equal(r.profit,r.revenue-r.costOfSales);});
+test('rechaza compras sin saldo',()=>assert.throws(()=>closeCycle({...base,decision:{...decision,quantity:1000}}),/insuficiente/));
+test('FIFO conserva inventario y valora unidades vendidas',()=>{const r=closeCycle({...base,batches:[{quantity:5,unitCost:10}],decision:{...decision,quantity:500,price:1000}});assert.ok(r.sold>=5);assert.equal(r.costOfSales,50+(r.sold-5)*50);assert.equal(r.inventory.reduce((a,b)=>a+b.quantity,0),505-r.sold);});
+test('sin decisión no compra ni gasta ni vende',()=>{const r=closeCycle({...base,batches:[{quantity:3,unitCost:10}]});assert.equal(r.cashEnd,base.cash);assert.equal(r.sold,0);assert.equal(r.inventory[0].quantity,3)});
+test('hay decisiones con utilidad positiva y negativa',()=>{assert.ok(closeCycle({...base,decision}).profit>0);assert.ok(closeCycle({...base,decision:{...decision,price:1,marketing:'high'}}).profit<0)});
+test('eventos comunes afectan compra o demanda y son reproducibles',()=>{assert.equal(EVENTS.length,12);const a=closeCycle({...base,decision,event:'cost_freight'});assert.equal(a.unitCost,55);assert.deepEqual(a,closeCycle({...base,decision,event:'cost_freight'}));assert.ok(closeCycle({...base,decision,event:'demand_fair'}).demand>closeCycle({...base,decision,event:'demand_slow'}).demand)});
+test('ranking usa rentabilidad patrimonial y desempata por caja',()=>{const r=rank([{name:'A',cash:60000,inventoryValue:0,initialCapital:30000},{name:'B',cash:100000,inventoryValue:0,initialCapital:100000}]);assert.equal(r[0].name,'A')});
