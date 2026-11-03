@@ -14,26 +14,26 @@ test('delivered UI distinguishes automatic values, edits, saves, confirmations a
   const states=()=>page.evaluate(()=>decisionCategories().map(c=>[c.cat,decisionSectionStatus(c.cat)]));
   assert.ok((await states()).every(([,s])=>s==='pending'));
   await page.locator('[data-cat="C"]').click();
-  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Sin decisiones');
+  assert.equal(await page.locator('#decisionTabs .tab-status').count(),0);
   await page.screenshot({path:path.join(root,'tests/output/decision-progress-initial.png'),fullPage:true});
   const initial=await page.evaluate(()=>({ledger:JSON.stringify(cashLedger),automatic:decisionState.LIMPIEZA.decisionOrigin}));assert.equal(initial.automatic,'automatic');
   await page.locator('[data-cat="DOP"]').click();
   await page.evaluate(()=>{window.initialTabNodes=[...document.querySelectorAll('.decision-tab')];});
   await page.locator('[data-mold-target="molde_1"]').fill('37');
   assert.equal(await page.evaluate(()=>initialTabNodes.every((node,index)=>node===document.querySelectorAll('.decision-tab')[index])),true,'editing preserves existing tab nodes and focus');
-  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'En edición');
-  assert.equal(await page.locator('[data-cat="DOP"] .tab-status').innerText(),'En edición');
+  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Borrador');
+  assert.equal(await page.locator('[data-cat="DOP"] .tab-status').innerText(),'Borrador');
   await page.reload();await page.evaluate(()=>openDecisionMenu());await page.locator('[data-cat="DOP"]').click();
   assert.equal(await page.evaluate(()=>decisionSectionStatus('C')),'draft');
   await page.locator('[data-cat="C"]').click();await page.locator('[data-cat="DOP"]').click();
   assert.equal(await page.locator('[data-mold-target="molde_1"]').inputValue(),'37');
   await page.locator('[data-cat="C"]').click();
   await page.locator('#saveDecisionSection').click();
-  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Borrador guardado');
+  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Borrador');
   assert.match(await page.locator('#sectionSaveHint').innerText(),/este equipo/);
   await page.reload();await page.evaluate(()=>openDecisionMenu());await page.locator('[data-cat="DOP"]').click();
   assert.equal(await page.locator('[data-mold-target="molde_1"]').inputValue(),'37');
-  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Borrador guardado');
+  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Borrador');
   await page.evaluate(()=>{loadDecisionState();restoreDraftsForRound();renderTabs();renderDecisionCategory();});
   assert.equal(await page.evaluate(()=>decisionSectionStatus('C')),'saved');
   await page.locator('[data-mold-target="molde_1"]').fill('38');
@@ -43,7 +43,10 @@ test('delivered UI distinguishes automatic values, edits, saves, confirmations a
   await page.locator('[data-cat="D"]').click();await page.locator('[data-choice="CANALES"][data-option="web"]').check();
   await page.locator('#sendDecisionSection').click();
   assert.equal(await page.evaluate(()=>decisionSectionStatus('D')),'sent');
-  assert.equal(await page.locator('[data-cat="D"] .tab-status').innerText(),'Confirmado');
+  assert.equal(await page.locator('[data-cat="D"] .tab-status').innerText(),'Enviado');
+  await page.reload();await page.evaluate(()=>openDecisionMenu());
+  assert.equal(await page.locator('[data-cat="D"] .tab-status').innerText(),'Enviado');
+  assert.equal(await page.locator('[data-cat="B"] .tab-status').count(),0);
   assert.equal(await page.evaluate(()=>liveCompanyReview().sections.every(s=>s.status===decisionSectionStatus(s.cat))),true);
   await page.setViewportSize({width:390,height:844});
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
@@ -52,11 +55,16 @@ test('delivered UI distinguishes automatic values, edits, saves, confirmations a
   for(const cycles of [3,6]){
    for(let round=2;round<=cycles;round++){
     const result=await page.evaluate(({round,cycles})=>{const conf=teacherConfig();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify({...conf,cycles}));localStorage.setItem('SIDE_ACTIVE_ROUND',String(round));loadDecisionState();restoreDraftsForRound();ensureCycleFixedCosts();renderTabs();currentCategory='C';renderDecisionCategory();return {states:decisionCategories().map(c=>decisionSectionStatus(c.cat)),target:currentProductionTarget(),old:decisionState.__decisionProgress[1].C.savedAt};},{round,cycles});
-    assert.ok(result.states.every(s=>s==='pending'),JSON.stringify(result));assert.equal(result.target,0);assert.ok(result.old);
+    assert.equal(await page.locator('#decisionTabs .tab-status').count(),0);assert.ok(result.states.every(s=>s==='pending'),JSON.stringify(result));assert.equal(result.target,0);assert.ok(result.old);
    }
   }
   await page.evaluate(()=>{decisionState.__cycleSettlements={6:{round:6}};renderTabs();});
   assert.equal(await page.evaluate(()=>decisionSectionStatus('C')),'finished');
+  assert.equal(await page.locator('[data-cat="C"] .tab-status').innerText(),'Enviado');
+  assert.equal(await page.locator('[data-cat="DOP"] .tab-status').innerText(),'Enviado');
+  assert.deepEqual(await page.evaluate(()=>['pending','draft','saved','sent','finished','legacy','unknown'].map(decisionStatusLabel)),['','Borrador','Borrador','Enviado','Enviado','','']);
+  await page.evaluate(()=>{decisionState.__cycleSettlements={};renderTabs();});
+  assert.equal(await page.locator('#decisionTabs .tab-status').count(),0);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

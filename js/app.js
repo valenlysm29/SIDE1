@@ -1080,7 +1080,16 @@ function decisionSectionStatus(cat=currentCategory){
   if(legacy.length)return 'legacy';
   return 'pending';
 }
-function decisionStatusLabel(status){return {pending:'Sin decisiones',draft:'En edición',saved:'Borrador guardado',sent:'Confirmado',finished:'Finalizado',legacy:'Origen no verificado'}[status]||'Sin decisiones';}
+function decisionStatusLabel(status) {
+  return {
+    pending: '',
+    draft: 'Borrador',
+    saved: 'Borrador',
+    sent: 'Enviado',
+    finished: 'Enviado',
+    legacy: ''
+  }[status] || '';
+}
 function categoryHasSaved(cat){return decisionSectionStatus(cat)==='saved';}
 function draftItemComplete(item){
   if(item.type==='info')return true;
