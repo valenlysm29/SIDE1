@@ -205,11 +205,18 @@
     if(temporal){for(const [i,key] of ['basic','medium','premium'].entries()){const line=productLines[i];line.plannedUnits=temporal.produced[key];line.productionPercent=line.target?Math.round(line.plannedUnits/line.target*100):0;}}
     const producibleUnits=sum(productLines.map(l=>l.plannedUnits));
     const materialRemaining=Object.fromEntries(materials.map(m=>[m.id,m.available]));let materialCapacity=0;
-    for(const line of productLines){const spec=MOLD_REQUIREMENTS[line.id],units=line.available?Math.max(0,Math.floor(Number(Math.min(line.target,...materials.map(m=>materialRemaining[m.id]/spec[m.id])).toPrecision(15)))):0;materialCapacity+=units;for(const m of materials)materialRemaining[m.id]=Number((materialRemaining[m.id]-units*spec[m.id]).toPrecision(15));}
+    const limitingMaterialIds=new Set();
+    for(const line of productLines){
+      const spec=MOLD_REQUIREMENTS[line.id];
+      const limits=Object.fromEntries(materials.map(m=>[m.id,Math.max(0,Math.floor(Number((materialRemaining[m.id]/spec[m.id]).toPrecision(15))))]));
+      const units=line.available?Math.max(0,Math.min(line.target,...Object.values(limits))):0;
+      if(line.available&&units<line.target)for(const m of materials)if(limits[m.id]===units)limitingMaterialIds.add(m.id);
+      materialCapacity+=units;for(const m of materials)materialRemaining[m.id]=Number((materialRemaining[m.id]-units*spec[m.id]).toPrecision(15));
+    }
     processes.forEach(process=>{process.plannedUnits=producibleUnits;process.shortfall=Math.max(0,target-process.cycleCapacity);});
     materials.forEach(material=>{material.consumption=Number(sum(productLines.map(l=>l.plannedUnits*MOLD_REQUIREMENTS[l.id][material.id])).toPrecision(15));material.remaining=Math.max(0,Number((material.available-material.consumption).toPrecision(15)));material.shortfall=Math.max(0,material.neededForTarget-material.available);});
     const limitingProcesses=processes.filter(process=>process.cycleCapacity===processCapacity).map(process=>process.label);
-    const limitingMaterials=materials.filter(material=>material.supportedUnits===materialCapacity).map(material=>material.label);
+    const limitingMaterials=materials.filter(material=>limitingMaterialIds.has(material.id)).map(material=>material.label);
     const unavailablePlannedMolds=productLines.filter(line=>line.target>0&&!line.available).map(line=>line.id);
     return {
       ...(temporal?{temporal}:{}),target,targets,productLines,days,efficiency,levelThree,hasLeadership,moldId,moldLabel:requirements.label,selectedMoldIds,ownedMoldIds:ownedIds,availableMoldIds,unavailablePlannedMolds,

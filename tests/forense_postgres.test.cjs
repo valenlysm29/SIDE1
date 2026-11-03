@@ -41,7 +41,7 @@ test('tres y seis ciclos: Node, Edge y PostgreSQL real; siete escenarios y reint
  try{
   // tmpfs avoids leaving database engine files anywhere on the host.
   docker(['run','-d','--rm','--network','none','--tmpfs','/var/lib/postgresql/data','--name',name,'-e','POSTGRES_HOST_AUTH_METHOD=trust','postgres:17-alpine']);
-  let ready=false;for(let i=0;i<80;i++){try{docker(['exec',name,'pg_isready','-U','postgres']);ready=true;break;}catch{await new Promise(r=>setTimeout(r,250));}}assert.ok(ready);
+  let ready=false;for(let i=0;i<80;i++){try{if(!docker(['logs',name]).includes('PostgreSQL init process complete; ready for start up.'))throw Error('initdb still running');docker(['exec',name,'pg_isready','-U','postgres']);ready=true;break;}catch{await new Promise(r=>setTimeout(r,250));}}assert.ok(ready);
   const fixtureSource=fs.readFileSync('tests/lifecycle_db_fixture.cjs','utf8'),base=fixtureSource.match(/await db\.exec\(`([\s\S]*?)`\);/)[1];
   await sql(base+"create role service_role; create function auth.role() returns text language sql stable as $$select current_setting('test.role',true)$$;");
   const migrations=['supabase/migrations/supabase_migration.sql','supabase/migrations/supabase_game_lifecycle.sql','supabase/migrations/supabase_student_admission.sql','supabase/migrations/20260930_preservar_opciones_decisiones.sql','supabase/migrations/20261009_sala_espera_identidad_exacta.sql','docs/sql/20261023_despliegue_cierre_v19.sql','supabase/migrations/20261026_cierre_sin_expulsion_automatica.sql','supabase/migrations/20261027_corregir_ventas_generales.sql','supabase/migrations/20261028_cierre_servidor.sql'];

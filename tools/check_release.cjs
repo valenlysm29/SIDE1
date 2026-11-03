@@ -9,7 +9,7 @@ const tests=[
  'product_cost_indicators.test.cjs','financial_presentation.test.cjs','student_financial_summary.test.js',
  'legacy_asset_inventory.test.cjs','legacy_production_targets.test.cjs','lotes_fifo_integrado.test.cjs',
  'sales_accounting_integration.test.cjs','sales_projection.test.cjs','revenue_excel_current.test.cjs',
- 'md_logic.test.cjs','dop_resource_planning.test.cjs','production_dop_target_ui.test.js','profit_projection.test.cjs',
+ 'oraculo_capacidad_independiente.test.cjs','md_logic.test.cjs','dop_resource_planning.test.cjs','production_dop_target_ui.test.js','profit_projection.test.cjs',
  'official_history.test.cjs','crear_partida_service.test.cjs','finance_config.test.cjs'
 ].filter(name=>{if(!fs.existsSync('tests/'+name))throw Error('Missing gate test '+name);return true;});
 const generated='supabase/functions/side-business-close/runtime.mjs',before=fs.readFileSync(generated,'utf8').replace(/\r\n/g,'\n');
