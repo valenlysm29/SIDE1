@@ -2,8 +2,14 @@
   'use strict';
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
+  // An activation never changes the economic policy of an already sealed cycle.
+  function economicPolicy(config,round){
+    const effective=Number(config.economicRulesEffectiveRound??1);
+    if(!Number.isSafeInteger(effective)||effective<1)throw new RangeError('Ciclo de activación económica inválido');
+    return Number(round)>=effective&&config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{};
+  }
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.loanPolicy?{loanPolicy:JSON.parse(JSON.stringify(config.loanPolicy))}:{}),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(config.utilityPrices?{utilityPrices:{...config.utilityPrices}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.loanPolicy?{loanPolicy:JSON.parse(JSON.stringify(config.loanPolicy))}:{}),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...economicPolicy(config,round),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(config.utilityPrices?{utilityPrices:{...config.utilityPrices}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);

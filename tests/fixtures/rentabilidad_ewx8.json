@@ -1,0 +1,606 @@
+{
+  "203": {
+    "state": {
+      "HILO": {
+        "cost": 6800.64,
+        "label": "Compra de hilo",
+        "round": 1,
+        "quantities": {
+          "hilo_ref": 2100,
+          "hilo_std": 0,
+          "hilo_prem": 0
+        }
+      },
+      "CUERO": {
+        "cost": 4371.84,
+        "label": "Compra de cuero",
+        "round": 1,
+        "quantities": {
+          "cuero_std": 120,
+          "cuero_prem": 0,
+          "cuero_sint": 0
+        }
+      },
+      "MOLDE": {
+        "cost": 1212,
+        "label": "Molde mejorado",
+        "round": 1,
+        "optionIds": [
+          "molde_2"
+        ],
+        "purchases": {
+          "1": {
+            "molde_2": 1
+          }
+        },
+        "optionRounds": {
+          "molde_2": 1
+        }
+      },
+      "CANALES": {
+        "cost": 4000,
+        "label": "Página web + Tienda · Miraflores x 1",
+        "round": 1,
+        "optionIds": [
+          "miraflores",
+          "web"
+        ],
+        "quantities": {
+          "miraflores": 1
+        },
+        "optionRounds": {
+          "web": 1,
+          "miraflores": 1
+        },
+        "storeContracts": {
+          "miraflores": [
+            {
+              "round": 1,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "ACABADOS": {
+        "cost": 9450,
+        "label": "Máquinas de acabados",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "aca_ind": 0,
+            "aca_semi": 2,
+            "aca_basica": 0
+          }
+        }
+      },
+      "ENSAMBLE": {
+        "cost": 15750,
+        "label": "Máquinas de ensamblado",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "ens_ind": 0,
+            "ens_semi": 2,
+            "ens_basica": 0
+          }
+        }
+      },
+      "INV_RRHH": {
+        "cost": 1000,
+        "label": "Baja",
+        "round": 1,
+        "optionIds": [
+          "cap_baja"
+        ],
+        "optionRounds": {
+          "cap_baja": 1
+        }
+      },
+      "JEFATURA": {
+        "cost": 3321.6,
+        "label": "Contratar",
+        "round": 1,
+        "optionIds": [
+          "si_jefatura"
+        ],
+        "optionRounds": {
+          "si_jefatura": 1
+        }
+      },
+      "LIMPIEZA": {
+        "cost": 712.32,
+        "label": "Limpieza y servicios generales",
+        "round": 1,
+        "optionIds": [
+          "limpieza"
+        ],
+        "optionRounds": {
+          "limpieza": 1
+        }
+      },
+      "PRESTAMO": {
+        "cost": 0,
+        "label": "Línea de crédito utilizada: S/ 0",
+        "round": 1,
+        "amount": 0
+      },
+      "ACCESORIOS": {
+        "cost": 2185.9200000000005,
+        "label": "Compra de accesorios",
+        "round": 1,
+        "quantities": {
+          "acc_eco": 0,
+          "acc_prem": 300
+        }
+      },
+      "LOCAL_PROD": {
+        "cost": 2000,
+        "label": "Local de producción estándar",
+        "round": 1,
+        "optionIds": [
+          "local_std"
+        ],
+        "optionRounds": {
+          "local_std": 1
+        }
+      },
+      "MESA_CORTE": {
+        "cost": 5250,
+        "label": "Mesas de corte",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "mesa": 2
+          }
+        }
+      },
+      "PERS_CORTE": {
+        "cost": 4508.8,
+        "label": "Personal de corte",
+        "round": 1,
+        "quantities": {
+          "corte_exp": 2,
+          "corte_basico": 0,
+          "corte_maestro": 0
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PT": {
+        "cost": 0,
+        "label": "Cobertura comercial 90 días",
+        "round": 1,
+        "optionIds": [
+          "pt_90"
+        ],
+        "optionRounds": {
+          "pt_90": 1
+        }
+      },
+      "PERS_ACABADO": {
+        "cost": 6208.32,
+        "label": "Personal de acabados",
+        "round": 1,
+        "quantities": {
+          "aca_personal_art": 0,
+          "aca_personal_tec": 2,
+          "aca_personal_basico": 0
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PROV": {
+        "cost": 0,
+        "label": "80% de devolución",
+        "round": 1,
+        "optionIds": [
+          "gar_80"
+        ],
+        "optionRounds": {
+          "gar_80": 1
+        }
+      },
+      "INV_MARKETING": {
+        "cost": 1500,
+        "label": "Baja",
+        "round": 1,
+        "optionIds": [
+          "mkt_baja"
+        ],
+        "optionRounds": {
+          "mkt_baja": 1
+        }
+      },
+      "MANTENIMIENTO": {
+        "cost": 1500,
+        "label": "Mantenimiento preventivo",
+        "round": 1,
+        "optionIds": [
+          "correctivo"
+        ],
+        "optionRounds": {
+          "correctivo": 1
+        }
+      },
+      "PERS_ENSAMBLE": {
+        "cost": 6208.32,
+        "label": "Personal de ensamble",
+        "round": 1,
+        "quantities": {
+          "ens_personal_esp": 0,
+          "ens_personal_ind": 2,
+          "ens_personal_basico": 0
+        },
+        "previousQuantities": {}
+      },
+      "PRODUCCION_META": {
+        "cost": 0,
+        "label": "Producción deseada: 300 unidades",
+        "round": 1,
+        "value": 300,
+        "moldTargets": {
+          "molde_1": 0,
+          "molde_2": 300,
+          "molde_3": 0
+        }
+      },
+      "ANALISTA_COMPRAS": {
+        "cost": 5000,
+        "label": "Contratar",
+        "round": 1,
+        "optionIds": [
+          "si_analista"
+        ],
+        "optionRounds": {
+          "si_analista": 1
+        }
+      }
+    },
+    "official": {
+      "otros": 0,
+      "costos": 52990.99,
+      "ingresos": 30000,
+      "utilidad": -22990.99,
+      "costoVentas": 30531.24,
+      "ventasNetas": 30000,
+      "depreciacion": 247.4,
+      "devoluciones": 0,
+      "gastosVentas": 8800,
+      "utilidadNeta": -22990.99,
+      "cicloImpuesto": 3,
+      "impuestoRenta": 0,
+      "utilidadBruta": -531.24,
+      "ventasTotales": 30000,
+      "criterioCostos": "ventas",
+      "desgloseCostos": {
+        "fijos": 6033.92,
+        "otros": 13300,
+        "total": 52990.99,
+        "manoObra": 16925.44,
+        "intereses": 0,
+        "almacenaje": 0,
+        "maquinaria": 1873.23,
+        "materiales": 13358.4,
+        "publicidad": 1500,
+        "costoVentas": 30531.24,
+        "depreciacion": 247.4,
+        "mantenimiento": 1625.83,
+        "capacidadOciosa": 0,
+        "costoProduccionCiclo": 30531.24
+      },
+      "gastoGarantias": 3000,
+      "impactoEventos": 0,
+      "policyWarnings": [],
+      "gastosOperacion": 22459.75,
+      "costosProduccion": 30531.24,
+      "impuestoDiferido": true,
+      "gastosFinancieros": 0,
+      "regimenTributario": "MYPE",
+      "utilidadNetaFinal": null,
+      "utilidadOperativa": -22990.99,
+      "ingresosFinancieros": 0,
+      "gastosAdministrativos": 13659.75,
+      "resultadoVentaActivos": 0,
+      "baseImponibleAcumulada": 0,
+      "utilidadAntesImpuestos": -22990.99,
+      "utilidadAntesImpuestosAcumulada": -22990.99
+    }
+  },
+  "204": {
+    "state": {
+      "HILO": {
+        "cost": 1104,
+        "label": "Compra de hilo",
+        "round": 1,
+        "quantities": {
+          "hilo_ref": 0,
+          "hilo_std": 600,
+          "hilo_prem": 0
+        }
+      },
+      "CUERO": {
+        "cost": 750,
+        "label": "Compra de cuero",
+        "round": 1,
+        "quantities": {
+          "cuero_std": 0,
+          "cuero_prem": 0,
+          "cuero_sint": 30
+        }
+      },
+      "MOLDE": {
+        "cost": 303,
+        "label": "Molde básico",
+        "round": 1,
+        "optionIds": [
+          "molde_1"
+        ],
+        "purchases": {
+          "1": {
+            "molde_1": 1
+          }
+        },
+        "optionRounds": {
+          "molde_1": 1
+        }
+      },
+      "CANALES": {
+        "cost": 1800,
+        "label": "Tienda · Los Olivos x 1",
+        "round": 1,
+        "optionIds": [
+          "los_olivos"
+        ],
+        "quantities": {
+          "los_olivos": 1
+        },
+        "optionRounds": {
+          "los_olivos": 1
+        },
+        "storeContracts": {
+          "los_olivos": [
+            {
+              "round": 1,
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "ACABADOS": {
+        "cost": 1260,
+        "label": "Máquinas de acabados",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "aca_ind": 0,
+            "aca_semi": 0,
+            "aca_basica": 1
+          }
+        }
+      },
+      "ENSAMBLE": {
+        "cost": 3675,
+        "label": "Máquinas de ensamblado",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "ens_ind": 0,
+            "ens_semi": 0,
+            "ens_basica": 1
+          }
+        }
+      },
+      "INV_RRHH": {
+        "cost": 0,
+        "label": "No capacitar este ciclo",
+        "round": 1,
+        "optionIds": [
+          "cap_no"
+        ],
+        "optionRounds": {
+          "cap_no": 1
+        }
+      },
+      "JEFATURA": {
+        "cost": 0,
+        "label": "No contratar",
+        "round": 1,
+        "optionIds": [
+          "no_jefatura"
+        ],
+        "optionRounds": {
+          "no_jefatura": 1
+        }
+      },
+      "LIMPIEZA": {
+        "cost": 712.32,
+        "label": "Limpieza y servicios generales",
+        "round": 1,
+        "optionIds": [
+          "limpieza"
+        ],
+        "optionRounds": {
+          "limpieza": 1
+        }
+      },
+      "PRESTAMO": {
+        "cost": 0,
+        "label": "Línea de crédito utilizada: S/ 0",
+        "round": 1,
+        "amount": 0
+      },
+      "ACCESORIOS": {
+        "cost": 368,
+        "label": "Compra de accesorios",
+        "round": 1,
+        "quantities": {
+          "acc_eco": 100,
+          "acc_prem": 0
+        }
+      },
+      "LOCAL_PROD": {
+        "cost": 2000,
+        "label": "Local de producción estándar",
+        "round": 1,
+        "optionIds": [
+          "local_std"
+        ],
+        "optionRounds": {
+          "local_std": 1
+        }
+      },
+      "MESA_CORTE": {
+        "cost": 2625,
+        "label": "Mesas de corte",
+        "round": 1,
+        "purchases": {
+          "1": {
+            "mesa": 1
+          }
+        }
+      },
+      "PERS_CORTE": {
+        "cost": 1690.8,
+        "label": "Personal de corte",
+        "round": 1,
+        "quantities": {
+          "corte_exp": 0,
+          "corte_basico": 1,
+          "corte_maestro": 0
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PT": {
+        "cost": 0,
+        "label": "Cobertura comercial 30 días",
+        "round": 1,
+        "optionIds": [
+          "pt_30"
+        ],
+        "optionRounds": {
+          "pt_30": 1
+        }
+      },
+      "PERS_ACABADO": {
+        "cost": 1690.8,
+        "label": "Personal de acabados",
+        "round": 1,
+        "quantities": {
+          "aca_personal_art": 0,
+          "aca_personal_tec": 0,
+          "aca_personal_basico": 1
+        },
+        "previousQuantities": {}
+      },
+      "GARANTIA_PROV": {
+        "cost": 0,
+        "label": "Sin garantía",
+        "round": 1,
+        "optionIds": [
+          "gar_0"
+        ],
+        "optionRounds": {
+          "gar_0": 1
+        }
+      },
+      "INV_MARKETING": {
+        "cost": 1500,
+        "label": "Baja",
+        "round": 1,
+        "optionIds": [
+          "mkt_baja"
+        ],
+        "optionRounds": {
+          "mkt_baja": 1
+        }
+      },
+      "MANTENIMIENTO": {
+        "cost": 0,
+        "label": "",
+        "round": 1,
+        "optionIds": [],
+        "optionRounds": {}
+      },
+      "PERS_ENSAMBLE": {
+        "cost": 1690.8,
+        "label": "Personal de ensamble",
+        "round": 1,
+        "quantities": {
+          "ens_personal_esp": 0,
+          "ens_personal_ind": 0,
+          "ens_personal_basico": 1
+        },
+        "previousQuantities": {}
+      },
+      "PRODUCCION_META": {
+        "cost": 0,
+        "label": "Producción deseada: 100 unidades",
+        "round": 1,
+        "value": 100,
+        "moldTargets": {
+          "molde_1": 100,
+          "molde_2": 0,
+          "molde_3": 0
+        }
+      },
+      "ANALISTA_COMPRAS": {
+        "cost": 0,
+        "label": "No contratar",
+        "round": 1,
+        "optionIds": [
+          "no_analista"
+        ],
+        "optionRounds": {
+          "no_analista": 1
+        }
+      }
+    },
+    "official": {
+      "otros": 0,
+      "costos": 12999.92,
+      "ingresos": 2805,
+      "utilidad": -10194.92,
+      "costoVentas": 6598.3,
+      "ventasNetas": 2805,
+      "depreciacion": 59.38,
+      "devoluciones": 0,
+      "gastosVentas": 3658.05,
+      "utilidadNeta": -10194.92,
+      "cicloImpuesto": 3,
+      "impuestoRenta": 0,
+      "utilidadBruta": -3793.3,
+      "ventasTotales": 2805,
+      "criterioCostos": "ventas",
+      "desgloseCostos": {
+        "fijos": 2712.32,
+        "otros": 2158.05,
+        "total": 12999.92,
+        "manoObra": 5072.4,
+        "intereses": 0,
+        "almacenaje": 0,
+        "maquinaria": 90.63,
+        "materiales": 1466.52,
+        "publicidad": 1500,
+        "costoVentas": 6598.3,
+        "depreciacion": 59.38,
+        "mantenimiento": 31.25,
+        "capacidadOciosa": 0,
+        "costoProduccionCiclo": 6598.3
+      },
+      "gastoGarantias": 330,
+      "impactoEventos": 0,
+      "policyWarnings": [],
+      "gastosOperacion": 6401.62,
+      "costosProduccion": 6598.3,
+      "impuestoDiferido": true,
+      "gastosFinancieros": 0,
+      "regimenTributario": "MYPE",
+      "utilidadNetaFinal": null,
+      "utilidadOperativa": -10194.92,
+      "ingresosFinancieros": 0,
+      "gastosAdministrativos": 2743.57,
+      "resultadoVentaActivos": 0,
+      "baseImponibleAcumulada": 0,
+      "utilidadAntesImpuestos": -10194.92,
+      "utilidadAntesImpuestosAcumulada": -10194.92
+    }
+  }
+}
