@@ -1,0 +1,149 @@
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: sin producción, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: producción sin ventas, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: ventas parciales, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: ventas completas, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: fijos elevados, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: recursos alternativos, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: configuración rentable, 3 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: sin producción, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: producción sin ventas, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: ventas parciales, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: ventas completas, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: fijos elevados, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: recursos alternativos, 6 ciclos
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+Closure status journal unavailable: RPC_ERROR
+OK PostgreSQL: configuración rentable, 6 ciclos
+✔ tres y seis ciclos: Node, Edge y PostgreSQL real; siete escenarios y reintento (371598.4129ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 371909.0687

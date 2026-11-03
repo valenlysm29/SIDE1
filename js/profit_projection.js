@@ -86,7 +86,7 @@
    }
    if(!base.sold)lossReasons.push('No se proyectan ventas: producir mantiene productos en inventario, pero no genera ingresos.');
    if(base.sold<base.produced)lossReasons.push('Parte de la producción quedaría sin vender; revisa canales, distribución y demanda.');
-   if(base.profit<0&&base.grossProfit>=0)lossReasons.push('La utilidad bruta no alcanza para cubrir los gastos operativos y financieros del ciclo.');
+   if(base.profit<0&&base.grossProfit>=0)lossReasons.push('Los gastos operativos, financieros y el impuesto aplicable superan la utilidad bruta del ciclo.');
    if(base.grossProfit<0)lossReasons.push('El costo de las unidades vendidas supera sus ingresos al precio efectivo de esta versión.');
    if(base.minimumSales!==null&&base.minimumSales>Math.min(base.capacity,base.demand))lossReasons.push('Las ventas de equilibrio estimadas superan la capacidad o la demanda proyectada con estos recursos.');
    if(base.availableBeforeSales<0)lossReasons.push('La caja inicial no cubre los pagos estimados anteriores a las ventas.');

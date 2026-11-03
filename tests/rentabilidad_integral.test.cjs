@@ -40,3 +40,12 @@ test('malas decisiones generan pérdida y el diagnóstico no modifica las decisi
  assert.ok(r.available);assert.ok(r.base.profit<0);assert.ok(r.lossReasons.length>0);assert.equal(JSON.stringify(input),before);
  assert.equal(r.base.operatingExpenses,C.close(input).financial.estadoResultados.gastosOperacion);assert.ok(r.base.sales[0].targetPrices.every(p=>p.price>r.base.sales[0].price));
 });
+
+test('una pérdida inicial puede recuperarse con decisiones eficientes y capital suficiente',()=>{
+ let previous={},rows=[];
+ for(let round=1;round<=3;round++){
+  const inputs=['a','b','c'].map(id=>{const state=plan({round,cycles:3,previous:previous[id]});if(round===1){state.PRODUCCION_META.moldTargets={molde_1:100};state.CUERO.quantities={cuero_sint:30};state.ACCESORIOS.quantities={acc_eco:100};state.HILO.quantities={hilo_std:600};state.ANALISTA_COMPRAS.optionIds=['si_analista'];}return {id,capital:100000,catalog,round,state:C.restoreState(state,previous[id]?.state||{}),ledger:previous[id]?.ledger||{},sectionsByRound:previous[id]?.financialSections||{},financialPolicy:{cycles:3,economicRulesVersion:'utility-v1',authoritativePrices:true}};});
+  previous=C.closeMany(inputs);for(const r of Object.values(previous)){assert.equal(money(r.financial.balanceGeneral.activos-r.financial.balanceGeneral.pasivoPatrimonio),0);assert.ok(r.financial.balanceGeneral.efectivo>=0);}rows.push({round,net:previous.a.financial.estadoResultados.utilidadNeta,accumulated:previous.a.financial.balanceGeneral.resultadosAcumulados,cash:previous.a.financial.balanceGeneral.efectivo});
+ }
+ assert.ok(rows[0].net<0);assert.ok(rows[2].accumulated>0);fs.writeFileSync(out+'/recuperacion.json',JSON.stringify(rows,null,2));
+});
