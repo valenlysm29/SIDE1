@@ -44,4 +44,4 @@ El cierre bloquea cada ciclo y las empresas dentro de una transacción PostgreSQ
 
 ## Pendiente antes de publicar para uso real
 
-La migración `202611030001_lite_local.sql` es para el servidor local propio; **no debe aplicarse directamente a un Supabase expuesto**. Falta sustituir la autenticación local por Supabase Auth, agregar políticas RLS y permisos probados, endurecer sesiones y límites de intentos, y crear un cierre programado alojado y una Edge Function autenticada. No hay infraestructura remota ni URL pública configurada. La interfaz estática de práctica anterior no es un sustituto de este servidor.
+La migración `202611030001_lite_local.sql` es para el servidor local propio; **no debe aplicarse directamente a un Supabase expuesto**. Falta sustituir la autenticación local por Supabase Auth, agregar políticas RLS y permisos probados, endurecer sesiones, aplicar controles adicionales de abuso y configurar HTTPS, y crear un cierre programado alojado y una Edge Function autenticada. No hay infraestructura remota ni URL pública configurada. La interfaz estática de práctica anterior no es un sustituto de este servidor.

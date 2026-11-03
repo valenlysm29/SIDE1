@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test';
-const base='http://127.0.0.1:4178',key='side-lite-local-testing-key-2026',suffix=Date.now(),password='contraseña-larga-2026';
+const base='http://127.0.0.1:4178',key=process.env.TEACHER_REGISTRATION_KEY||'side-lite-local-testing-key-2026',suffix=Date.now(),password='contraseña-larga-2026';
 async function call(ctx,path,method='GET',data){const r=await ctx.request.fetch(base+'/api'+path,{method,data});expect(r.ok(),await r.text()).toBeTruthy();return r.json()}
 async function account(browser,role,n){const ctx=await browser.newContext();const email=`${n}-${suffix}@side.test`;await call(ctx,'/register','POST',{email,password,name:n,role,key});await call(ctx,'/login','POST',{email,password});return ctx}
 async function waitClosed(ctx,id){await expect.poll(async()=>{const g=await call(ctx,'/games/'+id);return g.cycles.at(-1)?.status},{timeout:15000,intervals:[300,500]}).toBe('closed')}
