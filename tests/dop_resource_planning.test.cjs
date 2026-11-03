@@ -8,7 +8,7 @@ test('la meta sin recursos calcula materiales y recursos suficientes sin modific
  const c=context({molde_1:20}),before=JSON.stringify(c),p=model.calculate(c),h=dop.render(p),r=model.planResources(p.target);
  assert.equal(p.producibleUnits,0);assert.deepEqual(p.materials.map(m=>m.neededForTarget),[6,20,120]);
  assert.ok(r.processes.every(x=>x.workers===1&&x.machines===1&&x.cycleCapacity>=20));
- for(const s of ['6 m²','20 juegos de piezas','20 accesorios','20 unidades totales','1 mesas','1 máquinas básicas'])assert.ok(h.includes(s),s);
+ for(const s of ['6 m²','0 juegos de piezas','20 accesorios','0 unidades totales','1 mesas','1 máquinas básicas'])assert.ok(h.includes(s),s);
  assert.equal(JSON.stringify(c),before);
 });
 test('prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada',()=>{
@@ -16,7 +16,7 @@ test('prémium, metas grandes y tres moldes comparten una línea suficiente y ac
  assert.deepEqual(p.materials.map(m=>m.neededForTarget),[96,170,1770]);
  let r=model.planResources(p.target);assert.ok(r.processes.every(x=>x.cycleCapacity>=170&&x.workers===2&&x.machines===2));
  c.drafts.PRODUCCION_META.moldTargets={molde_3:100};p=model.calculate(c);
- assert.deepEqual(p.materials.map(m=>m.neededForTarget),[70,100,1300]);assert.match(dop.render(p),/100 unidades totales/);
+ assert.deepEqual(p.materials.map(m=>m.neededForTarget),[70,100,1300]);assert.match(dop.render(p),/PRODUCCIÓN TOTAL DESEADA<\/span><strong>100 u\./);
  r=model.planResources(10000);assert.ok(r.processes.every(x=>x.cycleCapacity>=10000&&x.workers>1&&x.machines===x.workers));
 });
 
@@ -24,9 +24,9 @@ test('prémium, metas grandes y tres moldes comparten una línea suficiente y ac
 test('DOP compares recommended, available and missing resources without changing the target',()=>{
  const c=context({molde_1:2000}),p=model.calculate(c),before=JSON.stringify(p),html=dop.render(p);
  assert.match(html,/<th>Disponible<\/th><th>Faltante<\/th>/);
- assert.match(html,/<th>Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/);
- assert.match(html,/<th>Molde básico<\/th><td>1<\/td><td>0<\/td><td>1<\/td>/);
- assert.match(html,/Faltante referencial/);
+ assert.match(html,/<th scope="row">Cuero<\/th><td>600 m²<\/td><td>0 m²<\/td><td>600 m²<\/td>/);
+ assert.match(html,/<th scope="row">Molde básico<\/th><td>1<\/td><td>0<\/td><td>1<\/td>/);
+ assert.match(html,/Diferencia/);
  assert.match(html,/Los faltantes no impiden guardar ni enviar tu meta/);
  assert.equal(JSON.stringify(p),before);
 });

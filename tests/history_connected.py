@@ -21,9 +21,19 @@ if os.environ.get('HISTORY_LEGACY'):
  OUT=ROOT/'tests/output/fase01/connected-legacy';OUT.mkdir(parents=True,exist_ok=True)
 if os.environ.get('HISTORY_BLOCKED_GAME'):
  OUT=ROOT/'tests/output/fase01/finalizacion/connected-isolation';OUT.mkdir(parents=True,exist_ok=True)
+if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
+ OUT=ROOT/'tests/output/finalizacion-integral/connected';OUT.mkdir(parents=True,exist_ok=True)
 def req(path,payload,token=None):
  r=urllib.request.Request(BASE+path,data=json.dumps(payload).encode(),headers={'apikey':KEY,'Authorization':'Bearer '+(token or KEY),'Content-Type':'application/json'})
  with urllib.request.urlopen(r) as f:return json.load(f)
+def qa_session():
+ if not os.environ.get('SIDE_INTEGRAL_ECONOMY'):return req('/auth/v1/signup',{})
+ # Permanent QA identities avoid exhausting anonymous sign-up quotas across reruns.
+ # Actual Auth JWTs and all role/ownership checks remain enabled.
+ identity=uuid.uuid4().hex;email='side-qa-'+identity+'@example.invalid';password=uuid.uuid4().hex+'Aa1!'
+ req('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True},status['SERVICE_ROLE_KEY'])
+ return req('/auth/v1/token?grant_type=password',{'email':email,'password':password})
+
 def rpc(name,args,token):return req('/rest/v1/rpc/'+name,args,token)
 def sql(query):
  return subprocess.check_output(['docker','exec',('supabase_db_fase01local' if os.environ.get('SIDE_FASE01_WORK') else 'supabase_db_sidep01http'),'psql','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-Atc',query],encoding='utf8').strip()
@@ -48,11 +58,9 @@ def worker(game,cycle):
  result=req('/functions/v1/history-qa',{'game':game,'cycle':cycle},status['SERVICE_ROLE_KEY'])
  assert result and all(r['success'] and not r.get('pending') for r in result),result
  return result
-
 if os.environ.get('SIDE_FASE01_WORK'):
  # Quarantine only abandoned fixtures in this dedicated local database.
  sql("update public.partidas set configuracion=configuracion||'{\"phase\":\"cancelled\",\"runtime\":{\"phase\":\"cancelled\"}}'::jsonb where nombre like 'QA Historia %'")
-
 class Handler(SimpleHTTPRequestHandler):
  def __init__(self,*a,**kw):super().__init__(*a,directory=str(ROOT),**kw)
  def log_message(self,*a):pass
@@ -63,10 +71,14 @@ class Handler(SimpleHTTPRequestHandler):
 server=ThreadingHTTPServer(('127.0.0.1',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start();origin='http://127.0.0.1:'+str(server.server_port)
 evidence=json.loads((OUT/'integration.json').read_text()) if os.environ.get('HISTORY_SCENARIO') and (OUT/'integration.json').exists() else []
 def plan(cycle,company):
- counts={'MESA_CORTE':{'mesa':1},'ENSAMBLE':{'ens_basica':1},'ACABADOS':{'aca_basica':1},'PERS_CORTE':{'corte_basico':1},'PERS_ENSAMBLE':{'ens_personal_basico':1},'PERS_ACABADO':{'aca_personal_basico':1},'CUERO':{'cuero_std':10},'ACCESORIOS':{'acc_eco':25},'HILO':{'hilo_std':2}}
+ counts={'MESA_CORTE':{'mesa':1},'ENSAMBLE':{'ens_basica':1},'ACABADOS':{'aca_basica':1},'PERS_CORTE':{'corte_basico':1},'PERS_ENSAMBLE':{'ens_personal_basico':1},'PERS_ACABADO':{'aca_personal_basico':1},'CUERO':{'cuero_std':100},'ACCESORIOS':{'acc_eco':200},'HILO':{'hilo_std':2}}
  s={k:{'round':cycle,'quantities':q,'optionIds':list(q),**({'purchases':{'1':q}} if k in ('MESA_CORTE','ENSAMBLE','ACABADOS') else {})} for k,q in counts.items()}
  for k in ('MESA_CORTE','ENSAMBLE','ACABADOS'):s[k]['round']=1
- s.update(MOLDE={'round':1,'optionIds':['molde_1']},CANALES={'round':cycle,'optionIds':['web']},PRODUCCION_META={'round':cycle,'moldTargets':{'molde_1':10+company*2}},PRESTAMO={'round':1,'amount':1000,'principal':1000})
+ s.update(MOLDE={'round':1,'optionIds':['molde_1','molde_2','molde_3']},CANALES={'round':cycle,'optionIds':['web']},PRODUCCION_META={'round':cycle,'moldTargets':{'molde_1':10+company*2}},PRESTAMO={'round':1,'amount':1000,'principal':1000})
+ if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
+  product=min(3,cycle if int(os.environ.get('HISTORY_SCENARIO','3'))==3 else (cycle+1)//2)
+  s['PRODUCCION_META']={'round':cycle,'moldTargets':{'molde_'+str(product):100+company*10}}
+  if company==2:s['INV_MARKETING']={'round':cycle,'optionIds':['mkt_alta']}
  return s
 with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='C:/Program Files/Google/Chrome/Application/chrome.exe',headless=True)
@@ -74,7 +86,7 @@ with sync_playwright() as p:
   for count,mode in [(3,'manual'),(6,'automatic')]:
    if os.environ.get('HISTORY_LEGACY') and mode!='manual':continue
    if os.environ.get('HISTORY_SCENARIO') and int(os.environ['HISTORY_SCENARIO'])!=count:continue
-   teacher=req('/auth/v1/signup',{});uid=teacher['user']['id'];sql(f"insert into profesores(id,nombre,apellido) values ('{uid}','Historia','QA') on conflict do nothing")
+   teacher=qa_session();uid=teacher['user']['id'];sql(f"insert into profesores(id,nombre,apellido) values ('{uid}','Historia','QA') on conflict do nothing")
    options={'viewport':{'width':1366,'height':900}}
    if not os.environ.get('SIDE_FASE01_WORK'):options['record_video_dir']=str(OUT/f'video-{count}')
    ctx=browser.new_context(**options)
@@ -92,7 +104,9 @@ with sync_playwright() as p:
     sql(f"update partidas set configuracion=configuracion-'sequentialCloseVersion' where id='{game}' and nombre='QA Historia {count}'")
    students=[]
    for n in range(3):
-    sc=browser.new_context(viewport={'width':1366,'height':900});sc.on('response',check_resource);s=sc.new_page();s.on('pageerror',lambda e:errors.append(str(e)))
+    sc=browser.new_context(viewport={'width':1366,'height':900});sc.on('response',check_resource);student_session=qa_session()
+    sc.add_init_script('localStorage.setItem("sb-127-auth-token",'+json.dumps(json.dumps(student_session))+');')
+    s=sc.new_page();s.on('pageerror',lambda e:errors.append(str(e)))
     s.goto(origin+'/index.html',wait_until='networkidle')
     try:s.locator('#startBtn').click(timeout=15000)
     except Exception:
@@ -133,6 +147,14 @@ with sync_playwright() as p:
     for sc,s,ident,company in students:
      row=next(r for r in closed if int(r['empresa_id'])==int(company) and int(r['ciclo'])==cycle);f=row['result']['financial'];receipt=row['result']['receipt']
      assert receipt['produced']>0 and receipt['sold']>0,(cycle,company,receipt)
+     if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
+      expected=plan(cycle,students.index((sc,s,ident,company)))['PRODUCCION_META']['moldTargets']
+      assert receipt['production']['target']==sum(expected.values()),(receipt['production'],expected)
+      assert len([x for x in receipt['sales'] if x['produced']>0])==1
+      assert round(f['estadoResultados']['ventasTotales']-f['estadoResultados']['costoVentas'],2)==f['estadoResultados']['utilidadBruta']
+      assert abs(f['balanceGeneral']['activos']-f['balanceGeneral']['pasivoPatrimonio'])<.011
+      for lot in f.get('lotMovements',[]):assert abs(lot['inventoryValue']-round(lot['inventoryValue'],2))<1e-8
+      scenario.setdefault('economics',[]).append({'cycle':cycle,'company':company,'product':next(x['id'] for x in receipt['sales'] if x['produced']>0),'target':receipt['production']['target'],'produced':receipt['produced'],'sold':receipt['sold'],'income':f['estadoResultados']['ventasTotales'],'cogs':f['estadoResultados']['costoVentas'],'profit':f['estadoResultados']['utilidadNeta'],'cash':f['balanceCaja']['cajaFinal'],'tax':f['estadoResultados']['impuestoRenta']})
      if company in previous:assert abs(float(f['balanceCaja']['cajaInicial'])-previous[company]['cash'])<.02,(f,previous[company])
      if company in previous:
       assert receipt['openingInventory']==previous[company]['inventory'],(receipt['openingInventory'],previous[company])
@@ -162,6 +184,8 @@ with sync_playwright() as p:
     else:t.evaluate('refreshTeacherGame()')
     if cycle<count:t.wait_for_function(f'state.round==={cycle+1}',timeout=15000)
    t.wait_for_function('runtime()?.phase==="finished"',timeout=20000);t.reload(wait_until='networkidle');t.locator('[data-tab="historial"]').click();t.wait_for_timeout(1500);t.screenshot(path=str(OUT/f'history-{count}.png'))
+   if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
+    assert any(r['profit']<0 for r in scenario['economics']) and any(r['profit']>0 for r in scenario['economics']),scenario['economics']
    assert not errors,errors
    assert not local_failures,local_failures
    scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;scenario['blockedHistoricalGame']=os.environ.get('HISTORY_BLOCKED_GAME');evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))

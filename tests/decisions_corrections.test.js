@@ -110,12 +110,12 @@ test('loading existing multi-store decisions preserves all quantities and contra
   assert.deepEqual(r.json('decisionState.CANALES'),entry);
   assert.equal(r.run('RULES.storeCount(channelDraft())'),6);
 });
-test('DOP renders once in Production and nowhere in the other categories or summary',()=>{
+test('DOP renders once in Planning and preserves the Production decision',()=>{
   const r=runtime();
-  for(const cat of ['B','C','F','D','E','A']){
+  for(const cat of ['B','C','F','D','E','A','DOP']){
     r.run(`currentCategory='${cat}';renderDecisionCategory();`);
     const html=r.elements.get('decisionCards').innerHTML;
-    assert.equal((html.match(/class="production-dop /g)||[]).length,cat==='C'?1:0,cat);
+    assert.equal((html.match(/class="production-dop /g)||[]).length,cat==='DOP'?1:0,cat);
   }
   assert.doesNotMatch(r.run('productionSummaryHtml(liveCompanyReview())'),/class="production-dop /);
   assert.deepEqual(r.errors,[]);
@@ -135,14 +135,13 @@ test('visual DOP handles empty, zero and valid targets and updates from active d
   r.run("localStorage.setItem('SIDE_ACTIVE_ROUND','2');decisionDrafts={};");
   assert.equal(r.run('productionPlan().target'),0);
 });
-test('manual transfers show central and store stock, persist in sales decision and reject excess',()=>{
- const r=runtime();r.run("decisionState.__finishedGoods={esencial:30};decisionState.__storeInventory={esencial:{'miraflores:1':10}};decisionDrafts.CANALES={optionIds:['miraflores'],quantities:{miraflores:1},transfers:{esencial:{'miraflores:1':15},urbano:{},premium:{}}}");
- const detail=r.json('manualDistributionData()[0]');assert.equal(detail.central,20);assert.equal(detail.assigned,15);assert.equal(detail.locations['miraflores:1'],10);
- assert.match(r.run('manualDistributionHtml()'),/almacén disponible 20/);
- const entry=r.json("prepareSectionSave(DECISION_CATALOG.find(c=>c.cat==='D')).entries.CANALES");assert.equal(entry.transfers.esencial['miraflores:1'],15);
- r.run("decisionDrafts.CANALES.transfers.esencial['miraflores:1']=21;toast=()=>{};");assert.equal(r.run("validateRequiredSection(DECISION_CATALOG.find(c=>c.cat==='D'))"),false);
+test('legacy transfer decisions survive save and reload without adding transfer controls',()=>{
+ const r=runtime(),entry={round:1,optionIds:['miraflores'],quantities:{miraflores:1},transfers:{esencial:{'miraflores:1':15},urbano:{},premium:{}}};
+ r.run('decisionState.CANALES='+JSON.stringify(entry)+';localStorage.setItem(decisionKey(),JSON.stringify(decisionState));loadDecisionState();');
+ assert.deepEqual(r.json('decisionState.CANALES'),entry);
+ r.run("currentCategory='D';renderDecisionCategory();");
+ assert.doesNotMatch(r.elements.get('decisionCards').innerHTML,/data-transfer/);
 });
-
 
 test('DOP shortages never block saving or sending production and material sections',()=>{
  const r=runtime();

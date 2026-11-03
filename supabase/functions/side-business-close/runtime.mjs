@@ -819,6 +819,15 @@ module.exports={runOnce,remoteRpc};
 (function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(()=>node?load("js/engine/config.js"):root.SIDE_ECONOMIC_CONFIG);if(node)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(getEconomicConfig){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100||0;
+  // Allocate a carrying value in whole cents, preserving its exact total.
+  function allocateMoney(total,weights){
+    const positive=weights.map(v=>Math.max(0,n(v))),sum=positive.reduce((a,b)=>a+b,0);
+    if(!sum)return weights.map(()=>0);
+    const cents=Math.round(Math.abs(money(total))*100),shares=positive.map(w=>cents*w/sum),parts=shares.map(Math.floor);
+    const order=shares.map((v,i)=>({i,remainder:v-parts[i]})).sort((a,b)=>b.remainder-a.remainder||a.i-b.i);
+    for(let left=cents-parts.reduce((a,b)=>a+b,0),i=0;left>0;left--,i++)parts[order[i%order.length].i]++;
+    return parts.map(v=>v/100*Math.sign(total));
+  }
   function buildStatement(input={}){
     const ventasTotales=money(input.ventasTotales),costoVentas=money(input.costoVentas),gastosAdministrativos=money(input.gastosAdministrativos),gastosVentas=money(input.gastosVentas),ingresosFinancieros=money(input.ingresosFinancieros),gastosFinancieros=money(input.gastosFinancieros);
     const utilidadBruta=money(ventasTotales-costoVentas),gastosOperacion=money(gastosAdministrativos+gastosVentas),utilidadOperativa=money(utilidadBruta-gastosOperacion),utilidadAntesImpuestos=money(utilidadOperativa+ingresosFinancieros-gastosFinancieros),impuestoRenta=money(input.impuestoRenta??Math.max(0,utilidadAntesImpuestos*n(getEconomicConfig().tax.generalRate))),utilidadNeta=money(utilidadAntesImpuestos-impuestoRenta);
@@ -889,42 +898,54 @@ module.exports={runOnce,remoteRpc};
         if(weight){for(const o of options){materialValues[o.id]=n(materialValues[o.id])+unallocatedSeed*n(opening[o.id])*n(o.cost)/weight;materialQuantities[o.id]=n(opening[o.id]);}unallocatedSeed=0;}
       }
       const purchases=Object.entries(sectionsByRound[p.r]||{}).filter(([kind,s])=>Object.hasOwn(ledger,`${p.r}:${kind}`)&&Math.abs(n(s.recordedNet??s.net)-n(ledger[`${p.r}:${kind}`]))<.02).flatMap(([,s])=>s.items||[]).filter(e=>items.get(e.id)?.material);
-      let consumedMaterial=0,closingMaterial=0;const consumedByFamily={},materialUnitCosts={};
+      const openingMaterialValue=materialValue;
+      let consumedMaterial=0,closingMaterial=0,receivedMaterialCost=0;const consumedByFamily={},materialUnitCosts={};
       for(const item of items.values())if(item.material)for(const option of item.options||[]){
         const rows=purchases.filter(e=>e.id===item.id).flatMap(e=>e.rows||[]).filter(row=>row.label===option.label),qty=receipt?.materialReceiptFacts?n(receipt.materialReceiptFacts.receivedBySku?.[option.id]):rows.reduce((s,row)=>s+n(row.quantity),0),cost=receipt?.materialReceiptFacts?n(receipt.materialReceiptFacts.receivedValueBySku?.[option.id]):rows.reduce((s,row)=>s+n(row.outflow),0),opening=n(materialQuantities[option.id]);
+        receivedMaterialCost+=cost;
         const available=opening+qty,value=n(materialValues[option.id])+cost,remaining=receipt?n(inventory[option.id]):available;
         const closing=available?value*Math.min(1,remaining/available):value;materialUnitCosts[option.id]=available?value/available:0;consumedMaterial+=value-closing;consumedByFamily[item.id]=n(consumedByFamily[item.id])+value-closing;closingMaterial+=closing;materialValues[option.id]=closing;materialQuantities[option.id]=remaining;
       }
       // Preserve explicitly valued migrated stock until its valuation is available.
       materialValue=money(closingMaterial+unallocatedSeed);
+      consumedMaterial=money(openingMaterialValue+receivedMaterialCost-materialValue);
       if(receipt?.materialReceiptFacts){const facts=receipt.materialReceiptFacts,ordered=Object.values(facts.ordersBySku).reduce((sum,v)=>sum+n(v.quantity)*n(v.unitCost),0),received=Object.values(facts.receivedValueBySku).reduce((sum,v)=>sum+n(v),0);if(Math.abs(money(ordered)-money(p.mp))>0.02)throw new Error('Pago de materiales no coincide con las órdenes verificadas.');if(facts.paymentMode==='credit'){if(Math.abs(money(ordered)-money(p.supplierCredit))>0.02)throw new Error('Crédito de proveedor inconsistente.');supplierPayable=money(supplierPayable+received);for(const item of facts.receipts){if(supplierPayableDetails.some(row=>row.receiptId===item.receiptId))throw new Error('Obligación de proveedor duplicada.');supplierPayableDetails.push({...item,paid:0,outstanding:item.value});}}else{materialPrepayment=money(materialPrepayment+p.mp-received);if(materialPrepayment < -0.01)throw new Error('Anticipo de materiales inconsistente.');}}
       const economicConfig=getEconomicConfig(),policy={...financialPolicy,...receipt?.financialPolicy},life={MESA_CORTE:10,ENSAMBLE:10,ACABADOS:8,MOLDE:5},months=n(policy.cycleMonths)||1;
       const md=receipt?.modelVersion==='md-20261027',residualRate=policy.residualRate??(receipt?.regimen==='NO_MYPE' ? .10 : .05);
       let depreciation=0;
-      for(const [id,years] of Object.entries(life)){const item=items.get(id);for(const option of item?.options||[]){const purchases=decisions[id]?.purchases,qty=purchases?Math.max(0,Object.entries(purchases).filter(([r])=>Number(r)<=p.r).reduce((sum,[,row])=>sum+n(row?.[option.id]),0)):(n(decisions[id]?.quantities?.[option.id])||Number(decisions[id]?.optionIds?.includes(option.id)||false)),base=qty*n(option.cost)*(1-n(residualRate)),linear=base/(n(policy.usefulLives?.[id])||years)/12*months,method=md?[]:decisions.__catalogSelection||receipt?.catalogSelection||[],annualized=method.includes('FIN-02B')?base*n(receipt?.produced)/(economicConfig?.depreciation?.productiveLife||100000):linear*(method.includes('FIN-02C')?(economicConfig?.depreciation?.acceleratedFactor||2):1),charge=Math.max(0,Math.min(base-n(depreciationValues[option.id]),annualized));depreciation+=charge;depreciationValues[option.id]=n(depreciationValues[option.id])+charge;}}
+      for(const [id,years] of Object.entries(life)){const item=items.get(id);if(item?.noDepreciation===true)continue;for(const option of item?.options||[]){const purchases=decisions[id]?.purchases,qty=purchases?Math.max(0,Object.entries(purchases).filter(([r])=>Number(r)<=p.r).reduce((sum,[,row])=>sum+n(row?.[option.id]),0)):(n(decisions[id]?.quantities?.[option.id])||Number(decisions[id]?.optionIds?.includes(option.id)||false)),base=qty*n(option.cost)*(1-n(residualRate)),linear=base/(n(policy.usefulLives?.[id])||years)/12*months,method=md?[]:decisions.__catalogSelection||receipt?.catalogSelection||[],annualized=method.includes('FIN-02B')?base*n(receipt?.produced)/(economicConfig?.depreciation?.productiveLife||100000):linear*(method.includes('FIN-02C')?(economicConfig?.depreciation?.acceleratedFactor||2):1),charge=Math.max(0,Math.min(base-n(depreciationValues[option.id]),annualized));depreciation+=charge;depreciationValues[option.id]=n(depreciationValues[option.id])+charge;}}
       depreciation=money(Math.min(Math.max(0,assets+p.comprasActivos-p.bajaActivos),depreciation));
-      const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=consumedMaterial+(produced?p.mod+depreciation:0);
+      const produced=(receipt?.sales||[]).reduce((s,row)=>s+n(row.produced),0),productionCost=money(consumedMaterial+(produced?p.mod+depreciation:0));
       const lines=receipt?.production?.productLines||[];
+      const sales=receipt?.sales||[],openingIds=Object.keys(goodsValues),openingValues=allocateMoney(Object.values(goodsValues).reduce((s,v)=>s+n(v),0),Object.values(goodsValues));
+      openingIds.forEach((id,i)=>goodsValues[id]=openingValues[i]);
+      const productionWeights=sales.map((row,index)=>{
+        if(!n(row.produced))return 0;
+        const lot=row.lots?.find(l=>Number(l.cycle)===p.r&&!l.legacy);
+        let materials=0;
+        if(lot){for(const family of Object.values(lot.materials||{}))for(const [id,qty] of Object.entries(family))materials+=n(qty)*n(materialUnitCosts[id]);}
+        else for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);materials+=value*(total?n(weights[index])/total:n(row.produced)/produced);}
+        return materials+(p.mod+depreciation)*n(row.produced)/produced;
+      });
+      const assignedProduction=allocateMoney(productionCost,productionWeights);
       let cogs=0,goodsLots=[],lotMovements=[];
-      for(const [index,row] of (receipt?.sales||[]).entries()){
+      for(const [index,row] of sales.entries()){
         if(Array.isArray(row.lots)&&Array.isArray(row.lotSales)){
           const lots=row.lots.map(l=>({...l})),newLot=lots.find(l=>Number(l.cycle)===p.r&&!l.legacy);
           const legacy=lots.find(l=>l.legacy),openingKnown=lots.filter(l=>l!==newLot&&!l.legacy).reduce((sum,l)=>sum+n(l.available)*n(l.unitCost),0);
           // El valor agregado heredado se mantiene como una sola partida, sin
           // suponer composición o ciclos de fabricación inexistentes.
           if(legacy){const value=Math.max(0,n(goodsValues[row.id])-openingKnown);legacy.unitCost=n(legacy.available)?value/n(legacy.available):0;}
-          if(newLot){
-            let materials=0;for(const family of Object.values(newLot.materials||{}))for(const [id,qty] of Object.entries(family))materials+=n(qty)*n(materialUnitCosts[id]);
-            const assigned=materials+(produced?(p.mod+depreciation)*n(row.produced)/produced:0);
-            newLot.unitCost=n(newLot.produced)?assigned/n(newLot.produced):0;
-          }
+          const openingLots=lots.filter(l=>l!==newLot);
+          const carrying=allocateMoney(n(goodsValues[row.id]),openingLots.map(l=>l.inventoryValue??n(l.available)*n(l.unitCost)));
+          const lotValues=new Map(openingLots.map((l,i)=>[l,carrying[i]]));
+          if(newLot)lotValues.set(newLot,assignedProduction[index]);
           let value=0;
-          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),sold=Math.min(n(lot.available),n(sale?.units));cogs+=sold*n(lot.unitCost);lot.available-=sold;if(lot.closingLocations){lot.locations=lot.closingLocations;delete lot.closingLocations;}lot.inventoryValue=lot.available*n(lot.unitCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:sold*n(lot.unitCost)});if(lot.available>0)goodsLots.push(lot);}
-          goodsValues[row.id]=value;
+          for(const lot of lots){const sale=row.lotSales.find(x=>x.id===lot.id),available=n(lot.available),sold=Math.min(available,n(sale?.units)),bookValue=n(lotValues.get(lot)),soldCost=available?money(bookValue*sold/available):0;lot.unitCost=available?bookValue/available:0;cogs+=soldCost;lot.available-=sold;if(lot.closingLocations){lot.locations=lot.closingLocations;delete lot.closingLocations;}lot.inventoryValue=money(bookValue-soldCost);value+=lot.inventoryValue;lotMovements.push({...lot,sold,costOfSales:soldCost});if(lot.available>0)goodsLots.push(lot);}
+          goodsValues[row.id]=money(value);
         }else{
-          // Cierres históricos se siguen calculando con la regla agregada original.
-          let lineMaterial=0;for(const [family,value] of Object.entries(consumedByFamily)){const weights=lines.map(line=>n(line.target)?n(line.requirements?.[family])/n(line.target)*n(line.plannedUnits):0),total=weights.reduce((s,v)=>s+v,0);lineMaterial+=value*(total?n(weights[index])/total:produced?n(row.produced)/produced:0);}
-          const assignedCost=lineMaterial+(produced?(p.mod+depreciation)*n(row.produced)/produced:0),availableValue=n(goodsValues[row.id])+assignedCost,soldCost=n(row.available)?availableValue*n(row.sold)/n(row.available):0;cogs+=soldCost;goodsValues[row.id]=availableValue-soldCost;
+          // Aggregate receipts also relieve the same cents recognized as COGS.
+          const availableValue=money(n(goodsValues[row.id])+assignedProduction[index]),soldCost=n(row.available)?money(availableValue*n(row.sold)/n(row.available)):0;cogs+=soldCost;goodsValues[row.id]=money(availableValue-soldCost);
         }
       }
       // Finished goods remain an asset until sold; idle labor and depreciation

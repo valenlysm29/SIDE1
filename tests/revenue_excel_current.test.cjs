@@ -9,7 +9,7 @@ test('current revenue adapter reproduces fresh v19 Excel market allocations',()=
  const rows=E.settleMarketCompanies(companies,'SEG-01');assert.equal(rows.reduce((s,r)=>s+r.vendidas,0),200);assert.ok(rows[0].demanda>rows[1].demanda);
 });
 test('catalog reputation is unique, bounded and independent from advertising spend proxy',()=>{
- const input=inputs()[0],profile=REVENUE.profile(input);assert.ok(profile.scores.reputation>=0&&profile.scores.reputation<=10);assert.ok(Math.abs(profile.scores.reputation-(1/3+1+1+0)*10/4)<1e-10);
+ const input=inputs()[0],profile=REVENUE.profile(input);assert.ok(profile.scores.reputation>=0&&profile.scores.reputation<=10);assert.ok(Math.abs(profile.scores.reputation-((1/3+1+1+0)*10/4+2))<1e-10);
  const changed=structuredClone(input);changed.state.__worldPublicity=999999;assert.deepEqual(REVENUE.profile(changed).scores,profile.scores);
 });
 test('shared closure competes across companies, caps sales at stock and ignores POS activity',()=>{

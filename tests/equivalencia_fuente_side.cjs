@@ -17,7 +17,7 @@ for(const item of cases)test('Excel real y producción SIDE: '+item.id,()=>{
  const plan={nombre:item.id,entradas:{[sheet]:inputs},salidas:Object.fromEntries(cells.map(c=>[c,[sheet,c]]))},file=path.join(out,item.id+'.json'),res=path.join(out,item.id+'-valores.json');fs.writeFileSync(file,JSON.stringify(plan));
  cp.execFileSync('powershell',['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(root,'tests/oracle/recalcular_com.ps1'),'-Plan',file,'-Modelo',book,'-LibroSalida',path.join(out,item.id+'.xlsx'),'-JsonSalida',res],{cwd:root,timeout:90000,stdio:'pipe'});
  const excel=JSON.parse(fs.readFileSync(res,'utf8').replace(/^\uFEFF/,''));assert.equal(excel.metadatos.estadoCalculo,0);const e=excel.valores;
- const state={},counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1},CUERO:{cuero_sint:60,cuero_std:110,cuero_prem:30},ACCESORIOS:{acc_eco:200,acc_prem:190},HILO:{hilo_ref:item.ref,hilo_prem:item.prem}};
+ const state={},counts={MESA_CORTE:{mesa:2},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1},CUERO:{cuero_sint:60,cuero_std:110,cuero_prem:30},ACCESORIOS:{acc_eco:200,acc_prem:190},HILO:{hilo_ref:item.ref,hilo_prem:item.prem}};
  for(const [id,quantities] of Object.entries(counts))state[id]={round:1,quantities,...(['MESA_CORTE','ENSAMBLE','ACABADOS'].includes(id)?{purchases:{1:quantities}}:{})};
  state.PERS_ENSAMBLE.assignments={ens_personal_basico:{ens_ind:1},ens_personal_ind:{ens_basica:1},ens_personal_esp:{ens_semi:1}};state.PERS_ACABADO.assignments={aca_personal_tec:{aca_ind:1},aca_personal_art:{aca_basica:1}};
  state.MOLDE={round:1,optionIds:['molde_1','molde_2','molde_3']};state.PRODUCCION_META={round:1,moldTargets:Object.fromEntries(item.targets.map((n,i)=>['molde_'+(i+1),n]))};
@@ -30,7 +30,7 @@ for(const item of cases)test('Excel real y producción SIDE: '+item.id,()=>{
 test('Excel real y SIDE: inventario arrastrado durante tres ciclos',()=>{
  const sheet='Costos De Producción',ids=['cuero_sint','cuero_std','cuero_prem','acc_eco','acc_prem','hilo_std','hilo_ref','hilo_prem'];
  const purchase={cuero_sint:60,cuero_std:110,cuero_prem:30,acc_eco:200,acc_prem:190,hilo_std:0,hilo_ref:1500,hilo_prem:1400};
- const counts={MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1}};
+ const counts={MESA_CORTE:{mesa:2},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1}};
  let state={},ledger={},excelOpening=Object.fromEntries(ids.map(id=>[id,0]));
  for(let round=1;round<=3;round++){
   const inputs={D46:50,D47:30,D48:20};ids.forEach((id,i)=>{inputs['D'+(54+i)]=excelOpening[id];if(round>1)inputs[String.fromCharCode(68+i)+'31']=0;});

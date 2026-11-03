@@ -33,5 +33,6 @@ test('teacher closure displays persisted revenue and stops on a rejected closure
   const apply=source.slice(source.indexOf('function applyConfirmedReportClosures('),source.indexOf("\nlet rosterSyncError="));
   vm.createContext(ctx);vm.runInContext(apply+'\n'+fn,ctx);assert.equal(await ctx.closeBusinessRemoteRound(1),true);assert.equal(report.ingresos,750);assert.equal(report.caja,200650);
   assert.deepEqual(calls,['persist','render']);calls.length=0;response={success:false,error:'Revision conflict'};
-  assert.equal(await ctx.closeBusinessRemoteRound(1),false);assert.equal(calls.includes('persist'),false);assert.match(status.textContent,/pendiente/);
+  assert.equal(await ctx.closeBusinessRemoteRound(1),true,'sealed cycle is reused');
+  assert.equal(await ctx.closeBusinessRemoteRound(2),false);assert.equal(calls.includes('persist'),false);assert.match(status.textContent,/pendiente/);
 });

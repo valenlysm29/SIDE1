@@ -11,7 +11,7 @@
   ].map(edge=>Object.freeze(edge)));
   const escape=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
   const number=value=>Number(value||0).toLocaleString('es-PE');
-  function render(plan,{round,producedPercent}={}){
+  function render(plan,{round=1,producedPercent}={}){
     // Persisted plans from the Excel adapter keep resources in requirements and comparison.
     // Read these snapshots without mutating them or manufacturing resource availability.
     plan={...plan,materials:plan.materials||plan.requirements?.materials?.map(row=>({...row,neededForTarget:row.needs,available:plan.comparison?.items?.find(item=>item.id===row.id)?.available||0}))||[],processes:plan.processes||[],productLines:plan.productLines||[]};
