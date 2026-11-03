@@ -33,5 +33,3 @@ result = subprocess.run(['docker','exec','-i','supabase_db_sidecleanfinal','psql
 print(result.stdout)
 if result.returncode:
     raise RuntimeError(result.stderr)
-
-
