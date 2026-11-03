@@ -1,6 +1,30 @@
 /* Bounded reads of immutable company histories. Never recalculate or write results. */
 (function(root){'use strict';
+ const clients=new WeakMap();
+ function cache(client){
+  if(clients.has(client))return clients.get(client);
+  const state={pending:new Map(),sealed:new Map(),user:undefined};clients.set(client,state);
+  client.auth?.onAuthStateChange?.((event,session)=>{
+   const user=session?.user?.id;
+   if(event==='SIGNED_OUT'||state.user!==undefined&&state.user!==user){state.pending.clear();state.sealed.clear();}
+   state.user=user;
+  });
+  return state;
+ }
  async function read(client,game,companyIds){
+  const ids=[...new Set(companyIds.map(String))].sort((a,b)=>Number(a)-Number(b)),key=JSON.stringify([game,ids]),state=cache(client);
+  if(state.sealed.has(key))return state.sealed.get(key);
+  if(state.pending.has(key))return state.pending.get(key);
+  const operation=load(client,game,ids).then(result=>{
+   // Every configured cycle is confirmed: these seals are immutable. A new
+   // game or authentication change uses a different cache; pending cycles
+   // are always fetched again. Never cache failures or partial histories.
+   if(state.pending.get(key)===operation&&result.cycles.length&&result.cycles.every(r=>r.status==='confirmed'))state.sealed.set(key,result);
+   return result;
+  }).finally(()=>{if(state.pending.get(key)===operation)state.pending.delete(key);});
+  state.pending.set(key,operation);return operation;
+ }
+ async function load(client,game,companyIds){
   const ids=[...new Set(companyIds.map(String))].sort((a,b)=>Number(a)-Number(b));
   if(!ids.length)return {version:'official-history-v1',partida_id:game,companies:[],cycles:[]};
   const results=new Array(ids.length);let next=0;

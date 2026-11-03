@@ -33,6 +33,7 @@ test('historial 12 empresas × 6 ciclos: optimización conserva JSON, estados y 
   await db.exec(fs.readFileSync(require.resolve('../supabase/migrations/20261103161158_optimizar_historial_oficial_progresivo.sql'),'utf8'));
   await db.exec(fs.readFileSync(require.resolve('../supabase/migrations/20261103162040_serializar_historial_sin_copias_jsonb.sql'),'utf8'));
   await db.exec(fs.readFileSync(require.resolve('../supabase/migrations/20261103162526_historial_oficial_lectura_secuencial.sql'),'utf8'));
+  await db.exec(fs.readFileSync(require.resolve('../supabase/migrations/20261103163707_indice_lectura_cierres_por_empresa.sql'),'utf8'));
   await db.query("select set_config('test.uid',$1,false)",[owner]);const began=performance.now(),after=await call(null),newMs=performance.now()-began;
   assert.deepEqual(after,before);assert.equal(after.cycles.length,72);
   assert.equal(after.cycles.find(r=>r.ciclo===3&&r.empresa_id===12).status,'missing');
@@ -42,6 +43,14 @@ test('historial 12 empresas × 6 ciclos: optimización conserva JSON, estados y 
   await db.query("select set_config('test.uid',$1,false)",[student]);assert.deepEqual(await call(1),studentBefore);
   await assert.rejects(call(2),/autorizada/);await assert.rejects(call(null),/autorizada/);
   await db.query("select set_config('test.uid','',false)");await assert.rejects(call(1),/Sesión requerida/);
+  const future={receipt:{round:4,sold:5},financial:{estadoResultados:{utilidadNeta:123},balanceCaja:{cajaFinal:456}}};
+  await db.query('insert into side_business_closures values($1,4,$2,now())',[game,{resultadosPorEmpresa:{1:future}}]);
+  assert.deepEqual((await db.query('select result from side_private.official_company_closures where partida_id=$1 and ciclo=4 and empresa_id=1',[game])).rows[0].result,future,'El trigger indexa cierres futuros sin modificar su JSON');
+  await db.query("select set_config('test.uid',$1,false)",[owner]);
+  assert.deepEqual((await call(1)).cycles.find(r=>r.ciclo===4).result,future);
+  await db.exec('set role authenticated');
+  await assert.rejects(db.query('select * from side_private.official_company_closures'),/permission denied/);
+  await db.exec('reset role');
   console.log('HISTORY_PERFORMANCE',JSON.stringify({rows:72,oldMs:Math.round(oldMs),newMs:Math.round(newMs),identical:true}));
  }finally{await db.close()}
 });

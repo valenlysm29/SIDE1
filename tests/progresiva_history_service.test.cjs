@@ -16,3 +16,15 @@ test('no acepta resultados parciales, empresas ajenas, duplicados ni fallos de a
   await assert.rejects(api.read({rpc:async()=>({data})},'g',[1]));
  }
 });
+
+test('comparte lecturas simultáneas y cierres completos; invalida al cambiar sesión y reconsulta pendientes',async()=>{
+ const api=load();let calls=0,auth;let status='confirmed';
+ const client={auth:{onAuthStateChange(fn){auth=fn;}},rpc:async()=>{
+  calls++;await new Promise(r=>setTimeout(r,5));return {data:{version:'official-history-v1',partida_id:'g',companies:[{id:1}],cycles:[{partida_id:'g',empresa_id:1,ciclo:1,status}]}};
+ }};
+ const [a,b]=await Promise.all([api.read(client,'g',[1]),api.read(client,'g',[1])]);assert.equal(calls,1);assert.equal(a,b);
+ assert.equal(await api.read(client,'g',[1]),a);assert.equal(calls,1);
+ auth('SIGNED_OUT',null);await api.read(client,'g',[1]);assert.equal(calls,2);
+ auth('SIGNED_IN',{user:{id:'teacher'}});auth('SIGNED_IN',{user:{id:'other'}});
+ status='pending';await api.read(client,'g',[1]);await api.read(client,'g',[1]);assert.equal(calls,4);
+});

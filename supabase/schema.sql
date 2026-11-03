@@ -349,3 +349,7 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- expone el estado sin transformar errores en comprobantes oficiales.
 
 -- Avance docente: supabase/migrations/20261103_validacion_avance_docente.sql
+-- Lectura progresiva: las migraciones 20261103161158, 20261103162040,
+-- 20261103162526 y 20261103163707 preservan el JSON sellado y agregan un
+-- índice privado por empresa/ciclo. El trigger mantiene los cierres futuros;
+-- side_historial_oficial conserva la autorización de docente y estudiante.
