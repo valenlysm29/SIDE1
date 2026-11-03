@@ -1,0 +1,23 @@
+/* Bounded reads of immutable company histories. Never recalculate or write results. */
+(function(root){'use strict';
+ async function read(client,game,companyIds){
+  const ids=[...new Set(companyIds.map(String))].sort((a,b)=>Number(a)-Number(b));
+  if(!ids.length)return {version:'official-history-v1',partida_id:game,companies:[],cycles:[]};
+  const results=new Array(ids.length);let next=0;
+  await Promise.all(Array.from({length:Math.min(2,ids.length)},async()=>{
+   while(next<ids.length){
+    const index=next++,id=ids[index],{data,error}=await client.rpc('side_historial_oficial',{p_partida_id:game,p_empresa_id:Number(id)});
+    if(error)throw Object.assign(new Error(error.message||'No se pudo leer el historial oficial.'),{code:error.code});
+    if(data?.error||data?.version!=='official-history-v1'||data.partida_id!==game||!Array.isArray(data.cycles)||!Array.isArray(data.companies)
+     ||data.cycles.some(row=>String(row.empresa_id)!==id||row.partida_id!==game)
+     ||data.companies.some(row=>String(row.id)!==id))throw new Error('Respuesta de historial oficial no verificable.');
+    results[index]=data;
+   }
+  }));
+  const companies=results.flatMap(h=>h.companies),cycles=results.flatMap(h=>h.cycles);
+  const keys=new Set();for(const row of cycles){const key=row.empresa_id+':'+row.ciclo;if(keys.has(key))throw new Error('Ciclo oficial duplicado.');keys.add(key);}
+  companies.sort((a,b)=>Number(a.id)-Number(b.id));cycles.sort((a,b)=>Number(a.ciclo)-Number(b.ciclo)||Number(a.empresa_id)-Number(b.empresa_id));
+  return {version:'official-history-v1',partida_id:game,companies,cycles};
+ }
+ root.SIDE_OFFICIAL_HISTORY_SERVICE=Object.freeze({read});
+})(typeof globalThis==='object'?globalThis:this);

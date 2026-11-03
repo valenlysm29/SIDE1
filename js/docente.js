@@ -986,7 +986,7 @@ async function supabaseReports(reportsBase=state.reports){
   }));
   if(!stillCurrent())return null;
   let official=null,historyError=null;
-  try{const response=await S.SupabaseClient.get().rpc('side_historial_oficial',{p_partida_id:partidaId,p_empresa_id:null});if(response.error)throw response.error;official=response.data;}catch(error){historyError=error.message;}
+  try{official=await window.SIDE_OFFICIAL_HISTORY_SERVICE.read(S.SupabaseClient.get(),partidaId,participants.map(p=>p.empresa_id));}catch(error){historyError=error.message;}
   if(!stillCurrent())return null;
   const failures=[];
   if(historyError)failures.push('Historial oficial: '+historyError);
