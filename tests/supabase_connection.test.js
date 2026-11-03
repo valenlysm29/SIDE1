@@ -5,12 +5,12 @@ const vm = require('node:vm');
 const fs = require('node:fs');
 const path = require('node:path');
 
-function fixture(fetch) {
+function fixture(fetch, expectedDeadline = 15000) {
   let options, expire, cancelled = 0;
   const window = {
     SIDE_CONFIG: { SUPABASE_URL: 'https://test.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'test' },
     fetch, AbortController,
-    setTimeout(fn, ms) { assert.equal(ms, 15000); expire = fn; return 1; },
+    setTimeout(fn, ms) { assert.equal(ms, expectedDeadline); expire = fn; return 1; },
     clearTimeout() { cancelled++; },
     supabase: { createClient(_url, _key, config) { options = config; return {}; } }
   };
@@ -59,4 +59,17 @@ test('bounded transport preserves caller cancellation and HTTP error bodies', as
   assert.equal(response.status, 403);
   assert.deepEqual(await response.json(), { code: '42501' });
   assert.equal(f.cancelled(), 1);
+});
+
+test('large sealed read bodies have a bounded 45 second deadline and are never replayed', async () => {
+  for (const name of ['side_historial_oficial', 'obtener_reporte_empresa']) {
+    let calls = 0;
+    const f = fixture(async () => { calls++; return { clone: () => ({ arrayBuffer: () => new Promise(() => {}) }) }; }, 45000);
+    const pending = f.fetch('https://test.supabase.co/rest/v1/rpc/' + name);
+    await Promise.resolve(); await Promise.resolve(); f.expire();
+    await assert.rejects(pending, { code: 'CONEXION_TIMEOUT' });
+    assert.equal(calls, 1);
+  }
+  const write = fixture(async () => new Response('{}'));
+  await write.fetch('https://test.supabase.co/rest/v1/rpc/guardar_decisiones_estudiante');
 });

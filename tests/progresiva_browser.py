@@ -1,7 +1,9 @@
 """Verify all official cycles on the published Student, Teacher and Laboratory pages."""
-import sys,json,re,hashlib,builtins
+import sys,json,re,hashlib,builtins,os
 from pathlib import Path
 from progresiva_oficial import ROOT,PROJECT,OUT,load,session
+temporary=OUT/'browser-temp';temporary.mkdir(parents=True,exist_ok=True)
+for key in ['TEMP','TMP','TMPDIR']:os.environ[key]=str(temporary)
 sys.path.insert(0,str(PROJECT/'.codex-work/python'))
 from playwright.sync_api import sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeout
@@ -11,7 +13,7 @@ h=json.loads((OUT/(str(cycles)+'-historia-'+str(cycles)+'.json')).read_text())
 rows=[r for r in h['cycles'] if r['status']=='confirmed']
 assert len(rows)==cycles*12
 by={(str(r['empresa_id']),r['ciclo']):r['result'] for r in rows}
-evidence={'partida':m['game']['codigo'],'ciclos':cycles,'checks':[],'errors':[],'reloaded':False}
+evidence={'partida':m['game']['codigo'],'ciclos':cycles,'checks':[],'errors':[],'reloaded':False,'reentryRetries':[]}
 def amount(t):return builtins.round(float(re.sub(r'[^0-9.\-]','',t)),2)
 def init(s,student=False):
  key='side-student-auth' if student else 'sb-plfuwfdpsagzrlveqkvl-auth-token'
@@ -32,9 +34,9 @@ with sync_playwright() as p:
  try:
   navigate(t,BASE+'docente.html?qa=progresiva')
   t.wait_for_function('(game)=>state.partidaId===game',arg=m['game']['id'],timeout=60000)
-  t.wait_for_function('state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length>0)',timeout=60000)
+  t.wait_for_function('state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length>0)',timeout=120000)
   # Reload exercises the actual persisted history instead of browser state.
-  navigate(t);t.wait_for_function('(n)=>state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length===n)',arg=cycles,timeout=60000)
+  navigate(t);t.wait_for_function('(n)=>state.reports.length===12&&state.reports.every(r=>r.cycleHistory?.filter(x=>x.closureStatus==="confirmed").length===n)',arg=cycles,timeout=120000)
   evidence['reloaded']=True
   actual=t.evaluate('state.reports.map(r=>({id:r.empresaId,cycles:r.cycleHistory.map(c=>({round:c.round,estadoResultados:c.estadoResultados,balanceCaja:c.balanceCaja,flujoCaja:c.flujoCaja,balanceGeneral:c.balanceGeneral,status:c.closureStatus}))}))')
   for company in actual:
@@ -73,14 +75,29 @@ with sync_playwright() as p:
    try:
     navigate(s,BASE+'index.html?qa=progresiva')
     s.locator('#startBtn').click(timeout=60000);s.locator('[data-profile="student"]').click()
-    s.locator('#gameCode').fill(m['game']['codigo']);s.locator('#companyLegalName').fill(company['name']+' SAC');s.locator('#companyBrandName').fill(company['name']);s.locator('#studentForm button[type="submit"]').click()
-    s.wait_for_function('studentConnected&&currentStudent.empresaId',timeout=60000)
+    s.locator('#gameCode').fill(m['game']['codigo']);s.locator('#companyLegalName').fill(company['name']+' SAC');s.locator('#companyBrandName').fill(company['name'])
+    for attempt in range(2):
+     s.locator('#studentForm button[type="submit"]').click()
+     try:
+      s.wait_for_function('studentConnected&&currentStudent.empresaId',timeout=30000)
+      break
+     except PlaywrightTimeout:
+      if attempt or not s.locator('#studentForm').is_visible():raise
+      evidence['reentryRetries'].append({'empresa':company['id'],'attempt':attempt+1})
+      print('UI REENTRY RETRY',cycles,company['key'],flush=True)
+    assert str(s.evaluate('currentStudent.empresaId'))==str(company['id'])
     s.evaluate('refreshStudentGame({forceHydrate:true})')
     s.wait_for_function('(n)=>currentRound()===n&&financialReport().closureStatus==="confirmed"&&financialReport().history?.length===n',arg=cycles,timeout=60000)
     actual=s.evaluate('financialReport()')
     for row in actual['history']:
      expected=by[(str(company['id']),row['round'])]
-     statements(row,expected['financial']);evidence['checks'].append({'vista':'estudiante','empresa':company['id'],'ciclo':row['round'],'exacto':True})
+     statements(row,expected['financial'])
+     text=s.locator('#studentCycleHistory [data-history-round="'+str(row['round'])+'"] > summary').inner_text()
+     values=re.search(r'utilidad\s+(.*?)\s+·\s+caja\s+(.*)$',text)
+     assert values,text
+     assert amount(values[1])==expected['financial']['estadoResultados']['utilidadNeta']
+     assert amount(values[2])==expected['financial']['balanceCaja']['cajaFinal']
+     evidence['checks'].append({'vista':'estudiante','empresa':company['id'],'ciclo':row['round'],'exacto':True})
     assert amount(s.locator('#studentIncomeResult').inner_text())==by[(str(company['id']),cycles)]['financial']['estadoResultados']['utilidadNeta'],{'company':company['id'],'round':s.evaluate('currentRound()'),'visible':s.locator('#studentIncomeResult').inner_text(),'expected':by[(str(company['id']),cycles)]['financial']['estadoResultados']['utilidadNeta']}
     assert amount(s.locator('#studentCashResult').inner_text())==by[(str(company['id']),cycles)]['financial']['balanceCaja']['cajaFinal']
     # Reload must preserve the same official balances without resubmission.
@@ -89,6 +106,9 @@ with sync_playwright() as p:
     for row in refreshed['history']:statements(row,by[(str(company['id']),row['round'])]['financial'])
     if company['key']=='combinado-eficiente':s.screenshot(path=str(OUT/('estudiante-'+str(cycles)+'-combinado.png')),full_page=True)
     print('UI STUDENT',cycles,company['key'],flush=True)
+   except Exception as error:
+    print('UI STUDENT FAILURE',company['key'],repr(error),s.locator('body').inner_text()[-1800:],flush=True)
+    raise
    finally:sc.close()
   assert len(evidence['checks'])==cycles*12*3;assert not evidence['errors'],evidence['errors']
   evidence['passed']=True

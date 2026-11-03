@@ -22,6 +22,10 @@
   // A stalled HTTP response must release polling/queue locks. Do not retry
   // writes here: a timeout does not prove that the server rejected the write.
   function boundedFetch(input, options = {}) {
+    // Six-cycle sealed reports exceed a megabyte per company. Their transfer
+    // can legitimately outlast the normal write/interactive deadline.
+    const url = typeof input === 'string' ? input : String(input?.url || input || '');
+    const deadline = /\/rest\/v1\/rpc\/(side_historial_oficial|obtener_reporte_empresa)(?:\?|$)/.test(url) ? 45000 : 15000;
     const controller = new global.AbortController();
     const source = options.signal || input?.signal;
     const abort = () => controller.abort(source.reason);
@@ -33,7 +37,7 @@
         const error = Object.assign(new TypeError('La conexión con Supabase tardó demasiado. Vuelve a intentar.'), { code: 'CONEXION_TIMEOUT' });
         reject(error);
         controller.abort(error);
-      }, 15000);
+      }, deadline);
     });
     const operation = Promise.resolve().then(async () => {
       const response = await global.fetch(input, { ...options, signal: controller.signal });

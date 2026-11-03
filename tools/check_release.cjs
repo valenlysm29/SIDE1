@@ -13,7 +13,7 @@ const tests=[
  'oraculo_capacidad_independiente.test.cjs','md_logic.test.cjs','dop_resource_planning.test.cjs','production_dop_target_ui.test.js','profit_projection.test.cjs',
  'official_history.test.cjs','crear_partida_service.test.cjs','finance_config.test.cjs',
  'loan_schedule.test.cjs','event_cost_bases.test.cjs','rentabilidad_integral.test.cjs','rentabilidad_projection.test.cjs','rentabilidad_waiting.test.cjs',
- 'progresiva_integral.test.cjs','progresiva_historial_sql.test.cjs','progresiva_history_service.test.cjs'
+ 'progresiva_integral.test.cjs','progresiva_historial_sql.test.cjs','progresiva_history_service.test.cjs','supabase_connection.test.js'
 ].filter(name=>{if(!fs.existsSync('tests/'+name))throw Error('Missing gate test '+name);return true;});
 const generated='supabase/functions/side-business-close/runtime.mjs',before=fs.readFileSync(generated,'utf8').replace(/\r\n/g,'\n');
 let r=spawnSync(process.execPath,['tools/build_business_edge.cjs'],{stdio:'inherit'});if(r.status)process.exit(r.status||1);
