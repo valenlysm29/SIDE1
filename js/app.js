@@ -1716,8 +1716,7 @@ async function recoverStaleStudentState(){
   studentSnapshotEpoch++;studentProgressHydrated=false;
   const recovered=await refreshStudentGame({forceHydrate:true});
   studentSnapshotEpoch++;
-  if(recovered)toast('La empresa se actualizó en otra sesión. Recuperamos el estado más reciente.');
-  else toast('No se pudo sincronizar el estado. Vuelve a ingresar con los datos de tu empresa.');
+  if(!recovered)toast('No se pudo actualizar tu partida. Vuelve a ingresar con los datos de tu empresa.');
   return false;
 }
 function studentSyncPending(){return Boolean(studentOutbox?.pending(studentIdentityKey())||getStudentOutbox()?.pending(studentIdentityKey()))}
@@ -1727,7 +1726,7 @@ function renderStudentConnection(){
   el.textContent=!studentConnected?'Sin conexión con la partida.':!currentStudent.empresaId?'Modo local · sin conexión a una sala remota.':navigator.onLine===false?'Sin conexión a internet. Tus avances guardados se conservan en este dispositivo.':studentStateFailure?'No se pudo confirmar la conexión con el servidor. Reintentando…':studentSessionRecovering||studentConnectionConfirmedAt===null?'Verificando conexión con la partida…':performance.now()-studentConnectionConfirmedAt>15000?'Conexión con el servidor sin confirmar. Reintentando…':'Conexión con el servidor confirmada. Al iniciar la partida entrarás al menú de decisiones.';
 }
 function showStudentSyncStatus(status,error){
-  const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'El estado cambió en otra sesión. Recuperando la versión del servidor.',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
+  const labels={saving:'Sincronizando cambios…',pending:'Cambios guardados en este dispositivo. Sincronización pendiente.',conflict:'',rejected:JOIN_INVALID_MESSAGE,'storage-error':'No se pudo conservar la sincronización pendiente en este dispositivo.'};
   if(status==='pending'&&window.SIDE?.StudentSync?.pendingMessage)labels.pending=window.SIDE.StudentSync.pendingMessage(error);
   if(status==='synced'&&decisionState.__cyclePlans?.[currentRound()]){setCyclePlanSyncPending(false);if(temporalStudentRoom())refreshStudentMaterialBook();else if(currentCategory==='A'&&!$('decisionMenu')?.classList.contains('hidden'))queueMicrotask(()=>renderCompanySummary());}
   for(const el of document.querySelectorAll('[data-student-sync-status]')){el.textContent=labels[status]||'';el.classList.toggle('hidden',!currentStudent.empresaId||!el.textContent);}
