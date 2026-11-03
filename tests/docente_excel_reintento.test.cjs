@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 function entorno({round=1,next=2,phase='decisions',active=true,failOnce=true}={}){
- const source=fs.readFileSync(require.resolve('../js/docente.js'),'utf8'),start=source.indexOf('async function refreshTeacherGame(){'),end=source.indexOf('\nfunction watchTeacherGame',start),calls=[];
+ const source=fs.readFileSync(require.resolve('../js/docente.js'),'utf8'),start=source.indexOf('let teacherSyncFlight=null;'),end=source.indexOf('\nfunction watchTeacherGame',start),calls=[];
  let failure=failOnce;
  const ctx={roomGeneration:0,state:{lifecycleVersion:2,partidaId:'p',round},gameStatus:()=>({active}),teacherBusy:false,teacherRead:Promise.resolve(),window:{SIDE:{PartidaService:{controlar:async()=>({success:true,data:{configuracion:{runtime:{round:next,phase}}}})}}},closeBusinessRemoteRound:async c=>{calls.push(c);if(failure){failure=false;return false;}return true;},applyTeacherState:p=>{ctx.state.round=p.configuracion.runtime.round;}};
  vm.createContext(ctx);vm.runInContext(source.slice(start,end),ctx);return {ctx,calls};

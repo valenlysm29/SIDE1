@@ -347,3 +347,5 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- 20261102051739_closure_processing_status.sql registra intentos y errores del
 -- ejecutor, con RLS y escritura exclusiva del servicio. La lectura histórica
 -- expone el estado sin transformar errores en comprobantes oficiales.
+
+-- Avance docente: supabase/migrations/20261103_validacion_avance_docente.sql

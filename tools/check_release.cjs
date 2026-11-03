@@ -2,6 +2,7 @@
 // Portable gate for the authoritative business contract. Connected acceptance is separate.
 const {spawnSync}=require('node:child_process'),fs=require('node:fs');
 const tests=[
+ 'avance_docente_integridad.test.cjs','avance_docente_ui.test.cjs','docente_excel_reintento.test.cjs','cancelar_partida.test.cjs','business_empty_closure.test.cjs',
  'authoritative_worker.test.cjs','business_edge_auth.test.cjs','business_rpc_http.test.cjs',
  'cierre_aislamiento_historico.test.cjs','cierre_tracked_aislamiento.test.cjs','cierre_worker_versiones.test.cjs',
  'cierre_guardia_manual.test.cjs','cierre_guardia_automatico.test.cjs','eventos_costos_restriccion.test.cjs',

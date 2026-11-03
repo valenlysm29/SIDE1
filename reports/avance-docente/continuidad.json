@@ -1,0 +1,146 @@
+{
+  "scope": "Actual isolated Supabase Auth/PostgREST/PostgreSQL/Edge and Chromium; production historical games were not advanced",
+  "scenarios": [
+    {
+      "cycles": 3,
+      "mode": "manual",
+      "game": "65da1d92-1c5b-41a1-8ea4-db383acb9c87",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 181381.65,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 176625.3,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 166988.95,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    },
+    {
+      "cycles": 6,
+      "mode": "manual",
+      "game": "f7241ada-f3e7-45f8-b182-ab2cc2ccbe86",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 181381.65,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 176625.3,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 166988.95,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 4,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 157352.6,
+          "immutableClosures": 12,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 5,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 147716.25,
+          "immutableClosures": 15,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 6,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 138079.9,
+          "immutableClosures": 18,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    }
+  ],
+  "regression": {
+    "before": {
+      "accepted": false,
+      "writes": 0
+    },
+    "after": {
+      "accepted": true,
+      "writes": 1
+    }
+  },
+  "security": [
+    {
+      "role": "anon",
+      "httpStatus": 401,
+      "denied": true
+    },
+    {
+      "role": "non_teacher",
+      "httpStatus": 403,
+      "denied": true
+    }
+  ],
+  "releaseTests": 204,
+  "production": {
+    "migration": "20261103133130_validacion_avance_docente",
+    "edgeVersion": 15,
+    "historicalClosures": 164,
+    "beforeAndAfterDigest": "aaf1eab64751ae9040a5d792c364185c"
+  }
+}

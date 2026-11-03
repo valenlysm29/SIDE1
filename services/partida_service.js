@@ -337,12 +337,16 @@
     const sb=client();if(!sb)return offline();
     try{
       const {data,error}=await sb.rpc('controlar_partida',{p_partida_id:partidaId,p_accion:accion,p_config:config,p_expected_round:expectedRound});
+      if(!error&&!data?.error&&data?.id){
+        const readiness=await sb.rpc('side_estado_avance',{p_partida_id:partidaId});
+        data.avance=readiness.error?{error:readiness.error.message}:readiness.data?.round?readiness.data:{error:'Supabase no confirmó el estado de avance del ciclo.'};
+      }
       if(!error&&!data?.error&&accion==='guardar'&&config?.eventRules&&JSON.stringify(config.eventRules)!==JSON.stringify(data?.configuracion?.eventRules||{})){
         // JSONB can reorder keys; compare each rule instead of its serialization.
         const saved=data?.configuracion?.eventRules||{};
         if(Object.entries(config.eventRules).some(([id,rule])=>saved[id]?.firstRound!==rule.firstRound||saved[id]?.repeat!==rule.repeat))return {success:false,error:'No se guardaron las reglas de eventos. Actualiza supabase/migrations/supabase_game_lifecycle.sql en Supabase.'};
       }
-      return error||data?.error?{success:false,error:error?.message||data.error}:{success:true,data};
+      return error||data?.error?{success:false,error:error?.message||data.error,code:error?.code||data.code,avance:data?.avance}:{success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
   async function cancelar(partidaId){

@@ -187,6 +187,23 @@ function refreshSetupSummary(){
   $('startCycle1Btn')?.classList.toggle('hidden',true);
   if(integration)$('roundState').textContent=waitingText;
   else if(active&&modern)$('roundState').textContent=r?.phase==='results'?'Ciclo cerrado':`Ciclo ${state.round} en curso`;
+  if(active&&modern&&state.partidaId){
+    const readiness=state.advanceReadiness,button=$('advanceRound');
+    const ready=readiness?.round===state.round&&readiness.ready===true&&!readiness.error;
+    if(button)button.disabled=button.disabled||!ready||!!state.controlling;
+    let message='Verificando confirmaciones y cierre oficial…';
+    if(readiness?.error)message='Error de Supabase: '+readiness.error;
+    else if(readiness?.round===state.round){
+      if(readiness.missing?.length)message='Falta confirmar: '+readiness.missing.map(x=>x.nombre).join(', ')+'.';
+      else if(!readiness.total)message='No hay empresas participantes en esta partida.';
+      else if(!closed)message='Todas las empresas confirmaron. Preparando el cierre oficial…';
+      else if(ready)message='Todas las empresas confirmadas · cierre oficial completo. Puedes avanzar.';
+      else if(readiness.processing?.error)message='Error del cierre: '+readiness.processing.error;
+      else message='Cierre oficial en procesamiento. Se actualizará automáticamente.';
+    }
+    if(button)button.title=message;
+    if(!integration)$('roundState').textContent=message;
+  }
   $('cancelGame')?.classList.toggle('hidden',!canCancelRoom());
   ['copyGameCode','copyGameLink','copyLobbyCode'].forEach(id=>{if($(id))$(id).disabled=!sharedRoom;});
   refreshStartButton();
@@ -288,7 +305,7 @@ function generateGameCode(){
 }
 function setDefaultDates(){const now=new Date(),end=new Date(now);end.setMonth(end.getMonth()+2);$('startDate').value=RULES.localDate(now);$('endDate').value=RULES.localDate(end)}
 function roundSeconds(){if(state.round===1&&state.integrationMinutes===60)return 3600;if(state.integrationMinutes===0&&state.round===1)return Math.max(60,Number($('roundHours').value||0)*3600+Number($('roundMinutes').value||0)*60);return Math.max(60,Number($('roundHours').value||0)*3600+Number($('roundMinutes').value||0)*60)}
-function cycleMode(){return document.querySelector('input[name="cycleMode"]:checked')?.value||'manual'}
+function cycleMode(){return state.partidaId&&gameStatus()?.active&&state.authoritative?.cycleCloseMode||document.querySelector('input[name="cycleMode"]:checked')?.value||'manual'}
 function capitalMode(){return document.querySelector('input[name="capitalMode"]:checked')?.value||'fixed'}
 function editableFinancialInput(input){return ['interest','capital','capitalMin','capitalMax'].includes(input.id)||input.name==='capitalMode'}
 function eventSelectionMode(){return document.querySelector('input[name="eventSelectionMode"]:checked')?.value||state.eventSelectionMode||'manual'}
@@ -642,6 +659,7 @@ async function ensureSupabasePartida(config){
 let teacherClock=null,teacherPoll=null,teacherTick=null,teacherBusy=false,teacherRead=Promise.resolve();
 function teacherNow(){if(state.partidaId&&!teacherClock)return NaN;return teacherClock?teacherClock.time+performance.now()-teacherClock.at:Date.now();}
 function applyTeacherState(partida){
+  state.advanceReadiness=partida.avance||null;
   if(partida.id)rememberSharedRoom(partida);
   const c=partida.configuracion;if(!c)return;
   if(Number.isSafeInteger(Number(partida.config_revision))&&partida.config_revision!=null){state.configRevision=Number(partida.config_revision);if(state.formConfigRevision==null)state.formConfigRevision=state.configRevision;}
@@ -661,7 +679,7 @@ function applyTeacherState(partida){
   localStorage.setItem('SIDE_GAME_STATUS',JSON.stringify({cancelledAt:c.cancelledAt||partida.cancelled_at||null,active:!['finalizada','cancelada'].includes(partida.estado)&&!c.cancelledAt,startedAt:c.gameStartedAt,finishedAt:['finalizada','cancelada'].includes(partida.estado)?new Date(teacherNow()).toISOString():null,code:partida.codigo||$('gameCode').value}));
   paintTeacherClock();
   const {runtime:clockRuntime,...viewConfig}=c;
-  const viewKey=JSON.stringify([state.partidaId,roomGeneration,partida.estado,viewConfig,state.round,r.phase,r.running]);
+  const viewKey=JSON.stringify([state.partidaId,roomGeneration,partida.estado,viewConfig,state.round,r.phase,r.running,state.advanceReadiness]);
   if(state.teacherViewKey!==viewKey){
     state.teacherViewKey=viewKey;updateRoundDisplay();refreshSetupSummary();renderCycleNews();renderEventBank();
   }
@@ -676,15 +694,21 @@ function paintTeacherClock(){
     for(const id of ['gameStatusBanner','roundState'])if($(id)&&$(id).textContent!==label)$(id).textContent=label;
   }
 }
-async function refreshTeacherGame(){
-  if(state.starting||state.cancelling||state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
+let teacherSyncFlight=null;
+function refreshTeacherGame(){
+  if(teacherSyncFlight)return teacherSyncFlight;
+  teacherSyncFlight=refreshTeacherGameOnce().finally(()=>{teacherSyncFlight=null;});
+  return teacherSyncFlight;
+}
+async function refreshTeacherGameOnce(){
+  if(state.controlling||state.starting||state.cancelling||state.lifecycleVersion!==2||teacherBusy||!state.partidaId&&!gameStatus()?.active)return false;
   if(Date.now()<Number(state.syncRetryAt||0))return false;
   if(state.partidaId){
     teacherBusy=true;
     const id=state.partidaId,generation=roomGeneration;
     const stillCurrent=()=>id===state.partidaId&&generation===roomGeneration;
     try{teacherRead=window.SIDE.PartidaService.controlar(id,'sincronizar');const result=await teacherRead;if(!stillCurrent())return false;if(!result.success)throw new Error(result.error||'comprueba la conexión y reintenta.');const runtime=result.data?.configuracion?.runtime||{},next=Number(runtime.round||state.round),last=next-(['results','finished'].includes(runtime.phase)?0:1);if(runtime.phase!=='cancelled'&&runtime.phase!=='integration')for(let cycle=1;cycle<=last;cycle++){if(!stillCurrent()||!await closeBusinessRemoteRound(cycle)){state.syncFailures=Number(state.syncFailures||0)+1;state.syncRetryAt=Date.now()+Math.min(60000,3000*2**Math.min(state.syncFailures-1,4));return false;}}if(!stillCurrent())return false;state.syncFailures=0;state.syncRetryAt=0;applyTeacherState(result.data);return true;}
-    catch(error){if(stillCurrent()){state.syncFailures=Number(state.syncFailures||0)+1;state.syncRetryAt=Date.now()+Math.min(60000,3000*2**Math.min(state.syncFailures-1,4));console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message+' Se reintentará automáticamente.','error');}return false;}
+    catch(error){if(stillCurrent()){state.advanceReadiness={error:error.message};refreshSetupSummary();state.syncFailures=Number(state.syncFailures||0)+1;state.syncRetryAt=Date.now()+Math.min(60000,3000*2**Math.min(state.syncFailures-1,4));console.error('SIDE: sincronización de sala',error);creationFeedback('No se pudo sincronizar la sala: '+error.message+' Se reintentará automáticamente.','error');}return false;}
     finally{teacherBusy=false;}
   }else{
     const c={...state.authoritative,runtime:RULES.resolveRuntime(state.authoritative,teacherNow())};
@@ -722,16 +746,19 @@ async function prepareGame(){
   watchTeacherGame();startLiveCompanies();return true;
 }
 async function controlGame(action){
-  if(state.cancelling)return false;
+  if(state.cancelling||state.controlling)return false;
+  state.controlling=true;
   const expectedRound=state.round;
+  try{
+  refreshSetupSummary();
+  await teacherSyncFlight;
   await teacherRead;
   if(teacherBusy||state.cancelling)return false;
   teacherBusy=true;
-  try{
     if(state.partidaId){
       const settles=['cerrar','avanzar'].includes(action)&&state.authoritative?.runtime?.phase!=='integration';
       const result=await window.SIDE.PartidaService.controlar(state.partidaId,action,null,expectedRound);
-      if(!result.success){toast(result.error||'No se pudo actualizar la partida.');return false;}
+      if(!result.success){if(result.avance)state.advanceReadiness=result.avance;toast(result.error||'No se pudo actualizar la partida.','error');return false;}
       if(action==='cancelar'&&!result.data?.configuracion?.cancelledAt){toast('La cancelación no se aplicó. Actualiza Supabase con supabase/migrations/supabase_game_lifecycle.sql.');return false;}
       applyTeacherState(result.data);
       if(settles)for(let cycle=1;cycle<=expectedRound;cycle++){if(!await closeBusinessRemoteRound(cycle))return false;}
@@ -752,7 +779,8 @@ async function controlGame(action){
       if(r.phase==='decisions'){triggerGroupEvents(r.round);state.authoritative.eventSchedule=eventSchedule();localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(state.authoritative));}
     }
     return true;
-  }finally{teacherBusy=false;}
+  }catch(error){state.advanceReadiness={error:error.message};toast(error.message,'error');return false;}
+  finally{teacherBusy=false;state.controlling=false;refreshSetupSummary();}
 }
 async function startGame(){
   if(state.starting||state.cancelling)return;
@@ -1377,7 +1405,7 @@ async function closeBusinessRemoteRound(ciclo){
   }
   if(response.pending){
     // Older pending cycles must not alternate the current cycle's status on every poll.
-    const status=Number(ciclo)===Number(state.round)?$('roundState'):null,label=`Ciclo ${ciclo}: el servidor está procesando el cierre económico. Puedes continuar; los resultados se actualizarán automáticamente.`;if(status&&status.textContent!==label)status.textContent=label;
+    const status=Number(ciclo)===Number(state.round)?$('roundState'):null,label=`Ciclo ${ciclo}: el servidor está procesando el cierre económico. El avance espera el cierre completo; se actualizará automáticamente.`;if(status&&status.textContent!==label)status.textContent=label;
     return true;
   }
   if(response.data){loadedTeacherClosures.add(closureKey);state.teacherViewKey=null;}

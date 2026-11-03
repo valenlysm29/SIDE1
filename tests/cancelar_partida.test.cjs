@@ -28,7 +28,7 @@ function teacher(){
   classList:{toggle(){},add(){},remove(){}},close(){this.closed=true},addEventListener(event,fn){this.handler=fn}});
  vm.createContext(context);
  vm.runInContext(section('function creationFeedback(','function renderTeacherLobby(')+
-  section('async function refreshTeacherGame(){','function watchTeacherGame(){')+
+  section('let teacherSyncFlight=null;','function watchTeacherGame(){')+
   section("$('confirmCancelGame')?.addEventListener","$('backHome')?.addEventListener"),context);
  return {context,calls,storage,confirm:()=>context.$('confirmCancelGame').handler()};
 }
