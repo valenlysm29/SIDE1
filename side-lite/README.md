@@ -15,7 +15,7 @@ npm run migrate
 npm start
 ```
 
-Abrir http://127.0.0.1:4178. La carpeta local ignorada `.data/` conserva los datos dentro de SIDE1. No usar las contraseñas de ejemplo fuera del entorno local. El servidor rechaza explícitamente la referencia del Supabase original.
+Abrir http://127.0.0.1:4178. La carpeta local ignorada `.data/` conserva los datos dentro de SIDE1. No usar las contraseñas de ejemplo fuera del entorno local. El servidor y el migrador solo admiten PostgreSQL local: rechazan también la referencia del Supabase original.
 
 El docente crea una cuenta con la clave de registro configurada, inicia sesión y crea una partida. Comparte el código con los estudiantes, quienes crean su cuenta y se incorporan antes del primer ciclo. El docente inicia cada ciclo; al llegar el plazo, el servidor cierra automáticamente incluso si nadie tiene el navegador abierto. Si el servidor está apagado al vencimiento, al reiniciarlo procesa los ciclos vencidos. El siguiente ciclo lo inicia el docente. La última ronda cierra la partida y deja su historial accesible.
 
@@ -27,11 +27,14 @@ Los estudiantes pueden guardar borradores y confirmar. Una confirmación es defi
 npm test
 $env:PLAYWRIGHT_BROWSERS_PATH='<directorio-de-navegadores-dentro-de-SIDE1>'
 npx playwright install chromium
-npx playwright test e2e/multiplayer.spec.js --workers=1 --timeout=120000
+npm run test:e2e
+npm run test:abuse
 node e2e/restart.js
 ```
 
 Para Playwright el servidor debe estar en marcha en el puerto 4178. La prueba `restart.js` inicia y detiene su propio proceso en el puerto 4180 y requiere que no haya otros servidores SIDE Lite usando esa misma base si se desea verificar la recuperación del cierre después de una caída completa. Las pruebas escriben cuentas y partidas de prueba en la base local.
+
+Las campañas de publicidad describen el monto elegido; son simuladas y no realizan publicaciones reales. El presupuesto exacto sigue determinando su efecto continuo. La aplicación avisa si se pierde la conexión: los cambios solo quedan persistidos al guardar o confirmar.
 
 ## Modelo económico
 
