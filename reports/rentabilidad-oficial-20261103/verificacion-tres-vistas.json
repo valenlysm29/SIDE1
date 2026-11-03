@@ -1,0 +1,66 @@
+{
+  "url": "https://valenlysm29.github.io/SIDE1/",
+  "code": "SIDE-WWZB",
+  "cycle": 1,
+  "checks": [
+    {
+      "strategy": "basico",
+      "view": "docente",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    },
+    {
+      "strategy": "estandar",
+      "view": "docente",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    },
+    {
+      "strategy": "premium",
+      "view": "docente",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    },
+    {
+      "strategy": "basico",
+      "view": "laboratorio",
+      "officialHistoryEqual": true,
+      "visibleValuesEqual": true,
+      "breakdownReconciled": true
+    },
+    {
+      "strategy": "estandar",
+      "view": "laboratorio",
+      "officialHistoryEqual": true,
+      "visibleValuesEqual": true,
+      "breakdownReconciled": true
+    },
+    {
+      "strategy": "premium",
+      "view": "laboratorio",
+      "officialHistoryEqual": true,
+      "visibleValuesEqual": true,
+      "breakdownReconciled": true
+    },
+    {
+      "strategy": "basico",
+      "view": "estudiante",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    },
+    {
+      "strategy": "estandar",
+      "view": "estudiante",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    },
+    {
+      "strategy": "premium",
+      "view": "estudiante",
+      "allFourStatementsEqual": true,
+      "visibleValuesEqual": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

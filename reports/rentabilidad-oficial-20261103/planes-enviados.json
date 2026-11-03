@@ -1,0 +1,287 @@
+{
+  "basico": {
+    "MESA_CORTE": {
+      "round": 1,
+      "quantities": {
+        "mesa": 2
+      },
+      "purchases": {
+        "1": {
+          "mesa": 2
+        }
+      }
+    },
+    "ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_basica": 2
+      },
+      "purchases": {
+        "1": {
+          "ens_basica": 2
+        }
+      }
+    },
+    "ACABADOS": {
+      "round": 1,
+      "quantities": {
+        "aca_basica": 2
+      },
+      "purchases": {
+        "1": {
+          "aca_basica": 2
+        }
+      }
+    },
+    "PERS_CORTE": {
+      "round": 1,
+      "quantities": {
+        "corte_basico": 2
+      }
+    },
+    "PERS_ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_personal_basico": 2
+      }
+    },
+    "PERS_ACABADO": {
+      "round": 1,
+      "quantities": {
+        "aca_personal_basico": 2
+      }
+    },
+    "CUERO": {
+      "round": 1,
+      "quantities": {
+        "cuero_sint": 75
+      }
+    },
+    "ACCESORIOS": {
+      "round": 1,
+      "quantities": {
+        "acc_eco": 250
+      }
+    },
+    "HILO": {
+      "round": 1,
+      "quantities": {
+        "hilo_std": 1500
+      }
+    },
+    "MOLDE": {
+      "round": 1,
+      "optionIds": [
+        "molde_1"
+      ]
+    },
+    "JEFATURA": {
+      "round": 1,
+      "optionIds": [
+        "no_jefatura"
+      ]
+    },
+    "CANALES": {
+      "round": 1,
+      "optionIds": [
+        "web"
+      ]
+    },
+    "PRODUCCION_META": {
+      "round": 1,
+      "moldTargets": {
+        "molde_1": 250
+      }
+    }
+  },
+  "estandar": {
+    "MESA_CORTE": {
+      "round": 1,
+      "quantities": {
+        "mesa": 2
+      },
+      "purchases": {
+        "1": {
+          "mesa": 2
+        }
+      }
+    },
+    "ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_basica": 2
+      },
+      "purchases": {
+        "1": {
+          "ens_basica": 2
+        }
+      }
+    },
+    "ACABADOS": {
+      "round": 1,
+      "quantities": {
+        "aca_basica": 2
+      },
+      "purchases": {
+        "1": {
+          "aca_basica": 2
+        }
+      }
+    },
+    "PERS_CORTE": {
+      "round": 1,
+      "quantities": {
+        "corte_basico": 2
+      }
+    },
+    "PERS_ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_personal_basico": 2
+      }
+    },
+    "PERS_ACABADO": {
+      "round": 1,
+      "quantities": {
+        "aca_personal_basico": 2
+      }
+    },
+    "CUERO": {
+      "round": 1,
+      "quantities": {
+        "cuero_sint": 100
+      }
+    },
+    "ACCESORIOS": {
+      "round": 1,
+      "quantities": {
+        "acc_eco": 250
+      }
+    },
+    "HILO": {
+      "round": 1,
+      "quantities": {
+        "hilo_std": 1750
+      }
+    },
+    "MOLDE": {
+      "round": 1,
+      "optionIds": [
+        "molde_2"
+      ]
+    },
+    "JEFATURA": {
+      "round": 1,
+      "optionIds": [
+        "no_jefatura"
+      ]
+    },
+    "CANALES": {
+      "round": 1,
+      "optionIds": [
+        "web"
+      ]
+    },
+    "PRODUCCION_META": {
+      "round": 1,
+      "moldTargets": {
+        "molde_2": 250
+      }
+    }
+  },
+  "premium": {
+    "MESA_CORTE": {
+      "round": 1,
+      "quantities": {
+        "mesa": 1
+      },
+      "purchases": {
+        "1": {
+          "mesa": 1
+        }
+      }
+    },
+    "ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_basica": 1
+      },
+      "purchases": {
+        "1": {
+          "ens_basica": 1
+        }
+      }
+    },
+    "ACABADOS": {
+      "round": 1,
+      "quantities": {
+        "aca_basica": 1
+      },
+      "purchases": {
+        "1": {
+          "aca_basica": 1
+        }
+      }
+    },
+    "PERS_CORTE": {
+      "round": 1,
+      "quantities": {
+        "corte_basico": 1
+      }
+    },
+    "PERS_ENSAMBLE": {
+      "round": 1,
+      "quantities": {
+        "ens_personal_basico": 1
+      }
+    },
+    "PERS_ACABADO": {
+      "round": 1,
+      "quantities": {
+        "aca_personal_basico": 1
+      }
+    },
+    "CUERO": {
+      "round": 1,
+      "quantities": {
+        "cuero_prem": 70
+      }
+    },
+    "ACCESORIOS": {
+      "round": 1,
+      "quantities": {
+        "acc_prem": 100
+      }
+    },
+    "HILO": {
+      "round": 1,
+      "quantities": {
+        "hilo_prem": 1300
+      }
+    },
+    "MOLDE": {
+      "round": 1,
+      "optionIds": [
+        "molde_3"
+      ]
+    },
+    "JEFATURA": {
+      "round": 1,
+      "optionIds": [
+        "no_jefatura"
+      ]
+    },
+    "CANALES": {
+      "round": 1,
+      "optionIds": [
+        "web"
+      ]
+    },
+    "PRODUCCION_META": {
+      "round": 1,
+      "moldTargets": {
+        "molde_3": 100
+      }
+    }
+  }
+}

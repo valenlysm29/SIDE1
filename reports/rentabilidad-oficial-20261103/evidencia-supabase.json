@@ -1,0 +1,45 @@
+{
+  "newReports": [
+    {
+      "ciclo": 1,
+      "costos": 19392.12,
+      "ingresos": 30000,
+      "utilidad": 10607.88,
+      "caja_final": 39303.63,
+      "empresa_id": 208
+    },
+    {
+      "ciclo": 1,
+      "costos": 20355.87,
+      "ingresos": 37500,
+      "utilidad": 17144.13,
+      "caja_final": 43430.88,
+      "empresa_id": 209
+    },
+    {
+      "ciclo": 1,
+      "costos": 23580.68,
+      "ingresos": 39200,
+      "utilidad": 15619.32,
+      "caja_final": 46743.7,
+      "empresa_id": 210
+    }
+  ],
+  "edgeAttempts": [
+    {
+      "ciclo": 1,
+      "run_id": "aebed539-9bca-4faf-bad5-7cda1c235f5b",
+      "outcome": "confirmed",
+      "partida_id": "0dee449b-3643-4f62-84ae-8805341af68b",
+      "started_at": "2026-11-03T15:45:47.529343+00:00",
+      "updated_at": "2026-11-03T15:45:48.009633+00:00",
+      "finished_at": "2026-11-03T15:45:48.009633+00:00"
+    }
+  ],
+  "edgeResponse": {
+    "status": 503,
+    "content": "{\"success\":false,\"results\":[{\"game\":\"0dee449b-3643-4f62-84ae-8805341af68b\",\"cycle\":1,\"success\":true,\"pending\":false},{\"game\":\"5f875186-ea21-4c5b-aef2-5db7e8ca013b\",\"cycle\":2,\"success\":false,\"pending\":false,\"code\":\"DECISION_INVALIDA\",\"error\":\"El préstamo supera la línea disponible verificada.\"},{\"game\":\"668c0643-13c9-4461-abc7-17c5dbcbc0f1\",\"cycle\":2,\"success\":false,\"pending\":false,\"code\":\"DATOS_ECONOMICOS_NO_VERIFICADOS\",\"error\":\"No se puede verificar el saldo inicial o los eventos de este ciclo.\"},{\"game\":\"67111697-d6be-408b-8ff1-4950c00fcfa9\",\"cycle\":2,\"success\":false,\"pending\":false,\"code\":\"DATOS_ECONOMICOS_NO_VERIFICADOS\",\"error\":\"No se puede verificar el saldo inicial o los eventos de este ciclo.\"},{\"game\":\"691d9d55-8592-403a-87cf-3cca173cc13f\",\"cycle\":1,\"success\":false,\"pending\":false,\"code\":\"DATOS_ECONOMICOS_NO_VERIFICADOS\",\"error\":\"No se puede verificar el saldo inicial o los eventos de este ciclo.\"}]}"
+  },
+  "oldReportsHash": "d9d876913f6b4369fbca2bf9dc0f1dcf",
+  "oldClosuresHash": "4ddca1a638bc0800e5b458246e3a5440"
+}

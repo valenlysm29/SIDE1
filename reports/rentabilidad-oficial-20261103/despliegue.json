@@ -1,0 +1,54 @@
+{
+  "url": "https://valenlysm29.github.io/SIDE1/",
+  "commit": "8cd602a",
+  "files": [
+    {
+      "path": "index.html",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "6aab49fb290b40e90b067e533b021ef2c5788df11b8da7fb56758deabc4cccf4"
+    },
+    {
+      "path": "docente.html",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "20d51960182067a80b2df1b3e0d2af647059ad4bfe4c2239d013e7aa7cec4a53"
+    },
+    {
+      "path": "services/finance_config.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "f51f6b5df4310fbf431544575210e653cfa0985e41f09760b85470a5d0733c49"
+    },
+    {
+      "path": "js/engine/cierre.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "aaffc57d8fb025d53d6ca8a2deff2b3b7a9ff5ee1e1ceb3df52dafcd38275fea"
+    },
+    {
+      "path": "services/official_history.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "12a1c042b9745685f022fb146c47f1bf625b064a854df7c8f898397e56be68cf"
+    },
+    {
+      "path": "js/app.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "04fd657f070e4efc80e4ecc9b4c1eeb241dfaa7baeb5fa733ab5f6f18b4c74b3"
+    },
+    {
+      "path": "js/docente.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "99a2ec70437f20d24e8d48055484e39af3eff1319dd22c772f284f3d9327f01d"
+    },
+    {
+      "path": "js/laboratorio.js",
+      "httpStatus": 200,
+      "matchesMain": true,
+      "sha256": "6c7577fa4a687634386571abc5fc72b77d649960cbefb942e42454a6ee11c285"
+    }
+  ]
+}
