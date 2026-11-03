@@ -1,8 +1,10 @@
 name: SIDE quality and publication
 on:
   pull_request:
+    paths-ignore: ["reports/**", "docs/**", "README.md"]
   push:
     branches: [main, codex/finalizacion-integral]
+    paths-ignore: ["reports/**", "docs/**", "README.md"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,7 +33,7 @@ jobs:
           node-version: '24'
       - run: node --test tests/forense_postgres.test.cjs
   package:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
     needs: [business-contract, postgres-edge]
     runs-on: ubuntu-latest
     permissions:
@@ -48,7 +50,7 @@ jobs:
         with:
           path: output/site
   deploy:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
     needs: package
     runs-on: ubuntu-latest
     permissions:
