@@ -106,13 +106,14 @@
       <article class="card events-config-summary">
         <div class="card-title"><div><h3>Eventos habilitados</h3><p>Selecciona los eventos que podrán ocurrir desde el Ciclo 1.</p></div><button id="openEventPicker" class="secondary" type="button" aria-haspopup="dialog">Seleccionar eventos</button></div>
         <div id="enabledEventsSummary" class="enabled-events-summary" aria-live="polite">Sin eventos habilitados.</div>
-        <div id="challengeV1Panel" hidden>
+        <div id="challengeV1Panel" hidden><label>Modo de desafíos <select id="challengeV1Mode"><option value="manual">Asignación manual</option><option value="random">Eventos aleatorios</option><option value="balanced">Competencia equilibrada</option></select></label>
           <h4>Asignación experimental por empresa</h4>
           <p id="challengeV1Preview" class="hint">El atractivo relativo cambia el reparto de demanda; el inventario limita las ventas. Programa antes de que empiecen las decisiones del ciclo.</p>
           <div class="value-row"><label>Empresa<select id="challengeV1Company"></select></label><label>Desafío<select id="challengeV1Event"><option value="PE69">Producto viral en TikTok</option><option value="PE71">Recomendación de influencer peruano</option><option value="PE74">Campaña de marketing altamente efectiva</option><option value="PE75">Campaña de marketing ineficiente</option><option value="PE30">Falla en máquina ensambladora</option><option value="PE23">Inseguridad en zona comercial</option><option value="PE68">Ataque de phishing empresarial</option><option value="PE77">Inspección municipal del local</option></select></label><label>Ciclo<input id="challengeV1Round" type="number" min="1" max="6" value="1"></label><label><span id="challengeV1IntensityLabel">Intensidad (%)</span><input id="challengeV1Intensity" type="number" min="1" max="25" value="20"></label></div>
           <button id="challengeV1Assign" class="secondary" type="button">Programar desafío</button>
           <button id="challengeV1Draw" class="secondary" type="button">Sortear eventos implementados para este ciclo</button>
           <p class="hint">El sorteo usa las probabilidades y desfases del catálogo para los ocho eventos implementados y las empresas participantes actuales. Los demás eventos todavía no se sortean.</p>
+          <button id="challengeV1Balanced" class="secondary" type="button">Programar rotación experimental para tres empresas</button>
           <button id="challengeV1Refresh" class="secondary" type="button">Actualizar historial</button>
           <div id="challengeV1History" role="status" aria-live="polite"></div>
         </div>
@@ -229,7 +230,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="js/config.js?v=20261022-reversion"></script>
 <script src="services/supabase_client.js?v=20261013-connection"></script>
-<script src="services/partida_service.js?v=20261028-server-close"></script>
+<script src="services/partida_service.js?v=20261103-optional-policies"></script>
 <script src="services/empresa_service.js?v=20261022-reversion"></script>
 <script src="services/decisiones_service.js?v=20261027-live-sales"></script>
 <script src="services/teacher_history_service.js?v=20261102-official-history"></script>
@@ -240,13 +241,15 @@
 <script src="js/teacher_podium.js?v=20261022-reversion"></script>
 <script src="services/teacher_sync.js?v=20261013-connection"></script>
 <script src="js/teacher_report_pdf.js?v=20261028-balance"></script>
-<script src="services/finance_config.js?v=20261028-server-close"></script>
+<script src="services/finance_config.js?v=20261103-optional-policies"></script>
 <script src="js/business_rules.js?v=20261027-md"></script>
 <script src="js/material_orders.js"></script>
 <script src="js/material_preview.js"></script>
 <script src="js/temporal_production.js"></script>
 <script src="js/production_model.js?v=20261102-integral-2"></script>
-<script src="js/financial_model.js?v=20261102-rentabilidad-final"></script>
+<script src="js/event_cost_bases.js?v=20261103-proposal-v1"></script>
+<script src="js/loan_schedule.js?v=20261103-french-v1"></script>
+<script src="js/financial_model.js?v=20261103-optional-policies"></script>
 <script src="js/engine/config_excel.js?v=20261023-ingresos"></script>
 <script src="js/engine/mercado.js?v=20261023-ingresos"></script>
 <script src="js/engine/costos.js?v=20261023-ingresos"></script>
@@ -254,15 +257,15 @@
 <script src="js/engine/config.js?v=20261027-md"></script>
 <script src="js/engine/cierre.js?v=20261028-materiales"></script>
 <script src="js/revenue_model.js?v=20261024-v19"></script>
-<script src="js/cycle_model.js?v=20261028-materiales"></script>
+<script src="js/cycle_model.js?v=20261103-optional-policies"></script>
 <script src="services/live_results.js?v=20261027-live-sales"></script>
 <script src="services/official_history.js?v=20261102-history"></script>
-<script src="js/student_financial_view.js?v=20261102-integral-1"></script>
+<script src="js/student_financial_view.js?v=20261103-optional-policies"></script>
 <script src="services/laboratorio_service.js?v=20261102-official-history"></script>
 <script src="services/laboratorio_demo.js?v=1"></script>
 <script src="js/laboratorio_model.js?v=20261030-4"></script>
 <script src="js/laboratorio_scenarios.js?v=1"></script>
 <script src="js/laboratorio.js?v=20261102-official-history"></script>
-<script src="js/docente.js?v=20261102-integral-1"></script>
+<script src="js/docente.js?v=20261103-optional-policies"></script>
 </body>
 </html>

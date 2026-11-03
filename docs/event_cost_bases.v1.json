@@ -1,0 +1,1750 @@
+{
+  "version": "event-bases-proposal-v1",
+  "officialActivation": false,
+  "approval": "No academic matrix found in repository, catalogue, source documents or reviewed history",
+  "rows": [
+    {
+      "event": "PE01",
+      "description": "La campaña por el Día del Padre incrementa temporalmente la compra de regalos.",
+      "implication": "Las ventas aumentan 10% durante el ciclo afectado.",
+      "percentage": 10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE02",
+      "description": "La campaña del Día de la Madre eleva el flujo de compradores.",
+      "implication": "Las ventas aumentan 15%.",
+      "percentage": 15,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE03",
+      "description": "El consumo por celebraciones de julio impulsa las compras.",
+      "implication": "Las ventas aumentan 25%.",
+      "percentage": 25,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE04",
+      "description": "La demanda por regalos aumenta durante diciembre.",
+      "implication": "Las ventas aumentan 30%.",
+      "percentage": 30,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE05",
+      "description": "El inicio de clases impulsa productos utilitarios y accesorios.",
+      "implication": "La demanda aumenta y las ventas suben 18%.",
+      "percentage": 18,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE06",
+      "description": "Los trabajadores reciben gratificación y aumenta el consumo.",
+      "implication": "Las ventas aumentan 15%.",
+      "percentage": 15,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE07",
+      "description": "Las promociones digitales generan mayor tráfico de compra por internet.",
+      "implication": "Las ventas aumentan 12%.",
+      "percentage": 12,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE08",
+      "description": "Las promociones agresivas elevan el volumen de ventas.",
+      "implication": "Las ventas aumentan 18%, con mayor presión comercial.",
+      "percentage": 18,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE09",
+      "description": "El feriado largo incrementa el movimiento en zonas comerciales.",
+      "implication": "Las ventas aumentan 10%.",
+      "percentage": 10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE10",
+      "description": "Una feria cercana aumenta el tránsito de compradores.",
+      "implication": "Las ventas aumentan 12%.",
+      "percentage": 12,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE11",
+      "description": "El turismo y las salidas de verano elevan la compra de accesorios.",
+      "implication": "Las ventas aumentan 8% durante dos ciclos.",
+      "percentage": 8,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE12",
+      "description": "La compra de regalos por febrero impulsa productos de mayor valor.",
+      "implication": "Las ventas aumentan 10%.",
+      "percentage": 10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE13",
+      "description": "El centro comercial realiza promociones y atrae más clientes.",
+      "implication": "Las ventas aumentan 9%.",
+      "percentage": 9,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE14",
+      "description": "Una feria de marcas locales mejora la exposición de las empresas.",
+      "implication": "Las ventas aumentan 8%.",
+      "percentage": 8,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE15",
+      "description": "Un paro restringe el traslado de insumos y mercadería.",
+      "implication": "Los costos logísticos aumentan 20%.",
+      "percentage": 20,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE16",
+      "description": "El bloqueo retrasa entregas hacia Lima y otras zonas.",
+      "implication": "Los costos operativos aumentan 12% por compras y entregas de emergencia.",
+      "percentage": 12,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE17",
+      "description": "Las movilizaciones reducen temporalmente el flujo comercial.",
+      "implication": "Las ventas disminuyen 10%.",
+      "percentage": -10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE18",
+      "description": "Una transferencia extraordinaria incrementa temporalmente el consumo.",
+      "implication": "La demanda general aumenta y las ventas suben 10%.",
+      "percentage": 10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE19",
+      "description": "La incertidumbre política reduce decisiones de gasto e inversión.",
+      "implication": "Las ventas disminuyen 10% durante dos ciclos.",
+      "percentage": -10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE20",
+      "description": "La operación portuaria se ralentiza y encarece insumos importados.",
+      "implication": "Los costos aumentan 18%.",
+      "percentage": 18,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE21",
+      "description": "La congestión retrasa entregas de una empresa.",
+      "implication": "Los costos de distribución aumentan 5%.",
+      "percentage": 5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE22",
+      "description": "La actividad comercial de Gamarra se restringe temporalmente.",
+      "implication": "La presión competitiva modifica el mercado y las ventas disminuyen 15%.",
+      "percentage": -15,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE23",
+      "description": "Un incidente obliga a reforzar seguridad y genera pérdidas puntuales.",
+      "implication": "Se genera un gasto extraordinario de S/ 500.",
+      "percentage": null,
+      "amount": -500,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE24",
+      "description": "Trabajos municipales dificultan el acceso peatonal.",
+      "implication": "Las ventas disminuyen 7% durante dos ciclos.",
+      "percentage": -7,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE25",
+      "description": "Se limitan horarios de circulación de proveedores.",
+      "implication": "Los costos logísticos aumentan 7%.",
+      "percentage": 7,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE26",
+      "description": "Una interrupción eléctrica afecta la producción de una empresa.",
+      "implication": "La producción se reduce; financieramente las ventas del ciclo disminuyen 10%.",
+      "percentage": -10,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE27",
+      "description": "Una fiscalización obliga a detener parcialmente actividades para revisión.",
+      "implication": "La productividad temporal disminuye y los costos aumentan 4%.",
+      "percentage": 4,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE28",
+      "description": "Parte del personal operativo renuncia inesperadamente.",
+      "implication": "La disponibilidad de trabajadores disminuye 10%; las ventas bajan 5%.",
+      "percentage": -5,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE29",
+      "description": "Se requiere incorporar y adaptar nuevos trabajadores.",
+      "implication": "La eficiencia temporal disminuye y los costos aumentan 5%.",
+      "percentage": 5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE30",
+      "description": "Una máquina crítica requiere mantenimiento correctivo.",
+      "implication": "La capacidad de producción disminuye 25% y se paga S/ 200 de mantenimiento.",
+      "percentage": null,
+      "amount": -200,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE31",
+      "description": "Una avería mayor paraliza parte de la línea.",
+      "implication": "Se genera un gasto extraordinario de S/ 1,200.",
+      "percentage": null,
+      "amount": -1200,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE32",
+      "description": "El equipo detecta una falla antes de que detenga la producción.",
+      "implication": "Los costos operativos se reducen 5%.",
+      "percentage": -5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE33",
+      "description": "Un lote de materiales presenta fallas de calidad.",
+      "implication": "La calidad del producto disminuye y se genera un costo de S/ 800.",
+      "percentage": null,
+      "amount": -800,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE34",
+      "description": "Un lote necesita trabajo adicional antes de venderse.",
+      "implication": "Los costos del ciclo aumentan 8%.",
+      "percentage": 8,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE35",
+      "description": "Varios productos terminados regresan por garantía.",
+      "implication": "La empresa asume S/ 700 en cambios y reparaciones.",
+      "percentage": null,
+      "amount": -700,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE36",
+      "description": "El equipo detecta errores antes de la entrega.",
+      "implication": "Los costos por merma y devoluciones se reducen 5%.",
+      "percentage": -5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE37",
+      "description": "El conteo de almacén detecta faltantes.",
+      "implication": "Se registra una pérdida de S/ 400.",
+      "percentage": null,
+      "amount": -400,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE38",
+      "description": "Una incidencia operativa obliga a detener un área y cubrir gastos.",
+      "implication": "Se genera un gasto extraordinario de S/ 1,000.",
+      "percentage": null,
+      "amount": -1000,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE39",
+      "description": "Varias ausencias reducen la capacidad de atención.",
+      "implication": "Las ventas disminuyen 6%.",
+      "percentage": -6,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE40",
+      "description": "La capacitación del equipo mejora la ejecución del trabajo.",
+      "implication": "Los costos operativos se reducen 5% durante dos ciclos.",
+      "percentage": -5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE41",
+      "description": "El personal reorganiza el trabajo y reduce tiempos.",
+      "implication": "Los costos del ciclo se reducen 8%.",
+      "percentage": -8,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE42",
+      "description": "Los insumos llegan antes de lo previsto y se evitan compras de emergencia.",
+      "implication": "Se recuperan S/ 300 de costos logísticos.",
+      "percentage": null,
+      "amount": 300,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE43",
+      "description": "La entrega de insumos se posterga.",
+      "implication": "Los costos aumentan 10% por abastecimiento de emergencia.",
+      "percentage": 10,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE44",
+      "description": "Una parte del lote debe volver a preparación.",
+      "implication": "Se genera un costo de S/ 350.",
+      "percentage": null,
+      "amount": -350,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE45",
+      "description": "Un nuevo responsable mejora la coordinación del equipo.",
+      "implication": "Los costos operativos se reducen 4% durante dos ciclos.",
+      "percentage": -4,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE46",
+      "description": "El tipo de cambio encarece insumos importados.",
+      "implication": "El costo de insumos aumenta 15%.",
+      "percentage": 15,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE47",
+      "description": "El tipo de cambio reduce temporalmente el costo de importaciones.",
+      "implication": "Los costos disminuyen 8%.",
+      "percentage": -8,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE48",
+      "description": "La oferta de cuero disminuye en el mercado nacional.",
+      "implication": "El precio del cuero aumenta 20%.",
+      "percentage": 20,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE49",
+      "description": "Los proveedores reportan baja disponibilidad de accesorios.",
+      "implication": "Los costos de insumos aumentan 12%.",
+      "percentage": 12,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE50",
+      "description": "La distribución nacional se encarece.",
+      "implication": "Los costos de distribución aumentan 10%.",
+      "percentage": 10,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE51",
+      "description": "El costo de transporte disminuye.",
+      "implication": "Los costos operativos se reducen 5%.",
+      "percentage": -5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE52",
+      "description": "Los proveedores actualizan precios por inflación.",
+      "implication": "Los costos aumentan 8% durante dos ciclos.",
+      "percentage": 8,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE53",
+      "description": "Sube el costo del financiamiento empresarial.",
+      "implication": "Los costos financieros aumentan 6% durante dos ciclos.",
+      "percentage": 6,
+      "amount": null,
+      "base": "interest-accrual",
+      "includedAccounts": [
+        "gastosFinancieros: interest for current cycle"
+      ],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "unambiguous-proposal-tested-not-official",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE54",
+      "description": "El mercado financiero ofrece mejores condiciones.",
+      "implication": "Los costos financieros se reducen 4% durante dos ciclos.",
+      "percentage": -4,
+      "amount": null,
+      "base": "interest-accrual",
+      "includedAccounts": [
+        "gastosFinancieros: interest for current cycle"
+      ],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "unambiguous-proposal-tested-not-official",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE55",
+      "description": "Un embarque de componentes importados queda retenido.",
+      "implication": "Los costos aumentan 10%.",
+      "percentage": 10,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE56",
+      "description": "Se aplica un recargo a determinados insumos importados.",
+      "implication": "Los costos aumentan 9%.",
+      "percentage": 9,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE57",
+      "description": "Una medida reduce costos de importación.",
+      "implication": "Los costos disminuyen 7%.",
+      "percentage": -7,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE58",
+      "description": "Los proveedores reducen temporalmente sus precios.",
+      "implication": "Los costos de materia prima disminuyen 10%.",
+      "percentage": -10,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE59",
+      "description": "Suben los precios de materiales complementarios.",
+      "implication": "Los costos aumentan 7%.",
+      "percentage": 7,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE60",
+      "description": "Las alteraciones climáticas afectan transporte y materias primas.",
+      "implication": "Los costos de materias primas aumentan 30% durante dos ciclos.",
+      "percentage": 30,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE61",
+      "description": "Las lluvias reducen el tránsito hacia tiendas físicas.",
+      "implication": "Las ventas disminuyen 7%.",
+      "percentage": -7,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE62",
+      "description": "La interrupción vial encarece el abastecimiento.",
+      "implication": "Los costos logísticos aumentan 20%.",
+      "percentage": 20,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE63",
+      "description": "La operación del puerto se restringe temporalmente.",
+      "implication": "Los costos de importación aumentan 12%.",
+      "percentage": 12,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE64",
+      "description": "El flujo de clientes cambia hacia horarios de menor afluencia.",
+      "implication": "Las ventas disminuyen 4%.",
+      "percentage": -4,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE65",
+      "description": "Una campaña de billeteras digitales incentiva las compras.",
+      "implication": "Las ventas aumentan 6%.",
+      "percentage": 6,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE66",
+      "description": "El sistema de pagos con tarjeta falla temporalmente.",
+      "implication": "Las ventas disminuyen 8%.",
+      "percentage": -8,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE67",
+      "description": "La empresa pierde temporalmente ventas digitales y pagos conectados.",
+      "implication": "Las ventas disminuyen 5%.",
+      "percentage": -5,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE68",
+      "description": "Una cuenta corporativa es comprometida y requiere recuperación.",
+      "implication": "Se genera un gasto extraordinario de S/ 1,200.",
+      "percentage": null,
+      "amount": -1200,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE69",
+      "description": "Un bolso de la empresa se vuelve tendencia.",
+      "implication": "Las ventas aumentan 20%.",
+      "percentage": 20,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE70",
+      "description": "Una publicación negativa afecta la confianza en la marca.",
+      "implication": "Las ventas disminuyen 12% durante dos ciclos.",
+      "percentage": -12,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE71",
+      "description": "Un creador de contenido recomienda espontáneamente la marca.",
+      "implication": "Las ventas aumentan 15%.",
+      "percentage": 15,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE72",
+      "description": "Las comisiones por cobros electrónicos suben.",
+      "implication": "Los costos aumentan 3%.",
+      "percentage": 3,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE73",
+      "description": "El banco reduce temporalmente sus comisiones.",
+      "implication": "Los costos disminuyen 2%.",
+      "percentage": -2,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE74",
+      "description": "La publicidad supera el rendimiento esperado.",
+      "implication": "Las ventas aumentan 12%.",
+      "percentage": 12,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE75",
+      "description": "La campaña no logra el alcance esperado.",
+      "implication": "Las ventas disminuyen 6%.",
+      "percentage": -6,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE76",
+      "description": "Un cliente inicia un reclamo formal por un producto.",
+      "implication": "Se genera un gasto de S/ 600 entre atención, devolución y gestión.",
+      "percentage": null,
+      "amount": -600,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE77",
+      "description": "La municipalidad realiza una revisión de seguridad y licencia.",
+      "implication": "Se generan S/ 300 de gastos administrativos.",
+      "percentage": null,
+      "amount": -300,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "existing-versioned-scope-only",
+      "activation": "existing-version-specific"
+    },
+    {
+      "event": "PE78",
+      "description": "Se requiere adaptar empaques y gestión de residuos.",
+      "implication": "Los costos operativos aumentan 5% durante dos ciclos.",
+      "percentage": 5,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE79",
+      "description": "La empresa accede a un beneficio de formalización o productividad.",
+      "implication": "Se reciben S/ 800 de apoyo extraordinario.",
+      "percentage": null,
+      "amount": 800,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE80",
+      "description": "Una empresa solicita un lote extraordinario.",
+      "implication": "Se generan S/ 2,500 adicionales de ingreso.",
+      "percentage": null,
+      "amount": 2500,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE81",
+      "description": "Un cliente corporativo cancela una compra acordada.",
+      "implication": "Se registra una pérdida de S/ 1,500.",
+      "percentage": null,
+      "amount": -1500,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE82",
+      "description": "Un comprador internacional solicita una muestra y un pedido inicial.",
+      "implication": "Se generan S/ 3,000 adicionales de ingreso.",
+      "percentage": null,
+      "amount": 3000,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE83",
+      "description": "Se detecta una pérdida de productos en almacén.",
+      "implication": "La empresa pierde S/ 700.",
+      "percentage": null,
+      "amount": -700,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE84",
+      "description": "Se recupera inventario que se consideraba perdido.",
+      "implication": "Se recuperan S/ 500.",
+      "percentage": null,
+      "amount": 500,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE85",
+      "description": "Una marca rival reduce precios temporalmente.",
+      "implication": "Las ventas disminuyen 8%.",
+      "percentage": -8,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE86",
+      "description": "Un competidor deja de operar temporalmente en la zona.",
+      "implication": "Las ventas aumentan 8% durante dos ciclos.",
+      "percentage": 8,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE87",
+      "description": "El propietario reajusta el alquiler del local.",
+      "implication": "Los costos aumentan 4% durante dos ciclos.",
+      "percentage": 4,
+      "amount": null,
+      "base": "pending-definition",
+      "includedAccounts": [],
+      "excludedAccounts": [
+        "totalCost: never used as fallback",
+        "principal repayment",
+        "asset purchases",
+        "unreceived materials"
+      ],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE88",
+      "description": "El arrendador concede un descuento por renovación.",
+      "implication": "Se recuperan S/ 600 en caja.",
+      "percentage": null,
+      "amount": 600,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE89",
+      "description": "Un distribuidor empieza a comprar regularmente.",
+      "implication": "Se generan S/ 1,800 adicionales de ingreso.",
+      "percentage": null,
+      "amount": 1800,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE90",
+      "description": "Aumentan los cambios y devoluciones de productos terminados.",
+      "implication": "Se genera un costo de S/ 750.",
+      "percentage": null,
+      "amount": -750,
+      "base": "fixed-amount-conditional",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE91",
+      "description": "La empresa recibe una mención positiva en un medio peruano.",
+      "implication": "Las ventas aumentan 7% durante dos ciclos.",
+      "percentage": 7,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    },
+    {
+      "event": "PE92",
+      "description": "Un incidente afecta la percepción pública de la empresa.",
+      "implication": "Las ventas disminuyen 12% durante dos ciclos.",
+      "percentage": -12,
+      "amount": null,
+      "base": "demand-or-competitive-share",
+      "includedAccounts": [],
+      "excludedAccounts": [],
+      "source": [
+        "docs/BANCO_EVENTOS_PERU.md",
+        "js/events_catalog.js",
+        "js/event_semantics_v2.js"
+      ],
+      "status": "pending-definition-or-complete-semantics",
+      "activation": "blocked-for-official-closing"
+    }
+  ]
+}

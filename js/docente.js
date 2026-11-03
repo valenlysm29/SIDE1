@@ -301,9 +301,12 @@ function renderTeacherChallengeControls(){
   const key=JSON.stringify(companies.map(r=>[String(r.empresaId),r.empresa]));
   if(select.dataset.roster!==key){select.replaceChildren();for(const r of companies){const option=document.createElement('option');option.value=String(r.empresaId);option.textContent=r.empresa||'Empresa';select.appendChild(option);}select.dataset.roster=key;if(companies.some(r=>String(r.empresaId)===previous))select.value=previous;}
   $('challengeV1Round').max=String(Math.min(6,Number(state.authoritative.cycles)||6));
+  const mode=$('challengeV1Mode');if(mode&&mode.dataset.game!==state.partidaId){mode.value=state.authoritative.challengeModeV1||'manual';mode.dataset.game=state.partidaId;}
+  const selectedMode=mode?.value||'manual';$('challengeV1Assign').hidden=selectedMode!=='manual';$('challengeV1Draw').hidden=selectedMode!=='random';$('challengeV1Balanced').hidden=selectedMode!=='balanced';
   updateChallengeV1Preview();
   $('challengeV1Assign').disabled=!companies.length;
   if($('challengeV1Draw'))$('challengeV1Draw').disabled=!companies.length;
+  if($('challengeV1Balanced'))$('challengeV1Balanced').disabled=companies.length!==3;
 }
 function updateChallengeV1Preview(){
   const limits={PE23:1,PE30:25,PE68:1,PE69:20,PE71:15,PE74:12,PE75:6,PE77:1},event=$('challengeV1Event')?.value,intensity=$('challengeV1Intensity'),preview=$('challengeV1Preview');
@@ -338,6 +341,18 @@ async function drawTeacherChallenges(){
     if(!result.success){toast(result.error||'No se pudo realizar el sorteo.');return;}
     toast(`${result.data.reused?'Sorteo recuperado':'Sorteo guardado'}: ${result.data.events.length} asignaciones.${result.data.rosterChanged?' La lista de empresas cambió desde el sorteo.':''}`);await refreshTeacherChallenges();
   }catch{if(game===state.partidaId&&generation===roomGeneration)toast('No se pudo realizar el sorteo.');}
+  finally{if(game===state.partidaId&&generation===roomGeneration)renderTeacherChallengeControls();}
+}
+async function scheduleBalancedChallenges(){
+  const game=state.partidaId,generation=roomGeneration,round=Number($('challengeV1Round')?.value),button=$('challengeV1Balanced');
+  if(!game||!button||!Number.isInteger(round)||round<1||round>Math.min(6,Number(state.authoritative?.cycles)||6)){toast('Revisa el ciclo de la programación.');return;}
+  button.disabled=true;
+  try{
+    const result=await window.SIDE.PartidaService.programarDesafiosEquilibrados(game,round);
+    if(game!==state.partidaId||generation!==roomGeneration)return;
+    if(!result.success){toast(result.error||'No se pudo programar la rotación.');return;}
+    toast(result.data.reused?'Programación recuperada.':'Rotación experimental programada.');await refreshTeacherChallenges();
+  }catch{if(game===state.partidaId&&generation===roomGeneration)toast('No se pudo programar la rotación.');}
   finally{if(game===state.partidaId&&generation===roomGeneration)renderTeacherChallengeControls();}
 }
 function getConfig(){return {
@@ -1520,6 +1535,13 @@ document.querySelectorAll('#tab-configuracion input').forEach(input=>{
 $('openEventPicker')?.addEventListener('click',()=>{$('eventPicker').showModal();renderEventBank()});
 $('challengeV1Assign')?.addEventListener('click',()=>{void assignTeacherChallenge();});
 $('challengeV1Draw')?.addEventListener('click',()=>{void drawTeacherChallenges();});
+$('challengeV1Balanced')?.addEventListener('click',()=>{void scheduleBalancedChallenges();});
+$('challengeV1Mode')?.addEventListener('change',async()=>{
+ const mode=$('challengeV1Mode'),game=state.partidaId,generation=roomGeneration,previous=state.authoritative?.challengeModeV1||'manual';mode.disabled=true;
+ try{const r=await window.SIDE.PartidaService.configurarModoDesafios(game,mode.value);if(game!==state.partidaId||generation!==roomGeneration)return;if(!r.success){mode.value=previous;toast(r.error);return;}state.authoritative.challengeModeV1=r.data.mode;localStorage.setItem('SIDE_TEACHER_CONFIG',JSON.stringify(state.authoritative));}
+ catch{if(game===state.partidaId){mode.value=previous;toast('No se pudo guardar el modo.');}}
+ finally{if(game===state.partidaId&&generation===roomGeneration){mode.disabled=false;renderTeacherChallengeControls();}}
+});
 $('challengeV1Refresh')?.addEventListener('click',()=>{void refreshTeacherChallenges();});
 $('challengeV1Event')?.addEventListener('change',updateChallengeV1Preview);
 $('closeEventPicker')?.addEventListener('click',()=>$('eventPicker').close());

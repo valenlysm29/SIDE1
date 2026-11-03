@@ -154,6 +154,7 @@ module.exports={runOnce,remoteRpc};
     const receipt={round,catalogSelection:clone(state.__catalogSelection||[]),modelVersion:ECON.config.version,capacityRulesVersion:'one-worker-per-resource-20261029',...(temporalFacts?{materialReceiptFacts:temporalFacts}:{}),reputation:economic.reputation,regimen:businessRules.regime({state}),maintenanceCost:maintenance,scores:economic.scores,consequences:economic.messages,accountsReceivable:economic.receivable,creditCollections:economic.collections,cashRevenue:economic.cashRevenue,storageCost:economic.storage,events:clone(appliedEvents),demandFactor:economic.demandFactor,openingInventory,financialPolicy:clone(financialPolicy),production:clone(plan),materialLots:clone(economic.materialLots),decisions,produced:n(plan.producibleUnits),sold:sales.reduce((sum,row)=>sum+row.sold,0),revenue,sales,market,marketAllocation:assigned,inventory,goods,storeInventory:economic.storeInventory,distributions:economic.distributions};
     state.__cycleSettlements={...state.__cycleSettlements,[round]:receipt};
     const financial=FIN.calculate({capital,ledger,sectionsByRound,catalog,round,openingBalance:state.__openingBalance,state,financialPolicy});
+    if(financial.loanPayments)ledger[`${round}:BANCO_PAGO`]=-financial.loanPayments.reduce((sum,p)=>sum+p.total,0)||0;
     if(temporalFacts)ledger[`${round}:PROVEEDOR_PAGO`]=-n(financial.flujoCaja?.pagosProveedores)||0;
     state.__goodsLots=clone(financial.goodsLots||[]);receipt.lotMovements=clone(financial.lotMovements||[]);
     const snapshot=clone(financial);delete snapshot.history;state.__financialSnapshots={...state.__financialSnapshots,[round]:snapshot};
@@ -823,7 +824,7 @@ module.exports={runOnce,remoteRpc};
 },
 "js/financial_model.js":(module,exports,load)=>{
 /* Accrual statements; recorded payments remain the source of cash movements. */
-(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(()=>node?load("js/engine/config.js"):root.SIDE_ECONOMIC_CONFIG);if(node)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(getEconomicConfig){
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(()=>node?load("js/engine/config.js"):root.SIDE_ECONOMIC_CONFIG,()=>node?load("js/loan_schedule.js"):root.SIDE_LOAN_SCHEDULE,()=>node?load("js/event_cost_bases.js"):root.SIDE_EVENT_COST_BASES);if(node)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(getEconomicConfig,getLoanSchedule,getEventCostBases){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100||0;
   // Allocate a carrying value in whole cents, preserving its exact total.
@@ -856,7 +857,7 @@ module.exports={runOnce,remoteRpc};
       const p=period(r),amount=n(value);
       // The receipt already deterministically derives this payment; retain its
       // ledger entry for cash reconciliation without applying it a second time.
-      if(kind==='PROVEEDOR_PAGO')continue;
+      if(kind==='PROVEEDOR_PAGO'||kind==='BANCO_PAGO')continue;
       p.neto+=amount;
       if(kind==='CAPITAL_ADJUSTMENT')p.aportes+=amount;
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
@@ -891,13 +892,14 @@ module.exports={runOnce,remoteRpc};
     let cash=openingBalance?n(seed.cash??seedBG.efectivo):n(capital),assets=n(seedBG.activosFijos),debt=n(seedBG.deuda),earnings=n(seedBG.resultadosAcumulados),equity=openingBalance?n(seedBG.capital??capital):n(capital);const otherAssets=Math.max(0,n(seedBG.activos)-n(seedBG.efectivo)-assets-n(seedBG.inventarioMP)-n(seedBG.inventarioPT)-n(seedBG.cuentasPorCobrar)),history=JSON.parse(JSON.stringify(seed.history||[])).filter(row=>Number(row.round)<=Math.min(round,seedRound));
     let supplierPayable=n(seedBG.cuentasPorPagarProveedores),materialPrepayment=n(seedBG.anticiposMateriales),accountsReceivable=n(seedBG.cuentasPorCobrar),materialValue=n(seedBG.inventarioMP),goodsValues={...(seed.inventoryValues?.goods||{})},materialQuantities={...(seed.inventoryQuantities||{})},materialValues={...(seed.inventoryValues?.materials||{})},taxPayable=n(seedBG.impuestosPorPagar),interestPayable=n(seedBG.interesesPorPagar),warrantyPayable=n(seedBG.provisionGarantias);
     let supplierPayableDetails=JSON.parse(JSON.stringify(seed.supplierPayables||[]));
+    let loanBook=JSON.parse(JSON.stringify(seed.loanBook||[]));
     let depreciationValues={...seed.depreciationValues},unallocatedSeed=Object.keys(materialValues).length?0:n(seedBG.inventarioMP);
     for(const p of [...periods.values()].sort((a,b)=>a.r-b.r)){
       const frozen=state.__financialSnapshots?.[p.r];
-      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;cash=n(bg.efectivo);supplierPayable=n(bg.cuentasPorPagarProveedores);supplierPayableDetails=JSON.parse(JSON.stringify(frozen.cuentasPorPagarDetalle||[]));materialPrepayment=n(bg.anticiposMateriales);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
+      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;loanBook=JSON.parse(JSON.stringify(frozen.loanBook||[]));cash=n(bg.efectivo);supplierPayable=n(bg.cuentasPorPagarProveedores);supplierPayableDetails=JSON.parse(JSON.stringify(frozen.cuentasPorPagarDetalle||[]));materialPrepayment=n(bg.anticiposMateriales);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
       const initial=cash;let operating=p.ventas-n(p.credito)+n(p.cobros)-p.devoluciones-p.gastos+n(p.supplierCredit)+p.eventos+p.otros;
       accountsReceivable+=n(p.credito)-n(p.cobros);
-      const investing=p.ventaActivos-p.comprasActivos,financing=p.prestamos+p.aportes;
+      const investing=p.ventaActivos-p.comprasActivos;let financing=p.prestamos+p.aportes;
       const disposal=p.ventaActivos-p.bajaActivos;
       const receipt=state.__cycleSettlements?.[p.r],decisions=receipt?.decisions||state.__cyclePlans?.[p.r]?.state||{},inventory=receipt?.inventory||materialQuantities;
       if(unallocatedSeed&&receipt?.openingInventory){
@@ -959,7 +961,19 @@ module.exports={runOnce,remoteRpc};
       // cannot be capitalized when no units were manufactured.
       const idle=produced?0:p.mod+depreciation;
       const baseTEA=policy.tea??policy.interest??20,baseRate=periodRate(baseTEA,months);
-      const interest=money((debt+p.prestamos)*baseRate+p.prestamos*(periodRate(Number(baseTEA)+n(policy.nextLoanPenaltyPP),months)-baseRate));
+      let preparedLoan=null;
+      if(policy.loanPolicy){
+        if(months!==1)throw new Error('french-v1 requiere ciclos de 30 días.');
+        if(Math.abs(money(loanBook.reduce((sum,l)=>sum+n(l.balance),0))-money(debt))>.001||Math.abs(money(loanBook.reduce((sum,l)=>sum+n(l.interestArrears),0))-money(interestPayable))>.001)throw new Error('Deuda histórica sin calendario verificable; no se convierte automáticamente.');
+        preparedLoan=getLoanSchedule().prepare({book:loanBook,round:p.r,amount:p.prestamos,tea:Number(baseTEA),penaltyPP:n(policy.nextLoanPenaltyPP),policy:policy.loanPolicy,cycles:n(policy.cycles)});
+      }
+      let interest=preparedLoan?preparedLoan.interest:money((debt+p.prestamos)*baseRate+p.prestamos*(periodRate(Number(baseTEA)+n(policy.nextLoanPenaltyPP),months)-baseRate));
+      let costEventApplications=[];
+      if(policy.eventCostPolicy){
+        if(preparedLoan)throw new Error('Combinación de amortización y costos financieros pendiente de aprobación.');
+        const effect=getEventCostBases().interest({events:receipt?.events||[],round:p.r,base:interest,policy:policy.eventCostPolicy});
+        interest=effect.amount;costEventApplications=effect.applications;
+      }
       const warrantyId=decisions.GARANTIA_PT?.optionIds?.[0],warrantyDays=items.get('GARANTIA_PT')?.options?.find(o=>o.id===warrantyId)?.value,warrantyRates={30:economicConfig?.warranty.pt_30??5,90:economicConfig?.warranty.pt_90??10,180:economicConfig?.warranty.pt_180??10,...policy.warrantyUnitCosts},warrantyRate=warrantyRates[warrantyDays],warranty=money(n(warrantyRate)*(receipt?.sales||[]).reduce((s,row)=>s+n(row.sold),0));warrantyPayable+=warranty;
       const policyWarnings=warrantyDays&&warrantyRate==null?[`Garantía ${warrantyDays} días sin costo unitario configurado; requiere definir financialPolicy.warrantyUnitCosts.${warrantyDays}.`]:[];
       let er=buildStatement({criterioCostos:'ventas',ventasTotales:p.ventas-p.devoluciones,costoVentas:cogs,gastosAdministrativos:p.gastos-p.mp-p.mod-p.comercial+idle-p.eventos-p.otros-disposal,gastosVentas:p.comercial+warranty,gastosFinancieros:interest,gastoGarantias:warranty,policyWarnings,depreciacion:depreciation,costosProduccion:money(productionCost),devoluciones:money(p.devoluciones),impactoEventos:money(p.eventos),otros:money(p.otros),resultadoVentaActivos:money(disposal)});
@@ -975,6 +989,12 @@ module.exports={runOnce,remoteRpc};
       const identifiable=cogs+idle+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
       er.desgloseCostos={costoVentas:money(cogs),costoProduccionCiclo:money(productionCost),capacidadOciosa:money(idle),materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-identifiable),total:money(er.costos)};
       const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
+      let loanPayment=null;
+      if(preparedLoan){
+        loanPayment=getLoanSchedule().pay(preparedLoan,Math.max(0,money(cash+p.neto-paidTax)));
+        loanBook=loanPayment.book;interestPayable=loanPayment.interestPayable;
+        p.neto=money(p.neto-loanPayment.totalPaid);operating=money(operating-loanPayment.interestPaid);financing=money(financing-loanPayment.principalPaid);
+      }
       let supplierPaid=0;const supplierPayments=[];
       if(receipt?.materialReceiptFacts){
         if(Math.abs(money(supplierPayableDetails.reduce((sum,row)=>sum+n(row.outstanding),0))-money(supplierPayable))>0.01)throw new Error('Detalle de cuentas por pagar no verificable.');
@@ -989,17 +1009,78 @@ module.exports={runOnce,remoteRpc};
         }
         supplierPayable=money(supplierPayable-supplierPaid);p.neto-=supplierPaid;operating-=supplierPaid;
       }
-      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
+      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt=loanPayment?loanPayment.debt:debt+p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
-      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos+n(p.supplierCredit)-supplierPaid),...(receipt?.materialReceiptFacts?{pagosProveedores:money(supplierPaid)}:{}),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
-      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos-n(p.supplierCredit)+supplierPaid+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
+      const fc={...(loanPayment?{amortizacionPrestamos:-loanPayment.principalPaid,interesesBancariosPagados:-loanPayment.interestPaid}:{}),cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos+n(p.supplierCredit)-supplierPaid-n(loanPayment?.interestPaid)),...(receipt?.materialReceiptFacts?{pagosProveedores:money(supplierPaid)}:{}),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
+      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(n(loanPayment?.totalPaid)+paidTax+p.devoluciones+p.gastos-n(p.supplierCredit)+supplierPaid+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets+materialPrepayment);
       const bg={...(receipt?.materialReceiptFacts||materialPrepayment||supplierPayable?{anticiposMateriales:money(materialPrepayment),cuentasPorPagarProveedores:money(supplierPayable)}:{}),cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+supplierPayable+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,...(receipt?.materialReceiptFacts?{cuentasPorPagarDetalle:JSON.parse(JSON.stringify(supplierPayableDetails)),pagosProveedores:supplierPayments}:{}),estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
+      history.push({...(costEventApplications.length?{costEventApplications}:{}),...(loanPayment?{loanBook:JSON.parse(JSON.stringify(loanBook)),loanPayments:loanPayment.payments,loanPolicyVersion:loanPayment.version}:{}),round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,...(receipt?.materialReceiptFacts?{cuentasPorPagarDetalle:JSON.parse(JSON.stringify(supplierPayableDetails)),pagosProveedores:supplierPayments}:{}),estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
     }
     return {...history.at(-1),history};
   }
   return Object.freeze({calculate,buildStatement,periodRate,incomeTax});
+});
+
+},
+"js/loan_schedule.js":(module,exports,load)=>{
+/* Optional French loan contract. No policy is inferred for historical debt. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_LOAN_SCHEDULE=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ const clone=x=>JSON.parse(JSON.stringify(x)),money=x=>Math.round((x+Number.EPSILON)*100)/100||0;
+ const number=(x,label)=>{if(typeof x!=='number'||!Number.isFinite(x)||x<0)throw new RangeError('Préstamo: '+label+' inválido.');return x;};
+ function prepare({book=[],round,amount=0,tea,penaltyPP=0,policy,cycles}={}){
+  if(!policy||policy.version!=='french-v1')throw new RangeError('Política de amortización no soportada.');
+  if(!Number.isInteger(round)||round<1||!Number.isInteger(cycles)||round>cycles||cycles>6)throw new RangeError('Plazo de partida inválido.');
+  number(amount,'desembolso');number(tea,'TEA');number(penaltyPP,'penalidad');
+  const remaining=cycles-round+1,term=policy.termCycles??remaining;
+  if(amount&&(!Number.isInteger(term)||term<1||term>remaining))throw new RangeError('El plazo supera los ciclos restantes.');
+  const loans=clone(book),ids=new Set();
+  for(const l of loans){if(!l.id||ids.has(l.id)||!Number.isInteger(l.openedRound)||l.openedRound<1||l.openedRound>round||!Number.isInteger(l.periods)||l.periods<1||l.openedRound+l.periods-1>cycles||l.lastAccruedRound!==round-1)throw new RangeError('Calendario duplicado o fuera de orden.');ids.add(l.id);for(const k of ['original','balance','rate','installment','principalArrears','interestArrears'])number(l[k],k);if(l.balance>l.original||l.principalArrears>l.balance)throw new RangeError('Saldo de préstamo inconsistente.');}
+  if(amount){const rate=Math.pow(1+(tea+penaltyPP)/100,1/12)-1,id='loan:'+round;if(ids.has(id))throw new RangeError('Desembolso duplicado.');loans.push({id,openedRound:round,periods:term,tea:tea+penaltyPP,rate,original:money(amount),balance:money(amount),installment:money(rate?amount*rate/(1-Math.pow(1+rate,-term)):amount/term),principalArrears:0,interestArrears:0,lastAccruedRound:round-1});}
+  let interest=0;const due=[];
+  for(const l of loans){
+   const elapsed=round-l.openedRound+1,charge=money(l.balance*l.rate);interest=money(interest+charge);
+   // Arrears do not capitalize interest or create a second installment. The
+   // contractual principal schedule is maintained even if an earlier one was unpaid.
+   const theoretical=elapsed>=l.periods?l.balance:money(l.original*Math.pow(1+l.rate,elapsed-1)-l.installment*(l.rate?(Math.pow(1+l.rate,elapsed-1)-1)/l.rate:elapsed-1));
+   const scheduled=elapsed>=l.periods?l.balance-l.principalArrears:Math.min(l.balance-l.principalArrears,Math.max(0,money(l.installment-money(theoretical*l.rate))));
+   l.principalArrears=money(Math.min(l.balance,l.principalArrears+scheduled));l.interestArrears=money(l.interestArrears+charge);l.lastAccruedRound=round;
+   due.push({id:l.id,interestAccrued:charge,principalDue:l.principalArrears,interestDue:l.interestArrears});
+  }
+  return {version:'french-v1',round,book:loans,interest,disbursement:money(amount),due};
+ }
+ function pay(prepared,available){
+  number(available,'caja disponible');const result=clone(prepared);let cash=money(available),principalPaid=0,interestPaid=0;const payments=[];
+  for(const loan of result.book){const interest=money(Math.min(cash,loan.interestArrears));cash=money(cash-interest);loan.interestArrears=money(loan.interestArrears-interest);const principal=money(Math.min(cash,loan.principalArrears));cash=money(cash-principal);loan.principalArrears=money(loan.principalArrears-principal);loan.balance=money(loan.balance-principal);principalPaid=money(principalPaid+principal);interestPaid=money(interestPaid+interest);payments.push({id:loan.id+':'+result.round,loanId:loan.id,cycle:result.round,principal,interest,total:money(principal+interest)});}
+  return {...result,principalPaid,interestPaid,totalPaid:money(principalPaid+interestPaid),debt:money(result.book.reduce((s,l)=>s+l.balance,0)),interestPayable:money(result.book.reduce((s,l)=>s+l.interestArrears,0)),payments};
+ }
+ return Object.freeze({prepare,pay});
+});
+
+},
+"js/event_cost_bases.js":(module,exports,load)=>{
+/* Proposal only: specific financial bases, never a percentage of total costs.
+ * Official selectors remain blocked until the policy is explicitly approved. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SIDE_EVENT_COST_BASES=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ const rates=Object.freeze({PE53:6,PE54:-4});
+ function interest({events=[],round,base,policy}={}){
+  if(!Number.isInteger(round)||round<1||!Array.isArray(events))throw new RangeError('Contexto de evento no verificable.');
+  if(!Number.isFinite(base)||base<0)throw new RangeError('Base financiera no verificable.');
+  const selected=events.filter(e=>e?.effect?.costPct!=null);
+  if(!selected.length)return {amount:base,applications:[]};
+  if(policy!=='interest-base-proposal-v1')throw new RangeError('Base de evento pendiente de aprobación.');
+  const seen=new Set(),applications=[];let amount=base;
+  for(const e of selected.sort((a,b)=>a.id.localeCompare(b.id)||a.triggerRound-b.triggerRound)){
+   const key=e.id+':'+e.triggerRound;
+   if(!Object.hasOwn(rates,e.id)||e.version!=='legacy-event-context-v1'||e.effect.costPct!==rates[e.id]||!Number.isInteger(e.triggerRound)||e.startRound!==e.triggerRound+1||round<e.startRound||round>=e.startRound+2||seen.has(key))throw new RangeError('Evento financiero no verificable.');
+   seen.add(key);const before=amount;amount=amount*(1+rates[e.id]/100);
+   applications.push({id:e.id,occurrence:key,cycle:round,percent:rates[e.id],base:'interest-accrual',baseAmount:before,adjustment:amount-before,approval:'proposal-not-academically-approved',excluded:['principal','materials','payroll','administration','sales','depreciation']});
+  }
+  return {amount:Math.round((amount+Number.EPSILON)*100)/100,applications};
+ }
+ return Object.freeze({interest});
 });
 
 },
@@ -2859,7 +2940,7 @@ module.exports={runOnce,remoteRpc};
   const defaults={interest:20,capitalMode:'fixed',capital:100000,capitalMin:80000,capitalMax:120000};
   const fields=Object.keys(defaults);
   function values(config={}){return Object.fromEntries(fields.map(key=>[key,config[key]??defaults[key]]));}
-  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(config.utilityPrices?{utilityPrices:{...config.utilityPrices}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
+  function resolve(config={},round=1){const rows=(config.financialSchedule||[]).filter(row=>Number(row.effectiveRound)<=Number(round)).sort((a,b)=>a.effectiveRound-b.effectiveRound);return {...values(rows.at(-1)||config),...(config.loanPolicy?{loanPolicy:JSON.parse(JSON.stringify(config.loanPolicy))}:{}),...(config.tax?{tax:{...config.tax}}:{}),...(config.taxRegime?{taxRegime:config.taxRegime}:{}),...(config.materials?{materials:{...config.materials}}:{}),...(config.materialPurchaseVersion?{materialPurchaseVersion:config.materialPurchaseVersion}:{}),...(config.economicRulesVersion?{economicRulesVersion:config.economicRulesVersion}:{}),...(config.utilityDemand?{utilityDemand:JSON.parse(JSON.stringify(config.utilityDemand))}:{}),...(config.utilityPrices?{utilityPrices:{...config.utilityPrices}}:{}),...(Number(config.cycles)>0?{cycles:Number(config.cycles),incomeTaxTiming:'final-cycle'}:{})};}
   function schedule(base={},next={},effectiveRound=1){const round=Math.max(1,Number(effectiveRound)||1);const rows=(base.financialSchedule||[{effectiveRound:1,...values(base)}]).filter(row=>Number(row.effectiveRound)<round);rows.push({effectiveRound:round,...values({...base,...next})});return {...base,...next,financialSchedule:rows};}
   function capitalFor(config={},round=1,identity='',originalCapital){
     const original=Number(originalCapital),hasOriginal=originalCapital!==undefined&&originalCapital!==null&&Number.isFinite(original);
@@ -3581,6 +3662,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
         if(temporal)result.ledger[`${ciclo}:PROVEEDOR_PAGO`]=-Number(result.financial.flujoCaja?.pagosProveedores||0)||0;
+        if(result.financial.loanPayments)result.ledger[`${ciclo}:BANCO_PAGO`]=-result.financial.loanPayments.reduce((sum,payment)=>sum+Number(payment.total),0)||0;
         result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
@@ -3609,6 +3691,21 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function programarDesafiosEquilibrados(partidaId,ciclo){
+    if(!Number.isInteger(ciclo)||ciclo<1||ciclo>6)return {success:false,code:'CICLO_INVALIDO',error:'Ciclo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_schedule_balanced_v1',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.round)!==Number(ciclo)||typeof data?.reused!=='boolean'||!Array.isArray(data?.events)||data.events.length!==3||data.events.some(e=>!e||!/^\d+$/.test(String(e.companyId))||BigInt(e.companyId)<1n||!['PE69','PE71','PE75'].includes(e.eventId)||Number(e.round)!==Number(ciclo)||Number(e.intensity)!==(ciclo<=2?2:ciclo<=4?4:6))||new Set(data.events.map(e=>String(e.companyId))).size!==3||new Set(data.events.map(e=>e.eventId)).size!==3)return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó la programación equilibrada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
+  async function configurarModoDesafios(partidaId,mode){
+    if(!['manual','random','balanced'].includes(mode))return {success:false,error:'Modo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{const {data,error}=await sb.rpc('side_challenge_mode_v1',{p_partida_id:partidaId,p_mode:mode});if(error||String(data?.partidaId)!==String(partidaId)||data?.mode!==mode)return {success:false,error:error?.message||'Modo no confirmado por el servidor.'};return {success:true,data};}catch(error){return {success:false,error:error.message};}
+  }
   async function consultarDesafios(partidaId){
     const sb=client();if(!sb)return offline();
     try{
@@ -3632,7 +3729,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,programarDesafiosEquilibrados,configurarModoDesafios,consultarDesafios,podio };
 });
 
 }

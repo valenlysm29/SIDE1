@@ -23,6 +23,8 @@ if os.environ.get('HISTORY_BLOCKED_GAME'):
  OUT=ROOT/'tests/output/fase01/finalizacion/connected-isolation';OUT.mkdir(parents=True,exist_ok=True)
 if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
  OUT=ROOT/'tests/output/finalizacion-integral/connected';OUT.mkdir(parents=True,exist_ok=True)
+if os.environ.get('SIDE_FINAL_QA'):
+ OUT=ROOT/'tests/output/cierre-definitivo/connected';OUT.mkdir(parents=True,exist_ok=True)
 def req(path,payload,token=None):
  r=urllib.request.Request(BASE+path,data=json.dumps(payload).encode(),headers={'apikey':KEY,'Authorization':'Bearer '+(token or KEY),'Content-Type':'application/json'})
  with urllib.request.urlopen(r) as f:return json.load(f)
@@ -99,6 +101,7 @@ with sync_playwright() as p:
    t.locator('#gameName').fill(f'QA Historia {count}');t.locator('#cycles').fill(str(count));t.locator('#roundMinutes').fill('1');t.locator('#integrationDurationMinutes').fill('5');t.locator('#capital').fill('200000')
    t.locator(f'input[name=cycleMode][value={mode}]').check()
    t.evaluate("state.authoritative={materialRulesVersion:'receipts-v1',materialPurchaseVersion:'excel-v2-packs-v1',materialLeadTimeDays:0,materialPaymentMode:'credit',supplierCreditTermCycles:2,planSyncGraceSeconds:0}")
+   if os.environ.get('SIDE_FINAL_QA'):t.evaluate("Object.assign(state.authoritative,{loanPolicy:{version:'french-v1'},economicEventsVersion:'demand-share-v1'});state.enabledEvents=new Set(['PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'])")
    t.locator('#startGame').click();t.wait_for_function('state.partidaId!==null',timeout=30000);game=t.evaluate('state.partidaId');code=t.locator('#gameCode').input_value()
    if os.environ.get('HISTORY_LEGACY'):
     sql(f"update partidas set configuracion=configuracion-'sequentialCloseVersion' where id='{game}' and nombre='QA Historia {count}'")
@@ -120,6 +123,23 @@ with sync_playwright() as p:
      s.screenshot(path=str(OUT/'admission-failure.png'));print(s.locator('#studentMessage').text_content(),flush=True);raise
     ident={'codigo':code,'nombreLegal':name,'nombreComercial':name};company=s.evaluate('currentStudent.empresaId')
     students.append((sc,s,ident,company))
+   if os.environ.get('SIDE_FINAL_QA'):
+    # Persist all three modes through the delivered controls; no mocked RPC.
+    t.evaluate('loadReports()');t.wait_for_function('state.reports.length===3');t.locator('[data-tab="configuracion"]').click()
+    t.wait_for_selector('#challengeV1Mode')
+    for eventmode in ['random','balanced','manual']:
+     t.locator('#challengeV1Mode').select_option(eventmode)
+     t.wait_for_function('(mode)=>state.authoritative?.challengeModeV1===mode',arg=eventmode)
+    # Random draw is persisted once in a future cycle; re-read must be identical.
+    if count==3:
+     drawn=rpc('side_draw_events_v1',{'p_partida_id':game,'p_source_cycle':count},teacher['access_token'])
+     retry=rpc('side_draw_events_v1',{'p_partida_id':game,'p_source_cycle':count},teacher['access_token']);assert retry['reused'] and retry['events']==drawn['events']
+    for eventcycle in range(1,count+1 if count==6 else count):
+     if count==6 or eventcycle%2:
+      balanced=rpc('side_schedule_balanced_v1',{'p_partida_id':game,'p_ciclo':eventcycle},teacher['access_token']);again=rpc('side_schedule_balanced_v1',{'p_partida_id':game,'p_ciclo':eventcycle},teacher['access_token']);assert again['reused'] and again['events']==balanced['events']
+     else:
+      assigned=rpc('side_assign_event_v1',{'p_partida_id':game,'p_empresa_id':students[(eventcycle-1)%3][3],'p_ciclo':eventcycle,'p_event_id':'PE68','p_intensity':1},teacher['access_token']);assert assigned['eventId']=='PE68'
+    t.reload(wait_until='networkidle');assert t.evaluate('state.authoritative.challengeModeV1')=='manual'
    # Test clock only: this SQL targets the new QA game, preserving real RPC transitions.
    sql(f"update partidas set configuracion=jsonb_set(configuracion,'{{gameStartAt}}',to_jsonb(clock_timestamp()-interval '1 second')) where id='{game}'")
    t.evaluate('refreshTeacherGame()');t.wait_for_function('runtime()?.phase==="decisions"',timeout=15000)
@@ -147,6 +167,12 @@ with sync_playwright() as p:
     for sc,s,ident,company in students:
      row=next(r for r in closed if int(r['empresa_id'])==int(company) and int(r['ciclo'])==cycle);f=row['result']['financial'];receipt=row['result']['receipt']
      assert receipt['produced']>0 and receipt['sold']>0,(cycle,company,receipt)
+     if os.environ.get('SIDE_FINAL_QA'):
+      assert f['loanPolicyVersion']=='french-v1';assert f['balanceGeneral']['deuda']>=0
+      if cycle==count:assert f['balanceGeneral']['deuda']==0
+      news=s.evaluate('''async ({game,company})=>{const r=await SIDE.SupabaseClient.getStudent().rpc('side_student_events_v1',{p_partida_id:game,p_empresa_id:company});if(r.error)throw r.error;return r.data}''',{'game':game,'company':company})
+      assert news is not None
+      if receipt['events']:assert all(e['id'] in ['PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'] for e in receipt['events'])
      if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
       expected=plan(cycle,students.index((sc,s,ident,company)))['PRODUCCION_META']['moldTargets']
       assert receipt['production']['target']==sum(expected.values()),(receipt['production'],expected)
@@ -158,7 +184,9 @@ with sync_playwright() as p:
      if company in previous:assert abs(float(f['balanceCaja']['cajaInicial'])-previous[company]['cash'])<.02,(f,previous[company])
      if company in previous:
       assert receipt['openingInventory']==previous[company]['inventory'],(receipt['openingInventory'],previous[company])
-      assert f['balanceGeneral']['deuda']==previous[company]['debt']
+      if os.environ.get('SIDE_FINAL_QA'):
+       paid=sum(p['principal'] for p in f['loanPayments']);assert abs(f['balanceGeneral']['deuda']-previous[company]['debt']+paid)<.011
+      else:assert f['balanceGeneral']['deuda']==previous[company]['debt']
      previous[company]={'cash':float(f['balanceCaja']['cajaFinal']),'inventory':receipt['inventory'],'goods':receipt.get('goods'),'debt':f['balanceGeneral'].get('deuda')}
      assert abs(float(f['balanceGeneral']['activos'])-float(f['balanceGeneral']['pasivoPatrimonio']))<.03
      s.reload(wait_until='networkidle');s.evaluate('refreshStudentGame({forceHydrate:true})')
@@ -192,7 +220,7 @@ with sync_playwright() as p:
     assert any(r['profit']<0 for r in scenario['economics']) and any(r['profit']>0 for r in scenario['economics']),scenario['economics']
    assert not errors,errors
    assert not local_failures,local_failures
-   scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;scenario['blockedHistoricalGame']=os.environ.get('HISTORY_BLOCKED_GAME');evidence.append(scenario);(OUT/'integration.json').write_text(json.dumps(evidence,indent=2))
+   scenario['pageErrors']=errors;scenario['failedLocalResources']=local_failures;scenario['blockedHistoricalGame']=os.environ.get('HISTORY_BLOCKED_GAME');evidence.append(scenario);(OUT/('integration-'+str(count)+'.json' if os.environ.get('SIDE_FINAL_QA') else 'integration.json')).write_text(json.dumps(evidence,indent=2))
    print('PASS',count,'cycles, 3 companies, manual/automatic, authenticated reloads, sealed history and lab',flush=True)
    for sc,*_ in students:sc.close()
    ctx.close()

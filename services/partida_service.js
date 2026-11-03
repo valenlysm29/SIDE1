@@ -558,6 +558,7 @@
         result.ledger=financialLedger;
         result.financial=global.SIDE_FINANCIAL_MODEL.calculate({capital:Number(company.capital),ledger:result.ledger,sectionsByRound:result.financialSections,catalog:global.SIDE_DECISION_CATALOG,round:ciclo,openingBalance:result.state.__openingBalance,state:result.state,financialPolicy:result.receipt?.financialPolicy||global.SIDE_FINANCE_CONFIG?.resolve(ctx.financialConfig||{},ciclo)||ctx.financialConfig||{}});
         if(temporal)result.ledger[`${ciclo}:PROVEEDOR_PAGO`]=-Number(result.financial.flujoCaja?.pagosProveedores||0)||0;
+        if(result.financial.loanPayments)result.ledger[`${ciclo}:BANCO_PAGO`]=-result.financial.loanPayments.reduce((sum,payment)=>sum+Number(payment.total),0)||0;
         result.state.__goodsLots=JSON.parse(JSON.stringify(result.financial.goodsLots||[]));result.receipt.lotMovements=JSON.parse(JSON.stringify(result.financial.lotMovements||[]));
         const frozen={...result.financial};delete frozen.history;result.state.__financialSnapshots={...result.state.__financialSnapshots,[ciclo]:frozen};
       }
@@ -586,6 +587,21 @@
       return {success:true,data};
     }catch(error){return {success:false,error:error.message};}
   }
+  async function programarDesafiosEquilibrados(partidaId,ciclo){
+    if(!Number.isInteger(ciclo)||ciclo<1||ciclo>6)return {success:false,code:'CICLO_INVALIDO',error:'Ciclo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{
+      const {data,error}=await sb.rpc('side_schedule_balanced_v1',{p_partida_id:partidaId,p_ciclo:ciclo});
+      if(error||data?.error)return {success:false,error:error?.message||data.error,code:error?.code||data.code};
+      if(Number(data?.round)!==Number(ciclo)||typeof data?.reused!=='boolean'||!Array.isArray(data?.events)||data.events.length!==3||data.events.some(e=>!e||!/^\d+$/.test(String(e.companyId))||BigInt(e.companyId)<1n||!['PE69','PE71','PE75'].includes(e.eventId)||Number(e.round)!==Number(ciclo)||Number(e.intensity)!==(ciclo<=2?2:ciclo<=4?4:6))||new Set(data.events.map(e=>String(e.companyId))).size!==3||new Set(data.events.map(e=>e.eventId)).size!==3)return {success:false,code:'EVENTOS_NO_VERIFICADOS',error:'El servidor no confirmó la programación equilibrada.'};
+      return {success:true,data};
+    }catch(error){return {success:false,error:error.message};}
+  }
+  async function configurarModoDesafios(partidaId,mode){
+    if(!['manual','random','balanced'].includes(mode))return {success:false,error:'Modo inválido.'};
+    const sb=client();if(!sb)return offline();
+    try{const {data,error}=await sb.rpc('side_challenge_mode_v1',{p_partida_id:partidaId,p_mode:mode});if(error||String(data?.partidaId)!==String(partidaId)||data?.mode!==mode)return {success:false,error:error?.message||'Modo no confirmado por el servidor.'};return {success:true,data};}catch(error){return {success:false,error:error.message};}
+  }
   async function consultarDesafios(partidaId){
     const sb=client();if(!sb)return offline();
     try{
@@ -609,5 +625,5 @@
     }catch(error){return {success:false,error:error.message};}
     finally{clearTimeout(timer);}
   }
-  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,consultarDesafios,podio };
+  global.SIDE.PartidaService = { buscarPorCodigo, crear, obtenerActiva, recuperarSala, avanzarCiclo, finalizar, obtener, listarParticipantes, expulsarEmpresa, actualizarConfiguracion, guardarPuntaje, controlar, cancelar,cerrarNegocio,consultarCierreNegocio,asignarDesafio,sortearDesafios,programarDesafiosEquilibrados,configurarModoDesafios,consultarDesafios,podio };
 });

@@ -1,5 +1,5 @@
 /* Accrual statements; recorded payments remain the source of cash movements. */
-(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(()=>node?require('./engine/config.js'):root.SIDE_ECONOMIC_CONFIG);if(node)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(getEconomicConfig){
+(function(root,factory){const node=typeof module==='object'&&module.exports;const api=factory(()=>node?require('./engine/config.js'):root.SIDE_ECONOMIC_CONFIG,()=>node?require('./loan_schedule.js'):root.SIDE_LOAN_SCHEDULE,()=>node?require('./event_cost_bases.js'):root.SIDE_EVENT_COST_BASES);if(node)module.exports=api;else root.SIDE_FINANCIAL_MODEL=api;})(typeof globalThis!=='undefined'?globalThis:this,function(getEconomicConfig,getLoanSchedule,getEventCostBases){
   const n=v=>Number.isFinite(Number(v))?Number(v):0;
   const money=v=>Math.round((n(v)+Number.EPSILON)*100)/100||0;
   // Allocate a carrying value in whole cents, preserving its exact total.
@@ -32,7 +32,7 @@
       const p=period(r),amount=n(value);
       // The receipt already deterministically derives this payment; retain its
       // ledger entry for cash reconciliation without applying it a second time.
-      if(kind==='PROVEEDOR_PAGO')continue;
+      if(kind==='PROVEEDOR_PAGO'||kind==='BANCO_PAGO')continue;
       p.neto+=amount;
       if(kind==='CAPITAL_ADJUSTMENT')p.aportes+=amount;
       else if(kind==='SIM_VENTAS')p.ventas+=amount;
@@ -67,13 +67,14 @@
     let cash=openingBalance?n(seed.cash??seedBG.efectivo):n(capital),assets=n(seedBG.activosFijos),debt=n(seedBG.deuda),earnings=n(seedBG.resultadosAcumulados),equity=openingBalance?n(seedBG.capital??capital):n(capital);const otherAssets=Math.max(0,n(seedBG.activos)-n(seedBG.efectivo)-assets-n(seedBG.inventarioMP)-n(seedBG.inventarioPT)-n(seedBG.cuentasPorCobrar)),history=JSON.parse(JSON.stringify(seed.history||[])).filter(row=>Number(row.round)<=Math.min(round,seedRound));
     let supplierPayable=n(seedBG.cuentasPorPagarProveedores),materialPrepayment=n(seedBG.anticiposMateriales),accountsReceivable=n(seedBG.cuentasPorCobrar),materialValue=n(seedBG.inventarioMP),goodsValues={...(seed.inventoryValues?.goods||{})},materialQuantities={...(seed.inventoryQuantities||{})},materialValues={...(seed.inventoryValues?.materials||{})},taxPayable=n(seedBG.impuestosPorPagar),interestPayable=n(seedBG.interesesPorPagar),warrantyPayable=n(seedBG.provisionGarantias);
     let supplierPayableDetails=JSON.parse(JSON.stringify(seed.supplierPayables||[]));
+    let loanBook=JSON.parse(JSON.stringify(seed.loanBook||[]));
     let depreciationValues={...seed.depreciationValues},unallocatedSeed=Object.keys(materialValues).length?0:n(seedBG.inventarioMP);
     for(const p of [...periods.values()].sort((a,b)=>a.r-b.r)){
       const frozen=state.__financialSnapshots?.[p.r];
-      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;cash=n(bg.efectivo);supplierPayable=n(bg.cuentasPorPagarProveedores);supplierPayableDetails=JSON.parse(JSON.stringify(frozen.cuentasPorPagarDetalle||[]));materialPrepayment=n(bg.anticiposMateriales);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
+      if(frozen?.balanceGeneral){const bg=frozen.balanceGeneral;loanBook=JSON.parse(JSON.stringify(frozen.loanBook||[]));cash=n(bg.efectivo);supplierPayable=n(bg.cuentasPorPagarProveedores);supplierPayableDetails=JSON.parse(JSON.stringify(frozen.cuentasPorPagarDetalle||[]));materialPrepayment=n(bg.anticiposMateriales);accountsReceivable=n(bg.cuentasPorCobrar);assets=n(bg.activosFijos);debt=n(bg.deuda);earnings=n(bg.resultadosAcumulados);equity=n(bg.capital);materialValue=n(bg.inventarioMP);goodsValues={...frozen.inventoryValues?.goods};materialValues={...frozen.inventoryValues?.materials};materialQuantities={...frozen.inventoryQuantities};depreciationValues={...frozen.depreciationValues};unallocatedSeed=Math.max(0,materialValue-Object.values(materialValues).reduce((s,v)=>s+n(v),0));taxPayable=n(bg.impuestosPorPagar);interestPayable=n(bg.interesesPorPagar);warrantyPayable=n(bg.provisionGarantias);history.push(JSON.parse(JSON.stringify(frozen)));continue;}
       const initial=cash;let operating=p.ventas-n(p.credito)+n(p.cobros)-p.devoluciones-p.gastos+n(p.supplierCredit)+p.eventos+p.otros;
       accountsReceivable+=n(p.credito)-n(p.cobros);
-      const investing=p.ventaActivos-p.comprasActivos,financing=p.prestamos+p.aportes;
+      const investing=p.ventaActivos-p.comprasActivos;let financing=p.prestamos+p.aportes;
       const disposal=p.ventaActivos-p.bajaActivos;
       const receipt=state.__cycleSettlements?.[p.r],decisions=receipt?.decisions||state.__cyclePlans?.[p.r]?.state||{},inventory=receipt?.inventory||materialQuantities;
       if(unallocatedSeed&&receipt?.openingInventory){
@@ -135,7 +136,19 @@
       // cannot be capitalized when no units were manufactured.
       const idle=produced?0:p.mod+depreciation;
       const baseTEA=policy.tea??policy.interest??20,baseRate=periodRate(baseTEA,months);
-      const interest=money((debt+p.prestamos)*baseRate+p.prestamos*(periodRate(Number(baseTEA)+n(policy.nextLoanPenaltyPP),months)-baseRate));
+      let preparedLoan=null;
+      if(policy.loanPolicy){
+        if(months!==1)throw new Error('french-v1 requiere ciclos de 30 días.');
+        if(Math.abs(money(loanBook.reduce((sum,l)=>sum+n(l.balance),0))-money(debt))>.001||Math.abs(money(loanBook.reduce((sum,l)=>sum+n(l.interestArrears),0))-money(interestPayable))>.001)throw new Error('Deuda histórica sin calendario verificable; no se convierte automáticamente.');
+        preparedLoan=getLoanSchedule().prepare({book:loanBook,round:p.r,amount:p.prestamos,tea:Number(baseTEA),penaltyPP:n(policy.nextLoanPenaltyPP),policy:policy.loanPolicy,cycles:n(policy.cycles)});
+      }
+      let interest=preparedLoan?preparedLoan.interest:money((debt+p.prestamos)*baseRate+p.prestamos*(periodRate(Number(baseTEA)+n(policy.nextLoanPenaltyPP),months)-baseRate));
+      let costEventApplications=[];
+      if(policy.eventCostPolicy){
+        if(preparedLoan)throw new Error('Combinación de amortización y costos financieros pendiente de aprobación.');
+        const effect=getEventCostBases().interest({events:receipt?.events||[],round:p.r,base:interest,policy:policy.eventCostPolicy});
+        interest=effect.amount;costEventApplications=effect.applications;
+      }
       const warrantyId=decisions.GARANTIA_PT?.optionIds?.[0],warrantyDays=items.get('GARANTIA_PT')?.options?.find(o=>o.id===warrantyId)?.value,warrantyRates={30:economicConfig?.warranty.pt_30??5,90:economicConfig?.warranty.pt_90??10,180:economicConfig?.warranty.pt_180??10,...policy.warrantyUnitCosts},warrantyRate=warrantyRates[warrantyDays],warranty=money(n(warrantyRate)*(receipt?.sales||[]).reduce((s,row)=>s+n(row.sold),0));warrantyPayable+=warranty;
       const policyWarnings=warrantyDays&&warrantyRate==null?[`Garantía ${warrantyDays} días sin costo unitario configurado; requiere definir financialPolicy.warrantyUnitCosts.${warrantyDays}.`]:[];
       let er=buildStatement({criterioCostos:'ventas',ventasTotales:p.ventas-p.devoluciones,costoVentas:cogs,gastosAdministrativos:p.gastos-p.mp-p.mod-p.comercial+idle-p.eventos-p.otros-disposal,gastosVentas:p.comercial+warranty,gastosFinancieros:interest,gastoGarantias:warranty,policyWarnings,depreciacion:depreciation,costosProduccion:money(productionCost),devoluciones:money(p.devoluciones),impactoEventos:money(p.eventos),otros:money(p.otros),resultadoVentaActivos:money(disposal)});
@@ -151,6 +164,12 @@
       const identifiable=cogs+idle+p.mantenimiento+p.almacenaje+p.fijos+p.publicidad+interest;
       er.desgloseCostos={costoVentas:money(cogs),costoProduccionCiclo:money(productionCost),capacidadOciosa:money(idle),materiales:money(consumedMaterial),manoObra:money(p.mod),fijos:money(p.fijos),maquinaria:money(depreciation+p.mantenimiento),depreciacion:money(depreciation),mantenimiento:money(p.mantenimiento),publicidad:money(p.publicidad),intereses:money(interest),almacenaje:money(p.almacenaje),otros:money(er.costos-identifiable),total:money(er.costos)};
       const profit=er.utilidadNeta,paidTax=n(policy.cycles)>0?er.impuestoRenta:0;taxPayable+=er.impuestoRenta-paidTax;interestPayable+=interest;
+      let loanPayment=null;
+      if(preparedLoan){
+        loanPayment=getLoanSchedule().pay(preparedLoan,Math.max(0,money(cash+p.neto-paidTax)));
+        loanBook=loanPayment.book;interestPayable=loanPayment.interestPayable;
+        p.neto=money(p.neto-loanPayment.totalPaid);operating=money(operating-loanPayment.interestPaid);financing=money(financing-loanPayment.principalPaid);
+      }
       let supplierPaid=0;const supplierPayments=[];
       if(receipt?.materialReceiptFacts){
         if(Math.abs(money(supplierPayableDetails.reduce((sum,row)=>sum+n(row.outstanding),0))-money(supplierPayable))>0.01)throw new Error('Detalle de cuentas por pagar no verificable.');
@@ -165,13 +184,13 @@
         }
         supplierPayable=money(supplierPayable-supplierPaid);p.neto-=supplierPaid;operating-=supplierPaid;
       }
-      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt+=p.prestamos;earnings+=profit;equity+=p.aportes;
+      cash+=p.neto-paidTax;assets+=p.comprasActivos-p.bajaActivos;debt=loanPayment?loanPayment.debt:debt+p.prestamos;earnings+=profit;equity+=p.aportes;
       assets-=depreciation;
-      const fc={cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos+n(p.supplierCredit)-supplierPaid),...(receipt?.materialReceiptFacts?{pagosProveedores:money(supplierPaid)}:{}),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
-      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(paidTax+p.devoluciones+p.gastos-n(p.supplierCredit)+supplierPaid+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
+      const fc={...(loanPayment?{amortizacionPrestamos:-loanPayment.principalPaid,interesesBancariosPagados:-loanPayment.interestPaid}:{}),cobrosVentas:money(p.ventas-n(p.credito)+n(p.cobros)),reembolsos:money(-p.devoluciones),pagosOperacion:money(-p.gastos+n(p.supplierCredit)-supplierPaid-n(loanPayment?.interestPaid)),...(receipt?.materialReceiptFacts?{pagosProveedores:money(supplierPaid)}:{}),eventos:money(p.eventos),otros:money(p.otros),operacion:money(operating-paidTax),impuestoRenta:money(-paidTax),compraActivos:money(-p.comprasActivos),ventaActivos:money(p.ventaActivos),inversion:money(investing),financiamiento:money(financing),flujoNeto:money(p.neto-paidTax),cajaInicial:money(initial),cajaFinal:money(cash)};
+      const bc={cajaInicial:money(initial),entradas:money(p.ventas-n(p.credito)+n(p.cobros)+Math.max(0,p.eventos)+Math.max(0,p.otros)+p.ventaActivos+p.prestamos+Math.max(0,p.aportes)),salidas:money(n(loanPayment?.totalPaid)+paidTax+p.devoluciones+p.gastos-n(p.supplierCredit)+supplierPaid+Math.max(0,-p.eventos)+Math.max(0,-p.otros)+p.comprasActivos+Math.max(0,-p.aportes)),prestamos:money(p.prestamos),aportesCapital:money(p.aportes),cajaFinal:money(cash)};
       const fg=Object.values(goodsValues).reduce((s,v)=>s+n(v),0),totalAssets=money(cash+accountsReceivable+assets+materialValue+fg+otherAssets+materialPrepayment);
       const bg={...(receipt?.materialReceiptFacts||materialPrepayment||supplierPayable?{anticiposMateriales:money(materialPrepayment),cuentasPorPagarProveedores:money(supplierPayable)}:{}),cuentasPorCobrar:money(accountsReceivable),efectivo:money(cash),activosFijos:money(assets),inventarioMP:money(materialValue),inventarioPT:money(fg),inventarios:money(materialValue+fg),activos:totalAssets,deuda:money(debt),impuestosPorPagar:money(taxPayable),interesesPorPagar:money(interestPayable),provisionGarantias:money(warrantyPayable),capital:money(equity),resultadosAcumulados:money(earnings),patrimonio:money(equity+earnings),pasivoPatrimonio:money(debt+supplierPayable+taxPayable+interestPayable+warrantyPayable+equity+earnings)};
-      history.push({round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,...(receipt?.materialReceiptFacts?{cuentasPorPagarDetalle:JSON.parse(JSON.stringify(supplierPayableDetails)),pagosProveedores:supplierPayments}:{}),estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
+      history.push({...(costEventApplications.length?{costEventApplications}:{}),...(loanPayment?{loanBook:JSON.parse(JSON.stringify(loanBook)),loanPayments:loanPayment.payments,loanPolicyVersion:loanPayment.version}:{}),round:p.r,closureStatus:receipt?'closed':'pending',sold:receipt? n(receipt.sold):null,cycleReceipt:receipt||null,...(receipt?.materialReceiptFacts?{cuentasPorPagarDetalle:JSON.parse(JSON.stringify(supplierPayableDetails)),pagosProveedores:supplierPayments}:{}),estadoResultados:er,balanceCaja:bc,flujoCaja:fc,balanceGeneral:bg,detalleGastos:p.detalle,depreciationValues:{...depreciationValues},inventoryValues:{materials:{...materialValues},goods:{...goodsValues}},inventoryQuantities:{...materialQuantities},goodsLots,lotMovements});
     }
     return {...history.at(-1),history};
   }
