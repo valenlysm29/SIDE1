@@ -58,7 +58,7 @@ function showScreen(id){
   if(['simulator3d','simulationLoading'].includes(id)&&!canVisitFunWorld())id='studentLobby';
   if(['decisionMenu','characterSelection'].includes(id)&&!canExploreWorld()&&!(id==='decisionMenu'&&studentAccess().canReview))id='studentLobby';
   screens.forEach(s=>$(s)?.classList.toggle('hidden',s!==id));window.scrollTo(0,0);
-  if(['simulator3d','simulationLoading'].includes(id)&&$('studentCyclePause'))$('studentCyclePause').hidden=true;
+  renderCyclePause(lastPauseState===true);
   if(id!=='tutorial')window.stopSIDETutorial?.($('tutorialMount')?.querySelector('.tutorial-shell'));
   syncWaitingTutorial();
   return id;
@@ -210,12 +210,6 @@ function updateIntegrationUI(){
   $('cancelledBackToProfiles')?.classList.toggle('hidden',!access.cancelled);
   const cycleRuntime=readRoundRuntime();
   const paused=cycleRuntime?.status==='paused';
-  for(const id of ['studentLobby','decisionMenu']){
-    const host=$(id);if(!host)continue;
-    let banner=host.querySelector('[data-cycle-paused]');
-    if(!banner){banner=document.createElement('p');banner.dataset.cyclePaused='';banner.className='student-sync-status';banner.setAttribute('role','status');host.prepend(banner);}
-    banner.hidden=!paused;banner.textContent=paused?'Ciclo pausado por el docente. El reloj económico está detenido; el modo diversión sigue disponible. Puedes revisar y preparar tus decisiones.':'';
-  }
   renderCyclePause(paused);
   if($('lobbySegment'))$('lobbySegment').textContent=access.cancelled?'PARTIDA CANCELADA':access.integration?'SALA DE ESPERA':('EMPRESA: '+currentStudent.company+' · REVISA Y REGISTRA TUS DECISIONES');
   if($('resumeWorldBtn'))$('resumeWorldBtn').classList.toggle('hidden',!canStartSimulation()||!decisionsComplete);
@@ -253,21 +247,24 @@ function updateIntegrationUI(){
 
   if(!access.canOperate&&!access.canReview&&['decisionMenu'].some(id=>!$(id)?.classList.contains('hidden'))){playerIsDeciding=false;window.SIDE3D?.suspend?.();showScreen('studentLobby');}
 }
-let lastPauseState=null,pauseDismissed=false;
+let lastPauseState=null;
 function renderCyclePause(paused){
-  let overlay=$('studentCyclePause');
-  if(!overlay){
-    overlay=document.createElement('section');overlay.id='studentCyclePause';overlay.className='cycle-pause-overlay';overlay.hidden=true;
-    overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-labelledby','cyclePauseTitle');
-    overlay.innerHTML='<div class="side-panel"><h2 id="cyclePauseTitle">Ciclo en pausa</h2><p>El docente detuvo el ciclo. El temporizador está congelado y no puedes guardar ni enviar decisiones.</p><p>Puedes revisar y preparar tu plan mientras esperas.</p><button type="button" class="primary-gold">Revisar mis decisiones</button></div>';
-    overlay.querySelector('button').addEventListener('click',()=>{pauseDismissed=true;overlay.hidden=true;openDecisionMenu();});document.body.appendChild(overlay);
+  let notice=$('studentCyclePause');
+  if(!notice){
+    notice=document.createElement('aside');notice.id='studentCyclePause';notice.className='cycle-pause-notice';
+    notice.setAttribute('role','status');notice.setAttribute('aria-live','polite');notice.setAttribute('aria-atomic','true');
+    document.body.appendChild(notice);
   }
+  const visible=paused&&!currentStudent.expulsada&&['studentLobby','decisionMenu'].some(id=>$(id)&&!$(id).classList.contains('hidden'));
   if(paused!==lastPauseState){
     if(!paused&&lastPauseState===true&&studentAccess().canOperate)toast('Ciclo reanudado. El reloj continúa; ya puedes guardar y enviar decisiones.');
-    pauseDismissed=false;lastPauseState=paused;
-    if(paused)setTimeout(()=>overlay.querySelector('button')?.focus(),0);
+    lastPauseState=paused;
   }
-  overlay.hidden=!paused||pauseDismissed||['simulator3d','simulationLoading'].some(id=>!$(id)?.classList.contains('hidden'));
+  if(visible&&!notice.classList.contains('is-visible')){
+    notice.innerHTML='<span class="cycle-pause-notice__icon" aria-hidden="true">Ⅱ</span><div><strong>Ciclo pausado por el docente</strong><p>El reloj económico está detenido; el modo diversión sigue disponible. Puedes revisar y preparar tus decisiones.</p></div>';
+  }
+  notice.classList.toggle('is-visible',visible);
+  notice.setAttribute('aria-hidden',String(!visible));
 }
 let cancellationShown=false;
 const STUDENT_EXPULSION_MESSAGE='Tu empresa fue eliminada de la partida por inactividad. Contacta a tu profesor si necesitas volver a participar.';
