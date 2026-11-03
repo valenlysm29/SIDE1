@@ -183,7 +183,11 @@ with sync_playwright() as p:
     if mode=='manual':t.locator('#advanceRound').click()
     else:t.evaluate('refreshTeacherGame()')
     if cycle<count:t.wait_for_function(f'state.round==={cycle+1}',timeout=15000)
-   t.wait_for_function('runtime()?.phase==="finished"',timeout=20000);t.reload(wait_until='networkidle');t.locator('[data-tab="historial"]').click();t.wait_for_timeout(1500);t.screenshot(path=str(OUT/f'history-{count}.png'))
+   for retry in range(90):
+    if t.evaluate('runtime()?.phase==="finished"'):break
+    t.evaluate('refreshTeacherGame()');t.wait_for_timeout(1000)
+   else:raise AssertionError(t.evaluate('({runtime:runtime(),busy:teacherBusy,failures:state.syncFailures,retryAt:state.syncRetryAt,status:document.querySelector("#roundState")?.textContent})'))
+   t.reload(wait_until='networkidle');t.locator('[data-tab="historial"]').click();t.wait_for_timeout(1500);t.screenshot(path=str(OUT/f'history-{count}.png'))
    if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
     assert any(r['profit']<0 for r in scenario['economics']) and any(r['profit']>0 for r in scenario['economics']),scenario['economics']
    assert not errors,errors
