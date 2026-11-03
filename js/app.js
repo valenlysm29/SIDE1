@@ -1062,6 +1062,13 @@ function renderTabs(){
     if(nav.children[index]!==button)nav.insertBefore(button,nav.children[index]||null);
   });
   updateDecisionLayout();
+  // Mantener completa la pestaña activa dentro de la navegación horizontal.
+  const active=nav.querySelector('.decision-tab.active');
+  if(active&&nav.dataset.activeCategory!==currentCategory&&nav.scrollWidth>nav.clientWidth){
+    const tab=active.getBoundingClientRect(),frame=nav.getBoundingClientRect();
+    if(tab.left<frame.left+8||tab.right>frame.right-8)nav.scrollTo({left:nav.scrollLeft+tab.left-frame.left-8,behavior:'instant'});
+  }
+  nav.dataset.activeCategory=currentCategory;
 }
 // Progress is student activity, not completeness or the existence of economic rows.
 function decisionSectionStatus(cat=currentCategory){

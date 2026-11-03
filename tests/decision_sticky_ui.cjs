@@ -25,7 +25,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
  const p=await browser.newPage({viewport:{width:1900,height:1000}});
  p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());if(m.type()==='warning')warnings.push(m.text());});
  await p.route('**/*',route=>new URL(route.request().url()).origin===origin?route.continue():route.abort());
- const categories=['B','C','F','D','E','A'];
+ const categories=['DOP','B','C','F','D','E','A'];
  const scroller=()=>p.locator('#decisionFormScroll');
  async function top(){await scroller().evaluate(el=>{el.scrollTop=0});}
  async function tab(cat){await p.locator(`#decisionTabs [data-cat="${cat}"]`).click();}
@@ -39,7 +39,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   await scroller().waitFor();
   assert.match(await p.locator('#decisionProgressText').innerText(),/^0\/5/);
   const runtimeStart=await p.evaluate(()=>readRoundRuntime().startedAt);
-  for(const [width,height] of [[1900,1000],[1366,900],[390,844],[320,568],[844,390],[667,375]]){
+  for(const [width,height] of [[1900,1000],[1366,900],[390,844],[320,568],[360,640],[768,1024],[820,1180],[1024,768],[1180,820],[844,390],[667,375]]){
    await p.setViewportSize({width,height});
    for(const cat of categories){
     await tab(cat);await top();
@@ -58,7 +58,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
     assert.ok(layout.body.height>=(height>=568?100:70),`usable content height ${width}/${cat}: ${layout.body.height}`);
     assert.ok(layout.body.bottom<=height+.5,`body inside viewport ${width}/${cat}`);
     if(layout.body.scrollHeight>layout.body.clientHeight+2)assert.ok(layout.body.scrollTop>0,`body responds to scroll ${width}/${cat}`);
-    if(cat==='B'||cat==='A')await p.screenshot({path:path.join(output,`decision-sticky-${width}x${height}-${cat}-scrolled.png`)});
+    if(cat==='B'||cat==='A'||cat==='DOP')await p.screenshot({path:path.join(output,`decision-sticky-${width}x${height}-${cat}-scrolled.png`)});
     const target=p.locator('#decisionCards input:not([disabled]),#decisionCards button:not([disabled])').last();
     if(await target.count()){
      await target.focus();
@@ -73,7 +73,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
    assert.equal(await p.locator('#cashBalance').isVisible(),true);
    await tab('A');assert.equal(await p.locator('.cs-unit-cost').count(),1,'production unit cost remains');
    assert.deepEqual(errors,[]);
-   console.log('PASS 36 responsive tab layouts; no duplicate balance; top cash and unit cost retained; no browser errors');return;
+   console.log('PASS 77 responsive tab layouts; no duplicate balance; top cash and unit cost retained; no browser errors');return;
   }
   await p.setViewportSize({width:1366,height:900});await tab('B');
   const initial=await p.evaluate(()=>cashBalance());
@@ -88,11 +88,12 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   const seconds=text=>text.trim().split(':').reduce((total,part)=>total*60+Number(part),0),timerBefore=seconds(await p.locator('#decisionRoundTimer').innerText());
   await p.clock.fastForward(2100);await p.evaluate(()=>syncStudentTimer());
   assert.ok(seconds(await p.locator('#decisionRoundTimer').innerText())<=timerBefore-2,'visible cycle timer keeps counting down');
+  const expectedCash=await p.evaluate(()=>projectedCash());
   await p.locator('#saveDecisionSection').click();
-  assert.equal(await p.evaluate(()=>cashBalance()),initial-2800,'saved desk and mold charge once; initial already includes required premises');
+  assert.equal(await p.evaluate(()=>cashBalance()),expectedCash,'saved desk and mold charge once; initial already includes required premises');
   assert.equal(await p.locator('#cashBalance').innerText(),await p.evaluate(()=>money(cashBalance())));
-  await p.locator('#saveDecisionSection').click();assert.equal(await p.evaluate(()=>cashBalance()),initial-2800,'saving twice does not charge twice');
-  await tab('C');await number('[data-mold-target="molde_1"]',1);await choice('GARANTIA_PT','pt_30');await p.locator('#saveDecisionSection').click();
+  await p.locator('#saveDecisionSection').click();assert.equal(await p.evaluate(()=>cashBalance()),expectedCash,'saving twice does not charge twice');
+  await tab('DOP');await number('[data-mold-target="molde_1"]',1);await tab('C');await choice('GARANTIA_PT','pt_30');await p.locator('#saveDecisionSection').click();
   await tab('F');for(const [id,option] of [['CUERO','cuero_sint'],['ACCESORIOS','acc_eco'],['HILO','hilo_std']])await number(`[data-qty="${id}"][data-option="${option}"]`,1);await p.locator('#saveDecisionSection').click();
   await tab('D');await choice('CANALES','web');await p.locator('#saveDecisionSection').click();
   await tab('E');await choice('INV_MARKETING','mkt_baja');await p.locator('#saveDecisionSection').click();
@@ -109,7 +110,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   // Confirmation returns to the lobby/world; reopen the read-only decision summary.
   await p.evaluate(()=>openDecisionMenu());
   assert.match(await p.locator('#decisionProgressText').innerText(),/^5\/5/);assert.equal(await p.evaluate(()=>simulationSubmissionComplete()),true);assert.equal(await p.evaluate(()=>cashBalance()),savedCash,'final confirmation does not duplicate saved charges');
-  assert.equal(await p.locator('#decisionTabs .section-sent').count(),5);
+  assert.equal(await p.locator('#decisionTabs .section-sent').count(),6);
   await tab('A');await p.locator('[data-summary-filter="sent"]').click();assert.equal(await p.locator('#companySummaryMount [data-summary-section]').count(),5);
   assert.equal(await p.locator('#companySummaryCycle').inputValue(),'current');
   await p.evaluate(()=>{localStorage.setItem('SIDE_ACTIVE_ROUND','2');lastObservedRound=2;loadDecisionState();restoreDraftsForRound();currentCategory='A';renderTabs();renderDecisionCategory();});
@@ -117,6 +118,6 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   await p.locator('#companySummaryCycle').selectOption('current');assert.match(await p.locator('#companySummaryTitle').innerText(),/Resumen/);
   assert.equal(await p.evaluate(()=>readRoundRuntime().startedAt),runtimeStart,'navigation and actions do not restart timer');
   assert.deepEqual(errors,[]);assert.deepEqual(warnings,[]);
-  console.log('PASS sticky decisions: 36 responsive tab checks; fixed header, body scroll, focus; cash/draft/send/review/filter/cycle/progress and persistent timer; no browser warnings/errors');
+  console.log('PASS sticky decisions: 77 responsive tab checks; fixed header, body scroll, focus; cash/draft/send/review/filter/cycle/progress and persistent timer; no browser warnings/errors');
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

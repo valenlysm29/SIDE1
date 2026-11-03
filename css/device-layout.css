@@ -1,0 +1,82 @@
+/* Adaptación del estudiante: conserva la identidad SIDE y todos los controles. */
+@media (max-width: 1180px) {
+  #decisionMenu { --ui-space: 14px; }
+  #decisionMenu .tabbed-stage { width: 100%; padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right)); }
+  #decisionMenu .decision-tabs { scroll-snap-type: x proximity; scroll-behavior: auto; }
+  #decisionMenu .decision-tab {
+    flex: 0 0 auto; width: max-content; min-width: 132px; max-width: none;
+    padding: 10px 12px; min-height: 48px;
+  }
+  #decisionMenu .decision-tab .tab-label { white-space: nowrap; overflow-wrap: normal; }
+  #decisionMenu .detail-heading, #decisionMenu .detail-heading > div { min-width: 0; }
+  #decisionMenu .detail-heading p { white-space: normal; overflow-wrap: break-word; max-width: 75ch; }
+  #decisionMenu input:not([type=checkbox]):not([type=radio]),
+  #decisionMenu select, #companyReviewDialog select { font-size: 16px; min-height: 44px; }
+  #decisionMenu .stepper button, #decisionMenu .store-quantity-row .stepper button,
+  #decisionMenu .mold-target-control button { min-width: 44px; min-height: 44px; touch-action: manipulation; }
+  #decisionMenu .choice-pill { min-height: 48px; }
+  #decisionMenu .cs-filters button, #decisionMenu .cs-jump-bar button,
+  #companyReviewDialog button, .plan-assistant-panel header button { min-height: 44px; }
+  #companyReviewDialog .cs-close { min-width: 44px; flex-shrink: 0; }
+  #companyReviewDialog .cs-dialog-footer { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  #decisionMenu .section-save-bar { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+@media (min-width: 601px) and (max-width: 1080px) and (min-height: 501px) {
+  #decisionMenu #decisionTopbar, #decisionMenu #decisionTopbar.compact { gap: 8px 16px; padding: 8px 12px; }
+  #decisionMenu #decisionTopbar .cash-hud,
+  #decisionMenu #decisionTopbar .student-top-timer { min-height: 56px; padding: 6px 10px; }
+  #decisionMenu #decisionTopbar .cash-hud strong { margin-block: 1px; }
+}
+@media (max-width: 600px) {
+  #decisionMenu { --ui-space: 12px; }
+  #decisionMenu #decisionTopbar, #decisionMenu #decisionTopbar.compact {
+    gap: 6px; padding: max(6px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
+  }
+  #decisionMenu #decisionTopbar .decision-topbar-identity { gap: 8px; }
+  #decisionMenu #decisionTopbar .decision-topbar-metrics { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 8px; }
+  #decisionMenu #decisionTopbar .cash-hud,
+  #decisionMenu #decisionTopbar .student-top-timer { min-height: 54px; padding: 5px 8px; }
+  #decisionMenu #decisionTopbar .cash-hud small { font-size: 9px; }
+  #decisionMenu #decisionTopbar .decision-topbar-actions { grid-template-columns: minmax(0, 1fr) 132px; gap: 10px; }
+  #decisionMenu #decisionTopbar .mission-label { margin-bottom: 3px; }
+  #decisionMenu #decisionTopbar #decisionProgressHint { margin-top: 3px; font-size: 9px; }
+  #decisionMenu #decisionTopbar .top-submit-all { padding: 8px; }
+  #decisionMenu .decision-tabs { padding: 6px; gap: 6px; }
+  #decisionMenu .decision-tab { min-width: 130px; }
+  #decisionMenu .sticky-section-head { padding-block: 8px; }
+  #decisionMenu .detail-heading h1 { font-size: 19px; line-height: 1.25; }
+  #decisionMenu .detail-heading p { font-size: 12px; line-height: 1.45; margin-top: 4px; }
+  #decisionMenu .decision-row { padding: 14px 12px; }
+  #decisionMenu .decision-row-head { flex-wrap: wrap; gap: 8px; }
+  #decisionMenu .decision-row-head h3 { font-size: 18px; }
+  #decisionMenu .decision-row-head p, #decisionMenu .choice-pill p { font-size: 13px; line-height: 1.5; }
+  #decisionMenu .choice-strip, #decisionMenu .loan-box { grid-template-columns: minmax(0, 1fr) !important; }
+  #decisionMenu .decision-action-pair button { min-height: 64px; }
+  #decisionMenu .decision-action-pair button strong { font-size: 12px; }
+  #decisionMenu .decision-action-pair button small { font-size: 11px; }
+  #decisionMenu .cs-metric > span { font-size: 11px; }
+  #decisionMenu .cs-metric p, #decisionMenu .cs-detail-row strong { font-size: 12px; }
+  #decisionMenu .cs-cumulative-resource { grid-template-columns: minmax(0, 1fr); }
+  #companyReviewDialog .cs-dialog-footer .cs-primary,
+  #companyReviewDialog .cs-dialog-footer .cs-secondary { font-size: 12px; white-space: normal; }
+  .plan-assistant { right: max(12px, env(safe-area-inset-right)); }
+}
+@media (max-height: 500px) and (min-width: 601px) and (max-width: 1180px) {
+  #decisionMenu #decisionTopbar, #decisionMenu #decisionTopbar.compact {
+    grid-template-columns: minmax(118px, .8fr) minmax(234px, 1.5fr) minmax(220px, 1.2fr);
+    gap: 6px; padding-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right));
+  }
+  #decisionMenu #decisionTopbar .decision-topbar-metrics { grid-template-columns: minmax(132px, 1.2fr) minmax(96px, 1fr); gap: 6px; }
+  #decisionMenu #decisionTopbar .cash-hud, #decisionMenu #decisionTopbar .student-top-timer { min-height: 56px; }
+  #decisionMenu #decisionTopbar #decisionRoundTimer { font-size: 17px; min-width: 0; }
+  #decisionMenu .decision-tab { min-height: 44px; padding-block: 6px; }
+  #decisionMenu .sticky-section-head { padding-block: 5px; }
+}
+
+/* Mi Plan queda junto al título en móvil, libre de los botones de guardar/enviar. */
+@media (max-width: 600px) and (min-height: 501px) {
+  #decisionMenu #decisionTopbar .decision-topbar-identity { padding-right: 52px; }
+  .plan-assistant { top: max(6px, env(safe-area-inset-top)); bottom: auto; }
+  .plan-assistant-toggle { width: 44px; height: 44px; }
+  .plan-assistant-panel { top: 54px; bottom: auto; max-height: calc(100dvh - 80px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+}
