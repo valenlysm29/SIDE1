@@ -4,11 +4,168 @@ Corte inicial: **1 de noviembre de 2026, Lima**. **Actualización de ejecución:
 
 ## Resumen del estado real
 
-**SIDE todavía no reúne evidencia suficiente para entrega final.** Hay motor económico, cierres persistentes, interfaces, Laboratorio, modos experimentales, oráculos y pruebas relevantes. La brecha principal está en la compatibilidad y aceptación conjunta de frontend, SQL y Edge, la recuperación histórica y las funciones económicas incompletas.
+**SIDE todavía no reúne evidencia suficiente para entrega final.** Hay motor económico, cierres persistentes, interfaces, Laboratorio, modos experimentales, oráculos y pruebas relevantes. La integración conectada de tres y seis ciclos ya cuenta con evidencia. Restan eventos no conciliados, deuda histórica, reglas financieras incompletas, cobertura final de interfaz y puerta administrativa de publicación.
 
-Inventario actualizado: **90 tareas: 29 ✅, 45 🟡, 13 🔴 y 3 ⚪**. De las 61 tareas abiertas, **12 son P0, 40 P1, 6 P2 y 3 P3**. Estos números cuentan tareas de esta matriz, no porcentajes de avance ni número de defectos independientes. Varias se resuelven en un mismo ensayo o paquete coordinado.
+Inventario actualizado: **90 tareas: 54 ✅, 25 🟡, 8 🔴 y 3 ⚪**. De las 36 tareas abiertas, **8 son P0, 19 P1, 6 P2 y 3 P3**. Estos números cuentan tareas de esta matriz, no porcentajes de avance ni número de defectos independientes. Varias se resuelven en un mismo ensayo o paquete coordinado.
 
 Los estados ✅ certifican exclusivamente el alcance descrito: una prueba de modelo, un escenario histórico o una comprobación administrativa no certifican toda un área ni toda producción. Las tareas 🟡 tienen implementación y evidencia parcial; las 🔴 tienen falta o fallo documentado; las ⚪ carecen de evidencia suficiente para afirmar implementación/operación completas.
+
+## F03 — Finalización integral: estado y evidencia
+
+**Resultado: 25 tareas adicionales verificadas; 54 completadas y 36 abiertas. SIDE no se declara finalizado.** Esta sección y la matriz final prevalecen sobre F01/F02. No se recuperó ni reescribió ningún cierre real. Evidencia nueva en `tests/output/finalizacion-integral/` (local ignorado); no sumar repeticiones como casos nuevos.
+
+### Correcciones realizadas
+
+- **Finanzas:** integración selectiva de 84ae5a5. El modelo ignoraba `noDepreciation` de moldes y distribuía por caminos distintos los céntimos de MP/PT/costo vendido. Ahora preserva el valor exacto por lote, sin ajustar caja o patrimonio para cuadrar. Mantenimiento opcional y automático siguen siendo conceptos independientes. Los snapshots históricos prevalecen. Commit b67fb62; Edge regenerada.
+- **Recepción docente:** la vista de resultado pendiente retornaba antes de presentar formularios válidos de entrega. Se conserva el aviso sin cifras oficiales y se muestran recepción/proyección verificadas. Un fallo de conexión permite repetir con el mismo identificador. Caso real Auth/HTTP/Edge: meta 1.000, hilo recibido 1.500 m, producción 250; repetición sin duplicar recepción. No se inventan materiales.
+- **Producción:** parche exclusivo efe1483, integrado en 3ebcdfe: material limitante por producto y orden secuencial, incluyendo empates. Antes se comparaba un cociente agregado que podía omitirlo. Oráculo independiente: 19/19. Sin cambiar metas, recetas ni decisiones.
+- **Regresión:** los ejemplos Excel exigían dos cortadores con una mesa. Se corrigió la comparación equivalente y se conservaron casos de capacidad limitada. Bono prémium, precio efectivo, capacidad por pareja y ubicación DOP/Planificación no se revierten para aprobar expectativas antiguas. Dobles corregidos para consultas oficiales y guardias vigentes.
+- **Autorización docente:** un perfil se creaba para cada identidad y bastaba para crear/controlar salas. Se reprodujo el escalamiento de estudiante. `20261103002234_teacher_authorization.sql` exige identidad actual no anónima, correo confirmado y política institucional existente (`upch.pe` o excepción privada); protege 13 RPC y escrituras RLS. No usa metadata editable. Los diez propietarios reales activos/en espera cumplen la regla. Migración remota **20261103013157**, commit ba36101; rollback/reaplicación ensayados sobre restauración sin cambiar datos económicos.
+- **Avances concurrentes:** main avanzó a 7da1ca5 desde la rama de rentabilidad; merge c573b9b conserva sus mejoras, diagnóstico, financiación y evidencia. Se verificaron los puntos afectados sin sobrescribir la publicación ajena. Los informes incorporados por ese trabajo son antecedentes existentes, no entregables intermedios nuevos de esta intervención.
+
+### Pruebas y alcance demostrado
+
+| Comprobación | Resultado | Evidencia |
+| -- | -- | -- |
+| Regresión general anterior al merge concurrente | 1.013 aprobadas, 0 fallidas, 0 omitidas | regression-final.log |
+| Contrato combinado tras el merge | 177 aprobadas | merged-gate.log |
+| Proyección e interfaz concurrente afectada | 11 aprobadas | merged-profit.log |
+| Excel COM real | 9 aprobadas, 0 omitidas; capacidad, consumo, arrastre tres ciclos, puntajes y reputación | excel-real.log |
+| PostgreSQL 17 y Deno Edge | 14 escenarios de 3/6 ciclos; 63 cierres persistidos, releídos e idempotentes | forensic-postgres.log; tests/output/forense_v2/postgres.json |
+| Recursos y limitantes, oráculo independiente | 19 aprobadas | material-diagnostic.log |
+| Seguridad Auth/Data API/Edge | 54 negativos + 42 negativos adicionales; 3 lecturas autorizadas | security.log; access-matrix.log/json |
+| Límite de rol docente | 8 comprobaciones reales; error original reproducido, migración dos veces | teacher-boundary.log/json |
+| Rollback SQL docente | ida/vuelta/reaplicación, 13 RPC, hashes económicos iguales | teacher-rollback.log/json; rollback-teacher.sql local |
+| Instalación CLI desde vacío y reset | 49 fuentes ordenadas, 23 tablas públicas, RLS, guardia docente, Cron inactivo | clean-install-manifest.json; clean-install.log; clean-reset.log |
+| Respaldo actual restaurado | public/side_private/Auth/Vault, 159 cierres, 155 originales idénticos; DPAPI restaurado | backup/; restore-current.json; restore-current-readback.log; restore-vault.log |
+| Rollback Edge v11 y reaplicación | token inválido rechazado, error legado explícito, datos económicos iguales | rollback-v11.log |
+
+La regresión inicial produjo 984/1.011 y 27 fallos; se corrigieron causas y expectativas documentadas, sin excluir los fallos. La primera carrera de inicialización PostgreSQL en Actions se corrigió esperando el fin de initdb. Las repeticiones HTTP agotaron cuotas locales de cuentas anónimas: QA usa cuentas efímeras reales y login por contraseña, conservando Auth/RLS; la admisión anónima negativa se prueba separadamente. Los escenarios comparten base QA y deben ejecutarse secuencialmente: una tentativa paralela canceló otro fixture y se invalidó. La espera final consulta sincronización real respetando backoff, sin sobrescribir ciclos en el navegador.
+
+**Aceptación conectada:** A = 3 empresas × 3 ciclos = 9 resultados; básico, estándar y prémium, cierre manual. B = 3 empresas × 6 ciclos = 18; dos ciclos por segmento, cierre automático. Auth, Edge real, Data API/PostgreSQL y tres interfaces sobre la misma base aislada. La partida antigua inválida sigue sin sello y devuelve error independiente. Se cotejan decisiones guardadas por servicio real, compras, recepciones, inventario, deuda, caja, historia previa inmutable y recarga. No se afirma haber recorrido manualmente todos los formularios de decisiones.
+
+Los escenarios incluyen ganancias y pérdidas legítimas. En tres ciclos, las empresas eficientes obtienen utilidad neta 1.387,66 / 4.099,35 / 3.236,73; la empresa con marketing excesivo obtiene −10.612,34 / −7.900,65 / −7.793,96. Seis ciclos también conserva pérdidas con decisiones deficientes. `verify_economic_acceptance.py` concilia **27 resultados con Decimal independiente**: ingresos/costo vendido/utilidad, activo/pasivo/patrimonio, flujo/caja, arrastre de resultados y PT, impuesto acumulado solo al finalizar, moldes sin depreciación y consumo dentro de lo recibido. Evidencia: decimal-reconciliation.json y auth-decimal.log. Seleccionar la última ejecución aprobada de cada duración en connected/integration.json; auth-connected-3.log y auth-connected-6.log registran el ensayo posterior a la guardia docente.
+
+La rama concurrente añade estrategias utility-v1 financiables, proyección por producto y diagnóstico sin modificar decisiones, documentados en 606afd9/7da1ca5. Se conserva la distinción entre estrategia rentable probada y rentabilidad universal. Las fuentes Excel se copiaron a QA; no se editaron los libros originales. Paridad seis ciclos del libro completo sigue pendiente en SIDE-084.
+
+### Publicación y límites administrativos
+
+Commits propios: b67fb62, 09beb51, 3ebcdfe y ba36101; merge concurrente c573b9b. Edge **v13 ACTIVE**, legacy intacto. SQL docente instalado con respaldo y rollback; Cron activo una vez/minuto. No se invocó el worker autorizado sobre partidas reales para fabricar aceptación. Sus errores históricos siguen explícitos.
+
+CI de rama: 41549779625 y 41551357526 aprobados; ba36101: 41560304775 aprobado. Main 3ebcdfe: calidad 41551666073 y Pages 41551665830 aprobados. El cierre de publicación de F03 registra abajo SHA y pruebas posteriores de la revisión combinada.
+
+Comprobación posterior combinada: diez archivos públicos servidos por Pages coinciden con el candidato (incluidos ambos HTML, app/docente, modelos, proyección e historial); `published-http.log/json`. Descarga de los cuatro archivos de Edge v13 idéntica: `deployed-files-final.json`. HTTP remoto sin credencial: GET 405 y POST 401. Consulta posterior SQL: 159 cierres totales, 155 originales/hash intactos, 13 RPC protegidas y un Cron activo. Los ensayos posteriores a la autorización aprueban tres y seis ciclos, recepción parcial y conciliación Decimal. La validación SQL remota es de solo lectura; no constituye una prueba funcional autenticada con cuentas reales de estudiantes de producción.
+
+**Bloqueo administrativo real:** GitHub tiene permiso `write`, no `admin`. Pages sigue `legacy`; cambiar `build_type` devolvió HTTP 404. Workflow de calidad y publicación preparado, pero el propietario debe seleccionar GitHub Actions, establecer `SIDE_PAGES_ACTIONS=enabled` y exigir checks en la rama. No se declara activa una puerta que Pages legacy puede eludir. SIDE-088 queda implementada por validar.
+
+Los asesores mantienen advertencias de RPC SECURITY DEFINER y protección de contraseñas filtradas desactivada. RLS sin política en tablas solo servidor implica denegación directa intencional; no se abre para silenciar el aviso. Resta revisión contextual en SIDE-067/073: [asesor RPC](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable), [contraseñas](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
+
+### Historia, bloqueos y orden restante
+
+Los **155 cierres originales** mantienen hash `e9444aa8211fe7a585b7c13076a8e9f8`, antes/después de SQL. Había 159 al respaldo; cuatro se generaron previamente fuera de esta intervención. Los 26 huecos conservan clasificación: 2 candidatos, 11 con evidencia incompleta, 3 por conciliar y 10 dependencias. Ser candidato técnico no prueba legitimidad académica. Ninguno se recuperó.
+
+La consulta actual identifica 12 resultados descuadrados: 9 md-20261027, 1 excel-v19 y 2 sin modelo; diferencias −272,87 a −13.985,84. Los componentes internos suman sus totales. No son diferencias de céntimos explicadas por esta corrección: SIDE-048 conserva causal individual pendiente y los sellos no se reescriben.
+
+Bloqueos externos consultados: regla aprobada de amortización (050), fuente de 41/15/4 y 360 combinaciones (055), tamaño de curso y umbral de respuesta para carga (074), administración Pages/checks (088). Sin respuesta, no se inventan. Las tres no verificables siguen siendo 055 (datos), 074 (carga completa) y 078 (lector/contraste completo).
+
+Orden restante: (1) cerrar RPC/sesiones/contraseñas y puerta Actions; (2) aprobar amortización y bases/semántica de eventos 059/060 manteniendo bloqueos; (3) completar canales, controles docentes/modos/eventos, recomendaciones, accesibilidad/carga y paridad Excel 1–6; (4) resolver historia por evidencia en línea independiente; (5) aceptación académica SIDE-090 sobre SHA/SQL/Edge finales, con P0/P1 obligatorios cerrados o excluidos expresamente. Optimización global y expansión 3D son futuras. No se declara entrega integral por estas pruebas parciales.
+
+### Trazabilidad individual de las 90 tareas
+
+La matriz anterior registra estado final/evidencia/falta. Esta tabla conserva el estado previo a F03; «conservada» significa que no se certifica de nuevo una tarea ya probada.
+
+| ID | Estado anterior | Estado F03 | Corrección/validación y commit | Bloqueo restante |
+| -- | -- | -- | -- | -- |
+| SIDE-001 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Conservar referencia del corte; no equivale a aceptación funcional |
+| SIDE-002 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Base original preservada; usar el clon íntegro para trabajar. |
+| SIDE-003 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No reintegrar la rama antigua ni copiar su frontend. |
+| SIDE-004 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | La rama de trabajo original y sus modificaciones permanecen intactas. |
+| SIDE-005 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Sin integración adicional necesaria. |
+| SIDE-006 | 🔴 Pendiente | ✅ Completada y verificada | F03: regression-final.log: 1013/1013; oráculo independiente 19/19; gate-final 166/166; sin omitir fallos. 27 fallos iniciales clasificados y corregidos sin cambiar reglas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-007 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Verificación acotada a escenarios de fase 1; no certifica economía completa ni todas las partidas reales. |
+| SIDE-008 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Preservar la excepción versionada de partidas heredadas; no cambiar su historia. |
+| SIDE-009 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Aceptación económica/UI completa sigue en fase 3. |
+| SIDE-010 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Mantener pruebas al cambiar transiciones; no adelantar relojes de partidas reales. |
+| SIDE-011 | ✅ Completada y verificada | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | No se cambió el motor legado. El ajuste HTTP candidato no se desplegó. |
+| SIDE-012 | ✅ Completada y verificada | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | Mantener monitoreo; errores históricos continúan explícitos. |
+| SIDE-013 | 🔴 Pendiente | 🔴 Pendiente | F02: 26 huecos clasificados sin escritura; 2 candidatos, 11 sin evidencia, 3 para conciliar, 10 dependientes | Recuperación separada: 2 candidatos no equivalen a cierres académicos aprobados; 24 casos con evidencia/conciliación/dependencia pendiente. Ningún cierre recuperado. |
+| SIDE-014 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Recorrido actual con sesión real, transferencia autorizada y expulsión |
+| SIDE-015 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: student_sync_ui: borrador, pérdida de respuesta, recarga y desconexión; Auth/Data API reales en 27 resultados; snapshot y cierre cotejados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-016 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 54 negativos originales + 42 RPC cruzadas reales, tres lecturas autorizadas; navegador rechaza historia de otra empresa; teacher-boundary impide escalamiento de estudiante. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-017 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: regresión DOM preserva pestañas/edición/scroll, decisiones y metas; DOP en Planificación vigente; ninguna opción Ventas/Finanzas agregada o retirada. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-018 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: partial_receipt_http: recepción docente autenticada y repetida idempotente; meta 1000, hilo recibido 1500, producción 250; 27 cierres receipts-v1 conectados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-019 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Probar varios canales desde formularios y cotejar cierre sellado |
+| SIDE-020 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Versionar/autorizar planes heredados; impedir vías manipuladas |
+| SIDE-021 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 27 cierres HTTP con préstamo, deuda y caja arrastrados; estados visibles iguales al sello en las tres interfaces; límites negativos y suite financiera aprobados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-022 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: tres interfaces cotejadas con historia oficial, recarga y rechazo cruzado; pendiente muestra estado sin importes definitivos; presentación y revisión focal aprobadas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-023 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Comprobar interacción con nuevo reloj y servidor real |
+| SIDE-024 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: creación por DOM real con docentes autenticados, tres/seis ciclos y receipts/packs; lifecycle y crear_partida de regresión aprobados; guardia de rol en SQL. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-025 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Recorrido actual; cierres previos a avance y cancelación sin falso éxito |
+| SIDE-026 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Probar cada modo por interfaz, persistencia y compatibilidad con catálogo vigente |
+| SIDE-027 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 27 resultados oficiales de las mismas empresas/ciclos cotejados Estudiante/Docente/Laboratorio; tabla docente y ciclos anteriores sin falsos pendientes. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-028 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Validar permisos y estado tras recarga/transferencia en versión final |
+| SIDE-029 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Verificar exportación vigente contra cierre sellado y autorización |
+| SIDE-030 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Sin nueva auditoría de fórmulas puras; integración en tarea 34 |
+| SIDE-031 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: recarga de cada ciclo del alumno, reconsulta oficial del Laboratorio y reapertura de historial final; 3 y 6 ciclos conectados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-032 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Conservar casos; prueba conectada conjunta en tarea 34 |
+| SIDE-033 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Verificar recibos reales y límites; no prometer ventas/utilidad contrafactual |
+| SIDE-034 | 🔴 Pendiente | ✅ Completada y verificada | F03: 9 + 18 resultados de 3 empresas; Auth, Edge real, PostgreSQL y tres interfaces; básico→estándar→prémium, finales manual/automático, pérdidas y beneficios. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-035 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: dos docentes/dos estudiantes: HTTP autorizado propio y rechazo ajeno, 42 negativos adicionales; interfaz Lab cotejada con RPC real. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-036 | 🔴 Pendiente | 🔴 Pendiente | Conservada: evidencia anterior; sin corrección adicional en F03. | Ampliación futura, solo si se incluye en alcance académico |
+| SIDE-037 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: Excel COM real: 9/9 comparaciones y oráculo aritmético independiente 19/19; recursos pareados, capacidad, mezcla secuencial y materiales. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-038 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: fixture Excel corregido para tener dos mesas y dos cortadores: cada trabajador requiere su equipo; capacidad y puntaje no se sustituyeron; 19 pruebas independientes. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-039 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 63 cierres PostgreSQL/Deno con ventas parciales/cero/totales y 27 HTTP receipts-v1; FIFO, consumo por SKU, saldos y centavos conciliados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-040 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: parche exclusivo efe1483 aplicado; faltante por cada producto en orden y empates correctos; 19 pruebas independientes, paquete Edge regenerado. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-041 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Comprobar advertencias, presupuesto y recepciones sin alterar meta |
+| SIDE-042 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No repetir búsqueda local; mantener aviso de que no prueba óptimo global |
+| SIDE-043 | 🔴 Pendiente | 🔴 Pendiente | Conservada: evidencia anterior; sin corrección adicional en F03. | Mejora futura; no bloquear entrega si se rotula recomendación aproximada |
+| SIDE-044 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 49 fuentes de instalación incluyen presentaciones atómicas; HTTP 3/6 ciclos usa excel-v2-packs-v1; parcial 1500 metros recibidos sin inventar recepciones. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-045 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: moldes no depreciables, mantenimiento opcional/automático y reparto exacto de centavos; 10 focales y 63 cierres PostgreSQL/Deno; 27 conciliaciones decimales. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-046 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Validar múltiples canales y ventas parciales desde interfaces |
+| SIDE-047 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No repetir ese escenario sin cambios; ampliar cobertura en tarea 34 |
+| SIDE-048 | 🔴 Pendiente | 🔴 Pendiente | F03: consulta actual identifica 12 resultados descuadrados: 9 md, 1 excel-v19 y 2 sin modelo; diferencias -272.87 a -13985.84; sumas internas de componentes coinciden. | Causa raíz individual histórica no resuelta; desajuste entre activo y pasivo/patrimonio no se explica solo por redondeo. No alterar sellos. |
+| SIDE-049 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 27 resultados HTTP con préstamo inicial y deuda constante entre ciclos; límites de crédito negativos; intereses/devengo en 63 escenarios SQL; amortización distinta en SIDE-050. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-050 | 🔴 Pendiente | 🔴 Pendiente | Conservada: evidencia anterior; sin corrección adicional en F03. | Definir regla académica, implementar luego y probar; conservar decisiones existentes |
+| SIDE-051 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: 3/6 ciclos reales con crédito proveedor y obligación a dos ciclos; recepción parcial idempotente; suite crédito/CxC/CxP y conciliación Decimal aprobadas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-052 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: Decimal verifica impuesto acumulado solo ciclo final 3/6, MYPE y resultados negativos sin impuesto; cotejo de las tres vistas con mismo sello. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-053 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | Proyección 606afd9/7da1ca5 conservada; 11/11 y 177/177. | Hipótesis explícitas; no garantiza rentabilidad. |
+| SIDE-054 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | 3.000 escenarios competitivos financiables; aprobar supuestos y sensibilidad |
+| SIDE-055 | ⚪ No verificable | ⚪ No verificable | Conservada: evidencia anterior; sin corrección adicional en F03. | Localizar datos originales; evitar reconstrucción inventada; decidir vigencia del requisito |
+| SIDE-056 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Conservar inventario; no confundir con efectos completos |
+| SIDE-057 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Alcance: fuente/guardias; semántica completa de 92 eventos sigue en SIDE-060. |
+| SIDE-058 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Prueba remota controlada, idempotencia y continuidad con nuevas reglas |
+| SIDE-059 | 🔴 Pendiente | 🔴 Pendiente | Conservada: evidencia anterior; sin corrección adicional en F03. | Regla económica pendiente de fase 2; no bloquea partidas nuevas con configuración admitida. |
+| SIDE-060 | 🔴 Pendiente | 🔴 Pendiente | Conservada: evidencia anterior; sin corrección adicional en F03. | Completar 84 restantes y reconciliar incluso los 8 con texto/condiciones; PE30 es compuesto |
+| SIDE-061 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No altera selecciones existentes; costos no soportados siguen bloqueados. |
+| SIDE-062 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Auth real y comprobante: programado/aplicado/no aplicado, sin filtración entre empresas |
+| SIDE-063 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Eventos positivos/negativos/grupales distintos, seis ciclos y dos conexiones |
+| SIDE-064 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F02: clasificación con motor original en transacciones revertidas; hashes de copia sin cambios | Recuperación separada: 2 candidatos no equivalen a cierres académicos aprobados; 24 casos con evidencia/conciliación/dependencia pendiente. Ningún cierre recuperado. |
+| SIDE-065 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No repetir comprobación de bandera; autorización efectiva en tareas 16/35/67 |
+| SIDE-066 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Cierra hallazgo antiguo de acceso directo; no acredita todas las rutas RPC |
+| SIDE-067 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F03: 54+42 negativos reales, escalamiento docente reproducido/corregido, 13 RPC protegidas, rollback real. Asesores conservan avisos de endpoints privilegiados intencionales. | Revisión completa de RPC de lectura, privilegios de triggers y sesiones fuera de los endpoints probados; protección de contraseñas filtradas pendiente. |
+| SIDE-068 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F03: prepare_clean_install.py genera baseline CLI desde 49 fuentes preservadas; start desde vacío y db reset local aprobados; 23 tablas, 0 sin RLS, guardia docente y Cron inactivo. | Instalación limpia reproducible validada; resta normalizar o retirar la ambigüedad de toda la cadena SQL histórica sin aplicarla a una base existente. |
+| SIDE-069 | ✅ Completada y verificada | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | Seguimiento instalado externamente conservado y versionado en el repositorio. |
+| SIDE-070 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Presencia comprobada; recuperación y operación aisladas en SIDE-071/072. |
+| SIDE-071 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | La operación remota conserva errores históricos económicos explícitos; no se confunden con éxito de cron. |
+| SIDE-072 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | DPAPI requiere esta cuenta/equipo; en otro host rotar token dedicado y probarlo antes de activar cron. Copias sensibles locales, no en Git. |
+| SIDE-073 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F03: rol docente validado contra auth.users actual y correo confirmado; metadata editable y JWT previo no elevan permisos; protección de filtradas continúa desactivada. | Habilitar y verificar política de contraseñas disponible; cubrir revocación completa/transferencias y sesiones antiguas. |
+| SIDE-074 | ⚪ No verificable | ⚪ No verificable | Conservada: evidencia anterior; sin corrección adicional en F03. | Medir curso simultáneo, consultas y tiempos; umbrales de aceptación |
+| SIDE-075 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Conservar regresiones aprobadas; revisión integrada con servidor en tarea 34 |
+| SIDE-076 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: DOP/Planificación existente preservado; pruebas antiguas actualizadas a su ubicación aprobada; proyección abre sin guardar decisiones y navegación no pierde campos. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-077 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Recorrido conectado, textos largos, zoom y formularios actuales |
+| SIDE-078 | ⚪ No verificable | ⚪ No verificable | Conservada: evidencia anterior; sin corrección adicional en F03. | Revisión focal de controles esenciales y errores |
+| SIDE-079 | 🟡 Implementada, pendiente de validación | ✅ Completada y verificada | F03: checkout íntegro, cero errores de recursos locales en 3/6 ciclos; npm ci reproducible y Pages de main; paquete público con directorios explícitos. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-080 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Mantener pruebas existentes; no rehacer lógica económica 3D |
+| SIDE-081 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Clasificar estado actual y probar solo flujo incluido en entrega |
+| SIDE-082 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | Conservada: evidencia anterior; sin corrección adicional en F03. | Mejora futura; comparar motor realmente entregado antes de invertir |
+| SIDE-083 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No repetir esos libros sin cambio de fórmula ni exigir paridad de versiones distintas |
+| SIDE-084 | 🔴 Pendiente | 🟡 Implementada, pendiente de validación | F03: nueve comparaciones COM reales aprobadas, incluido arrastre tres ciclos; fuentes originales restauradas solo como copias locales. | Extender comparación Excel equivalente hasta seis ciclos; no confundir QA 6 ciclos del motor con paridad de libro completa. |
+| SIDE-085 | 🔴 Pendiente | ✅ Completada y verificada | F03: Excel COM real 9/9, fixture de una mesa frente a dos cortadores corregido; bono prémium +2 y precio 350 reconocidos como regla vigente; mercado usa capacidad real. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. |
+| SIDE-086 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | Mantener hashes y pruebas; concurrencia masiva y aceptación general quedan fuera del alcance probado. |
+| SIDE-087 | ✅ Completada y verificada | ✅ Completada y verificada | Conservada: evidencia anterior; sin corrección adicional en F03. | No necesita repetir publicación; aceptación de aplicación en tareas 34/90 |
+| SIDE-088 | 🔴 Pendiente | 🟡 Implementada, pendiente de validación | F03: quality-pages.yml; npm ci fijo, 166 contratos + PostgreSQL/Deno 63 cierres; CI de rama y main aprobada. Publicación actual Pages legacy, usuario GitHub write. | Propietario: cambiar Pages a GitHub Actions, variable SIDE_PAGES_ACTIONS=enabled; configurar checks requeridos. API de configuración devolvió 404; no simular puerta activa. |
+| SIDE-089 | 🟡 Implementada, pendiente de validación | 🟡 Implementada, pendiente de validación | F03: README corregido: Cron real, motores, snapshots, instalación aislada y límites; se quitaron instrucciones contradictorias de aplicar v19 sobre base actual. | Unificar guías secundarias y fijar alcance académico de eventos, amortización, mejoras futuras y aceptación. |
+| SIDE-090 | 🔴 Pendiente | 🔴 Pendiente | E03/E05/E08: no hay aprobación integral de versión actual | P0/P1 restantes, semántica eventos, deuda histórica, política financiera y puerta Pages requieren cierre explícito. No declarar entrega integral. |
 
 ## F02 — Finalización operativa de Fase 1 y despliegue real
 
@@ -258,8 +415,6 @@ Otras ramas relevantes: version-estable-1/codex/continuidad-empresarial en caa30
 
 ## Matriz completa de tareas
 
-Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** función esencial incompleta; **P2** mejora importante; **P3** mejora secundaria/opcional. IDs estables dentro de este inventario; no se suman nuevamente sus subtareas de prueba.
-
 | ID | Área | Tarea | Estado | Evidencia | Qué falta | Prioridad |
 | -- | ---- | ----- | ------ | --------- | --------- | --------- |
 | SIDE-001 | Repositorio | Inventariar referencias actuales y publicación | ✅ Completada y verificada | E01/E02: main remoto c558d95; Pages correcto | Conservar referencia del corte; no equivale a aceptación funcional | P2 |
@@ -267,54 +422,54 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 | SIDE-003 | Repositorio | Conciliar rama de cierre con main vigente | ✅ Completada y verificada | Comparación exclusiva: main 4b6b57a ya contiene cierres, UI y parpadeos; sin diferencias de UI/producción en d56806d; commit d56806d. | No reintegrar la rama antigua ni copiar su frontend. | P1 |
 | SIDE-004 | Repositorio | Sincronizar main local con revisión de entrega | ✅ Completada y verificada | main local original y origin/main sincronizados a 4b6b57a; referencia anterior guardada en codex/preservado-main-fase0; commit d56806d. | La rama de trabajo original y sus modificaciones permanecen intactas. | P1 |
 | SIDE-005 | Repositorio | Normalización local del runtime legado | ✅ Completada y verificada | 0fb55cb revisado: legacy-runtime no difiere de main; normalización ya contenida; commit d56806d. | Sin integración adicional necesaria. | P3 |
-| SIDE-006 | Calidad | Resolver regresión general en una sola revisión | 🔴 Pendiente | E05: 981 casos, 959 pasan, 22 fallan; 21 reproducidos en base | Clasificar y resolver 21 casos; nueva suite completa sobre versión candidata | P0 |
+| SIDE-006 | Calidad | Resolver regresión general en una sola revisión | ✅ Completada y verificada | F03: regression-final.log: 1013/1013; oráculo independiente 19/19; gate-final 166/166; sin omitir fallos. 27 fallos iniciales clasificados y corregidos sin cambiar reglas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P0 |
 | SIDE-007 | Cierres | Guardar cierres oficiales idempotentes en servidor | ✅ Completada y verificada | F01: Edge real + Auth/Data API: 9 y 18 resultados; concurrencia y hashes de cierres inmutables; commit d56806d. | Verificación acotada a escenarios de fase 1; no certifica economía completa ni todas las partidas reales. | P0 |
 | SIDE-008 | Cierres | Impedir avance manual sin cierre de todas las empresas | ✅ Completada y verificada | F01: guardia manual probada; recorrido conectado 3 ciclos; SQL vigente en producción leído; commit d56806d. | Preservar la excepción versionada de partidas heredadas; no cambiar su historia. | P0 |
 | SIDE-009 | Cierres | Avance automático secuencial sin saltos | ✅ Completada y verificada | F01: 6 ciclos automáticos consecutivos, 3 empresas, Edge real y RPC reales; commit d56806d. | Aceptación económica/UI completa sigue en fase 3. | P0 |
 | SIDE-010 | Cierres | Respetar gracia de sincronización y reloj real de cada ciclo | ✅ Completada y verificada | F01: tests PostgreSQL de reloj/gracia/6 ciclos aprobados; escenario automático conectado aprobado; commit d56806d. | Mantener pruebas al cambiar transiciones; no adelantar relojes de partidas reales. | P0 |
-| SIDE-011 | Cierres | Enrutar motor nuevo y legado sin transformar partidas | ✅ Completada y verificada | F01: Edge v8 coincide con cuatro archivos del main base; motores 1 y 0 probados mediante Edge real; commit d56806d. | No se cambió el motor legado. El ajuste HTTP candidato no se desplegó. | P0 |
-| SIDE-012 | Cierres | Distinguir error económico de HTTP exitoso | ✅ Completada y verificada | F02: HTTP 204, errores por partida y seguimiento/fencing probados y desplegados en Edge v11; commits d56806d,3c0455d,fe9b4e6,de49d92 | Mantener monitoreo; errores históricos continúan explícitos. | P0 |
-| SIDE-013 | Cierres | Recuperar ciclos históricos ausentes | 🔴 Pendiente | F02: 26 huecos clasificados sin escritura; 2 candidatos, 11 sin evidencia, 3 para conciliar, 10 dependientes | Recuperación histórica independiente. No ejecutar automáticamente candidatos ni inventar planes/eventos. | P0 |
+| SIDE-011 | Cierres | Enrutar motor nuevo y legado sin transformar partidas | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | No se cambió el motor legado. El ajuste HTTP candidato no se desplegó. | P0 |
+| SIDE-012 | Cierres | Distinguir error económico de HTTP exitoso | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | Mantener monitoreo; errores históricos continúan explícitos. | P0 |
+| SIDE-013 | Cierres | Recuperar ciclos históricos ausentes | 🔴 Pendiente | F02: 26 huecos clasificados sin escritura; 2 candidatos, 11 sin evidencia, 3 para conciliar, 10 dependientes | Recuperación separada: 2 candidatos no equivalen a cierres académicos aprobados; 24 casos con evidencia/conciliación/dependencia pendiente. Ningún cierre recuperado. | P0 |
 | SIDE-014 | Estudiante | Admisión, código, identidad y reingreso | 🟡 Implementada, pendiente de validación | E07/E12: Auth local y pruebas de código; controles presentes | Recorrido actual con sesión real, transferencia autorizada y expulsión | P1 |
-| SIDE-015 | Estudiante | Guardar borradores y confirmar decisiones por ciclo | 🟡 Implementada, pendiente de validación | E05/E12: persistencia, cola y recuperación focales | E2E en red interrumpida; confirmar coincidencia con snapshot servidor | P1 |
-| SIDE-016 | Estudiante | Aislamiento entre empresas, salas y ciclos | 🟡 Implementada, pendiente de validación | E05/E07: guardias de identidad y pruebas locales | Pruebas negativas HTTP con dos docentes y estudiantes en revisión final | P0 |
-| SIDE-017 | Estudiante | Planificación, infraestructura y personal conservan decisiones | 🟡 Implementada, pendiente de validación | E05/E09: controles y DOP implementados | Validar navegación, edición y recarga sin cambios de opciones | P1 |
-| SIDE-018 | Estudiante | Logística: pedido, recepción parcial y faltantes | 🟡 Implementada, pendiente de validación | E07/E08: pruebas temporales locales; remoto 0 órdenes/0 recepciones | Activación explícita de nueva sala y recorrido con entregas verificadas | P1 |
+| SIDE-015 | Estudiante | Guardar borradores y confirmar decisiones por ciclo | ✅ Completada y verificada | F03: student_sync_ui: borrador, pérdida de respuesta, recarga y desconexión; Auth/Data API reales en 27 resultados; snapshot y cierre cotejados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-016 | Estudiante | Aislamiento entre empresas, salas y ciclos | ✅ Completada y verificada | F03: 54 negativos originales + 42 RPC cruzadas reales, tres lecturas autorizadas; navegador rechaza historia de otra empresa; teacher-boundary impide escalamiento de estudiante. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P0 |
+| SIDE-017 | Estudiante | Planificación, infraestructura y personal conservan decisiones | ✅ Completada y verificada | F03: regresión DOM preserva pestañas/edición/scroll, decisiones y metas; DOP en Planificación vigente; ninguna opción Ventas/Finanzas agregada o retirada. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-018 | Estudiante | Logística: pedido, recepción parcial y faltantes | ✅ Completada y verificada | F03: partial_receipt_http: recepción docente autenticada y repetida idempotente; meta 1000, hilo recibido 1500, producción 250; 27 cierres receipts-v1 conectados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-019 | Estudiante | Ventas por canal y distribución automática | 🟡 Implementada, pendiente de validación | E07/E08: FIFO, tiendas/web y límites locales | Probar varios canales desde formularios y cotejar cierre sellado | P1 |
 | SIDE-020 | Estudiante | Compatibilidad de transferencias manuales antiguas | 🟡 Implementada, pendiente de validación | E04: restablecidas y probadas; regresión manual pendiente E05 | Versionar/autorizar planes heredados; impedir vías manipuladas | P1 |
-| SIDE-021 | Estudiante | Finanzas: resumen, préstamo y caja visibles | 🟡 Implementada, pendiente de validación | E05/E08: vistas implementadas; casos focales | Validar decisión a cierre y reporte, incluidos límites y deuda | P1 |
-| SIDE-022 | Estudiante | Resultados provisionales y oficiales distinguibles | 🟡 Implementada, pendiente de validación | E04/E08: fuente sellada en rutas corregidas | Revisar todas las vistas y evitar ceros inventados/estimaciones oficiales | P1 |
+| SIDE-021 | Estudiante | Finanzas: resumen, préstamo y caja visibles | ✅ Completada y verificada | F03: 27 cierres HTTP con préstamo, deuda y caja arrastrados; estados visibles iguales al sello en las tres interfaces; límites negativos y suite financiera aprobados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-022 | Estudiante | Resultados provisionales y oficiales distinguibles | ✅ Completada y verificada | F03: tres interfaces cotejadas con historia oficial, recarga y rechazo cruzado; pendiente muestra estado sin importes definitivos; presentación y revisión focal aprobadas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-023 | Estudiante | Alertas, pausa, vencimiento y recuperación de conexión | 🟡 Implementada, pendiente de validación | E05/E12: backoff y sincronización probados focalmente | Comprobar interacción con nuevo reloj y servidor real | P1 |
-| SIDE-024 | Docente | Crear/configurar partidas y recuperar borrador | 🟡 Implementada, pendiente de validación | E12: lifecycle UI aprobado históricamente | Revalidar creación vigente con flags, espera y límites de ciclos | P1 |
+| SIDE-024 | Docente | Crear/configurar partidas y recuperar borrador | ✅ Completada y verificada | F03: creación por DOM real con docentes autenticados, tres/seis ciclos y receipts/packs; lifecycle y crear_partida de regresión aprobados; guardia de rol en SQL. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-025 | Docente | Controlar inicio, pausa, reanudación, cancelación y fin | 🟡 Implementada, pendiente de validación | E03/E12: controles y pruebas locales | Recorrido actual; cierres previos a avance y cancelación sin falso éxito | P1 |
 | SIDE-026 | Docente | Modos Manual, Aleatorio y Competencia equilibrada | 🟡 Implementada, pendiente de validación | E07/E11: modos experimentales y 27 cierres HTTP/Edge documentados | Probar cada modo por interfaz, persistencia y compatibilidad con catálogo vigente | P1 |
-| SIDE-027 | Docente | Comparar empresas y consultar resultados oficiales | 🟡 Implementada, pendiente de validación | E04/E06: modelo y consultas implementados | Conciliar Empresas/Resultados/Laboratorio en misma partida | P1 |
+| SIDE-027 | Docente | Comparar empresas y consultar resultados oficiales | ✅ Completada y verificada | F03: 27 resultados oficiales de las mismas empresas/ciclos cotejados Estudiante/Docente/Laboratorio; tabla docente y ciclos anteriores sin falsos pendientes. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-028 | Docente | Presencia, expulsión, liberación y podio | 🟡 Implementada, pendiente de validación | E12: servicios/pruebas históricas | Validar permisos y estado tras recarga/transferencia en versión final | P1 |
 | SIDE-029 | Docente | Historial, calificaciones y exportación PDF | 🟡 Implementada, pendiente de validación | E12/E08: servicios y pruebas presentes | Verificar exportación vigente contra cierre sellado y autorización | P1 |
 | SIDE-030 | Laboratorio | Modelo de indicadores solo desde cierres sellados | ✅ Completada y verificada | E06: 46 pruebas focales; fuente, ratios y ausencias explícitos | Sin nueva auditoría de fórmulas puras; integración en tarea 34 | P1 |
-| SIDE-031 | Laboratorio | Historial y reapertura con recarga de cierres | 🟡 Implementada, pendiente de validación | E04/E06: actualización implementada y focales | Validar aparición de cierres reales tras cerrar/reabrir | P1 |
+| SIDE-031 | Laboratorio | Historial y reapertura con recarga de cierres | ✅ Completada y verificada | F03: recarga de cada ciclo del alumno, reconsulta oficial del Laboratorio y reapertura de historial final; 3 y 6 ciclos conectados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-032 | Laboratorio | Comparaciones, gráficos y ausencia de ciclos futuros | ✅ Completada y verificada | E06: Chromium escritorio/tablet/móvil con fixtures y pruebas del modelo | Conservar casos; prueba conectada conjunta en tarea 34 | P2 |
 | SIDE-033 | Laboratorio | Escenarios numéricos compatibles sin mutar cierre | 🟡 Implementada, pendiente de validación | E06: producción sintética validada para versiones limitadas | Verificar recibos reales y límites; no prometer ventas/utilidad contrafactual | P2 |
-| SIDE-034 | Laboratorio | Continuidad integral de 3 y 6 ciclos, tres empresas | 🔴 Pendiente | E03/E05/E06: capas probadas por separado, no recorrido completo | Mismo Supabase, identidades, tres interfaces y conciliación por ciclo | P0 |
-| SIDE-035 | Laboratorio | Acceso de dos docentes y rechazo cruzado real | 🟡 Implementada, pendiente de validación | E06: RPC inspeccionada, sesión docente real pendiente | Login real, partida propia/ajena y comparación pantalla/RPC | P0 |
+| SIDE-034 | Laboratorio | Continuidad integral de 3 y 6 ciclos, tres empresas | ✅ Completada y verificada | F03: 9 + 18 resultados de 3 empresas; Auth, Edge real, PostgreSQL y tres interfaces; básico→estándar→prémium, finales manual/automático, pérdidas y beneficios. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P0 |
+| SIDE-035 | Laboratorio | Acceso de dos docentes y rechazo cruzado real | ✅ Completada y verificada | F03: dos docentes/dos estudiantes: HTTP autorizado propio y rechazo ajeno, 42 negativos adicionales; interfaz Lab cotejada con RPC real. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P0 |
 | SIDE-036 | Laboratorio | Simulación de versiones no soportadas y recepciones | 🔴 Pendiente | E06: barreras devuelven simulación no disponible | Ampliación futura, solo si se incluye en alcance académico | P3 |
-| SIDE-037 | Producción | Cálculo físico de capacidad y cuellos de botella | 🟡 Implementada, pendiente de validación | E09/E10: oráculos y focales; discrepancias actuales E05 | Resolver contratos y verificar mezcla/meta/capacidad con versión final | P1 |
-| SIDE-038 | Producción | Regla interna trabajador-máquina y puntaje de maquinaria | 🟡 Implementada, pendiente de validación | E08/E09: corrección utility-v1 y pruebas de vigencia | Verificar motor desplegado, historial y capacidad; sin nuevos controles UI | P1 |
-| SIDE-039 | Producción | Consumo, moldes, lotes, materiales y arrastre | 🟡 Implementada, pendiente de validación | E07/E08: FIFO y seis ciclos locales | Contraste integral final y casos límite de múltiples segmentos | P1 |
-| SIDE-040 | Producción | Diagnóstico exacto de materiales limitantes | 🟡 Implementada, pendiente de validación | E11: efe1483, 23 casos y 12 recomendaciones en combinación de ensayo | Parche aislado sobre main actual; temporalidad y paridad Edge | P1 |
+| SIDE-037 | Producción | Cálculo físico de capacidad y cuellos de botella | ✅ Completada y verificada | F03: Excel COM real: 9/9 comparaciones y oráculo aritmético independiente 19/19; recursos pareados, capacidad, mezcla secuencial y materiales. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-038 | Producción | Regla interna trabajador-máquina y puntaje de maquinaria | ✅ Completada y verificada | F03: fixture Excel corregido para tener dos mesas y dos cortadores: cada trabajador requiere su equipo; capacidad y puntaje no se sustituyeron; 19 pruebas independientes. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-039 | Producción | Consumo, moldes, lotes, materiales y arrastre | ✅ Completada y verificada | F03: 63 cierres PostgreSQL/Deno con ventas parciales/cero/totales y 27 HTTP receipts-v1; FIFO, consumo por SKU, saldos y centavos conciliados. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-040 | Producción | Diagnóstico exacto de materiales limitantes | ✅ Completada y verificada | F03: parche exclusivo efe1483 aplicado; faltante por cada producto en orden y empates correctos; 19 pruebas independientes, paquete Edge regenerado. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-041 | Producción | Recomendación integrada con recursos existentes | 🟡 Implementada, pendiente de validación | E09: seis órdenes de etapas y estimación factible | Comprobar advertencias, presupuesto y recepciones sin alterar meta | P1 |
 | SIDE-042 | Producción | Búsqueda acotada de compras de hilo | ✅ Completada y verificada | E09: alternativas enteras acotadas y casos documentados | No repetir búsqueda local; mantener aviso de que no prueba óptimo global | P2 |
 | SIDE-043 | Producción | Optimización global de personal/equipos/materiales | 🔴 Pendiente | E09: algoritmo acotado, no demuestra mínimo global | Mejora futura; no bloquear entrega si se rotula recomendación aproximada | P3 |
-| SIDE-044 | Producción | Presentaciones físicas y descuentos informativos | 🟡 Implementada, pendiente de validación | E11: side-packs-v1 en otra rama; pruebas parciales | Revisar versiones, migración y continuidad; evitar importar cambios económicos en bloque | P1 |
-| SIDE-045 | Finanzas | Costos, depreciación, mantenimiento y valorización | 🟡 Implementada, pendiente de validación | E08/E10: escenarios locales y oráculos históricos | Contrastar revisión actual y decisiones equivalentes; separar devengo/caja | P1 |
+| SIDE-044 | Producción | Presentaciones físicas y descuentos informativos | ✅ Completada y verificada | F03: 49 fuentes de instalación incluyen presentaciones atómicas; HTTP 3/6 ciclos usa excel-v2-packs-v1; parcial 1500 metros recibidos sin inventar recepciones. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-045 | Finanzas | Costos, depreciación, mantenimiento y valorización | ✅ Completada y verificada | F03: moldes no depreciables, mantenimiento opcional/automático y reparto exacto de centavos; 10 focales y 63 cierres PostgreSQL/Deno; 27 conciliaciones decimales. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-046 | Finanzas | Ingresos por lote, margen y costo de venta | 🟡 Implementada, pendiente de validación | E08: precio efectivo corregido y escenarios conciliados | Validar múltiples canales y ventas parciales desde interfaces | P1 |
 | SIDE-047 | Finanzas | Estados y caja conciliados seis ciclos en escenario local | ✅ Completada y verificada | E08: conciliador, recepciones, CxP e impuesto; límites expresos | No repetir ese escenario sin cambios; ampliar cobertura en tarea 34 | P1 |
-| SIDE-048 | Finanzas | Diagnóstico de balances históricos descuadrados | 🔴 Pendiente | E07: 12 de 75 resultados históricos; causa no determinada | Trazar origen/versiones y documentar impacto académico sin reescribir cierres | P0 |
-| SIDE-049 | Finanzas | Préstamo, línea aprobada e intereses devengados | 🟡 Implementada, pendiente de validación | E08: modelo y validación de monto; seis ciclos citados sin préstamo | Probar deudas sucesivas, tasa, arrastre y límites en cierre vigente | P1 |
+| SIDE-048 | Finanzas | Diagnóstico de balances históricos descuadrados | 🔴 Pendiente | F03: consulta actual identifica 12 resultados descuadrados: 9 md, 1 excel-v19 y 2 sin modelo; diferencias -272.87 a -13985.84; sumas internas de componentes coinciden. | Causa raíz individual histórica no resuelta; desajuste entre activo y pasivo/patrimonio no se explica solo por redondeo. No alterar sellos. | P0 |
+| SIDE-049 | Finanzas | Préstamo, línea aprobada e intereses devengados | ✅ Completada y verificada | F03: 27 resultados HTTP con préstamo inicial y deuda constante entre ciclos; límites de crédito negativos; intereses/devengo en 63 escenarios SQL; amortización distinta en SIDE-050. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-050 | Finanzas | Calendario de amortización y pago de intereses bancarios | 🔴 Pendiente | E08: no definido/implementado; intereses por pagar se acumulan | Definir regla académica, implementar luego y probar; conservar decisiones existentes | P1 |
-| SIDE-051 | Finanzas | Cobros a crédito, anticipos y obligaciones proveedor | 🟡 Implementada, pendiente de validación | E08: CxC/CxP y recepciones parciales conciliadas localmente | Verificar plazos, cobranzas y pagos en flujo real; documentar extensiones al Excel | P1 |
-| SIDE-052 | Finanzas | Impuesto en último ciclo de partidas de 3 y 6 | 🟡 Implementada, pendiente de validación | E03/E08: pruebas locales y casos de recuperación | Validar cierre final compartido y reflejo en tres vistas | P1 |
-| SIDE-053 | Finanzas | Proyección informativa sin guardar decisiones | 🟡 Implementada, pendiente de validación | E08: motor en copia, Chrome focal, filtro de caja agregado | Verificar ubicación actual, recepción y factibilidad temporal; no afirmar liquidez diaria | P1 |
+| SIDE-051 | Finanzas | Cobros a crédito, anticipos y obligaciones proveedor | ✅ Completada y verificada | F03: 3/6 ciclos reales con crédito proveedor y obligación a dos ciclos; recepción parcial idempotente; suite crédito/CxC/CxP y conciliación Decimal aprobadas. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-052 | Finanzas | Impuesto en último ciclo de partidas de 3 y 6 | ✅ Completada y verificada | F03: Decimal verifica impuesto acumulado solo ciclo final 3/6, MYPE y resultados negativos sin impuesto; cotejo de las tres vistas con mismo sello. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
+| SIDE-053 | Finanzas | Proyección informativa sin guardar decisiones | ✅ Completada y verificada | F03: avances concurrentes 606afd9/7da1ca5 preservados; proyección por producto/caja/comisiones sin mutación, merged-profit 11/11 y gate 177/177. | Hipótesis de demanda/recepción explícitas; no garantiza rentabilidad ni liquidez diaria. | P1 |
 | SIDE-054 | Finanzas | Calibración educativa utility-v1 y rentabilidad por segmento | 🟡 Implementada, pendiente de validación | E08: candidatos 120/150/280, competencia y recuperación locales | 3.000 escenarios competitivos financiables; aprobar supuestos y sensibilidad | P1 |
 | SIDE-055 | Finanzas | Reproducir casos históricos 41/15/4 y 360 combinaciones | ⚪ No verificable | E08: requerimiento previo sin reproducción acreditada | Localizar datos originales; evitar reconstrucción inventada; decidir vigencia del requisito | P2 |
 | SIDE-056 | Eventos | Inventario estático de 92 IDs únicos | ✅ Completada y verificada | E11: catálogo e inventario; 48 grupales y 44 individuales | Conservar inventario; no confundir con efectos completos | P2 |
@@ -325,33 +480,33 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 | SIDE-061 | Eventos | Restricciones de selección antes de iniciar partida | ✅ Completada y verificada | F02: trigger instalado y verificado; migración remota 20261102181550, fuente 20261102025853 | No altera selecciones existentes; costos no soportados siguen bloqueados. | P0 |
 | SIDE-062 | Eventos | Noticia privada y trazabilidad docente de aplicación | 🟡 Implementada, pendiente de validación | E11: UI y RPC experimentales, fixtures aprobados | Auth real y comprobante: programado/aplicado/no aplicado, sin filtración entre empresas | P1 |
 | SIDE-063 | Eventos | Equidad, duración, combinaciones y concurrencia | 🟡 Implementada, pendiente de validación | E11: rotación PE69 y ensayos de modos parciales | Eventos positivos/negativos/grupales distintos, seis ciclos y dos conexiones | P1 |
-| SIDE-064 | Eventos | Reconstrucción histórica sin resorteo ni datos inventados | 🟡 Implementada, pendiente de validación | F02: clasificación con motor original en transacciones revertidas; hashes de copia sin cambios | Revisión y eventual recuperación separadas; fuentes de eventos y saldos aún necesarias. | P0 |
+| SIDE-064 | Eventos | Reconstrucción histórica sin resorteo ni datos inventados | 🟡 Implementada, pendiente de validación | F02: clasificación con motor original en transacciones revertidas; hashes de copia sin cambios | Recuperación separada: 2 candidatos no equivalen a cierres académicos aprobados; 24 casos con evidencia/conciliación/dependencia pendiente. Ningún cierre recuperado. | P0 |
 | SIDE-065 | Supabase | RLS habilitado en tablas públicas inspeccionadas | ✅ Completada y verificada | E02: 20 tablas públicas con rowsecurity=true en consulta actual | No repetir comprobación de bandera; autorización efectiva en tareas 16/35/67 | P0 |
 | SIDE-066 | Supabase | RPC de guardado de cierre restringidas a servidor | ✅ Completada y verificada | E02: side_guardar_cierre_excel y negocio sin EXECUTE anon/authenticated | Cierra hallazgo antiguo de acceso directo; no acredita todas las rutas RPC | P0 |
-| SIDE-067 | Supabase | Auditar permisos SECURITY DEFINER y search_path | 🟡 Implementada, pendiente de validación | F02: 54 pruebas negativas reales; search_path fijo y escritores financieros server-only verificados en producción; migración 20261102181532 | Resta revisión contextual completa de otras RPC/política Auth; no bloquea este despliegue focal. | P0 |
-| SIDE-068 | Supabase | Reconstrucción completa de esquema/migraciones desde cero | 🟡 Implementada, pendiente de validación | F01: bootstrap reproducible de manifiestos y restauración real desde vacío con Auth, side_private y FK; commit d56806d. | Cadena histórica CLI completa todavía no normalizada; no confundir manifiesto de instalación probado con todas las migraciones antiguas. | P0 |
-| SIDE-069 | Supabase | Alinear migraciones nuevas con funciones instaladas | ✅ Completada y verificada | F02: SQL instalado y Edge v11 idéntica a los cuatro archivos de main de49d92; Pages success | Seguimiento instalado externamente conservado y versionado en el repositorio. | P0 |
+| SIDE-067 | Supabase | Auditar permisos SECURITY DEFINER y search_path | 🟡 Implementada, pendiente de validación | F03: 54+42 negativos reales, escalamiento docente reproducido/corregido, 13 RPC protegidas, rollback real. Asesores conservan avisos de endpoints privilegiados intencionales. | Revisión completa de RPC de lectura, privilegios de triggers y sesiones fuera de los endpoints probados; protección de contraseñas filtradas pendiente. | P0 |
+| SIDE-068 | Supabase | Reconstrucción completa de esquema/migraciones desde cero | 🟡 Implementada, pendiente de validación | F03: prepare_clean_install.py genera baseline CLI desde 49 fuentes preservadas; start desde vacío y db reset local aprobados; 23 tablas, 0 sin RLS, guardia docente y Cron inactivo. | Instalación limpia reproducible validada; resta normalizar o retirar la ambigüedad de toda la cadena SQL histórica sin aplicarla a una base existente. | P0 |
+| SIDE-069 | Supabase | Alinear migraciones nuevas con funciones instaladas | ✅ Completada y verificada | F03: main con motores preservados y Edge v13 (paquete nuevo sin alterar legacy); versión comprobada mediante descarga; SQL docente compatible y sin cambios económicos históricos. | Seguimiento instalado externamente conservado y versionado en el repositorio. | P0 |
 | SIDE-070 | Supabase | Cron y presencia de secreto de programación | ✅ Completada y verificada | F01: un job activo por minuto y Vault presente en producción; lectura sin invocación de partidas reales; commit d56806d. | Presencia comprobada; recuperación y operación aisladas en SIDE-071/072. | P0 |
 | SIDE-071 | Supabase | Operación autenticada cron→Edge→cierre y alertas | ✅ Completada y verificada | F01: cron real local -> pg_net -> Edge real HTTP 200/success; token inválido 401; programación restaurada inactiva; commit d56806d. | La operación remota conserva errores históricos económicos explícitos; no se confunden con éxito de cron. | P0 |
 | SIDE-072 | Supabase | Respaldo integral y restauración ensayada | ✅ Completada y verificada | F01: respaldo real de public/side_private/Auth/Vault; recuperación DPAPI, 155 cierres con hash idéntico y cron inactivo; commit d56806d. | DPAPI requiere esta cuenta/equipo; en otro host rotar token dedicado y probarlo antes de activar cron. Copias sensibles locales, no en Git. | P0 |
-| SIDE-073 | Supabase | Protección de contraseñas y sesiones | 🟡 Implementada, pendiente de validación | E02: asesor informa protección de filtradas desactivada; Auth local probado | Revisar política disponible, revocación/transferencia y sesiones vigentes | P1 |
+| SIDE-073 | Supabase | Protección de contraseñas y sesiones | 🟡 Implementada, pendiente de validación | F03: rol docente validado contra auth.users actual y correo confirmado; metadata editable y JWT previo no elevan permisos; protección de filtradas continúa desactivada. | Habilitar y verificar política de contraseñas disponible; cubrir revocación completa/transferencias y sesiones antiguas. | P1 |
 | SIDE-074 | Supabase | Rendimiento de consultas, índices y límites operativos | ⚪ No verificable | E05: backoff/interfaz; sin carga integral ni capacidad remota acreditada | Medir curso simultáneo, consultas y tiempos; umbrales de aceptación | P2 |
 | SIDE-075 | Interfaz | Parpadeos, foco y preservación de formularios | ✅ Completada y verificada | E05: main contiene 417b63d; log versionado 45/45 y comparación base | Conservar regresiones aprobadas; revisión integrada con servidor en tarea 34 | P1 |
-| SIDE-076 | Interfaz | Navegación estudiantil y separación DOP/Producción | 🟡 Implementada, pendiente de validación | E01/E09: main Planificación, rama DOP y Planificación; cambios locales adicionales | Consolidar diseño autorizado sin perder campos de Ventas/Finanzas | P1 |
+| SIDE-076 | Interfaz | Navegación estudiantil y separación DOP/Producción | ✅ Completada y verificada | F03: DOP/Planificación existente preservado; pruebas antiguas actualizadas a su ubicación aprobada; proyección abre sin guardar decisiones y navegación no pierde campos. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-077 | Interfaz | Adaptación escritorio, tablet y móvil | 🟡 Implementada, pendiente de validación | E05/E06: fixtures y carga estática en tamaños probados | Recorrido conectado, textos largos, zoom y formularios actuales | P2 |
 | SIDE-078 | Interfaz | Accesibilidad: teclado, lector y contraste | ⚪ No verificable | E06: no hay certificación completa de lector/contraste | Revisión focal de controles esenciales y errores | P2 |
-| SIDE-079 | Interfaz | Carga estática y disponibilidad de recursos | 🟡 Implementada, pendiente de validación | E01/E05: Pages publicado; checkout local con assets ausentes | Comprobar recursos de entrega y CDN/red real; no culpar al motor por checkout | P1 |
+| SIDE-079 | Interfaz | Carga estática y disponibilidad de recursos | ✅ Completada y verificada | F03: checkout íntegro, cero errores de recursos locales en 3/6 ciclos; npm ci reproducible y Pages de main; paquete público con directorios explícitos. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-080 | Interfaz/3D | Independencia económica de mundo 3D | ✅ Completada y verificada | E10/E11: pruebas focales de separación y no autoridad de ventas 3D | Mantener pruebas existentes; no rehacer lógica económica 3D | P1 |
 | SIDE-081 | Interfaz/3D | Entrada al mundo, reinicio, NPC y navegación | 🟡 Implementada, pendiente de validación | E10/E12: mejoras y 12/12 interiores; fallos históricos de entrada/reinicio | Clasificar estado actual y probar solo flujo incluido en entrega | P2 |
 | SIDE-082 | Interfaz/3D | Expansión Godot, navmesh, oclusión y perfiles de rendimiento | 🟡 Implementada, pendiente de validación | E12: QA local; cápsulas, navegación plana y una máquina | Mejora futura; comparar motor realmente entregado antes de invertir | P3 |
 | SIDE-083 | Excel | Paridad histórica de oráculos y escenarios guardados | ✅ Completada y verificada | E10: 3.104 salidas y auditoría original documentada; focales independientes | No repetir esos libros sin cambio de fórmula ni exigir paridad de versiones distintas | P1 |
-| SIDE-084 | Excel | Paridad actual 1–6 ciclos con mismas decisiones | 🔴 Pendiente | E05/E08/E10: seis comparaciones fallidas y no contraste completo worker/libro | Restaurar fuentes/COM; mapear versiones, adaptaciones y 1–6 ciclos | P1 |
-| SIDE-085 | Excel | Resolver reputación, puntajes, consumo y mercado discrepantes | 🔴 Pendiente | E05: fallos nominados en baseline; cambios utility-v1 intencionales | Separar defecto, expectativa obsoleta y nueva regla; preservar oráculo independiente | P1 |
+| SIDE-084 | Excel | Paridad actual 1–6 ciclos con mismas decisiones | 🟡 Implementada, pendiente de validación | F03: nueve comparaciones COM reales aprobadas, incluido arrastre tres ciclos; fuentes originales restauradas solo como copias locales. | Extender comparación Excel equivalente hasta seis ciclos; no confundir QA 6 ciclos del motor con paridad de libro completa. | P1 |
+| SIDE-085 | Excel | Resolver reputación, puntajes, consumo y mercado discrepantes | ✅ Completada y verificada | F03: Excel COM real 9/9, fixture de una mesa frente a dos cortadores corregido; bono prémium +2 y precio 350 reconocidos como regla vigente; mercado usa capacidad real. Commits b67fb62/3ebcdfe/ba36101. | Mantener regresión del alcance probado; no acredita funcionalidades futuras o reglas no definidas. | P1 |
 | SIDE-086 | Calidad | Prueba de concurrencia e idempotencia real ampliada | ✅ Completada y verificada | F01: dos llamadas Edge concurrentes por ciclo; PostgreSQL real Node/Edge, rollback, reintentos y 36 resultados incluidos legado; commit d56806d. | Mantener hashes y pruebas; concurrencia masiva y aceptación general quedan fuera del alcance probado. | P0 |
 | SIDE-087 | Despliegue | Publicación Pages de main | ✅ Completada y verificada | E02: run 41386402180 build y deploy success para c558d95 | No necesita repetir publicación; aceptación de aplicación en tareas 34/90 | P2 |
-| SIDE-088 | Despliegue | Pipeline de calidad previo a publicar y coordinación DB/Edge | 🔴 Pendiente | E02: workflow dinámico solo build/report/deploy; sin pruebas de producto | Puerta de regresión, contrato de versiones, rollback y comprobación posterior | P0 |
-| SIDE-089 | Documentación | Guías vigentes y alcance académico definitivo | 🟡 Implementada, pendiente de validación | E03–E12: guías e informes contradictorios por revisión/fecha | Unificar versión, instalación, roles, eventos soportados y límites económicos | P1 |
-| SIDE-090 | Entrega | Aceptación final reproducible de SIDE | 🔴 Pendiente | E03/E05/E08: no hay aprobación integral de versión actual | Cerrar P0/P1, ensayo académico y acta con SHA/SQL/Edge, sin fallos críticos | P0 |
+| SIDE-088 | Despliegue | Pipeline de calidad previo a publicar y coordinación DB/Edge | 🟡 Implementada, pendiente de validación | F03: quality-pages.yml; npm ci fijo, 166 contratos + PostgreSQL/Deno 63 cierres; CI de rama y main aprobada. Publicación actual Pages legacy, usuario GitHub write. | Propietario: cambiar Pages a GitHub Actions, variable SIDE_PAGES_ACTIONS=enabled; configurar checks requeridos. API de configuración devolvió 404; no simular puerta activa. | P0 |
+| SIDE-089 | Documentación | Guías vigentes y alcance académico definitivo | 🟡 Implementada, pendiente de validación | F03: README corregido: Cron real, motores, snapshots, instalación aislada y límites; se quitaron instrucciones contradictorias de aplicar v19 sobre base actual. | Unificar guías secundarias y fijar alcance académico de eventos, amortización, mejoras futuras y aceptación. | P1 |
+| SIDE-090 | Entrega | Aceptación final reproducible de SIDE | 🔴 Pendiente | E03/E05/E08: no hay aprobación integral de versión actual | P0/P1 restantes, semántica eventos, deuda histórica, política financiera y puerta Pages requieren cierre explícito. No declarar entrega integral. | P0 |
 
 ## Tareas terminadas, parciales, pendientes y no verificables
 
@@ -362,16 +517,37 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-003: Conciliar rama de cierre con main vigente.
 - SIDE-004: Sincronizar main local con revisión de entrega.
 - SIDE-005: Normalización local del runtime legado.
+- SIDE-006: Resolver regresión general en una sola revisión.
 - SIDE-007: Guardar cierres oficiales idempotentes en servidor.
 - SIDE-008: Impedir avance manual sin cierre de todas las empresas.
 - SIDE-009: Avance automático secuencial sin saltos.
 - SIDE-010: Respetar gracia de sincronización y reloj real de cada ciclo.
 - SIDE-011: Enrutar motor nuevo y legado sin transformar partidas.
 - SIDE-012: Distinguir error económico de HTTP exitoso.
+- SIDE-015: Guardar borradores y confirmar decisiones por ciclo.
+- SIDE-016: Aislamiento entre empresas, salas y ciclos.
+- SIDE-017: Planificación, infraestructura y personal conservan decisiones.
+- SIDE-018: Logística: pedido, recepción parcial y faltantes.
+- SIDE-021: Finanzas: resumen, préstamo y caja visibles.
+- SIDE-022: Resultados provisionales y oficiales distinguibles.
+- SIDE-024: Crear/configurar partidas y recuperar borrador.
+- SIDE-027: Comparar empresas y consultar resultados oficiales.
 - SIDE-030: Modelo de indicadores solo desde cierres sellados.
+- SIDE-031: Historial y reapertura con recarga de cierres.
 - SIDE-032: Comparaciones, gráficos y ausencia de ciclos futuros.
+- SIDE-034: Continuidad integral de 3 y 6 ciclos, tres empresas.
+- SIDE-035: Acceso de dos docentes y rechazo cruzado real.
+- SIDE-037: Cálculo físico de capacidad y cuellos de botella.
+- SIDE-038: Regla interna trabajador-máquina y puntaje de maquinaria.
+- SIDE-039: Consumo, moldes, lotes, materiales y arrastre.
+- SIDE-040: Diagnóstico exacto de materiales limitantes.
 - SIDE-042: Búsqueda acotada de compras de hilo.
+- SIDE-044: Presentaciones físicas y descuentos informativos.
+- SIDE-045: Costos, depreciación, mantenimiento y valorización.
 - SIDE-047: Estados y caja conciliados seis ciclos en escenario local.
+- SIDE-049: Préstamo, línea aprobada e intereses devengados.
+- SIDE-051: Cobros a crédito, anticipos y obligaciones proveedor.
+- SIDE-052: Impuesto en último ciclo de partidas de 3 y 6.
 - SIDE-056: Inventario estático de 92 IDs únicos.
 - SIDE-057: Fuente autoritativa, programación y recuperación de sorteos.
 - SIDE-061: Restricciones de selección antes de iniciar partida.
@@ -382,44 +558,29 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-071: Operación autenticada cron→Edge→cierre y alertas.
 - SIDE-072: Respaldo integral y restauración ensayada.
 - SIDE-075: Parpadeos, foco y preservación de formularios.
+- SIDE-076: Navegación estudiantil y separación DOP/Producción.
+- SIDE-079: Carga estática y disponibilidad de recursos.
 - SIDE-080: Independencia económica de mundo 3D.
 - SIDE-083: Paridad histórica de oráculos y escenarios guardados.
+- SIDE-085: Resolver reputación, puntajes, consumo y mercado discrepantes.
 - SIDE-086: Prueba de concurrencia e idempotencia real ampliada.
 - SIDE-087: Publicación Pages de main.
+
+- SIDE-053: Proyección informativa sin guardar decisiones.
 
 ### 🟡 Implementada, pendiente de validación
 
 - SIDE-014: Admisión, código, identidad y reingreso.
-- SIDE-015: Guardar borradores y confirmar decisiones por ciclo.
-- SIDE-016: Aislamiento entre empresas, salas y ciclos.
-- SIDE-017: Planificación, infraestructura y personal conservan decisiones.
-- SIDE-018: Logística: pedido, recepción parcial y faltantes.
 - SIDE-019: Ventas por canal y distribución automática.
 - SIDE-020: Compatibilidad de transferencias manuales antiguas.
-- SIDE-021: Finanzas: resumen, préstamo y caja visibles.
-- SIDE-022: Resultados provisionales y oficiales distinguibles.
 - SIDE-023: Alertas, pausa, vencimiento y recuperación de conexión.
-- SIDE-024: Crear/configurar partidas y recuperar borrador.
 - SIDE-025: Controlar inicio, pausa, reanudación, cancelación y fin.
 - SIDE-026: Modos Manual, Aleatorio y Competencia equilibrada.
-- SIDE-027: Comparar empresas y consultar resultados oficiales.
 - SIDE-028: Presencia, expulsión, liberación y podio.
 - SIDE-029: Historial, calificaciones y exportación PDF.
-- SIDE-031: Historial y reapertura con recarga de cierres.
 - SIDE-033: Escenarios numéricos compatibles sin mutar cierre.
-- SIDE-035: Acceso de dos docentes y rechazo cruzado real.
-- SIDE-037: Cálculo físico de capacidad y cuellos de botella.
-- SIDE-038: Regla interna trabajador-máquina y puntaje de maquinaria.
-- SIDE-039: Consumo, moldes, lotes, materiales y arrastre.
-- SIDE-040: Diagnóstico exacto de materiales limitantes.
 - SIDE-041: Recomendación integrada con recursos existentes.
-- SIDE-044: Presentaciones físicas y descuentos informativos.
-- SIDE-045: Costos, depreciación, mantenimiento y valorización.
 - SIDE-046: Ingresos por lote, margen y costo de venta.
-- SIDE-049: Préstamo, línea aprobada e intereses devengados.
-- SIDE-051: Cobros a crédito, anticipos y obligaciones proveedor.
-- SIDE-052: Impuesto en último ciclo de partidas de 3 y 6.
-- SIDE-053: Proyección informativa sin guardar decisiones.
 - SIDE-054: Calibración educativa utility-v1 y rentabilidad por segmento.
 - SIDE-058: Aplicación de demanda histórica y movimientos de caja.
 - SIDE-062: Noticia privada y trazabilidad docente de aplicación.
@@ -428,27 +589,22 @@ Prioridades: **P0** impide funcionamiento/cierre o publicación segura; **P1** f
 - SIDE-067: Auditar permisos SECURITY DEFINER y search_path.
 - SIDE-068: Reconstrucción completa de esquema/migraciones desde cero.
 - SIDE-073: Protección de contraseñas y sesiones.
-- SIDE-076: Navegación estudiantil y separación DOP/Producción.
 - SIDE-077: Adaptación escritorio, tablet y móvil.
-- SIDE-079: Carga estática y disponibilidad de recursos.
 - SIDE-081: Entrada al mundo, reinicio, NPC y navegación.
 - SIDE-082: Expansión Godot, navmesh, oclusión y perfiles de rendimiento.
+- SIDE-084: Paridad actual 1–6 ciclos con mismas decisiones.
+- SIDE-088: Pipeline de calidad previo a publicar y coordinación DB/Edge.
 - SIDE-089: Guías vigentes y alcance académico definitivo.
 
 ### 🔴 Pendiente
 
-- SIDE-006: Resolver regresión general en una sola revisión.
 - SIDE-013: Recuperar ciclos históricos ausentes.
-- SIDE-034: Continuidad integral de 3 y 6 ciclos, tres empresas.
 - SIDE-036: Simulación de versiones no soportadas y recepciones.
 - SIDE-043: Optimización global de personal/equipos/materiales.
 - SIDE-048: Diagnóstico de balances históricos descuadrados.
 - SIDE-050: Calendario de amortización y pago de intereses bancarios.
 - SIDE-059: Efectos de costos históricos no verificables.
 - SIDE-060: Semántica económica completa de los 92 eventos.
-- SIDE-084: Paridad actual 1–6 ciclos con mismas decisiones.
-- SIDE-085: Resolver reputación, puntajes, consumo y mercado discrepantes.
-- SIDE-088: Pipeline de calidad previo a publicar y coordinación DB/Edge.
 - SIDE-090: Aceptación final reproducible de SIDE.
 
 ### ⚪ No verificable
