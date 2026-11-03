@@ -61,6 +61,7 @@ function showScreen(id){
   renderCyclePause(lastPauseState===true);
   if(id!=='tutorial')window.stopSIDETutorial?.($('tutorialMount')?.querySelector('.tutorial-shell'));
   syncWaitingTutorial();
+  window.SIDE_PLAN_ASSISTANT?.refresh();
   return id;
 }
 let modalTrigger = null;
@@ -265,6 +266,7 @@ function renderCyclePause(paused){
   }
   notice.classList.toggle('is-visible',visible);
   notice.setAttribute('aria-hidden',String(!visible));
+  window.SIDE_PLAN_ASSISTANT?.refresh();
 }
 let cancellationShown=false;
 const STUDENT_EXPULSION_MESSAGE='Tu empresa fue eliminada de la partida por inactividad. Contacta a tu profesor si necesitas volver a participar.';
@@ -1041,6 +1043,7 @@ window.addEventListener('resize',updateDecisionLayout);
 document.fonts?.ready.then(updateDecisionLayout);
 function scrollDecisionContentToTop(){const scroller=$('decisionFormScroll');if(scroller)scroller.scrollTop=0;}
 function renderTabs(){
+  window.SIDE_PLAN_ASSISTANT?.refresh();
   const nav=$('decisionTabs');
   const categories=navigationCategories(),keys=new Set(categories.map(c=>c.cat));
   nav.querySelectorAll('.decision-tab').forEach(button=>{if(!keys.has(button.dataset.cat))button.remove();});
@@ -1327,6 +1330,7 @@ function changeStaff(itemId,store,delta){const item=findDecisionItem(itemId),d=i
 function setLoan(itemId,value,rerender=false){const item=findDecisionItem(itemId),max=loanMaximum(),d=initDraft(item);d.amount=Math.max(0,Math.min(max,Number(value)||0));if(rerender)renderDecisionCategory()}
 function updateRowCost(itemId){const row=document.querySelector(`[data-item="${itemId}"] .row-cost`),item=findDecisionItem(itemId);if(!row)return;const cost=computeItemCost(item);row.textContent=cost>0?`${item.mandatoryFixed?'Costo obligatorio':'Costo actual'}: ${money(cost)}`:cost<0?`Ingreso por liquidación: ${money(Math.abs(cost))}`:'Sin salida de caja'}
 function updateSectionCost(){
+  window.SIDE_PLAN_ASSISTANT?.refresh();
   const locked=cycleDecisionsLocked()||sectionSubmitted(currentCategory);
   const net=categoryDraftNet(currentCategory),old=Number(cashLedger[sectionLedgerKey(currentCategory)]||0),delta=net-old,projected=projectedCash();
   $('sectionDraftCost').textContent=delta<0?`Gastado: ${money(Math.abs(delta))}`:delta>0?`Ingreso previsto: +${money(delta)}`:'Sin cambios pendientes';
@@ -2096,3 +2100,16 @@ window.addEventListener('offline',()=>{
   if(studentSyncPending())showStudentSyncStatus('pending',{code:'FETCH_ERROR',error:'Sin conexión con el servidor.'});
 });
 if(supabaseClient)supabaseClient.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT')showScreen('profiles')});
+
+// Read-only adapter: the assistant uses the current scoped drafts and the existing production engine.
+window.SIDE_PLAN_ASSISTANT?.connect({
+  read(includePlan){
+    const round=currentRound(),verified=!currentStudent.empresaId||Boolean(authoritativeStudentState&&authoritativeStudentState.empresaId===currentStudent.empresaId&&authoritativeStudentState.gameId===currentStudent.game?.id&&authoritativeStudentState.code===admissionCode(currentStudent.game?.codigo)&&studentProgressHydrated&&!studentSessionRecovering);
+    const context=includePlan&&verified&&(!temporalStudentRoom()||validStudentMaterialBook())?decisionModelContext():null;
+    return {identity:JSON.stringify([currentStudent.game?.id,currentStudent.game?.codigo,currentStudent.empresaId,currentStudent.company,round]),round,company:currentStudent.company,category:currentCategory,
+      provisional:['B','C','F'].some(cat=>['draft','saved'].includes(decisionSectionStatus(cat))),
+      visible:!$('decisionMenu').classList.contains('hidden'),verified,
+      context,plan:context?window.SIDE_PRODUCTION_MODEL.calculate(context):null};
+  },
+  navigate(){currentCategory='DOP';renderTabs();renderDecisionCategory();scrollDecisionContentToTop();document.querySelector('.decision-tab.active')?.focus({preventScroll:true});}
+});
