@@ -13,8 +13,8 @@ def req(path,args,token=None):
   try:body=json.loads(body)
   except ValueError:body=body.decode()
   return e.code,body
-def session():
- email=uuid.uuid4().hex+'@example.invalid';password=uuid.uuid4().hex+'Aa1!'
+def session(domain="example.invalid"):
+ email=uuid.uuid4().hex+'@'+domain;password=uuid.uuid4().hex+'Aa1!'
  assert req('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True},status['SERVICE_ROLE_KEY'])[0]==200
  return req('/auth/v1/token?grant_type=password',{'email':email,'password':password})[1]
 def sql(q):return subprocess.check_output(['docker','exec','supabase_db_fase01local','psql','-U','postgres','-Atq','-v','ON_ERROR_STOP=1','-c',q],encoding='utf8').strip()

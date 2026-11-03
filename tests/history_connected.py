@@ -26,11 +26,11 @@ if os.environ.get('SIDE_INTEGRAL_ECONOMY'):
 def req(path,payload,token=None):
  r=urllib.request.Request(BASE+path,data=json.dumps(payload).encode(),headers={'apikey':KEY,'Authorization':'Bearer '+(token or KEY),'Content-Type':'application/json'})
  with urllib.request.urlopen(r) as f:return json.load(f)
-def qa_session():
+def qa_session(teacher=False):
  if not os.environ.get('SIDE_INTEGRAL_ECONOMY'):return req('/auth/v1/signup',{})
  # Permanent QA identities avoid exhausting anonymous sign-up quotas across reruns.
  # Actual Auth JWTs and all role/ownership checks remain enabled.
- identity=uuid.uuid4().hex;email='side-qa-'+identity+'@example.invalid';password=uuid.uuid4().hex+'Aa1!'
+ identity=uuid.uuid4().hex;email='side-qa-'+identity+('@upch.pe' if teacher else '@example.invalid');password=uuid.uuid4().hex+'Aa1!'
  req('/auth/v1/admin/users',{'email':email,'password':password,'email_confirm':True},status['SERVICE_ROLE_KEY'])
  return req('/auth/v1/token?grant_type=password',{'email':email,'password':password})
 
@@ -86,7 +86,7 @@ with sync_playwright() as p:
   for count,mode in [(3,'manual'),(6,'automatic')]:
    if os.environ.get('HISTORY_LEGACY') and mode!='manual':continue
    if os.environ.get('HISTORY_SCENARIO') and int(os.environ['HISTORY_SCENARIO'])!=count:continue
-   teacher=qa_session();uid=teacher['user']['id'];sql(f"insert into profesores(id,nombre,apellido) values ('{uid}','Historia','QA') on conflict do nothing")
+   teacher=qa_session(True);uid=teacher['user']['id'];sql(f"insert into profesores(id,nombre,apellido) values ('{uid}','Historia','QA') on conflict do nothing")
    options={'viewport':{'width':1366,'height':900}}
    if not os.environ.get('SIDE_FASE01_WORK'):options['record_video_dir']=str(OUT/f'video-{count}')
    ctx=browser.new_context(**options)

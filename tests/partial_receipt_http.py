@@ -3,7 +3,7 @@ from pathlib import Path
 # Reuse transport definitions only; do not execute the separate access scenario.
 exec(Path(__file__).with_name('access_matrix_http.py').read_text(encoding='utf-8-sig').split('t,other,a,b=')[0])
 sql("update partidas set configuracion=configuracion||'{\"runtime\":{\"phase\":\"cancelled\"}}'::jsonb where nombre='QA Partial real HTTP'")
-teacher,student=session(),session();gid=str(uuid.uuid4())
+teacher,student=session("upch.pe"),session();gid=str(uuid.uuid4())
 config={'lifecycleVersion':2,'cycles':1,'roundHours':0,'roundMinutes':1,'cycleCloseMode':'manual','integrationDurationMinutes':5,'materialRulesVersion':'receipts-v1','materialPurchaseVersion':'excel-v2-packs-v1','materialLeadTimeDays':0,'materialPaymentMode':'credit','supplierCreditTermCycles':2,'deliveryPolicy':'explicit_provider_event_v1','enabledEvents':[],'capital':1000000}
 sql(f"insert into profesores(id,nombre,apellido) values('{teacher['user']['id']}','QA','Partial') on conflict do nothing")
 game=json.loads(sql(f"insert into partidas(id,profesor_id,nombre,configuracion) values('{gid}','{teacher['user']['id']}','QA Partial real HTTP','{json.dumps(config)}') returning row_to_json(partidas)"))
@@ -23,7 +23,7 @@ for o in orders:
  code_,receipt=rpc('side_registrar_entrega_proveedor_v1',args,teacher);assert code_==200 and receipt.get('receiptId')==args['p_receipt_id'],receipt
  code_,retry=rpc('side_registrar_entrega_proveedor_v1',args,teacher);assert code_==200 and retry.get('reused'),retry
 control=rpc('controlar_partida',{'p_partida_id':gid,'p_accion':'cerrar','p_expected_round':1},teacher);assert control[0]==200 and not control[1].get('error'),control
-run=str(uuid.uuid4());sql(f"insert into side_closure_execution_requests(run_id,request_id) values('{run}',-1)")
+run=str(uuid.uuid4());sql(f"insert into side_closure_execution_requests(run_id,request_id) values('{run}',{-int(uuid.UUID(run).int%(2**60))})")
 r=urllib.request.Request(BASE+'/functions/v1/side-business-close',data=json.dumps({'run_id':run}).encode(),headers={'Content-Type':'application/json','x-side-cron-token':'fase01-local-only'})
 try:
  with urllib.request.urlopen(r) as response:out=json.load(response)
