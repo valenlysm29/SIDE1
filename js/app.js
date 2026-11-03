@@ -1152,7 +1152,8 @@ function refreshProductionDop(){
 }
 
 function profitProjectionPanel(){
-  return '<section class="decision-row profit-diagnostic"><h3>Proyección de rentabilidad</h3><p>Revisa tu plan antes de confirmar. Es una estimación, no un cierre oficial; puedes continuar aunque proyecte una pérdida.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section>';
+  // La proyección permanece interna y no se presenta al estudiante.
+  return '';
 }
 function showProfitProjection(){
   const candidate=arguments[0],mount=candidate?.matches?.('[data-profit-projection]')?candidate:document.querySelector('[data-profit-projection]');if(!mount)return;
