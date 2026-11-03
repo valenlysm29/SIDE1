@@ -1,0 +1,126 @@
+✔ standard formulas, positive income, losses and zero sales use 29.5% only on profits (6.0505ms)
+✔ unused MP and unsold finished goods stay capitalized; assets do not become expenses (2.5527ms)
+✔ no sales create no COGS, no commission, and preserve all finished goods (0.416ms)
+✔ idle labor and depreciation are expenses, not production or inventory (0.7001ms)
+✔ TEA uses effective monthly compounding and loan principal stays outside revenue (1.0948ms)
+✔ restoring and reading historical receipts is deterministic and does not mutate state (2.1733ms)
+✔ closed financial snapshots resist later ledger and policy changes (1.0545ms)
+✔ unconfirmed material section never creates an inventory asset (0.4716ms)
+✔ warranty uses source rates and explicit v19 180-day assumption (1.6331ms)
+✔ migrated MP aggregate is consumed using explicit opening quantities (0.9011ms)
+✔ paga parcialmente un vencimiento solo hasta la caja y conserva el saldo (0.8534ms)
+✔ cierre contado con hilo pendiente: anticipo, stock cero, rollback y reintento (3753.4341ms)
+✔ v19 deterministic closure uses actual stock, segment eligibility and chosen price (23.2625ms)
+✔ v19 equal prices give price score 100 and preserve unserved demand (17.9785ms)
+✔ la calidad premium modifica el precio efectivo conservando el precio base (3.0135ms)
+✔ v19 price validation and nonnegative price score (1.9658ms)
+✔ v19 three cycles four companies have sales, receivables collect next cycle, retries reuse (109.3212ms)
+✔ v19 physical resource failures report no production (5.1097ms)
+✔ physical capacity follows the document without catalog score penalties (1.874ms)
+✔ v19 reconstructed cost sections survive authoritative financial recalculation (8.2431ms)
+✔ v19 asset depreciation reads real UI purchases history without synthetic quantities (5.1988ms)
+CIERRE_CREDITO_QA {"producido":100,"recibidoHilo":1300,"pendienteHilo":1300,"cxp":14352,"vencimiento":2,"cajaInicial":200000,"cajaFinal":204916.14,"ventas":35000,"costoVentas":13503.78,"utilidad":16094.76}
+✔ crédito parcial: recepción crea CxP sin pagar compra; Node y Edge cierran igual (3861.4923ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":35000,"cxc":7000,"cajaInicial":200000,"cajaFinal":206704.45,"costoVentas":13503.78,"utilidad":17883.07,"impuesto":0},{"ciclo":2,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"valorMP":418.6,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":33250,"cxc":8312.5,"cajaInicial":206704.45,"cajaFinal":215621.9,"costoVentas":13085.18,"utilidad":16569.17,"impuesto":0},{"ciclo":3,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":5,"hilo_ref":0,"hilo_std":65,"cuero_std":0,"hilo_prem":0,"cuero_prem":3.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"valorMP":879.87,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":9975,"cajaInicial":215621.9,"cajaFinal":236149.35,"costoVentas":13490.51,"utilidad":16163.84,"impuesto":0},{"ciclo":4,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":10,"hilo_ref":0,"hilo_std":130,"cuero_std":0,"hilo_prem":0,"cuero_prem":7,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"valorMP":1322.71,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":11637.5,"cajaInicial":236149.35,"cajaFinal":250248.8,"costoVentas":13508.94,"utilidad":16145.41,"impuesto":0},{"ciclo":5,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":15,"hilo_ref":0,"hilo_std":195,"cuero_std":0,"hilo_prem":0,"cuero_prem":10.5,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"valorMP":1763.95,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":13300,"cajaInicial":250248.8,"cajaFinal":264348.25,"costoVentas":13510.54,"utilidad":16143.81,"impuesto":0},{"ciclo":6,"producido":95,"vendido":95,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":95,"hilo_ref":0,"hilo_std":1235,"cuero_std":0,"hilo_prem":0,"cuero_prem":66.5,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":20,"hilo_ref":0,"hilo_std":260,"cuero_std":0,"hilo_prem":0,"cuero_prem":14,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":25,"hilo_ref":0,"hilo_std":325,"cuero_std":0,"hilo_prem":0,"cuero_prem":17.5,"cuero_sint":0},"valorMP":2204.99,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":33250,"cxc":14962.5,"cajaInicial":264348.25,"cajaFinal":265315.77,"costoVentas":13510.74,"utilidad":3011.68,"impuesto":13131.93}]
+✔ 6 ciclos credit anterior: arrastran stock y liquidan obligaciones sin duplicación (3277.0517ms)
+CICLOS_ACTIVOS_CREDIT_6 [{"ciclo":1,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":1300},"recibido":{"acc_prem":200,"hilo_std":1300,"cuero_prem":140},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{},"stockFinal":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"valorMP":5980,"anticipos":0,"cxpInicial":0,"cxpNueva":14352,"pago":0,"cxpFinal":14352,"inventarioPT":0,"ventas":28000,"cxc":5600,"cajaInicial":200000,"cajaFinal":201174.45,"costoVentas":13503.78,"utilidad":10953.07,"impuesto":0},{"ciclo":2,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"hilo_std":1300},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":14352,"cxpNueva":2392,"pago":14352,"cxpFinal":2392,"inventarioPT":0,"ventas":28000,"cxc":7000,"cajaInicial":201174.45,"cajaFinal":204806.9,"costoVentas":13503.78,"utilidad":10953.07,"impuesto":0},{"ciclo":3,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":2392,"cxpNueva":8820,"pago":2392,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":8400,"cajaInicial":204806.9,"cajaFinal":220399.35,"costoVentas":13951.78,"utilidad":10505.07,"impuesto":0},{"ciclo":4,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":9800,"cajaInicial":220399.35,"cajaFinal":229563.8,"costoVentas":13951.78,"utilidad":10505.07,"impuesto":0},{"ciclo":5,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":11200,"cajaInicial":229563.8,"cajaFinal":238728.25,"costoVentas":13951.78,"utilidad":10505.07,"impuesto":0},{"ciclo":6,"producido":100,"vendido":100,"pedidosPendientes":{"CUERO":0,"ACCESORIOS":0,"HILO":0},"recibido":{"acc_prem":100,"hilo_std":1300,"cuero_prem":70},"consumido":{"acc_eco":0,"acc_prem":100,"hilo_ref":0,"hilo_std":1300,"cuero_std":0,"hilo_prem":0,"cuero_prem":70,"cuero_sint":0},"stockInicial":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"stockFinal":{"acc_eco":0,"acc_prem":0,"hilo_ref":0,"hilo_std":0,"cuero_std":0,"hilo_prem":0,"cuero_prem":0,"cuero_sint":0},"valorMP":0,"anticipos":0,"cxpInicial":8820,"cxpNueva":8820,"pago":8820,"cxpFinal":8820,"inventarioPT":0,"ventas":28000,"cxc":12600,"cajaInicial":238728.25,"cajaFinal":241500.06,"costoVentas":13951.78,"utilidad":4112.43,"impuesto":6392.64}]
+✔ 6 ciclos credit utility-v1: arrastran stock y liquidan obligaciones sin duplicación (3272.973ms)
+✔ edge empaquetada y servidor producen idéntico cierre financiero y lotes (125.7514ms)
+✔ Node y Edge aplican igual la puntuación y los precios versionados (17.3314ms)
+✔ Node y Edge rechazan por igual un cierre temporal sin persistencia verificable (1.212ms)
+✔ Node y Edge rechazan presentaciones sin integración autoritativa (1.1135ms)
+✔ molde no depreciable: producción 0, ventas 0 (3.9597ms)
+✔ molde no depreciable: producción 10, ventas 0 (0.3219ms)
+✔ molde no depreciable: producción 10, ventas 4 (0.2966ms)
+✔ molde no depreciable: producción 10, ventas 10 (0.4784ms)
+✔ la marca se respeta con métodos acelerado y por unidades; sin marca conserva depreciación (0.9118ms)
+✔ el cierre real congelado permanece idéntico y el contrafactual solo cambia devengo (7.5855ms)
+✔ mantenimiento opcional y automático son independientes, con deduplicación del automático antiguo (29.1622ms)
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (11.0927ms)
+✖ corrected actual consumption gives exact reputation and quality factors (5.3644ms)
+✔ advertising is capped, debited once and contributes only its reputation factor (7.6787ms)
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (19.7958ms)
+✔ MYPE and No MYPE labor, acquisition and maintenance follow the two source columns (0.752ms)
+✔ base maintenance recurs in the engine while the optional decision keeps its original fee (17.2602ms)
+✔ the engine retains all owned mold types without adding a multi-purchase control (1.1746ms)
+✔ largest remainders preserve the market and are independent of input order (27.7647ms)
+✔ price guards support identical prices, arbitrary chosen prices and zero total scores (1.1095ms)
+✔ opening finished stock sells without new labor, material or production plan (3.7575ms)
+✔ unused premium purchases do not raise reputation; all thread levels form its denominator (1.0873ms)
+✔ sub-cent physical material balances survive repeated closures (3.0692ms)
+✔ unsold production costs remain in inventory and sold costs are recognized once (6.0461ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 45
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10804.4837
+
+✖ failing tests:
+
+test at tests\md_logic.test.cjs:14:1
+✖ document example: matrix, all N3 efficiency, 30 days and sequential production (11.0927ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    [
+  +   8,
+  -   14,
+      31.4,
+      24
+    ]
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\md_logic.test.cjs:15:72)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 8, 31.4, 24 ],
+    expected: [ 14, 31.4, 24 ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:18:1
+✖ corrected actual consumption gives exact reputation and quality factors (5.3644ms)
+  AssertionError [ERR_ASSERTION]: 0 != 2.119565217391304
+      at near (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\md_logic.test.cjs:6:65)
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\md_logic.test.cjs:19:43)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests\md_logic.test.cjs:26:1
+✖ full closure preserves chosen prices, inventory balances and corrected MP valuation (19.7958ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  221 !== 368
+
+      at TestContext.<anonymous> (C:\Users\Asus\OneDrive\Documentos\side_side_va\SIDE1\tests\md_logic.test.cjs:27:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 221,
+    expected: 368,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

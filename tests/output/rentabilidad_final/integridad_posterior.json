@@ -1,0 +1,8 @@
+{
+  "method": "remote read-only dump, temporary local table, PostgreSQL md5(cierre::text)",
+  "baseline": 159,
+  "current": 159,
+  "unchanged": 159,
+  "added": 0,
+  "changed": 0
+}

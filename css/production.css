@@ -818,3 +818,17 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   #decisionMenu .decision-tabs { scroll-behavior: auto; }
 }
+.profit-diagnostic { border-inline-start: 3px solid var(--side-gold, #ffd329); min-width: 0; }
+.profit-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); gap: 12px 24px; }
+.profit-metrics div { padding-block: 8px; border-bottom: 1px solid var(--side-line,#294358); }
+.profit-metrics dt { color: var(--side-text-muted,#a3b8c9); font-size: .86rem; }
+.profit-metrics dd { margin: 4px 0 0; font-weight: 600; }
+.profit-reasons { padding-inline-start: 22px; }
+.profit-reasons li { margin-block: 8px; }
+.profit-price-table { max-width: 100%; overflow-x: auto; margin-block: 16px; }
+.profit-price-table table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.profit-price-table caption { text-align: start; padding-block: 8px; color: var(--side-text-muted,#a3b8c9); }
+.profit-price-table th,.profit-price-table td { padding: 9px 12px; text-align: end; white-space: nowrap; border-bottom: 1px solid var(--side-line,#294358); }
+.profit-price-table th:first-child { text-align: start; }
+.profit-diagnostic details { margin-block: 14px; }
+.profit-diagnostic summary { cursor: pointer; }

@@ -1,0 +1,106 @@
+[
+  {
+    "cycles": 3,
+    "mode": "manual",
+    "game": "515b5905-7508-455c-8ff9-3eea0baa3cd3",
+    "workerVersion": "1",
+    "checks": [
+      {
+        "cycle": 1,
+        "confirmedCompanies": 3,
+        "produced": 430,
+        "sold": 430,
+        "cash": 89963.63,
+        "immutableClosures": 3
+      },
+      {
+        "cycle": 2,
+        "confirmedCompanies": 3,
+        "produced": 430,
+        "sold": 430,
+        "cash": 114034.26,
+        "immutableClosures": 6
+      },
+      {
+        "cycle": 3,
+        "confirmedCompanies": 3,
+        "produced": 140,
+        "sold": 140,
+        "cash": 118842.04,
+        "immutableClosures": 9
+      }
+    ],
+    "producedTotal": 1000,
+    "soldTotal": 1000,
+    "finalCash": 118842.04,
+    "profit": 57501.65,
+    "nodeDenoPostgresEqual": true,
+    "pageErrors": [],
+    "failedLocalResources": [],
+    "blockedHistoricalGame": null
+  },
+  {
+    "cycles": 6,
+    "mode": "automatic",
+    "game": "877d79a1-cd11-492b-a8ea-f92e32f10198",
+    "workerVersion": "1",
+    "checks": [
+      {
+        "cycle": 1,
+        "confirmedCompanies": 3,
+        "produced": 150,
+        "sold": 150,
+        "cash": 94708.03,
+        "immutableClosures": 3
+      },
+      {
+        "cycle": 2,
+        "confirmedCompanies": 3,
+        "produced": 142,
+        "sold": 142,
+        "cash": 99268.66,
+        "immutableClosures": 6
+      },
+      {
+        "cycle": 3,
+        "confirmedCompanies": 3,
+        "produced": 200,
+        "sold": 200,
+        "cash": 95239.05,
+        "immutableClosures": 9
+      },
+      {
+        "cycle": 4,
+        "confirmedCompanies": 3,
+        "produced": 190,
+        "sold": 190,
+        "cash": 102251.68,
+        "immutableClosures": 12
+      },
+      {
+        "cycle": 5,
+        "confirmedCompanies": 3,
+        "produced": 150,
+        "sold": 150,
+        "cash": 98505.73,
+        "immutableClosures": 15
+      },
+      {
+        "cycle": 6,
+        "confirmedCompanies": 3,
+        "produced": 142,
+        "sold": 142,
+        "cash": 106013.39,
+        "immutableClosures": 18
+      }
+    ],
+    "producedTotal": 974,
+    "soldTotal": 974,
+    "finalCash": 106013.39,
+    "profit": 46916.59,
+    "nodeDenoPostgresEqual": true,
+    "pageErrors": [],
+    "failedLocalResources": [],
+    "blockedHistoricalGame": null
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "round": 1,
+    "produced": 1000,
+    "sold": 902,
+    "capacity": 1134,
+    "demand": 902,
+    "inventory": 5639.16,
+    "net": 47320.76,
+    "cash": 171736.23
+  },
+  {
+    "round": 2,
+    "produced": 1000,
+    "sold": 1098,
+    "capacity": 1134,
+    "demand": 2069,
+    "inventory": 0,
+    "net": 76542.24,
+    "cash": 239819.26
+  },
+  {
+    "round": 3,
+    "produced": 1000,
+    "sold": 148,
+    "capacity": 1134,
+    "demand": 148,
+    "inventory": 152884.95,
+    "net": -1631.96,
+    "cash": 105958.18
+  }
+]

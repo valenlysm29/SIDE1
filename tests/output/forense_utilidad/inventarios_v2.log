@@ -1,0 +1,33 @@
+✔ legacy physical holdings generate production and sales in their acquisition cycle and later cycles (38.5181ms)
+✔ legacy option selections are recovered only without a purchase ledger and actual holdings remain authoritative (21.7613ms)
+✔ holdings from future cycles never supply current equipment or sales (14.2204ms)
+✔ purchase history overrides duplicate holdings and sums purchases and liquidations exactly once (1.5073ms)
+✔ current draft purchases add to prior legacy holdings while replacing same-cycle saved purchases (1.8816ms)
+✔ invalid acquisition cycles cannot create equipment, purchases, maintenance or investment costs (4.2646ms)
+✔ legacy equipment review and maintenance preserve the same acquisition costs and holdings as canonical history (16.3234ms)
+✔ FIFO concilia tres ciclos, calidades y costos distintos (46.7135ms)
+✔ umbrales reales CONS-03 y CONS-08 distinguen puntaje y eficiencia física (9.6014ms)
+✔ CONS-04 con umbral real tras dos ciclos de reputación baja (11.2331ms)
+✔ dos calidades prémium conservan sus precios por unidad y FIFO (2.8581ms)
+✔ varias tiendas concilian lotes FIFO, ingresos, inventario y cuentas por cobrar (17.772ms)
+✔ cada tienda vende solo sus lotes y conserva los saldos por ubicación (1.4135ms)
+✔ transferencias manuales no pueden superar el stock central (1.3929ms)
+✔ múltiples lotes antiguos sin ubicación verificable se bloquean (1.2071ms)
+✔ tres ciclos con dos tiendas mantienen FIFO por ubicación y concilian el balance (18.2122ms)
+✔ saldo agregado anterior conserva ubicación registrada y no inventa su composición (1.5163ms)
+✔ without channel stock is retained and no commission is charged (32.6304ms)
+✔ web sales earn exactly one percent commission and close is idempotent (10.1941ms)
+✔ unsold inventory carries forward and earlier receipt remains frozen (11.1027ms)
+✔ material inventory preserves unrelated lots and consumes only available purchased stock (3.3088ms)
+✔ shared closing keeps company stock and cash isolated (24.1316ms)
+✔ POS receipts never alter assigned demand or stock (7.4121ms)
+✔ restoring a submitted plan preserves live material inventories and accounting seed (0.562ms)
+✔ commercial event changes demand before fulfillment, never money beyond stocked units (9.2287ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 440.1261

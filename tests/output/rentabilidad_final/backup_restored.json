@@ -1,0 +1,20 @@
+{
+  "restored": true,
+  "container": "supabase_db_sideprofitfinal",
+  "closures": 158,
+  "allHashesMatch": true,
+  "files": {
+    "schema.sql": {
+      "bytes": 304553,
+      "sha256": "d8a192df38d8fad4c0c65ef3ca9182751c4e431f124432956ec7d1745cd88a65"
+    },
+    "public.sql": {
+      "bytes": 20569703,
+      "sha256": "28a93b6b630152d4e4ef7a254e1dfb3978e0f1a04c5df85ab24ab3b504b4b878"
+    },
+    "side_private.sql": {
+      "bytes": 28578,
+      "sha256": "af5aa594828e9d57c897458be0ab8ce9b1b11b4d6ca53c3220625413a612bc27"
+    }
+  }
+}

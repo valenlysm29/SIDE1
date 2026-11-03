@@ -1,0 +1,16 @@
+{
+  "profitable": {
+    "cost": 5000,
+    "purchaseSavings": 9936,
+    "consumedSavings": 9936,
+    "profitEffect": 4936,
+    "scope": "Comparación del mismo plan sin analista; respeta inventarios, impuesto y financiación."
+  },
+  "unprofitable": {
+    "cost": 5000,
+    "purchaseSavings": 266.64,
+    "consumedSavings": 266.64,
+    "profitEffect": -4733.36,
+    "scope": "Comparación del mismo plan sin analista; respeta inventarios, impuesto y financiación."
+  }
+}

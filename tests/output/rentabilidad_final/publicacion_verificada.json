@@ -1,0 +1,45 @@
+{
+  "frontend": "https://valenlysm29.github.io/SIDE1/",
+  "files": [
+    {
+      "file": "index.html",
+      "matches": true,
+      "sha256": "e768c0db9cddf2bd8b8d2da5283fc3fed57c6183d83c8dac3ec582228afe1599"
+    },
+    {
+      "file": "docente.html",
+      "matches": true,
+      "sha256": "df460834d6865e02187954aa9c5fcd8521048c04249e560ecbc66a831fe7eef4"
+    },
+    {
+      "file": "js/app.js",
+      "matches": true,
+      "sha256": "39e4716621d0dd79dd5a0e6f96db1b50bab881fb78b4cd79c21a40c370b8d2b1"
+    },
+    {
+      "file": "js/company_summary.js",
+      "matches": true,
+      "sha256": "6110bf9e945ca180a551e7c4c88d6e9803541838444f909ade31367868042965"
+    },
+    {
+      "file": "js/profit_projection.js",
+      "matches": true,
+      "sha256": "ec05abefb5ca9c246d69bacb43eeb2db2324dbcf6647a7e84ef4035e2930cb65"
+    },
+    {
+      "file": "js/financial_model.js",
+      "matches": true,
+      "sha256": "99cf16e9607953f11a4a3152c35db2f7b99fedf115fffedb26b1336f7095ee72"
+    },
+    {
+      "file": "css/production.css",
+      "matches": true,
+      "sha256": "4e303a097bef4f433f9a2784703c7b32ff385735755536af40dd97bd864b17e4"
+    }
+  ],
+  "edgeAuthorization": {
+    "GET": 405,
+    "POST": 401
+  },
+  "financialWrites": false
+}

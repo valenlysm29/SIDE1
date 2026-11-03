@@ -313,6 +313,7 @@ async function refreshStudentMaterialBook(){
   const previous=validStudentMaterialBook();
   if(!previous){studentMaterialBook=null;studentMaterialStatus='Verificando datos de recepción…';}
   if(!temporalStudentRoom())return true;
+  if(!['decisions','results','finished'].includes(phase)){studentMaterialBook=null;studentMaterialStatus='Las recepciones se podrán consultar cuando comience el ciclo.';return true;}
   if(!previous)requestMaterialViewRefresh();
   const result=await window.SIDE?.DecisionesService?.obtenerContextoMaterial(gameId,companyId,cycle,true);
   if(sequence!==studentMaterialSequence||gameId!==currentStudent.game?.id||String(companyId)!==String(currentStudent.empresaId)||cycle!==currentRound()||phase!==studentMaterialPhase()||!studentConnected)return false;
@@ -1115,8 +1116,11 @@ function refreshProductionDop(){
   disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(mount);
 }
 
+function profitProjectionPanel(){
+  return '<section class="decision-row profit-diagnostic"><h3>Proyección de rentabilidad</h3><p>Revisa tu plan antes de confirmar. Es una estimación, no un cierre oficial; puedes continuar aunque proyecte una pérdida.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section>';
+}
 function showProfitProjection(){
-  const mount=document.querySelector('[data-profit-projection]');if(!mount)return;
+  const candidate=arguments[0],mount=candidate?.matches?.('[data-profit-projection]')?candidate:document.querySelector('[data-profit-projection]');if(!mount)return;
   if(temporalStudentRoom()&&!validStudentMaterialBook()){mount.textContent='La proyección no está disponible hasta que las recepciones puedan verificarse con el cierre.';return;}
   try{
     const context=decisionModelContext(),state=deepClone(context.state),ledger={...financialLedger()},sections=deepClone(recordedFinancialSections()),round=currentRound();
@@ -1125,13 +1129,16 @@ function showProfitProjection(){
       delete ledger[`${round}:${category.cat}`];if(sections[round])delete sections[round][category.cat];
     }
     const config=teacherConfig(),temporal=temporalStudentRoom();
-    const result=window.SIDE_PROFIT_PROJECTION.analyze({state,ledger,sectionsByRound:sections,catalog:DECISION_CATALOG,round,capital:initialCapital(),financialPolicy:{...(window.SIDE_FINANCE_CONFIG?.resolve(config,round)||config),authoritativePrices:true,...(temporal?{verifiedMaterialContext:true,materialPaymentMode:config.materialPaymentMode,supplierCreditTermCycles:Number(config.supplierCreditTermCycles??1)}:{})},events:cycleBusinessData(round).events});
+    const result=window.SIDE_PROFIT_PROJECTION.analyze({state,ledger,sectionsByRound:sections,catalog:DECISION_CATALOG,round,capital:initialCapital(),...(temporal?{projectionAssumptions:{plannedDeliveries:true,leadTimeDays:Number(config.materialLeadTimeDays??7)}}:{}),financialPolicy:{...(window.SIDE_FINANCE_CONFIG?.resolve(config,round)||config),authoritativePrices:true,...(typeof studentConnected!=='undefined'&&studentConnected?{workerVersion:String(config.sequentialCloseVersion??'0')}:{}),...(temporal?{verifiedMaterialContext:true,materialPaymentMode:config.materialPaymentMode,supplierCreditTermCycles:Number(config.supplierCreditTermCycles??1)}:{})},events:cycleBusinessData(round).events});
     if(!result.available){mount.textContent=result.reason;return;}
     const b=result.base,breakeven=result.breakEven?`Primera meta con resultado no negativo en las 20 pruebas: ${result.breakEven.target} unidades (ventas estimadas: ${result.breakEven.sold}).`:'No se encontró punto de equilibrio dentro de las metas probadas con estos recursos.';
     const alternative=result.alternatives.length?result.alternatives.map(a=>`<li>${escapeHtml(a.label)}: utilidad ${money(a.profit)} (${a.difference>=0?'+':''}${money(a.difference)}), caja ${money(a.cash)}, ventas ${a.sold} u.</li>`).join(''):'<li>No hay alternativas que superen la comprobación estimada de caja.</li>';
     const resources=(b.plan.processes||[]).map(p=>`${escapeHtml(p.label)}: ${p.staff} trabajadores, ${p.machines} equipos y ${p.pairs} parejas activas`).join(' · ');
     const shortages=(b.plan.materials||[]).filter(m=>Number(m.shortfall)>0).map(m=>`${escapeHtml(m.label)}: faltan ${Number(m.shortfall).toLocaleString('es-PE')} ${escapeHtml(m.unit)}`).join(' · ');
-    mount.innerHTML=`<p><strong>${b.profit<0?'Riesgo de pérdida: ':''}utilidad estimada ${money(b.profit)}</strong> · ingresos ${money(b.income)} · costos y gastos ${money(b.cost)} · caja final ${money(b.cash)}</p><p>Producción ${b.produced} u. · ventas ${b.sold} u. · demanda asignada ${b.demand} u. · costo de fabricación ${money(b.productionCost)} · costo por unidad ${b.unitCost==null?'no disponible':money(b.unitCost)}</p><p>${b.sales.map(s=>`${escapeHtml(s.id)}: precio efectivo ${money(s.price)}`).join(' · ')}</p><p>${escapeHtml(breakeven)}</p><p>${resources}</p>${shortages?`<p>Insumos insuficientes para la meta: ${shortages}</p>`:''}<strong>Comparaciones calculadas con el motor</strong><ul>${alternative}</ul><small>Estimación individual: no incluye el reparto definitivo con competidores. ${temporal?'Usa únicamente las recepciones verificadas disponibles al consultar; otras recepciones pueden cambiar el resultado. ':''}Para filtrar alternativas se consideran una vez los movimientos de las decisiones y la caja final estimada. El sistema no registra fechas de pago dentro del ciclo; esta comprobación no garantiza liquidez en cada momento. La primera meta probada no es un punto de equilibrio exacto. No se guardó ninguna decisión.</small>`;
+    const percent=v=>v==null?'no disponible':`${Number(v).toLocaleString('es-PE',{maximumFractionDigits:2})}%`;
+    const analyst=(result.assumptions||[]).map(a=>`<p class="profit-assumption"><strong>${escapeHtml(a)}</strong></p>`).join('')+(result.analyst?`<p><strong>Analista de compras:</strong> costo ${money(result.analyst.cost)}; ahorro estimado en compras ${money(result.analyst.purchaseSavings)}.${result.analyst.profitEffect==null?'':` Efecto en la utilidad neta de este plan: ${money(result.analyst.profitEffect)}.`} <small>${escapeHtml(result.analyst.scope)}</small></p>`:'');
+    const prices=b.sales.map(s=>`<tr><th scope="row">${escapeHtml({esencial:'Básico',urbano:'Estándar',premium:'Prémium'}[s.id]||s.id)}</th><td>${money(s.price)}</td><td>${s.unitCost==null?'no disponible':money(s.unitCost)}</td><td>${s.breakEvenPrice==null?'no disponible':money(s.breakEvenPrice)}</td>${(s.targetPrices||[]).map(t=>`<td>${t.price==null?'no disponible':money(t.price)}</td>`).join('')}</tr>`).join('');
+    mount.innerHTML=`<p><strong>${b.profit<0?'Riesgo de pérdida: ':''}utilidad estimada ${money(b.profit)}</strong> · ingresos ${money(b.income)} · costos y gastos ${money(b.cost)} · caja final ${money(b.cash)}</p><dl class="profit-metrics"><div><dt>Costo de producción estimado</dt><dd>${money(b.productionCost)}</dd></div><div><dt>Gastos operativos</dt><dd>${money(b.operatingExpenses)}</dd></div><div><dt>Margen bruto</dt><dd>${percent(b.grossMargin)}</dd></div><div><dt>Margen neto</dt><dd>${percent(b.netMargin)}</dd></div><div><dt>Ventas mínimas estimadas de equilibrio</dt><dd>${b.minimumSales==null?'No alcanzable con este margen':`${b.minimumSales} unidades`}</dd></div><div><dt>Capacidad máxima disponible</dt><dd>${b.capacity} unidades por ciclo</dd></div></dl><p><small>${escapeHtml(b.minimumSalesScope)}</small></p><p>Producción ${b.produced} u. · ventas ${b.sold} u. · demanda asignada ${b.demand} u. · costo por unidad ${b.unitCost==null?'no disponible':money(b.unitCost)}</p>${(result.lossReasons||[]).length?`<ul class="profit-reasons">${result.lossReasons.map(r=>`<li>${escapeHtml(r)}</li>`).join('')}</ul>`:''}${analyst}<div class="profit-price-table"><table><caption>Precios analíticos con el costo y volumen actuales; no se aplican a tus decisiones</caption><thead><tr><th>Producto</th><th>Precio efectivo</th><th>Costo unitario</th><th>Equilibrio</th><th>10%</th><th>15%</th><th>20%</th><th>25%</th></tr></thead><tbody>${prices}</tbody></table></div><p><small>Los objetivos son márgenes antes de impuestos. Suponen la mezcla actual, costo unitario constante y reparto de gastos por unidades; subir el precio puede reducir la demanda.</small></p><details><summary>Recursos y comparaciones del plan</summary><p>${escapeHtml(breakeven)}</p><p>${resources}</p>${shortages?`<p>Insumos insuficientes para la meta: ${shortages}</p>`:''}<strong>Comparaciones calculadas con el motor</strong><ul>${alternative}</ul></details><small>Estimación individual: no incluye el reparto definitivo con competidores. ${temporal?'Las recepciones confirmadas se conservan; cuando se indica una hipótesis, las entregas futuras son solo un supuesto de planificación. ':''}Para filtrar alternativas se consideran una vez los movimientos de las decisiones y la caja final estimada. El sistema no registra fechas de pago dentro del ciclo; esta comprobación no garantiza liquidez en cada momento. La primera meta probada no es un punto de equilibrio exacto. No se guardó ninguna decisión.</small>`;
   }catch(error){mount.textContent='No se pudo calcular la proyección con las decisiones disponibles.';console.warn('SIDE: proyección de rentabilidad no disponible',error);}
 }
 
@@ -1141,7 +1148,7 @@ function renderDecisionCategory(){
   $('categoryTitle').textContent=cat.title;$('categoryDescription').textContent=cat.desc;$('detailCategoryIcon').src=cat.icon;$('roundLabel').textContent=`CICLO ${currentRound()} · ${currentStudent.company}`;
   if(temporalStudentRoom()&&!validStudentMaterialBook()){document.querySelector('.section-save-bar')?.classList.toggle('hidden',!!cat.summaryOnly);const html=`<p role="status">${escapeHtml(studentMaterialStatus)}</p>`;if($('decisionCards').innerHTML!==html)$('decisionCards').innerHTML=html;return;}
   if(cat.cat==='DOP'){
-    $('decisionCards').innerHTML=renderDecisionRow(findDecisionItem('PRODUCCION_META'))+`<p class="decision-row">La meta se comparte con Producción. Para guardar o enviar la decisión, abre Producción.</p><section class="decision-row"><h3>Proyección de rentabilidad</h3><p>Calcula el resultado y compara cambios sin guardar decisiones.</p><button type="button" data-profit-calculate>Calcular proyección</button><div data-profit-projection role="status" aria-live="polite"></div></section><div class="production-dop-mount">${productionDopHtml()}</div>`;
+    $('decisionCards').innerHTML=renderDecisionRow(findDecisionItem('PRODUCCION_META'))+`<p class="decision-row">La meta se comparte con Producción. Para guardar o enviar la decisión, abre Producción.</p>`+profitProjectionPanel()+`<div class="production-dop-mount">${productionDopHtml()}</div>`;
     document.querySelector('.section-save-bar')?.classList.add('hidden');
     bindDecisionControls();document.querySelector('[data-profit-calculate]')?.addEventListener('click',showProfitProjection);updateHud();syncStudentTimer();updateDecisionLayout();
     disposeProductionDop=window.SIDE_PRODUCTION_DOP.mount(document.querySelector('.production-dop-mount'));return;
@@ -1162,6 +1169,7 @@ function renderDecisionCategory(){
     if(warnings.length)lead+=`<aside class="required-alert" role="status"><strong>Revisa la producción antes de enviar</strong>${warnings.map(w=>`<span>${escapeHtml(w.text)}</span>`).join('')}</aside>`;
   }
 
+  if(['A','C','E'].includes(cat.cat))lead+=profitProjectionPanel();
   const footnotes=footnoteItems.length?`<div class="asterisk-notes">${footnoteItems.map(i=>`<p class="asterisk-note">* ${escapeHtml(i.desc)}</p>`).join('')}</div>`:'';
   const cards=cardItems.filter(item=>cat.cat!=='C'||item.id!=='PRODUCCION_META').map(renderDecisionRow).join('');
   $('decisionCards').innerHTML=lead+cards+footnotes+(cat.cat==='D'?automaticDistributionHtml()+cycleSalesHtml():'')+(cat.cat==='A'?'<div id="companySummaryMount"></div>':'');
@@ -1574,6 +1582,7 @@ function recordedFinancialSections(){
 }
 let salesProjectionCache=null;
 function cycleSalesProjection(round=currentRound()){
+  if(studentConnected&&String(teacherConfig().sequentialCloseVersion??'0')!=='1')return null;
   if(temporalStudentRoom())return null;
   if(round!==currentRound()||!simulationSubmissionComplete()||decisionState.__cycleSettlements?.[round])return null;
   const model=window.SIDE_CYCLE_MODEL;if(!model?.project)return null;

@@ -4,29 +4,36 @@ const scope={window:{}};vm.runInNewContext(fs.readFileSync(require.resolve('../j
 const catalog=JSON.parse(JSON.stringify(scope.window.SIDE_DECISION_CATALOG)),items=catalog.flatMap(c=>c.items),item=id=>items.find(i=>i.id===id);
 const PRO=require('../js/production_model'),E=require('../js/engine/cierre'),CYCLE=require('../js/cycle_model'),REVIEW=require('../js/decision_review_model'),RULES=require('../js/side_rules'),BUS=require('../js/business_rules');
 const clone=v=>JSON.parse(JSON.stringify(v)),near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
-function state(){const s={};for(const [id,q] of Object.entries({MESA_CORTE:{mesa:2},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1},CUERO:{cuero_sint:60,cuero_std:110,cuero_prem:30},ACCESORIOS:{acc_eco:200,acc_prem:190},HILO:{hilo_ref:1500,hilo_prem:1400}}))s[id]={round:1,quantities:q,...(item(id).asset?{purchases:{1:q}}:{})};
+function state(){const s={};for(const [id,q] of Object.entries({MESA_CORTE:{mesa:1},ENSAMBLE:{ens_basica:1,ens_semi:1,ens_ind:1},ACABADOS:{aca_basica:1,aca_ind:1},PERS_CORTE:{corte_basico:1,corte_exp:1},PERS_ENSAMBLE:{ens_personal_basico:1,ens_personal_ind:1,ens_personal_esp:1},PERS_ACABADO:{aca_personal_tec:1,aca_personal_art:1},CUERO:{cuero_sint:60,cuero_std:110,cuero_prem:30},ACCESORIOS:{acc_eco:200,acc_prem:190},HILO:{hilo_ref:1500,hilo_prem:1400}}))s[id]={round:1,quantities:q,...(item(id).asset?{purchases:{1:q}}:{})};
   s.PERS_ENSAMBLE.assignments={ens_personal_basico:{ens_ind:1},ens_personal_ind:{ens_basica:1},ens_personal_esp:{ens_semi:1}};
   s.PERS_ACABADO.assignments={aca_personal_tec:{aca_ind:1},aca_personal_art:{aca_basica:1}};
   s.JEFATURA={round:1,optionIds:['no_jefatura']};s.REGIMEN_LABORAL={round:1,optionIds:['mype']};s.CANALES={round:1,optionIds:['web']};
   s.MOLDE={round:1,optionIds:['molde_1','molde_2','molde_3']};s.PRODUCCION_META={round:1,moldTargets:{molde_1:150,molde_2:140,molde_3:95},prices:{esencial:40,urbano:120,premium:250}};s.INV_MARKETING={round:1,value:3000};return s;
 }
 function context(s=state(),round=1){return {state:s,catalog,drafts:{},round,rules:RULES};}
-test('document example: matrix, all N3 efficiency, 30 days and sequential production',()=>{
- const plan=PRO.calculate(context());assert.equal(plan.days,30);assert.deepEqual(plan.processes.map(p=>p.dailyCapacity),[14,31.4,24]);assert.equal(plan.efficiency,.92);assert.equal(plan.processCapacity,386);
- assert.deepEqual(plan.productLines.map(p=>p.plannedUnits),[150,140,78]);assert.equal(plan.producibleUnits,368);assert.deepEqual(plan.materials.map(m=>m.consumption),[155.6,368,2894]);
+test('one-worker-per-resource: one cutting table pairs one cutter and limits the document example',()=>{
+ const plan=PRO.calculate(context());assert.equal(plan.days,30);assert.deepEqual(plan.processes.map(p=>p.dailyCapacity),[8,31.4,24]);assert.equal(plan.efficiency,.92);assert.equal(plan.processCapacity,221);
+ assert.equal(plan.processes[0].pairs,1);assert.equal(plan.processes[0].assignments.corte_exp.mesa,1);
+ assert.deepEqual(plan.productLines.map(p=>p.plannedUnits),[150,71,0]);assert.equal(plan.producibleUnits,221);assert.deepEqual(plan.materials.map(m=>m.consumption),[73.4,221,1397]);
+});
+
+test('the original 368-unit example requires a second cutting table under current resource rules',()=>{
+ const s=state();s.MESA_CORTE.quantities.mesa=2;s.MESA_CORTE.purchases[1].mesa=2;
+ const plan=PRO.calculate(context(s));assert.equal(plan.processes[0].pairs,2);assert.equal(plan.processes[0].dailyCapacity,6+8);assert.equal(plan.processCapacity,Math.round(14*30*.92));
+ assert.deepEqual(plan.productLines.map(p=>p.plannedUnits),[150,140,78]);assert.equal(plan.producibleUnits,368);
 });
 test('corrected actual consumption gives exact reputation and quality factors',()=>{
- const r=E.prepare({id:'A',...context()});near(r.reputation.factorProduccion,78/368*10);near(r.reputation.factorMO,2/7*10);near(r.reputation.factorMP,((168/368)+(1394/2894))/3*10);assert.equal(r.reputation.factorPublicidad,3);near(r.scores.reputation,4.7760170074159287);
- assert.deepEqual(r.reputation.consumo,{cuero_sint:60,cuero_std:95.6,cuero_prem:0,acc_eco:200,acc_prem:168,hilo_std:0,hilo_ref:1500,hilo_prem:1394});near(r.lines[0].quality,1+1+2+1);
+ const r=E.prepare({id:'A',...context()});near(r.reputation.factorProduccion,0);near(r.reputation.factorMO,2/7*10);near(r.reputation.factorMP,(21/221)/3*10);assert.equal(r.reputation.factorPublicidad,3);near(r.scores.reputation,(2/7*10+(21/221)/3*10+3)/4);
+ assert.deepEqual(r.reputation.consumo,{cuero_sint:60,cuero_std:13.4,cuero_prem:0,acc_eco:200,acc_prem:21,hilo_std:0,hilo_ref:1397,hilo_prem:0});near(r.lines[0].quality,1+1+2+1);
 });
 test('advertising is capped, debited once and contributes only its reputation factor',()=>{
  const s=state();s.INV_MARKETING={round:1,optionIds:['mkt_alta']};const r=E.prepare({id:'A',...context(s)});assert.equal(r.reputation.factorPublicidad,10);assert.equal(r.demandFactor,1);assert.equal(REVIEW.breakdown(item('INV_MARKETING'),context(s)).outflow,12000);
  s.INV_MARKETING={round:1,optionIds:['mkt_alta']};assert.equal(BUS.advertising({state:s}),10000);
 });
 test('full closure preserves chosen prices, inventory balances and corrected MP valuation',()=>{
- const r=CYCLE.close({...context(),capital:200000});assert.equal(r.receipt.produced,368);assert.equal(r.receipt.sold,368);assert.equal(r.receipt.revenue,50100);assert.equal(r.receipt.sales[2].price,350);
- near(r.state.__inventarioMP.cuero_std,14.4);assert.equal(r.state.__inventarioMP.acc_prem,22);assert.equal(r.state.__inventarioMP.hilo_prem,6);
- near(r.financial.balanceGeneral.inventarioMP,14.4*45*.92+22*9*.92+6*7*.92+30*80);const er=r.financial.estadoResultados;near(er.costosProduccion,22082.24+21749.12+er.depreciacion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
+ const r=CYCLE.close({...context(),capital:200000});assert.equal(r.receipt.produced,221);assert.equal(r.receipt.sold,221);assert.equal(r.receipt.revenue,150*40+71*120);assert.equal(r.receipt.sales[2].price,250);
+ near(r.state.__inventarioMP.cuero_std,96.6);assert.equal(r.state.__inventarioMP.acc_prem,169);assert.equal(r.state.__inventarioMP.hilo_prem,1400);
+ near(r.financial.balanceGeneral.inventarioMP,96.6*45*.92+169*9*.92+103*4*.92+1400*7*.92+30*80);const er=r.financial.estadoResultados;near(er.costosProduccion,8105.60+21749.12+er.depreciacion);near(r.financial.balanceGeneral.activos,r.financial.balanceGeneral.pasivoPatrimonio);
  assert.match(require('../js/student_financial_view').incomeHtml(er),/Costo de ventas/i);
  assert.equal(r.receipt.modelVersion,'md-20261027');assert.equal(CYCLE.close({...context(r.state),ledger:r.ledger,capital:200000}).reused,true);
 });

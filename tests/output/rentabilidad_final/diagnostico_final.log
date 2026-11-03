@@ -1,0 +1,12 @@
+✔ la proyección se abre desde Planificación sin guardar decisiones (6994.6437ms)
+✔ una cotización previa distingue entregas hipotéticas de recepciones registradas (148.7983ms)
+✔ las órdenes confirmadas sin entregas no se reemplazan por entregas hipotéticas (59.4282ms)
+✔ los precios de margen son informativos y no cambian la versión ni precios guardados (68.5907ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7601.7694
