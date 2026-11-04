@@ -46,3 +46,9 @@ Se ejecutaron partidas contra la función HTTPS `sidepreview`, con sesiones y JW
 - La API rechazó un token falsificado, un intento de acceso a partida ajena y una solicitud de activar al docente desde un dominio no institucional. Una sesión previamente emitida fue rechazada al bloquear la identidad.
 
 El programador se habilitó temporalmente durante las pruebas y quedó desactivado; no existe todavía un mecanismo automático permanente económico y recuperable. Las pruebas fueron mediante scripts de Node, no Playwright ni una interfaz conectada. El frontend y el BFF siguen pendientes, al igual que la recepción real de correo institucional y la revisión de seguridad de producción.
+
+## Contrato HTTP comprobado
+
+La función `e2e/neon-auth-contract.js` consulta en modo lectura el OpenAPI de la rama de desarrollo. El servicio publica registro, inicio y cierre de sesión, recuperación de sesión, token, verificación OTP y reenvío OTP, con los campos exigidos esperados. Esta comprobación no acredita envío de correo ni constituye un BFF ni una prueba de navegador.
+
+La existencia de esos endpoints no define por sí sola cómo trasladar sus cookies, protección de sesión y respuestas a otro origen. Neon recomienda su cliente administrado y documenta el proxy de servidor de `@neondatabase/auth/server`; sigue pendiente integrar una versión compatible con la política de dependencias del proyecto y verificar el manejo de cookies, CSRF, limitación de abuso y sesiones antes de exponer una interfaz. No se desplegó una interfaz ni un BFF para usuarios.
