@@ -4,18 +4,18 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const source=fs.readFileSync(path.join(__dirname,'../js/app.js'),'utf8');
 function runtime({failure=false,missingCategory=false}={}){
-  const store=new Map();
+  const store=new Map();let renderCalls=0;
   const context=vm.createContext({
     categoryByCat:()=>missingCategory?null:{items:[{id:'MOLDE'},{id:'LOCAL'}]},currentCategory:'B',currentRound:()=>1,
-    storageKey:()=> 'QA_LOCAL',deepClone:value=>JSON.parse(JSON.stringify(value)),
+    storageKey:()=> 'QA_LOCAL',renderTabs:()=>renderCalls++,deepClone:value=>JSON.parse(JSON.stringify(value)),
     decisionDrafts:{MOLDE:{optionIds:['molde_1']},LOCAL:{optionIds:['local_1']}},
     localStorage:{getItem:key=>store.get(key)||null,setItem(key,value){if(failure)throw new Error('QuotaExceededError');store.set(key,value)}}
   });
   vm.runInContext(source.slice(source.indexOf('function persistCurrentDraftOnly(){'),source.indexOf('function restoreDraftsForRound(){')),context);
-  return {save:()=>vm.runInContext('persistCurrentDraftOnly()',context),store,context};
+  return {save:()=>vm.runInContext('persistCurrentDraftOnly()',context),store,context,getRenderCalls:()=>renderCalls};
 }
 test('el borrador conserva juntas todas las decisiones del segmento',()=>{
-  const r=runtime();assert.equal(r.save(),true);
+  const r=runtime();assert.equal(r.save(),true);assert.equal(r.getRenderCalls(),1);
   assert.deepEqual(JSON.parse(r.store.get('SIDE_DECISION_DRAFTS_QA_LOCAL_1')),{B:{MOLDE:{optionIds:['molde_1']},LOCAL:{optionIds:['local_1']}}});
 });
 test('el borrador de otro segmento se conserva',()=>{

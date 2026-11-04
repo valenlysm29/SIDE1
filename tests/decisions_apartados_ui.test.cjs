@@ -23,6 +23,7 @@ for(const version of ['excel-16','side-lotes-2026-10-20'])test('Student edits ev
   persistGameState();currentCategory='B';openDecisionMenu();
  });
  if(await page.locator('#cycleCostsUnderstood').isVisible())await page.locator('#cycleCostsUnderstood').click();
+ if(await page.locator('.coach-layer').isVisible())await page.locator('.coach-card [data-action=skip]').click();
  async function change(cat,selector,value){
   console.log('EDIT',cat,selector);
   await page.locator(`[data-cat="${cat}"]`).click();

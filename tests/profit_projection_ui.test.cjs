@@ -10,6 +10,7 @@ test('la proyección permanece oculta en decisiones y revisión sin alterar el p
  await page.goto('http://side-profit.test/');await page.waitForLoadState('networkidle');
  await page.evaluate(async input=>{stopStudentSync();currentStudent={game:{id:'test-game',codigo:'SIDE-418'},company:'Marca A',legalName:'Legal A',empresaId:1,snapshotRevision:server.revision};studentConnected=true;studentProgressHydrated=true;await refreshStudentGame();stopStudentSync();Object.assign(decisionState,input);decisionDrafts={};persistGameState();currentCategory='C';openDecisionMenu();},require('./rentabilidad_plan.cjs').plan({round:1,cycles:3,scenario:'inefficient'}));
  if(await page.locator('#cycleCostsUnderstood').isVisible())await page.locator('#cycleCostsUnderstood').click();
+ if(await page.locator('.coach-layer').isVisible())await page.locator('.coach-card [data-action=skip]').click();
  const before=await page.evaluate(()=>JSON.stringify(decisionState));
  for(const cat of ['DOP','B','C','F','D','E','A']){
   await page.locator(`[data-cat="${cat}"]`).click();

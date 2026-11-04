@@ -56,6 +56,7 @@ test('student synchronization and session recovery through the delivered UI',asy
       studentConnected=true;studentProgressHydrated=true;persistStudentSession();await refreshStudentGame();hydrateRemoteProgress(state());stopStudentSync();
       currentCategory='D';openDecisionMenu();currentCategory='D';renderTabs();renderDecisionCategory();
     });
+    if(await p.locator('.coach-layer').isVisible())await p.locator('.coach-card [data-action=skip]').click();
     await p.locator('[data-choice="CANALES"][data-option="web"]').check();
     await p.locator('#saveDecisionSection').click();
     await p.evaluate(()=>studentSnapshotQueue);

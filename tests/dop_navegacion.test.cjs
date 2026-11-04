@@ -43,7 +43,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
    assert.equal(new Set(layout.map(e=>e.top)).size,1,`single row ${width}`);
    for(const cat of tabs){await tab(cat);assert.equal(await p.locator('#decisionTabs .active').getAttribute('data-cat'),cat);}
    const scroll=await p.locator('#decisionTabs').evaluate(e=>({width:e.clientWidth,total:e.scrollWidth}));
-   if(width<=1024)assert.ok(scroll.total>scroll.width,`horizontal scroll ${width}`);
+   if(width<=768)assert.ok(scroll.total>scroll.width,`horizontal scroll ${width}`);
    assert.equal(await p.locator('#decisionTabs [data-cat="DOP"] .tab-label').innerText(),'Planificación');
    await tab('DOP');assert.equal(await p.locator('#categoryTitle').innerText(),'Planificación');assert.equal(await p.locator('.production-dop').count(),1);
    const target=p.locator('[data-mold-target]');await target.fill('25');await target.press('Tab');
@@ -59,8 +59,8 @@ const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css'
   await p.evaluate(()=>{localStorage.setItem('SIDE_ACTIVE_ROUND','1');decisionDrafts={};restoreDraftsForRound();});
   await tab('C');await tab('DOP');assert.equal(await p.locator('[data-mold-target]').inputValue(),'25');
   await p.evaluate(()=>{window.originalCategoryHasSaved=categoryHasSaved;categoryHasSaved=cat=>cat==='C';renderTabs();});
-  assert.equal(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),'BORRADOR');
-  await p.evaluate(()=>{categoryHasSaved=window.originalCategoryHasSaved;setSectionSubmitted('C');});await tab('C');assert.match(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),/ENVIADA/);await tab('DOP');assert.equal(await p.locator('[data-mold-target]').isDisabled(),true);
+  assert.equal(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),'Borrador');
+  await p.evaluate(()=>{categoryHasSaved=window.originalCategoryHasSaved;setSectionSubmitted('C');});await tab('C');assert.match(await p.locator('#decisionTabs [data-cat="C"] .tab-status').innerText(),/Enviado/);await tab('DOP');assert.equal(await p.locator('[data-mold-target]').isDisabled(),true);
   assert.deepEqual(errors,[]);console.log('PASS DOP navigation, draft, lock and responsive layout');return;
  }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

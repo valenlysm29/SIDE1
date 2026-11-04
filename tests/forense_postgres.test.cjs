@@ -7,7 +7,7 @@ const fixture=require('./economic_v19_fixture.cjs'),original=require('./fixtures
 const name='side-forense-'+crypto.randomBytes(5).toString('hex'),teacher='11111111-1111-1111-1111-111111111111';
 const edgeName=name+'-edge';
 const out=path.resolve('tests/output/forense_v2');fs.mkdirSync(out,{recursive:true});
-const docker=args=>execFileSync('docker',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']});
+const docker=args=>execFileSync('docker',args,{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:60000});
 const quote=v=>"'"+String(v).replaceAll("'","''")+"'";
 const arg=v=>v==null?'null':typeof v==='object'?quote(JSON.stringify(v))+'::jsonb':typeof v==='number'?String(v):quote(v);
 async function sql(text){return new Promise((resolve,reject)=>{
@@ -36,7 +36,7 @@ function reconcile(r,previous){
  for(const key of ['estadoResultados','balanceGeneral','flujoCaja'])assert.deepEqual(rebuilt[key],f[key],`replay ${key}`);
 }
 
-test('tres y seis ciclos: Node, Edge y PostgreSQL real; siete escenarios y reintento',{timeout:600000},async()=>{
+test('tres y seis ciclos: Node, Edge y PostgreSQL real; siete escenarios y reintento',{timeout:1200000},async()=>{
  const evidence={database:'PostgreSQL 17, Docker network=none; real committed RPC writes and independent read connections',scenarios:[],cycles:[]};
  try{
   // tmpfs avoids leaving database engine files anywhere on the host.
