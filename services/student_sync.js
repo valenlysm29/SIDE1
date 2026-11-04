@@ -11,6 +11,16 @@
   // An omitted key has exactly the same meaning in cierre.prices(). The older
   // database contract accepts implicit defaults but validates explicit prices
   // against the former editable ranges (including Medio >= 120).
+  // Normalize student plans at the UI and persistence boundaries, never in the engine.
+  function singleMoldPlan(meta={}, selectedId){
+    const ids=['molde_1','molde_2','molde_3'];
+    const quantity=value=>Number.isFinite(Number(value))?Math.max(0,Math.trunc(Number(value))):0;
+    const active=ids.find(id=>id===meta.moldId)||ids.find(id=>id===meta.viewMoldId)||ids.find(id=>quantity(meta.moldTargets?.[id])>0)||ids[0];
+    const moldId=ids.includes(selectedId)?selectedId:active;
+    // A legacy mixed plan retains one line's quantity; it must never sum lines.
+    const value=meta.moldTargets?quantity(meta.moldTargets[active]):quantity(meta.value);
+    return {...meta,moldId,viewMoldId:moldId,value,moldTargets:Object.fromEntries(ids.map(id=>[id,id===moldId?value:0]))};
+  }
   function withImplicitPrices(snapshot,defaults){
     const result=copy(snapshot);
     function compact(state){
@@ -21,6 +31,7 @@
       }
       if(!Object.keys(prices).length)delete meta.prices;
     }
+    if(result.decision_state?.PRODUCCION_META)result.decision_state.PRODUCCION_META=singleMoldPlan(result.decision_state.PRODUCCION_META);
     compact(result.decision_state);
     for(const plan of Object.values(result.decision_state?.__cyclePlans||{}))compact(plan?.state);
     return result;
@@ -145,7 +156,7 @@
     if(typeof global.addEventListener==='function')global.addEventListener('online',()=>{attempts=0;nextAttempt=0;if(retryTimer!==null)cancel(retryTimer);retryTimer=null;void flush();});
     return {enqueue,flush,pending,discard};
   }
-  const api={createQueue,pendingMessage,withImplicitPrices};
+  const api={createQueue,pendingMessage,withImplicitPrices,singleMoldPlan};
   global.SIDE=global.SIDE||{};global.SIDE.StudentSync=api;
   if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

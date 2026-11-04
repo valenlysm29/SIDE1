@@ -882,7 +882,7 @@ function normalizeDecisionDraft(item,draft){
   if(draft.quantities)draft.quantities=mapValues(draft.quantities);
   if(item.id==='MOLDE'&&item.type==='choice'&&draft.optionIds)draft.optionIds=draft.optionIds.filter(id=>item.options.some(option=>option.id===id)).slice(0,1);
   if(['PERS_ENSAMBLE','PERS_ACABADO'].includes(item.id))delete draft.assignments;
-  if(item.type==='production-plan')draft.prices=normalizedProductionPrices(draft.prices);
+  if(item.type==='production-plan'){Object.assign(draft,window.SIDE.StudentSync.singleMoldPlan(draft));draft.prices=normalizedProductionPrices(draft.prices);}
   if(draft.moldTargets)draft.moldTargets=mapValues(draft.moldTargets);
   if(draft.staff)draft.staff=mapValues(draft.staff);
   for(const key of ['value','amount'])if(Object.hasOwn(draft,key)&&draft[key]!=='')draft[key]=nonnegativeDecisionNumber(draft[key]);
@@ -898,7 +898,7 @@ function createDecisionDraft(item){
   if(item.type==='quantity'||item.type==='quantity-choice'){const quantities={};item.options.forEach(o=>quantities[o.id]=Number(sameRound?e.quantities?.[o.id]||0:0));return decisionDrafts[item.id]={quantities}}
   if(item.type==='production-plan'){
     const moldTargets=window.SIDE_PRODUCTION_MODEL.resolveProductionTargets({state:decisionState,drafts:decisionDrafts,round:currentRound()});
-    return decisionDrafts[item.id]={moldTargets,prices:normalizedProductionPrices(e?.prices)};
+    return decisionDrafts[item.id]={moldTargets,moldId:sameRound?e?.moldId:undefined,viewMoldId:sameRound?e?.moldId:undefined,prices:normalizedProductionPrices(e?.prices)};
   }
   if(item.type==='number')return decisionDrafts[item.id]={value:item.id==='INV_MARKETING'?window.SIDE_BUSINESS_RULES.advertising({state:sameRound?decisionState:{}}):Number(sameRound?e.value:0)};
   if(item.id==='MOLDE')return decisionDrafts[item.id]={optionIds:sameRound?(e.optionIds||[]):[]};
@@ -1138,7 +1138,7 @@ function normalizedProductionPrices(prices={}){
 }
 function productionCalculatorHtml(plan,draft,locked){
   const line=calculatorMoldLine(plan,draft);draft.viewMoldId=line.id;
-  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Indica tu meta por molde y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta total de todos los moldes</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields"><div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><label for="productionMoldSelector">Molde a calcular<select id="productionMoldSelector" data-production-mold ${locked?'disabled':''}>${plan.productLines.map(entry=>`<option value="${entry.id}" ${entry.id===line.id?'selected':''}>${escapeHtml(entry.label)}</option>`).join('')}</select></label><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Cambia de molde para revisar otra meta; las cantidades anteriores se conservan.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
+  return `<div class="production-calculator production-calculator-single"><header><div><strong>¿Cuánto deseas producir?</strong><p>Selecciona un molde por ciclo y organiza los materiales, el personal y los equipos para producirla.</p></div><div class="production-total"><small>Meta del ciclo</small><b data-production-total role="status" aria-live="polite" aria-atomic="true">${plan.target.toLocaleString('es-PE')} u.</b></div></header><div class="production-calculator-fields"><div class="production-calculator-quantity"><label for="production-${line.id}">Cantidad deseada con este molde</label><div class="mold-target-control"><button type="button" data-mold-step="${line.id}" data-delta="-10" aria-label="Reducir diez unidades" ${locked?'disabled':''}>−10</button><input id="production-${line.id}" data-mold-target="${line.id}" aria-describedby="productionPlanningHint" type="number" inputmode="numeric" min="0" step="1" value="${line.target}" ${locked?'disabled':''}><button type="button" data-mold-step="${line.id}" data-delta="10" aria-label="Agregar diez unidades" ${locked?'disabled':''}>+10</button><span>unidades</span></div></div><fieldset class="production-mold-options"><legend>Molde del ciclo</legend>${plan.productLines.map(entry=>`<label><input type="radio" name="productionMold" data-production-mold value="${entry.id}" ${entry.id===line.id?'checked':''} ${locked?'disabled':''}>${escapeHtml({molde_1:'Básico',molde_2:'Estándar',molde_3:'Prémium'}[entry.id])}</label>`).join('')}</fieldset><p id="productionPlanningHint" class="production-calculator-reading" data-production-planning-hint>Requisitos para la cantidad indicada. Al cambiar de molde se conserva la cantidad y se asigna únicamente al molde seleccionado.</p><div class="mold-requirements" data-mold-requirements aria-live="polite" aria-atomic="true">${productionCalculatorRequirements(line)}</div></div><footer><small>La calculadora no realiza compras ni cambia tus recursos. Consulta los insumos necesarios y la capacidad de tu línea de producción.</small></footer></div>`;
 }
 function productionCalculatorRequirements(line){return `<span>${line.available?'Molde disponible':'Molde no adquirido: no se producirán unidades con este molde.'}</span><span>Insumos para ${line.target.toLocaleString('es-PE')} unidades de ${escapeHtml(line.label)}</span><b>Cuero: ${line.requirements.CUERO.toLocaleString('es-PE')} m²</b><b>Accesorios: ${line.requirements.ACCESORIOS.toLocaleString('es-PE')} u.</b><b>Hilo: ${line.requirements.HILO.toLocaleString('es-PE')} m</b>`;}
 function normalizeProductionTargetInput(input){const value=input.value===''?'':Math.max(0,Math.trunc(Number(input.value)||0));if(input.value!=='')input.value=String(value);return value;}
@@ -1302,8 +1302,8 @@ function bindDecisionControls(){
     if(decisionEditingBlocked())return;
     const d=initDraft(findDecisionItem('PRODUCCION_META'));
     if(!productionPlan().productLines.some(line=>line.id===select.value))return;
-    d.viewMoldId=select.value;persistCurrentDraftOnly();renderDecisionCategory();
-    document.querySelector('[data-production-mold]')?.focus({preventScroll:true});
+    Object.assign(d,window.SIDE.StudentSync.singleMoldPlan(d,select.value));persistCurrentDraftOnly();updateHud();renderDecisionCategory();
+    document.querySelector('[data-production-mold]:checked')?.focus({preventScroll:true});
   }));
   document.querySelectorAll('[data-mold-step]').forEach(button=>button.addEventListener('click',()=>{
     if(decisionEditingBlocked())return;const item=findDecisionItem('PRODUCCION_META'),d=initDraft(item),id=button.dataset.moldStep;
@@ -1388,7 +1388,7 @@ function validateRequiredSection(cat){
     const d=initDraft(item);
     if(item.type==='choice'&&!(d.optionIds||[]).length){toast(`Debes completar: ${item.name}.`);return false}
     if(item.type==='multi-choice'&&(d.optionIds||[]).length<Number(item.minSelections||1)){toast(`Debes seleccionar al menos una opción en ${item.name}.`);return false}
-    if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir en al menos uno de los tres moldes.');return false}
+    if(item.type==='production-plan'&&Object.values(d.moldTargets||{}).reduce((total,value)=>total+Number(value||0),0)<Number(item.min||0)){toast('Indica cuánto deseas producir con el molde seleccionado.');return false}
     if(item.type==='number'&&Number(d.value)<Number(item.min||0)){toast(`${item.name} debe ser como mínimo ${item.min}.`);return false}
     if(item.requiredWhenProduction&&currentProductionTarget()>0){/* El faltante de insumos es una advertencia, no un bloqueo. */}
   }
@@ -1414,7 +1414,7 @@ function prepareSectionSave(cat,context=decisionModelContext()){
     if(item.type==='production-plan'){
       const moldTargets=Object.fromEntries(Object.entries(d.moldTargets||{}).map(([id,value])=>[id,Math.max(0,Math.trunc(Number(value)||0))]));
       const value=Object.values(moldTargets).reduce((total,target)=>total+target,0);
-      entries[item.id]={...common,moldTargets,prices:deepClone(d.prices||{}),value,label:`Producción deseada: ${value} unidades`};return;
+      entries[item.id]={...common,moldId:d.moldId,moldTargets,prices:deepClone(d.prices||{}),value,label:`Producción deseada: ${value} unidades`};return;
     }
     if(item.type==='number'){entries[item.id]={...common,value:Number(d.value||0),label:`${item.name}: ${Number(d.value||0)} ${item.unit||''}`};return;}
     if(item.type==='sales-staff'){entries[item.id]={...common,staff:deepClone(d.staff||{})};return;}

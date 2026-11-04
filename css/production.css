@@ -818,6 +818,12 @@ body:has(#decisionMenu:not(.hidden)) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   #decisionMenu .decision-tabs { scroll-behavior: auto; }
 }
+
+#decisionMenu .production-mold-options { margin: 0; min-width: 0; padding: 12px; border: 1px solid var(--ui-line); border-radius: 8px; font: inherit; }
+#decisionMenu .production-mold-options label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-right: 12px; cursor: pointer; }
+#decisionMenu .production-mold-options input { accent-color: var(--ui-yellow); }
+#decisionMenu .production-mold-options label:has(:checked) { color: var(--ui-yellow); font-weight: 600; }
+#decisionMenu .production-mold-options input:focus-visible { outline: 3px solid var(--ui-yellow); outline-offset: 3px; }
 .profit-diagnostic { border-inline-start: 3px solid var(--side-gold, #ffd329); min-width: 0; }
 .profit-metrics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,210px),1fr)); gap: 12px 24px; }
 .profit-metrics div { padding-block: 8px; border-bottom: 1px solid var(--side-line,#294358); }

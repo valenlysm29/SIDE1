@@ -490,6 +490,7 @@
           for(const [option,value] of Object.entries(entry.quantities||{}))if(!allowed.has(option)||!safeInteger(value))return invalid('Cantidad de activo inválida en '+item.id+'.');
         }
         for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.moldTargets||{}))if(!['molde_1','molde_2','molde_3'].includes(id)||!finiteNonnegative(value)||!Number.isInteger(Number(value)))return invalid('Plan de producción inválido.');
+        if(Object.values(decisions.PRODUCCION_META?.moldTargets||{}).filter(value=>Number(value)>0).length>1)return invalid('Selecciona un único molde por ciclo.');
         for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.prices||{}))if(!['esencial','urbano','premium'].includes(id)||!finiteNonnegative(value))return invalid('Precio de venta inválido.');
         if(decisions.INV_MARKETING?.value!=null&&(!finiteNonnegative(decisions.INV_MARKETING.value)||Number(decisions.INV_MARKETING.value)>10000))return invalid('La publicidad debe estar entre S/ 0 y S/ 10,000.');
         if(decisions.PRESTAMO?.amount!=null&&!finiteNonnegative(decisions.PRESTAMO.amount))return invalid('Préstamo inválido.');

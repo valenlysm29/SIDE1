@@ -43,7 +43,7 @@ const SIDE_DECISION_CATALOG_DATA = [
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
     desc:'Define el volumen del ciclo y organiza el personal que opera la línea única de corte, ensamblado y acabado.',
     items:[
-      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir por cada tipo de molde. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
+      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir y selecciona un único molde para el ciclo. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
       {id:'PERS_CORTE',required:false,name:'Personal de corte',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1690.8},
         {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2254.4},
