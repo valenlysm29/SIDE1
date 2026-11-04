@@ -1,3 +1,5 @@
+// Disabled: old test created .invalid accounts and cannot prove real verification.
+throw new Error('Prueba deshabilitada: se requieren cuentas institucionales verificadas reales.');
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import {readFile} from 'node:fs/promises';

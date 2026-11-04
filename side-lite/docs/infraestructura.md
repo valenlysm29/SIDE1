@@ -15,3 +15,7 @@ Se creó un proyecto independiente SIDE-LITE en el plan gratuito y una rama de d
 ## Integración de desarrollo y cierre alojado
 
 El puente local autentica solicitudes con Neon Auth y trabaja contra la rama de desarrollo mediante un rol SQL limitado. Se probaron partidas remotas de tres y seis ciclos y un ciclo de 120 segundos. La función `sideclose` fue probada con un disparador por minuto; está desactivado para preservar cuota. La aplicación pública y la integración del cliente oficial siguen pendientes; ver `remote/README.md`.
+
+## Política institucional vigente
+
+La rama Neon de desarrollo exige verificación por código. El servidor permite activar el rol docente, sin aprobación individual, solo para una identidad verificada cuyo correo termine exactamente en `@upch.pe`. El acceso estudiantil permanece separado. La entrega real del código, el cliente y el backend públicos siguen pendientes; no se han habilitado ciclos periódicos permanentes.

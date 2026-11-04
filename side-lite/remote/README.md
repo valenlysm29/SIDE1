@@ -1,34 +1,29 @@
-# Neon — integración de desarrollo, no lista para publicar
+# Neon — desarrollo de SIDE Lite, no listo para publicar
 
-Proyecto independiente `odd-dust-54712578`, rama `side-lite-dev` (`br-snowy-moon-bcshnyw2`). No se modificó su rama principal. La rama de desarrollo tiene Neon Auth y el esquema privado `lite` con nueve tablas, tiendas y doce eventos. `PUBLIC` no tiene USAGE sobre ese esquema y no se habilitó Data API.
+Proyecto `odd-dust-54712578`, rama autorizada `side-lite-dev` (`br-snowy-moon-bcshnyw2`). La rama principal de Neon y SIDE original no se utilizan. El esquema `lite` no permite USAGE a PUBLIC y no se habilitó Data API. El rol SQL del puente no es superusuario, no hereda `neon_superuser`, no tiene DELETE ni puede actualizar directamente la columna `role` de perfiles.
 
-## Backend y autorización de prueba
+## Identidad y política docente
 
-`dev-server.js` es un puente de integración que **solo escucha en 127.0.0.1** y requiere `SIDE_LITE_NEON_DEV_ONLY=1`. Verifica cada token de Neon con `identity.js`, crea únicamente perfiles de estudiante y consulta el rol en PostgreSQL. Reutiliza las rutas y el motor económico locales, con nombres de tabla calificados en `lite`. Un docente de prueba se habilita mediante una inserción administrativa directa; no existe un endpoint que permita solicitar ese rol. Los permisos están documentados en `migrations/202611040001_api_grants_dev.sql`: el rol de aplicación no es superusuario, no hereda `neon_superuser` y no tiene permiso DELETE.
+Neon Auth de desarrollo exige verificación por código al registrarse, usando el proveedor compartido de Neon para pruebas. La entrega y recepción reales no se han comprobado: falta una bandeja institucional autorizada. Para producción Neon requiere configurar un proveedor de correo propio y dominios confiables.
 
-El archivo ignorado `.neon-dev-secrets.json` contiene credenciales exclusivas de desarrollo; nunca añadirlo a Git ni utilizarlo para producción. El corredor `dev-runner.js` acepta esos valores por entrada estándar. Estas credenciales no pertenecen al SIDE original.
+El puente de desarrollo escucha solo en `127.0.0.1`, verifica firma, emisor, audiencia, vencimiento, antigüedad, correo verificado y estado de bloqueo. `POST /api/teacher/activate` utiliza exclusivamente la identidad del token: la función de PostgreSQL consulta el usuario de Neon y activa el rol docente solo si su correo verificado termina exactamente en `@upch.pe`. No requiere listas ni aprobación individual. Una persona con correo institucional permanece como estudiante hasta solicitar el apartado docente. El servidor vuelve a comprobar el dominio y la verificación al usar el rol. No hay acceso del navegador a la base de datos.
 
-`e2e/neon-game-live.js` crea cuentas de prueba `.invalid`, imprime el UUID de su docente y espera a que un administrador inserte ese perfil en `lite.lite_profiles` como docente. Ejecuta partidas de tres y seis ciclos con dos estudiantes, comprueba el aislamiento y compara resultados. Con `SIDE_LITE_REAL_CYCLE=1` prueba un ciclo de 120 segundos. La prueba usa el puente local y acceso HTTP de prueba a Neon Auth, no Playwright ni el cliente oficial.
+La interfaz local muestra el mensaje institucional, pero **todavía no está conectada a Neon Auth ni llama al endpoint de activación**. Las pruebas históricas que creaban direcciones `.invalid` están deshabilitadas; no se debe enviar un código a direcciones ficticias ni simular su recepción. La prueba real de entrega queda pendiente hasta disponer de una bandeja institucional autorizada.
 
-## Cierre programado en desarrollo
+El archivo ignorado `.neon-dev-secrets.json` contiene credenciales exclusivas de desarrollo; nunca añadirlo a Git ni utilizarlo en producción. El corredor `dev-runner.js` las recibe por entrada estándar. No son credenciales del SIDE original.
 
-`close-cycle.js` reutiliza el motor económico y hace el cierre en una transacción con bloqueo `FOR UPDATE SKIP LOCKED`. `closing-function.js` solo acepta entregas de programador verificadas mediante `@neon/functions/triggers`. Se desplegó como la función `sideclose`, con una cuenta SQL limitada y sin credenciales en el navegador. Su programación `side-lite-close-dev` es cada minuto y está **desactivada** para evitar consumo continuo de la cuota gratuita.
+## Cierre programado
 
-La función alojada cerró una partida vencida sin ningún puente local abierto; el resultado quedó único tras una segunda ejecución. Una prueba adicional lanzó dos cierres concurrentes en Neon y comprobó un solo resultado. Para reproducirla, un administrador crea un ciclo vencido con `tests/create_due_fixture.sql` en la rama de desarrollo y pasa su UUID como `SIDE_LITE_TEST_CYCLE_ID` a `node e2e/neon-close-concurrency.js`, con el programador y otros puentes detenidos. Un ciclo probado cerró 58,5 segundos después de vencer: con cron por minuto la demora puede alcanzar aproximadamente un minuto más la latencia o reintentos; el servidor bloquea decisiones a partir de la hora de vencimiento, no del momento en que termina el cierre.
+`close-cycle.js` reutiliza el motor económico y procesa cada ciclo en su propia transacción con `FOR UPDATE SKIP LOCKED`; un ciclo defectuoso no bloquea los demás. `closing-function.js` solo acepta entregas verificadas de Neon Function Trigger. La función `sideclose` está desplegada en desarrollo, pero su programación por minuto permanece **desactivada** para evitar consumo continuo de cuota. La hora guardada en PostgreSQL bloquea decisiones vencidas; el procesamiento puede terminar después. La interfaz local muestra «Procesando resultados» durante esa espera.
+
+La versión anterior del cierre alojado fue probada sin puente local y no duplicó resultados. La versión actualizada se probó con dos cierres concurrentes en Neon y luego se desplegó en desarrollo. El cron de prueba cerró un ciclo y quedó nuevamente desactivado. La cuota gratuita debe revisarse antes de cualquier activación permanente.
 
 ## Pendiente antes de publicar
 
-- Integrar el cliente oficial de Neon Auth en el frontend. La versión `@neondatabase/auth` 0.6.0-beta evaluada introdujo alertas de seguridad críticas y otras en dependencias; se retiró. No afirmar que la interfaz actual usa Neon Auth.
-- Configurar verificación de correo, SMTP de producción y dominios confiables; el Auth de desarrollo no exige verificar correo.
-- Desplegar un backend completo y seguro: el puente actual es solo local, no tiene política de HTTPS/CORS ni límites de abuso para Internet y el JWT no garantiza revocación inmediata. Probar roles y accesos cruzados con el cliente real.
-- Ejecutar Playwright de los flujos remotos y probar recuperación de red y reinicio sobre ese backend. Las pruebas Playwright anteriores usan PostgreSQL local.
-- Evaluar cuota, frecuencia y supervisión antes de activar permanentemente el programador; la base gratuita suspende capacidad al superar límites. El esquema no tiene RLS y no debe exponerse directamente.
-- Separar los recursos y credenciales de producción de los de prueba. No se ha desplegado una URL pública de juego.
+- Integrar el cliente oficial de Neon Auth o una alternativa oficial soportada sin vulnerabilidades no mitigadas; la evaluación está en `../docs/neon-auth-audit.md`.
+- Comprobar recepción real y caducidad de un código con una bandeja institucional autorizada; configurar SMTP propio y dominios de producción.
+- Conectar las pantallas al backend remoto seguro, con HTTPS, CORS, protección de sesiones y límites de abuso; el puente es solo local.
+- Ejecutar Playwright de registro verificado y partidas completas contra frontend y backend remotos realmente desplegados.
+- Verificar cuotas, monitoreo y recuperación antes de activar el programador permanentemente; no exponer directamente el esquema `lite`.
 
-## Comprobaciones adicionales
-
-La interfaz local muestra «Procesando resultados» después del vencimiento estimado a partir del reloj del servidor y oculta las decisiones mientras el ciclo sigue abierto. El servidor continúa siendo la autoridad que rechaza decisiones tardías. Una prueba Playwright con respuestas controladas verificó esa transición.
-
-El puente de Neon exige correo verificado por defecto y rechaza cuentas marcadas como bloqueadas. La excepción `SIDE_LITE_DEV_ALLOW_UNVERIFIED=1` es solo para pruebas del puente restringido a localhost; la configuración de Neon de desarrollo todavía no envía ni exige verificación de correo. `e2e/neon-bridge.spec.js`, habilitada con `SIDE_LITE_NEON_E2E=1`, probó la interfaz local contra el puente y Neon reales usando la excepción de prueba y un docente asignado por un administrador. No constituye una prueba de frontend ni backend públicos.
-
-La auditoría del cliente oficial está en `../docs/neon-auth-audit.md`.
+Las pruebas anteriores de tres y seis ciclos en Neon y del ciclo de 120 segundos utilizaron el puente local, antes de exigir verificación real. No constituyen pruebas del flujo actual de correo ni de un despliegue público.
