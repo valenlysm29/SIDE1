@@ -1,54 +1,21 @@
-# Neon — desarrollo de SIDE Lite, no listo para publicar
+# SIDE Lite — vista previa privada en Neon de desarrollo
 
-Proyecto `odd-dust-54712578`, rama autorizada `side-lite-dev` (`br-snowy-moon-bcshnyw2`). La rama principal de Neon y SIDE original no se utilizan. El esquema `lite` no permite USAGE a PUBLIC y no se habilitó Data API. El rol SQL del puente no es superusuario, no hereda `neon_superuser`, no tiene DELETE ni puede actualizar directamente la columna `role` de perfiles.
+Proyecto `odd-dust-54712578`, rama `side-lite-dev` (`br-snowy-moon-bcshnyw2`). No utilizar SIDE original ni Neon main. La URL privada es `https://br-snowy-moon-bcshnyw2-sideweb.compute.c-16.us-east-1.aws.neon.tech/`; exige la credencial de vista previa, deshabilita el registro público y no está habilitada para estudiantes reales. Las cuentas de prueba permanecen bloqueadas fuera de pruebas expresamente autorizadas.
 
-## Identidad y política docente
+## BFF y sesión
 
-Neon Auth de desarrollo exige verificación por código al registrarse, usando el proveedor compartido de Neon para pruebas. La entrega y recepción reales no se han comprobado: falta una bandeja institucional autorizada. Para producción Neon requiere configurar un proveedor de correo propio y dominios confiables.
+`sideweb` sirve el frontend y se comunica con Neon Auth y `sidepreview`. El navegador no recibe el JWT, `LITE_PREVIEW_KEY`, ni la conexión a PostgreSQL. La cookie de sesión propia contiene las cookies de Neon cifradas y autenticadas con AES-256-GCM; es `HttpOnly`, `Secure`, `SameSite=Strict` y restringida al origen. En cada solicitud de juego, el BFF consulta la sesión de Neon, exige correo verificado y obtiene allí un JWT para `sidepreview`; la API verifica además la identidad y autorización sobre la partida. Las escrituras comprueban origen y contenido JSON; el acceso de vista previa exige autenticación independiente, y el cuerpo se limita a 16 KiB.
 
-El puente de desarrollo escucha solo en `127.0.0.1`, verifica firma, emisor, audiencia, vencimiento y antigüedad del token; consulta además el estado actual de verificación y bloqueo en Neon Auth en cada solicitud. `POST /api/teacher/activate` utiliza exclusivamente la identidad del token: la función de PostgreSQL consulta el usuario de Neon y activa el rol docente solo si su correo verificado termina exactamente en `@upch.pe`. No requiere listas ni aprobación individual. Una persona con correo institucional permanece como estudiante hasta solicitar el apartado docente. El servidor vuelve a comprobar el dominio y la verificación al usar el rol. No hay acceso del navegador a la base de datos.
+La integración parte del ZIP de desarrollo entregado por el usuario. El empaquetador `scripts/build-bff.mjs` genera un artefacto temporal bajo `tests/output/bff/`. No se utilizó el desplegador del ZIP porque pasaba secretos como argumentos del proceso. Los secretos se guardan en variables del servicio y en `.neon-dev-secrets.json`, archivo local ignorado por Git. No imprimir ni publicar sus contenidos. El proxy usa directamente los endpoints HTTP de Neon con una envoltura de sesión propia; no es el SDK oficial y requiere revisión independiente antes de producción. Sus límites de intentos son por instancia, no un control distribuido de abuso.
 
-La interfaz tiene pantallas de código OTP y activación docente para el adaptador de Neon, pero **no inicializa el cliente oficial** y sigue sin conexión real a Neon Auth. El modo local no representa la política de producción. Las pruebas históricas que creaban direcciones `.invalid` están deshabilitadas; no se debe enviar un código a direcciones ficticias ni simular su recepción. La prueba real de entrega queda pendiente hasta disponer de una bandeja institucional autorizada.
+## Pruebas
 
-El archivo ignorado `.neon-dev-secrets.json` contiene credenciales exclusivas de desarrollo; nunca añadirlo a Git ni utilizarlo en producción. El corredor `dev-runner.js` las recibe por entrada estándar. No son credenciales del SIDE original.
+`npm test` incluye 28 pruebas locales, de las cuales cinco usan un proveedor controlado para comprobar el BFF. `e2e/bff-live.spec.js`, `e2e/bff-revocation-live.spec.js` y `e2e/bff-multiplayer-live.spec.js` usan el frontend HTTPS, BFF, Neon Auth y PostgreSQL reales; solo se ejecutan con `SIDE_LITE_BFF_LIVE=1`, credenciales de desarrollo ignoradas y cuentas habilitadas administrativamente. Esas identidades se verificaron administrativamente, no por recepción de correo, y se bloquearon al terminar.
 
-## Cierre programado
+Playwright comprobó sesiones independientes, recarga, cookies, rechazo anónimo y CSRF, revocación, cierre de sesión y rechazo de una cookie anterior, reconexión, ausencia de secretos en respuestas y acceso en móvil. Tres navegadores completaron una partida de tres ciclos y otra de seis ciclos de 30 segundos, y un ciclo de 120 segundos: los resultados visibles de docente y estudiantes coincidieron. La primera ejecución del test multijugador falló por un selector ambiguo y se corrigió antes de repetirla.
 
-`close-cycle.js` reutiliza el motor económico y procesa cada ciclo en su propia transacción con `FOR UPDATE SKIP LOCKED`; un ciclo defectuoso no bloquea los demás. `closing-function.js` solo acepta entregas verificadas de Neon Function Trigger. La función `sideclose` está desplegada en desarrollo, pero su programación por minuto permanece **desactivada** para evitar consumo continuo de cuota. La hora guardada en PostgreSQL bloquea decisiones vencidas; el procesamiento puede terminar después. La interfaz local muestra «Procesando resultados» durante esa espera.
+## Cierre y pendientes
 
-La versión anterior del cierre alojado fue probada sin puente local y no duplicó resultados. La versión actualizada se probó con dos cierres concurrentes en Neon y luego se desplegó en desarrollo. El cron de prueba cerró un ciclo y quedó nuevamente desactivado. La cuota gratuita debe revisarse antes de cualquier activación permanente.
+`sideclose` cierra transaccionalmente, sin depender del navegador, y bloquea decisiones al vencimiento oficial. El trigger de prueba se activó durante los recorridos y se desactivó al terminarlos. No hay todavía un programador permanente recuperable compatible con la cuota gratuita: una invocación por minuto puede mantener activo el cómputo y, a 0,25 CU, consumir alrededor de 180 CU-horas en 30 días frente a las 100 CU-horas mensuales gratuitas documentadas. No activarlo permanentemente sin resolver el control de consumo.
 
-## Pendiente antes de publicar
-
-- Integrar el cliente oficial de Neon Auth o una alternativa oficial soportada sin vulnerabilidades no mitigadas; la evaluación está en `../docs/neon-auth-audit.md`.
-- Comprobar recepción real y caducidad de un código con una bandeja institucional autorizada; configurar SMTP propio y dominios de producción.
-- Conectar las pantallas al backend remoto seguro, con HTTPS, CORS, protección de sesiones y límites de abuso; el puente es solo local.
-- Ejecutar Playwright de registro verificado y partidas completas contra frontend y backend remotos realmente desplegados.
-- Verificar cuotas, monitoreo y recuperación antes de activar el programador permanentemente; no exponer directamente el esquema `lite`.
-
-Las pruebas anteriores de tres y seis ciclos en Neon y del ciclo de 120 segundos utilizaron el puente local, antes de exigir verificación real. No constituyen pruebas del flujo actual de correo ni de un despliegue público.
-
-El proyecto usa el plan gratuito con un mínimo de 0,25 CU. Un cierre consultado cada minuto puede impedir la suspensión del cómputo; 30 días continuos a ese mínimo equivalen a unas 180 CU-horas, por encima de las 100 CU-horas mensuales documentadas para el plan gratuito. El programador permanece desactivado.
-
-## API HTTPS privada de desarrollo
-
-La función `sidepreview` está desplegada solo en `side-lite-dev`. Recibe las mismas rutas que el puente mediante `api-app.js`, y exige una clave de vista previa más un JWT verificado antes de consultar datos de partidas. Sin clave o sin JWT la prueba HTTPS devuelve 401. La clave y la contraseña de la base se guardan en variables de función y en el archivo local ignorado; no van al navegador ni a Git. La vista previa no es un sitio ni un backend listo para producción: no hay protección perimetral contra abuso, conexión de frontend, ni prueba con una sesión verificada. El adaptador usa un servidor interno de loopback en el proceso de Neon; la prueba HTTPS solo cubre rechazos, no operaciones autenticadas. No usar para datos reales.
-
-El proxy oficial de Neon se documenta en `@neondatabase/auth/server` y depende del mismo paquete afectado; el SDK combinado también depende de ese paquete. En la versión 0.7.0-beta el árbol instala Better Auth 1.7.6, incluido en la alerta crítica GHSA-965c-763c-88jm. La alerta requiere además Magic Link y OAuth, por lo que la presencia del paquete no demuestra por sí sola una explotación en esta aplicación. Una combinación corregida dio conflictos entre pares de dependencias, por lo que no se incorporó ni se considera una integración validada.
-
-## Recorridos remotos con identidades de desarrollo
-
-Se ejecutaron partidas contra la función HTTPS `sidepreview`, con sesiones y JWT emitidos por Neon Auth y resultados guardados en PostgreSQL. Se crearon tres identidades exclusivas de desarrollo y se verificaron administrativamente en `side-lite-dev`; no se envió ni recibió correo y esta prueba no verifica entrega real. Las tres identidades quedaron bloqueadas al terminar. Las credenciales de pruebas están en `tests/output/` ignorado por Git; para repetirlas se necesita una habilitación administrativa expresa y el programador de cierre de prueba.
-
-- Partida de tres ciclos de 15 segundos: dos estudiantes, decisiones confirmadas y recuperadas, tres cierres alojados y resultados coincidentes entre docente y estudiantes.
-- Partida de seis ciclos de 15 segundos: mismos controles y coincidencia de resultados en los seis ciclos.
-- Ciclo adicional de 120 segundos: cierre alojado y resultados coincidentes; otra prueba comprobó el rechazo HTTP 409 de una decisión tras el plazo oficial.
-- La API rechazó un token falsificado, un intento de acceso a partida ajena y una solicitud de activar al docente desde un dominio no institucional. Una sesión previamente emitida fue rechazada al bloquear la identidad.
-
-El programador se habilitó temporalmente durante las pruebas y quedó desactivado; no existe todavía un mecanismo automático permanente económico y recuperable. Las pruebas fueron mediante scripts de Node, no Playwright ni una interfaz conectada. El frontend y el BFF siguen pendientes, al igual que la recepción real de correo institucional y la revisión de seguridad de producción.
-
-## Contrato HTTP comprobado
-
-La función `e2e/neon-auth-contract.js` consulta en modo lectura el OpenAPI de la rama de desarrollo. El servicio publica registro, inicio y cierre de sesión, recuperación de sesión, token, verificación OTP y reenvío OTP, con los campos exigidos esperados. Esta comprobación no acredita envío de correo ni constituye un BFF ni una prueba de navegador.
-
-La existencia de esos endpoints no define por sí sola cómo trasladar sus cookies, protección de sesión y respuestas a otro origen. Neon recomienda su cliente administrado y documenta el proxy de servidor de `@neondatabase/auth/server`; sigue pendiente integrar una versión compatible con la política de dependencias del proyecto y verificar el manejo de cookies, CSRF, limitación de abuso y sesiones antes de exponer una interfaz. No se desplegó una interfaz ni un BFF para usuarios.
+Faltan comprobar la recepción real del OTP en una bandeja institucional autorizada, configurar SMTP y dominios de producción, revisar la integración HTTP y las cookies frente a los cambios de Neon, aplicar protección perimetral y límites distribuidos, y resolver el cierre automático recuperable. El registro público permanece desactivado y la vista previa no es una plataforma para estudiantes reales.

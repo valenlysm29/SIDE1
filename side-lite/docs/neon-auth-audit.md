@@ -1,5 +1,7 @@
 # Evaluación del cliente oficial de Neon Auth
 
+**Actualización:** ahora existe una vista previa privada con un BFF experimental basado en HTTP de Neon Auth, procedente del ZIP de desarrollo. Las observaciones siguientes son históricas sobre el SDK; el estado y las pruebas actuales se detallan en `remote/README.md`. El BFF no utiliza ese SDK y no está aprobado para producción.
+
 Fecha de evaluación: 2026-11-03. Se instaló `@neondatabase/auth@0.7.0-beta` únicamente en un directorio temporal ignorado dentro de `tests/output/`, con scripts de instalación deshabilitados; no se añadió a las dependencias de SIDE Lite.
 
 La instalación directa produjo diez alertas en `npm audit --omit=dev`: seis bajas, tres altas y una crítica. Entre ellas figuran avisos de [OAuth Proxy en Better Auth](https://github.com/advisories/GHSA-r4xp-prcw-77qf), [estado OAuth como Magic Link](https://github.com/advisories/GHSA-965c-763c-88jm) y [validación de colecciones en Zod](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5). La presencia en el árbol de dependencias no demuestra que SIDE Lite sea explotable; la interfaz no incorpora ese paquete.
