@@ -1,0 +1,351 @@
+Bundled 20 local modules (298073 bytes).
+✔ worker ignores forged current ledger, valid section and financial snapshot (78.1666ms)
+✔ worker restores previous immutable closure, rejecting forged current opening cash (10.2708ms)
+✔ unverifiable events fail closed (0.71ms)
+✔ legitimate loan is reconstructed from confirmed decision, not client ledger (7.6401ms)
+✔ worker usa precio interno pese a precio inyectado con producción y ventas (7.9825ms)
+✔ missing prior immutable closure fails closed (0.4992ms)
+✔ forged past acquisitions cannot create assets in a later cycle (4.1391ms)
+✔ worker rejects invalid decisions before calculating or persisting (3.2844ms)
+✔ later credit line rejects fabricated loan and permits verified available line (11.0746ms)
+✔ worker rejects cycle totals above six before persisting a closure (1.0215ms)
+✔ worker rejects an out-of-range cycle even when a context is returned (0.5428ms)
+✔ worker no convierte compras en stock cuando la sala requiere recepción temporal (0.5045ms)
+✔ el cierre rechaza una versión de presentaciones aún no integrada en lugar de interpretarla como unidades físicas (0.4116ms)
+✔ avance PostgreSQL: 3 ciclos, dos empresas y reintento con el mismo ciclo esperado (3307.8695ms)
+✔ avance PostgreSQL: 6 ciclos, dos empresas y reintento con el mismo ciclo esperado (2860.9995ms)
+✔ clic durante lectura de cierres espera la consulta completa y avanza una sola vez (10.7984ms)
+✔ modo remoto manual prevalece sobre un formulario automático desactualizado (2.4ms)
+✔ botón refleja confirmaciones, procesamiento, error y cierre completo sin recargar (3.0432ms)
+✔ edge rejects missing and invalid scheduler token without running closures (58.9256ms)
+✔ edge reports failed and pending closures as unavailable (9.9271ms)
+✔ edge authorizes scheduler through service-only RPC and then closes cycles (5.2785ms)
+✔ edge fails closed on auth outage and disallows non-POST calls (4.1223ms)
+✔ zero confirmed plans is a provisional no-op and never calls persistence RPC (11.3809ms)
+✔ malformed confirmed plans still return an error (2.6581ms)
+✔ acknowledged teacher controls keep pending closures provisional (8.6619ms)
+✔ teacher reuses confirmed closures, retries pending closures and scopes the cache to the room generation (4.6535ms)
+✔ Node and generated Edge accept actual PostgREST void acknowledgements and preserve failures (205.8188ms)
+✔ un fallo de cancelación conserva la identidad heredada para reintentar sin falso éxito (12.1829ms)
+✔ un poll detenido en cierre de negocio no reaplica su sala activa después de cancelar (4.8992ms)
+✔ solo el propietario ve cancelar una sala abierta (2.054ms)
+✔ un error o excepción legado no afecta al cierre nuevo ni habilita ciclos siguientes (7.1163ms)
+✔ versión histórica desconocida o RPC fallida solo bloquea esa partida (1.9617ms)
+✔ un fallo nuevo se aísla y un plazo agotado se declara pendiente, nunca éxito vacío (1.045ms)
+✔ reloj automático espera cada cierre antes de iniciar el siguiente ciclo (3342.3859ms)
+✔ manual: no avanza sin cierre persistido y permite reintento tras confirmación (3678.4302ms)
+✔ manual: partidas anteriores conservan su transición (3036.5608ms)
+✔ seguimiento conserva fencing, prioriza nuevas y aísla el fallo histórico (15.6047ms)
+✔ intento ocupado no puede cerrar ni finalizar la propiedad ajena (3.0304ms)
+✔ cada partida usa su motor y un reintento no mezcla versiones (8.191ms)
+✔ rechaza versiones desconocidas sin ejecutar su motor ni silenciar el error (2.5612ms)
+✔ registra errores de procesamiento sin convertirlos en cierres ni cambiar el resultado económico (1.1967ms)
+✔ corte sellado PostgreSQL: 3 ciclos, dos empresas y reintento con el mismo ciclo esperado (3732.4607ms)
+✔ corte sellado PostgreSQL: 6 ciclos, dos empresas y reintento con el mismo ciclo esperado (3320.8873ms)
+✔ recuperación de borradores: token estable al reintentar, compras confirmadas y sellos intactos (3024.5237ms)
+✔ creación usa RPC atómico, conserva requestId y envía la configuración exacta (14.5563ms)
+✔ crear una sala no altera la versión explícita de una configuración heredada (3.2566ms)
+✔ conflicto entrega sala anterior sin anunciar éxito (4.6019ms)
+✔ crear nunca cancela ni reemplaza una partida anterior implícitamente (2.7284ms)
+✔ migración ausente PGRST202 identifica script y permite reintento (3.2763ms)
+✔ migración ausente PGRST204 identifica script y permite reintento (4.0147ms)
+✔ migración ausente 42883 identifica script y permite reintento (2.937ms)
+✔ migración ausente 42703 identifica script y permite reintento (2.7219ms)
+✔ recuperación servidor es explícita, admite vacío y exige reloj válido (3.5332ms)
+✔ respuesta de creación vacía no se anuncia como sala creada (3.8118ms)
+✔ reintento de solicitud ya cancelada o terminada exige nueva solicitud (6.2699ms)
+✔ respuesta sin estado usable o runtime coherente no anuncia éxito (9.2019ms)
+✔ recuperación heredada conserva identificación para sincronizar el servidor (6.0712ms)
+✔ recuperación moderna sin runtime no se acepta como partida heredada (4.3859ms)
+✔ sala moderna sin fecha de inicio conserva identificación para reparar el reloj (4.0014ms)
+✔ versión 2 guardada como texto conserva sala usable, sin clasificarla antigua (2.6901ms)
+✔ recuperación RPC conserva id y comprueba reloj, estado y código (2.6493ms)
+✔ recuperación ausente pide el SQL específico, sin éxito ficticio (2.5577ms)
+✔ recuperación de terminal permite configurar nueva sin reabrir la partida (2.3962ms)
+✔ Falla transitoria mantiene ciclo pendiente y próximo poll reintenta antes de avanzar (10.7134ms)
+✔ Profesor recién recargado recupera todos los ciclos pasados desde el primero (4.2563ms)
+✔ Fase results cierra mismo ciclo; finished inactivo permite reintentar último (5.1656ms)
+✔ Cancelación no calcula nuevos cierres después de cancelar la partida (2.8087ms)
+✔ la meta sin recursos calcula materiales y recursos suficientes sin modificar el estado (46.2525ms)
+✔ prémium, metas grandes y tres moldes comparten una línea suficiente y actualizada (5.4583ms)
+✔ DOP compares recommended, available and missing resources without changing the target (2.7522ms)
+✔ closing keeps a 2000-unit decision and produces only the 500 supported by stock (57.4027ms)
+✔ 92 matrix entries retain original amounts and pending academic approval; no global cost base (2.9796ms)
+✔ financial cost events use interest only, including duration, zero base and duplicates (25.1256ms)
+✔ accrual integration changes interest payable and profit, never principal/materials or a second cash charge (12.3443ms)
+✔ la clasificación cubre cada ID del catálogo y distingue los eventos implementados (7.2786ms)
+✔ impide nuevas selecciones costPct y conserva selecciones históricas (3585.157ms)
+✔ nuevas selecciones coinciden con los eventos restringidos por el servidor (98.6299ms)
+✔ conserva eventos históricos y respeta partidas con versión de eventos (5.9628ms)
+✔ financial changes preserve prior cycles, replace pending target, and retain actual random assignment (1.7267ms)
+✔ capital adjustment is financing, reconciles cash, and applies only once across closures (12.64ms)
+✔ El estado conserva las filas sin detalles adicionales (33.7371ms)
+✔ Estado de resultados conserva las doce filas obligatorias y valores realizados (14.4235ms)
+✔ DOM de alumno y profesor consume el mismo estado sin generar movimientos (6.4668ms)
+✔ Advertencias de garantías son visibles y escapadas en alumno, historial y profesor (9.9063ms)
+✔ balance identifica las cuentas persistidas que explican los totales (7.7803ms)
+✔ molde no depreciable: producción 0, ventas 0 (6.2674ms)
+✔ molde no depreciable: producción 10, ventas 0 (0.6391ms)
+✔ molde no depreciable: producción 10, ventas 4 (0.6131ms)
+✔ molde no depreciable: producción 10, ventas 10 (0.855ms)
+✔ la marca se respeta con métodos acelerado y por unidades; sin marca conserva depreciación (2.0755ms)
+✔ el cierre real congelado permanece idéntico y el contrafactual solo cambia devengo (11.3154ms)
+✔ mantenimiento opcional y automático son independientes, con deduplicación del automático antiguo (27.2784ms)
+✔ seis ciclos con ventas parciales conservan los céntimos de MP, PT y costo de ventas (114.3466ms)
+✔ varios productos reparten centavos sin crear ni perder valor; lotes=false (1.4696ms)
+✔ varios productos reparten centavos sin crear ni perder valor; lotes=true (1.0256ms)
+✔ legacy physical holdings generate production and sales in their acquisition cycle and later cycles (48.0533ms)
+✔ legacy option selections are recovered only without a purchase ledger and actual holdings remain authoritative (18.6537ms)
+✔ holdings from future cycles never supply current equipment or sales (10.6603ms)
+✔ purchase history overrides duplicate holdings and sums purchases and liquidations exactly once (1.0777ms)
+✔ current draft purchases add to prior legacy holdings while replacing same-cycle saved purchases (1.1663ms)
+✔ invalid acquisition cycles cannot create equipment, purchases, maintenance or investment costs (3.5149ms)
+✔ legacy equipment review and maintenance preserve the same acquisition costs and holdings as canonical history (14.1585ms)
+✔ saved numeric production targets use the chosen mold and generate sales in every segment (34.537ms)
+✔ numeric plans honor an explicit mold, recover previous purchases, and ignore invalid mold ids (0.5353ms)
+✔ current drafts and explicit per-mold zero plans take precedence over legacy values (1.2478ms)
+✔ numeric and text cycle identifiers preserve identical material consumption, sales and remaining stock (7.1742ms)
+✔ a current-cycle mold purchase remains available when synchronized optionIds are missing (3.1182ms)
+✔ French installments use the existing TEA, conserve principal and end at zero (3.6459ms)
+✔ zero interest, remaining term and insufficient cash retain arrears without capitalizing interest (1.2297ms)
+✔ contractual rate is fixed per disbursement; new loans use the current rate (0.6522ms)
+✔ financial integration 3 cycles: principal is financing, interest is expense; replay is immutable (81.8036ms)
+✔ financial integration 6 cycles: principal is financing, interest is expense; replay is immutable (125.8645ms)
+✔ no opt-in preserves accrued-only legacy loans and never converts unexplained historical balances (1.6808ms)
+✔ FIFO concilia tres ciclos, calidades y costos distintos (60.7035ms)
+✔ umbrales reales CONS-03 y CONS-08 distinguen puntaje y eficiencia física (7.426ms)
+✔ CONS-04 con umbral real tras dos ciclos de reputación baja (15.0565ms)
+✔ dos calidades prémium conservan sus precios por unidad y FIFO (3.9797ms)
+✔ varias tiendas concilian lotes FIFO, ingresos, inventario y cuentas por cobrar (17.7379ms)
+✔ cada tienda vende solo sus lotes y conserva los saldos por ubicación (1.586ms)
+✔ transferencias manuales no pueden superar el stock central (2.9559ms)
+✔ múltiples lotes antiguos sin ubicación verificable se bloquean (1.2283ms)
+✔ tres ciclos con dos tiendas mantienen FIFO por ubicación y concilian el balance (22.0391ms)
+✔ saldo agregado anterior conserva ubicación registrada y no inventa su composición (1.8565ms)
+✔ one-worker-per-resource: one cutting table pairs one cutter and limits the document example (11.4767ms)
+✔ the original 368-unit example requires a second cutting table under current resource rules (2.2332ms)
+✔ corrected actual consumption gives exact reputation and quality factors (5.9069ms)
+✔ advertising is capped, debited once and contributes only its reputation factor (6.655ms)
+✔ full closure preserves chosen prices, inventory balances and corrected MP valuation (70.3293ms)
+✔ MYPE and No MYPE labor, acquisition and maintenance follow the two source columns (1.2284ms)
+✔ base maintenance recurs in the engine while the optional decision keeps its original fee (13.7816ms)
+✔ the engine retains all owned mold types without adding a multi-purchase control (1.0651ms)
+✔ largest remainders preserve the market and are independent of input order (15.9968ms)
+✔ price guards support identical prices, arbitrary chosen prices and zero total scores (1.1612ms)
+✔ opening finished stock sells without new labor, material or production plan (4.4009ms)
+✔ unused premium purchases do not raise reputation; all thread levels form its denominator (1.3915ms)
+✔ sub-cent physical material balances survive repeated closures (4.0066ms)
+✔ unsold production costs remain in inventory and sold costs are recognized once (8.3137ms)
+✔ seal status overrides the financial calculation status, and isolates company and cycle (3.8013ms)
+✔ official history rendering omits future or processing amounts and never mutates the seal (45.5805ms)
+✔ oráculo independiente: meta inferior (19.1964ms)
+✔ oráculo independiente: igual capacidad (1.5105ms)
+✔ oráculo independiente: meta elevada (1.2931ms)
+✔ oráculo independiente: sin trabajador corte (1.1121ms)
+✔ oráculo independiente: sin máquina ensamble (1.164ms)
+✔ oráculo independiente: cuello corte (0.8898ms)
+✔ oráculo independiente: trabajadores insuficientes (0.8422ms)
+✔ oráculo independiente: equipos insuficientes (1.5561ms)
+✔ oráculo independiente: cuello ensamblado (1.7003ms)
+✔ oráculo independiente: cuello acabado (1.7823ms)
+✔ oráculo independiente: cuero insuficiente (0.948ms)
+✔ oráculo independiente: mezcla y prioridad (1.1195ms)
+✔ oráculo independiente: sobrantes anteriores (0.9106ms)
+✔ oráculo independiente: niveles y jefatura (0.7762ms)
+✔ oráculo temporal: recepción parcial no adelanta pedidos ni reutiliza capacidad pasada (1.8191ms)
+✔ oráculo temporal: prioriza básico, mejorado y premium con inventario de apertura (1.4088ms)
+✔ el material limitante se identifica en mezcla con prioridad secuencial (0.8299ms)
+✔ se informan empates de materiales y no se atribuyen faltantes si la meta se completa (1.0386ms)
+✔ asignaciones históricas válidas se respetan sin exceder recursos (0.897ms)
+✔ costos por producto conservan fabricación y lotes vendidos; equilibrio no duplica fabricación (38.8694ms)
+✔ ausencia de lotes o cierre no fabrica costos; cero producción y ventas permanece no disponible (1.7221ms)
+✔ tabla conserva inventario anterior y muestra importes oficiales por ciclo (5.5581ms)
+✔ sin actividad presenta mensaje breve (0.5816ms)
+✔ 10 básicos sin recursos (50.5141ms)
+✔ 100 prémium y receta (4.4741ms)
+✔ metas combinadas y cambio de cantidad (2.4787ms)
+✔ la representación no altera estado ni resultados reales (3.5073ms)
+✔ 3000 básicos conservan la meta y muestran capacidad y producción real (1.1546ms)
+✔ proyección y alternativas usan el cierre sin modificar decisiones ni contabilidad (185.7761ms)
+✔ ninguna alternativa sin caja suficiente se muestra como financiable (76.2975ms)
+✔ una decisión financiable no pierde caja dos veces por su costo contable (92.1917ms)
+✔ recepciones no verificadas no se presentan como proyección (0.4079ms)
+✔ no se estima caja cuando falta el catálogo (0.3601ms)
+✔ el contexto competitivo explícito usa el cierre compartido y rechaza datos incompletos (163.3085ms)
+✔ la vista de estudiante muestra la proyección y advierte sus límites (82.602ms)
+✔ la vista temporal solo pasa al motor el libro vigente y la modalidad configurada (3.9044ms)
+HISTORY_PERFORMANCE {"rows":72,"oldMs":122,"newMs":85,"identical":true}
+✔ historial 12 empresas × 6 ciclos: optimización conserva JSON, estados y autorización (3936.9ms)
+✔ historial paginado: 12 empresas × 6 ciclos, concurrencia acotada, orden y valores idénticos (74.573ms)
+✔ no acepta resultados parciales, empresas ajenas, duplicados ni fallos de autorización (6.0468ms)
+✔ comparte lecturas simultáneas y cierres completos; invalida al cambiar sesión y reconsulta pendientes (43.6892ms)
+{
+  "cases": 90,
+  "positive": 58,
+  "negative": 32,
+  "efficientSolo": [
+    {
+      "molde": "molde_1",
+      "meta": 100,
+      "sold": 100,
+      "net": 1282.65
+    },
+    {
+      "molde": "molde_2",
+      "meta": 100,
+      "sold": 100,
+      "net": 3814.9
+    },
+    {
+      "molde": "molde_3",
+      "meta": 100,
+      "sold": 100,
+      "net": 15619.32
+    },
+    {
+      "molde": "molde_1",
+      "meta": 200,
+      "sold": 200,
+      "net": 5778.88
+    },
+    {
+      "molde": "molde_2",
+      "meta": 200,
+      "sold": 200,
+      "net": 10847.13
+    },
+    {
+      "molde": "molde_3",
+      "meta": 200,
+      "sold": 200,
+      "net": 35361.55
+    },
+    {
+      "molde": "molde_1",
+      "meta": 300,
+      "sold": 300,
+      "net": 10275.1
+    },
+    {
+      "molde": "molde_2",
+      "meta": 300,
+      "sold": 300,
+      "net": 18119.35
+    },
+    {
+      "molde": "molde_3",
+      "meta": 300,
+      "sold": 300,
+      "net": 54655.77
+    },
+    {
+      "molde": "molde_1",
+      "meta": 500,
+      "sold": 500,
+      "net": 24729.33
+    },
+    {
+      "molde": "molde_2",
+      "meta": 500,
+      "sold": 500,
+      "net": 37505.58
+    },
+    {
+      "molde": "molde_3",
+      "meta": 500,
+      "sold": 445,
+      "net": 87213.18
+    },
+    {
+      "molde": "molde_1",
+      "meta": 750,
+      "sold": 750,
+      "net": 38700.78
+    },
+    {
+      "molde": "molde_2",
+      "meta": 750,
+      "sold": 750,
+      "net": 57867.03
+    },
+    {
+      "molde": "molde_3",
+      "meta": 750,
+      "sold": 445,
+      "net": 87153.18
+    },
+    {
+      "molde": "molde_1",
+      "meta": 1000,
+      "sold": 1000,
+      "net": 52672.23
+    },
+    {
+      "molde": "molde_2",
+      "meta": 1000,
+      "sold": 1000,
+      "net": 78228.48
+    },
+    {
+      "molde": "molde_3",
+      "meta": 1000,
+      "sold": 445,
+      "net": 87093.18
+    }
+  ]
+}
+✔ 90 escenarios: cantidades y soles concilian; ganancias y pérdidas reales (581.4484ms)
+✔ Node y Edge: las 90 estrategias aplican exactamente iguales producción, costos y estados (1398.7618ms)
+✔ restricciones: dotación sin máquina, falta de hilo y cuota parcial no crean producción ni materiales (19.8087ms)
+POSTGRES_MATRIX 18
+POSTGRES_MATRIX 36
+POSTGRES_MATRIX 54
+POSTGRES_MATRIX 72
+POSTGRES_MATRIX 90
+✔ PostgreSQL real del fixture: persiste 90 escenarios y el reintento Edge coincide con Node (33321.4421ms)
+{"cycles":3,"produced":1000,"sold":1000,"profit":57501.65,"cash":118842.04}
+{"cycles":6,"produced":974,"sold":974,"profit":46916.59,"cash":106013.39}
+✔ transición básico, estándar y prémium con tres competidores, 3 ciclos y unas 1000 unidades (142.0985ms)
+✔ transición básico, estándar y prémium con tres competidores, 6 ciclos y unas 1000 unidades (248.7326ms)
+✔ escala 1000 por ciclo: producción física no equivale a 1000 ventas prémium (79.4387ms)
+✔ analista rentable y no rentable: diferencia del mismo plan, no ahorro inventado (242.8438ms)
+✔ malas decisiones generan pérdida y el diagnóstico no modifica las decisiones (147.6977ms)
+✔ una pérdida inicial puede recuperarse con decisiones eficientes y capital suficiente (77.8476ms)
+✔ una cotización previa distingue entregas hipotéticas de recepciones registradas (324.0352ms)
+✔ las órdenes confirmadas sin entregas no se reemplazan por entregas hipotéticas (94.3768ms)
+✔ los precios de margen son informativos y no cambian la versión ni precios guardados (145.5906ms)
+✔ la sala de espera no consulta un contexto material fuera de fase (3.5149ms)
+✔ current revenue adapter reproduces fresh v19 Excel market allocations (29.2057ms)
+✔ catalog reputation is unique, bounded and independent from advertising spend proxy (16.942ms)
+✔ shared closure competes across companies, caps sales at stock and ignores POS activity (49.3791ms)
+✔ unsold goods carry forward and opening stock can sell without current production (21.5806ms)
+✔ browser pages load the same revenue dependencies as Node (58.9236ms)
+✔ remote service ignores world prices and preserves confirmed decision expenses (44.2603ms)
+✔ connected students cannot allocate the whole shared market to themselves (3.3301ms)
+✔ without channel stock is retained and no commission is charged (33.093ms)
+✔ web sales earn exactly one percent commission and close is idempotent (11.6408ms)
+✔ unsold inventory carries forward and earlier receipt remains frozen (14.1075ms)
+✔ material inventory preserves unrelated lots and consumes only available purchased stock (4.9907ms)
+✔ shared closing keeps company stock and cash isolated (29.2016ms)
+✔ POS receipts never alter assigned demand or stock (9.5236ms)
+✔ restoring a submitted plan preserves live material inventories and accounting seed (0.5404ms)
+✔ commercial event changes demand before fulfillment, never money beyond stocked units (9.1761ms)
+✔ a live projection computes physical sales and price times units without settling or mutating input (39.4964ms)
+✔ the projection requires a channel and preserves stock (10.1471ms)
+✔ the final shared market replaces the individual reference and cannot sell stock twice (31.1771ms)
+✔ teacher cash adjustments preserve closed cycles and enter equity, never profit or debt (17.0954ms)
+✔ summary retains every cycle, including quiet cycles, and reports cumulative values (38.4218ms)
+✔ office view uses financial model statements, including debt and assets (4.8511ms)
+✔ student financial report uses the same ledger model as the teacher summary (6.409ms)
+✔ hung Supabase request aborts, releases the caller and allows a subsequent request (50.8269ms)
+✔ Supabase deadline covers a stalled body after headers arrived (2.1117ms)
+✔ bounded transport preserves caller cancellation and HTTP error bodies (2.7654ms)
+✔ large sealed read bodies have a bounded 45 second deadline and are never replayed (6.3339ms)
+ℹ tests 219
+ℹ suites 0
+ℹ pass 219
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56600.7422

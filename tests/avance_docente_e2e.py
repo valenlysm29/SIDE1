@@ -17,7 +17,7 @@ if os.environ.get('SIDE_FASE01_WORK'):
 else:
  proxy=subprocess.check_output(['docker','port','side-history-local-proxy','8000/tcp'],encoding='utf8').strip();assert proxy.startswith('127.0.0.1:');BASE='http://'+proxy
 KEY=status['ANON_KEY']
-OUT=PROJECT/'tests/output/avance-docente/e2e';OUT.mkdir(parents=True,exist_ok=True)
+OUT=PROJECT/('tests/output/ciclos-definitivo/cortes' if os.environ.get('SIDE_CUT_QA') else 'tests/output/avance-docente/e2e');OUT.mkdir(parents=True,exist_ok=True)
 if os.environ.get('HISTORY_LEGACY'):
  OUT=ROOT/'tests/output/fase01/connected-legacy';OUT.mkdir(parents=True,exist_ok=True)
 if os.environ.get('HISTORY_BLOCKED_GAME'):
@@ -100,7 +100,7 @@ with sync_playwright() as p:
     if response.url.startswith(origin+'/') and response.status>=400:local_failures.append({'url':response.url,'status':response.status})
    ctx.on('response',check_resource)
    t.goto(origin+'/docente.html',wait_until='networkidle')
-   t.locator('#gameName').fill(f'QA Historia {count}');t.locator('#cycles').fill(str(count));t.locator('#roundMinutes').fill('1');t.locator('#integrationDurationMinutes').fill('5');t.locator('#capital').fill('200000')
+   t.locator('#gameName').fill(f'QA Historia {count}');t.locator('#cycles').fill(str(count));t.locator('#roundMinutes').fill('10' if os.environ.get('SIDE_CUT_QA') else '1');t.locator('#integrationDurationMinutes').fill('5');t.locator('#capital').fill('200000')
    t.locator(f'input[name=cycleMode][value={mode}]').check()
    t.evaluate("state.authoritative={materialRulesVersion:'receipts-v1',materialPurchaseVersion:'excel-v2-packs-v1',materialLeadTimeDays:0,materialPaymentMode:'credit',supplierCreditTermCycles:2,planSyncGraceSeconds:0}")
    if os.environ.get('SIDE_FINAL_QA'):t.evaluate("Object.assign(state.authoritative,{loanPolicy:{version:'french-v1'},economicEventsVersion:'demand-share-v1'});state.enabledEvents=new Set(['PE23','PE30','PE68','PE69','PE71','PE74','PE75','PE77'])")
@@ -151,7 +151,7 @@ with sync_playwright() as p:
    for cycle in range(1,count+1):
     for n,(sc,s,ident,company) in enumerate(students):
      s.evaluate('refreshStudentGame({forceHydrate:true})')
-     result=s.evaluate('''async ({ident,plan,cycle})=>{let result;for(let attempt=0;attempt<5;attempt++){const current=await SIDE.EmpresaService.obtenerEstado(ident);if(!current.success)return current;const snapshot=current.data.snapshot||{};snapshot.round=cycle;snapshot.decisions_submitted=true;const ds=snapshot.decision_state||{};Object.assign(ds,plan);ds.__cyclePlans={...ds.__cyclePlans,[cycle]:{state:plan}};snapshot.decision_state=ds;result=await SIDE.EmpresaService.guardarEstado(ident,snapshot,current.data.snapshot_revision);if(result.success||result.code!=='ESTADO_DESACTUALIZADO')return result;await new Promise(r=>setTimeout(r,100));}return result;}''',{'ident':ident,'plan':plan(cycle,n),'cycle':cycle})
+     result=s.evaluate('''async ({ident,plan,cycle,confirmed})=>{let result;for(let attempt=0;attempt<5;attempt++){const current=await SIDE.EmpresaService.obtenerEstado(ident);if(!current.success)return current;const snapshot=current.data.snapshot||{};snapshot.round=cycle;snapshot.decisions_submitted=confirmed;const ds=snapshot.decision_state||{};Object.assign(ds,plan);if(confirmed)ds.__cyclePlans={...ds.__cyclePlans,[cycle]:{state:plan}};snapshot.decision_state=ds;result=await SIDE.EmpresaService.guardarEstado(ident,snapshot,current.data.snapshot_revision);if(result.success||result.code!=='ESTADO_DESACTUALIZADO')return result;await new Promise(r=>setTimeout(r,100));}return result;}''',{'ident':ident,'plan':plan(cycle,n),'cycle':cycle,'confirmed':not os.environ.get('SIDE_CUT_QA') or n<2})
      assert result['success'],result
      if n<2:
       t.evaluate('refreshTeacherGame()')
@@ -159,6 +159,20 @@ with sync_playwright() as p:
       missing=t.evaluate('state.advanceReadiness?.missing?.length')
       assert missing==2-n,missing
     t.locator('[data-tab="rondas"]').click()
+    if os.environ.get('SIDE_CUT_QA'):
+     t.bring_to_front()
+     t.evaluate('refreshTeacherGame()')
+     t.wait_for_function('state.advanceReadiness?.missing?.length===1')
+     assert t.locator('#advanceRound').is_disabled()
+     if count==6 and cycle==1:
+      sql(f"update partidas set configuracion=jsonb_set(configuracion,'{{runtime,startedAt}}',to_jsonb(clock_timestamp()-interval '11 minutes')) where id='{game}'")
+      t.evaluate('refreshTeacherGame()')
+     else:
+      t.keyboard.press('Escape')
+      t.locator('.coach-help').click()
+      t.locator('[data-action="next"]').click()
+      t.locator('#cutRound').click()
+      t.keyboard.press('Escape')
     t.evaluate('refreshTeacherGame()');t.wait_for_function('runtime()?.phase==="results"',timeout=15000)
     assert t.locator('#advanceRound').is_disabled(),'Official closure is still pending'
     t.screenshot(path=str(OUT/f'pending-{count}-{cycle}.png'))
@@ -174,7 +188,7 @@ with sync_playwright() as p:
      assert before_hashes.get(key,digest)==digest;before_hashes[key]=digest
     for sc,s,ident,company in students:
      row=next(r for r in closed if int(r['empresa_id'])==int(company) and int(r['ciclo'])==cycle);f=row['result']['financial'];receipt=row['result']['receipt']
-     assert receipt['produced']>0 and receipt['sold']>0,(cycle,company,receipt)
+     assert (receipt['produced']==0 and receipt['sold']==0) if os.environ.get('SIDE_CUT_QA') and company==students[2][3] else (receipt['produced']>0 and receipt['sold']>0),(cycle,company,receipt)
      if os.environ.get('SIDE_FINAL_QA'):
       assert f['loanPolicyVersion']=='french-v1';assert f['balanceGeneral']['deuda']>=0
       if cycle==count:assert f['balanceGeneral']['deuda']==0
@@ -215,11 +229,13 @@ with sync_playwright() as p:
     t.locator('[data-tab="laboratorio"]').click();t.wait_for_selector('#lab-cycle');t.locator('#lab-game').select_option(game);t.locator('#lab-refresh').click();t.wait_for_timeout(1200);t.locator('#lab-cycle').select_option(str(cycle));t.wait_for_timeout(700)
     t.screenshot(path=str(OUT/f'lab-{count}-{cycle}.png'))
     print('PASS cycle',count,cycle,'official economics and student/lab history',flush=True)
-    scenario['checks'].append({'cycle':cycle,'confirmedCompanies':3,'produced':receipt['produced'],'sold':receipt['sold'],'cash':f['balanceCaja']['cajaFinal'],'immutableClosures':len(closed)})
+    scenario['checks'].append({'cutWithDraft':bool(os.environ.get('SIDE_CUT_QA')),'cycle':cycle,'confirmedCompanies':3,'produced':receipt['produced'],'sold':receipt['sold'],'cash':f['balanceCaja']['cajaFinal'],'immutableClosures':len(closed)})
     t.locator('[data-tab="rondas"]').click()
     if mode=='manual':
      t.wait_for_function('state.advanceReadiness?.ready===true&&!document.getElementById("advanceRound").disabled',timeout=20000)
      observer.wait_for_function('state.advanceReadiness?.ready===true',timeout=20000)
+     if os.environ.get('SIDE_CUT_QA'):
+      t.reload(wait_until='networkidle');t.locator('[data-tab="rondas"]').click();t.wait_for_function('state.advanceReadiness?.ready===true&&!document.getElementById("advanceRound").disabled',timeout=20000)
      t.screenshot(path=str(OUT/f'enabled-{count}-{cycle}.png'))
      if cycle==1:
       assert t.evaluate('()=>{void refreshTeacherGame();const wasBusy=teacherBusy;for(let i=0;i<5;i++)document.getElementById("advanceRound").click();return wasBusy;}')

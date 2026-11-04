@@ -22,13 +22,15 @@ test('modo remoto manual prevalece sobre un formulario automático desactualizad
 test('botón refleja confirmaciones, procesamiento, error y cierre completo sin recargar',()=>{
  const nodes=new Proxy({}, {get:(target,key)=>target[key]??=( {value:key==='cycles'?'6':'0',firstChild:{},classList:{toggle(){}}})});
  const state={round:1,partidaId:'test',lifecycleVersion:2,advanceReadiness:{round:1,total:2,missing:[{nombre:'Empresa Dos'}],complete:false,ready:false}};
- const ctx={state,$:id=>nodes[id],formatStudentTime:()=>'',gameStatus:()=>({active:true}),runtime:()=>({phase:'results'}),cycleMode:()=> 'manual',document:{querySelector(){},querySelectorAll:()=>[]},canCancelRoom:()=>false,sharedRoom:null,refreshStartButton(){},renderTeacherLobby(){},renderTeacherChallengeControls(){}};
+ const ctx={state,$:id=>nodes[id],formatStudentTime:()=>'',gameStatus:()=>({active:true}),runtime:()=>({phase:state.phase||'results'}),cycleMode:()=> 'manual',document:{querySelector(){},querySelectorAll:()=>[]},canCancelRoom:()=>false,sharedRoom:null,refreshStartButton(){},renderTeacherLobby(){},renderTeacherChallengeControls(){}};
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function refreshSetupSummary(){'),source.indexOf('\nlet publishedState=')),ctx);
- ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,true);assert.match(nodes.roundState.textContent,/Empresa Dos/);
+ state.phase='decisions';ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,true);assert.match(nodes.roundState.textContent,/Empresa Dos/);
+ state.phase='results';ctx.refreshSetupSummary();assert.match(nodes.roundState.textContent,/procesamiento/);
  state.advanceReadiness.missing=[];ctx.refreshSetupSummary();assert.match(nodes.roundState.textContent,/procesamiento/);
  state.advanceReadiness.processing={error:'fallo real SQL'};ctx.refreshSetupSummary();assert.match(nodes.roundState.textContent,/fallo real SQL/);
  state.advanceReadiness={round:1,total:2,missing:[],complete:true,ready:true};ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,false);
- state.controlling=true;ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,true);
+ state.advanceReadiness.missing=[{nombre:'Empresa Dos'}];ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,false);assert.match(nodes.roundState.textContent,/Cierre oficial completo/);
+ state.controlling=true;ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,true);assert.equal(nodes.cutRound.disabled,true);assert.equal(nodes.startTimer.disabled,true);
  state.controlling=false;state.round=2;ctx.refreshSetupSummary();assert.equal(nodes.advanceRound.disabled,true,'respuesta vieja no autoriza ciclo nuevo');
  state.advanceReadiness={error:'permission denied'};ctx.refreshSetupSummary();assert.match(nodes.roundState.textContent,/permission denied/);
 });

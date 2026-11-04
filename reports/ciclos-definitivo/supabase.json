@@ -1,0 +1,13 @@
+{
+  "migration": "avance_cierre_oficial",
+  "project": "SIDE",
+  "historicalSeals": 180,
+  "beforeDigest": "ae6855d3443d797e269fb99bd6c72988",
+  "afterDigest": "ae6855d3443d797e269fb99bd6c72988",
+  "readOnlyOwnerValidation": {
+    "ready": true,
+    "complete": true,
+    "missing": 1
+  },
+  "realGamesAdvanced": false
+}

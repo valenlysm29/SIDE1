@@ -53,6 +53,7 @@
     "supabase/migrations/20261103002234_teacher_authorization.sql",
     "supabase/migrations/20261103015747_optional_french_loan_policy.sql",
     "supabase/migrations/20261103020446_challenge_modes.sql",
-    "supabase/migrations/20261103_validacion_avance_docente.sql"
+    "supabase/migrations/20261103_validacion_avance_docente.sql",
+    "supabase/migrations/20261104220123_avance_cierre_oficial.sql"
   ]
 }

@@ -353,3 +353,5 @@ alter table public.partidas add column if not exists inicio_programado timestamp
 -- 20261103162526 y 20261103163707 preservan el JSON sellado y agregan un
 -- índice privado por empresa/ciclo. El trigger mantiene los cierres futuros;
 -- side_historial_oficial conserva la autorización de docente y estudiante.
+
+-- Apply supabase/migrations/20261104220123_avance_cierre_oficial.sql after readiness validation.

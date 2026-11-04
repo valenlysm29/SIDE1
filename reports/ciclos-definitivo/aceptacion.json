@@ -1,0 +1,256 @@
+{
+  "base": "7fc8486",
+  "criticalTestsPassed": 219,
+  "coachmarkTestsPassed": 3,
+  "officialCompanyCycles": 54,
+  "baselineAllSubmitted": [
+    {
+      "cycles": 3,
+      "mode": "manual",
+      "game": "a22c3d7a-8510-4f3d-8520-48f2d7bfd18f",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 181381.65,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 176625.3,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 166988.95,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    },
+    {
+      "cycles": 6,
+      "mode": "manual",
+      "game": "ce7c0da8-e693-4aee-85e5-ae47f2e42ea1",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 181381.65,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 176625.3,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 166988.95,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 4,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 157352.6,
+          "immutableClosures": 12,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 5,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 147716.25,
+          "immutableClosures": 15,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cycle": 6,
+          "confirmedCompanies": 3,
+          "produced": 14,
+          "sold": 14,
+          "cash": 138079.9,
+          "immutableClosures": 18,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    }
+  ],
+  "cutWithDraftAndReload": [
+    {
+      "cycles": 3,
+      "mode": "manual",
+      "game": "9770a3e6-5d87-45e2-9e17-b0c6c43a3891",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cutWithDraft": true,
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 180054.45,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 171718.9,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 163383.35,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    },
+    {
+      "cycles": 6,
+      "mode": "manual",
+      "game": "bd6cbc3c-eb7a-44b9-9cb8-8c8822b055bd",
+      "workerVersion": "1",
+      "checks": [
+        {
+          "cutWithDraft": true,
+          "cycle": 1,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 180054.45,
+          "immutableClosures": 3,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 2,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 171718.9,
+          "immutableClosures": 6,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 3,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 163383.35,
+          "immutableClosures": 9,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 4,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 155047.8,
+          "immutableClosures": 12,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 5,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 146712.25,
+          "immutableClosures": 15,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        },
+        {
+          "cutWithDraft": true,
+          "cycle": 6,
+          "confirmedCompanies": 3,
+          "produced": 0,
+          "sold": 0,
+          "cash": 138376.7,
+          "immutableClosures": 18,
+          "advanceEnabledBeforeClick": true,
+          "allTabsSynchronized": true
+        }
+      ],
+      "pageErrors": [],
+      "failedLocalResources": [],
+      "blockedHistoricalGame": null
+    }
+  ],
+  "permissions": [
+    {
+      "role": "anon",
+      "httpStatus": 401,
+      "denied": true
+    },
+    {
+      "role": "non_teacher",
+      "httpStatus": 403,
+      "denied": true
+    }
+  ],
+  "pendingCriticalErrors": []
+}

@@ -182,7 +182,7 @@ function refreshSetupSummary(){
   document.querySelector('[data-tab="rondas"]')?.classList.toggle('hidden',!active&&!status?.finishedAt);
   document.querySelectorAll('#tab-configuracion input:not([readonly])').forEach(input=>{if(!input.closest?.('#challengeV1Panel'))input.disabled=active&&(!editableFinancialInput(input)||state.round>=count)});if($('taxRegime'))$('taxRegime').disabled=active;
   const closed=modern&&r?.phase==='results',finalClosed=closed&&state.round>=count;
-  ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)||(closed&&id!=='advanceRound')});
+  ['startTimer','cutRound','advanceRound'].forEach(id=>{if($(id))$(id).disabled=!!state.controlling||!!state.cancelling||!active||cycleMode()==='automatic'||integration||(!modern&&state.round===1&&state.integrationMinutes===60&&state.seconds>0)||(closed&&id!=='advanceRound')});
   if($('advanceRound')?.firstChild)$('advanceRound').firstChild.nodeValue=finalClosed?'Finalizar partida ':'Pasar al siguiente ciclo ';
   $('startCycle1Btn')?.classList.toggle('hidden',true);
   if(integration)$('roundState').textContent=waitingText;
@@ -194,12 +194,12 @@ function refreshSetupSummary(){
     let message='Verificando confirmaciones y cierre oficial…';
     if(readiness?.error)message='Error de Supabase: '+readiness.error;
     else if(readiness?.round===state.round){
-      if(readiness.missing?.length)message='Falta confirmar: '+readiness.missing.map(x=>x.nombre).join(', ')+'.';
+      if(ready)message='Cierre oficial completo. Puedes avanzar.';
+      else if(closed)message=readiness.processing?.error?'Error del cierre: '+readiness.processing.error:'Cierre oficial en procesamiento. Se actualizará automáticamente.';
+      else if(readiness.missing?.length)message='Falta confirmar: '+readiness.missing.map(x=>x.nombre).join(', ')+'.';
       else if(!readiness.total)message='No hay empresas participantes en esta partida.';
       else if(!closed)message='Todas las empresas confirmaron. Preparando el cierre oficial…';
-      else if(ready)message='Todas las empresas confirmadas · cierre oficial completo. Puedes avanzar.';
-      else if(readiness.processing?.error)message='Error del cierre: '+readiness.processing.error;
-      else message='Cierre oficial en procesamiento. Se actualizará automáticamente.';
+            else message='Cierre oficial en procesamiento. Se actualizará automáticamente.';
     }
     if(button)button.title=message;
     if(!integration)$('roundState').textContent=message;
