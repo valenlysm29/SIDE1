@@ -29,3 +29,9 @@ La versión anterior del cierre alojado fue probada sin puente local y no duplic
 Las pruebas anteriores de tres y seis ciclos en Neon y del ciclo de 120 segundos utilizaron el puente local, antes de exigir verificación real. No constituyen pruebas del flujo actual de correo ni de un despliegue público.
 
 El proyecto usa el plan gratuito con un mínimo de 0,25 CU. Un cierre consultado cada minuto puede impedir la suspensión del cómputo; 30 días continuos a ese mínimo equivalen a unas 180 CU-horas, por encima de las 100 CU-horas mensuales documentadas para el plan gratuito. El programador permanece desactivado.
+
+## API HTTPS privada de desarrollo
+
+La función `sidepreview` está desplegada solo en `side-lite-dev`. Recibe las mismas rutas que el puente mediante `api-app.js`, y exige una clave de vista previa más un JWT verificado antes de consultar datos de partidas. Sin clave o sin JWT la prueba HTTPS devuelve 401. La clave y la contraseña de la base se guardan en variables de función y en el archivo local ignorado; no van al navegador ni a Git. La vista previa no es un sitio ni un backend listo para producción: no hay protección perimetral contra abuso, conexión de frontend, ni prueba con una sesión verificada. El adaptador usa un servidor interno de loopback en el proceso de Neon; la prueba HTTPS solo cubre rechazos, no operaciones autenticadas. No usar para datos reales.
+
+El proxy oficial de Neon se documenta en `@neondatabase/auth/server` y depende del mismo paquete afectado; el SDK combinado también depende de ese paquete. En la versión 0.7.0-beta el árbol instala Better Auth 1.7.6, incluido en la alerta crítica GHSA-965c-763c-88jm. La alerta requiere además Magic Link y OAuth, por lo que la presencia del paquete no demuestra por sí sola una explotación en esta aplicación. Una combinación corregida dio conflictos entre pares de dependencias, por lo que no se incorporó ni se considera una integración validada.
