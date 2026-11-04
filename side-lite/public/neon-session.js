@@ -6,6 +6,8 @@ export function createNeonSession(client, fetcher = fetch) {
   };
   return {
     async register({email,password,name}) { return unwrap(await client.signUp.email({email,password,name})); },
+    async verifyEmail({email,otp}) { const result=unwrap(await client.emailOtp.verifyEmail({email,otp})); if(result?.status!==true)throw new Error('No se pudo verificar el código.'); return result; },
+    async resendCode({email}) { return unwrap(await client.emailOtp.sendVerificationOtp({email,type:'email-verification'})); },
     async signIn({email,password}) { return unwrap(await client.signIn.email({email,password})); },
     async signOut() { unwrap(await client.signOut()); },
     async session() { return unwrap(await client.getSession()); },
