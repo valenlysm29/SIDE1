@@ -11,3 +11,7 @@ Ninguna opción se ha contratado ni desplegado. El servidor actual solo acepta u
 ## Actualización: Neon conectado
 
 Se creó un proyecto independiente SIDE-LITE en el plan gratuito y una rama de desarrollo con Auth administrado. Las nueve tablas y los doce eventos están preparados en esa rama. Todavía falta integrar la aplicación, la autorización y el cierre alojado; consulta `remote/README.md`. No hay URL pública de juego.
+
+## Integración de desarrollo y cierre alojado
+
+El puente local autentica solicitudes con Neon Auth y trabaja contra la rama de desarrollo mediante un rol SQL limitado. Se probaron partidas remotas de tres y seis ciclos y un ciclo de 120 segundos. La función `sideclose` fue probada con un disparador por minuto; está desactivado para preservar cuota. La aplicación pública y la integración del cliente oficial siguen pendientes; ver `remote/README.md`.
