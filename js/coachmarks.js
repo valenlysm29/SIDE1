@@ -30,7 +30,7 @@
   let index=-1, key='', active=false, scheduled=false, lastFocus=null, invitation=false, identityReady=!teacher, suspended=false;
   const visible=el=>!!el && !!el.getClientRects().length && getComputedStyle(el).visibility!=='hidden' && !el.closest('[hidden], .hidden, [aria-hidden="true"]') && !el.matches(':disabled, [aria-disabled="true"]');
   function target(step){for(const selector of step[0].split(',')){const el=[...document.querySelectorAll(selector.trim())].find(visible);if(el)return el}}
-  function otherDialog(){return [...document.querySelectorAll('[role=dialog][aria-modal=true], [role=alertdialog][aria-modal=true], dialog[open]')].some(el=>!layer.contains(el)&&visible(el))}
+  function otherDialog(){return [...document.querySelectorAll('[role=dialog][aria-modal=true], [role=alertdialog][aria-modal=true], dialog[open], .context-layer:not([hidden])')].some(el=>!layer.contains(el)&&visible(el))}
   function persist(){try{localStorage.setItem(key,'1')}catch{}}
   function end(){active=false;suspended=false;layer.hidden=true; spot.hidden=true; lastFocus?.focus({preventScroll:true})}
   function position(){
