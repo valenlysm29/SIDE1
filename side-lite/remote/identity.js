@@ -7,6 +7,6 @@ export function createIdentityVerifier({authBaseUrl,jwksUrl,keySet}={}){
   return async authorization=>{
     const match=typeof authorization==='string'&&/^Bearer ([^\s]+)$/i.exec(authorization);
     if(!match)throw new Error('No autorizado');
-    try{const {payload}=await jwtVerify(match[1],jwks,{issuer,audience:issuer,algorithms:['EdDSA'],requiredClaims:['sub','exp','iat','aud']});if(typeof payload.sub!=='string'||!payload.sub.trim())throw new Error('Identidad inválida');return {subject:payload.sub}}catch{throw new Error('No autorizado')}
+    try{const {payload}=await jwtVerify(match[1],jwks,{issuer,audience:issuer,algorithms:['EdDSA'],maxTokenAge:'15m',clockTolerance:30,requiredClaims:['sub','exp','iat','aud']});if(typeof payload.sub!=='string'||!payload.sub.trim())throw new Error('Identidad inválida');return {subject:payload.sub,emailVerified:payload.emailVerified===true,banned:payload.banned===true}}catch{throw new Error('No autorizado')}
   };
 }

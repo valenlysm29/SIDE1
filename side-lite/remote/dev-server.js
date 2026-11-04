@@ -17,7 +17,7 @@ const fail=(status,message)=>Object.assign(new Error(message),{status});
 const num=(n,min,max)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const tx=async fn=>{const c=await pool.connect();try{await c.query('BEGIN');const value=await fn(c);await c.query('COMMIT');return value}catch(e){await c.query('ROLLBACK');throw e}finally{c.release()}};
 app.use(express.json({limit:'16kb'}));
-app.use('/api',wrap(async(req,res,next)=>{res.set('Cache-Control','no-store');let identity;try{identity=await verify(req.get('authorization'))}catch{return res.status(401).json({error:'No autorizado'})}
+app.use('/api',wrap(async(req,res,next)=>{res.set('Cache-Control','no-store');let identity;try{identity=await verify(req.get('authorization'))}catch{return res.status(401).json({error:'No autorizado'})}if(identity.banned)return res.status(403).json({error:'Cuenta bloqueada'});if(!identity.emailVerified&&process.env.SIDE_LITE_DEV_ALLOW_UNVERIFIED!=='1')return res.status(403).json({error:'Verifica tu correo antes de continuar'});
   let {rows:[profile]}=await pool.query('SELECT id,display_name,role FROM lite.lite_profiles WHERE id=$1',[identity.subject]);
   if(!profile){await pool.query("INSERT INTO lite.lite_profiles(id,display_name,role) VALUES($1,$2,'student') ON CONFLICT(id) DO NOTHING",[identity.subject,'Estudiante']);({rows:[profile]}=await pool.query('SELECT id,display_name,role FROM lite.lite_profiles WHERE id=$1',[identity.subject]))}if(!profile)throw fail(403,'Sin perfil');req.user=profile;next()}));
 const auth=(req,res,next)=>req.user?next():res.status(401).json({error:'Inicia sesión'});

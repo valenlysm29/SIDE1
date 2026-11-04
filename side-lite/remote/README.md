@@ -24,3 +24,11 @@ La función alojada cerró una partida vencida sin ningún puente local abierto;
 - Ejecutar Playwright de los flujos remotos y probar recuperación de red y reinicio sobre ese backend. Las pruebas Playwright anteriores usan PostgreSQL local.
 - Evaluar cuota, frecuencia y supervisión antes de activar permanentemente el programador; la base gratuita suspende capacidad al superar límites. El esquema no tiene RLS y no debe exponerse directamente.
 - Separar los recursos y credenciales de producción de los de prueba. No se ha desplegado una URL pública de juego.
+
+## Comprobaciones adicionales
+
+La interfaz local muestra «Procesando resultados» después del vencimiento estimado a partir del reloj del servidor y oculta las decisiones mientras el ciclo sigue abierto. El servidor continúa siendo la autoridad que rechaza decisiones tardías. Una prueba Playwright con respuestas controladas verificó esa transición.
+
+El puente de Neon exige correo verificado por defecto y rechaza cuentas marcadas como bloqueadas. La excepción `SIDE_LITE_DEV_ALLOW_UNVERIFIED=1` es solo para pruebas del puente restringido a localhost; la configuración de Neon de desarrollo todavía no envía ni exige verificación de correo. `e2e/neon-bridge.spec.js`, habilitada con `SIDE_LITE_NEON_E2E=1`, probó la interfaz local contra el puente y Neon reales usando la excepción de prueba y un docente asignado por un administrador. No constituye una prueba de frontend ni backend públicos.
+
+La auditoría del cliente oficial está en `../docs/neon-auth-audit.md`.

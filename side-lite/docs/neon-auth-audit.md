@@ -1,0 +1,7 @@
+# Evaluación del cliente oficial de Neon Auth
+
+Fecha de evaluación: 2026-11-03. Se instaló `@neondatabase/auth@0.7.0-beta` únicamente en un directorio temporal ignorado dentro de `tests/output/`, con scripts de instalación deshabilitados; no se añadió a las dependencias de SIDE Lite.
+
+La instalación directa produjo diez alertas en `npm audit --omit=dev`: seis bajas, tres altas y una crítica. Entre ellas figuran avisos de [OAuth Proxy en Better Auth](https://github.com/advisories/GHSA-r4xp-prcw-77qf), [estado OAuth como Magic Link](https://github.com/advisories/GHSA-965c-763c-88jm) y [validación de colecciones en Zod](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5). La presencia en el árbol de dependencias no demuestra que SIDE Lite sea explotable; la interfaz no incorpora ese paquete.
+
+En la misma instalación aislada, sobrescribir Better Auth a 1.7.16 y Zod a 4.6.6 eliminó las alertas críticas y altas, pero quedaron siete bajas, incluyendo una de `deepmerge`, y npm informó conflictos de versiones entre dependencias. No se consideró una combinación verificada ni se integró en la aplicación. Es necesario contar con una versión compatible sin alertas o evaluar una solución oficial soportada con revisión de seguridad antes de publicar.
