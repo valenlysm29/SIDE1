@@ -8,7 +8,7 @@ test('90 escenarios: cantidades y soles concilian; ganancias y pérdidas reales'
  assert.ok(rows.some(r=>r.estrategia==='ineficiente'&&r.utilidad<0));
  assert.ok(rows.some(r=>r.molde==='molde_3'&&r.meta===1000&&r.vendido<r.producido));
 });
-test('Node y Edge: las 90 estrategias aplican exactamente iguales producción, costos y estados',async()=>{
+test('Node y Edge: resultados idénticos para planes válidos y rechazo de planes mixtos',async()=>{
  const edge=await import('../supabase/functions/side-business-close/runtime.mjs');
  for(const spec of F.scenarios()){
   async function run(engine){let seal;const state=F.plan(spec.target,spec.strategy);
@@ -18,7 +18,9 @@ test('Node y Edge: las 90 estrategias aplican exactamente iguales producción, c
     if(name==='side_guardar_cierre_negocio'){seal=structuredClone(args.p_cierre);return {data:{cierre:seal}}}
     throw Error(name);
    };
-   const rows=await engine(rpc);assert.ok(rows.every(r=>r.success),JSON.stringify(rows));return seal;
+   const rows=await engine(rpc);
+   if(Object.values(spec.target).filter(v=>v>0).length>1){assert.equal(rows[0].success,false);assert.equal(rows[0].code,'DECISION_INVALIDA');assert.equal(seal,undefined);return rows[0].code;}
+   assert.ok(rows.every(r=>r.success),JSON.stringify(rows));return seal;
   }
   assert.deepEqual(await run(edge.runOnce),await run(worker.runOnce),spec.id);
  }
@@ -36,7 +38,7 @@ test('restricciones: dotación sin máquina, falta de hilo y cuota parcial no cr
  assert.equal(close(thread).receipt.inventory.hilo_std,0);
  const zero=structuredClone(base);zero.HILO.quantities.hilo_std=0;assert.equal(close(zero).receipt.produced,0);
 });
-test('PostgreSQL real del fixture: persiste 90 escenarios y el reintento Edge coincide con Node',{timeout:240000},async()=>{
+test('PostgreSQL: persiste planes válidos y rechaza planes mixtos en Node y Edge',{timeout:240000},async()=>{
  const {database,config,createGame,rpc}=require('./lifecycle_db_fixture.cjs'),db=await database();
  const edge=await import('../supabase/functions/side-business-close/runtime.mjs');let count=0;
  try{
@@ -50,7 +52,13 @@ test('PostgreSQL real del fixture: persiste 90 escenarios y el reintento Edge co
    await db.query("update partidas set configuracion=configuracion||jsonb_build_object('runtime',jsonb_build_object('round',1,'phase','results','status','finished')) where id=$1",[game.id]);
    await db.query("select set_config('test.role','service_role',false)");await db.exec('set role service_role');
    const call=async(name,args)=>{if(name==='side_cierres_pendientes')return {data:[{id:game.id,cycles:[1]}]};try{return {data:await rpc(db,name,args)}}catch(error){return {error:{message:error.message}}}};
-   await db.exec('begin');let run=await worker.runOnce(call);assert.ok(run[0].success,JSON.stringify(run));
+   await db.exec('begin');let run=await worker.runOnce(call);
+   if(Object.values(spec.target).filter(v=>v>0).length>1){
+    assert.equal(run[0].success,false);assert.equal(run[0].code,'DECISION_INVALIDA');await db.exec('rollback');
+    run=await edge.runOnce(call);assert.equal(run[0].success,false);assert.equal(run[0].code,'DECISION_INVALIDA');
+    await db.exec('reset role');assert.equal(Number((await db.query('select count(*) n from side_business_closures where partida_id=$1',[game.id])).rows[0].n),0);count++;continue;
+   }
+   assert.ok(run[0].success,JSON.stringify(run));
    const node=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre;await db.exec('rollback');
    run=await edge.runOnce(call);assert.ok(run[0].success,JSON.stringify(run));
    const stored=(await rpc(db,'side_contexto_cierre_negocio',{p_partida_id:game.id,p_ciclo:1})).cierre;

@@ -3010,7 +3010,7 @@ const SIDE_DECISION_CATALOG_DATA = [
     cat:'C', title:'Producción', short:'Producción', icon:'assets/icons/categories/recursos_humanos.svg',
     desc:'Define el volumen del ciclo y organiza el personal que opera la línea única de corte, ensamblado y acabado.',
     items:[
-      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir por cada tipo de molde. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
+      {id:'PRODUCCION_META',name:'¿Cuánto deseas producir?',type:'production-plan',recurring:true,required:true,min:1,step:1,unit:'unidades',desc:'Indica cuánto deseas producir y selecciona un único molde para el ciclo. SIDE calcula los insumos necesarios para tu meta y luego los compara con tus recursos disponibles.',cost:0},
       {id:'PERS_CORTE',required:false,name:'Personal de corte',desc:'Costo mensual del personal elegido.',type:'quantity-choice',recurring:true,severanceEligible:true,options:[
         {id:'corte_basico',label:'Operario básico',desc:'Apoya tareas de corte con procesos estandarizados.',cost:1690.8},
         {id:'corte_exp',label:'Cortador con experiencia',desc:'Mejor aprovechamiento del material y mayor velocidad.',cost:2254.4},
@@ -3600,6 +3600,7 @@ else window.SIDE_DECISION_CATALOG=SIDE_DECISION_CATALOG_DATA;
           for(const [option,value] of Object.entries(entry.quantities||{}))if(!allowed.has(option)||!safeInteger(value))return invalid('Cantidad de activo inválida en '+item.id+'.');
         }
         for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.moldTargets||{}))if(!['molde_1','molde_2','molde_3'].includes(id)||!finiteNonnegative(value)||!Number.isInteger(Number(value)))return invalid('Plan de producción inválido.');
+        if(Object.values(decisions.PRODUCCION_META?.moldTargets||{}).filter(value=>Number(value)>0).length>1)return invalid('Selecciona un único molde por ciclo.');
         for(const [id,value] of Object.entries(decisions.PRODUCCION_META?.prices||{}))if(!['esencial','urbano','premium'].includes(id)||!finiteNonnegative(value))return invalid('Precio de venta inválido.');
         if(decisions.INV_MARKETING?.value!=null&&(!finiteNonnegative(decisions.INV_MARKETING.value)||Number(decisions.INV_MARKETING.value)>10000))return invalid('La publicidad debe estar entre S/ 0 y S/ 10,000.');
         if(decisions.PRESTAMO?.amount!=null&&!finiteNonnegative(decisions.PRESTAMO.amount))return invalid('Préstamo inválido.');
