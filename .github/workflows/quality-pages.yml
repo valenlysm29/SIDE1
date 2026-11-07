@@ -33,7 +33,7 @@ jobs:
           node-version: '24'
       - run: node --test tests/forense_postgres.test.cjs
   package:
-    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
+    if: github.ref == 'refs/heads/main'
     needs: [business-contract, postgres-edge]
     runs-on: ubuntu-latest
     permissions:
@@ -50,7 +50,7 @@ jobs:
         with:
           path: output/site
   deploy:
-    if: github.ref == 'refs/heads/main' && vars.SIDE_PAGES_ACTIONS == 'enabled'
+    if: github.ref == 'refs/heads/main'
     needs: package
     runs-on: ubuntu-latest
     permissions:
