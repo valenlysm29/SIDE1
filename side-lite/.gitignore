@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+playwright-report/
+.env
+.data/
+tests/output/
+.neon-dev-secrets.json

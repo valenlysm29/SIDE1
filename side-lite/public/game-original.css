@@ -1,0 +1,37 @@
+/* Adaptación de los componentes de partida al tema docente de SIDE Original
+   (css/faculty-theme.css). Alcance limitado a partidas activas. */
+body:has(#app #back) { background: #081a34; color: #f8feff; }
+body:has(#app #back) > header { background: #030712; border-bottom: 1px solid rgb(57 208 255 / 65%); }
+body:has(#app #back) main { max-width: 1500px; }
+#app:has(#back) { color: #f8feff; }
+#app:has(#back) .toolbar { align-items: flex-start; gap: 16px; padding-bottom: 20px; margin-bottom: 20px; border-bottom: 1px solid rgb(57 208 255 / 65%); }
+#app:has(#back) .toolbar h1 { font-size: clamp(23px, 2.1vw, 30px); font-weight: 600; line-height: 1.35; margin: 12px 0 0; }
+#app:has(#back) .toolbar strong, #app:has(#back) #clock { color: #39d0ff; }
+#app:has(#back) .summary { background: #09182f; border: 1px solid rgb(57 208 255 / 65%); border-radius: 20px; }
+#app:has(#back) .summary div { border-color: rgb(57 208 255 / 35%); }
+#app:has(#back) .summary strong { color: #39d0ff; }
+#app:has(#back) .panel { background: #09182f; border: 1px solid rgb(57 208 255 / 65%); border-radius: 20px; box-shadow: none; padding: 20px; }
+#app:has(#back) h2, #app:has(#back) h3 { color: #39d0ff; }
+#app:has(#back) h2 { font-size: 14px; font-weight: 600; text-transform: uppercase; }
+#app:has(#back) label { color: #f8feff; font-size: 14px; font-weight: 500; }
+#app:has(#back) input[type=number], #app:has(#back) select { background: #09182f; color: #f8feff; border: 1px solid rgb(57 208 255 / 65%); }
+#app:has(#back) button { min-height: 44px; background: #023863; color: #f8feff; border: 1px solid #39d0ff; box-shadow: none; }
+#app:has(#back) button:hover { background: #07507e; }
+#app:has(#back) button:disabled { opacity: .55; cursor: not-allowed; }
+#app:has(#back) .secondary { width: auto; background: #09182f; color: #f8feff; border: 1px solid rgb(57 208 255 / 65%); }
+#app:has(#back) .secondary:hover { background: #023863; border-color: #39d0ff; }
+#app:has(#back) .campaign-section { background: rgb(2 56 99 / 70%); border: 1px solid rgb(57 208 255 / 65%); }
+#app:has(#back) .campaign-card { background: #09182f; border: 1px solid rgb(57 208 255 / 65%); }
+#app:has(#back) .campaign-icon { background: #023863; color: #39d0ff; }
+#app:has(#back) .campaign-card p, #app:has(#back) .campaign-card span, #app:has(#back) .campaign-card small, #app:has(#back) .campaign-subtitle, #app:has(#back) .field-help, #app:has(#back) .event-note, #app:has(#back) .fine, #app:has(#back) details, #app:has(#back) .amount-input { color: rgb(248 254 255 / 70%); }
+#app:has(#back) table { font-size: 13px; }
+#app:has(#back) th { color: #39d0ff; }
+#app:has(#back) td, #app:has(#back) th { border-color: rgb(57 208 255 / 35%); }
+#app:has(#back) input[type=range] { accent-color: #39d0ff; }
+@media (max-width: 720px) {
+  #app:has(#back) .toolbar { flex-wrap: wrap; }
+  #app:has(#back) .summary { border-radius: 16px; }
+  #app:has(#back) .panel { padding: 16px; }
+  #app:has(#back) .layout > *, #app:has(#back) .row > * { min-width: 0; }
+  #app:has(#back) table { overflow-wrap: anywhere; }
+}
