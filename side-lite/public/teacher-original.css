@@ -1,0 +1,44 @@
+/* Estructura basada en docente.html y faculty-theme.css de SIDE Original. */
+body:has(.lite-teacher-shell){background:#081a34;color:#f8feff;font-family:Poppins,Arial,sans-serif}
+body:has(.lite-teacher-shell)>header{display:none}
+body:has(.lite-teacher-shell)>main{max-width:none;margin:0;padding:0}
+body:has(.lite-teacher-shell) #error:not(:empty){position:fixed;z-index:10;right:24px;top:12px;max-width:min(90vw,500px);padding:12px 16px;border:1px solid #39d0ff;border-radius:10px;background:#023863;color:#fff}
+.lite-teacher-shell{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr)}
+.lite-teacher-sidebar{position:sticky;top:0;align-self:start;height:100vh;padding:24px;background:#030712;display:flex;flex-direction:column;gap:0}
+.lite-teacher-brand{text-align:center;padding-bottom:24px;color:#f8feff;font-style:italic;font-size:68px;font-weight:800;letter-spacing:-4px;line-height:1.2}
+.lite-teacher-nav{display:flex;flex-direction:column;gap:12px}
+.lite-teacher-nav-btn,.lite-teacher-back{width:100%;min-height:50px;padding:14px 18px;border:1px solid transparent;border-radius:10px;background:transparent;color:#f8feff;font:600 16px Poppins,Arial,sans-serif;display:flex;justify-content:center;align-items:center;gap:8px;cursor:pointer}
+.lite-teacher-nav-btn img{display:none;width:20px;height:20px}
+.lite-teacher-nav-btn.active{background:#023863;border-color:#39d0ff;box-shadow:inset 0 0 0 1px rgb(57 208 255 / 20%)}
+.lite-teacher-nav-btn:hover,.lite-teacher-back:hover{background:#09182f;border-color:#39d0ff}
+.lite-teacher-back{margin-top:auto;background:#023863;border-color:rgb(57 208 255 / 65%);font-size:15px}
+.lite-teacher-content{min-width:0;padding:24px 24px 48px}
+.lite-teacher-topbar{margin:-24px -24px 20px;padding:24px;border-bottom:1px solid rgb(57 208 255 / 65%);box-shadow:0 3px 8px rgb(57 208 255 / 12%);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 20px}
+.lite-teacher-topbar h1{width:100%;order:1;margin:0;color:#f8feff;font-size:clamp(23px,2.1vw,30px);font-weight:600;line-height:1.35}
+.lite-teacher-eyebrow{width:100%;margin:0;color:#39d0ff;font-size:13px;font-weight:600}
+.lite-teacher-game-identity{order:2;color:#39d0ff}
+.lite-teacher-game-identity p{margin:4px 0 0;color:#f8feff}
+.lite-teacher-view[hidden]{display:none}
+.lite-teacher-view .panel,.lite-teacher-common .summary{background:#09182f;border:1px solid rgb(57 208 255 / 65%);border-radius:20px;box-shadow:none;color:#f8feff;padding:20px}
+.lite-teacher-view .panel h2{color:#39d0ff;font-size:14px;text-transform:uppercase}
+.lite-teacher-view label{color:#f8feff;font-size:14px;font-weight:500}
+.lite-teacher-view input:not([type=checkbox]),.lite-teacher-view select{background:#09182f;color:#f8feff;border:1px solid rgb(57 208 255 / 65%)}
+.lite-teacher-view input[type=checkbox]{accent-color:#39d0ff}
+.lite-teacher-view button{background:#023863;border:1px solid #39d0ff;color:#f8feff;min-height:44px}
+.lite-teacher-view button:hover{background:#07507e}
+.lite-teacher-view .secondary{width:auto}
+.lite-teacher-view td,.lite-teacher-view th{border-color:rgb(57 208 255 / 35%)}
+.lite-teacher-view th{color:#39d0ff}.lite-teacher-view .events small,.lite-teacher-view details{color:rgb(248 254 255 / 70%)}
+.lite-teacher-common .summary{padding:0}.lite-teacher-common .summary strong{color:#39d0ff}.lite-teacher-common .summary div{border-color:rgb(57 208 255 / 35%)}
+.lite-teacher-common .event-note{color:rgb(248 254 255 / 70%)}
+.lite-teacher-view .list{display:flex;gap:8px;flex-wrap:wrap}
+@media(min-width:1400px){.lite-teacher-shell{grid-template-columns:300px minmax(0,1fr)}}
+@media(max-width:820px){.lite-teacher-shell{display:block}.lite-teacher-sidebar{position:static;height:auto;padding:12px 16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px}.lite-teacher-brand{text-align:left;padding:0;font-size:36px;letter-spacing:-2px}.lite-teacher-nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.lite-teacher-nav-btn{min-height:44px;padding:8px 6px;font-size:12px;line-height:1.35}.lite-teacher-back{grid-column:2;grid-row:1;width:auto;min-height:44px;margin:0;padding:8px 10px;font-size:12px}.lite-teacher-content{padding:20px 16px 48px}.lite-teacher-topbar{margin:-20px -16px 20px;padding:20px 16px}.lite-teacher-view .panel{padding:16px}.lite-teacher-view table{overflow-wrap:anywhere}}
+
+.lite-teacher-signout{margin-top:12px;background:transparent;color:#f8feff;border:1px solid rgb(57 208 255 / 65%);min-height:44px;font:600 14px Poppins,Arial,sans-serif}.lite-teacher-signout:hover{background:#09182f}@media(max-width:820px){.lite-teacher-signout{grid-column:1/-1;margin:0}}
+/* Tarjetas de configuración adaptadas de docente.html y faculty-theme.css. */
+.lite-teacher-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px;margin-bottom:20px;border:1px solid rgb(57 208 255 / 65%);border-radius:20px;background:#09182f}.lite-teacher-hero h2{color:#f8feff;font-size:14px;font-weight:600;margin:2px 0}.lite-teacher-hero p{color:#b4c5d3;font-size:14px;line-height:1.5;margin:8px 0 0}.lite-teacher-hero-mark{font-style:italic;font-weight:800;font-size:54px;letter-spacing:-3px;color:#f8feff}.lite-teacher-view .lite-teacher-configuration.panel{background:none;border:0;padding:0}.lite-teacher-configuration>h2{display:none}.lite-teacher-config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.lite-teacher-config-card{padding:20px;border:1px solid rgb(57 208 255 / 65%);border-radius:20px;background:#09182f;min-width:0}.lite-teacher-card-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.lite-teacher-card-title h3{margin:0;color:#39d0ff;text-transform:uppercase;font-size:14px;font-weight:600}.lite-teacher-card-title span{color:#39d0ff;border:1px solid rgb(57 208 255 / 65%);border-radius:999px;padding:4px 9px;font-size:11px}.lite-teacher-config-card .events{grid-template-columns:repeat(2,minmax(0,1fr))}.lite-teacher-config-actions{text-align:right}.lite-teacher-configuration input,.lite-teacher-configuration select{max-width:100%}@media(max-width:820px){.lite-teacher-config-grid{grid-template-columns:1fr}.lite-teacher-hero-mark{font-size:38px}.lite-teacher-config-card{padding:16px}}
+.lite-teacher-shell input[type=text],.lite-teacher-shell input:not([type]){display:block;width:100%;background:#09182f;color:#f8feff;border:1px solid #39d0ff;border-radius:7px;padding:11px;margin-top:6px;font:inherit}
+/* Encabezados e información del panel docente original. */
+.lite-teacher-info{margin-bottom:20px;padding:16px;border:1px solid rgb(57 208 255 / 65%);border-radius:10px;background:#09182f;color:#b4c5d3;font-size:14px}
+.lite-teacher-section-head{display:flex;align-items:center;gap:16px;margin:24px 0 20px}.lite-teacher-section-head h2{margin:4px 0;color:#f8feff;font-size:26px;line-height:1.25}.lite-teacher-section-head p{margin:7px 0 0;color:#b4c5d3}.lite-teacher-section-icon{display:grid;place-items:center;width:52px;height:52px;flex:none;border:1px solid #39d0ff;border-radius:12px;background:#023863}.lite-teacher-section-icon img{width:30px;height:30px;object-fit:contain}@media(max-width:820px){.lite-teacher-section-head h2{font-size:20px}.lite-teacher-section-head{margin:20px 0 16px}}
